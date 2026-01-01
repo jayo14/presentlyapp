@@ -7,17 +7,48 @@ schema_view = get_schema_view(
    openapi.Info(
       title="Presently API",
       default_version='v1',
-      description="API documentation for the Presently application.",
+      description="""
+      # Presently API Documentation
+      
+      Complete API for the Presently attendance management system.
+      
+      ## Features
+      - 🔐 JWT Authentication
+      - 🎓 Institution, College, Department Management
+      - 📚 Course Management
+      - ✅ Attendance Sessions & Check-ins
+      - 📊 Real-time Analytics & Insights
+      - 🔔 Push Notifications (FCM)
+      - 📄 PDF/Excel Report Generation
+      - 🎯 Automated Exam Clearance
+      - 🗺️ GPS Geofencing
+      - 📱 QR Code Scanning
+      
+      ## Authentication
+      Use JWT tokens obtained from `/api/auth/login/` endpoint.
+      Include in request headers: `Authorization: Bearer <token>`
+      """,
       contact=openapi.Contact(email="contact@presently.app"),
-      license=openapi.License(name="MIT License"),
+      license=openapi.License(name="Proprietary License"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
-    path('', include('institutions.urls')),
+    # API Documentation
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('', schema_view.with_ui('swagger', cache_timeout=0), name='api-root'),
+    
+    # Core APIs
+    path('', include('institutions.urls')),  # Auth, Institutions, Courses, Sessions, Attendance
+    
+    # Feature APIs
+    path('notifications/', include('notifications.urls')),  # Push notifications, FCM
+    path('analytics/', include('analytics.urls')),  # Real-time analytics, insights
+    path('reports/', include('reports.urls')),  # PDF/Excel exports
+    path('exam-clearance/', include('exam_clearance.urls')),  # Exam clearance management
 ]
+
