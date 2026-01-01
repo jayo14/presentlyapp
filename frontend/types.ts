@@ -93,6 +93,35 @@ export interface Department {
   updated_at: string;
 }
 
+export interface Venue {
+  id: number;
+  institution_id: number;
+  institution_name?: string;
+  name: string;
+  code: string;
+  description?: string;
+  building_name?: string;
+  floor_number?: string;
+  room_number?: string;
+  capacity?: number;
+  
+  // Precise geolocation with elevation
+  latitude: number;
+  longitude: number;
+  elevation?: number;
+  
+  // Boundary/polygon for precise location mapping
+  boundary_coordinates?: number[][];  // Array of [lat, lng] pairs
+  
+  // Location verification settings
+  verification_radius: number;
+  
+  // Metadata
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface User {
   id: string;
   name: string;

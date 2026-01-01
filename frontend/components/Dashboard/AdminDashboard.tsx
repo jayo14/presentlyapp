@@ -4,6 +4,9 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Switch } from '../Switch';
 import { InstitutionManagement } from '../Admin/InstitutionManagement';
+import UserManagement from '../Admin/UserManagement';
+import VenueManagement from '../Admin/VenueManagement';
+import DepartmentManagement from '../Admin/DepartmentManagement';
 import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, GeolocateControl, Source, Layer, MapRef } from 'react-map-gl';
 import * as maplibregl from 'maplibre-gl';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
@@ -321,6 +324,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
 
   // 2. User Management View
   if (view === 'users') {
+    return <UserManagement />;
+  }
+
+  // 3. Venue Management View
+  if (view === 'venues') {
+    return <VenueManagement />;
+  }
+
+  // 4. Department Management View
+  if (view === 'departments') {
+    return <DepartmentManagement />;
+  }
+
+  // 5. Venue Management View (Old Map-based view - keeping as backup)
       return (
           <div className="space-y-6 animate-in fade-in">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
