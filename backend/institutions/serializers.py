@@ -1,3 +1,4 @@
+import secrets
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
@@ -152,7 +153,6 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         # Generate unique session code
-        import secrets
         validated_data['session_code'] = secrets.token_urlsafe(16)
         return super().create(validated_data)
 
