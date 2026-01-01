@@ -88,3 +88,32 @@ export const useChangePassword = () => {
       authApi.changePassword(oldPassword, newPassword),
   });
 };
+
+// Hook for requesting password reset
+export const useRequestPasswordReset = () => {
+  return useMutation({
+    mutationFn: (email: string) => authApi.requestPasswordReset(email),
+  });
+};
+
+// Hook for verifying reset token
+export const useVerifyResetToken = () => {
+  return useMutation({
+    mutationFn: ({ uid, token }: { uid: string; token: string }) =>
+      authApi.verifyResetToken(uid, token),
+  });
+};
+
+// Hook for resetting password
+export const useResetPassword = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: ({ uid, token, newPassword }: { uid: string; token: string; newPassword: string }) =>
+      authApi.resetPassword(uid, token, newPassword),
+    onSuccess: () => {
+      // Navigate to login after successful password reset
+      navigate('/login');
+    },
+  });
+};

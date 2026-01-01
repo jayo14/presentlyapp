@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     register_view, login_view, logout_view, current_user_view,
     complete_onboarding_view, change_password_view,
+    request_password_reset_view, reset_password_view, verify_reset_token_view,
     InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
     CourseViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet
 )
@@ -28,6 +29,11 @@ urlpatterns = [
     path('auth/onboarding/', complete_onboarding_view, name='complete-onboarding'),
     path('auth/change-password/', change_password_view, name='change-password'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    
+    # Password reset endpoints
+    path('auth/password-reset/request/', request_password_reset_view, name='request-password-reset'),
+    path('auth/password-reset/verify/', verify_reset_token_view, name='verify-reset-token'),
+    path('auth/password-reset/confirm/', reset_password_view, name='reset-password'),
     
     # Include router URLs
     path('', include(router.urls)),
