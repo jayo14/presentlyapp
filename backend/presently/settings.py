@@ -34,7 +34,14 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'drf_yasg',
+    'fcm_django',
+    # Presently apps
     'institutions',
+    'attendance',
+    'analytics',
+    'notifications',
+    'reports',
+    'exam_clearance',
 ]
 
 MIDDLEWARE = [
@@ -188,3 +195,29 @@ EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links
 FRONTEND_URL = 'http://localhost:5173'  # Update for production
+
+# Firebase Cloud Messaging (FCM) Configuration
+FCM_DJANGO_SETTINGS = {
+    "FCM_SERVER_KEY": os.environ.get('FCM_SERVER_KEY', ''),
+    "ONE_DEVICE_PER_USER": False,
+    "DELETE_INACTIVE_DEVICES": True,
+}
+
+# Firebase Admin SDK Configuration (for FCM)
+# Path to Firebase service account JSON file
+FIREBASE_SERVICE_ACCOUNT_KEY = os.environ.get('FIREBASE_SERVICE_ACCOUNT_KEY', '')
+
+# Celery Configuration for async tasks
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Report Generation Settings
+REPORTS_DIR = BASE_DIR / 'reports'
+REPORTS_DIR.mkdir(exist_ok=True)
+
+# Exam Clearance Settings
+EXAM_CLEARANCE_THRESHOLD = 75  # Minimum attendance percentage for exam clearance
