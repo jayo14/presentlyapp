@@ -379,8 +379,9 @@ class EmailVerificationOTP(models.Model):
     
     @staticmethod
     def generate_otp():
-        """Generate a 6-digit OTP"""
-        return ''.join(random.choices(string.digits, k=6))
+        """Generate a cryptographically secure 6-digit OTP"""
+        import secrets
+        return ''.join(secrets.choice(string.digits) for _ in range(6))
     
     @classmethod
     def create_otp(cls, user):
