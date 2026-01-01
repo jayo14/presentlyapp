@@ -117,3 +117,34 @@ export const useResetPassword = () => {
     },
   });
 };
+
+// Hook for sending email verification OTP
+export const useSendVerificationOTP = () => {
+  return useMutation({
+    mutationFn: (email: string) => authApi.sendVerificationOTP(email),
+  });
+};
+
+// Hook for verifying email with OTP
+export const useVerifyEmailOTP = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: ({ email, otp }: { email: string; otp: string }) =>
+      authApi.verifyEmailOTP(email, otp),
+    onSuccess: (response: any) => {
+      if (response.success && response.user) {
+        // Set current user in cache
+        queryClient.setQueryData(queryKeys.currentUser, response.user);
+        
+        // Navigate based on onboarding status
+        if (response.requires_onboarding) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
+      }
+    },
+  });
+};
