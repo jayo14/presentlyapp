@@ -51,7 +51,7 @@ class SendNotificationSerializer(serializers.Serializer):
         help_text="List of user IDs to send notification to"
     )
     title = serializers.CharField(max_length=200, required=True)
-    message = serializers.CharField(required=True)
+    message = serializers.CharField(max_length=2000, required=True)
     notification_type = serializers.ChoiceField(
         choices=Notification._meta.get_field('notification_type').choices,
         required=True
@@ -62,7 +62,7 @@ class SendNotificationSerializer(serializers.Serializer):
 class BroadcastNotificationSerializer(serializers.Serializer):
     """Serializer for broadcasting notifications"""
     title = serializers.CharField(max_length=200, required=True)
-    message = serializers.CharField(required=True)
+    message = serializers.CharField(max_length=2000, required=True)
     notification_type = serializers.ChoiceField(
         choices=Notification._meta.get_field('notification_type').choices,
         required=True
