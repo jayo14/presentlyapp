@@ -527,6 +527,8 @@ class InstitutionViewSet(viewsets.ModelViewSet):
         return [IsAdminUser()]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
         queryset = Institution.objects.all()
         # Non-admin users can only see active institutions
         if self.request.user.role != UserRole.ADMIN:
@@ -545,6 +547,8 @@ class CollegeViewSet(viewsets.ModelViewSet):
         return [IsAdminUser()]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
         queryset = College.objects.all()
         institution_id = self.request.query_params.get('institution', None)
         if institution_id:
@@ -566,6 +570,8 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         return [IsAdminUser()]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
         queryset = Department.objects.all()
         college_id = self.request.query_params.get('college', None)
         institution_id = self.request.query_params.get('institution', None)
@@ -592,6 +598,8 @@ class CourseViewSet(viewsets.ModelViewSet):
         return [IsLecturerOrAdmin()]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
         queryset = Course.objects.all()
         department_id = self.request.query_params.get('department', None)
         lecturer_id = self.request.query_params.get('lecturer', None)
@@ -621,6 +629,8 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         return [IsLecturerOrAdmin()]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
         queryset = AttendanceSession.objects.all()
         course_id = self.request.query_params.get('course', None)
         is_active = self.request.query_params.get('active', None)
@@ -683,6 +693,8 @@ class AttendanceViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
         queryset = Attendance.objects.all()
         session_id = self.request.query_params.get('session', None)
         student_id = self.request.query_params.get('student', None)
@@ -709,6 +721,8 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
         queryset = User.objects.all()
         role = self.request.query_params.get('role', None)
         institution_id = self.request.query_params.get('institution', None)
