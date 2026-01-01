@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 from django.core.validators import EmailValidator
 import uuid
+import random
+import string
 
 
 class UserRole(models.TextChoices):
@@ -196,6 +198,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     avatar_url = models.URLField(blank=True, null=True)
     onboarding_complete = models.BooleanField(default=False)
     
+    # Email verification
+    email_verified = models.BooleanField(default=False)
+    email_verified_at = models.DateTimeField(null=True, blank=True)
+    
     # Institutional Affiliation
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
     college = models.ForeignKey(College, on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
@@ -345,3 +351,44 @@ class Attendance(models.Model):
     
     def __str__(self):
         return f"{self.student.full_name} - {self.session}"
+
+
+class EmailVerificationOTP(models.Model):
+    """OTP for email verification"""
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verification_otps')
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'email_verification_otps'
+        indexes = [
+            models.Index(fields=['user', 'otp']),
+            models.Index(fields=['created_at']),
+        ]
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"OTP for {self.user.email} - {self.otp}"
+    
+    def is_valid(self):
+        """Check if OTP is still valid"""
+        return not self.is_used and timezone.now() < self.expires_at
+    
+    @staticmethod
+    def generate_otp():
+        """Generate a 6-digit OTP"""
+        return ''.join(random.choices(string.digits, k=6))
+    
+    @classmethod
+    def create_otp(cls, user):
+        """Create a new OTP for user"""
+        otp = cls.generate_otp()
+        expires_at = timezone.now() + timezone.timedelta(minutes=15)  # 15 minutes validity
+        return cls.objects.create(
+            user=user,
+            otp=otp,
+            expires_at=expires_at
+        )
