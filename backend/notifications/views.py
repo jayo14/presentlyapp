@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from institutions.models import User, UserRole
 from .models import Notification, FCMDevice, NotificationPreference
 from .serializers import (
     NotificationSerializer, FCMDeviceSerializer, NotificationPreferenceSerializer,
@@ -33,7 +35,6 @@ class MarkNotificationReadView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, pk):
-        from django.utils import timezone
         notification = get_object_or_404(Notification, pk=pk, user=request.user)
         notification.is_read = True
         notification.read_at = timezone.now()
@@ -46,7 +47,6 @@ class MarkAllReadView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        from django.utils import timezone
         count = Notification.objects.filter(user=request.user, is_read=False).update(
             is_read=True,
             read_at=timezone.now()
@@ -127,7 +127,6 @@ class SendNotificationView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        from institutions.models import User, UserRole
         # Only admins can send notifications
         if request.user.role != UserRole.ADMIN:
             return Response(
@@ -147,6 +146,8 @@ class SendNotificationView(APIView):
         
         # Create notifications for specified users
         notifications = []
+        failed_user_ids = []
+        
         for user_id in user_ids:
             try:
                 user = User.objects.get(id=user_id)
@@ -159,12 +160,18 @@ class SendNotificationView(APIView):
                 )
                 notifications.append(notification)
             except User.DoesNotExist:
-                pass
+                failed_user_ids.append(str(user_id))
         
-        return Response({
+        response_data = {
             'message': 'Notifications sent successfully',
             'recipients': len(notifications)
-        })
+        }
+        
+        if failed_user_ids:
+            response_data['warning'] = f'Failed to send to {len(failed_user_ids)} user(s)'
+            response_data['failed_user_ids'] = failed_user_ids
+        
+        return Response(response_data)
 
 
 class BroadcastNotificationView(APIView):
@@ -172,7 +179,6 @@ class BroadcastNotificationView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        from institutions.models import User, UserRole
         # Only admins can broadcast notifications
         if request.user.role != UserRole.ADMIN:
             return Response(
