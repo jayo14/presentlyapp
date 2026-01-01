@@ -168,6 +168,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5173',
+    'https://presentlyapp.vercel.app',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -201,7 +202,7 @@ DEFAULT_FROM_EMAIL = 'noreply@presently.app'
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links
-FRONTEND_URL = 'http://localhost:5173'  # Update for production
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://presentlyapp.vercel.app')
 
 # Firebase Cloud Messaging (FCM) Configuration
 FCM_DJANGO_SETTINGS = {

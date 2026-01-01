@@ -2,7 +2,7 @@
   "name": "Presently Smart Attendance",
   "short_name": "Presently",
   "description": "Smart Attendance Management System with AI-powered insights, GPS verification, and real-time analytics.",
-  "start_url": "/",
+  "start_url": "https://presentlyapp.vercel.app/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#09090b",
@@ -31,14 +31,14 @@
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "Go to your dashboard",
-      "url": "/dashboard",
+      "url": "https://presentlyapp.vercel.app/dashboard",
       "icons": [{ "src": "https://aistudiocdn.com/lucide-react/layout-dashboard.svg", "sizes": "96x96" }]
     },
     {
       "name": "Check In",
       "short_name": "Check In",
       "description": "Quick attendance check-in",
-      "url": "/dashboard?action=checkin",
+      "url": "https://presentlyapp.vercel.app/dashboard?action=checkin",
       "icons": [{ "src": "https://aistudiocdn.com/lucide-react/scan.svg", "sizes": "96x96" }]
     }
   ],
