@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Institution, College, Department, Course, AttendanceSession, Attendance
+from .models import User, Institution, College, Department, Course, AttendanceSession, Attendance, EmailVerificationOTP
 
 
 @admin.register(User)
@@ -89,4 +89,18 @@ class AttendanceAdmin(admin.ModelAdmin):
     search_fields = ['student__email', 'student__full_name', 'session__session_code']
     ordering = ['-checked_in_at']
     readonly_fields = ['checked_in_at']
+
+
+@admin.register(EmailVerificationOTP)
+class EmailVerificationOTPAdmin(admin.ModelAdmin):
+    """Admin configuration for EmailVerificationOTP model"""
+    list_display = ['user', 'otp', 'created_at', 'expires_at', 'is_used']
+    list_filter = ['is_used', 'created_at']
+    search_fields = ['user__email', 'otp']
+    ordering = ['-created_at']
+    readonly_fields = ['created_at']
+    
+    def has_add_permission(self, request):
+        # Prevent manual OTP creation through admin
+        return False
 
