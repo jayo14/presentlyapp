@@ -64,17 +64,19 @@ class ExamClearance(models.Model):
     def __str__(self):
         return f"{self.student.full_name} - {self.course.code} - {self.status}"
     
-    def calculate_attendance_percentage(self):
-        """Calculate and update attendance percentage"""
+    def calculate_attendance_percentage(self, save=True):
+        """Calculate attendance percentage (optionally save)"""
         if self.total_sessions > 0:
             self.attendance_percentage = (self.attended_sessions / self.total_sessions) * 100
         else:
             self.attendance_percentage = 0.0
-        self.save()
+        
+        if save:
+            self.save(update_fields=['attendance_percentage'])
     
     def check_clearance_status(self):
         """Check if student meets clearance requirements"""
-        self.calculate_attendance_percentage()
+        self.calculate_attendance_percentage(save=False)
         
         if (self.attendance_percentage >= self.minimum_attendance_required and 
             not self.has_outstanding_fees and 
@@ -85,6 +87,6 @@ class ExamClearance(models.Model):
             self.is_cleared = False
             self.status = ExamClearanceStatus.NOT_CLEARED
         
-        self.save()
+        self.save(update_fields=['attendance_percentage', 'is_cleared', 'status'])
         return self.is_cleared
 
