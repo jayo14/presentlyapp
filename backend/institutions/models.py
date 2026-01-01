@@ -248,6 +248,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             models.Index(fields=['matric_number']),
             models.Index(fields=['staff_id']),
         ]
+        ordering = ['-date_joined']
     
     def __str__(self):
         return f"{self.full_name} ({self.email})"
@@ -257,6 +258,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def get_short_name(self):
         return self.full_name.split()[0] if self.full_name else self.email
+    
+    @property
+    def username(self):
+        """Property to make the User model compatible with Django admin templates that expect a username field"""
+        return self.email
 
 
 class Course(models.Model):
