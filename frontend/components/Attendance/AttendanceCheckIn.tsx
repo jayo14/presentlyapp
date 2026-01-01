@@ -55,13 +55,19 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         elevation: position.altitude,
       };
 
-      // Find session by code first (we'd need to add this endpoint or search through sessions)
-      // For now, we'll assume we need the session ID
-      // In a real implementation, you'd have an endpoint that accepts session_code
+      // TODO: Implement endpoint that accepts session_code for lookup
+      // Backend needs: POST /sessions/check-in-by-code/ with { session_code, ...checkInData }
+      // For now this is a placeholder that will need the actual session ID
+      // In production, you should:
+      // 1. First call an endpoint to find session by code: GET /sessions/?session_code={code}
+      // 2. Then call check_in with the found session ID
       
-      // Placeholder: You should implement an endpoint that accepts session_code
-      // For now, let's simulate the check-in
-      const result = await sessionApi.checkIn(1, checkInData); // This needs to be updated to accept session_code
+      // Temporary workaround - this will fail without proper session ID
+      // const sessions = await sessionApi.getAll({ active: true });
+      // const session = sessions.find(s => s.session_code === sessionCode);
+      // if (!session) throw new Error('Session not found');
+      
+      const result = await sessionApi.checkIn(1, checkInData); // FIXME: Use actual session ID
       
       setCheckInResult(result);
 

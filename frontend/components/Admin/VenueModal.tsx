@@ -106,7 +106,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       setError('Institution is required');
       return;
     }
-    if (!formData.latitude || !formData.longitude) {
+    if (formData.latitude == null || formData.longitude == null) {
       setError('Latitude and longitude are required');
       return;
     }

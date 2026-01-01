@@ -90,12 +90,13 @@ export const pointInPolygon = (
   let inside = false;
 
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const [lat1, lon1] = polygon[i];
-    const [lat2, lon2] = polygon[j];
+    const [lat_i, lon_i] = polygon[i];
+    const [lat_j, lon_j] = polygon[j];
 
+    // Check if point's longitude is between the two vertices' longitudes
     const intersect =
-      lon1 > lon !== lon2 > lon &&
-      lat < ((lat2 - lat1) * (lon - lon1)) / (lon2 - lon1) + lat1;
+      ((lon_i > lon) !== (lon_j > lon)) &&
+      (lat < (lat_j - lat_i) * (lon - lon_i) / (lon_j - lon_i) + lat_i);
 
     if (intersect) inside = !inside;
   }
