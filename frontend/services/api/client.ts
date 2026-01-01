@@ -91,8 +91,9 @@ apiClient.interceptors.response.use(
           refresh: refreshToken,
         });
 
-        const { access } = response.data;
-        tokenManager.setTokens(access, refreshToken);
+        const { access, refresh } = response.data;
+        // Update both access and refresh tokens (rotation enabled)
+        tokenManager.setTokens(access, refresh);
 
         processQueue(null, access);
         originalRequest.headers.Authorization = `Bearer ${access}`;
