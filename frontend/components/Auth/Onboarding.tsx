@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
-import { UserRole } from '../../types';
+import { UserRole, Course } from '../../types';
 import { useCompleteOnboarding, useCurrentUser } from '../../hooks/useAuth';
 import { coursesApi } from '../../services/api';
 import { 
@@ -24,7 +24,7 @@ export const Onboarding: React.FC = () => {
   const completeOnboardingMutation = useCompleteOnboarding();
 
   // Courses state
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [coursesError, setCoursesError] = useState('');
 
@@ -38,7 +38,7 @@ export const Onboarding: React.FC = () => {
     assignedLecturer: ''
   });
 
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   
   const [permissions, setPermissions] = useState({
     notifications: false,
@@ -114,7 +114,7 @@ export const Onboarding: React.FC = () => {
     }
   };
 
-  const toggleCourseSelection = (courseId: string) => {
+  const toggleCourseSelection = (courseId: number) => {
     setSelectedCourses(prev => 
       prev.includes(courseId) 
         ? prev.filter(id => id !== courseId) 
@@ -369,11 +369,11 @@ export const Onboarding: React.FC = () => {
         <>
           <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-3 max-h-[400px]">
             {courses.map((course) => {
-                const isSelected = selectedCourses.includes(course.id.toString());
+                const isSelected = selectedCourses.includes(course.id);
                 return (
                     <button
                         key={course.id}
-                        onClick={() => toggleCourseSelection(course.id.toString())}
+                        onClick={() => toggleCourseSelection(course.id)}
                         className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
                             isSelected 
                                 ? 'bg-primary/10 border-primary shadow-lg shadow-primary/5' 
