@@ -3,8 +3,8 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import logout
 from django.db.models import Q
+import secrets
 
 from .models import User, Institution, College, Department, Course, AttendanceSession, Attendance, UserRole
 from .serializers import (
@@ -90,7 +90,6 @@ def logout_view(request):
         if refresh_token:
             token = RefreshToken(refresh_token)
             token.blacklist()
-        logout(request)
         return Response({
             'success': True,
             'message': 'Logout successful'

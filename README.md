@@ -310,7 +310,11 @@ Contributions are welcome! Please follow these steps:
 
 ## 📝 License
 
-[Add your license information here]
+**Proprietary Software - All Rights Reserved**
+
+This software is proprietary and confidential. Unauthorized copying, distribution, modification, or use of this software is strictly prohibited. See the [LICENSE](LICENSE) file for full details.
+
+For licensing inquiries or permissions, please contact the project maintainers.
 
 ---
 
