@@ -1,0 +1,190 @@
+# Add these views to institutions/views.py after the register_view
+
+def send_verification_email(user, otp_code):
+    """Send OTP verification email"""
+    subject = 'Verify Your Email - Presently'
+    
+    html_message = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+            .otp-box {{ background: white; border: 2px dashed #667eea; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }}
+            .otp-code {{ font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px; }}
+            .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎓 Presently</h1>
+                <p>Verify Your Email Address</p>
+            </div>
+            <div class="content">
+                <h2>Hello {user.full_name},</h2>
+                <p>Thank you for signing up for Presently! To complete your registration, please verify your email address using the OTP code below:</p>
+                
+                <div class="otp-box">
+                    <p style="margin: 0; color: #666;">Your Verification Code</p>
+                    <div class="otp-code">{otp_code}</div>
+                    <p style="margin: 10px 0 0 0; color: #999; font-size: 14px;">This code will expire in 15 minutes</p>
+                </div>
+                
+                <p>If you didn't create an account with Presently, please ignore this email.</p>
+            </div>
+            <div class="footer">
+                <p>© 2026 Presently. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    plain_message = f"""
+Hello {user.full_name},
+
+Thank you for signing up for Presently!
+
+Your email verification code is: {otp_code}
+
+This code will expire in 15 minutes.
+
+Best regards,
+The Presently Team
+    """
+    
+    send_mail(
+        subject,
+        plain_message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        html_message=html_message,
+        fail_silently=False,
+    )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def send_verification_otp_view(request):
+    """Send OTP to user's email for verification"""
+    email = request.data.get('email')
+    
+    if not email:
+        return Response({
+            'success': False,
+            'error': 'Email is required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        if user.email_verified:
+            return Response({
+                'success': False,
+                'error': 'Email is already verified'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Invalidate old OTPs
+        EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        # Create new OTP
+        otp_obj = EmailVerificationOTP.create_otp(user)
+        
+        # Send email
+        send_verification_email(user, otp_obj.otp)
+        
+        return Response({
+            'success': True,
+            'message': 'Verification OTP sent to your email',
+            'expires_in': 900  # 15 minutes in seconds
+        }, status=status.HTTP_200_OK)
+        
+    except User.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'User not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': 'Failed to send verification email'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_email_otp_view(request):
+    """Verify email using OTP"""
+    email = request.data.get('email')
+    otp = request.data.get('otp')
+    
+    if not all([email, otp]):
+        return Response({
+            'success': False,
+            'error': 'Email and OTP are required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        if user.email_verified:
+            return Response({
+                'success': False,
+                'error': 'Email is already verified'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get the latest valid OTP
+        otp_obj = EmailVerificationOTP.objects.filter(
+            user=user,
+            otp=otp,
+            is_used=False
+        ).order_by('-created_at').first()
+        
+        if not otp_obj:
+            return Response({
+                'success': False,
+                'error': 'Invalid OTP code'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not otp_obj.is_valid():
+            return Response({
+                'success': False,
+                'error': 'OTP has expired. Please request a new one.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Mark OTP as used
+        otp_obj.is_used = True
+        otp_obj.save()
+        
+        # Mark email as verified
+        user.email_verified = True
+        user.email_verified_at = timezone.now()
+        user.save()
+        
+        # Generate tokens
+        tokens = get_tokens_for_user(user)
+        
+        return Response({
+            'success': True,
+            'message': 'Email verified successfully',
+            'user': {
+                'id': str(user.id),
+                'email': user.email,
+                'full_name': user.full_name,
+                'role': user.role,
+                'email_verified': user.email_verified,
+                'onboarding_complete': user.onboarding_complete
+            },
+            'tokens': tokens,
+            'requires_onboarding': not user.onboarding_complete
+        }, status=status.HTTP_200_OK)
+        
+    except User.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'User not found'
+        }, status=status.HTTP_404_NOT_FOUND)
