@@ -1,0 +1,203 @@
+from rest_framework import serializers
+from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from .models import User, Institution, College, Department, Course, AttendanceSession, Attendance, UserRole
+
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    """Serializer for user registration"""
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True, label="Confirm Password")
+    
+    class Meta:
+        model = User
+        fields = ['email', 'full_name', 'password', 'password2']
+    
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+        return attrs
+    
+    def create(self, validated_data):
+        validated_data.pop('password2')
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password'],
+            full_name=validated_data['full_name'],
+            role=UserRole.STUDENT,  # Default role
+            onboarding_complete=False
+        )
+        return user
+
+
+class UserLoginSerializer(serializers.Serializer):
+    """Serializer for user login"""
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+        
+        if email and password:
+            user = authenticate(request=self.context.get('request'),
+                              username=email, password=password)
+            
+            if not user:
+                raise serializers.ValidationError('Invalid email or password.')
+            
+            if not user.is_active:
+                raise serializers.ValidationError('User account is disabled.')
+        else:
+            raise serializers.ValidationError('Must include "email" and "password".')
+        
+        attrs['user'] = user
+        return attrs
+
+
+class InstitutionSerializer(serializers.ModelSerializer):
+    """Serializer for Institution model"""
+    
+    class Meta:
+        model = Institution
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class CollegeSerializer(serializers.ModelSerializer):
+    """Serializer for College model"""
+    institution_name = serializers.CharField(source='institution.full_name', read_only=True)
+    
+    class Meta:
+        model = College
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    """Serializer for Department model"""
+    college_name = serializers.CharField(source='college.name', read_only=True)
+    institution_name = serializers.CharField(source='institution.full_name', read_only=True)
+    
+    class Meta:
+        model = Department
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """Serializer for user profile"""
+    institution_name = serializers.CharField(source='institution.full_name', read_only=True)
+    college_name = serializers.CharField(source='college.name', read_only=True)
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 'email', 'full_name', 'role', 'avatar_url', 'onboarding_complete',
+            'institution', 'institution_name', 'college', 'college_name',
+            'phone_number', 'matric_number', 'department', 'level',
+            'staff_id', 'courses', 'assigned_lecturer',
+            'notifications_enabled', 'location_enabled', 'dark_mode',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'email', 'created_at', 'updated_at']
+
+
+class OnboardingSerializer(serializers.ModelSerializer):
+    """Serializer for user onboarding"""
+    
+    class Meta:
+        model = User
+        fields = [
+            'role', 'phone_number', 'matric_number', 'department', 'level',
+            'staff_id', 'courses', 'assigned_lecturer', 'institution', 'college',
+            'avatar_url', 'notifications_enabled', 'location_enabled', 'dark_mode'
+        ]
+    
+    def update(self, instance, validated_data):
+        # Update all provided fields
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        
+        # Mark onboarding as complete
+        instance.onboarding_complete = True
+        instance.save()
+        return instance
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    """Serializer for Course model"""
+    department_name = serializers.CharField(source='department.name', read_only=True)
+    lecturer_name = serializers.CharField(source='lecturer.full_name', read_only=True)
+    
+    class Meta:
+        model = Course
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class AttendanceSessionSerializer(serializers.ModelSerializer):
+    """Serializer for Attendance Session model"""
+    course_name = serializers.CharField(source='course.title', read_only=True)
+    course_code = serializers.CharField(source='course.code', read_only=True)
+    attendee_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AttendanceSession
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at', 'session_code']
+    
+    def get_attendee_count(self, obj):
+        return obj.attendances.count()
+    
+    def create(self, validated_data):
+        # Generate unique session code
+        import secrets
+        validated_data['session_code'] = secrets.token_urlsafe(16)
+        return super().create(validated_data)
+
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    """Serializer for Attendance model"""
+    student_name = serializers.CharField(source='student.full_name', read_only=True)
+    student_matric = serializers.CharField(source='student.matric_number', read_only=True)
+    course_code = serializers.CharField(source='session.course.code', read_only=True)
+    
+    class Meta:
+        model = Attendance
+        fields = '__all__'
+        read_only_fields = ['checked_in_at']
+    
+    def validate(self, attrs):
+        # Check if student has already checked in for this session
+        session = attrs.get('session')
+        student = attrs.get('student')
+        
+        if Attendance.objects.filter(session=session, student=student).exists():
+            raise serializers.ValidationError("Student has already checked in for this session.")
+        
+        return attrs
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    """Serializer for password change"""
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    new_password2 = serializers.CharField(write_only=True, required=True, label="Confirm New Password")
+    
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password2']:
+            raise serializers.ValidationError({"new_password": "Password fields didn't match."})
+        return attrs
+    
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is incorrect.")
+        return value
+    
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user
