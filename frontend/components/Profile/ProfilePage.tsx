@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserRole } from '../../types';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { 
   User, Mail, Phone, MapPin, Calendar, Briefcase, GraduationCap, 
   BookOpen, Award, Clock, Edit2, Camera, Shield, Hash, Building,
-  Check, Users, Globe, Link as LinkIcon
+  Check, Users, Globe, Link as LinkIcon, Loader
 } from 'lucide-react';
+import { useCurrentUser } from '../../hooks/useAuth';
 
 interface ProfilePageProps {
   userRole: UserRole;
@@ -14,22 +15,42 @@ interface ProfilePageProps {
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole, userName }) => {
+  const { data: user, isLoading } = useCurrentUser();
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
     name: userName,
-    email: userName.toLowerCase().replace(' ', '.') + '@university.edu',
-    phone: '+234 812 345 6789',
-    location: 'Lagos, Nigeria',
-    bio: 'Passionate about technology and education. Always learning something new.',
-    // Role specific mocks
-    matricNumber: 'ENG/21/0452',
-    department: 'Computer Science',
-    level: '400',
-    cgpa: '4.52',
-    staffId: 'LEC/CS/007',
-    office: 'Faculty Block B, Rm 304',
-    specialization: 'Artificial Intelligence'
+    email: '',
+    phone: '',
+    location: '',
+    bio: '',
+    matricNumber: '',
+    department: '',
+    level: '',
+    cgpa: '',
+    staffId: '',
+    office: '',
+    specialization: ''
   });
+
+  // Update userData when user data is loaded
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        name: user.full_name || userName,
+        email: user.email || '',
+        phone: user.phone_number || '',
+        location: user.institution_name || '',
+        bio: '', // Can be added to backend later
+        matricNumber: user.matric_number || '',
+        department: user.department || '',
+        level: user.level || '',
+        cgpa: '', // Can be calculated from backend
+        staffId: user.staff_id || '',
+        office: '', // Can be added to backend later
+        specialization: user.courses || ''
+      });
+    }
+  }, [user, userName]);
 
   const getRoleBadgeColor = () => {
     switch (userRole) {
@@ -50,8 +71,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole, userName }) 
   return (
     <div className="max-w-6xl mx-auto pb-20 animate-in fade-in duration-500">
       
-      {/* Cover Image & Header */}
-      <div className="relative mb-24">
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <>
+          {/* Cover Image & Header */}
+          <div className="relative mb-24">
          <div className="h-48 md:h-64 w-full rounded-2xl overflow-hidden relative group">
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 dark:from-zinc-900 dark:to-zinc-800"></div>
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
@@ -127,16 +154,26 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole, userName }) 
                 <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
                     <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                         <Mail size={16} className="text-zinc-400" />
-                        <span>{userData.email}</span>
+                        <span>{userData.email || 'No email'}</span>
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
-                        <Phone size={16} className="text-zinc-400" />
-                        <span>{userData.phone}</span>
-                    </div>
-                     <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
-                        <LinkIcon size={16} className="text-zinc-400" />
-                        <a href="#" className="hover:text-primary transition-colors">university.edu/profile/jdoe</a>
-                    </div>
+                    {userData.phone && (
+                      <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+                          <Phone size={16} className="text-zinc-400" />
+                          <span>{userData.phone}</span>
+                      </div>
+                    )}
+                    {user?.institution_name && (
+                      <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+                          <Building size={16} className="text-zinc-400" />
+                          <span>{user.institution_name}</span>
+                      </div>
+                    )}
+                    {user?.college_name && (
+                      <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+                          <GraduationCap size={16} className="text-zinc-400" />
+                          <span>{user.college_name}</span>
+                      </div>
+                    )}
                 </div>
             </div>
 
@@ -250,6 +287,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole, userName }) 
         </div>
 
       </div>
+        </>
+      )}
     </div>
   );
 };
