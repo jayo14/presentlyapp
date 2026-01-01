@@ -3,55 +3,33 @@ import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
-import { requestPasswordReset } from '../../services/supabase/auth';
-
-interface ForgotPasswordProps {
-  onBack: () => void;
-  onLoginClick: () => void;
-}
+import { useRequestPasswordReset } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 type PageState = 'form' | 'sent' | 'error';
 
-export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onLoginClick }) => {
+export const ForgotPassword: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [pageState, setPageState] = useState<PageState>('form');
+  const requestPasswordResetMutation = useRequestPasswordReset();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      // Validate email
-      if (!email || !email.includes('@')) {
-        setError('Please enter a valid email address');
-        setLoading(false);
-        return;
-      }
-
-      const result = await requestPasswordReset(email);
-
-      if (result.success) {
-        setPageState('sent');
-      } else {
-        setError(result.error || 'Failed to send reset email');
-        setPageState('error');
-      }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
-      setPageState('error');
-    } finally {
-      setLoading(false);
-    }
+    requestPasswordResetMutation.mutate(email, {
+      onSuccess: () => setPageState('sent'),
+      onError: () => setPageState('error'),
+    });
   };
 
   const handleReset = () => {
     setEmail('');
-    setError('');
+    requestPasswordResetMutation.reset();
     setPageState('form');
   };
+
+  const onBack = () => navigate(-1);
+  const onLoginClick = () => navigate('/login');
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
@@ -74,13 +52,12 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onLoginC
         </div>
 
         <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-2xl shadow-2xl">
-          {/* Form State */}
           {pageState === 'form' && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
+              {requestPasswordResetMutation.error && (
                 <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm flex items-start gap-2">
                   <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
-                  <span>{error}</span>
+                  <span>{requestPasswordResetMutation.error.message}</span>
                 </div>
               )}
 
@@ -92,15 +69,16 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onLoginC
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
+                disabled={requestPasswordResetMutation.isPending}
               />
 
               <Button
                 type="submit"
-                disabled={loading || !email}
+                disabled={requestPasswordResetMutation.isPending || !email}
                 className="w-full mt-6"
+                isLoading={requestPasswordResetMutation.isPending}
               >
-                {loading ? 'Sending...' : 'Send Reset Link'}
+                Send Reset Link
               </Button>
 
               <div className="mt-4 text-center text-sm">
@@ -118,7 +96,6 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onLoginC
             </form>
           )}
 
-          {/* Success State */}
           {pageState === 'sent' && (
             <div className="space-y-6 text-center">
               <div className="flex justify-center">
@@ -132,38 +109,13 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onLoginC
                 <p className="text-zinc-400 text-sm">
                   We've sent a password reset link to <span className="font-medium text-white">{email}</span>
                 </p>
-                <p className="text-zinc-400 text-sm">
-                  Please check your email and follow the link to reset your password.
-                </p>
               </div>
-
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 text-left">
-                <p className="text-xs text-zinc-400 font-medium mb-2">TIPS:</p>
-                <ul className="text-xs text-zinc-400 space-y-1">
-                  <li>• Check your spam/junk folder if you don't see the email</li>
-                  <li>• The reset link expires in 24 hours</li>
-                  <li>• If you don't receive it, try requesting another link</li>
-                </ul>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleReset}
-                  className="flex-1 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg font-medium transition-colors border border-zinc-800"
-                >
-                  Try Another Email
-                </button>
-                <button
-                  onClick={onLoginClick}
-                  className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors"
-                >
-                  Back to Sign In
-                </button>
-              </div>
+              <Button onClick={onLoginClick} className="w-full">
+                Back to Sign In
+              </Button>
             </div>
           )}
 
-          {/* Error State */}
           {pageState === 'error' && (
             <div className="space-y-6 text-center">
               <div className="flex justify-center">
@@ -171,49 +123,19 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack, onLoginC
                   <AlertCircle size={48} className="text-red-500" />
                 </div>
               </div>
-
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-white">Something went wrong</h3>
                 <p className="text-zinc-400 text-sm">
-                  {error || 'We encountered an error while sending the reset email.'}
+                  {requestPasswordResetMutation.error?.message || 'We could not send a reset link.'}
                 </p>
               </div>
-
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 text-left">
-                <p className="text-xs text-zinc-400 font-medium mb-2">WHAT YOU CAN DO:</p>
-                <ul className="text-xs text-zinc-400 space-y-1">
-                  <li>• Double-check your email address</li>
-                  <li>• Make sure the email is registered with us</li>
-                  <li>• Try again in a few moments</li>
-                  <li>• Contact support if the problem persists</li>
-                </ul>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleReset}
-                  className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors"
-                >
-                  Try Again
-                </button>
-                <button
-                  onClick={onLoginClick}
-                  className="flex-1 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg font-medium transition-colors border border-zinc-800"
-                >
-                  Back to Sign In
-                </button>
-              </div>
+              <Button onClick={handleReset} className="w-full">
+                Try Again
+              </Button>
             </div>
           )}
-        </div>
-
-        {/* Footer Help */}
-        <div className="mt-6 text-center text-xs text-zinc-500">
-          <p>Need help? <a href="mailto:support@presently.com" className="text-primary hover:underline">Contact support</a></p>
         </div>
       </div>
     </div>
   );
 };
-
-export default ForgotPassword;

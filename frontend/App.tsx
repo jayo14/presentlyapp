@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { LandingPage } from './components/LandingPage';
 import { Login } from './components/Auth/Login';
 import { Register } from './components/Auth/Register';
@@ -20,120 +20,30 @@ import { AiAssistant } from './components/Dashboard/AiAssistant';
 import { SettingsPage } from './components/Settings/SettingsPage';
 import { NotFound } from './components/NotFound';
 import { UnauthorizedPage } from './components/UnauthorizedPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { UserRole } from './types';
-import { supabase } from './services/supabase/client';
-import { getCurrentUserProfile } from './services/supabase/auth';
+import { useCurrentUser, useLogout } from './hooks/useAuth';
 
-// Auth context wrapper component
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [userName, setUserName] = useState<string>('User');
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string>('');
-  const [dashboardPage, setDashboardPage] = useState('dashboard'); // Sub-navigation within Layout
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: user, isLoading } = useCurrentUser();
+  const logoutMutation = useLogout();
+  const [dashboardPage, setDashboardPage] = useState('dashboard');
 
-  // Check for existing session on mount
   useEffect(() => {
-    checkSession();
-
-    // Listen for auth changes only if Supabase is configured
-    if (!supabase) {
-      return () => {}; // Return empty cleanup function
+    if (!isLoading && user && !user.onboarding_complete) {
+      navigate('/onboarding', { replace: true });
     }
+  }, [user, isLoading, navigate]);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        await loadUserProfile(session.user.id);
-      } else if (event === 'SIGNED_OUT') {
-        handleLogout();
-      } else if (event === 'USER_UPDATED') {
-        if (session?.user) {
-          await loadUserProfile(session.user.id);
-        }
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const checkSession = async () => {
-    try {
-      if (!supabase) {
-        setIsLoading(false);
-        return;
-      }
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        await loadUserProfile(session.user.id);
-      }
-    } catch (error) {
-      console.error('Session check error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadUserProfile = async (uid: string) => {
-    const profile = await getCurrentUserProfile();
-    if (profile) {
-      setUserId(uid);
-      setUserEmail(profile.email);
-      setUserName(profile.name);
-      setUserRole(profile.role);
-      
-      if (!profile.onboardingComplete) {
-        navigate('/onboarding', { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
-    }
-  };
-
-  const handleLogin = (role: UserRole, name: string, uid?: string, email?: string) => {
-    setUserRole(role);
-    setUserName(name);
-    if (uid) setUserId(uid);
-    if (email) setUserEmail(email);
-    navigate('/dashboard');
-    setDashboardPage('dashboard');
-  };
-
-  const handleRegisterSuccess = (name: string, email: string, requiresVerification: boolean) => {
-    setUserName(name);
-    setUserEmail(email);
-    if (requiresVerification) {
-      navigate('/email-verification');
-    } else {
-      navigate('/onboarding');
-    }
-  };
-
-  const handleOnboardingComplete = (role: UserRole) => {
-    setUserRole(role);
-    navigate('/dashboard');
+  const handleDashboardNavChange = (page: string) => {
+    setDashboardPage(page);
   };
 
   const handleLogout = async () => {
-    setUserRole(null);
-    setUserName('User');
-    setUserId(null);
-    setUserEmail('');
-    navigate('/');
-    setDashboardPage('dashboard');
-  };
-  
-  // Handle sub-navigation change from Sidebar
-  const handleDashboardNavChange = (page: string) => {
-      setDashboardPage(page);
+    logoutMutation.mutate();
   };
 
-  // Show loading state while checking session
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -145,71 +55,67 @@ const AppContent: React.FC = () => {
     );
   }
 
+  const renderDashboard = () => {
+    if (!user) return null;
+    switch (user.role) {
+      case UserRole.STUDENT:
+        return <StudentDashboard userName={user.full_name} view={dashboardPage} />;
+      case UserRole.LECTURER:
+        return <LecturerDashboard userName={user.full_name} view={dashboardPage} />;
+      case UserRole.ADMIN:
+        return <AdminDashboard userName={user.full_name} view={dashboardPage} />;
+      case UserRole.CLASS_REP:
+        return <ClassRepDashboard userName={user.full_name} view={dashboardPage} />;
+      default:
+        return <Navigate to="/unauthorized" replace />;
+    }
+  };
+
   return (
     <Routes>
       <Route path="/" element={<LandingPage onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />} />
-      
-      <Route path="/login" element={<Login onLogin={handleLogin} onRegisterClick={() => navigate('/register')} onBack={() => navigate('/')} userId={userId} />} />
-      
-      <Route path="/register" element={<Register onRegister={handleRegisterSuccess} onLoginClick={() => navigate('/login')} onBack={() => navigate('/')} />} />
-      
-      <Route path="/forgot-password" element={<ForgotPassword onBack={() => navigate('/login')} onLoginClick={() => navigate('/login')} />} />
-      
-      <Route path="/reset-password" element={<ResetPassword onBack={() => navigate('/login')} />} />
-      
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
-      
-      <Route path="/email-verification" element={<EmailVerificationSent email={userEmail} onBack={() => navigate('/login')} />} />
-      
+      <Route path="/email-verification" element={<EmailVerificationSent />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       
-      <Route path="/onboarding" element={
-        userId ? (
-          <Onboarding onComplete={handleOnboardingComplete} userId={userId} userName={userName} />
-        ) : (
-          <Navigate to="/login" replace />
-        )
-      } />
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute>
+            <Onboarding />
+          </ProtectedRoute>
+        }
+      />
       
-      <Route path="/dashboard" element={
-        userRole ? (
-          <Layout 
-            userRole={userRole}
-            userName={userName}
-            onLogout={handleLogout}
-            currentPage={dashboardPage}
-            setCurrentPage={handleDashboardNavChange}
-          >
-            {dashboardPage === 'profile' && (
-                 <ProfilePage userRole={userRole} userName={userName} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            {user && (
+              <Layout
+                userRole={user.role}
+                userName={user.full_name}
+                onLogout={handleLogout}
+                currentPage={dashboardPage}
+                setCurrentPage={handleDashboardNavChange}
+              >
+                {dashboardPage === 'profile' && <ProfilePage userRole={user.role} userName={user.full_name} />}
+                {dashboardPage === 'notifications' && <NotificationsPage />}
+                {dashboardPage === 'settings' && <SettingsPage userRole={user.role} onLogout={handleLogout} />}
+                {dashboardPage !== 'profile' && dashboardPage !== 'notifications' && dashboardPage !== 'settings' && renderDashboard()}
+                <AiAssistant />
+              </Layout>
             )}
-            {dashboardPage === 'notifications' && (
-                 <NotificationsPage />
-            )}
-            
-            {/* Dashboard Role Routing */}
-            {dashboardPage !== 'profile' && dashboardPage !== 'notifications' && dashboardPage !== 'settings' && (
-                <>
-                    {userRole === UserRole.STUDENT && <StudentDashboard userName={userName} view={dashboardPage} />}
-                    {userRole === UserRole.LECTURER && <LecturerDashboard userName={userName} view={dashboardPage} />}
-                    {userRole === UserRole.ADMIN && <AdminDashboard userName={userName} view={dashboardPage} />}
-                    {userRole === UserRole.CLASS_REP && <ClassRepDashboard userName={userName} view={dashboardPage} />}
-                </>
-            )}
-
-            {dashboardPage === 'settings' && (
-                <SettingsPage userRole={userRole} onLogout={handleLogout} />
-            )}
-            <AiAssistant />
-          </Layout>
-        ) : (
-          <Navigate to="/login" replace />
-        )
-      } />
-      
-      <Route path="*" element={<NotFound onBack={() => navigate('/')} />} />
+          </ProtectedRoute>
+        }
+      />
       
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <Route path="*" element={<NotFound onBack={() => navigate('/')} />} />
     </Routes>
   );
 };

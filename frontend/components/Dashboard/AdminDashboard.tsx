@@ -3,7 +3,7 @@ import { Users, Map as MapIcon, ShieldAlert, Activity, Search, MapPin, Settings,
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Switch } from '../Switch';
-import InstitutionManagement from '../Admin/InstitutionManagement';
+import { InstitutionManagement } from '../Admin/InstitutionManagement';
 import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, GeolocateControl, Source, Layer, MapRef } from 'react-map-gl';
 import * as maplibregl from 'maplibre-gl';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
