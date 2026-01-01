@@ -7,7 +7,7 @@ from .views import (
     complete_onboarding_view, change_password_view,
     send_verification_otp_view, verify_email_otp_view,
     request_password_reset_view, reset_password_view, verify_reset_token_view,
-    InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
+    InstitutionViewSet, CollegeViewSet, DepartmentViewSet, VenueViewSet,
     CourseViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet
 )
 
@@ -16,6 +16,7 @@ router = DefaultRouter()
 router.register(r'institutions', InstitutionViewSet, basename='institution')
 router.register(r'colleges', CollegeViewSet, basename='college')
 router.register(r'departments', DepartmentViewSet, basename='department')
+router.register(r'venues', VenueViewSet, basename='venue')
 router.register(r'courses', CourseViewSet, basename='course')
 router.register(r'sessions', AttendanceSessionViewSet, basename='session')
 router.register(r'attendances', AttendanceViewSet, basename='attendance')
