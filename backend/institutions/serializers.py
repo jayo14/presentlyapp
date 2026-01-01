@@ -177,15 +177,6 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 
-class VenueSerializer(serializers.ModelSerializer):
-    """Serializer for Venue"""
-    
-    class Meta:
-        model = Venue
-        fields = '__all__'
-        read_only_fields = ['created_at', 'updated_at']
-
-
 class TimetableSerializer(serializers.ModelSerializer):
     """Serializer for Timetable (DEFERRED FEATURE - Read-only)"""
     course_details = CourseSerializer(source='course', read_only=True)
