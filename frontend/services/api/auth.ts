@@ -135,4 +135,26 @@ export const authApi = {
   isAuthenticated: (): boolean => {
     return !!tokenManager.getAccessToken();
   },
+
+  // Request password reset email
+  requestPasswordReset: async (email: string): Promise<{ success: boolean; message?: string; error?: string }> => {
+    const response = await apiClient.post('/auth/password-reset/request/', { email });
+    return response.data;
+  },
+
+  // Verify password reset token
+  verifyResetToken: async (uid: string, token: string): Promise<{ success: boolean; valid: boolean; email?: string; error?: string }> => {
+    const response = await apiClient.post('/auth/password-reset/verify/', { uid, token });
+    return response.data;
+  },
+
+  // Reset password with token
+  resetPassword: async (uid: string, token: string, newPassword: string): Promise<{ success: boolean; message?: string; error?: string }> => {
+    const response = await apiClient.post('/auth/password-reset/confirm/', {
+      uid,
+      token,
+      new_password: newPassword,
+    });
+    return response.data;
+  },
 };
