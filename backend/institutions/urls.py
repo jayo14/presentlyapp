@@ -8,7 +8,8 @@ from .views import (
     send_verification_otp_view, verify_email_otp_view,
     request_password_reset_view, reset_password_view, verify_reset_token_view,
     InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
-    CourseViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet
+    CourseViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet,
+    VenueViewSet, TimetableViewSet
 )
 
 # Create router for ViewSets
@@ -20,6 +21,8 @@ router.register(r'courses', CourseViewSet, basename='course')
 router.register(r'sessions', AttendanceSessionViewSet, basename='session')
 router.register(r'attendances', AttendanceViewSet, basename='attendance')
 router.register(r'users', UserViewSet, basename='user')
+router.register(r'venues', VenueViewSet, basename='venue')
+router.register(r'timetables', TimetableViewSet, basename='timetable')  # Read-only, deferred
 
 urlpatterns = [
     # Authentication endpoints
@@ -39,6 +42,9 @@ urlpatterns = [
     path('auth/password-reset/request/', request_password_reset_view, name='request-password-reset'),
     path('auth/password-reset/verify/', verify_reset_token_view, name='verify-reset-token'),
     path('auth/password-reset/confirm/', reset_password_view, name='reset-password'),
+    
+    # Public check-in (QR code URL)
+    path('check-in/<str:session_code>/', __import__('institutions.views', fromlist=['public_check_in_view']).public_check_in_view, name='public-check-in'),
     
     # Include router URLs
     path('', include(router.urls)),
