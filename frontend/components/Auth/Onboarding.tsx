@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
 import { UserRole } from '../../types';
-import { PaymentGateway } from './PaymentGateway';
 import { useCompleteOnboarding, useCurrentUser } from '../../hooks/useAuth';
 import { 
-  User, BookOpen, Bell, MapPin, Check, Users, Upload, 
+  User, Bell, MapPin, Check, Upload, 
   Moon, Sun, Camera, Smartphone, ChevronRight, ChevronLeft,
   GraduationCap, Briefcase, UserCheck, X, Plus
 } from 'lucide-react';
@@ -32,10 +31,6 @@ export const Onboarding: React.FC = () => {
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [error, setError] = useState('');
   
-  const [showPayment, setShowPayment] = useState(false);
-  const [hasPaid, setHasPaid] = useState(false);
-  const [isPaymentEnabled, setIsPaymentEnabled] = useState(false);
-  
   const { data: user } = useCurrentUser();
   const completeOnboardingMutation = useCompleteOnboarding();
 
@@ -57,24 +52,19 @@ export const Onboarding: React.FC = () => {
     darkMode: true
   });
 
-  useEffect(() => {
-    const storedSetting = localStorage.getItem('PAYMENT_GATEWAY_ENABLED');
-    setIsPaymentEnabled(storedSetting === 'true');
-  }, []);
-
+  // Calculate total steps based on role
   const totalSteps = selectedRole === UserRole.STUDENT ? 5 : 4;
 
   const handleNext = async () => {
-    if (step === 1 && selectedRole && isPaymentEnabled && !hasPaid) {
-        setShowPayment(true);
-        return;
-    }
-
     if (step < totalSteps) {
       setDirection(1);
       setStep(step + 1);
     } else {
+      // Complete onboarding
       if (selectedRole) {
+        setError('');
+        
+        // Prepare onboarding data
         const onboardingData = {
           role: selectedRole,
           phone_number: formData.phoneNumber || undefined,
@@ -89,6 +79,7 @@ export const Onboarding: React.FC = () => {
           location_enabled: permissions.location,
           dark_mode: permissions.darkMode,
         };
+
         completeOnboardingMutation.mutate(onboardingData);
       }
     }
@@ -99,13 +90,6 @@ export const Onboarding: React.FC = () => {
       setDirection(-1);
       setStep(step - 1);
     }
-  };
-
-  const handlePaymentSuccess = () => {
-      setHasPaid(true);
-      setShowPayment(false);
-      setDirection(1);
-      setStep(step + 1);
   };
 
   const togglePermission = (key: 'notifications' | 'location' | 'darkMode') => {
@@ -149,12 +133,22 @@ export const Onboarding: React.FC = () => {
   };
 
   const variants = {
-    enter: (direction: number) => ({ x: direction > 0 ? 50 : -50, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (direction: number) => ({ x: direction < 0 ? 50 : -50, opacity: 0 })
+    enter: (direction: number) => ({
+      x: direction > 0 ? 50 : -50,
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 50 : -50,
+      opacity: 0
+    })
   };
 
   // --- Step Content Renderers ---
+
   const renderRoleSelection = () => (
     <div className="space-y-4">
       <div className="text-center mb-6">
@@ -197,376 +191,318 @@ export const Onboarding: React.FC = () => {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white mb-2">Personal Details</h2>
-        <p className="text-zinc-500">Let's set up your profile, {user?.full_name}.</p>
+        <p className="text-zinc-500">Let's set up your profile.</p>
+      </div>
+
+      <div className="flex flex-col items-center mb-8 gap-4">
+        <div className="relative group cursor-pointer">
+           <div className="w-28 h-28 rounded-full bg-zinc-800 overflow-hidden border-4 border-zinc-900 ring-2 ring-zinc-800 group-hover:ring-primary transition-all">
+              {pendingImage ? (
+                  <img src={pendingImage} alt="Preview" className="w-full h-full object-cover opacity-80" />
+              ) : profileImage ? (
+                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                  <div className="w-full h-full flex items-center justify-center text-zinc-600">
+                      <User size={40} />
+                  </div>
+              )}
+           </div>
+           
+           {!pendingImage && (
+             <label className="absolute bottom-0 right-0 bg-primary text-black p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110">
+                <Camera size={16} />
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+             </label>
+           )}
+        </div>
+
+        {pendingImage && (
+            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <Button size="sm" variant="secondary" onClick={cancelImage} className="h-8">
+                    <X size={14} className="mr-1" /> Cancel
+                </Button>
+                <Button size="sm" onClick={confirmImage} className="h-8">
+                    <Check size={14} className="mr-1" /> Confirm Photo
+                </Button>
+            </div>
+        )}
       </div>
 
       <div className="space-y-4">
-        <Input
-          label="Phone Number"
+        <Input 
           name="phoneNumber"
-          type="tel"
+          label="Phone Number" 
+          placeholder="+234 800 000 0000" 
+          icon={<Smartphone size={16} />}
           value={formData.phoneNumber}
           onChange={handleInputChange}
-          placeholder="+234 800 000 0000"
         />
+      </div>
+    </div>
+  );
 
-        {selectedRole === UserRole.STUDENT && (
-          <>
-            <Input
-              label="Matric Number"
-              name="matricNumber"
-              value={formData.matricNumber}
-              onChange={handleInputChange}
-              placeholder="e.g., 20/0001"
-            />
-            <Input
-              label="Department"
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              placeholder="e.g., Computer Science"
-            />
-            <Input
-              label="Level"
-              name="level"
-              value={formData.level}
-              onChange={handleInputChange}
-              placeholder="e.g., 400"
-            />
-          </>
+  const renderAcademicDetails = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-white mb-2">Academic Info</h2>
+        <p className="text-zinc-500">
+           {selectedRole === UserRole.LECTURER ? 'Tell us about your teaching role.' : 'Tell us about your course of study.'}
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {(selectedRole === UserRole.STUDENT || selectedRole === UserRole.CLASS_REP) && (
+            <>
+                <Input 
+                    name="matricNumber"
+                    label="Matriculation Number" 
+                    placeholder="e.g. ENG/2021/001" 
+                    value={formData.matricNumber}
+                    onChange={handleInputChange}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                    <Input 
+                        name="department"
+                        label="Department" 
+                        placeholder="Comp. Sci" 
+                        value={formData.department}
+                        onChange={handleInputChange}
+                    />
+                    <Input 
+                        name="level"
+                        label="Level" 
+                        placeholder="400" 
+                        value={formData.level}
+                        onChange={handleInputChange}
+                    />
+                </div>
+            </>
         )}
 
-        {selectedRole === UserRole.LECTURER && (
-          <>
-            <Input
-              label="Staff ID"
-              name="staffId"
-              value={formData.staffId}
-              onChange={handleInputChange}
-              placeholder="e.g., STAFF/2024/001"
-            />
-            <Input
-              label="Department"
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              placeholder="e.g., Computer Science"
-            />
-          </>
+        {selectedRole === UserRole.STUDENT && (
+             <div className="w-full">
+                 <label className="block text-sm font-medium text-zinc-400 mb-1.5">Digital Signature <span className="text-zinc-600 font-normal">(Optional)</span></label>
+                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-900 hover:border-primary/50 cursor-pointer transition-colors group">
+                    <Upload className="h-6 w-6 text-zinc-600 group-hover:text-primary mb-2 transition-colors" />
+                    <p className="text-xs text-zinc-500 group-hover:text-zinc-300">Upload signature image</p>
+                 </div>
+            </div>
         )}
 
         {selectedRole === UserRole.CLASS_REP && (
-          <>
-            <Input
-              label="Department"
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              placeholder="e.g., Computer Science"
+            <Input 
+                name="assignedLecturer"
+                label="Assigned Lecturer / Course" 
+                placeholder="Dr. Smith - CS402" 
+                value={formData.assignedLecturer}
+                onChange={handleInputChange}
             />
-            <Input
-              label="Assigned Lecturer"
-              name="assignedLecturer"
-              value={formData.assignedLecturer}
-              onChange={handleInputChange}
-              placeholder="Lecturer's name"
-            />
-          </>
+        )}
+
+        {selectedRole === UserRole.LECTURER && (
+            <>
+                <Input 
+                    name="staffId"
+                    label="Staff ID" 
+                    placeholder="e.g. STF/001" 
+                    value={formData.staffId}
+                    onChange={handleInputChange}
+                />
+                <Input 
+                    name="department"
+                    label="Department" 
+                    placeholder="Computer Science" 
+                    value={formData.department}
+                    onChange={handleInputChange}
+                />
+                 <Input 
+                    name="courses"
+                    label="Courses Taught" 
+                    placeholder="CS101, CS202..." 
+                    value={formData.courses}
+                    onChange={handleInputChange}
+                />
+            </>
         )}
       </div>
     </div>
   );
 
-  const renderProfilePhoto = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Profile Photo</h2>
-        <p className="text-zinc-500">Add a photo to personalize your account</p>
+  const renderCourseRegistration = () => (
+    <div className="space-y-6 h-full flex flex-col">
+      <div className="text-center mb-4">
+        <h2 className="text-2xl font-bold text-white mb-2">Register Courses</h2>
+        <p className="text-zinc-500">Select courses to add to your dashboard.</p>
       </div>
 
-      <div className="flex flex-col items-center gap-6">
-        {pendingImage ? (
-          <div className="space-y-4 w-full max-w-xs">
-            <div className="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-zinc-800">
-              <img src={pendingImage} alt="Preview" className="w-full h-full object-cover" />
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={confirmImage} className="flex-1">
-                <Check size={16} className="mr-2" /> Confirm
-              </Button>
-              <Button onClick={cancelImage} variant="secondary" className="flex-1">
-                <X size={16} className="mr-2" /> Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <label className="cursor-pointer group">
-            <div className="w-40 h-40 rounded-full border-2 border-dashed border-zinc-700 hover:border-primary transition-colors flex flex-col items-center justify-center bg-zinc-900/50 hover:bg-zinc-900">
-              {profileImage ? (
-                <img src={profileImage} alt="Profile" className="w-full h-full object-cover rounded-full" />
-              ) : (
-                <>
-                  <Camera size={32} className="text-zinc-500 group-hover:text-primary transition-colors mb-2" />
-                  <p className="text-sm text-zinc-500 group-hover:text-primary transition-colors">Upload Photo</p>
-                </>
-              )}
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-            />
-          </label>
-        )}
-        <p className="text-xs text-zinc-500 text-center">Optional - you can skip this step</p>
+      <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-3 max-h-[400px]">
+        {AVAILABLE_COURSES.map((course) => {
+            const isSelected = selectedCourses.includes(course.id);
+            return (
+                <button
+                    key={course.id}
+                    onClick={() => toggleCourseSelection(course.id)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                        isSelected 
+                            ? 'bg-primary/10 border-primary shadow-lg shadow-primary/5' 
+                            : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                    }`}
+                >
+                    <div className="text-left">
+                        <div className="flex items-center gap-2">
+                             <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-white'}`}>{course.id}</span>
+                             <span className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">{course.level}L</span>
+                        </div>
+                        <p className="text-xs text-zinc-400 mt-1">{course.name}</p>
+                    </div>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
+                        isSelected ? 'bg-primary border-primary text-black' : 'border-zinc-600 bg-transparent'
+                    }`}>
+                        {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-500" />}
+                    </div>
+                </button>
+            );
+        })}
+      </div>
+      
+      <div className="text-center text-xs text-zinc-600 pt-2">
+        You selected {selectedCourses.length} courses.
       </div>
     </div>
   );
 
-  const renderCourseSelection = () => (
+  const renderPreferences = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Select Your Courses</h2>
-        <p className="text-zinc-500">Choose the courses you're enrolled in</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Permissions</h2>
+        <p className="text-zinc-500">Customize your app experience.</p>
       </div>
 
-      <div className="grid gap-3 max-h-96 overflow-y-auto pr-2">
-        {AVAILABLE_COURSES.map((course) => (
-          <button
-            key={course.id}
-            onClick={() => toggleCourseSelection(course.id)}
-            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
-              selectedCourses.includes(course.id)
-                ? 'border-primary bg-primary/5'
-                : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
-            }`}
-          >
-            <div
-              className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                selectedCourses.includes(course.id)
-                  ? 'border-primary bg-primary'
-                  : 'border-zinc-600'
-              }`}
+      <div className="space-y-3">
+        {[
+            { 
+                id: 'location', 
+                label: 'Location Access', 
+                desc: 'Required for GPS attendance verification.', 
+                icon: MapPin, 
+                state: permissions.location 
+            },
+            { 
+                id: 'notifications', 
+                label: 'Notifications', 
+                desc: 'Get alerts for classes and attendance.', 
+                icon: Bell, 
+                state: permissions.notifications 
+            },
+            { 
+                id: 'darkMode', 
+                label: 'Dark Mode', 
+                desc: 'Easier on the eyes in low light.', 
+                icon: permissions.darkMode ? Moon : Sun, 
+                state: permissions.darkMode 
+            }
+        ].map((item) => (
+            <div 
+                key={item.id}
+                onClick={() => togglePermission(item.id as any)}
+                className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all
+                    ${item.state 
+                        ? 'bg-zinc-900 border-primary/30' 
+                        : 'bg-zinc-900/50 border-transparent hover:bg-zinc-900'
+                    }`}
             >
-              {selectedCourses.includes(course.id) && (
-                <Check size={14} className="text-black" />
-              )}
+                <div className="flex items-center gap-4">
+                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-black' : 'bg-zinc-800 text-zinc-400'}`}>
+                        <item.icon size={20} />
+                    </div>
+                    <div className="text-left">
+                        <p className={`font-medium transition-colors ${item.state ? 'text-white' : 'text-zinc-400'}`}>{item.label}</p>
+                        <p className="text-xs text-zinc-500">{item.desc}</p>
+                    </div>
+                </div>
+                <div className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}>
+                    <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                </div>
             </div>
-            <div className="flex-1">
-              <p className="font-medium text-white">{course.id}</p>
-              <p className="text-sm text-zinc-500">{course.name}</p>
-            </div>
-            <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-1 rounded">
-              {course.level} Level
-            </span>
-          </button>
         ))}
       </div>
-
-      {selectedCourses.length > 0 && (
-        <div className="flex items-center gap-2 text-sm text-zinc-400">
-          <Check size={16} className="text-primary" />
-          <span>{selectedCourses.length} course{selectedCourses.length !== 1 ? 's' : ''} selected</span>
-        </div>
-      )}
     </div>
   );
-
-  const renderNotificationSettings = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Notification Settings</h2>
-        <p className="text-zinc-500">Customize how you receive updates</p>
-      </div>
-
-      <div className="space-y-4">
-        <div
-          onClick={() => togglePermission('notifications')}
-          className="flex items-center gap-4 p-4 rounded-xl border-2 border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition-all cursor-pointer"
-        >
-          <div className={`p-3 rounded-xl ${permissions.notifications ? 'bg-primary text-black' : 'bg-zinc-800 text-zinc-400'}`}>
-            <Bell size={24} />
-          </div>
-          <div className="flex-1">
-            <p className="font-medium text-white">Push Notifications</p>
-            <p className="text-sm text-zinc-500">Get notified about attendance and updates</p>
-          </div>
-          <div
-            className={`w-12 h-6 rounded-full transition-colors ${
-              permissions.notifications ? 'bg-primary' : 'bg-zinc-700'
-            }`}
-          >
-            <div
-              className={`w-5 h-5 rounded-full bg-white transition-transform duration-200 mt-0.5 ${
-                permissions.notifications ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </div>
-        </div>
-
-        <div
-          onClick={() => togglePermission('location')}
-          className="flex items-center gap-4 p-4 rounded-xl border-2 border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition-all cursor-pointer"
-        >
-          <div className={`p-3 rounded-xl ${permissions.location ? 'bg-primary text-black' : 'bg-zinc-800 text-zinc-400'}`}>
-            <MapPin size={24} />
-          </div>
-          <div className="flex-1">
-            <p className="font-medium text-white">Location Access</p>
-            <p className="text-sm text-zinc-500">Enable location-based attendance</p>
-          </div>
-          <div
-            className={`w-12 h-6 rounded-full transition-colors ${
-              permissions.location ? 'bg-primary' : 'bg-zinc-700'
-            }`}
-          >
-            <div
-              className={`w-5 h-5 rounded-full bg-white transition-transform duration-200 mt-0.5 ${
-                permissions.location ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </div>
-        </div>
-
-        <div
-          onClick={() => togglePermission('darkMode')}
-          className="flex items-center gap-4 p-4 rounded-xl border-2 border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition-all cursor-pointer"
-        >
-          <div className={`p-3 rounded-xl ${permissions.darkMode ? 'bg-primary text-black' : 'bg-zinc-800 text-zinc-400'}`}>
-            {permissions.darkMode ? <Moon size={24} /> : <Sun size={24} />}
-          </div>
-          <div className="flex-1">
-            <p className="font-medium text-white">Dark Mode</p>
-            <p className="text-sm text-zinc-500">Use dark theme throughout the app</p>
-          </div>
-          <div
-            className={`w-12 h-6 rounded-full transition-colors ${
-              permissions.darkMode ? 'bg-primary' : 'bg-zinc-700'
-            }`}
-          >
-            <div
-              className={`w-5 h-5 rounded-full bg-white transition-transform duration-200 mt-0.5 ${
-                permissions.darkMode ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderCurrentStep = () => {
-    switch (step) {
-      case 1:
-        return renderRoleSelection();
-      case 2:
-        return renderPersonalDetails();
-      case 3:
-        if (selectedRole === UserRole.STUDENT) {
-          return renderCourseSelection();
-        }
-        return renderProfilePhoto();
-      case 4:
-        if (selectedRole === UserRole.STUDENT) {
-          return renderProfilePhoto();
-        }
-        return renderNotificationSettings();
-      case 5:
-        return renderNotificationSettings();
-      default:
-        return renderRoleSelection();
-    }
-  };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
-      {showPayment ? (
-        <PaymentGateway
-          amount={5000}
-          onSuccess={handlePaymentSuccess}
-          onCancel={() => setShowPayment(false)}
-        />
-      ) : (
-        <>
-          <div className="w-full max-w-md mb-8">
+      <div className="w-full max-w-lg">
+        {/* Header Logo */}
+        <div className="flex justify-center mb-8">
             <Logo />
-          </div>
+        </div>
 
-          {/* Progress indicator */}
-          <div className="w-full max-w-md mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-zinc-500">
-                Step {step} of {totalSteps}
-              </span>
-              <span className="text-sm text-zinc-500">
-                {Math.round((step / totalSteps) * 100)}%
-              </span>
+        <div className="bg-zinc-950 border border-zinc-900 p-6 md:p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+             {/* Error Display */}
+             {error && (
+               <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm flex items-start gap-3">
+                 <div className="flex-1">{error}</div>
+                 <button onClick={() => setError('')} className="text-red-400 hover:text-red-300">
+                   <X size={16} />
+                 </button>
+               </div>
+             )}
+             
+             {/* Progress Bar */}
+             <div className="flex gap-2 mb-8 px-2">
+                {Array.from({ length: totalSteps }).map((_, i) => (
+                  <div key={i} className="flex-1 h-1.5 rounded-full bg-zinc-900 overflow-hidden">
+                      <div 
+                        className={`h-full bg-primary transition-all duration-500 ease-out ${step >= i + 1 ? 'w-full' : 'w-0'}`} 
+                      />
+                  </div>
+                ))}
             </div>
-            <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary transition-all duration-300"
-                style={{ width: `${(step / totalSteps) * 100}%` }}
-              />
+
+            <div className="min-h-[400px] flex flex-col">
+                <AnimatePresence mode="wait" custom={direction}>
+                    <motion.div
+                        key={step}
+                        custom={direction}
+                        variants={variants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="flex-1"
+                    >
+                        {step === 1 && renderRoleSelection()}
+                        {step === 2 && renderPersonalDetails()}
+                        {step === 3 && renderAcademicDetails()}
+                        {step === 4 && selectedRole === UserRole.STUDENT && renderCourseRegistration()}
+                        {step === (selectedRole === UserRole.STUDENT ? 5 : 4) && renderPreferences()}
+                    </motion.div>
+                </AnimatePresence>
+
+                <div className="flex gap-4 mt-8 pt-6 border-t border-zinc-900">
+                    {step > 1 && (
+                        <Button variant="secondary" onClick={handleBack} className="px-4">
+                            <ChevronLeft size={20} />
+                        </Button>
+                    )}
+                    <Button 
+                        className="flex-1" 
+                        size="lg" 
+                        onClick={handleNext}
+                        disabled={(step === 1 && !selectedRole) || (pendingImage !== null) || completeOnboardingMutation.isPending}
+                        isLoading={completeOnboardingMutation.isPending}
+                    >
+                        {step === totalSteps ? 'Finish Setup' : 'Continue'}
+                        {step < totalSteps && !completeOnboardingMutation.isPending && <ChevronRight size={18} className="ml-2" />}
+                    </Button>
+                </div>
             </div>
-          </div>
-
-          {/* Main content card */}
-          <div className="w-full max-w-md bg-zinc-900 rounded-2xl p-8 border border-zinc-800 shadow-2xl">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={step}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3 }}
-              >
-                {renderCurrentStep()}
-              </motion.div>
-            </AnimatePresence>
-
-            {error && (
-              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <p className="text-sm text-red-500">{error}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Navigation buttons */}
-          <div className="w-full max-w-md mt-6 flex gap-4">
-            {step > 1 && (
-              <Button
-                onClick={handleBack}
-                variant="secondary"
-                className="flex-1"
-              >
-                <ChevronLeft size={18} className="mr-2" />
-                Back
-              </Button>
-            )}
-            <Button
-              onClick={handleNext}
-              disabled={!selectedRole && step === 1}
-              className="flex-1"
-            >
-              {step === totalSteps ? (
-                completeOnboardingMutation.isPending ? (
-                  'Completing...'
-                ) : (
-                  'Complete'
-                )
-              ) : (
-                <>
-                  Next
-                  <ChevronRight size={18} className="ml-2" />
-                </>
-              )}
-            </Button>
-          </div>
-        </>
-      )}
+        </div>
+        
+        <p className="text-center text-zinc-600 text-xs mt-6">
+            Step {step} of {totalSteps}
+        </p>
+      </div>
     </div>
   );
 };
