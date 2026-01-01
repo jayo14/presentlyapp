@@ -176,3 +176,22 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# Email Configuration
+# For development, use console backend (prints emails to console)
+# For production, configure SMTP settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production with real email (Gmail example):
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
+DEFAULT_FROM_EMAIL = 'noreply@presently.app'
+EMAIL_SUBJECT_PREFIX = '[Presently] '
+
+# Frontend URL for password reset links
+FRONTEND_URL = 'http://localhost:5173'  # Update for production
