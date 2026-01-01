@@ -23,18 +23,25 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    # Django Unfold (must be before django.contrib.admin)
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
+    # Django core apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'drf_yasg',
     'fcm_django',
+    'location_field.apps.DefaultConfig',
     # Presently apps
     'institutions',
     'attendance',
@@ -221,3 +228,129 @@ REPORTS_DIR.mkdir(exist_ok=True)
 
 # Exam Clearance Settings
 EXAM_CLEARANCE_THRESHOLD = 75  # Minimum attendance percentage for exam clearance
+
+# Django Location Field Configuration
+LOCATION_FIELD = {
+    'provider.google.api': '//maps.google.com/maps/api/js?sensor=false',
+    'provider.google.api_key': os.environ.get('GOOGLE_MAPS_API_KEY', ''),
+    'provider.google.api_libraries': '',
+    'provider.google.map.type': 'ROADMAP',
+}
+
+# Django Unfold Admin Configuration
+UNFOLD = {
+    "SITE_TITLE": "Presently Admin",
+    "SITE_HEADER": "Presently Administration",
+    "SITE_URL": "/",
+    "SITE_ICON": None,  # Can add a custom icon URL here
+    "SITE_SYMBOL": "speed",  # Google Material Icon name
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "ENVIRONMENT": "presently.utils.environment_callback",
+    "DASHBOARD_CALLBACK": "presently.utils.dashboard_callback",
+    "STYLES": [
+        lambda request: f"/static/css/styles.css",
+    ],
+    "SCRIPTS": [
+        lambda request: f"/static/js/scripts.js",
+    ],
+    "COLORS": {
+        "primary": {
+            "50": "250 245 255",
+            "100": "243 232 255",
+            "200": "233 213 255",
+            "300": "216 180 254",
+            "400": "192 132 252",
+            "500": "168 85 247",
+            "600": "147 51 234",
+            "700": "126 34 206",
+            "800": "107 33 168",
+            "900": "88 28 135",
+            "950": "59 7 100",
+        },
+    },
+    "EXTENSIONS": {
+        "modeltranslation": {
+            "flags": {
+                "en": "🇬🇧",
+                "fr": "🇫🇷",
+                "nl": "🇧🇪",
+            },
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": "Navigation",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Dashboard",
+                        "icon": "dashboard",
+                        "link": lambda request: "/admin/",
+                    },
+                ],
+            },
+            {
+                "title": "Institutions",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Institutions",
+                        "icon": "school",
+                        "link": lambda request: "/admin/institutions/institution/",
+                    },
+                    {
+                        "title": "Colleges",
+                        "icon": "domain",
+                        "link": lambda request: "/admin/institutions/college/",
+                    },
+                    {
+                        "title": "Departments",
+                        "icon": "apartment",
+                        "link": lambda request: "/admin/institutions/department/",
+                    },
+                    {
+                        "title": "Venues",
+                        "icon": "place",
+                        "link": lambda request: "/admin/institutions/venue/",
+                    },
+                ],
+            },
+            {
+                "title": "Academic",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Courses",
+                        "icon": "menu_book",
+                        "link": lambda request: "/admin/institutions/course/",
+                    },
+                    {
+                        "title": "Users",
+                        "icon": "people",
+                        "link": lambda request: "/admin/institutions/user/",
+                    },
+                ],
+            },
+            {
+                "title": "Attendance",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Sessions",
+                        "icon": "event",
+                        "link": lambda request: "/admin/institutions/attendancesession/",
+                    },
+                    {
+                        "title": "Attendance Records",
+                        "icon": "how_to_reg",
+                        "link": lambda request: "/admin/institutions/attendance/",
+                    },
+                ],
+            },
+        ],
+    },
+}

@@ -1,10 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from unfold.admin import ModelAdmin
+from location_field.forms.plain import PlainLocationField
 from .models import User, Institution, College, Department, Venue, Course, AttendanceSession, Attendance, EmailVerificationOTP
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin, ModelAdmin):
     """Admin configuration for custom User model"""
     list_display = ['email', 'full_name', 'role', 'onboarding_complete', 'is_active', 'date_joined']
     list_filter = ['role', 'onboarding_complete', 'is_active', 'is_staff']
@@ -32,7 +34,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 @admin.register(Institution)
-class InstitutionAdmin(admin.ModelAdmin):
+class InstitutionAdmin(ModelAdmin):
     """Admin configuration for Institution model"""
     list_display = ['full_name', 'short_name', 'city', 'institution_type', 'is_active', 'created_at']
     list_filter = ['institution_type', 'accreditation_status', 'is_active', 'country']
@@ -42,7 +44,7 @@ class InstitutionAdmin(admin.ModelAdmin):
 
 
 @admin.register(College)
-class CollegeAdmin(admin.ModelAdmin):
+class CollegeAdmin(ModelAdmin):
     """Admin configuration for College model"""
     list_display = ['name', 'code', 'institution', 'is_active', 'created_at']
     list_filter = ['institution', 'is_active']
@@ -52,7 +54,7 @@ class CollegeAdmin(admin.ModelAdmin):
 
 
 @admin.register(Department)
-class DepartmentAdmin(admin.ModelAdmin):
+class DepartmentAdmin(ModelAdmin):
     """Admin configuration for Department model"""
     list_display = ['name', 'code', 'college', 'institution', 'is_active', 'created_at']
     list_filter = ['institution', 'college', 'is_active', 'accreditation_status']
@@ -62,13 +64,18 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Venue)
-class VenueAdmin(admin.ModelAdmin):
+class VenueAdmin(ModelAdmin):
     """Admin configuration for Venue model"""
     list_display = ['name', 'code', 'institution', 'building_name', 'capacity', 'is_active', 'created_at']
     list_filter = ['institution', 'is_active']
     search_fields = ['name', 'code', 'building_name']
     ordering = ['institution', 'name']
     readonly_fields = ['created_at', 'updated_at']
+    
+    formfield_overrides = {
+        PlainLocationField: {'widget': PlainLocationField},
+    }
+    
     fieldsets = (
         ('Basic Information', {
             'fields': ('institution', 'name', 'code', 'description')
@@ -77,7 +84,8 @@ class VenueAdmin(admin.ModelAdmin):
             'fields': ('building_name', 'floor_number', 'room_number', 'capacity')
         }),
         ('Geolocation', {
-            'fields': ('latitude', 'longitude', 'elevation', 'boundary_coordinates', 'verification_radius')
+            'fields': ('latitude', 'longitude', 'elevation', 'boundary_coordinates', 'verification_radius'),
+            'description': 'Use the map widget to set location coordinates. You can also manually enter coordinates.'
         }),
         ('Status', {
             'fields': ('is_active', 'created_at', 'updated_at')
@@ -86,7 +94,7 @@ class VenueAdmin(admin.ModelAdmin):
 
 
 @admin.register(Course)
-class CourseAdmin(admin.ModelAdmin):
+class CourseAdmin(ModelAdmin):
     """Admin configuration for Course model"""
     list_display = ['code', 'title', 'department', 'lecturer', 'credit_units', 'is_active', 'created_at']
     list_filter = ['department', 'is_active', 'semester', 'level']
@@ -96,7 +104,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 @admin.register(AttendanceSession)
-class AttendanceSessionAdmin(admin.ModelAdmin):
+class AttendanceSessionAdmin(ModelAdmin):
     """Admin configuration for AttendanceSession model"""
     list_display = ['session_code', 'course', 'venue', 'start_time', 'end_time', 'is_active', 'created_at']
     list_filter = ['course', 'venue', 'is_active', 'start_time']
@@ -106,7 +114,7 @@ class AttendanceSessionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Attendance)
-class AttendanceAdmin(admin.ModelAdmin):
+class AttendanceAdmin(ModelAdmin):
     """Admin configuration for Attendance model"""
     list_display = ['student', 'session', 'status', 'checked_in_at', 'location_verified', 'distance_from_venue']
     list_filter = ['status', 'location_verified', 'checked_in_at']
@@ -116,7 +124,7 @@ class AttendanceAdmin(admin.ModelAdmin):
 
 
 @admin.register(EmailVerificationOTP)
-class EmailVerificationOTPAdmin(admin.ModelAdmin):
+class EmailVerificationOTPAdmin(ModelAdmin):
     """Admin configuration for EmailVerificationOTP model"""
     list_display = ['user', 'otp', 'created_at', 'expires_at', 'is_used']
     list_filter = ['is_used', 'created_at']
