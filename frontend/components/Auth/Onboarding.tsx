@@ -1,27 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
 import { UserRole } from '../../types';
 import { useCompleteOnboarding, useCurrentUser } from '../../hooks/useAuth';
+import { coursesApi } from '../../services/api';
 import { 
   User, Bell, MapPin, Check, Upload, 
   Moon, Sun, Camera, Smartphone, ChevronRight, ChevronLeft,
-  GraduationCap, Briefcase, UserCheck, X, Plus
+  GraduationCap, Briefcase, UserCheck, X, Plus, Loader
 } from 'lucide-react';
-
-// Mock courses for onboarding selection
-const AVAILABLE_COURSES = [
-  { id: 'CS402', name: 'Advanced Web Development', level: '400' },
-  { id: 'CS301', name: 'Database Systems', level: '300' },
-  { id: 'ENG101', name: 'Technical Writing', level: '100' },
-  { id: 'MTH202', name: 'Linear Algebra', level: '200' },
-  { id: 'PHY101', name: 'General Physics', level: '100' },
-  { id: 'GNS101', name: 'Use of English', level: '100' },
-  { id: 'CS410', name: 'Software Engineering', level: '400' },
-  { id: 'MTH301', name: 'Numerical Analysis', level: '300' },
-];
 
 export const Onboarding: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -33,6 +22,11 @@ export const Onboarding: React.FC = () => {
   
   const { data: user } = useCurrentUser();
   const completeOnboardingMutation = useCompleteOnboarding();
+
+  // Courses state
+  const [courses, setCourses] = useState<any[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [coursesError, setCoursesError] = useState('');
 
   const [formData, setFormData] = useState({
     phoneNumber: '',
@@ -51,6 +45,27 @@ export const Onboarding: React.FC = () => {
     location: false,
     darkMode: true
   });
+
+  // Fetch courses when user selects student role and reaches course selection step
+  useEffect(() => {
+    if (selectedRole === UserRole.STUDENT && step === 4) {
+      fetchCourses();
+    }
+  }, [selectedRole, step]);
+
+  const fetchCourses = async () => {
+    try {
+      setCoursesLoading(true);
+      setCoursesError('');
+      const data = await coursesApi.getAllCourses();
+      setCourses(data.filter(course => course.is_active));
+    } catch (err: any) {
+      setCoursesError(err.message || 'Failed to load courses');
+      console.error('Error fetching courses:', err);
+    } finally {
+      setCoursesLoading(false);
+    }
+  };
 
   // Calculate total steps based on role
   const totalSteps = selectedRole === UserRole.STUDENT ? 5 : 4;
@@ -335,39 +350,63 @@ export const Onboarding: React.FC = () => {
         <p className="text-zinc-500">Select courses to add to your dashboard.</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-3 max-h-[400px]">
-        {AVAILABLE_COURSES.map((course) => {
-            const isSelected = selectedCourses.includes(course.id);
-            return (
-                <button
-                    key={course.id}
-                    onClick={() => toggleCourseSelection(course.id)}
-                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                        isSelected 
-                            ? 'bg-primary/10 border-primary shadow-lg shadow-primary/5' 
-                            : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
-                    }`}
-                >
-                    <div className="text-left">
-                        <div className="flex items-center gap-2">
-                             <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-white'}`}>{course.id}</span>
-                             <span className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">{course.level}L</span>
+      {coursesLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : coursesError ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <p className="text-red-400 text-sm">{coursesError}</p>
+          <Button size="sm" onClick={fetchCourses}>
+            Retry
+          </Button>
+        </div>
+      ) : courses.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-zinc-500 text-sm">No courses available at the moment.</p>
+        </div>
+      ) : (
+        <>
+          <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-3 max-h-[400px]">
+            {courses.map((course) => {
+                const isSelected = selectedCourses.includes(course.id.toString());
+                return (
+                    <button
+                        key={course.id}
+                        onClick={() => toggleCourseSelection(course.id.toString())}
+                        className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                            isSelected 
+                                ? 'bg-primary/10 border-primary shadow-lg shadow-primary/5' 
+                                : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                        }`}
+                    >
+                        <div className="text-left">
+                            <div className="flex items-center gap-2">
+                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-white'}`}>{course.code}</span>
+                                 {course.level && (
+                                   <span className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">{course.level}L</span>
+                                 )}
+                            </div>
+                            <p className="text-xs text-zinc-400 mt-1">{course.title}</p>
+                            {course.lecturer_name && (
+                              <p className="text-[10px] text-zinc-600 mt-0.5">{course.lecturer_name}</p>
+                            )}
                         </div>
-                        <p className="text-xs text-zinc-400 mt-1">{course.name}</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
-                        isSelected ? 'bg-primary border-primary text-black' : 'border-zinc-600 bg-transparent'
-                    }`}>
-                        {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-500" />}
-                    </div>
-                </button>
-            );
-        })}
-      </div>
-      
-      <div className="text-center text-xs text-zinc-600 pt-2">
-        You selected {selectedCourses.length} courses.
-      </div>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
+                            isSelected ? 'bg-primary border-primary text-black' : 'border-zinc-600 bg-transparent'
+                        }`}>
+                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-500" />}
+                        </div>
+                    </button>
+                );
+            })}
+          </div>
+          
+          <div className="text-center text-xs text-zinc-600 pt-2">
+            You selected {selectedCourses.length} courses.
+          </div>
+        </>
+      )}
     </div>
   );
 
