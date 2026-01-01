@@ -23,7 +23,6 @@
     "recharts": "^3.5.1"
   },
   "devDependencies": {
-    "@supabase/supabase-js": "^2.86.0",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.22",
