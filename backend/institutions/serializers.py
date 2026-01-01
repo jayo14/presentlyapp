@@ -2,7 +2,10 @@ import secrets
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from .models import User, Institution, College, Department, Course, AttendanceSession, Attendance, UserRole
+from .models import (
+    User, Institution, College, Department, Course, AttendanceSession, 
+    Attendance, UserRole, Venue, Timetable
+)
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -137,23 +140,76 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 
+class VenueSerializer(serializers.ModelSerializer):
+    """Serializer for Venue"""
+    
+    class Meta:
+        model = Venue
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+
+class TimetableSerializer(serializers.ModelSerializer):
+    """Serializer for Timetable (DEFERRED FEATURE - Read-only)"""
+    course_details = CourseSerializer(source='course', read_only=True)
+    venue_details = VenueSerializer(source='venue', read_only=True)
+    
+    class Meta:
+        model = Timetable
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at', 'is_active']  # is_active should remain False
+
+
 class AttendanceSessionSerializer(serializers.ModelSerializer):
     """Serializer for Attendance Session model"""
     course_name = serializers.CharField(source='course.title', read_only=True)
     course_code = serializers.CharField(source='course.code', read_only=True)
+    venue_details = VenueSerializer(source='venue', read_only=True)
     attendee_count = serializers.SerializerMethodField()
+    qr_code_data = serializers.SerializerMethodField()
+    qr_code_url = serializers.URLField(read_only=True)
+    is_within_time = serializers.SerializerMethodField()
     
     class Meta:
         model = AttendanceSession
         fields = '__all__'
-        read_only_fields = ['created_at', 'updated_at', 'session_code']
+        read_only_fields = ['created_at', 'updated_at', 'session_code', 'qr_code_url']
     
     def get_attendee_count(self, obj):
         return obj.attendances.count()
     
+    def get_qr_code_data(self, obj):
+        """Generate QR code as base64 image"""
+        import qrcode
+        import io
+        import base64
+        
+        # Create QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(obj.qr_code_url or obj.session_code)
+        qr.make(fit=True)
+        
+        # Create image
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        img_str = base64.b64encode(buffer.getvalue()).decode()
+        
+        return f"data:image/png;base64,{img_str}"
+    
+    def get_is_within_time(self, obj):
+        """Check if session is currently active"""
+        return obj.is_within_time()
+    
     def create(self, validated_data):
-        # Generate unique session code
-        validated_data['session_code'] = secrets.token_urlsafe(16)
+        # Session code and QR URL will be auto-generated in model's save method
         return super().create(validated_data)
 
 
