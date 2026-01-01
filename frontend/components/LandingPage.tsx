@@ -84,13 +84,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <button onClick={handleLoginClick} className="text-sm font-medium text-white hover:text-primary transition-colors">
-              {user ? 'Dashboard' : 'Sign In'}
-            </button>
-            {!user && (
-              <Button onClick={handleCTAClick} size="sm" className="rounded-full px-6 shadow-primary/20">
-                Get Started
+            {user ? (
+              <Button onClick={handleLoginClick} size="sm" className="rounded-full px-6 shadow-primary/20">
+                Dashboard
               </Button>
+            ) : (
+              <>
+                <button onClick={handleLoginClick} className="text-sm font-medium text-white hover:text-primary transition-colors">
+                  Sign In
+                </button>
+                <Button onClick={handleCTAClick} size="sm" className="rounded-full px-6 shadow-primary/20">
+                  Get Started
+                </Button>
+              </>
             )}
           </div>
 
