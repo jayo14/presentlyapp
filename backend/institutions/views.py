@@ -648,7 +648,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def check_in(self, request, pk=None):
-        """Student check-in to a session"""
+        """Student check-in to a session with GPS verification"""
         session = self.get_object()
         
         if request.user.role != UserRole.STUDENT:
@@ -663,27 +663,73 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 'error': 'This session is not active'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Create attendance record
-        attendance_data = {
-            'session': session.id,
-            'student': request.user.id,
-            'latitude': request.data.get('latitude'),
-            'longitude': request.data.get('longitude'),
-            'location_verified': request.data.get('location_verified', False),
-        }
-        
-        serializer = AttendanceSerializer(data=attendance_data)
-        if serializer.is_valid():
-            serializer.save()
+        # Check if session is within time range
+        if not session.is_within_time_range():
             return Response({
-                'success': True,
-                'message': 'Check-in successful',
-                'attendance': serializer.data
-            }, status=status.HTTP_201_CREATED)
+                'success': False,
+                'error': 'This session is not currently running'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if already checked in
+        existing_attendance = Attendance.objects.filter(
+            session=session,
+            student=request.user
+        ).first()
+        
+        if existing_attendance:
+            return Response({
+                'success': False,
+                'error': 'You have already checked in to this session',
+                'attendance': AttendanceSerializer(existing_attendance).data
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get student location
+        student_lat = request.data.get('latitude')
+        student_lng = request.data.get('longitude')
+        
+        location_verified = False
+        distance_from_venue = None
+        
+        if student_lat and student_lng:
+            # Verify GPS location
+            location_verified = session.verify_location(student_lat, student_lng)
+            
+            if session.latitude and session.longitude:
+                from haversine import haversine, Unit
+                session_location = (float(session.latitude), float(session.longitude))
+                student_location = (float(student_lat), float(student_lng))
+                distance_from_venue = haversine(session_location, student_location, unit=Unit.METERS)
+            
+            if not location_verified:
+                return Response({
+                    'success': False,
+                    'error': f'You are too far from the session location. You must be within {session.location_radius} meters.',
+                    'distance': distance_from_venue,
+                    'required_radius': session.location_radius
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Determine attendance status (PRESENT or LATE)
+        now = timezone.now()
+        late_threshold = session.start_time + timezone.timedelta(minutes=15)  # 15 minutes grace period
+        attendance_status = 'LATE' if now > late_threshold else 'PRESENT'
+        
+        # Create attendance record
+        attendance = Attendance.objects.create(
+            session=session,
+            student=request.user,
+            latitude=student_lat,
+            longitude=student_lng,
+            location_verified=location_verified,
+            status=attendance_status
+        )
+        
         return Response({
-            'success': False,
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            'success': True,
+            'message': f'Check-in successful! Status: {attendance_status}',
+            'attendance': AttendanceSerializer(attendance).data,
+            'distance_from_venue': distance_from_venue,
+            'location_verified': location_verified
+        }, status=status.HTTP_201_CREATED)
 
 
 class AttendanceViewSet(viewsets.ModelViewSet):
@@ -714,6 +760,47 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class VenueViewSet(viewsets.ModelViewSet):
+    """ViewSet for Venue CRUD"""
+    queryset = __import__('institutions.models', fromlist=['Venue']).Venue.objects.all()
+    serializer_class = __import__('institutions.serializers', fromlist=['VenueSerializer']).VenueSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
+        queryset = self.queryset
+        
+        institution_id = self.request.query_params.get('institution', None)
+        college_id = self.request.query_params.get('college', None)
+        venue_type = self.request.query_params.get('type', None)
+        is_active = self.request.query_params.get('active', None)
+        
+        if institution_id:
+            queryset = queryset.filter(institution_id=institution_id)
+        if college_id:
+            queryset = queryset.filter(college_id=college_id)
+        if venue_type:
+            queryset = queryset.filter(venue_type=venue_type)
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        
+        return queryset
+
+
+class TimetableViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for Timetable (DEFERRED - Read-only)"""
+    queryset = __import__('institutions.models', fromlist=['Timetable']).Timetable.objects.all()
+    serializer_class = __import__('institutions.serializers', fromlist=['TimetableSerializer']).TimetableSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
+        # Always return empty queryset since feature is deferred
+        return self.queryset.model.objects.none()
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """ViewSet for User management (Admin only)"""
     queryset = User.objects.all()
@@ -737,3 +824,110 @@ class UserViewSet(viewsets.ModelViewSet):
         
         return queryset
 
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def public_check_in_view(request, session_code):
+    """
+    Public check-in endpoint for QR code URLs
+    GET: Returns session details
+    POST: Performs check-in
+    """
+    try:
+        session = AttendanceSession.objects.get(session_code=session_code)
+    except AttendanceSession.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Invalid session code'
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        # Return session details
+        serializer = AttendanceSessionSerializer(session)
+        return Response({
+            'success': True,
+            'session': serializer.data
+        })
+    
+    elif request.method == 'POST':
+        # Perform check-in (reuse logic from AttendanceSessionViewSet.check_in)
+        if request.user.role != UserRole.STUDENT:
+            return Response({
+                'success': False,
+                'error': 'Only students can check in'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        if not session.is_active:
+            return Response({
+                'success': False,
+                'error': 'This session is not active'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if session is within time range
+        if not session.is_within_time_range():
+            return Response({
+                'success': False,
+                'error': 'This session is not currently running'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if already checked in
+        existing_attendance = Attendance.objects.filter(
+            session=session,
+            student=request.user
+        ).first()
+        
+        if existing_attendance:
+            return Response({
+                'success': False,
+                'error': 'You have already checked in to this session',
+                'attendance': AttendanceSerializer(existing_attendance).data
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get student location
+        student_lat = request.data.get('latitude')
+        student_lng = request.data.get('longitude')
+        
+        location_verified = False
+        distance_from_venue = None
+        
+        if student_lat and student_lng:
+            # Verify GPS location
+            location_verified = session.verify_location(student_lat, student_lng)
+            
+            if session.latitude and session.longitude:
+                from haversine import haversine, Unit
+                session_location = (float(session.latitude), float(session.longitude))
+                student_location = (float(student_lat), float(student_lng))
+                distance_from_venue = haversine(session_location, student_location, unit=Unit.METERS)
+            
+            if not location_verified:
+                return Response({
+                    'success': False,
+                    'error': f'You are too far from the session location. You must be within {session.location_radius} meters.',
+                    'distance': distance_from_venue,
+                    'required_radius': session.location_radius
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Determine attendance status (PRESENT or LATE)
+        now = timezone.now()
+        late_threshold = session.start_time + timezone.timedelta(minutes=15)  # 15 minutes grace period
+        attendance_status = 'LATE' if now > late_threshold else 'PRESENT'
+        
+        # Create attendance record
+        attendance = Attendance.objects.create(
+            session=session,
+            student=request.user,
+            latitude=student_lat,
+            longitude=student_lng,
+            location_verified=location_verified,
+            status=attendance_status
+        )
+        
+        return Response({
+            'success': True,
+            'message': f'Check-in successful! Status: {attendance_status}',
+            'attendance': AttendanceSerializer(attendance).data,
+            'distance_from_venue': distance_from_venue,
+            'location_verified': location_verified
+        }, status=status.HTTP_201_CREATED)
