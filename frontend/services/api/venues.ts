@@ -1,5 +1,6 @@
 import apiClient from './client';
 import { Venue } from '../../types';
+import { AttendanceSession } from './attendance';
 
 export interface VenueFilters {
   institution?: number;
@@ -37,7 +38,7 @@ export const venueApi = {
   },
 
   // Get sessions for a venue
-  getSessions: async (venueId: number): Promise<any[]> => {
+  getSessions: async (venueId: number): Promise<AttendanceSession[]> => {
     const response = await apiClient.get(`/venues/${venueId}/sessions/`);
     return response.data.sessions;
   },

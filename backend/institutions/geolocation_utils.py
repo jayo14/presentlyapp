@@ -69,15 +69,15 @@ def point_in_polygon(point: Tuple[float, float], polygon: List[List[float]]) -> 
     for i in range(1, n + 1):
         p2_lat, p2_lon = polygon[i % n]
         
-        # Check if point is on the same latitude band
+        # Check if point's longitude is between the two vertices' longitudes
         if min(p1_lon, p2_lon) < lon <= max(p1_lon, p2_lon):
-            # Check if point is to the left of the edge
-            if lat <= max(p1_lat, p2_lat):
-                if p1_lon != p2_lon:
-                    # Calculate intersection point
-                    x_intersection = (lon - p1_lon) * (p2_lat - p1_lat) / (p2_lon - p1_lon) + p1_lat
+            # Calculate the x-coordinate of polygon edge at point's longitude
+            if p2_lon != p1_lon:  # Avoid division by zero
+                # Calculate where the horizontal ray at 'lat' intersects the edge
+                x_intersection = p1_lat + (lon - p1_lon) * (p2_lat - p1_lat) / (p2_lon - p1_lon)
                 
-                if p1_lat == p2_lat or lat <= x_intersection:
+                # If point is to the left of the intersection, toggle inside/outside
+                if lat <= x_intersection:
                     inside = not inside
         
         p1_lat, p1_lon = p2_lat, p2_lon
