@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './src/index.css';
 import App from './App';
+import { reportWebVitals } from './utils/reportWebVitals';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -44,3 +45,6 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Start monitoring Web Vitals
+reportWebVitals();

@@ -18,6 +18,37 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      build: {
+        // Enable code splitting
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // Vendor chunks for better caching
+              'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+              'query-vendor': ['@tanstack/react-query'],
+              'ui-vendor': ['framer-motion', 'lucide-react'],
+              'map-vendor': ['mapbox-gl', 'maplibre-gl', 'react-map-gl'],
+              'chart-vendor': ['recharts'],
+            },
+          },
+        },
+        // Optimize chunk size
+        chunkSizeWarningLimit: 1000,
+        // Enable minification
+        minify: 'terser',
+        terserOptions: {
+          compress: {
+            drop_console: mode === 'production',
+            drop_debugger: mode === 'production',
+          },
+        },
+        // Source maps for debugging (disable in production for performance)
+        sourcemap: mode !== 'production',
+      },
+      // Performance optimizations
+      optimizeDeps: {
+        include: ['react', 'react-dom', 'react-router-dom'],
+      },
     };
 });
