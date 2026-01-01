@@ -3,15 +3,102 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Presently | Smart Attendance</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>Presently | Smart Attendance Management System</title>
+    <meta name="title" content="Presently | Smart Attendance Management System" />
+    <meta name="description" content="Modern, intelligent attendance tracking system for educational institutions. Track attendance with GPS verification, real-time analytics, and AI-powered insights." />
+    <meta name="keywords" content="attendance, tracking, education, GPS, analytics, student, lecturer, institution" />
+    <meta name="author" content="John A. Samuel (CodeGallantX)" />
+    <meta name="creator" content="John A. Samuel (CodeGallantX)" />
+    <meta name="publisher" content="Presently" />
+    <meta name="robots" content="index, follow" />
+    <meta name="copyright" content="© 2026 Presently. All rights reserved." />
+    <meta name="application-name" content="Presently" />
+    <meta name="generator" content="Vite" />
+    
+    <!-- Author Information -->
+    <link rel="author" href="https://github.com/codegallantx" />
+    <meta property="article:author" content="https://github.com/codegallantx" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://presentlyapp.vercel.app/" />
+    <meta property="og:title" content="Presently | Smart Attendance Management System" />
+    <meta property="og:description" content="Modern, intelligent attendance tracking system for educational institutions." />
+    <meta property="og:image" content="https://presentlyapp.vercel.app/og-image.png" />
+    <meta property="og:site_name" content="Presently" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://presentlyapp.vercel.app/" />
+    <meta property="twitter:title" content="Presently | Smart Attendance Management System" />
+    <meta property="twitter:description" content="Modern, intelligent attendance tracking system for educational institutions." />
+    <meta property="twitter:image" content="https://presentlyapp.vercel.app/og-image.png" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://presentlyapp.vercel.app/" />
+    
+    <!-- PWA -->
     <link rel="manifest" href="./manifest.json" />
     <meta name="theme-color" content="#ffca0d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Presently" />
+    
+    <!-- Performance: Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
-</head>
+    
+    <!-- Performance: DNS Prefetch for API and site -->
+    <link rel="dns-prefetch" href="https://presentlyapp.vercel.app" />
+    
+    <!-- Font loading with display=swap for better FCP -->
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" 
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'" 
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
+    </noscript>
+    
+    <!-- Accessibility: Skip to content link styles -->
+    <style>
+      .skip-to-content {
+        position: absolute;
+        left: -9999px;
+        z-index: 999;
+        padding: 1rem;
+        background-color: #ffca0d;
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .skip-to-content:focus {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 1rem;
+      }
+    </style>
+  </head>
   <body class="bg-background text-zinc-100 min-h-screen antialiased selection:bg-primary selection:text-black font-sans">
-    <div id="root"></div>
+    <!-- Accessibility: Skip to main content link -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    
+    <!-- Main app container with ARIA role -->
+    <div id="root" role="application" aria-label="Presently Application"></div>
+    
+    <!-- Module entry point -->
     <script type="module" src="/index.tsx"></script>
+    
+    <!-- Fallback for users without JavaScript -->
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: system-ui, sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>This application requires JavaScript to run. Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
   </body>
 </html>

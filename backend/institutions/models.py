@@ -292,18 +292,39 @@ class Course(models.Model):
 class Venue(models.Model):
     """Physical venues/buildings where classes are held"""
     
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='venues')
+    # Basic information
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='venues', blank=True, null=True)
+    college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='venues', blank=True, null=True)
     name = models.CharField(max_length=200)  # e.g., "Main Lecture Hall", "Chemistry Lab 1"
-    code = models.CharField(max_length=50)  # e.g., "MLH", "CHEM-LAB-1"
+    code = models.CharField(max_length=50, blank=True, null=True)  # e.g., "MLH", "CHEM-LAB-1"
     description = models.TextField(blank=True, null=True)
+    
+    # Location details
+    building = models.CharField(max_length=100, blank=True, null=True)  # Alias for building_name
     building_name = models.CharField(max_length=200, blank=True, null=True)
     floor_number = models.CharField(max_length=20, blank=True, null=True)
     room_number = models.CharField(max_length=50, blank=True, null=True)
-    capacity = models.IntegerField(blank=True, null=True, help_text="Maximum capacity of the venue")
+    capacity = models.IntegerField(default=0, help_text="Maximum capacity")
     
-    # Precise geolocation with elevation
-    latitude = models.DecimalField(max_digits=10, decimal_places=8, help_text="Venue center latitude")
-    longitude = models.DecimalField(max_digits=11, decimal_places=8, help_text="Venue center longitude")
+    # Venue type
+    VENUE_TYPES = [
+        ('CLASSROOM', 'Classroom'),
+        ('LECTURE_HALL', 'Lecture Hall'),
+        ('LAB', 'Laboratory'),
+        ('AUDITORIUM', 'Auditorium'),
+        ('ONLINE', 'Online/Virtual'),
+    ]
+    venue_type = models.CharField(max_length=20, choices=VENUE_TYPES, default='CLASSROOM')
+    
+    # Facilities
+    has_projector = models.BooleanField(default=False)
+    has_computers = models.BooleanField(default=False)
+    has_whiteboard = models.BooleanField(default=False)
+    has_microphone = models.BooleanField(default=False)
+    
+    # Geolocation with elevation
+    latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True, help_text="Venue center latitude")
+    longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True, help_text="Venue center longitude")
     elevation = models.DecimalField(
         max_digits=8, 
         decimal_places=2, 
@@ -321,6 +342,7 @@ class Venue(models.Model):
     )
     
     # Location verification settings
+    gps_radius = models.IntegerField(default=100, help_text="GPS verification radius in meters")
     verification_radius = models.IntegerField(
         default=100, 
         help_text="Radius in meters for location verification (if no boundary is set)"
@@ -333,15 +355,15 @@ class Venue(models.Model):
     
     class Meta:
         db_table = 'venues'
-        unique_together = [['institution', 'code']]
         indexes = [
-            models.Index(fields=['institution']),
-            models.Index(fields=['code']),
-            models.Index(fields=['is_active']),
+            models.Index(fields=['institution', 'is_active']),
+            models.Index(fields=['venue_type']),
         ]
+        ordering = ['name']
     
     def __str__(self):
-        return f"{self.name} ({self.code})"
+        location = f"{self.building or self.building_name} - {self.room_number}" if (self.building or self.building_name) and self.room_number else self.name
+        return location
 
 
 class AttendanceSession(models.Model):
@@ -521,58 +543,6 @@ class EmailVerificationOTP(models.Model):
         """Generate a 6-digit OTP"""
         import random
         return ''.join([str(random.randint(0, 9)) for _ in range(6)])
-
-
-class Venue(models.Model):
-    """Physical locations for attendance sessions"""
-    
-    name = models.CharField(max_length=200)
-    building = models.CharField(max_length=100, blank=True, null=True)
-    room_number = models.CharField(max_length=50, blank=True, null=True)
-    capacity = models.IntegerField(default=0, help_text="Maximum capacity")
-    
-    # Location for GPS verification
-    latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True)
-    gps_radius = models.IntegerField(default=100, help_text="GPS verification radius in meters")
-    
-    # Venue type
-    VENUE_TYPES = [
-        ('CLASSROOM', 'Classroom'),
-        ('LECTURE_HALL', 'Lecture Hall'),
-        ('LAB', 'Laboratory'),
-        ('AUDITORIUM', 'Auditorium'),
-        ('ONLINE', 'Online/Virtual'),
-    ]
-    venue_type = models.CharField(max_length=20, choices=VENUE_TYPES, default='CLASSROOM')
-    
-    # Facilities
-    has_projector = models.BooleanField(default=False)
-    has_computers = models.BooleanField(default=False)
-    has_whiteboard = models.BooleanField(default=False)
-    has_microphone = models.BooleanField(default=False)
-    
-    # Institution relationship
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='venues', null=True, blank=True)
-    college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='venues', null=True, blank=True)
-    
-    # Metadata
-    description = models.TextField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        db_table = 'venues'
-        indexes = [
-            models.Index(fields=['institution', 'is_active']),
-            models.Index(fields=['venue_type']),
-        ]
-        ordering = ['name']
-    
-    def __str__(self):
-        location = f"{self.building} - {self.room_number}" if self.building and self.room_number else self.name
-        return location
 
 
 class Timetable(models.Model):
