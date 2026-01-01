@@ -23,7 +23,9 @@ export const UserManagement: React.FC = () => {
       setLoading(true);
       const params = roleFilter !== 'all' ? { role: roleFilter } : {};
       const response = await apiClient.get('/users/', { params });
-      setUsers(response.data);
+      // Handle paginated response from Django REST Framework
+      const usersData = response.data.results || response.data;
+      setUsers(Array.isArray(usersData) ? usersData : []);
       setError(null);
     } catch (err) {
       setError('Failed to load users');
