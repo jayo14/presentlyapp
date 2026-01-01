@@ -163,7 +163,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }
                 </div>
               </div>
               <Button variant="outline" size="sm">Change</Button>
-          </div>
+            </div>
 
           {/* Student Specific: Digital Signature */}
           {userRole === UserRole.STUDENT && (
@@ -197,6 +197,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }
             </div>
           )}
         </div>
+        )}
       </section>
 
       {/* Notification Settings - All Roles */}
