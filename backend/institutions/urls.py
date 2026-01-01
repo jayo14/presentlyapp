@@ -22,7 +22,6 @@ router.register(r'courses', CourseViewSet, basename='course')
 router.register(r'sessions', AttendanceSessionViewSet, basename='session')
 router.register(r'attendances', AttendanceViewSet, basename='attendance')
 router.register(r'users', UserViewSet, basename='user')
-router.register(r'venues', VenueViewSet, basename='venue')
 router.register(r'timetables', TimetableViewSet, basename='timetable')  # Read-only, deferred
 
 urlpatterns = [

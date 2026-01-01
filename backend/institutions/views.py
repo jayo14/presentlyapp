@@ -875,34 +875,6 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class VenueViewSet(viewsets.ModelViewSet):
-    """ViewSet for Venue CRUD"""
-    queryset = __import__('institutions.models', fromlist=['Venue']).Venue.objects.all()
-    serializer_class = __import__('institutions.serializers', fromlist=['VenueSerializer']).VenueSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return self.queryset.model.objects.none()
-        queryset = self.queryset
-        
-        institution_id = self.request.query_params.get('institution', None)
-        college_id = self.request.query_params.get('college', None)
-        venue_type = self.request.query_params.get('type', None)
-        is_active = self.request.query_params.get('active', None)
-        
-        if institution_id:
-            queryset = queryset.filter(institution_id=institution_id)
-        if college_id:
-            queryset = queryset.filter(college_id=college_id)
-        if venue_type:
-            queryset = queryset.filter(venue_type=venue_type)
-        if is_active is not None:
-            queryset = queryset.filter(is_active=is_active.lower() == 'true')
-        
-        return queryset
-
-
 class TimetableViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for Timetable (DEFERRED - Read-only)"""
     queryset = __import__('institutions.models', fromlist=['Timetable']).Timetable.objects.all()
