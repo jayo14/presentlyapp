@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@tanstack/react-query": "^5.90.16",
+    "axios": "^1.13.2",
     "framer-motion": "^11.0.8",
     "lucide-react": "^0.555.0",
     "mapbox-gl": "^3.16.0",
