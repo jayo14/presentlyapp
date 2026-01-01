@@ -8,6 +8,7 @@ import {
   Moon, Sun, Globe, Lock, Upload, Mail, AlertTriangle, 
   FileText, ChevronRight, Laptop, Eye, Check, X, Database, Server
 } from 'lucide-react';
+import { useCurrentUser } from '../../hooks/useAuth';
 
 interface SettingsPageProps {
   userRole: UserRole;
@@ -15,15 +16,16 @@ interface SettingsPageProps {
 }
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }) => {
+  const { data: user, isLoading } = useCurrentUser();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [pendingSignature, setPendingSignature] = useState<string | null>(null);
   
-  // Preference States
+  // Preference States - Initialize from user data when available
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
-  const [emailNotifs, setEmailNotifs] = useState(true);
-  const [pushNotifs, setPushNotifs] = useState(false);
-  const [locationAccess, setLocationAccess] = useState(true);
+  const [emailNotifs, setEmailNotifs] = useState(user?.notifications_enabled ?? true);
+  const [pushNotifs, setPushNotifs] = useState(user?.notifications_enabled ?? false);
+  const [locationAccess, setLocationAccess] = useState(user?.location_enabled ?? true);
   const [highContrast, setHighContrast] = useState(false);
   const [reminderBeforeClass, setReminderBeforeClass] = useState(true);
 
@@ -79,25 +81,88 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }
           title="Account Settings" 
           description="Manage your profile and personal details." 
         />
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Full Name" defaultValue="John Doe" />
-            <Input label="Email" defaultValue="john.doe@university.edu" disabled />
-            {userRole === UserRole.STUDENT && <Input label="Department" defaultValue="Computer Science" />}
-            <Input label="Institution" defaultValue="Tech University" />
-          </div>
-          
-          <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-             <div className="flex items-center gap-3">
+        {isLoading ? (
+          <div className="text-center py-8 text-zinc-500">Loading user data...</div>
+        ) : (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input 
+                label="Full Name" 
+                defaultValue={user?.full_name || ''} 
+                placeholder="Your full name"
+              />
+              <Input 
+                label="Email" 
+                defaultValue={user?.email || ''} 
+                disabled 
+              />
+              {userRole === UserRole.STUDENT && (
+                <>
+                  <Input 
+                    label="Matric Number" 
+                    defaultValue={user?.matric_number || ''} 
+                    placeholder="Your matric number"
+                  />
+                  <Input 
+                    label="Department" 
+                    defaultValue={user?.department || ''} 
+                    placeholder="Your department"
+                  />
+                  <Input 
+                    label="Level" 
+                    defaultValue={user?.level || ''} 
+                    placeholder="Current level"
+                  />
+                </>
+              )}
+              {userRole === UserRole.LECTURER && (
+                <>
+                  <Input 
+                    label="Staff ID" 
+                    defaultValue={user?.staff_id || ''} 
+                    placeholder="Your staff ID"
+                  />
+                  <Input 
+                    label="Department" 
+                    defaultValue={user?.department || ''} 
+                    placeholder="Your department"
+                  />
+                </>
+              )}
+              <Input 
+                label="Institution" 
+                defaultValue={user?.institution_name || ''} 
+                placeholder="Your institution"
+                disabled
+              />
+              {user?.college_name && (
+                <Input 
+                  label="College/Faculty" 
+                  defaultValue={user.college_name} 
+                  placeholder="Your college"
+                  disabled
+                />
+              )}
+              {user?.phone_number && (
+                <Input 
+                  label="Phone Number" 
+                  defaultValue={user.phone_number} 
+                  placeholder="Your phone number"
+                />
+              )}
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+              <div className="flex items-center gap-3">
                 <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full">
-                    <Lock size={18} className="text-zinc-500 dark:text-zinc-400" />
+                  <Lock size={18} className="text-zinc-500 dark:text-zinc-400" />
                 </div>
                 <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-white">Password</p>
-                    <p className="text-xs text-zinc-500">Last changed 3 months ago</p>
+                  <p className="text-sm font-medium text-zinc-900 dark:text-white">Password</p>
+                  <p className="text-xs text-zinc-500">Update your password</p>
                 </div>
-             </div>
-             <Button variant="outline" size="sm">Change</Button>
+              </div>
+              <Button variant="outline" size="sm">Change</Button>
           </div>
 
           {/* Student Specific: Digital Signature */}
