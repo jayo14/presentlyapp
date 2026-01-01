@@ -157,4 +157,22 @@ export const authApi = {
     });
     return response.data;
   },
+
+  // Send email verification OTP
+  sendVerificationOTP: async (email: string): Promise<{ success: boolean; message?: string; expires_in?: number; error?: string }> => {
+    const response = await apiClient.post('/auth/email-verification/send/', { email });
+    return response.data;
+  },
+
+  // Verify email with OTP
+  verifyEmailOTP: async (email: string, otp: string): Promise<AuthResponse> => {
+    const response = await apiClient.post('/auth/email-verification/verify/', { email, otp });
+    const result = response.data;
+    
+    if (result.success && result.tokens) {
+      tokenManager.setTokens(result.tokens.access, result.tokens.refresh);
+    }
+    
+    return result;
+  },
 };
