@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { Button } from './Button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +9,7 @@ import {
   ChevronDown, ChevronUp, Star, Download, Menu, X, Play,
   Zap, MonitorPlay, Pause, Volume2, Maximize2
 } from 'lucide-react';
+import { useCurrentUser } from '../hooks/useAuth';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -15,6 +17,8 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin }) => {
+  const navigate = useNavigate();
+  const { data: user, isLoading } = useCurrentUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [billingCycle, setBillingCycle] = useState<'semester' | 'session'>('semester');
@@ -30,6 +34,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setMobileMenuOpen(false);
+  };
+
+  const handleCTAClick = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      onGetStarted();
+    }
+  };
+
+  const handleLoginClick = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      onLogin();
+    }
   };
 
   const fadeInUp = {
@@ -64,12 +84,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <button onClick={onLogin} className="text-sm font-medium text-white hover:text-primary transition-colors">
-              Sign In
+            <button onClick={handleLoginClick} className="text-sm font-medium text-white hover:text-primary transition-colors">
+              {user ? 'Dashboard' : 'Sign In'}
             </button>
-            <Button onClick={onGetStarted} size="sm" className="rounded-full px-6 shadow-primary/20">
-              Get Started
-            </Button>
+            {!user && (
+              <Button onClick={handleCTAClick} size="sm" className="rounded-full px-6 shadow-primary/20">
+                Get Started
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -90,8 +112,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
               <button onClick={() => scrollToSection('features')} className="block w-full text-left py-2 text-zinc-400">Features</button>
               <button onClick={() => scrollToSection('pricing')} className="block w-full text-left py-2 text-zinc-400">Pricing</button>
               <div className="pt-4 border-t border-zinc-800 flex flex-col gap-3">
-                <Button onClick={onLogin} variant="secondary" className="w-full justify-center">Sign In</Button>
-                <Button onClick={onGetStarted} className="w-full justify-center">Get Started</Button>
+                {user ? (
+                  <Button onClick={handleCTAClick} className="w-full justify-center">
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <>
+                    <Button onClick={handleLoginClick} variant="secondary" className="w-full justify-center">
+                      Sign In
+                    </Button>
+                    <Button onClick={handleCTAClick} className="w-full justify-center">
+                      Get Started
+                    </Button>
+                  </>
+                )}
               </div>
             </motion.div>
           )}
