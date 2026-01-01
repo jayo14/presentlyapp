@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Institution, College, Department, Course, AttendanceSession, Attendance, EmailVerificationOTP
+from .models import User, Institution, College, Department, Venue, Course, AttendanceSession, Attendance, EmailVerificationOTP
 
 
 @admin.register(User)
@@ -61,6 +61,30 @@ class DepartmentAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
 
+@admin.register(Venue)
+class VenueAdmin(admin.ModelAdmin):
+    """Admin configuration for Venue model"""
+    list_display = ['name', 'code', 'institution', 'building_name', 'capacity', 'is_active', 'created_at']
+    list_filter = ['institution', 'is_active']
+    search_fields = ['name', 'code', 'building_name']
+    ordering = ['institution', 'name']
+    readonly_fields = ['created_at', 'updated_at']
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('institution', 'name', 'code', 'description')
+        }),
+        ('Location Details', {
+            'fields': ('building_name', 'floor_number', 'room_number', 'capacity')
+        }),
+        ('Geolocation', {
+            'fields': ('latitude', 'longitude', 'elevation', 'boundary_coordinates', 'verification_radius')
+        }),
+        ('Status', {
+            'fields': ('is_active', 'created_at', 'updated_at')
+        }),
+    )
+
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     """Admin configuration for Course model"""
@@ -74,9 +98,9 @@ class CourseAdmin(admin.ModelAdmin):
 @admin.register(AttendanceSession)
 class AttendanceSessionAdmin(admin.ModelAdmin):
     """Admin configuration for AttendanceSession model"""
-    list_display = ['session_code', 'course', 'start_time', 'end_time', 'is_active', 'created_at']
-    list_filter = ['course', 'is_active', 'start_time']
-    search_fields = ['session_code', 'course__code', 'course__title']
+    list_display = ['session_code', 'course', 'venue', 'start_time', 'end_time', 'is_active', 'created_at']
+    list_filter = ['course', 'venue', 'is_active', 'start_time']
+    search_fields = ['session_code', 'course__code', 'course__title', 'venue__name']
     ordering = ['-start_time']
     readonly_fields = ['created_at', 'updated_at', 'session_code']
 
@@ -84,7 +108,7 @@ class AttendanceSessionAdmin(admin.ModelAdmin):
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
     """Admin configuration for Attendance model"""
-    list_display = ['student', 'session', 'status', 'checked_in_at', 'location_verified']
+    list_display = ['student', 'session', 'status', 'checked_in_at', 'location_verified', 'distance_from_venue']
     list_filter = ['status', 'location_verified', 'checked_in_at']
     search_fields = ['student__email', 'student__full_name', 'session__session_code']
     ordering = ['-checked_in_at']
