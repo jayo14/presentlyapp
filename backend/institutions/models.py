@@ -354,11 +354,17 @@ class AttendanceSession(models.Model):
     end_time = models.DateTimeField()
     is_active = models.BooleanField(default=True)
     
-    # Legacy location fields (kept for backward compatibility)
-    # These will be deprecated in favor of venue-based location
+    # Location for geo-fencing (can override venue location)
     latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True)
     location_radius = models.IntegerField(default=100, help_text="Radius in meters for geo-fencing")
+    
+    # Session metadata
+    title = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    
+    # QR code data (will store URL for external access)
+    qr_code_url = models.URLField(blank=True, null=True, help_text="URL that the QR code points to")
     
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
@@ -394,6 +400,47 @@ class AttendanceSession(models.Model):
             'boundary': None,
             'radius': self.location_radius
         }
+    def save(self, *args, **kwargs):
+        if not self.session_code:
+            # Generate unique session code
+            import secrets
+            import string
+            self.session_code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        
+        # Generate QR code URL if not set
+        if not self.qr_code_url:
+            from django.conf import settings
+            frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+            self.qr_code_url = f"{frontend_url}/check-in/{self.session_code}"
+        
+        # Use venue location if not specified
+        if self.venue and not self.latitude and not self.longitude:
+            self.latitude = self.venue.latitude
+            self.longitude = self.venue.longitude
+            if not self.location_radius and self.venue.gps_radius:
+                self.location_radius = self.venue.gps_radius
+        
+        super().save(*args, **kwargs)
+    
+    def is_within_time_range(self):
+        """Check if current time is within session time"""
+        now = timezone.now()
+        return self.start_time <= now <= self.end_time
+    
+    def verify_location(self, student_lat, student_lng):
+        """Verify if student is within the geofence radius"""
+        if not self.latitude or not self.longitude:
+            # If no location set, skip verification
+            return True
+        
+        from haversine import haversine, Unit
+        session_location = (float(self.latitude), float(self.longitude))
+        student_location = (float(student_lat), float(student_lng))
+        
+        # Calculate distance in meters
+        distance = haversine(session_location, student_location, unit=Unit.METERS)
+        
+        return distance <= self.location_radius
 
 
 class Attendance(models.Model):
@@ -470,6 +517,106 @@ class EmailVerificationOTP(models.Model):
         return not self.is_used and timezone.now() < self.expires_at
     
     @staticmethod
+    def generate_otp():
+        """Generate a 6-digit OTP"""
+        import random
+        return ''.join([str(random.randint(0, 9)) for _ in range(6)])
+
+
+class Venue(models.Model):
+    """Physical locations for attendance sessions"""
+    
+    name = models.CharField(max_length=200)
+    building = models.CharField(max_length=100, blank=True, null=True)
+    room_number = models.CharField(max_length=50, blank=True, null=True)
+    capacity = models.IntegerField(default=0, help_text="Maximum capacity")
+    
+    # Location for GPS verification
+    latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True)
+    gps_radius = models.IntegerField(default=100, help_text="GPS verification radius in meters")
+    
+    # Venue type
+    VENUE_TYPES = [
+        ('CLASSROOM', 'Classroom'),
+        ('LECTURE_HALL', 'Lecture Hall'),
+        ('LAB', 'Laboratory'),
+        ('AUDITORIUM', 'Auditorium'),
+        ('ONLINE', 'Online/Virtual'),
+    ]
+    venue_type = models.CharField(max_length=20, choices=VENUE_TYPES, default='CLASSROOM')
+    
+    # Facilities
+    has_projector = models.BooleanField(default=False)
+    has_computers = models.BooleanField(default=False)
+    has_whiteboard = models.BooleanField(default=False)
+    has_microphone = models.BooleanField(default=False)
+    
+    # Institution relationship
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='venues', null=True, blank=True)
+    college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='venues', null=True, blank=True)
+    
+    # Metadata
+    description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'venues'
+        indexes = [
+            models.Index(fields=['institution', 'is_active']),
+            models.Index(fields=['venue_type']),
+        ]
+        ordering = ['name']
+    
+    def __str__(self):
+        location = f"{self.building} - {self.room_number}" if self.building and self.room_number else self.name
+        return location
+
+
+class Timetable(models.Model):
+    """Timetable entries (DEFERRED - Currently disabled)"""
+    
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='timetable_entries')
+    venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=True, related_name='timetable_entries')
+    
+    # Day and time
+    DAY_CHOICES = [
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday'),
+    ]
+    day_of_week = models.IntegerField(choices=DAY_CHOICES)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    
+    # Recurrence
+    is_recurring = models.BooleanField(default=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    
+    # Status - DISABLED FOR NOW
+    is_active = models.BooleanField(default=False, help_text="DEFERRED FEATURE - Keep disabled")
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'timetables'
+        indexes = [
+            models.Index(fields=['course', 'day_of_week']),
+            models.Index(fields=['is_active']),
+        ]
+        ordering = ['day_of_week', 'start_time']
+    
+    def __str__(self):
+        return f"{self.course.code} - {self.get_day_of_week_display()} {self.start_time}"
     def generate_otp():
         """Generate a cryptographically secure 6-digit OTP"""
         import secrets
