@@ -3,4 +3,5 @@ export * from './auth';
 export * from './institutions';
 export * from './attendance';
 export * from './venues';
+export * from './courses';
 export { default as apiClient, tokenManager } from './client';
