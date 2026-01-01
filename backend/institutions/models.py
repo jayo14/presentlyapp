@@ -289,11 +289,66 @@ class Course(models.Model):
         return f"{self.code} - {self.title}"
 
 
+class Venue(models.Model):
+    """Physical venues/buildings where classes are held"""
+    
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='venues')
+    name = models.CharField(max_length=200)  # e.g., "Main Lecture Hall", "Chemistry Lab 1"
+    code = models.CharField(max_length=50)  # e.g., "MLH", "CHEM-LAB-1"
+    description = models.TextField(blank=True, null=True)
+    building_name = models.CharField(max_length=200, blank=True, null=True)
+    floor_number = models.CharField(max_length=20, blank=True, null=True)
+    room_number = models.CharField(max_length=50, blank=True, null=True)
+    capacity = models.IntegerField(blank=True, null=True, help_text="Maximum capacity of the venue")
+    
+    # Precise geolocation with elevation
+    latitude = models.DecimalField(max_digits=10, decimal_places=8, help_text="Venue center latitude")
+    longitude = models.DecimalField(max_digits=11, decimal_places=8, help_text="Venue center longitude")
+    elevation = models.DecimalField(
+        max_digits=8, 
+        decimal_places=2, 
+        blank=True, 
+        null=True, 
+        help_text="Elevation in meters above sea level"
+    )
+    
+    # Boundary/polygon for precise location mapping
+    # Stored as JSON array of coordinate pairs: [[lat, lng], [lat, lng], ...]
+    boundary_coordinates = models.JSONField(
+        blank=True, 
+        null=True,
+        help_text="Polygon boundary coordinates as array of [latitude, longitude] pairs"
+    )
+    
+    # Location verification settings
+    verification_radius = models.IntegerField(
+        default=100, 
+        help_text="Radius in meters for location verification (if no boundary is set)"
+    )
+    
+    # Metadata
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'venues'
+        unique_together = [['institution', 'code']]
+        indexes = [
+            models.Index(fields=['institution']),
+            models.Index(fields=['code']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"{self.name} ({self.code})"
+
+
 class AttendanceSession(models.Model):
     """Attendance sessions (lectures/classes)"""
     
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sessions')
-    venue = models.ForeignKey('Venue', on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions')
+    venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions')
     session_code = models.CharField(max_length=50, unique=True)  # QR code identifier
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -319,6 +374,7 @@ class AttendanceSession(models.Model):
         db_table = 'attendance_sessions'
         indexes = [
             models.Index(fields=['course']),
+            models.Index(fields=['venue']),
             models.Index(fields=['session_code']),
             models.Index(fields=['start_time']),
             models.Index(fields=['is_active']),
@@ -327,6 +383,23 @@ class AttendanceSession(models.Model):
     def __str__(self):
         return f"{self.course.code} - {self.start_time.strftime('%Y-%m-%d %H:%M')}"
     
+    def get_location_coords(self):
+        """Get location coordinates, preferring venue over legacy fields"""
+        if self.venue:
+            return {
+                'latitude': float(self.venue.latitude),
+                'longitude': float(self.venue.longitude),
+                'elevation': float(self.venue.elevation) if self.venue.elevation else None,
+                'boundary': self.venue.boundary_coordinates,
+                'radius': self.venue.verification_radius
+            }
+        return {
+            'latitude': float(self.latitude) if self.latitude else None,
+            'longitude': float(self.longitude) if self.longitude else None,
+            'elevation': None,
+            'boundary': None,
+            'radius': self.location_radius
+        }
     def save(self, *args, **kwargs):
         if not self.session_code:
             # Generate unique session code
@@ -377,10 +450,26 @@ class Attendance(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attendances')
     checked_in_at = models.DateTimeField(auto_now_add=True)
     
-    # Location verification
+    # Location verification with elevation support
     latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True)
+    elevation = models.DecimalField(
+        max_digits=8, 
+        decimal_places=2, 
+        blank=True, 
+        null=True, 
+        help_text="Student's elevation in meters when checking in"
+    )
     location_verified = models.BooleanField(default=False)
+    
+    # Distance from venue center (for analytics)
+    distance_from_venue = models.DecimalField(
+        max_digits=8, 
+        decimal_places=2, 
+        blank=True, 
+        null=True,
+        help_text="Distance in meters from venue center"
+    )
     
     # Status
     STATUS_CHOICES = [
