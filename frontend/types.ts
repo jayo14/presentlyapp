@@ -93,6 +93,23 @@ export interface Department {
   updated_at: string;
 }
 
+export interface Course {
+  id: number;
+  department: number;
+  department_name?: string;
+  code: string;
+  title: string;
+  description?: string;
+  lecturer?: number;
+  lecturer_name?: string;
+  credit_units: number;
+  semester?: string;
+  level?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Venue {
   id: number;
   institution_id: number;
