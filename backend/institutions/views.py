@@ -14,14 +14,15 @@ import secrets
 
 from .models import (
     User, Institution, College, Department, Course, AttendanceSession, 
-    Attendance, UserRole, EmailVerificationOTP
+    Attendance, Venue, UserRole, EmailVerificationOTP
 )
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
-    DepartmentSerializer, CourseSerializer, AttendanceSessionSerializer,
+    DepartmentSerializer, VenueSerializer, CourseSerializer, AttendanceSessionSerializer,
     AttendanceSerializer, PasswordChangeSerializer
 )
+from .geolocation_utils import verify_location, calculate_distance
 
 
 # Helper function to generate tokens
@@ -587,6 +588,45 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class VenueViewSet(viewsets.ModelViewSet):
+    """ViewSet for Venue CRUD"""
+    queryset = Venue.objects.all()
+    serializer_class = VenueSerializer
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+    
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
+        queryset = Venue.objects.all()
+        institution_id = self.request.query_params.get('institution', None)
+        
+        if institution_id:
+            queryset = queryset.filter(institution_id=institution_id)
+        
+        # Non-admin users can only see active venues from their institution
+        if self.request.user.role != UserRole.ADMIN:
+            queryset = queryset.filter(is_active=True)
+            if self.request.user.institution:
+                queryset = queryset.filter(institution=self.request.user.institution)
+        
+        return queryset
+    
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def sessions(self, request, pk=None):
+        """Get all sessions for this venue"""
+        venue = self.get_object()
+        sessions = AttendanceSession.objects.filter(venue=venue)
+        serializer = AttendanceSessionSerializer(sessions, many=True)
+        return Response({
+            'success': True,
+            'sessions': serializer.data
+        })
+
+
 class CourseViewSet(viewsets.ModelViewSet):
     """ViewSet for Course CRUD"""
     queryset = Course.objects.all()
@@ -663,6 +703,81 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 'error': 'This session is not active'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Check if session has ended
+        if timezone.now() > session.end_time:
+            return Response({
+                'success': False,
+                'error': 'This session has ended'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get student location
+        student_lat = request.data.get('latitude')
+        student_lon = request.data.get('longitude')
+        student_elevation = request.data.get('elevation')
+        
+        if not student_lat or not student_lon:
+            return Response({
+                'success': False,
+                'error': 'Location data is required for check-in'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get location data from session
+        location_data = session.get_location_coords()
+        
+        if not location_data.get('latitude') or not location_data.get('longitude'):
+            return Response({
+                'success': False,
+                'error': 'Session location is not configured'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify location
+        is_verified, distance = verify_location(
+            float(student_lat),
+            float(student_lon),
+            float(student_elevation) if student_elevation else None,
+            location_data['latitude'],
+            location_data['longitude'],
+            location_data['elevation'],
+            location_data['boundary'],
+            location_data['radius']
+        )
+        
+        # Determine status based on time
+        now = timezone.now()
+        grace_period = timezone.timedelta(minutes=15)  # 15 minutes grace period
+        status_value = 'PRESENT'
+        
+        if now > session.start_time + grace_period:
+            status_value = 'LATE'
+        
+        # Create attendance record
+        attendance_data = {
+            'session': session.id,
+            'student': request.user.id,
+            'latitude': student_lat,
+            'longitude': student_lon,
+            'elevation': student_elevation,
+            'location_verified': is_verified,
+            'distance_from_venue': distance,
+            'status': status_value,
+        }
+        
+        serializer = AttendanceSerializer(data=attendance_data)
+        if serializer.is_valid():
+            attendance = serializer.save()
+            
+            response_data = {
+                'success': True,
+                'message': 'Check-in successful' if is_verified else 'Check-in recorded but location not verified',
+                'attendance': serializer.data,
+                'location_verified': is_verified,
+                'distance_from_venue': float(distance),
+            }
+            
+            if not is_verified:
+                response_data['warning'] = f'You are {distance:.1f} meters from the venue. Check-in recorded but may be flagged.'
+            
+            return Response(response_data, status=status.HTTP_201_CREATED)
         # Check if session is within time range
         if not session.is_within_time_range():
             return Response({

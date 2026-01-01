@@ -89,6 +89,43 @@ class DepartmentSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 
+class VenueSerializer(serializers.ModelSerializer):
+    """Serializer for Venue model"""
+    institution_name = serializers.CharField(source='institution.full_name', read_only=True)
+    
+    class Meta:
+        model = Venue
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+    
+    def validate_boundary_coordinates(self, value):
+        """Validate that boundary coordinates are properly formatted"""
+        if value is not None:
+            if not isinstance(value, list):
+                raise serializers.ValidationError("Boundary coordinates must be an array")
+            
+            if len(value) < 3:
+                raise serializers.ValidationError("Boundary must have at least 3 coordinate pairs")
+            
+            for coord in value:
+                if not isinstance(coord, list) or len(coord) != 2:
+                    raise serializers.ValidationError(
+                        "Each coordinate must be an array of [latitude, longitude]"
+                    )
+                
+                lat, lng = coord
+                if not isinstance(lat, (int, float)) or not isinstance(lng, (int, float)):
+                    raise serializers.ValidationError("Coordinates must be numeric")
+                
+                if not (-90 <= lat <= 90):
+                    raise serializers.ValidationError("Latitude must be between -90 and 90")
+                
+                if not (-180 <= lng <= 180):
+                    raise serializers.ValidationError("Longitude must be between -180 and 180")
+        
+        return value
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     institution_name = serializers.CharField(source='institution.full_name', read_only=True)
@@ -164,6 +201,10 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
     """Serializer for Attendance Session model"""
     course_name = serializers.CharField(source='course.title', read_only=True)
     course_code = serializers.CharField(source='course.code', read_only=True)
+    venue_name = serializers.CharField(source='venue.name', read_only=True)
+    venue_code = serializers.CharField(source='venue.code', read_only=True)
+    attendee_count = serializers.SerializerMethodField()
+    location_data = serializers.SerializerMethodField()
     venue_details = VenueSerializer(source='venue', read_only=True)
     attendee_count = serializers.SerializerMethodField()
     qr_code_data = serializers.SerializerMethodField()
@@ -178,6 +219,9 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
     def get_attendee_count(self, obj):
         return obj.attendances.count()
     
+    def get_location_data(self, obj):
+        """Get complete location data including venue boundary"""
+        return obj.get_location_coords()
     def get_qr_code_data(self, obj):
         """Generate QR code as base64 image"""
         import qrcode

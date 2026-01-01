@@ -22,6 +22,9 @@ export interface AttendanceSession {
   course: number;
   course_name?: string;
   course_code?: string;
+  venue?: number;
+  venue_name?: string;
+  venue_code?: string;
   session_code: string;
   start_time: string;
   end_time: string;
@@ -30,6 +33,13 @@ export interface AttendanceSession {
   longitude?: number;
   location_radius: number;
   attendee_count?: number;
+  location_data?: {
+    latitude: number;
+    longitude: number;
+    elevation?: number;
+    boundary?: number[][];
+    radius: number;
+  };
   created_at: string;
   updated_at: string;
 }
@@ -44,6 +54,8 @@ export interface Attendance {
   checked_in_at: string;
   latitude?: number;
   longitude?: number;
+  elevation?: number;
+  distance_from_venue?: number;
   location_verified: boolean;
   status: 'PRESENT' | 'LATE' | 'EXCUSED';
 }
@@ -51,6 +63,7 @@ export interface Attendance {
 export interface CheckInData {
   latitude?: number;
   longitude?: number;
+  elevation?: number;
   location_verified?: boolean;
 }
 
