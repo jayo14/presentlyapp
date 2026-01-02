@@ -16,7 +16,149 @@ class DashboardAnalyticsView(APIView):
 class StudentDashboardAnalyticsView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        return Response({'student_dashboard': {}})
+        """
+        Get comprehensive dashboard data for student
+        Returns: user info, enrolled courses, attendance stats, next class, recent activity
+        """
+        user = request.user
+        
+        if user.role != UserRole.STUDENT:
+            return Response({
+                'error': 'This endpoint is only for students'
+            }, status=403)
+        
+        from institutions.models import CourseEnrollment
+        from datetime import datetime
+        
+        # Get enrolled courses with attendance stats
+        enrollments = CourseEnrollment.objects.filter(
+            student=user,
+            is_active=True
+        ).select_related('course', 'course__department')
+        
+        enrolled_courses = []
+        total_present = 0
+        total_late = 0
+        total_absent = 0
+        total_sessions_overall = 0
+        
+        for enrollment in enrollments:
+            course = enrollment.course
+            
+            # Get total sessions for this course
+            total_sessions = AttendanceSession.objects.filter(course=course).count()
+            
+            # Get student's attendance for this course
+            attendances = Attendance.objects.filter(
+                student=user,
+                session__course=course
+            )
+            
+            sessions_attended = attendances.count()
+            present_count = attendances.filter(status='PRESENT').count()
+            late_count = attendances.filter(status='LATE').count()
+            
+            # Calculate percentage
+            attendance_percentage = round((sessions_attended / total_sessions) * 100) if total_sessions > 0 else 0
+            
+            # Determine status
+            if attendance_percentage >= 75:
+                status = 'Good'
+            elif attendance_percentage >= 50:
+                status = 'Average'
+            else:
+                status = 'Warning'
+            
+            enrolled_courses.append({
+                'id': enrollment.id,
+                'course': course.id,
+                'course_code': course.code,
+                'course_name': course.title,
+                'course_title': course.title,
+                'department': course.department.id if course.department else None,
+                'department_name': course.department.name if course.department else None,
+                'semester': course.semester,
+                'level': course.level,
+                'credit_units': course.credit_units,
+                'lecturer_name': course.lecturer.full_name if course.lecturer else None,
+                'is_active': enrollment.is_active,
+                'enrolled_at': enrollment.created_at.isoformat(),
+                'attendance_percentage': attendance_percentage,
+                'sessions_attended': sessions_attended,
+                'total_sessions': total_sessions,
+                'status': status
+            })
+            
+            # Aggregate stats
+            total_present += present_count
+            total_late += late_count
+            total_absent += (total_sessions - sessions_attended)
+            total_sessions_overall += total_sessions
+        
+        # Calculate average attendance
+        avg_attendance = round(sum([c['attendance_percentage'] for c in enrolled_courses]) / len(enrolled_courses)) if enrolled_courses else 0
+        
+        # Get next upcoming class (from timetable or sessions)
+        from institutions.models import Timetable
+        now = timezone.now()
+        
+        # Try to find next session
+        next_session = AttendanceSession.objects.filter(
+            course__in=[e.course for e in enrollments],
+            start_time__gt=now,
+            is_active=True
+        ).order_by('start_time').first()
+        
+        next_class = None
+        if next_session:
+            next_class = {
+                'id': next_session.id,
+                'course_code': next_session.course.code,
+                'course_name': next_session.course.title,
+                'start_time': next_session.start_time.isoformat(),
+                'venue_name': next_session.venue.name if next_session.venue else None,
+                'venue_code': next_session.venue.code if next_session.venue else None,
+            }
+        
+        # Get recent activity (last 10 attendance records)
+        recent_attendances = Attendance.objects.filter(
+            student=user
+        ).select_related('session', 'session__course').order_by('-checked_in_at')[:10]
+        
+        recent_activity = []
+        for attendance in recent_attendances:
+            recent_activity.append({
+                'id': attendance.id,
+                'type': 'attendance',
+                'course_code': attendance.session.course.code,
+                'course_name': attendance.session.course.title,
+                'timestamp': attendance.checked_in_at.isoformat(),
+                'status': attendance.status,
+                'description': f"Marked {attendance.status.lower()} for {attendance.session.course.code}"
+            })
+        
+        return Response({
+            'user': {
+                'id': str(user.id),
+                'full_name': user.full_name,
+                'email': user.email,
+                'matric_number': user.matric_number,
+                'level': user.level,
+                'department': user.department.name if user.department else None,
+                'college': user.college.name if user.college else None,
+                'institution': user.institution.full_name if user.institution else None,
+            },
+            'enrolled_courses': enrolled_courses,
+            'attendance_stats': {
+                'average_attendance': avg_attendance,
+                'total_present': total_present,
+                'total_late': total_late,
+                'total_absent': total_absent,
+                'total_sessions': total_sessions_overall,
+            },
+            'next_class': next_class,
+            'recent_activity': recent_activity
+        })
 
 
 class LecturerDashboardAnalyticsView(APIView):
