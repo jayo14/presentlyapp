@@ -383,6 +383,11 @@ const CourseRegistrationModal = ({
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, view = 'dashboard' }) => {
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [isWarningDismissed, setIsWarningDismissed] = useState(() => {
+    // Initialize from localStorage
+    const dismissed = localStorage.getItem('attendanceWarningDismissed');
+    return dismissed === 'true';
+  });
   
   // State for courses to manage registration
   const [courses, setCourses] = useState<Course[]>([
@@ -398,6 +403,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const lowAttendanceCourses = registeredCourses.filter(c => c.attendance < 75);
   const avgAttendance = Math.round(registeredCourses.reduce((acc, c) => acc + c.attendance, 0) / (registeredCourses.length || 1));
   const nextClass = { name: 'CS402 - Adv. Web Dev', time: '10:00 AM', venue: 'LH 1' };
+
+  // Handler to dismiss warning
+  const handleDismissWarning = () => {
+    setIsWarningDismissed(true);
+    localStorage.setItem('attendanceWarningDismissed', 'true');
+  };
 
   // Analytics Mock Data
   const weeklyAttendanceData = [
@@ -658,10 +669,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
        {/* Warning Banner (Conditionally Rendered) */}
        <AnimatePresence>
-         {lowAttendanceCourses.length > 0 && (
+         {lowAttendanceCourses.length > 0 && !isWarningDismissed && (
            <motion.div 
              initial={{ opacity: 0, height: 0 }}
              animate={{ opacity: 1, height: 'auto' }}
+             exit={{ opacity: 0, height: 0 }}
              className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/50 p-4 rounded-2xl flex items-center gap-4"
            >
              <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full text-red-600 dark:text-red-400">
@@ -673,6 +685,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                    Below 75% in: {lowAttendanceCourses.map(c => c.code).join(', ')}
                  </p>
              </div>
+             <button
+               onClick={handleDismissWarning}
+               className="p-2 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-lg transition-colors"
+               title="Dismiss warning"
+             >
+               <X size={18} className="text-red-600 dark:text-red-400" />
+             </button>
            </motion.div>
          )}
        </AnimatePresence>
