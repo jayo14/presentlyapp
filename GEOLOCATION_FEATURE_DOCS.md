@@ -138,9 +138,27 @@ venueApi.delete(id): Promise<void>
 
 #### Components
 
+**VenueMap** (`frontend/components/Admin/VenueMap.tsx`)
+- Interactive map visualization using **MapLibre GL JS** (open-source)
+- Real-time marker display for all venues
+- Polygon boundary visualization
+- Navigation controls (zoom, pan, rotate)
+- Geolocation control for finding user location
+- Active session indicators with pulsing animations
+- Map tiles from **CartoDB** (open-source provider)
+- Alternative providers: OpenFreeMap, CartoDB Positron/Voyager
+
+**Technology Stack:**
+- **Map Library**: MapLibre GL JS 4.0.0 (BSD-licensed, fully open-source)
+- **React Integration**: react-map-gl 7.1.7 with `/maplibre` export
+- **Map Tiles**: CartoDB Dark Matter (free, open-source)
+- **No Mapbox**: Replaced proprietary Mapbox GL JS with MapLibre GL JS
+
 **VenueManagement** (`frontend/components/Admin/VenueManagement.tsx`)
 - List venues with filtering by institution
 - Create/edit venues with geolocation modal
+- Interactive map view with VenueMap component
+- Grid/List/Map view toggle
 - View venue details including boundary mapping
 - Delete venues
 
@@ -322,6 +340,12 @@ describe('pointInPolygon', () => {
 
 ### Common Issues
 
+**"Map not loading" or "Map tiles not displaying"**
+- Solution: Check internet connectivity
+- Verify firewall allows access to basemaps.cartocdn.com
+- Try alternative map styles (see VenueMap.tsx comments)
+- Check browser console for CORS or network errors
+
 **"Location permission denied"**
 - Solution: Enable location services in browser settings
 - Check if HTTPS is enabled (required for geolocation API)
@@ -361,7 +385,7 @@ LOGGING = {
 
 ## Future Enhancements
 
-1. **Interactive Map Editor**: Visual polygon drawing in admin interface
+1. **✅ Interactive Map Editor**: ~~Visual polygon drawing in admin interface~~ - **COMPLETED** (VenueMap with boundary drawing)
 2. **Batch Venue Import**: CSV/Excel import for multiple venues
 3. **Geo-fencing Alerts**: Notify when student is outside venue
 4. **Location History**: Track student movement patterns (with consent)
