@@ -14,8 +14,6 @@ interface VenueMapProps {
   onBoundaryComplete?: (coordinates: number[][]) => void;
 }
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
-
 // Pulsing animation for active sessions
 const pulsingDot = {
   width: 30,
