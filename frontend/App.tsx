@@ -106,50 +106,52 @@ const AppContent: React.FC = () => {
 
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        <Route path="/" element={<LandingPage onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/email-verification" element={<EmailVerificationSent />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        
-        <Route
-          path="/onboarding"
-          element={
-            <ProtectedRoute>
-              <Onboarding />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/dashboard/*"
-          element={
-            <ProtectedRoute>
-              {user && (
-                <Layout
-                  userRole={user.role}
-                  userName={user.full_name}
-                  onLogout={handleLogout}
-                  currentPage={dashboardPage}
-                  setCurrentPage={handleDashboardNavChange}
-                >
-                  {dashboardPage === 'profile' && <ProfilePage userRole={user.role} userName={user.full_name} />}
-                  {dashboardPage === 'notifications' && <NotificationsPage />}
-                  {dashboardPage === 'settings' && <SettingsPage userRole={user.role} onLogout={handleLogout} />}
-                  {dashboardPage !== 'profile' && dashboardPage !== 'notifications' && dashboardPage !== 'settings' && renderDashboard()}
-                </Layout>
-              )}
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        <Route path="*" element={<NotFound onBack={() => navigate('/')} />} />
-      </Routes>
+      <main id="main-content">
+        <Routes>
+          <Route path="/" element={<LandingPage onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/email-verification" element={<EmailVerificationSent />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <Onboarding />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dashboard/*"
+            element={
+              <ProtectedRoute>
+                {user && (
+                  <Layout
+                    userRole={user.role}
+                    userName={user.full_name}
+                    onLogout={handleLogout}
+                    currentPage={dashboardPage}
+                    setCurrentPage={handleDashboardNavChange}
+                  >
+                    {dashboardPage === 'profile' && <ProfilePage userRole={user.role} userName={user.full_name} />}
+                    {dashboardPage === 'notifications' && <NotificationsPage />}
+                    {dashboardPage === 'settings' && <SettingsPage userRole={user.role} onLogout={handleLogout} />}
+                    {dashboardPage !== 'profile' && dashboardPage !== 'notifications' && dashboardPage !== 'settings' && renderDashboard()}
+                  </Layout>
+                )}
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="*" element={<NotFound onBack={() => navigate('/')} />} />
+        </Routes>
+      </main>
     </Suspense>
   );
 };
