@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import Map, { Marker, Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl';
+import Map, { Marker, Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import { MapPin, Plus, X, Save, Edit2, Trash2, Activity } from 'lucide-react';
 import { Venue } from '../../types';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -172,6 +172,10 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         onMove={evt => setViewState(evt.viewState)}
         onClick={handleMapClick}
         mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+        // Alternative open-source map styles:
+        // OpenFreeMap: "https://tiles.openfreemap.org/styles/liberty"
+        // CartoDB Positron: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        // CartoDB Voyager: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
         style={{ width: '100%', height: '100%' }}
         cursor={drawingMode ? 'crosshair' : 'auto'}
       >
