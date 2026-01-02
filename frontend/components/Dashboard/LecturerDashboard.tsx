@@ -8,9 +8,16 @@ import { courseApi, sessionApi, AttendanceSession } from '../../services/api/att
 import { venueApi } from '../../services/api/venues';
 import { Venue as VenueType } from '../../types';
 import { analyticsApi, LecturerDashboardAnalytics, CourseAttendanceAnalytics } from '../../services/api/analytics';
+import { UserProfile } from '../../services/api/auth';
+import CourseModal from '../Admin/CourseModal';
+import { institutionsApi } from '../../services/api/institutions';
+import { Department, Course as CourseType } from '../../types';
+import { coursesApi } from '../../services/api/courses';
+import { toast } from 'sonner';
 
 interface LecturerDashboardProps {
   userName: string;
+  userProfile?: UserProfile;
   view?: string;
 }
 
@@ -35,7 +42,7 @@ interface Venue {
     name: string;
 }
 
-export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, view = 'dashboard' }) => {
+export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, userProfile, view = 'dashboard' }) => {
   // State
   const [sessions, setSessions] = useState<Session[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -51,6 +58,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Department data for course creation
+  const [departments, setDepartments] = useState<Department[]>([]);
 
   // Fetch real data on mount
   useEffect(() => {
@@ -58,6 +68,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     fetchVenues();
     fetchSessions();
     fetchDashboardAnalytics();
+    fetchDepartments();
   }, []);
 
   const fetchDashboardAnalytics = async () => {
@@ -184,6 +195,27 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     }
   };
 
+  const fetchDepartments = async () => {
+    try {
+      // If lecturer has institution/college, fetch filtered departments
+      if (userProfile?.institution) {
+        if (userProfile.college) {
+          const data = await institutionsApi.getDepartmentsByCollege(userProfile.college);
+          setDepartments(Array.isArray(data) ? data : []);
+        } else {
+          const data = await institutionsApi.getDepartmentsByInstitution(userProfile.institution);
+          setDepartments(Array.isArray(data) ? data : []);
+        }
+      } else {
+        // Fallback to all departments
+        const data = await institutionsApi.getAllDepartments();
+        setDepartments(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error('Error fetching departments:', err);
+    }
+  };
+
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -193,8 +225,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   
   // Course Management Modals
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  const [courseFormData, setCourseFormData] = useState({ name: '', code: '', students: '', venue: '' });
+  const [editingCourseData, setEditingCourseData] = useState<CourseType | null>(null);
 
   // Create Form State - UPDATED for Timer
   const [createSessionData, setCreateSessionData] = useState({
@@ -314,47 +345,50 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     }
   };
   
-  const handleSaveCourse = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (editingCourse) {
-          // Edit Logic
-          setCourses(prev => prev.map(c => 
-              c.id === editingCourse.id 
-                  ? { 
-                      ...c, 
-                      name: courseFormData.name, 
-                      code: courseFormData.code, 
-                      students: parseInt(courseFormData.students), 
-                      venue: courseFormData.venue 
-                    } 
-                  : c
-          ));
+  const handleSaveCourse = async (formData: Partial<CourseType>) => {
+    try {
+      if (editingCourseData) {
+        // Update existing course
+        await coursesApi.updateCourse(editingCourseData.id, formData);
+        toast.success('Course Updated', {
+          description: 'Course has been updated successfully'
+        });
       } else {
-          // Add Logic
-          const newCourse: Course = {
-              id: Date.now().toString(),
-              name: courseFormData.name,
-              code: courseFormData.code,
-              students: parseInt(courseFormData.students),
-              venue: courseFormData.venue
-          };
-          setCourses(prev => [...prev, newCourse]);
+        // Create new course
+        await coursesApi.createCourse(formData as Omit<CourseType, 'id' | 'created_at' | 'updated_at' | 'department_name' | 'lecturer_name'>);
+        toast.success('Course Created', {
+          description: 'Course has been created successfully'
+        });
       }
+      // Refresh courses list
+      await fetchCourses();
       setIsCourseModalOpen(false);
-      setEditingCourse(null);
-      setCourseFormData({ name: '', code: '', students: '', venue: '' });
+      setEditingCourseData(null);
+    } catch (err: any) {
+      toast.error('Save Failed', {
+        description: err.response?.data?.error || err.response?.data?.message || 'Failed to save course'
+      });
+      throw err;
+    }
   };
 
-  const openEditCourse = (course: Course) => {
-      setEditingCourse(course);
-      setCourseFormData({ name: course.name, code: course.code, students: course.students.toString(), venue: course.venue });
+  const openEditCourse = async (course: Course) => {
+    try {
+      // Fetch full course details from backend
+      const fullCourse = await coursesApi.getCourse(parseInt(course.id));
+      setEditingCourseData(fullCourse);
       setIsCourseModalOpen(true);
+    } catch (err) {
+      console.error('Error fetching course details:', err);
+      toast.error('Error', {
+        description: 'Failed to load course details'
+      });
+    }
   };
   
   const openAddCourse = () => {
-      setEditingCourse(null);
-      setCourseFormData({ name: '', code: '', students: '', venue: '' });
-      setIsCourseModalOpen(true);
+    setEditingCourseData(null);
+    setIsCourseModalOpen(true);
   };
 
   const getMockAttendees = (count: number): Attendee[] => {
@@ -548,33 +582,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
               </div>
           </div>
       );
-  };
+  }
   
-  const CourseModal = () => (
-      isCourseModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{editingCourse ? 'Edit Course' : 'Add New Course'}</h3>
-                    <button onClick={() => setIsCourseModalOpen(false)} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white"><X size={20}/></button>
-                </div>
-                <form onSubmit={handleSaveCourse} className="space-y-4">
-                    <Input label="Course Name" placeholder="e.g. Intro to Computer Science" value={courseFormData.name} onChange={e => setCourseFormData({...courseFormData, name: e.target.value})} required />
-                    <Input label="Course Code" placeholder="e.g. CS101" value={courseFormData.code} onChange={e => setCourseFormData({...courseFormData, code: e.target.value})} required />
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input label="Total Students" type="number" placeholder="100" value={courseFormData.students} onChange={e => setCourseFormData({...courseFormData, students: e.target.value})} required />
-                        <Input label="Default Venue" placeholder="LH 1" value={courseFormData.venue} onChange={e => setCourseFormData({...courseFormData, venue: e.target.value})} required />
-                    </div>
-                    <div className="pt-2 flex gap-3">
-                        <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsCourseModalOpen(false)}>Cancel</Button>
-                        <Button type="submit" className="flex-1">{editingCourse ? 'Save Changes' : 'Add Course'}</Button>
-                    </div>
-                </form>
-            </div>
-        </div>
-      )
-  );
-
   // Render Views
   if (view === 'courses') {
       return (
@@ -600,9 +609,19 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                       </div>
                   ))}
               </div>
-              {CourseModal()}
+              {isCourseModalOpen && (
+                <CourseModal
+                  course={editingCourseData}
+                  departments={departments}
+                  onSave={handleSaveCourse}
+                  onClose={() => {
+                    setIsCourseModalOpen(false);
+                    setEditingCourseData(null);
+                  }}
+                />
+              )}
           </div>
-      )
+      );
   }
 
   if (view === 'reports') {
@@ -627,7 +646,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                   ))}
               </div>
           </div>
-      )
+      );
   }
 
   if (view === 'timetable') {
@@ -642,7 +661,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                   <p>Your scheduled classes will appear here.</p>
               </div>
           </div>
-      )
+      );
   }
 
   if (view === 'analytics') {
