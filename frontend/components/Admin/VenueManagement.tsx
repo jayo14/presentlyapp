@@ -37,8 +37,8 @@ export const VenueManagement: React.FC = () => {
         institutionsApi.getAllInstitutions(),
         venueApi.getAll()
       ]);
-      setInstitutions(institutionsData);
-      setVenues(venuesData);
+      setInstitutions(Array.isArray(institutionsData) ? institutionsData : []);
+      setVenues(Array.isArray(venuesData) ? venuesData : []);
       setError(null);
     } catch (err) {
       setError('Failed to load data');
@@ -53,7 +53,7 @@ export const VenueManagement: React.FC = () => {
       setLoading(true);
       const filters = institutionId ? { institution: institutionId } : undefined;
       const data = await venueApi.getAll(filters);
-      setVenues(data);
+      setVenues(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       setError('Failed to load venues');
@@ -63,11 +63,11 @@ export const VenueManagement: React.FC = () => {
     }
   };
 
-  const filteredVenues = venues.filter(venue =>
+  const filteredVenues = Array.isArray(venues) ? venues.filter(venue =>
     venue.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     venue.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     venue.building_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) : [];
 
   const handleCreateVenue = () => {
     setEditingVenue(null);
