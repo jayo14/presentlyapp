@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* MapLibre GL CSS - required for map rendering */
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
 @layer base {
   :root {
     --background: 224 71% 4%; /* #010409 */
