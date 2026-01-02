@@ -136,19 +136,19 @@ class CourseAttendanceAnalyticsView(APIView):
                 'good_standing_count': 0
             })
         
-        # Get all students enrolled in courses in the same department (simplified enrollment logic)
-        # In a real system, you'd have a proper enrollment table
-        students = User.objects.filter(
-            role=UserRole.STUDENT,
-            department=course.department.name,  # Simplified: match by department name
+        # Get enrolled students for this course using the enrollment system
+        from institutions.models import CourseEnrollment
+        enrolled_students = CourseEnrollment.objects.filter(
+            course=course,
             is_active=True
-        )
+        ).select_related('student')
         
         # Build student analytics
         student_analytics = []
         benchmark = int(request.GET.get('benchmark', 70))
         
-        for student in students:
+        for enrollment in enrolled_students:
+            student = enrollment.student
             attended_count = Attendance.objects.filter(
                 student=student,
                 session__course=course
