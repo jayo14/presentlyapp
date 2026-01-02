@@ -13,13 +13,13 @@ from django.utils import timezone
 import secrets
 
 from .models import (
-    User, Institution, College, Department, Course, AttendanceSession, 
+    User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
     Attendance, Venue, UserRole, EmailVerificationOTP
 )
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
-    DepartmentSerializer, VenueSerializer, CourseSerializer, AttendanceSessionSerializer,
+    DepartmentSerializer, VenueSerializer, CourseSerializer, CourseEnrollmentSerializer, AttendanceSessionSerializer,
     AttendanceSerializer, PasswordChangeSerializer
 )
 from .geolocation_utils import verify_location, calculate_distance
@@ -656,6 +656,169 @@ class CourseViewSet(viewsets.ModelViewSet):
         # Only show active courses
         queryset = queryset.filter(is_active=True)
         return queryset
+    
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def enrolled_students(self, request, pk=None):
+        """Get list of students enrolled in this course"""
+        course = self.get_object()
+        
+        # Check if user has permission to view enrollments
+        if request.user.role not in [UserRole.LECTURER, UserRole.ADMIN]:
+            if course.lecturer != request.user:
+                return Response({
+                    'error': 'Permission denied'
+                }, status=status.HTTP_403_FORBIDDEN)
+        
+        enrollments = CourseEnrollment.objects.filter(
+            course=course,
+            is_active=True
+        ).select_related('student')
+        
+        students = []
+        for enrollment in enrollments:
+            students.append({
+                'id': str(enrollment.student.id),
+                'name': enrollment.student.full_name,
+                'email': enrollment.student.email,
+                'matric_number': enrollment.student.matric_number,
+                'department': enrollment.student.department,
+                'level': enrollment.student.level,
+                'enrolled_at': enrollment.enrolled_at,
+                'status': enrollment.status
+            })
+        
+        return Response({
+            'course_id': course.id,
+            'course_code': course.code,
+            'course_title': course.title,
+            'enrolled_count': len(students),
+            'students': students
+        })
+
+
+class CourseEnrollmentViewSet(viewsets.ModelViewSet):
+    """ViewSet for Course Enrollment CRUD"""
+    queryset = CourseEnrollment.objects.all()
+    serializer_class = CourseEnrollmentSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
+        
+        queryset = CourseEnrollment.objects.all()
+        student_id = self.request.query_params.get('student', None)
+        course_id = self.request.query_params.get('course', None)
+        is_active = self.request.query_params.get('active', None)
+        
+        if student_id:
+            queryset = queryset.filter(student_id=student_id)
+        if course_id:
+            queryset = queryset.filter(course_id=course_id)
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        
+        # Students can only see their own enrollments
+        if self.request.user.role == UserRole.STUDENT:
+            queryset = queryset.filter(student=self.request.user)
+        
+        # Lecturers can only see enrollments for their courses
+        elif self.request.user.role == UserRole.LECTURER:
+            queryset = queryset.filter(course__lecturer=self.request.user)
+        
+        return queryset.select_related('student', 'course')
+    
+    def perform_create(self, serializer):
+        """Handle enrollment creation"""
+        # Students can only enroll themselves
+        if self.request.user.role == UserRole.STUDENT:
+            serializer.save(student=self.request.user)
+        else:
+            serializer.save()
+    
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def enroll(self, request):
+        """Student enrolls in a course"""
+        if request.user.role != UserRole.STUDENT:
+            return Response({
+                'success': False,
+                'error': 'Only students can enroll in courses'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        course_id = request.data.get('course_id')
+        if not course_id:
+            return Response({
+                'success': False,
+                'error': 'course_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            course = Course.objects.get(id=course_id, is_active=True)
+        except Course.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'Course not found or inactive'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if already enrolled
+        existing_enrollment = CourseEnrollment.objects.filter(
+            student=request.user,
+            course=course
+        ).first()
+        
+        if existing_enrollment:
+            if existing_enrollment.is_active:
+                return Response({
+                    'success': False,
+                    'error': 'Already enrolled in this course'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                # Reactivate enrollment
+                existing_enrollment.is_active = True
+                existing_enrollment.status = 'ENROLLED'
+                existing_enrollment.save()
+                serializer = self.get_serializer(existing_enrollment)
+                return Response({
+                    'success': True,
+                    'message': 'Re-enrolled in course successfully',
+                    'enrollment': serializer.data
+                })
+        
+        # Create new enrollment
+        enrollment = CourseEnrollment.objects.create(
+            student=request.user,
+            course=course,
+            status='ENROLLED',
+            is_active=True
+        )
+        
+        serializer = self.get_serializer(enrollment)
+        return Response({
+            'success': True,
+            'message': 'Enrolled in course successfully',
+            'enrollment': serializer.data
+        }, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def drop(self, request, pk=None):
+        """Student drops a course"""
+        enrollment = self.get_object()
+        
+        # Students can only drop their own enrollments
+        if request.user.role == UserRole.STUDENT and enrollment.student != request.user:
+            return Response({
+                'success': False,
+                'error': 'Permission denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        enrollment.status = 'DROPPED'
+        enrollment.is_active = False
+        enrollment.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Course dropped successfully'
+        })
 
 
 class AttendanceSessionViewSet(viewsets.ModelViewSet):
