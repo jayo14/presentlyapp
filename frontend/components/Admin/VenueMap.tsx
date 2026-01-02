@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Map, { Marker, Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import { MapPin, Plus, X, Save, Edit2, Trash2, Activity } from 'lucide-react';
 import { Venue } from '../../types';
-import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface VenueMapProps {
   venues: Venue[];
@@ -79,12 +78,50 @@ export const VenueMap: React.FC<VenueMapProps> = ({
   const [hoveredVenue, setHoveredVenue] = useState<Venue | null>(null);
   const [boundaryPoints, setBoundaryPoints] = useState<number[][]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  // Map style - using open-source alternatives with fallback
+  const MAP_STYLES = [
+    // OpenStreetMap Carto style (always available)
+    'https://demotiles.maplibre.org/style.json',
+    // Fallback: Basic OSM raster tiles via MapTiler
+    {
+      version: 8,
+      sources: {
+        'osm': {
+          type: 'raster',
+          tiles: [
+            'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          ],
+          tileSize: 256,
+          attribution: '© OpenStreetMap contributors'
+        }
+      },
+      layers: [
+        {
+          id: 'osm',
+          type: 'raster',
+          source: 'osm',
+          minzoom: 0,
+          maxzoom: 22
+        }
+      ]
+    }
+  ];
+
+  const [currentStyleIndex, setCurrentStyleIndex] = useState(0);
 
   // Initialize map with pulsing animation
   useEffect(() => {
     const map = mapRef.current?.getMap();
     if (map && !map.hasImage('pulsing-dot')) {
-      map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 });
+      try {
+        map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 });
+      } catch (error) {
+        console.warn('Failed to add pulsing dot image:', error);
+      }
     }
   }, [mapRef.current]);
 
@@ -99,6 +136,18 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       });
     }
   }, [venues]);
+
+  const handleMapError = useCallback((error: any) => {
+    console.error('Map error:', error);
+    setMapError('Map failed to load. Trying alternative source...');
+    // Try next style
+    if (currentStyleIndex < MAP_STYLES.length - 1) {
+      setTimeout(() => {
+        setCurrentStyleIndex(currentStyleIndex + 1);
+        setMapError(null);
+      }, 2000);
+    }
+  }, [currentStyleIndex, MAP_STYLES.length]);
 
   const handleMapClick = useCallback((event: any) => {
     const { lngLat } = event;
@@ -166,18 +215,22 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
   return (
     <div className="relative w-full h-full">
+      {mapError && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 bg-yellow-500/90 text-black px-4 py-2 rounded-lg text-sm font-medium shadow-lg">
+          {mapError}
+        </div>
+      )}
+      
       <Map
         ref={mapRef}
         {...viewState}
         onMove={evt => setViewState(evt.viewState)}
         onClick={handleMapClick}
-        mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
-        // Alternative open-source map styles:
-        // OpenFreeMap: "https://tiles.openfreemap.org/styles/liberty"
-        // CartoDB Positron: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-        // CartoDB Voyager: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+        onError={handleMapError}
+        mapStyle={MAP_STYLES[currentStyleIndex]}
         style={{ width: '100%', height: '100%' }}
         cursor={drawingMode ? 'crosshair' : 'auto'}
+        attributionControl={true}
       >
         <NavigationControl position="top-right" />
         <GeolocateControl

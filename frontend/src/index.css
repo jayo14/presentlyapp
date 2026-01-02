@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* MapLibre GL CSS - required for map rendering */
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
 @layer base {
   :root {
     --background: 224 71% 4%; /* #010409 */
