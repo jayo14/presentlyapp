@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Edit2, Trash2, Search, Filter, Mail, Shield, AlertCircle, Loader, Download } from 'lucide-react';
+import { Users, Plus, Edit2, Trash2, Search, Filter, Mail, Shield, AlertCircle, Loader, Download, UserX, UserCheck, Key, Eye, MoreVertical, X } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { User, UserRole } from '../../types';
 import apiClient from '../../services/api/client';
+import { toast } from 'sonner';
 
 export const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -13,6 +14,7 @@ export const UserManagement: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -27,8 +29,12 @@ export const UserManagement: React.FC = () => {
       const usersData = response.data.results || response.data;
       setUsers(Array.isArray(usersData) ? usersData : []);
       setError(null);
-    } catch (err) {
-      setError('Failed to load users');
+    } catch (err: any) {
+      const errorMsg = 'Failed to load users';
+      setError(errorMsg);
+      toast.error('Load Error', {
+        description: errorMsg
+      });
       console.error(err);
     } finally {
       setLoading(false);
@@ -41,15 +47,20 @@ export const UserManagement: React.FC = () => {
   );
 
   const handleDeleteUser = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       return;
     }
 
     try {
       await apiClient.delete(`/users/${id}/`);
+      toast.success('User Deleted', {
+        description: 'User has been successfully deleted'
+      });
       await loadUsers();
-    } catch (err) {
-      setError('Failed to delete user');
+    } catch (err: any) {
+      toast.error('Delete Failed', {
+        description: err.response?.data?.error || 'Failed to delete user'
+      });
       console.error(err);
     }
   };
@@ -57,11 +68,58 @@ export const UserManagement: React.FC = () => {
   const handleUpdateRole = async (userId: string, newRole: UserRole) => {
     try {
       await apiClient.patch(`/users/${userId}/`, { role: newRole });
+      toast.success('Role Updated', {
+        description: 'User role has been updated successfully'
+      });
       await loadUsers();
-    } catch (err) {
-      setError('Failed to update user role');
+    } catch (err: any) {
+      toast.error('Update Failed', {
+        description: err.response?.data?.error || 'Failed to update user role'
+      });
       console.error(err);
     }
+  };
+
+  const handleSuspendUser = async (userId: string, suspend: boolean) => {
+    try {
+      await apiClient.patch(`/users/${userId}/`, { is_active: !suspend });
+      toast.success(suspend ? 'User Suspended' : 'User Activated', {
+        description: `User has been ${suspend ? 'suspended' : 'activated'} successfully`
+      });
+      await loadUsers();
+    } catch (err: any) {
+      toast.error('Action Failed', {
+        description: err.response?.data?.error || `Failed to ${suspend ? 'suspend' : 'activate'} user`
+      });
+      console.error(err);
+    }
+  };
+
+  const handleResetPassword = async (userId: string, email: string) => {
+    if (!confirm(`Send password reset email to ${email}?`)) {
+      return;
+    }
+
+    try {
+      await apiClient.post(`/users/${userId}/reset-password/`);
+      toast.success('Reset Email Sent', {
+        description: 'Password reset instructions have been sent to the user'
+      });
+    } catch (err: any) {
+      toast.error('Send Failed', {
+        description: err.response?.data?.error || 'Failed to send reset email'
+      });
+      console.error(err);
+    }
+  };
+
+  const handleSendEmail = (email: string) => {
+    window.location.href = `mailto:${email}`;
+  };
+
+  const handleViewUser = (user: User) => {
+    setSelectedUser(user);
+    setShowModal(true);
   };
 
   const getRoleColor = (role: UserRole) => {
@@ -246,12 +304,47 @@ export const UserManagement: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="text-red-400 hover:text-red-300 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleViewUser(user)}
+                        className="text-zinc-400 hover:text-zinc-200 transition-colors"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleSendEmail(user.email)}
+                        className="text-zinc-400 hover:text-zinc-200 transition-colors"
+                        title="Send Email"
+                      >
+                        <Mail className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleResetPassword(user.id, user.email)}
+                        className="text-zinc-400 hover:text-zinc-200 transition-colors"
+                        title="Reset Password"
+                      >
+                        <Key className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleSuspendUser(user.id, user.is_active !== false)}
+                        className={`transition-colors ${
+                          user.is_active !== false
+                            ? 'text-yellow-400 hover:text-yellow-300'
+                            : 'text-green-400 hover:text-green-300'
+                        }`}
+                        title={user.is_active !== false ? 'Suspend User' : 'Activate User'}
+                      >
+                        {user.is_active !== false ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="text-red-400 hover:text-red-300 transition-colors"
+                        title="Delete User"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -264,6 +357,100 @@ export const UserManagement: React.FC = () => {
         <div className="text-center py-12">
           <Users className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
           <p className="text-zinc-400">No users found</p>
+        </div>
+      )}
+
+      {/* User Details Modal */}
+      {showModal && selectedUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-foreground">User Details</h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                  <span className="text-primary font-semibold text-2xl">
+                    {selectedUser.name?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-foreground">{selectedUser.name || 'No Name'}</h4>
+                  <p className="text-zinc-400">{selectedUser.email}</p>
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 border ${getRoleColor(selectedUser.role)}`}>
+                    {selectedUser.role}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mt-6">
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase">Status</p>
+                  <p className="text-foreground font-medium mt-1">
+                    {selectedUser.is_active !== false ? 'Active' : 'Suspended'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase">Onboarding</p>
+                  <p className="text-foreground font-medium mt-1">
+                    {selectedUser.onboarding_complete ? 'Complete' : 'Pending'}
+                  </p>
+                </div>
+                {selectedUser.matric_number && (
+                  <div>
+                    <p className="text-xs text-zinc-500 uppercase">Matric Number</p>
+                    <p className="text-foreground font-medium mt-1">{selectedUser.matric_number}</p>
+                  </div>
+                )}
+                {selectedUser.level && (
+                  <div>
+                    <p className="text-xs text-zinc-500 uppercase">Level</p>
+                    <p className="text-foreground font-medium mt-1">{selectedUser.level}</p>
+                  </div>
+                )}
+                {selectedUser.department && (
+                  <div className="col-span-2">
+                    <p className="text-xs text-zinc-500 uppercase">Department</p>
+                    <p className="text-foreground font-medium mt-1">{selectedUser.department}</p>
+                  </div>
+                )}
+                {selectedUser.college && (
+                  <div className="col-span-2">
+                    <p className="text-xs text-zinc-500 uppercase">College</p>
+                    <p className="text-foreground font-medium mt-1">{selectedUser.college}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-6 pt-4 border-t border-zinc-800">
+                <Button
+                  variant="secondary"
+                  onClick={() => handleSendEmail(selectedUser.email)}
+                  className="flex-1"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Send Email
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    handleResetPassword(selectedUser.id, selectedUser.email);
+                    setShowModal(false);
+                  }}
+                  className="flex-1"
+                >
+                  <Key className="w-4 h-4 mr-2" />
+                  Reset Password
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
