@@ -5,19 +5,22 @@ export const coursesApi = {
   // Get all courses
   getAllCourses: async (): Promise<Course[]> => {
     const response = await apiClient.get('/courses/');
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
 
   // Get courses by department
   getCoursesByDepartment: async (departmentId: number): Promise<Course[]> => {
     const response = await apiClient.get(`/courses/?department=${departmentId}`);
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
 
   // Get courses by level
   getCoursesByLevel: async (level: string): Promise<Course[]> => {
     const response = await apiClient.get(`/courses/?level=${level}`);
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
 
   // Get a single course
