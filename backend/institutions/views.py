@@ -550,7 +550,7 @@ class CollegeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = College.objects.all()
+        queryset = College.objects.all().order_by('name')
         institution_id = self.request.query_params.get('institution', None)
         if institution_id:
             queryset = queryset.filter(institution_id=institution_id)
@@ -573,7 +573,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = Department.objects.all()
+        queryset = Department.objects.all().order_by('name')
         college_id = self.request.query_params.get('college', None)
         institution_id = self.request.query_params.get('institution', None)
         
