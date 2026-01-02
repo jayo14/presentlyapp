@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { studentApi, AvailableCourse } from '../../services/api/student';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 interface CourseRegistrationDialogProps {
   isOpen: boolean;
@@ -41,7 +42,11 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
       const data = await studentApi.getAvailableCourses();
       setCourses(data);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load available courses');
+      const errorMsg = err.response?.data?.error || 'Failed to load available courses';
+      setError(errorMsg);
+      toast.error('Load Error', {
+        description: errorMsg
+      });
     } finally {
       setLoading(false);
     }
@@ -75,9 +80,17 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         c.id === courseId ? { ...c, can_enroll: false } : c
       ));
       
+      toast.success('Enrollment Successful', {
+        description: 'You have been enrolled in the course'
+      });
+      
       onSuccess();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to enroll in course');
+      const errorMsg = err.response?.data?.error || 'Failed to enroll in course';
+      setError(errorMsg);
+      toast.error('Enrollment Failed', {
+        description: errorMsg
+      });
     } finally {
       setEnrollingCourseId(null);
     }

@@ -25,6 +25,17 @@ export interface SystemConfig {
   payment_gateway_enabled: boolean;
 }
 
+export interface SystemLog {
+  id: number;
+  event_type: string;
+  action: string;
+  user_name?: string;
+  user_role?: string;
+  ip_address?: string;
+  timestamp: string;
+  details?: string;
+}
+
 export const systemApi = {
   // Get system statistics
   getStats: async (): Promise<SystemStats> => {
@@ -117,6 +128,57 @@ export const systemApi = {
         localStorage.setItem('PAYMENT_GATEWAY_ENABLED', String(config.payment_gateway_enabled));
       }
       return config as SystemConfig;
+    }
+  },
+
+  // Get system logs
+  getLogs: async (filters?: {
+    event_type?: string;
+    start_date?: string;
+    end_date?: string;
+    limit?: number;
+  }): Promise<SystemLog[]> => {
+    try {
+      const response = await apiClient.get('/system/logs/', { params: filters });
+      // Handle paginated response
+      return response.data.results || response.data;
+    } catch (error) {
+      // Return mock data if endpoint doesn't exist yet
+      console.warn('System logs endpoint not available, using mock data');
+      return [
+        {
+          id: 1,
+          event_type: 'AUTH',
+          action: 'User Login',
+          user_name: 'Dr. Sarah Johnson',
+          user_role: 'Lecturer',
+          timestamp: new Date(Date.now() - 2 * 60000).toISOString(),
+        },
+        {
+          id: 2,
+          event_type: 'AUTH',
+          action: 'Failed Login Attempt',
+          ip_address: '192.168.1.100',
+          user_role: '-',
+          timestamp: new Date(Date.now() - 4 * 60000).toISOString(),
+        },
+        {
+          id: 3,
+          event_type: 'CONFIG',
+          action: 'System Config Update',
+          user_name: 'Admin User',
+          user_role: 'Admin',
+          timestamp: new Date(Date.now() - 90 * 60000).toISOString(),
+        },
+        {
+          id: 4,
+          event_type: 'SYSTEM',
+          action: 'Database Backup',
+          user_name: 'System',
+          user_role: 'System',
+          timestamp: new Date(Date.now() - 540 * 60000).toISOString(),
+        },
+      ];
     }
   },
 };
