@@ -5,7 +5,8 @@ export const institutionsApi = {
   // Institution methods
   getAllInstitutions: async (): Promise<Institution[]> => {
     const response = await apiClient.get('/institutions/');
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
   createInstitution: async (data: Omit<Institution, 'id'>): Promise<Institution> => {
     const response = await apiClient.post('/institutions/', data);
@@ -22,7 +23,8 @@ export const institutionsApi = {
   // College methods
   getCollegesByInstitution: async (institutionId: number): Promise<College[]> => {
     const response = await apiClient.get(`/colleges/?institution=${institutionId}`);
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
   createCollege: async (data: Omit<College, 'id'>): Promise<College> => {
     const response = await apiClient.post('/colleges/', data);
@@ -39,15 +41,18 @@ export const institutionsApi = {
   // Department methods
   getDepartmentsByCollege: async (collegeId: number): Promise<Department[]> => {
     const response = await apiClient.get(`/departments/?college=${collegeId}`);
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
   getDepartmentsByInstitution: async (institutionId: number): Promise<Department[]> => {
     const response = await apiClient.get(`/departments/?institution=${institutionId}`);
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
   getAllDepartments: async (): Promise<Department[]> => {
     const response = await apiClient.get('/departments/');
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
   createDepartment: async (data: Omit<Department, 'id'>): Promise<Department> => {
     const response = await apiClient.post('/departments/', data);

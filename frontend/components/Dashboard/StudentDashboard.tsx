@@ -3,21 +3,13 @@ import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, X, Image as
 import { Button } from '../Button';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 import { AnimatePresence, motion } from 'framer-motion';
-import { studentApi, StudentDashboardData, EnrolledCourse } from '../../services/api/student';
+import { studentApi, StudentDashboardData, EnrolledCourse, TimetableEntry, StudentAnalytics } from '../../services/api/student';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
+import { toast } from 'sonner';
 
 interface StudentDashboardProps {
   userName: string;
   view?: string;
-}
-
-interface Course {
-    code: string;
-    name: string;
-    attendance: number;
-    status: 'Good' | 'Average' | 'Warning';
-    time: string;
-    registered: boolean;
 }
 
 // Mock Database mapping Session Codes to Course Codes for validation
@@ -335,53 +327,6 @@ const MarkAttendanceModal = ({
     );
 };
 
-// Course Registration Modal
-const CourseRegistrationModal = ({
-    isOpen,
-    onClose,
-    allCourses,
-    onToggleCourse
-}: {
-    isOpen: boolean;
-    onClose: () => void;
-    allCourses: Course[];
-    onToggleCourse: (code: string) => void;
-}) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl flex flex-col max-h-[80vh]">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-white">Course Registration</h3>
-                    <button onClick={onClose} className="text-zinc-500 hover:text-white"><X size={20}/></button>
-                </div>
-                <div className="flex-1 overflow-y-auto space-y-3">
-                    {allCourses.map((course) => (
-                        <div key={course.code} className="flex items-center justify-between p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
-                            <div>
-                                <p className="text-white font-bold">{course.code}</p>
-                                <p className="text-sm text-zinc-500">{course.name}</p>
-                            </div>
-                            <Button 
-                                size="sm" 
-                                variant={course.registered ? "outline" : "primary"}
-                                onClick={() => onToggleCourse(course.code)}
-                                className={course.registered ? "border-green-500 text-green-500 hover:bg-green-500/10" : ""}
-                            >
-                                {course.registered ? <><CheckCircle2 size={14} className="mr-1"/> Registered</> : "Register"}
-                            </Button>
-                        </div>
-                    ))}
-                </div>
-                <div className="pt-4 mt-4 border-t border-zinc-800">
-                    <Button className="w-full" onClick={onClose}>Done</Button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, view = 'dashboard' }) => {
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
@@ -394,11 +339,27 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const [dashboardData, setDashboardData] = useState<StudentDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<StudentAnalytics | null>(null);
   
   // Load dashboard data on mount
   useEffect(() => {
     loadDashboardData();
   }, []);
+  
+  // Load timetable data when view changes to timetable
+  useEffect(() => {
+    if (view === 'timetable') {
+      loadTimetableData();
+    }
+  }, [view]);
+  
+  // Load analytics data when view changes to analytics
+  useEffect(() => {
+    if (view === 'analytics') {
+      loadAnalyticsData();
+    }
+  }, [view]);
 
   const loadDashboardData = async () => {
     try {
@@ -408,9 +369,37 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       setError(null);
     } catch (err: any) {
       console.error('Failed to load dashboard data:', err);
-      setError(err.response?.data?.error || 'Failed to load dashboard data');
+      const errorMsg = err.response?.data?.error || 'Failed to load dashboard data';
+      setError(errorMsg);
+      toast.error('Dashboard Error', {
+        description: errorMsg
+      });
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const loadTimetableData = async () => {
+    try {
+      const data = await studentApi.getTimetable();
+      setTimetableData(data);
+    } catch (err: any) {
+      console.error('Failed to load timetable data:', err);
+      toast.error('Timetable Error', {
+        description: 'Failed to load your class timetable'
+      });
+    }
+  };
+  
+  const loadAnalyticsData = async () => {
+    try {
+      const data = await studentApi.getAnalytics();
+      setAnalyticsData(data);
+    } catch (err: any) {
+      console.error('Failed to load analytics data:', err);
+      toast.error('Analytics Error', {
+        description: 'Failed to load your performance analytics'
+      });
     }
   };
   
@@ -462,18 +451,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       }
 
       // 2. Find Course Data
-      const course = courses.find(c => c.code === courseCode);
+      const course = enrolledCourses.find(c => c.course_code === courseCode);
       if (!course) return false;
 
-      // 3. Check Registration Status
-      if (!course.registered) return false;
+      // 3. Check if course is active
+      if (!course.is_active) return false;
 
-      // 4. Success Logic
-      setCourses(prev => prev.map(c => 
-          c.code === courseCode 
-          ? { ...c, attendance: Math.min(100, c.attendance + 5) }
-          : c
-      ));
+      // 4. Success Logic - reload dashboard data to get updated attendance
+      await loadDashboardData();
 
       return true;
   };
@@ -491,28 +476,34 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               </div>
               
               <div className="grid gap-4">
-                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
-                      <div key={day} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
-                          <h3 className="text-primary font-bold mb-3">{day}</h3>
-                          <div className="space-y-3">
-                              {registeredCourses.filter(c => c.time.startsWith(day.slice(0,3))).length > 0 ? (
-                                registeredCourses.filter(c => c.time.startsWith(day.slice(0,3))).map((c, i) => (
-                                    <div key={i} className="flex items-center gap-4 p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                                        <div className="bg-zinc-100 dark:bg-zinc-900 p-2 rounded text-zinc-500 dark:text-zinc-400">
-                                            <Clock size={16} />
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
+                      const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
+                      const dayClasses = timetableData.filter(t => t.day_of_week === dayUpper && t.is_active);
+                      
+                      return (
+                          <div key={day} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
+                              <h3 className="text-primary font-bold mb-3">{day}</h3>
+                              <div className="space-y-3">
+                                  {dayClasses.length > 0 ? (
+                                    dayClasses.map((t) => (
+                                        <div key={t.id} className="flex items-center gap-4 p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                                            <div className="bg-zinc-100 dark:bg-zinc-900 p-2 rounded text-zinc-500 dark:text-zinc-400">
+                                                <Clock size={16} />
+                                            </div>
+                                            <div>
+                                                <p className="text-zinc-900 dark:text-white font-medium">{t.course_code} - {t.course_name}</p>
+                                                <p className="text-sm text-zinc-500">{t.start_time} - {t.end_time}</p>
+                                                {t.venue_name && <p className="text-xs text-zinc-400">{t.venue_name}</p>}
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-zinc-900 dark:text-white font-medium">{c.code} - {c.name}</p>
-                                            <p className="text-sm text-zinc-500">{c.time}</p>
-                                        </div>
-                                    </div>
-                                ))
-                              ) : (
-                                  <p className="text-sm text-zinc-500 italic">No classes scheduled.</p>
-                              )}
+                                    ))
+                                  ) : (
+                                      <p className="text-sm text-zinc-500 italic">No classes scheduled.</p>
+                                  )}
+                              </div>
                           </div>
-                      </div>
-                  ))}
+                      );
+                  })}
               </div>
           </div>
       );
@@ -626,25 +617,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       <h3 className="font-bold text-zinc-900 dark:text-white">Course Performance</h3>
                   </div>
                   <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                      {registeredCourses.map((course) => (
-                          <div key={course.code} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
+                      {analyticsData?.course_performance.map((course) => (
+                          <div key={course.course_code} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
                               <div className="flex-1">
                                   <div className="flex justify-between mb-2">
-                                      <span className="font-bold text-zinc-900 dark:text-white text-sm">{course.code}</span>
-                                      <span className={`text-sm font-bold ${course.attendance >= 75 ? 'text-green-500' : 'text-red-500'}`}>{course.attendance}%</span>
+                                      <span className="font-bold text-zinc-900 dark:text-white text-sm">{course.course_code}</span>
+                                      <span className={`text-sm font-bold ${course.attendance_percentage >= 75 ? 'text-green-500' : 'text-red-500'}`}>{course.attendance_percentage}%</span>
                                   </div>
                                   <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
                                       <div 
-                                        className={`h-full rounded-full ${course.attendance >= 75 ? 'bg-green-500' : 'bg-red-500'}`} 
-                                        style={{ width: `${course.attendance}%` }}
+                                        className={`h-full rounded-full ${course.attendance_percentage >= 75 ? 'bg-green-500' : 'bg-red-500'}`} 
+                                        style={{ width: `${course.attendance_percentage}%` }}
                                       ></div>
                                   </div>
                               </div>
                               <div className="ml-6 text-right w-32">
-                                  <p className="text-xs text-zinc-500 truncate">{course.name}</p>
+                                  <p className="text-xs text-zinc-500 truncate">{course.course_name}</p>
                               </div>
                           </div>
-                      ))}
+                      )) || []}
                   </div>
               </div>
           </div>
@@ -769,7 +760,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                            <BookOpen size={16} />
                         </div>
                        <div>
-                           <p className="text-2xl font-bold text-zinc-900 dark:text-white">{registeredCourses.length}</p>
+                           <p className="text-2xl font-bold text-zinc-900 dark:text-white">{enrolledCourses.length}</p>
                            <p className="text-xs text-zinc-500">Active Courses</p>
                        </div>
                    </div>
@@ -822,11 +813,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         onVerify={verifyAttendanceCode}
        />
 
-       <CourseRegistrationModal
+       <CourseRegistrationDialog
         isOpen={isRegistrationOpen}
         onClose={() => setIsRegistrationOpen(false)}
-        allCourses={courses}
-        onToggleCourse={handleToggleCourse}
+        onSuccess={handleRegistrationSuccess}
        />
     </div>
   );

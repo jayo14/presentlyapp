@@ -11,7 +11,8 @@ export const venueApi = {
   // Get all venues (optionally filtered)
   getAll: async (filters?: VenueFilters): Promise<Venue[]> => {
     const response = await apiClient.get('/venues/', { params: filters });
-    return response.data;
+    // Handle paginated response
+    return response.data.results || response.data;
   },
 
   // Get venue by ID
@@ -40,6 +41,7 @@ export const venueApi = {
   // Get sessions for a venue
   getSessions: async (venueId: number): Promise<AttendanceSession[]> => {
     const response = await apiClient.get(`/venues/${venueId}/sessions/`);
-    return response.data.sessions;
+    // Handle both paginated and direct array responses
+    return response.data.results || response.data.sessions || response.data;
   },
 };
