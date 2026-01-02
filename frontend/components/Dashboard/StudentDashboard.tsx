@@ -717,7 +717,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
            {/* Next Class Card */}
-           <div className="bg-zinc-900 text-white p-6 rounded-3xl relative overflow-hidden border border-zinc-800">
+           {nextClass ? (
+             <div className="bg-zinc-900 text-white p-6 rounded-3xl relative overflow-hidden border border-zinc-800">
                <div className="relative z-10">
                    <p className="text-zinc-400 text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
                        <Clock size={14} className="text-primary"/> Up Next
@@ -735,7 +736,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                <div className="absolute right-[-20px] bottom-[-20px] opacity-5">
                    <BookOpen size={150} />
                </div>
-           </div>
+             </div>
+           ) : (
+             <div className="bg-zinc-900 text-white p-6 rounded-3xl relative overflow-hidden border border-zinc-800">
+               <div className="relative z-10">
+                   <p className="text-zinc-400 text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+                       <Clock size={14} className="text-primary"/> Up Next
+                   </p>
+                   <h3 className="text-2xl font-bold mb-1">No Classes Scheduled</h3>
+                   <p className="text-zinc-400 text-sm mt-4">You don't have any upcoming classes today.</p>
+               </div>
+               <div className="absolute right-[-20px] bottom-[-20px] opacity-5">
+                   <BookOpen size={150} />
+               </div>
+             </div>
+           )}
 
            {/* Quick Stats / Actions */}
            <div className="space-y-4">
