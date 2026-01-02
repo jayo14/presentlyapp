@@ -109,7 +109,7 @@ export interface AvailableCourse extends Course {
 export const studentApi = {
   // Get student dashboard data
   getDashboard: async (): Promise<StudentDashboardData> => {
-    const response = await apiClient.get('/students/dashboard/');
+    const response = await apiClient.get('/analytics/dashboard/student/');
     return response.data;
   },
 
@@ -122,7 +122,7 @@ export const studentApi = {
   // Get available courses for enrollment (by student's department)
   getAvailableCourses: async (): Promise<AvailableCourse[]> => {
     const response = await apiClient.get('/courses/available/');
-    return response.data;
+    return response.data.courses || response.data;
   },
 
   // Enroll in a course
