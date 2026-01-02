@@ -13,7 +13,7 @@ if (!rootElement) {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     // Register the service worker from the root using a cleaner path
-    navigator.serviceWorker.register('service-worker.js')
+    navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
       .then(registration => {
         console.log('SW registered: ', registration);
         

@@ -382,9 +382,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const loadTimetableData = async () => {
     try {
       const data = await studentApi.getTimetable();
-      setTimetableData(data);
+      // Ensure data is an array
+      setTimetableData(Array.isArray(data) ? data : []);
     } catch (err: any) {
       console.error('Failed to load timetable data:', err);
+      setTimetableData([]); // Set to empty array on error
       toast.error('Timetable Error', {
         description: 'Failed to load your class timetable'
       });
@@ -478,7 +480,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               <div className="grid gap-4">
                   {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
                       const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
-                      const dayClasses = timetableData.filter(t => t.day_of_week === dayUpper && t.is_active);
+                      const dayClasses = Array.isArray(timetableData) 
+                        ? timetableData.filter(t => t.day_of_week === dayUpper && t.is_active)
+                        : [];
                       
                       return (
                           <div key={day} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
