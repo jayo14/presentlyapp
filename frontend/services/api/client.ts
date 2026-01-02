@@ -142,23 +142,28 @@ apiClient.interceptors.response.use(
 
     // Show user-friendly error messages for other errors
     const status = error.response?.status;
-    const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message;
+    // Extract actual error message from API response - check multiple possible fields
+    const errorMessage = error.response?.data?.error || 
+                        error.response?.data?.message || 
+                        error.response?.data?.detail ||
+                        error.message;
 
     // Only show toast for errors that aren't handled by components
     if (!originalRequest._skipGlobalErrorHandler) {
       if (status === 403) {
         toast.error('Access Denied', {
-          description: 'You do not have permission to perform this action.'
+          description: errorMessage || 'You do not have permission to perform this action.'
         });
       } else if (status === 404) {
         toast.error('Not Found', {
-          description: 'The requested resource was not found.'
+          description: errorMessage || 'The requested resource was not found.'
         });
       } else if (status === 500) {
         toast.error('Server Error', {
-          description: 'Something went wrong on our end. Please try again later.'
+          description: errorMessage || 'Something went wrong on our end. Please try again later.'
         });
       } else if (status >= 400 && status < 500) {
+        // For 4xx errors, prioritize showing the actual API message
         toast.error('Request Failed', {
           description: errorMessage || 'Please check your input and try again.'
         });

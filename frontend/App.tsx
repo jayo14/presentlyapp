@@ -95,7 +95,7 @@ const AppContent: React.FC = () => {
       case UserRole.STUDENT:
         return <StudentDashboard userName={user.full_name} view={dashboardPage} />;
       case UserRole.LECTURER:
-        return <LecturerDashboard userName={user.full_name} view={dashboardPage} />;
+        return <LecturerDashboard userName={user.full_name} userProfile={user} view={dashboardPage} />;
       case UserRole.ADMIN:
         return <AdminDashboard userName={user.full_name} view={dashboardPage} />;
       case UserRole.CLASS_REP:
