@@ -43,11 +43,14 @@ export const useLogin = () => {
     onSuccess: (response: AuthResponse) => {
       if (response.success && response.user) {
         queryClient.setQueryData(queryKeys.currentUser, response.user);
-        if (response.requires_onboarding) {
-          navigate('/onboarding');
-        } else {
-          navigate('/dashboard');
-        }
+        // Small delay to show loading state during navigation
+        setTimeout(() => {
+          if (response.requires_onboarding) {
+            navigate('/onboarding');
+          } else {
+            navigate('/dashboard');
+          }
+        }, 100);
       }
     },
   });

@@ -5,6 +5,7 @@ import { Logo } from '../Logo';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin, useCurrentUser } from '../../hooks/useAuth';
+import { toast } from 'sonner';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -12,10 +13,12 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const loginMutation = useLogin();
   const { data: user, isLoading } = useCurrentUser();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Auto-redirect if user is already logged in
   useEffect(() => {
     if (user && !isLoading) {
+      setIsRedirecting(true);
       if (!user.onboarding_complete) {
         navigate('/onboarding', { replace: true });
       } else {
@@ -26,19 +29,32 @@ export const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    loginMutation.mutate({ email, password });
+    setIsRedirecting(true);
+    loginMutation.mutate({ email, password }, {
+      onError: (error: any) => {
+        setIsRedirecting(false);
+        toast.error('Login Failed', {
+          description: error.message || 'Invalid credentials. Please try again.'
+        });
+      },
+      onSuccess: () => {
+        toast.success('Login Successful', {
+          description: 'Welcome back! Redirecting to dashboard...'
+        });
+      }
+    });
   };
 
   const onBack = () => navigate(-1);
   const onRegisterClick = () => navigate('/register');
 
-  // Show loading state while checking auth
-  if (isLoading) {
+  // Show loading state while checking auth or redirecting
+  if (isLoading || isRedirecting) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-zinc-400">Loading...</p>
+          <p className="text-zinc-400">{isRedirecting ? 'Redirecting to dashboard...' : 'Loading...'}</p>
         </div>
       </div>
     );

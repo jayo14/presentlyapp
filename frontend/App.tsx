@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './services/api/queryClient';
 import { UserRole } from './types';
 import { useCurrentUser, useLogout } from './hooks/useAuth';
+import { Toaster } from 'sonner';
 
 // Eager load critical components for initial page
 import { LandingPage } from './components/LandingPage';
@@ -160,6 +161,7 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <Toaster position="top-right" richColors closeButton />
         <AppContent />
       </BrowserRouter>
     </QueryClientProvider>
