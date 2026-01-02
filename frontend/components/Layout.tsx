@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
-import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap } from 'lucide-react';
+import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap, Building2, Building } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface LayoutProps {
@@ -128,6 +128,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         return [
           { id: 'dashboard', icon: Home, label: 'Overview' },
           { id: 'users', icon: Users, label: 'User Mgmt' },
+          { id: 'institutions', icon: Building2, label: 'Institutions' },
+          { id: 'courses', icon: BookOpen, label: 'Courses' },
           { id: 'venues', icon: Map, label: 'Venues & Maps' },
           { id: 'logs', icon: ShieldAlert, label: 'Audit Logs' },
           ...common
@@ -291,27 +293,27 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation - Dock Style */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-4 z-50 pointer-events-none">
-        <div className="pointer-events-auto bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl px-8 py-4 flex items-center gap-8">
+      {/* Mobile Bottom Navigation - Dock Style with Glassmorphism */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 flex justify-center pb-4 px-4 z-50 pointer-events-none">
+        <div className="pointer-events-auto bg-white/60 dark:bg-zinc-900/60 backdrop-blur-2xl border border-white/20 dark:border-zinc-700/30 rounded-full shadow-2xl px-10 py-2 flex items-center gap-10">
           {navItems.slice(0, 4).map(item => (
             <button
               key={item.id}
               onClick={() => setCurrentPage(item.id)}
-              className={`flex flex-col items-center justify-center gap-1.5 transition-all duration-200 min-w-[60px] ${
+              className={`flex flex-col items-center justify-center gap-0.5 transition-all duration-200 min-w-[56px] ${
                 currentPage === item.id 
-                  ? 'text-primary scale-110' 
+                  ? 'text-primary scale-105' 
                   : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:scale-105'
               }`}
             >
-              <div className={`p-3 rounded-2xl transition-all duration-200 ${
+              <div className={`p-2 rounded-xl transition-all duration-200 ${
                 currentPage === item.id 
-                  ? 'bg-primary/10 shadow-lg' 
-                  : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  ? 'bg-primary/10 shadow-md' 
+                  : 'hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'
               }`}>
-                <item.icon size={24} strokeWidth={currentPage === item.id ? 2.5 : 2} />
+                <item.icon size={22} strokeWidth={currentPage === item.id ? 2.5 : 2} />
               </div>
-              <span className={`text-[10px] font-medium transition-all duration-200 ${
+              <span className={`text-[9px] font-medium transition-all duration-200 mt-0.5 ${
                 currentPage === item.id ? 'font-semibold' : ''
               }`}>
                 {item.label}

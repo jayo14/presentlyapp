@@ -7,7 +7,9 @@ import { InstitutionManagement } from '../Admin/InstitutionManagement';
 import UserManagement from '../Admin/UserManagement';
 import VenueManagement from '../Admin/VenueManagement';
 import DepartmentManagement from '../Admin/DepartmentManagement';
+import CourseManagement from '../Admin/CourseManagement';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { systemApi, SystemStats, SystemActivity, SystemAlert } from '../../services/api/system';
 
 interface AdminDashboardProps {
   userName: string;
@@ -36,17 +38,53 @@ interface SystemLog {
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view = 'dashboard' }) => {
   // --- State Management ---
   
+  // System Stats State
+  const [systemStats, setSystemStats] = useState<SystemStats>({
+    total_users: 2543,
+    active_venues: 12,
+    total_sessions: 8921,
+    security_alerts: 3,
+  });
+  const [activityData, setActivityData] = useState<SystemActivity[]>([]);
+  const [alerts, setAlerts] = useState<SystemAlert[]>([]);
+  const [statsLoading, setStatsLoading] = useState(true);
+  
   // System Config State
   const [paymentGatewayEnabled, setPaymentGatewayEnabled] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('PAYMENT_GATEWAY_ENABLED');
-    setPaymentGatewayEnabled(stored === 'true');
-  }, []);
+    if (view === 'dashboard') {
+      loadSystemData();
+    }
+  }, [view]);
 
-  const togglePaymentGateway = (checked: boolean) => {
+  const loadSystemData = async () => {
+    try {
+      setStatsLoading(true);
+      const [stats, activity, alertsData, config] = await Promise.all([
+        systemApi.getStats(),
+        systemApi.getActivity(),
+        systemApi.getAlerts(),
+        systemApi.getConfig(),
+      ]);
+      setSystemStats(stats);
+      setActivityData(activity);
+      setAlerts(alertsData);
+      setPaymentGatewayEnabled(config.payment_gateway_enabled);
+    } catch (error) {
+      console.error('Failed to load system data:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const togglePaymentGateway = async (checked: boolean) => {
     setPaymentGatewayEnabled(checked);
-    localStorage.setItem('PAYMENT_GATEWAY_ENABLED', String(checked));
+    try {
+      await systemApi.updateConfig({ payment_gateway_enabled: checked });
+    } catch (error) {
+      console.error('Failed to update payment gateway setting:', error);
+    }
   };
 
   // Users State
@@ -66,17 +104,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       { id: '2', action: 'Failed Login Attempt', user: 'Unknown IP', role: '-', timestamp: '10:40 AM', type: 'warning' },
       { id: '3', action: 'System Config Update', user: 'Admin User', role: 'Admin', timestamp: '09:15 AM', type: 'success' },
       { id: '4', action: 'Database Backup', user: 'System', role: 'System', timestamp: '02:00 AM', type: 'info' },
-  ];
-
-  // Activity Chart Data
-  const activityData = [
-    { name: 'Mon', active: 1200, sessions: 450 },
-    { name: 'Tue', active: 1900, sessions: 680 },
-    { name: 'Wed', active: 1500, sessions: 520 },
-    { name: 'Thu', active: 2100, sessions: 790 },
-    { name: 'Fri', active: 1800, sessions: 650 },
-    { name: 'Sat', active: 400, sessions: 120 },
-    { name: 'Sun', active: 300, sessions: 80 },
   ];
 
   // --- Handlers ---
@@ -120,7 +147,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     return <DepartmentManagement />;
   }
 
-  // 5. Audit Logs View
+  // 5. Course Management View
+  if (view === 'courses') {
+    return <CourseManagement />;
+  }
+
+  // 6. Audit Logs View
   if (view === 'logs') {
       return (
           <div className="space-y-6 animate-in fade-in">
@@ -196,10 +228,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
              {[
-                 { label: "Total Users", value: "2,543", icon: Users, color: "text-blue-500" },
-                 { label: "Active Venues", value: "12", icon: MapIcon, color: "text-green-500" },
-                 { label: "Total Sessions", value: "8,921", icon: Activity, color: "text-yellow-500" },
-                 { label: "Security Alerts", value: "3", icon: ShieldAlert, color: "text-red-500" },
+                 { label: "Total Users", value: systemStats.total_users.toLocaleString(), icon: Users, color: "text-blue-500" },
+                 { label: "Active Venues", value: systemStats.active_venues.toString(), icon: MapIcon, color: "text-green-500" },
+                 { label: "Total Sessions", value: systemStats.total_sessions.toLocaleString(), icon: Activity, color: "text-yellow-500" },
+                 { label: "Security Alerts", value: systemStats.security_alerts.toString(), icon: ShieldAlert, color: "text-red-500" },
              ].map((stat, i) => (
                  <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl flex items-center justify-between shadow-sm">
                      <div>
