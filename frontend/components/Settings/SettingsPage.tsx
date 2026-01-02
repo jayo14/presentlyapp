@@ -9,6 +9,7 @@ import {
   FileText, ChevronRight, Laptop, Eye, Check, X, Database, Server
 } from 'lucide-react';
 import { useCurrentUser } from '../../hooks/useAuth';
+import ChangePasswordModal from './ChangePasswordModal';
 
 interface SettingsPageProps {
   userRole: UserRole;
@@ -18,6 +19,7 @@ interface SettingsPageProps {
 export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }) => {
   const { data: user, isLoading } = useCurrentUser();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [pendingSignature, setPendingSignature] = useState<string | null>(null);
   
@@ -152,7 +154,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }
               )}
             </div>
             
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full">
                   <Lock size={18} className="text-zinc-500 dark:text-zinc-400" />
@@ -162,7 +164,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }
                   <p className="text-xs text-zinc-500">Update your password</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">Change</Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setIsPasswordModalOpen(true)}
+              >
+                Change
+              </Button>
             </div>
 
           {/* Student Specific: Digital Signature */}
@@ -398,6 +406,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }
                 </div>
             </div>
         </div>
+      )}
+
+      {/* Change Password Modal */}
+      {isPasswordModalOpen && (
+        <ChangePasswordModal onClose={() => setIsPasswordModalOpen(false)} />
       )}
 
     </div>
