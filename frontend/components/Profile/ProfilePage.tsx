@@ -69,7 +69,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole, userName }) 
   );
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto pb-20 md:pb-8 animate-in fade-in duration-500">
       
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
@@ -78,51 +78,51 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole, userName }) 
       ) : (
         <>
           {/* Cover Image & Header */}
-          <div className="relative mb-24">
-         <div className="h-48 md:h-64 w-full rounded-2xl overflow-hidden relative group">
+          <div className="relative mb-20 sm:mb-24">
+         <div className="h-32 sm:h-48 md:h-64 w-full rounded-xl sm:rounded-2xl overflow-hidden relative group">
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 dark:from-zinc-900 dark:to-zinc-800"></div>
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
             <div className="absolute inset-0 bg-primary/5"></div>
-            <button className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-lg backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100">
-                <Camera size={18} />
+            <button className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-lg backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100">
+                <Camera size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
          </div>
          
          {/* Profile Card Overlay */}
-         <div className="absolute -bottom-16 left-0 right-0 px-4 md:px-8">
-            <div className="flex flex-col md:flex-row items-end md:items-center justify-between gap-4">
-                <div className="flex items-end gap-6">
+         <div className="absolute -bottom-12 sm:-bottom-16 left-0 right-0 px-3 sm:px-4 md:px-8">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 sm:gap-6 w-full md:w-auto">
                     <div className="relative group">
-                        <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-[6px] border-white dark:border-black bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative shadow-xl">
-                             <div className="w-full h-full flex items-center justify-center text-5xl font-bold text-zinc-400 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-900">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full border-4 sm:border-[6px] border-white dark:border-black bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative shadow-xl">
+                             <div className="w-full h-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-400 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-900">
                                 {userData.name.charAt(0)}
                             </div>
                         </div>
-                        <button className="absolute bottom-2 right-2 bg-primary text-black p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100">
-                             <Camera size={16} />
+                        <button className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-primary text-black p-1.5 sm:p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100">
+                             <Camera size={14} className="sm:w-4 sm:h-4" />
                         </button>
                     </div>
-                    <div className="mb-2 md:mb-4">
-                        <h1 className="text-2xl md:text-4xl font-bold text-zinc-900 dark:text-white mb-1">{userData.name}</h1>
-                        <div className="flex flex-wrap items-center gap-2">
+                    <div className="text-center sm:text-left mb-2 sm:mb-2 md:mb-4">
+                        <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-zinc-900 dark:text-white mb-1">{userData.name}</h1>
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                              <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide border ${getRoleBadgeColor()}`}>
                                 {userRole.replace('_', ' ')}
                             </span>
-                            <span className="text-zinc-500 text-sm flex items-center gap-1">
+                            <span className="text-zinc-500 text-xs sm:text-sm flex items-center gap-1">
                                 <MapPin size={12} /> {userData.location}
                             </span>
                         </div>
                     </div>
                 </div>
-                <div className="mb-2 md:mb-4 w-full md:w-auto flex justify-end">
+                <div className="mb-2 md:mb-4 w-full md:w-auto md:ml-auto">
                     {isEditing ? (
-                        <div className="flex gap-2 w-full md:w-auto">
-                            <Button variant="secondary" onClick={() => setIsEditing(false)} className="flex-1 md:flex-none">Cancel</Button>
-                            <Button onClick={() => setIsEditing(false)} className="flex-1 md:flex-none">Save Changes</Button>
+                        <div className="flex gap-2 w-full">
+                            <Button variant="secondary" onClick={() => setIsEditing(false)} className="flex-1 text-sm sm:text-base py-2 sm:py-2.5">Cancel</Button>
+                            <Button onClick={() => setIsEditing(false)} className="flex-1 text-sm sm:text-base py-2 sm:py-2.5">Save Changes</Button>
                         </div>
                     ) : (
-                        <Button variant="outline" onClick={() => setIsEditing(true)} className="w-full md:w-auto bg-white dark:bg-zinc-900 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800">
-                            <Edit2 size={16} className="mr-2" /> Edit Profile
+                        <Button variant="outline" onClick={() => setIsEditing(true)} className="w-full bg-white dark:bg-zinc-900 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 text-sm sm:text-base py-2 sm:py-2.5">
+                            <Edit2 size={14} className="mr-2 sm:w-4 sm:h-4" /> Edit Profile
                         </Button>
                     )}
                 </div>
