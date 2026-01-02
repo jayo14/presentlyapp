@@ -84,27 +84,36 @@ export const Onboarding: React.FC = () => {
   const fetchInstitutions = async () => {
     try {
       const data = await institutionsApi.getAllInstitutions();
-      setInstitutions(data.filter(inst => inst.is_active));
+      // Handle both array and wrapped responses
+      const institutionList = Array.isArray(data) ? data : (data.results || data.data || []);
+      setInstitutions(Array.isArray(institutionList) ? institutionList.filter(inst => inst.is_active) : []);
     } catch (err) {
       console.error('Error fetching institutions:', err);
+      setInstitutions([]);
     }
   };
 
   const fetchColleges = async (institutionId: number) => {
     try {
       const data = await institutionsApi.getCollegesByInstitution(institutionId);
-      setColleges(data.filter(col => col.is_active));
+      // Handle both array and wrapped responses
+      const collegeList = Array.isArray(data) ? data : (data.results || data.data || []);
+      setColleges(Array.isArray(collegeList) ? collegeList.filter(col => col.is_active) : []);
     } catch (err) {
       console.error('Error fetching colleges:', err);
+      setColleges([]);
     }
   };
 
   const fetchDepartments = async (collegeId: number) => {
     try {
       const data = await institutionsApi.getDepartmentsByCollege(collegeId);
-      setDepartments(data.filter(dept => dept.is_active));
+      // Handle both array and wrapped responses
+      const departmentList = Array.isArray(data) ? data : (data.results || data.data || []);
+      setDepartments(Array.isArray(departmentList) ? departmentList.filter(dept => dept.is_active) : []);
     } catch (err) {
       console.error('Error fetching departments:', err);
+      setDepartments([]);
     }
   };
 
@@ -113,10 +122,13 @@ export const Onboarding: React.FC = () => {
       setCoursesLoading(true);
       setCoursesError('');
       const data = await coursesApi.getAllCourses();
-      setCourses(data.filter(course => course.is_active));
+      // Handle both array and wrapped responses
+      const courseList = Array.isArray(data) ? data : (data.results || data.data || []);
+      setCourses(Array.isArray(courseList) ? courseList.filter(course => course.is_active) : []);
     } catch (err: any) {
       setCoursesError(err.message || 'Failed to load courses');
       console.error('Error fetching courses:', err);
+      setCourses([]);
     } finally {
       setCoursesLoading(false);
     }
