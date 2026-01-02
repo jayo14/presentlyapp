@@ -441,13 +441,6 @@ export const Onboarding: React.FC = () => {
                     value={formData.staffId}
                     onChange={handleInputChange}
                 />
-                <Input 
-                    name="department"
-                    label="Department" 
-                    placeholder="Computer Science" 
-                    value={formData.department}
-                    onChange={handleInputChange}
-                />
                  <Input 
                     name="courses"
                     label="Courses Taught" 
