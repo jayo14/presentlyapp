@@ -9,13 +9,15 @@ interface VenueModalProps {
   institutions: Institution[];
   onSave: (data: Partial<Venue>) => Promise<void>;
   onClose: () => void;
+  initialLocation?: {lat: number; lng: number} | null;
 }
 
 export const VenueModal: React.FC<VenueModalProps> = ({
   venue,
   institutions,
   onSave,
-  onClose
+  onClose,
+  initialLocation
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,8 +31,8 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     floor_number: venue?.floor_number || '',
     room_number: venue?.room_number || '',
     capacity: venue?.capacity || undefined,
-    latitude: venue?.latitude || 0,
-    longitude: venue?.longitude || 0,
+    latitude: initialLocation?.lat || venue?.latitude || 0,
+    longitude: initialLocation?.lng || venue?.longitude || 0,
     elevation: venue?.elevation || undefined,
     boundary_coordinates: venue?.boundary_coordinates || [],
     verification_radius: venue?.verification_radius || 100,
