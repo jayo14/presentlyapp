@@ -101,7 +101,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <button 
+            className="md:hidden text-white" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
+          >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -527,12 +532,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                  <button 
                     onClick={() => setBillingCycle('semester')}
                     className={`px-6 py-2 rounded-full text-sm font-medium transition-all relative z-10 ${billingCycle === 'semester' ? 'text-black' : 'text-zinc-400 hover:text-white'}`}
+                    aria-label="Select per semester billing"
+                    aria-pressed={billingCycle === 'semester'}
                  >
                      Per Semester
                  </button>
                  <button 
                     onClick={() => setBillingCycle('session')}
                     className={`px-6 py-2 rounded-full text-sm font-medium transition-all relative z-10 ${billingCycle === 'session' ? 'text-black' : 'text-zinc-400 hover:text-white'}`}
+                    aria-label="Select per session billing (2x savings)"
+                    aria-pressed={billingCycle === 'session'}
                  >
                      Per Session <span className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded-full ml-1 absolute -top-2 -right-2">2x</span>
                  </button>
@@ -550,7 +559,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           >
             {/* Students Plan */}
             <motion.div variants={fadeInUp} className="bg-black border border-zinc-800 rounded-3xl p-8 pt-10 mt-4 md:mt-0 hover:border-zinc-700 transition-colors">
-               <h3 className="text-xl font-bold text-white">Students</h3>
+                <h3 className="text-xl font-bold text-white">Students</h3>
                <p className="text-zinc-400 text-sm mt-2">For academic tracking & attendance.</p>
                <div className="my-6">
                    <span className="text-4xl font-bold text-white">₦ {billingCycle === 'semester' ? '1,000' : '2,000'}</span>
@@ -647,6 +656,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                 <button 
                   onClick={() => toggleFaq(i)}
                   className="w-full flex items-center justify-between p-4 text-left font-medium text-white hover:bg-zinc-900 transition-colors"
+                  aria-expanded={openFaqIndex === i}
+                  aria-label={`Toggle answer for: ${question}`}
                 >
                   {question}
                   {openFaqIndex === i ? <ChevronUp className="text-zinc-500" /> : <ChevronDown className="text-zinc-500" />}
@@ -693,7 +704,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                         <div>
                             <h4 className="text-white font-bold">Install for Android</h4>
                             <p className="text-zinc-500 text-sm mb-2">Add to home screen for quick access.</p>
-                            <button className="text-primary text-sm font-bold hover:underline">Install App</button>
+                            <button 
+                              className="text-primary text-sm font-bold hover:underline"
+                              aria-label="Install Presently app for Android"
+                            >
+                              Install App
+                            </button>
                         </div>
                     </div>
                     <div className="flex items-start gap-4">
