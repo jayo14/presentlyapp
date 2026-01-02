@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from .models import (
-    User, Institution, College, Department, Course, AttendanceSession, 
+    User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
     Attendance, UserRole, Venue, Timetable
 )
 
@@ -170,12 +170,39 @@ class OnboardingSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     """Serializer for Course model"""
     department_name = serializers.CharField(source='department.name', read_only=True)
+    college_name = serializers.CharField(source='department.college.name', read_only=True)
+    institution_name = serializers.CharField(source='department.institution.full_name', read_only=True)
     lecturer_name = serializers.CharField(source='lecturer.full_name', read_only=True)
+    enrolled_students_count = serializers.SerializerMethodField()
+    applicable_levels = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
+    
+    def get_enrolled_students_count(self, obj):
+        """Get the count of enrolled students"""
+        from .models import CourseEnrollment
+        return CourseEnrollment.objects.filter(course=obj, is_active=True).count()
+    
+    def get_applicable_levels(self, obj):
+        """Get list of applicable levels for this course based on duration"""
+        return obj.get_applicable_levels()
+
+
+class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    """Serializer for Course Enrollment"""
+    student_name = serializers.CharField(source='student.full_name', read_only=True)
+    student_email = serializers.CharField(source='student.email', read_only=True)
+    student_matric = serializers.CharField(source='student.matric_number', read_only=True)
+    course_code = serializers.CharField(source='course.code', read_only=True)
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    
+    class Meta:
+        model = CourseEnrollment
+        fields = '__all__'
+        read_only_fields = ['enrolled_at', 'updated_at']
 
 
 class TimetableSerializer(serializers.ModelSerializer):
