@@ -1,0 +1,138 @@
+services:
+  # PostgreSQL Database
+  - type: pgsql
+    name: presently-db
+    databaseName: presently_production
+    user: presently_user
+    plan: free
+    ipAllowList: []
+
+  # Django Backend Web Service
+  - type: web
+    name: presently-backend
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: |
+      cd backend
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install psycopg2-binary gunicorn whitenoise
+      python manage.py collectstatic --noinput
+      python manage.py migrate --noinput
+    startCommand: |
+      cd backend
+      gunicorn presently.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    healthCheckPath: /api/health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: presently-db
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: presently.settings
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: True
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: FIREBASE_CREDENTIALS
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # Redis Cache (Optional - for Celery/Caching)
+  - type: redis
+    name: presently-redis
+    plan: free
+    ipAllowList: []
+
+  # Celery Worker (Optional - for background tasks)
+  - type: worker
+    name: presently-worker
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: |
+      cd backend
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install psycopg2-binary
+    startCommand: |
+      cd backend
+      celery -A presently worker --loglevel=info
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: False
+      - key: DATABASE_URL
+        fromDatabase:
+          name: presently-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: presently-redis
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: presently.settings
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: presently-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: presently-redis
+          property: connectionString
+
+  # Frontend Static Site (React/Vite)
+  - type: web
+    name: presently-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    staticPublishPath: ./frontend/dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_GEMINI_API_KEY
+        sync: false
