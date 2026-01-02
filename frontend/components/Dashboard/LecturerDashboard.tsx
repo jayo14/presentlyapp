@@ -56,14 +56,15 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   const fetchCourses = async () => {
     try {
       setCoursesLoading(true);
+      setError(null); // Clear previous errors
       const data = await courseApi.getAll();
       // Transform API courses to local format
       const transformedCourses = data.map(course => ({
         id: course.id.toString(),
         name: course.title,
         code: course.code,
-        students: 100, // Default value, should come from API
-        venue: 'TBD'
+        students: 0, // Will be populated from enrollment data when available
+        venue: 'No venue assigned'
       }));
       setCourses(transformedCourses);
     } catch (err) {
@@ -77,6 +78,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   const fetchVenues = async () => {
     try {
       setVenuesLoading(true);
+      setError(null); // Clear previous errors
       const data = await venueApi.getAll();
       // Transform API venues to local format
       const transformedVenues = data.map(venue => ({
@@ -95,6 +97,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   const fetchSessions = async () => {
     try {
       setSessionsLoading(true);
+      setError(null); // Clear previous errors
       const data = await sessionApi.getAll();
       // Transform API sessions to local format
       const transformedSessions = data.map(session => ({
@@ -783,6 +786,23 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   // Default Dashboard View (Sessions)
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-red-500 font-semibold">Error</p>
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+          <button 
+            onClick={() => setError(null)} 
+            className="text-red-500 hover:text-red-400"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Hi, {userName}</h1>
