@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
-import { LogOut, LayoutDashboard, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download } from 'lucide-react';
+import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface LayoutProps {
@@ -19,25 +19,17 @@ interface NavItemProps {
   label: string;
   isActive: boolean;
   onClick: (id: string) => void;
+  collapsed?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onClick }) => (
+const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onClick, collapsed = false }) => (
   <button 
     onClick={() => onClick(id)}
-    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+    className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+    title={collapsed ? label : undefined}
   >
     <Icon size={18} />
-    {label}
-  </button>
-);
-
-const NavItemMobile: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onClick }) => (
-  <button
-    onClick={() => onClick(id)}
-    className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${isActive ? 'text-primary' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-  >
-    <Icon size={20} className="mb-1" />
-    <span className="text-[10px] font-medium">{label}</span>
+    {!collapsed && label}
   </button>
 );
 
@@ -55,6 +47,7 @@ if (typeof window !== 'undefined') {
 export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
   const [isDark, setIsDark] = useState(true);
   const [installPrompt, setInstallPrompt] = useState<any>(deferredPromptEvent);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -79,7 +72,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         setCurrentPage(page);
       }
     }
-  }, []);
+  }, [location.pathname, currentPage, setCurrentPage]);
 
   useEffect(() => {
     // Initialize theme state based on document class
@@ -133,7 +126,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
     switch (userRole) {
       case UserRole.ADMIN:
         return [
-          { id: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
+          { id: 'dashboard', icon: Home, label: 'Overview' },
           { id: 'users', icon: Users, label: 'User Mgmt' },
           { id: 'venues', icon: Map, label: 'Venues & Maps' },
           { id: 'logs', icon: ShieldAlert, label: 'Audit Logs' },
@@ -141,7 +134,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         ];
       case UserRole.LECTURER:
         return [
-          { id: 'dashboard', icon: LayoutDashboard, label: 'Sessions' },
+          { id: 'dashboard', icon: Home, label: 'Sessions' },
           { id: 'analytics', icon: BarChart3, label: 'Analytics' },
           { id: 'courses', icon: BookOpen, label: 'Courses' },
           { id: 'reports', icon: FileText, label: 'Reports' },
@@ -150,7 +143,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         ];
       case UserRole.CLASS_REP:
         return [
-          { id: 'dashboard', icon: LayoutDashboard, label: 'My Attendance' },
+          { id: 'dashboard', icon: Home, label: 'My Attendance' },
           { id: 'class-mgmt', icon: Users, label: 'Class Mgmt' },
           { id: 'timetable', icon: Calendar, label: 'Timetable' },
           ...common
@@ -158,7 +151,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       case UserRole.STUDENT:
       default:
         return [
-          { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+          { id: 'dashboard', icon: Home, label: 'Home' },
           { id: 'timetable', icon: Calendar, label: 'Timetable' },
           { id: 'analytics', icon: BarChart3, label: 'Analytics' },
           ...common
@@ -171,12 +164,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row transition-colors duration-300">
       {/* Sidebar (Desktop) */}
-      <aside className="hidden md:flex w-64 border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-950 h-screen sticky top-0 transition-colors duration-300">
-        <div className="p-6">
-          <Logo className="text-zinc-900 dark:text-white" />
+      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-20' : 'w-64'} border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-950 h-screen sticky top-0 transition-all duration-300`}>
+        <div className={`p-6 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
+          {sidebarCollapsed ? (
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+              P
+            </div>
+          ) : (
+            <Logo className="text-zinc-900 dark:text-white" />
+          )}
         </div>
         
-        <nav className="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
+        {/* Collapse Toggle Button */}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="mx-4 mb-2 p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors flex items-center justify-center"
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg 
+            className={`w-5 h-5 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
           {navItems.map(item => (
             <NavItem 
               key={item.id} 
@@ -185,14 +200,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               label={item.label}
               isActive={currentPage === item.id}
               onClick={setCurrentPage}
+              collapsed={sidebarCollapsed}
             />
           ))}
           <button 
             onClick={() => setCurrentPage('notifications')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+            title={sidebarCollapsed ? 'Notifications' : undefined}
           >
             <Bell size={18} />
-            Notifications
+            {!sidebarCollapsed && 'Notifications'}
           </button>
         </nav>
 
@@ -200,41 +217,58 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
            {installPrompt && (
              <button 
                onClick={handleInstallClick}
-               className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-colors mb-2"
+               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-colors mb-2`}
+               title={sidebarCollapsed ? 'Install App' : undefined}
              >
                <Download size={18} />
-               Install App
+               {!sidebarCollapsed && 'Install App'}
              </button>
            )}
 
            <button 
               onClick={toggleTheme}
-              className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors`}
+              title={sidebarCollapsed ? (isDark ? 'Dark Mode' : 'Light Mode') : undefined}
            >
-              <div className="flex items-center gap-3">
-                 {isDark ? <Moon size={18} /> : <Sun size={18} />}
-                 <span>{isDark ? 'Dark Mode' : 'Light Mode'}</span>
-              </div>
-              <div className={`w-8 h-4 rounded-full p-0.5 flex transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}`}>
-                 <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
-              </div>
+              {!sidebarCollapsed && (
+                <div className="flex items-center gap-3">
+                   {isDark ? <Moon size={18} /> : <Sun size={18} />}
+                   <span>{isDark ? 'Dark Mode' : 'Light Mode'}</span>
+                </div>
+              )}
+              {sidebarCollapsed && (isDark ? <Moon size={18} /> : <Sun size={18} />)}
+              {!sidebarCollapsed && (
+                <div className={`w-8 h-4 rounded-full p-0.5 flex transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}`}>
+                   <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
+                </div>
+              )}
            </button>
 
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-               {userRole === UserRole.STUDENT ? 'S' : (userRole === UserRole.LECTURER ? 'L' : (userRole === UserRole.ADMIN ? 'A' : 'CR'))}
+          {!sidebarCollapsed && (
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                 {userRole === UserRole.STUDENT ? 'S' : (userRole === UserRole.LECTURER ? 'L' : (userRole === UserRole.ADMIN ? 'A' : 'CR'))}
+              </div>
+              <div className="flex-1 overflow-hidden">
+                  <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">{userName}</p>
+                  <p className="text-xs text-zinc-500 truncate capitalize">{userRole?.toLowerCase().replace('_', ' ')}</p>
+              </div>
             </div>
-            <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">{userName}</p>
-                <p className="text-xs text-zinc-500 truncate capitalize">{userRole?.toLowerCase().replace('_', ' ')}</p>
+          )}
+          {sidebarCollapsed && (
+            <div className="flex items-center justify-center px-4 py-3">
+              <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                 {userRole === UserRole.STUDENT ? 'S' : (userRole === UserRole.LECTURER ? 'L' : (userRole === UserRole.ADMIN ? 'A' : 'CR'))}
+              </div>
             </div>
-          </div>
+          )}
           <button 
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-colors"
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-colors`}
+            title={sidebarCollapsed ? 'Sign Out' : undefined}
           >
             <LogOut size={18} />
-            Sign Out
+            {!sidebarCollapsed && 'Sign Out'}
           </button>
         </div>
       </aside>
@@ -257,18 +291,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex justify-around p-2 z-50 pb-[env(safe-area-inset-bottom,20px)] transition-colors duration-300">
-        {navItems.slice(0, 4).map(item => (
-          <NavItemMobile 
-            key={item.id} 
-            id={item.id}
-            icon={item.icon}
-            label={item.label}
-            isActive={currentPage === item.id}
-            onClick={setCurrentPage}
-          />
-        ))}
+      {/* Mobile Bottom Navigation - Dock Style */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-4 z-50 pointer-events-none">
+        <div className="pointer-events-auto bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl px-6 py-3 flex items-center gap-6">
+          {navItems.slice(0, 4).map(item => (
+            <button
+              key={item.id}
+              onClick={() => setCurrentPage(item.id)}
+              className={`flex flex-col items-center justify-center transition-all duration-200 ${
+                currentPage === item.id 
+                  ? 'text-primary scale-110' 
+                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:scale-105'
+              }`}
+            >
+              <div className={`p-2 rounded-2xl transition-all duration-200 ${
+                currentPage === item.id 
+                  ? 'bg-primary/10 shadow-lg' 
+                  : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}>
+                <item.icon size={22} strokeWidth={currentPage === item.id ? 2.5 : 2} />
+              </div>
+              <span className={`text-[10px] font-medium mt-1 transition-all duration-200 ${
+                currentPage === item.id ? 'font-semibold' : ''
+              }`}>
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Main Content */}
