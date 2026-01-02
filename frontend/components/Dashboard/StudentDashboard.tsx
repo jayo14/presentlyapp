@@ -3,6 +3,8 @@ import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, X, Image as
 import { Button } from '../Button';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 import { AnimatePresence, motion } from 'framer-motion';
+import { studentApi, StudentDashboardData, EnrolledCourse } from '../../services/api/student';
+import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 
 interface StudentDashboardProps {
   userName: string;
@@ -384,50 +386,67 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [isWarningDismissed, setIsWarningDismissed] = useState(() => {
-    // Initialize from localStorage
     const dismissed = localStorage.getItem('attendanceWarningDismissed');
     return dismissed === 'true';
   });
   
-  // State for courses to manage registration
-  const [courses, setCourses] = useState<Course[]>([
-    { code: 'CS402', name: 'Adv. Web Dev', attendance: 92, status: 'Good', time: 'Mon 10:00 AM', registered: true },
-    { code: 'CS301', name: 'Database Systems', attendance: 85, status: 'Average', time: 'Tue 2:00 PM', registered: true },
-    { code: 'ENG101', name: 'Technical Writing', attendance: 65, status: 'Warning', time: 'Wed 11:00 AM', registered: true },
-    { code: 'MTH202', name: 'Linear Algebra', attendance: 95, status: 'Good', time: 'Fri 9:00 AM', registered: true },
-    { code: 'PHY101', name: 'General Physics', attendance: 0, status: 'Good', time: 'Thu 9:00 AM', registered: false },
-    { code: 'GNS101', name: 'Use of English', attendance: 0, status: 'Good', time: 'Fri 2:00 PM', registered: false },
-  ]);
+  // Real data from API
+  const [dashboardData, setDashboardData] = useState<StudentDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Load dashboard data on mount
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
 
-  const registeredCourses = courses.filter(c => c.registered);
-  const lowAttendanceCourses = registeredCourses.filter(c => c.attendance < 75);
-  const avgAttendance = Math.round(registeredCourses.reduce((acc, c) => acc + c.attendance, 0) / (registeredCourses.length || 1));
-  const nextClass = { name: 'CS402 - Adv. Web Dev', time: '10:00 AM', venue: 'LH 1' };
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const data = await studentApi.getDashboard();
+      setDashboardData(data);
+      setError(null);
+    } catch (err: any) {
+      console.error('Failed to load dashboard data:', err);
+      setError(err.response?.data?.error || 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Derived data from API response
+  const enrolledCourses = dashboardData?.enrolled_courses || [];
+  const lowAttendanceCourses = enrolledCourses.filter(c => (c.attendance_percentage || 0) < 75);
+  const avgAttendance = dashboardData?.attendance_stats?.average_attendance || 0;
+  const nextClass = dashboardData?.next_class;
+  const recentActivity = dashboardData?.recent_activity || [];
 
   // Handler to dismiss warning
   const handleDismissWarning = () => {
     setIsWarningDismissed(true);
     localStorage.setItem('attendanceWarningDismissed', 'true');
   };
+  
+  // Handler for successful course registration
+  const handleRegistrationSuccess = () => {
+    setIsRegistrationOpen(false);
+    loadDashboardData(); // Reload dashboard data
+  };
 
-  // Analytics Mock Data
+  // Analytics data from API
   const weeklyAttendanceData = [
     { name: 'W1', attendance: 70 },
     { name: 'W2', attendance: 85 },
     { name: 'W3', attendance: 80 },
     { name: 'W4', attendance: 90 },
-    { name: 'W5', attendance: 95 },
+    { name: 'W5', attendance: avgAttendance },
   ];
 
-  const attendanceStatusData = [
-    { name: 'Present', value: 35, color: '#22c55e' },
-    { name: 'Late', value: 5, color: '#eab308' },
-    { name: 'Absent', value: 2, color: '#ef4444' },
-  ];
-
-  const handleToggleCourse = (code: string) => {
-      setCourses(prev => prev.map(c => c.code === code ? { ...c, registered: !c.registered } : c));
-  };
+  const attendanceStatusData = dashboardData?.attendance_stats ? [
+    { name: 'Present', value: dashboardData.attendance_stats.total_present, color: '#22c55e' },
+    { name: 'Late', value: dashboardData.attendance_stats.total_late, color: '#eab308' },
+    { name: 'Absent', value: dashboardData.attendance_stats.total_absent, color: '#ef4444' },
+  ] : [];
 
   const verifyAttendanceCode = async (code: string): Promise<boolean> => {
       await new Promise(r => setTimeout(r, 1500)); // Simulate network check
