@@ -74,6 +74,17 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Don't show toast for graceful 404s or cancelled requests
+    if (error.response?.status === 404 && isGraceful404(originalRequest.url)) {
+      // These endpoints handle 404 gracefully with fallback data
+      return Promise.reject(error);
+    }
+
+    // Don't show errors for cancelled requests
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     // If error is 401 and we haven't tried to refresh yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -96,6 +107,9 @@ apiClient.interceptors.response.use(
       if (!refreshToken) {
         // No refresh token, redirect to login
         tokenManager.clearTokens();
+        toast.error('Session Expired', {
+          description: 'Please log in again to continue.'
+        });
         window.location.href = '/login';
         return Promise.reject(error);
       }
@@ -116,10 +130,42 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         tokenManager.clearTokens();
+        toast.error('Session Expired', {
+          description: 'Please log in again to continue.'
+        });
         window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
+      }
+    }
+
+    // Show user-friendly error messages for other errors
+    const status = error.response?.status;
+    const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message;
+
+    // Only show toast for errors that aren't handled by components
+    if (!originalRequest._skipGlobalErrorHandler) {
+      if (status === 403) {
+        toast.error('Access Denied', {
+          description: 'You do not have permission to perform this action.'
+        });
+      } else if (status === 404) {
+        toast.error('Not Found', {
+          description: 'The requested resource was not found.'
+        });
+      } else if (status === 500) {
+        toast.error('Server Error', {
+          description: 'Something went wrong on our end. Please try again later.'
+        });
+      } else if (status >= 400 && status < 500) {
+        toast.error('Request Failed', {
+          description: errorMessage || 'Please check your input and try again.'
+        });
+      } else if (error.code === 'ERR_NETWORK') {
+        toast.error('Network Error', {
+          description: 'Unable to connect to the server. Please check your connection.'
+        });
       }
     }
 
