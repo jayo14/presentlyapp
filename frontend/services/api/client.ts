@@ -1,7 +1,21 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 
 // API Base URL - Django backend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+// List of endpoints that gracefully handle 404s with fallback data
+const GRACEFUL_404_ENDPOINTS = [
+  '/system/stats/',
+  '/system/activity/',
+  '/system/alerts/',
+  '/system/config/'
+];
+
+// Check if an endpoint gracefully handles 404
+const isGraceful404 = (url: string): boolean => {
+  return GRACEFUL_404_ENDPOINTS.some(endpoint => url.includes(endpoint));
+};
 
 // Create axios instance
 const apiClient = axios.create({

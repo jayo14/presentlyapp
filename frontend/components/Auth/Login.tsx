@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../Button';
 import { Input } from '../Input';
+import { PasswordInput } from '../PasswordInput';
 import { Logo } from '../Logo';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -90,9 +91,8 @@ export const Login: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Input 
+            <PasswordInput 
               label="Password" 
-              type="password" 
               placeholder="••••••••" 
               icon={<Lock size={16} />} 
               required

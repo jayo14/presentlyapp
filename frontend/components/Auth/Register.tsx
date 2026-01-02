@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../Button';
 import { Input } from '../Input';
+import { PasswordInput } from '../PasswordInput';
 import { Logo } from '../Logo';
 import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRegister, useCurrentUser } from '../../hooks/useAuth';
+import { toast } from 'sonner';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +29,18 @@ export const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    registerMutation.mutate({ email, password, password2: password, full_name: name });
+    registerMutation.mutate({ email, password, password2: password, full_name: name }, {
+      onError: (error: any) => {
+        toast.error('Registration Failed', {
+          description: error.message || 'Failed to create account. Please try again.'
+        });
+      },
+      onSuccess: () => {
+        toast.success('Account Created', {
+          description: 'Welcome! Setting up your account...'
+        });
+      }
+    });
   };
 
   const onBack = () => navigate(-1);
@@ -84,9 +97,8 @@ export const Register: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Input 
+            <PasswordInput 
               label="Password" 
-              type="password" 
               placeholder="••••••••" 
               icon={<Lock size={16} />} 
               required
