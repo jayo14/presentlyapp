@@ -144,7 +144,7 @@ class StudentDashboardAnalyticsView(APIView):
                 'email': user.email,
                 'matric_number': user.matric_number,
                 'level': user.level,
-                'department': user.department.name if user.department else None,
+                'department': user.department,  # department is a CharField, not a ForeignKey
                 'college': user.college.name if user.college else None,
                 'institution': user.institution.full_name if user.institution else None,
             },
