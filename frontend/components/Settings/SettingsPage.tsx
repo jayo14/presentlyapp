@@ -416,3 +416,5 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }
     </div>
   );
 };
+
+export default SettingsPage;
