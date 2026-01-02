@@ -694,6 +694,60 @@ class CourseViewSet(viewsets.ModelViewSet):
             'enrolled_count': len(students),
             'students': students
         })
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def available(self, request):
+        """Get available courses for student enrollment based on their department"""
+        if request.user.role != UserRole.STUDENT:
+            return Response({
+                'success': False,
+                'error': 'This endpoint is only for students'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get courses from student's department
+        queryset = Course.objects.filter(is_active=True)
+        
+        if request.user.department:
+            queryset = queryset.filter(department=request.user.department)
+        
+        if request.user.level:
+            queryset = queryset.filter(level=request.user.level)
+        
+        # Get already enrolled course IDs
+        enrolled_course_ids = CourseEnrollment.objects.filter(
+            student=request.user,
+            is_active=True
+        ).values_list('course_id', flat=True)
+        
+        # Annotate with enrollment info
+        courses = []
+        for course in queryset:
+            enrollment_count = CourseEnrollment.objects.filter(
+                course=course,
+                is_active=True
+            ).count()
+            
+            courses.append({
+                'id': course.id,
+                'code': course.code,
+                'title': course.title,
+                'description': course.description,
+                'credit_units': course.credit_units,
+                'semester': course.semester,
+                'level': course.level,
+                'department': course.department.id if course.department else None,
+                'department_name': course.department.name if course.department else None,
+                'lecturer_name': course.lecturer.full_name if course.lecturer else None,
+                'enrollment_count': enrollment_count,
+                'can_enroll': course.id not in enrolled_course_ids,
+                'is_active': course.is_active
+            })
+        
+        return Response({
+            'success': True,
+            'courses': courses,
+            'total': len(courses)
+        })
 
 
 class CourseEnrollmentViewSet(viewsets.ModelViewSet):
@@ -1073,6 +1127,34 @@ class UserViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(college_id=college_id)
         
         return queryset
+    
+    def update(self, request, *args, **kwargs):
+        """Override update to prevent users from changing their own role"""
+        instance = self.get_object()
+        
+        # Check if user is trying to change their own role
+        if instance.id == request.user.id and 'role' in request.data:
+            if request.data['role'] != instance.role:
+                return Response({
+                    'success': False,
+                    'error': 'You cannot change your own role. Please contact another administrator.'
+                }, status=status.HTTP_403_FORBIDDEN)
+        
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        """Override partial_update to prevent users from changing their own role"""
+        instance = self.get_object()
+        
+        # Check if user is trying to change their own role
+        if instance.id == request.user.id and 'role' in request.data:
+            if request.data['role'] != instance.role:
+                return Response({
+                    'success': False,
+                    'error': 'You cannot change your own role. Please contact another administrator.'
+                }, status=status.HTTP_403_FORBIDDEN)
+        
+        return super().partial_update(request, *args, **kwargs)
 
 
 
