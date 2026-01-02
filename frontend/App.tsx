@@ -42,9 +42,34 @@ const LoadingFallback: React.FC = () => (
 
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user, isLoading, refetch } = useCurrentUser();
   const logoutMutation = useLogout();
   const [dashboardPage, setDashboardPage] = useState('dashboard');
+  const [previousRole, setPreviousRole] = useState<UserRole | null>(null);
+
+  // Poll for user role changes every 30 seconds
+  useEffect(() => {
+    if (!user) return;
+    
+    const pollInterval = setInterval(() => {
+      refetch();
+    }, 30000); // Poll every 30 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [user, refetch]);
+
+  // Detect role changes and reset dashboard page
+  useEffect(() => {
+    if (user && previousRole && user.role !== previousRole) {
+      // Role has changed, reset to main dashboard view
+      setDashboardPage('dashboard');
+      // Force re-render by staying on dashboard route
+      navigate('/dashboard', { replace: true });
+    }
+    if (user) {
+      setPreviousRole(user.role);
+    }
+  }, [user, previousRole, navigate]);
 
   useEffect(() => {
     if (!isLoading && user && !user.onboarding_complete) {
@@ -102,7 +127,7 @@ const AppContent: React.FC = () => {
         />
         
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
             <ProtectedRoute>
               {user && (

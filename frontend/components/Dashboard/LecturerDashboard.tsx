@@ -4,6 +4,10 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Session } from '../../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
+import { courseApi, sessionApi, AttendanceSession } from '../../services/api/attendance';
+import { venueApi } from '../../services/api/venues';
+import { Venue as VenueType } from '../../types';
+import { analyticsApi, LecturerDashboardAnalytics, CourseAttendanceAnalytics } from '../../services/api/analytics';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -33,43 +37,106 @@ interface Venue {
 
 export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, view = 'dashboard' }) => {
   // State
-  const [sessions, setSessions] = useState<Session[]>([
-    {
-      id: '1',
-      courseName: 'Advanced Web Development',
-      courseCode: 'CS402',
-      startTime: new Date(Date.now() - 1800000), // Started 30 mins ago
-      endTime: new Date(Date.now() + 1800000), // Ends in 30 mins
-      active: true,
-      attendees: 42,
-      sessionCode: 'AWD82X9L'
-    },
-    {
-      id: '2',
-      courseName: 'Database Systems',
-      courseCode: 'CS301',
-      startTime: new Date(Date.now() - 86400000),
-      endTime: new Date(Date.now() - 82800000),
-      active: false,
-      attendees: 58,
-      sessionCode: 'DB301QWZ'
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [venues, setVenues] = useState<Venue[]>([]);
+  
+  // Dashboard analytics state
+  const [dashboardAnalytics, setDashboardAnalytics] = useState<LecturerDashboardAnalytics | null>(null);
+  const [courseAnalytics, setCourseAnalytics] = useState<CourseAttendanceAnalytics | null>(null);
+  
+  // Loading states
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [venuesLoading, setVenuesLoading] = useState(false);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch real data on mount
+  useEffect(() => {
+    fetchCourses();
+    fetchVenues();
+    fetchSessions();
+    fetchDashboardAnalytics();
+  }, []);
+
+  const fetchDashboardAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const data = await analyticsApi.getLecturerDashboard();
+      setDashboardAnalytics(data);
+    } catch (err) {
+      console.error('Error fetching dashboard analytics:', err);
+    } finally {
+      setAnalyticsLoading(false);
     }
-  ]);
-  
-  const [courses, setCourses] = useState<Course[]>([
-      { id: '1', name: 'Advanced Web Development', code: 'CS402', students: 120, venue: 'LH 1' },
-      { id: '2', name: 'Database Systems', code: 'CS301', students: 85, venue: 'Lab 3' },
-      { id: '3', name: 'Software Engineering', code: 'CS410', students: 95, venue: 'LH 2' }
-  ]);
-  
-  // Mock Venues
-  const [venues] = useState<Venue[]>([
-      { id: '1', name: 'Lecture Hall 1 (LH1)' },
-      { id: '2', name: 'Lecture Hall 2 (LH2)' },
-      { id: '3', name: 'Computer Lab 1' },
-      { id: '4', name: 'Engineering Workshop' },
-      { id: '5', name: '700 Seater Auditorium' },
-  ]);
+  };
+
+  const fetchCourses = async () => {
+    try {
+      setCoursesLoading(true);
+      setError(null); // Clear previous errors
+      const data = await courseApi.getAll();
+      // Transform API courses to local format
+      const transformedCourses = data.map(course => ({
+        id: course.id.toString(),
+        name: course.title,
+        code: course.code,
+        students: 0, // Will be populated from enrollment data when available
+        venue: 'No venue assigned'
+      }));
+      setCourses(transformedCourses);
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+      setError('Failed to load courses');
+    } finally {
+      setCoursesLoading(false);
+    }
+  };
+
+  const fetchVenues = async () => {
+    try {
+      setVenuesLoading(true);
+      setError(null); // Clear previous errors
+      const data = await venueApi.getAll();
+      // Transform API venues to local format
+      const transformedVenues = data.map(venue => ({
+        id: venue.id.toString(),
+        name: venue.name
+      }));
+      setVenues(transformedVenues);
+    } catch (err) {
+      console.error('Error fetching venues:', err);
+      setError('Failed to load venues');
+    } finally {
+      setVenuesLoading(false);
+    }
+  };
+
+  const fetchSessions = async () => {
+    try {
+      setSessionsLoading(true);
+      setError(null); // Clear previous errors
+      const data = await sessionApi.getAll();
+      // Transform API sessions to local format
+      const transformedSessions = data.map(session => ({
+        id: session.id.toString(),
+        courseName: session.course_name || 'Unknown Course',
+        courseCode: session.course_code || 'N/A',
+        startTime: new Date(session.start_time),
+        endTime: new Date(session.end_time),
+        active: session.is_active,
+        attendees: session.attendee_count || 0,
+        sessionCode: session.session_code
+      }));
+      setSessions(transformedSessions);
+    } catch (err) {
+      console.error('Error fetching sessions:', err);
+      setError('Failed to load sessions');
+    } finally {
+      setSessionsLoading(false);
+    }
+  };
   
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
@@ -77,22 +144,36 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   
   // Analytics State
   const [analyticsBenchmark, setAnalyticsBenchmark] = useState(70);
-  const [analyticsCourse, setAnalyticsCourse] = useState('CS402');
+  const [analyticsCourse, setAnalyticsCourse] = useState<string>('');
   const [analyticsSearch, setAnalyticsSearch] = useState('');
-  
-  // Mock Student Analytics Data
-  const [studentAnalytics] = useState([
-    { id: '1', name: 'Alice Baker', matric: 'ENG/21/001', attended: 28, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '2', name: 'Bob Charlie', matric: 'ENG/21/002', attended: 15, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '3', name: 'Charlie Delta', matric: 'ENG/21/003', attended: 22, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '4', name: 'David Echo', matric: 'ENG/21/004', attended: 29, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '5', name: 'Eve Foxtrot', matric: 'ENG/21/005', attended: 10, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '6', name: 'Frank Golf', matric: 'ENG/21/006', attended: 25, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '7', name: 'Grace Hotel', matric: 'ENG/21/007', attended: 18, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '8', name: 'Henry India', matric: 'ENG/21/008', attended: 30, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '9', name: 'Ivy Juliet', matric: 'ENG/21/009', attended: 20, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '10', name: 'Jack Kilo', matric: 'ENG/21/010', attended: 5, total: 30, dept: 'Computer Science', level: '400' },
-  ]);
+
+  // Fetch course analytics when course or benchmark changes
+  useEffect(() => {
+    if (analyticsCourse && view === 'analytics') {
+      fetchCourseAnalytics(analyticsCourse, analyticsBenchmark);
+    }
+  }, [analyticsCourse, analyticsBenchmark, view]);
+
+  // Set default course when courses are loaded
+  useEffect(() => {
+    if (courses.length > 0 && !analyticsCourse) {
+      setAnalyticsCourse(courses[0].id);
+    }
+  }, [courses]);
+
+  const fetchCourseAnalytics = async (courseId: string, benchmark: number) => {
+    try {
+      setAnalyticsLoading(true);
+      setError(null);
+      const data = await analyticsApi.getCourseAttendance(parseInt(courseId), benchmark);
+      setCourseAnalytics(data);
+    } catch (err) {
+      console.error('Error fetching course analytics:', err);
+      setError('Failed to load course analytics');
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -149,25 +230,15 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
       return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
     });
 
-  // Analytics Processing
-  const processedAnalytics = studentAnalytics.map(s => ({
-      ...s,
-      percentage: Math.round((s.attended / s.total) * 100),
-  })).sort((a, b) => {
-      // Sort by percentage descending
-      if (b.percentage !== a.percentage) return b.percentage - a.percentage;
-      // Then by name alphabetical
-      return a.name.localeCompare(b.name);
-  });
-
-  const filteredAnalytics = processedAnalytics.filter(s => 
+  // Analytics Processing - use real data from courseAnalytics
+  const filteredAnalytics = courseAnalytics?.students.filter(s => 
       s.name.toLowerCase().includes(analyticsSearch.toLowerCase()) || 
       s.matric.toLowerCase().includes(analyticsSearch.toLowerCase())
-  );
+  ) || [];
   
-  const avgAttendance = Math.round(processedAnalytics.reduce((acc, curr) => acc + curr.percentage, 0) / processedAnalytics.length);
-  const belowBenchmarkCount = processedAnalytics.filter(s => s.percentage < analyticsBenchmark).length;
-  const aboveBenchmarkCount = processedAnalytics.length - belowBenchmarkCount;
+  const avgAttendance = courseAnalytics?.avg_attendance || 0;
+  const belowBenchmarkCount = courseAnalytics?.at_risk_count || 0;
+  const aboveBenchmarkCount = courseAnalytics?.good_standing_count || 0;
 
 
   // Handlers
@@ -186,37 +257,52 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     }
   };
 
-  const handleCreateSession = (e: React.FormEvent) => {
+  const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const selectedCourse = courses.find(c => c.id === createSessionData.courseId);
     if (!selectedCourse) return;
 
-    // Calculate times
-    const startTime = new Date();
-    const durationMs = createSessionData.durationUnit === 'minutes' 
-        ? parseInt(createSessionData.durationValue) * 60 * 1000 
-        : parseInt(createSessionData.durationValue) * 60 * 60 * 1000;
-    const endTime = new Date(startTime.getTime() + durationMs);
+    try {
+      // Calculate times
+      const startTime = new Date();
+      const durationMs = createSessionData.durationUnit === 'minutes' 
+          ? parseInt(createSessionData.durationValue) * 60 * 1000 
+          : parseInt(createSessionData.durationValue) * 60 * 60 * 1000;
+      const endTime = new Date(startTime.getTime() + durationMs);
 
-    const session: Session = {
-      id: Date.now().toString(),
-      courseName: selectedCourse.name,
-      courseCode: selectedCourse.code,
-      startTime: startTime,
-      endTime: endTime,
-      active: true,
-      attendees: 0,
-      sessionCode: generateSessionCode()
-    };
+      // Create session via API
+      const newSession = await sessionApi.create({
+        course: parseInt(createSessionData.courseId),
+        venue: parseInt(createSessionData.venueId),
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
+        is_active: true
+      });
 
-    setSessions(prev => [session, ...prev]);
-    setIsCreateModalOpen(false);
-    // Reset Form
-    setCreateSessionData({ courseId: '', venueId: '', durationValue: '60', durationUnit: 'minutes' });
-    
-    // Immediately open QR modal for convenience
-    setQrModalSession(session);
+      // Transform and add to local state
+      const session: Session = {
+        id: newSession.id.toString(),
+        courseName: selectedCourse.name,
+        courseCode: selectedCourse.code,
+        startTime: new Date(newSession.start_time),
+        endTime: new Date(newSession.end_time),
+        active: newSession.is_active,
+        attendees: 0,
+        sessionCode: newSession.session_code
+      };
+
+      setSessions(prev => [session, ...prev]);
+      setIsCreateModalOpen(false);
+      // Reset Form
+      setCreateSessionData({ courseId: '', venueId: '', durationValue: '60', durationUnit: 'minutes' });
+      
+      // Immediately open QR modal for convenience
+      setQrModalSession(session);
+    } catch (err) {
+      console.error('Error creating session:', err);
+      setError('Failed to create session');
+    }
   };
   
   const handleSaveCourse = (e: React.FormEvent) => {
@@ -484,22 +570,22 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   if (view === 'courses') {
       return (
           <div className="space-y-6 animate-in fade-in">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Manage Courses</h2>
                   <Button onClick={openAddCourse}><Plus size={18} className="mr-2"/> Add Course</Button>
               </div>
               <div className="grid gap-4">
                   {courses.map(course => (
-                      <div key={course.id} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl flex items-center justify-between shadow-sm">
-                          <div>
-                              <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{course.code}</h3>
-                              <p className="text-zinc-500 dark:text-zinc-400">{course.name}</p>
-                              <div className="flex items-center gap-4 mt-2 text-sm text-zinc-500">
+                      <div key={course.id} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm gap-4">
+                          <div className="flex-1">
+                              <h3 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white">{course.code}</h3>
+                              <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400">{course.name}</p>
+                              <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 text-xs sm:text-sm text-zinc-500">
                                   <span className="flex items-center gap-1"><Users size={14}/> {course.students} Students</span>
                                   <span className="flex items-center gap-1"><Users size={14}/> {course.venue}</span>
                               </div>
                           </div>
-                          <Button variant="outline" size="sm" onClick={() => openEditCourse(course)}>
+                          <Button variant="outline" size="sm" onClick={() => openEditCourse(course)} className="w-full sm:w-auto">
                               <Edit2 size={16} className="mr-2" /> Edit
                           </Button>
                       </div>
@@ -570,8 +656,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             value={analyticsCourse}
                             onChange={(e) => setAnalyticsCourse(e.target.value)}
                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-lg p-3 appearance-none focus:ring-1 focus:ring-primary outline-none"
+                            disabled={coursesLoading}
                           >
-                              {courses.map(c => <option key={c.id} value={c.code}>{c.code} - {c.name}</option>)}
+                              <option value="">Select a course...</option>
+                              {courses.map(c => <option key={c.id} value={c.id}>{c.code} - {c.name}</option>)}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={16} />
                       </div>
@@ -660,52 +748,73 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                       <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-400">
                           <thead className="bg-zinc-50 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-800">
                               <tr>
-                                  <th className="p-4 font-medium">Student Name</th>
-                                  <th className="p-4 font-medium">Matric Number</th>
-                                  <th className="p-4 font-medium">Classes Attended</th>
-                                  <th className="p-4 font-medium">Attendance %</th>
-                                  <th className="p-4 font-medium text-right">Status</th>
+                                  <th className="p-4 font-medium whitespace-nowrap">Student Name</th>
+                                  <th className="p-4 font-medium hidden md:table-cell whitespace-nowrap">Matric Number</th>
+                                  <th className="p-4 font-medium hidden sm:table-cell whitespace-nowrap">Classes Attended</th>
+                                  <th className="p-4 font-medium whitespace-nowrap">Attendance %</th>
+                                  <th className="p-4 font-medium text-right whitespace-nowrap">Status</th>
                               </tr>
                           </thead>
                           <tbody>
-                              {filteredAnalytics.map((student) => {
-                                  const isBelow = student.percentage < analyticsBenchmark;
-                                  return (
-                                      <tr key={student.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                                          <td className="p-4 font-medium text-zinc-900 dark:text-white">{student.name}</td>
-                                          <td className="p-4">{student.matric}</td>
-                                          <td className="p-4">{student.attended} / {student.total}</td>
-                                          <td className="p-4">
-                                              <div className="flex items-center gap-2">
-                                                  <div className="w-16 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                                                      <div 
-                                                          className={`h-full rounded-full ${isBelow ? 'bg-red-500' : 'bg-green-500'}`} 
-                                                          style={{ width: `${student.percentage}%` }}
-                                                      ></div>
-                                                  </div>
-                                                  <span className={isBelow ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}>{student.percentage}%</span>
-                                              </div>
-                                          </td>
-                                          <td className="p-4 text-right">
-                                              {isBelow ? (
-                                                  <span className="inline-flex items-center gap-1 text-red-500 bg-red-500/10 px-2 py-1 rounded text-xs font-bold">
-                                                      <AlertCircle size={12} /> At Risk
-                                                  </span>
-                                              ) : (
-                                                  <span className="inline-flex items-center gap-1 text-green-500 bg-green-500/10 px-2 py-1 rounded text-xs font-bold">
-                                                      <CheckCircle2 size={12} /> Good
-                                                  </span>
-                                              )}
-                                          </td>
-                                      </tr>
-                                  );
-                              })}
-                              {filteredAnalytics.length === 0 && (
+                              {analyticsLoading ? (
                                   <tr>
                                       <td colSpan={5} className="p-8 text-center text-zinc-500">
-                                          No students found matching your search.
+                                          <div className="flex items-center justify-center gap-2">
+                                              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                              Loading analytics...
+                                          </div>
                                       </td>
                                   </tr>
+                              ) : filteredAnalytics.length === 0 && !analyticsCourse ? (
+                                  <tr>
+                                      <td colSpan={5} className="p-8 text-center text-zinc-500">
+                                          Please select a course to view analytics.
+                                      </td>
+                                  </tr>
+                              ) : filteredAnalytics.length === 0 ? (
+                                  <tr>
+                                      <td colSpan={5} className="p-8 text-center text-zinc-500">
+                                          No students found {analyticsSearch ? 'matching your search' : 'for this course'}.
+                                      </td>
+                                  </tr>
+                              ) : (
+                                  filteredAnalytics.map((student) => {
+                                      const isBelow = student.percentage < analyticsBenchmark;
+                                      return (
+                                          <tr key={student.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                                              <td className="p-4 font-medium text-zinc-900 dark:text-white">
+                                                <div>
+                                                  <div className="font-medium">{student.name}</div>
+                                                  <div className="text-xs text-zinc-500 md:hidden">{student.matric}</div>
+                                                </div>
+                                              </td>
+                                              <td className="p-4 hidden md:table-cell">{student.matric}</td>
+                                              <td className="p-4 hidden sm:table-cell">{student.attended} / {student.total}</td>
+                                              <td className="p-4">
+                                                  <div className="flex items-center gap-2">
+                                                      <div className="w-12 sm:w-16 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                                          <div 
+                                                              className={`h-full rounded-full ${isBelow ? 'bg-red-500' : 'bg-green-500'}`} 
+                                                              style={{ width: `${student.percentage}%` }}
+                                                          ></div>
+                                                      </div>
+                                                      <span className={`text-xs sm:text-sm ${isBelow ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}`}>{student.percentage}%</span>
+                                                  </div>
+                                              </td>
+                                              <td className="p-4 text-right">
+                                                  {isBelow ? (
+                                                      <span className="inline-flex items-center gap-1 text-red-500 bg-red-500/10 px-2 py-1 rounded text-xs font-bold">
+                                                          <AlertCircle size={12} className="hidden sm:inline" /> <span className="hidden sm:inline">At Risk</span><span className="sm:hidden">!</span>
+                                                      </span>
+                                                  ) : (
+                                                      <span className="inline-flex items-center gap-1 text-green-500 bg-green-500/10 px-2 py-1 rounded text-xs font-bold">
+                                                          <CheckCircle2 size={12} className="hidden sm:inline" /> <span className="hidden sm:inline">Good</span><span className="sm:hidden">✓</span>
+                                                      </span>
+                                                  )}
+                                              </td>
+                                          </tr>
+                                      );
+                                  })
                               )}
                           </tbody>
                       </table>
@@ -718,6 +827,23 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   // Default Dashboard View (Sessions)
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-red-500 font-semibold">Error</p>
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+          <button 
+            onClick={() => setError(null)} 
+            className="text-red-500 hover:text-red-400"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Hi, {userName}</h1>
@@ -731,9 +857,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-            { label: "Total Sessions", value: "124", icon: <Calendar size={20} className="text-blue-400" /> },
-            { label: "Avg. Attendance", value: "85%", icon: <Users size={20} className="text-green-400" /> },
-            { label: "Active Now", value: sessions.filter(s => s.active && !isSessionExpired(s.endTime)).length.toString(), icon: <Clock size={20} className="text-primary" /> },
+            { label: "Total Sessions", value: dashboardAnalytics?.total_sessions.toString() || "0", icon: <Calendar size={20} className="text-blue-400" /> },
+            { label: "Avg. Attendance", value: `${dashboardAnalytics?.avg_attendance_percentage || 0}%`, icon: <Users size={20} className="text-green-400" /> },
+            { label: "Active Now", value: (dashboardAnalytics?.active_sessions_count || sessions.filter(s => s.active && !isSessionExpired(s.endTime)).length).toString(), icon: <Clock size={20} className="text-primary" /> },
         ].map((stat, i) => (
           <div key={i} className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl flex items-center justify-between shadow-sm">
             <div>
@@ -891,7 +1017,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                                         <div className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 flex justify-between items-center">
                                             <div>
                                                 <p className="text-xs text-zinc-500">Session Code</p>
-                                                <p className={`text-xl font-mono font-bold tracking-widest ${isExpired ? 'text-zinc-400 line-through' : 'text-zinc-900 dark:text-white'}`}>{session.sessionCode}</p>
+                                                <p className={`text-lg sm:text-xl font-mono font-bold tracking-widest ${isExpired ? 'text-zinc-400 line-through' : 'text-zinc-900 dark:text-white'}`}>{session.sessionCode}</p>
                                             </div>
                                             <button 
                                                 onClick={() => {
@@ -905,14 +1031,16 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                                             </button>
                                         </div>
 
-                                        <div className="flex gap-2">
-                                            <Button size="sm" onClick={() => setIsScannerOpen(true)} disabled={isExpired}>
+                                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                            <Button size="sm" onClick={() => setIsScannerOpen(true)} disabled={isExpired} className="w-full sm:w-auto justify-center">
                                                 <Camera size={16} className="mr-2" />
-                                                Scan Student ID
+                                                <span className="hidden sm:inline">Scan Student ID</span>
+                                                <span className="sm:hidden">Scan ID</span>
                                             </Button>
-                                            <Button size="sm" variant="secondary" onClick={() => setQrModalSession(session)} disabled={isExpired}>
+                                            <Button size="sm" variant="secondary" onClick={() => setQrModalSession(session)} disabled={isExpired} className="w-full sm:w-auto justify-center">
                                                 <QrCode size={16} className="mr-2" />
-                                                {isExpired ? 'Session Expired' : 'Show Class QR'}
+                                                <span className="hidden sm:inline">{isExpired ? 'Session Expired' : 'Show Class QR'}</span>
+                                                <span className="sm:hidden">QR Code</span>
                                             </Button>
                                         </div>
                                     </div>
@@ -952,14 +1080,20 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Weekly Overview</h2>
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl h-[300px] shadow-sm">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={[{ name: 'Mon', attendees: 40 }, { name: 'Tue', attendees: 55 }, { name: 'Wed', attendees: 48 }, { name: 'Thu', attendees: 60 }, { name: 'Fri', attendees: 38 }]}>
-                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} vertical={false} />
-                <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff' }} cursor={{ fill: '#71717a', opacity: 0.1 }} />
-                <Bar dataKey="attendees" fill="#ffca0d" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {analyticsLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-zinc-500">Loading...</div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dashboardAnalytics?.weekly_overview || []}>
+                  <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} vertical={false} />
+                  <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff' }} cursor={{ fill: '#71717a', opacity: 0.1 }} />
+                  <Bar dataKey="attendees" fill="#ffca0d" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>

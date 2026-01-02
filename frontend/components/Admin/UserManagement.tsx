@@ -81,7 +81,7 @@ export const UserManagement: React.FC = () => {
     const csv = [
       ['Name', 'Email', 'Role', 'Institution', 'College', 'Onboarding Complete'].join(','),
       ...filteredUsers.map(user => [
-        user.name,
+        user.name || 'No Name',
         user.email,
         user.role,
         user.institution_id || 'N/A',
@@ -215,11 +215,11 @@ export const UserManagement: React.FC = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
                         <span className="text-primary font-semibold">
-                          {user.name.charAt(0).toUpperCase()}
+                          {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-foreground">{user.name}</div>
+                        <div className="text-sm font-medium text-foreground">{user.name || 'No Name'}</div>
                         <div className="text-sm text-zinc-400">{user.email}</div>
                       </div>
                     </div>
