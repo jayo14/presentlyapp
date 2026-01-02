@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { Institution, College } from '../../types';
+import { Institution, College, Department } from '../../types';
 
 export const institutionsApi = {
   // Institution methods
@@ -34,5 +34,30 @@ export const institutionsApi = {
   },
   deleteCollege: async (id: number): Promise<void> => {
     await apiClient.delete(`/colleges/${id}/`);
+  },
+
+  // Department methods
+  getDepartmentsByCollege: async (collegeId: number): Promise<Department[]> => {
+    const response = await apiClient.get(`/departments/?college=${collegeId}`);
+    return response.data;
+  },
+  getDepartmentsByInstitution: async (institutionId: number): Promise<Department[]> => {
+    const response = await apiClient.get(`/departments/?institution=${institutionId}`);
+    return response.data;
+  },
+  getAllDepartments: async (): Promise<Department[]> => {
+    const response = await apiClient.get('/departments/');
+    return response.data;
+  },
+  createDepartment: async (data: Omit<Department, 'id'>): Promise<Department> => {
+    const response = await apiClient.post('/departments/', data);
+    return response.data;
+  },
+  updateDepartment: async (id: number, data: Partial<Department>): Promise<Department> => {
+    const response = await apiClient.patch(`/departments/${id}/`, data);
+    return response.data;
+  },
+  deleteDepartment: async (id: number): Promise<void> => {
+    await apiClient.delete(`/departments/${id}/`);
   },
 };
