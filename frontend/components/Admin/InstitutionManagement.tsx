@@ -32,8 +32,11 @@ export const InstitutionManagement: React.FC = () => {
       setLoading(true);
       const data = await institutionsApi.getAllInstitutions();
       
+      // Ensure data is an array before processing
+      const institutionsArray = Array.isArray(data) ? data : [];
+      
       const institutionsWithStats = await Promise.all(
-        data.map(async (inst) => {
+        institutionsArray.map(async (inst) => {
           const colleges = await institutionsApi.getCollegesByInstitution(inst.id);
           return {
             ...inst,

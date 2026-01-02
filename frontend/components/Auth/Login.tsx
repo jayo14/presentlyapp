@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLogin } from '../../hooks/useAuth';
+import { useLogin, useCurrentUser } from '../../hooks/useAuth';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const loginMutation = useLogin();
+  const { data: user, isLoading } = useCurrentUser();
+
+  // Auto-redirect if user is already logged in
+  useEffect(() => {
+    if (user && !isLoading) {
+      if (!user.onboarding_complete) {
+        navigate('/onboarding', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [user, isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +31,18 @@ export const Login: React.FC = () => {
 
   const onBack = () => navigate(-1);
   const onRegisterClick = () => navigate('/register');
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-zinc-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">

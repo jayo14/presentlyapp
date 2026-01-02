@@ -12,8 +12,7 @@ export default defineConfig(({ mode }) => {
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.VITE_MAPBOX_TOKEN': JSON.stringify(env.VITE_MAPBOX_TOKEN)
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
       },
       resolve: {
         alias: {
@@ -29,7 +28,7 @@ export default defineConfig(({ mode }) => {
               'react-vendor': ['react', 'react-dom', 'react-router-dom'],
               'query-vendor': ['@tanstack/react-query'],
               'ui-vendor': ['framer-motion', 'lucide-react'],
-              'map-vendor': ['mapbox-gl', 'maplibre-gl', 'react-map-gl'],
+              'map-vendor': ['maplibre-gl', 'react-map-gl'],
               'chart-vendor': ['recharts'],
             },
           },

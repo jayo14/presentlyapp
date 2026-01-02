@@ -1,0 +1,26 @@
+# Presently - Smart Attendance Management System
+# robots.txt
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /onboarding/
+Disallow: /profile/
+Disallow: /settings/
+
+# Allow public pages
+Allow: /
+Allow: /login
+Allow: /register
+Allow: /forgot-password
+
+# Sitemap location
+Sitemap: https://presently.app/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
