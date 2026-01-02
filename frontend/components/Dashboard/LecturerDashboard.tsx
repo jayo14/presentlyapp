@@ -77,8 +77,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
       setCoursesLoading(true);
       setError(null); // Clear previous errors
       const data = await courseApi.getAll();
+      // Ensure data is an array before mapping
+      const coursesArray = Array.isArray(data) ? data : [];
       // Transform API courses to local format
-      const transformedCourses = data.map(course => ({
+      const transformedCourses = coursesArray.map(course => ({
         id: course.id.toString(),
         name: course.title,
         code: course.code,
@@ -89,6 +91,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     } catch (err) {
       console.error('Error fetching courses:', err);
       setError('Failed to load courses');
+      setCourses([]); // Set empty array on error
     } finally {
       setCoursesLoading(false);
     }
@@ -99,8 +102,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
       setVenuesLoading(true);
       setError(null); // Clear previous errors
       const data = await venueApi.getAll();
+      // Ensure data is an array before mapping
+      const venuesArray = Array.isArray(data) ? data : [];
       // Transform API venues to local format
-      const transformedVenues = data.map(venue => ({
+      const transformedVenues = venuesArray.map(venue => ({
         id: venue.id.toString(),
         name: venue.name
       }));
@@ -108,6 +113,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     } catch (err) {
       console.error('Error fetching venues:', err);
       setError('Failed to load venues');
+      setVenues([]); // Set empty array on error
     } finally {
       setVenuesLoading(false);
     }
@@ -118,8 +124,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
       setSessionsLoading(true);
       setError(null); // Clear previous errors
       const data = await sessionApi.getAll();
+      // Ensure data is an array before mapping
+      const sessionsArray = Array.isArray(data) ? data : [];
       // Transform API sessions to local format
-      const transformedSessions = data.map(session => ({
+      const transformedSessions = sessionsArray.map(session => ({
         id: session.id.toString(),
         courseName: session.course_name || 'Unknown Course',
         courseCode: session.course_code || 'N/A',
@@ -133,6 +141,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     } catch (err) {
       console.error('Error fetching sessions:', err);
       setError('Failed to load sessions');
+      setSessions([]); // Set empty array on error
     } finally {
       setSessionsLoading(false);
     }
