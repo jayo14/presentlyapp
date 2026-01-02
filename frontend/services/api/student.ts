@@ -146,7 +146,7 @@ export const studentApi = {
 
   // Get student analytics
   getAnalytics: async (): Promise<StudentAnalytics> => {
-    const response = await apiClient.get('/analytics/student/');
+    const response = await apiClient.get('/analytics/dashboard/student/');
     return response.data;
   },
 

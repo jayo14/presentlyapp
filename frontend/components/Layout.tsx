@@ -47,6 +47,7 @@ if (typeof window !== 'undefined') {
 export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
   const [isDark, setIsDark] = useState(true);
   const [installPrompt, setInstallPrompt] = useState<any>(deferredPromptEvent);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,15 +79,35 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
     // Initialize theme state based on document class
     setIsDark(document.documentElement.classList.contains('dark'));
     
+    // Check if app is already installed
+    const checkIfInstalled = () => {
+      // Check if running in standalone mode (app is installed)
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                          (window.navigator as any).standalone || 
+                          document.referrer.includes('android-app://');
+      setIsAppInstalled(isStandalone);
+      
+      // If app is installed, don't show install prompt
+      if (isStandalone) {
+        setInstallPrompt(null);
+        deferredPromptEvent = null;
+      }
+    };
+    
+    checkIfInstalled();
+    
     // Sync local state with global variable on mount
-    if (deferredPromptEvent) {
+    if (deferredPromptEvent && !isAppInstalled) {
       setInstallPrompt(deferredPromptEvent);
     }
 
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
-      deferredPromptEvent = e;
-      setInstallPrompt(e);
+      // Only set the prompt if app is not already installed
+      if (!isAppInstalled) {
+        deferredPromptEvent = e;
+        setInstallPrompt(e);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -94,7 +115,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [isAppInstalled]);
 
   const handleInstallClick = async () => {
     if (!installPrompt) return;
