@@ -212,7 +212,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Student-specific fields
     matric_number = models.CharField(max_length=50, blank=True, null=True, unique=True)
     department = models.CharField(max_length=200, blank=True, null=True)
-    level = models.CharField(max_length=20, blank=True, null=True)
+    level = models.CharField(
+        max_length=3, 
+        blank=True, 
+        null=True,
+        choices=[
+            ('100', '100 Level'),
+            ('200', '200 Level'),
+            ('300', '300 Level'),
+            ('400', '400 Level'),
+            ('500', '500 Level'),
+        ],
+        help_text="Student's current academic level"
+    )
     
     # Lecturer-specific fields
     staff_id = models.CharField(max_length=50, blank=True, null=True, unique=True)
@@ -268,14 +280,43 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Course(models.Model):
     """Courses offered in departments"""
     
+    SEMESTER_CHOICES = [
+        ('FIRST', 'First Semester'),
+        ('SECOND', 'Second Semester'),
+    ]
+    
+    LEVEL_CHOICES = [
+        ('100', '100 Level'),
+        ('200', '200 Level'),
+        ('300', '300 Level'),
+        ('400', '400 Level'),
+        ('500', '500 Level'),
+    ]
+    
+    DURATION_CHOICES = [
+        (1, '1 Year'),
+        (2, '2 Years'),
+        (3, '3 Years'),
+        (4, '4 Years'),
+        (5, '5 Years'),
+        (6, '6 Years'),
+    ]
+    
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses')
     code = models.CharField(max_length=20)  # e.g., "CS402"
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    lecturer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='teaching_courses')
+    lecturer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='teaching_courses')
     credit_units = models.IntegerField(default=3)
-    semester = models.CharField(max_length=20, blank=True, null=True)  # e.g., "First", "Second"
-    level = models.CharField(max_length=20, blank=True, null=True)  # e.g., "100", "200"
+    semester = models.CharField(max_length=20, choices=SEMESTER_CHOICES, blank=True, null=True)
+    level = models.CharField(max_length=3, choices=LEVEL_CHOICES, blank=True, null=True)
+    
+    # Course program duration (helps determine which levels should have this course)
+    duration_years = models.IntegerField(
+        choices=DURATION_CHOICES,
+        default=4,
+        help_text="Program duration in years. Determines maximum level for this course."
+    )
     
     # Metadata
     is_active = models.BooleanField(default=True)
@@ -289,10 +330,79 @@ class Course(models.Model):
             models.Index(fields=['code']),
             models.Index(fields=['lecturer']),
             models.Index(fields=['is_active']),
+            models.Index(fields=['department']),
+            models.Index(fields=['level']),
+            models.Index(fields=['semester']),
         ]
     
     def __str__(self):
         return f"{self.code} - {self.title}"
+    
+    @property
+    def institution(self):
+        """Get the institution this course belongs to"""
+        return self.department.institution
+    
+    @property
+    def college(self):
+        """Get the college this course belongs to"""
+        return self.department.college
+    
+    def get_enrolled_students_count(self):
+        """Get the count of enrolled students"""
+        return self.enrollments.filter(is_active=True).count()
+    
+    def get_applicable_levels(self):
+        """Get list of levels applicable for this course based on duration"""
+        level_mapping = {
+            1: ['100'],
+            2: ['100', '200'],
+            3: ['100', '200', '300'],
+            4: ['100', '200', '300', '400'],
+            5: ['100', '200', '300', '400', '500'],
+            6: ['100', '200', '300', '400', '500'],  # 6-year programs also go up to 500 level
+        }
+        return level_mapping.get(self.duration_years, ['100', '200', '300', '400'])
+    
+    def is_level_applicable(self, level):
+        """Check if a given level is applicable for this course"""
+        return level in self.get_applicable_levels()
+
+
+class CourseEnrollment(models.Model):
+    """Student enrollment in courses"""
+    
+    ENROLLMENT_STATUS = [
+        ('ENROLLED', 'Enrolled'),
+        ('DROPPED', 'Dropped'),
+        ('COMPLETED', 'Completed'),
+    ]
+    
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_enrollments')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrollments')
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=ENROLLMENT_STATUS, default='ENROLLED')
+    is_active = models.BooleanField(default=True)
+    
+    # Grade tracking (optional)
+    grade = models.CharField(max_length=5, blank=True, null=True)  # e.g., "A", "B+", "C"
+    grade_point = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)  # e.g., 4.00, 3.50
+    
+    # Metadata
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'course_enrollments'
+        unique_together = [['student', 'course']]
+        indexes = [
+            models.Index(fields=['student', 'is_active']),
+            models.Index(fields=['course', 'is_active']),
+            models.Index(fields=['enrolled_at']),
+        ]
+        ordering = ['-enrolled_at']
+    
+    def __str__(self):
+        return f"{self.student.full_name} - {self.course.code}"
 
 
 class Venue(models.Model):
