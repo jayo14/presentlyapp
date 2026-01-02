@@ -164,7 +164,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row transition-colors duration-300">
       {/* Sidebar (Desktop) */}
-      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-20' : 'w-64'} border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-950 h-screen sticky top-0 transition-all duration-300`}>
+      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-20' : 'w-64'} border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-950 h-screen sticky top-0 transition-all duration-300 relative`}>
         <div className={`p-6 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
           {sidebarCollapsed ? (
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
@@ -175,19 +175,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           )}
         </div>
         
-        {/* Collapse Toggle Button */}
+        {/* Collapse Toggle Button - Positioned on the right edge */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="mx-4 mb-2 p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors flex items-center justify-center"
+          className="absolute -right-3 top-20 z-10 w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md text-zinc-600 dark:text-zinc-400 hover:text-primary hover:border-primary transition-all flex items-center justify-center"
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <svg 
-            className={`w-5 h-5 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`} 
+            className={`w-3 h-3 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`} 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         
@@ -293,25 +293,25 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
       {/* Mobile Bottom Navigation - Dock Style */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-4 z-50 pointer-events-none">
-        <div className="pointer-events-auto bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl px-6 py-3 flex items-center gap-6">
+        <div className="pointer-events-auto bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl px-8 py-4 flex items-center gap-8">
           {navItems.slice(0, 4).map(item => (
             <button
               key={item.id}
               onClick={() => setCurrentPage(item.id)}
-              className={`flex flex-col items-center justify-center transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center gap-1.5 transition-all duration-200 min-w-[60px] ${
                 currentPage === item.id 
                   ? 'text-primary scale-110' 
                   : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:scale-105'
               }`}
             >
-              <div className={`p-2 rounded-2xl transition-all duration-200 ${
+              <div className={`p-3 rounded-2xl transition-all duration-200 ${
                 currentPage === item.id 
                   ? 'bg-primary/10 shadow-lg' 
                   : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}>
-                <item.icon size={22} strokeWidth={currentPage === item.id ? 2.5 : 2} />
+                <item.icon size={24} strokeWidth={currentPage === item.id ? 2.5 : 2} />
               </div>
-              <span className={`text-[10px] font-medium mt-1 transition-all duration-200 ${
+              <span className={`text-[10px] font-medium transition-all duration-200 ${
                 currentPage === item.id ? 'font-semibold' : ''
               }`}>
                 {item.label}

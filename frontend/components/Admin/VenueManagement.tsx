@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map, List, Grid } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
 import { venueApi } from '../../services/api/venues';
 import { institutionsApi } from '../../services/api/institutions';
 import VenueModal from './VenueModal';
+import VenueMap from './VenueMap';
 
 export const VenueManagement: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -16,6 +17,9 @@ export const VenueManagement: React.FC = () => {
   const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null);
+  const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+  const [newVenueLocation, setNewVenueLocation] = useState<{lat: number; lng: number} | null>(null);
 
   // Load institutions and venues
   useEffect(() => {
@@ -37,8 +41,8 @@ export const VenueManagement: React.FC = () => {
         institutionsApi.getAllInstitutions(),
         venueApi.getAll()
       ]);
-      setInstitutions(institutionsData);
-      setVenues(venuesData);
+      setInstitutions(Array.isArray(institutionsData) ? institutionsData : []);
+      setVenues(Array.isArray(venuesData) ? venuesData : []);
       setError(null);
     } catch (err) {
       setError('Failed to load data');
@@ -53,7 +57,7 @@ export const VenueManagement: React.FC = () => {
       setLoading(true);
       const filters = institutionId ? { institution: institutionId } : undefined;
       const data = await venueApi.getAll(filters);
-      setVenues(data);
+      setVenues(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       setError('Failed to load venues');
@@ -63,15 +67,27 @@ export const VenueManagement: React.FC = () => {
     }
   };
 
-  const filteredVenues = venues.filter(venue =>
+  const filteredVenues = Array.isArray(venues) ? venues.filter(venue =>
     venue.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     venue.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     venue.building_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) : [];
 
   const handleCreateVenue = () => {
     setEditingVenue(null);
+    setNewVenueLocation(null);
     setShowModal(true);
+  };
+
+  const handleMapClick = (lat: number, lng: number) => {
+    // When clicking on map, prepare to create venue at that location
+    setNewVenueLocation({ lat, lng });
+    setEditingVenue(null);
+    setShowModal(true);
+  };
+
+  const handleVenueClick = (venue: Venue) => {
+    setSelectedVenue(venue);
   };
 
   const handleEditVenue = (venue: Venue) => {
@@ -116,9 +132,9 @@ export const VenueManagement: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
           <MapPin className="w-8 h-8 text-primary" />
           <div>
@@ -126,10 +142,34 @@ export const VenueManagement: React.FC = () => {
             <p className="text-sm text-zinc-400">Manage venue locations with geolocation data</p>
           </div>
         </div>
-        <Button onClick={handleCreateVenue} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Add Venue
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('map')}
+              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                viewMode === 'map' 
+                  ? 'bg-primary text-white' 
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Map className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                viewMode === 'grid' 
+                  ? 'bg-primary text-white' 
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Grid className="w-4 h-4" />
+            </button>
+          </div>
+          <Button onClick={handleCreateVenue} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Add Venue
+          </Button>
+        </div>
       </div>
 
       {/* Error Message */}
@@ -144,7 +184,7 @@ export const VenueManagement: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-shrink-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
           <Input
@@ -168,8 +208,18 @@ export const VenueManagement: React.FC = () => {
         </select>
       </div>
 
-      {/* Venues Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Map or Grid View */}
+      {viewMode === 'map' ? (
+        <div className="flex-1 min-h-[600px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+          <VenueMap
+            venues={filteredVenues}
+            onVenueClick={handleVenueClick}
+            onMapClick={handleMapClick}
+            selectedVenue={selectedVenue}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
         {filteredVenues.map(venue => (
           <div
             key={venue.id}
@@ -242,8 +292,9 @@ export const VenueManagement: React.FC = () => {
           </div>
         ))}
       </div>
+      )}
 
-      {filteredVenues.length === 0 && !loading && (
+      {filteredVenues.length === 0 && !loading && viewMode === 'grid' && (
         <div className="text-center py-12">
           <MapPin className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
           <p className="text-zinc-400">No venues found</p>
@@ -257,7 +308,11 @@ export const VenueManagement: React.FC = () => {
           venue={editingVenue || undefined}
           institutions={institutions}
           onSave={handleSaveVenue}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            setNewVenueLocation(null);
+          }}
+          initialLocation={newVenueLocation}
         />
       )}
     </div>
