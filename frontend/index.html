@@ -49,16 +49,18 @@
     <!-- Performance: Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://basemaps.cartocdn.com" />
     
-    <!-- Performance: DNS Prefetch for API and site -->
+    <!-- Performance: DNS Prefetch for API and CDN -->
     <link rel="dns-prefetch" href="https://presentlyapp.vercel.app" />
+    <link rel="dns-prefetch" href="https://basemaps.cartocdn.com" />
     
     <!-- Font loading with display=swap for better FCP -->
     <link 
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" 
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'" 
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'" 
     />
     <noscript>
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
