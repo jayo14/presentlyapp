@@ -125,7 +125,8 @@ self.addEventListener('fetch', (event) => {
   }
 
   // For API requests, use Network First with Cache Fallback
-  if (url.pathname.startsWith('/api/') || url.hostname.includes('supabase')) {
+  // Check for API endpoints or non-same-origin requests (likely API calls)
+  if (url.pathname.startsWith('/api/') || url.origin !== self.location.origin) {
     event.respondWith(
       fetch(request)
         .then(response => {
