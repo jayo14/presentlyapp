@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
-import { UserRole, Course } from '../../types';
+import { UserRole, Course, Institution, College, Department } from '../../types';
 import { useCompleteOnboarding, useCurrentUser } from '../../hooks/useAuth';
 import { coursesApi } from '../../services/api';
+import { institutionsApi } from '../../services/api/institutions';
 import { 
   User, Bell, MapPin, Check, Upload, 
   Moon, Sun, Camera, Smartphone, ChevronRight, ChevronLeft,
@@ -27,6 +28,14 @@ export const Onboarding: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [coursesError, setCoursesError] = useState('');
+
+  // Institution, College, Department state
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
+  const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     phoneNumber: '',
@@ -52,6 +61,52 @@ export const Onboarding: React.FC = () => {
       fetchCourses();
     }
   }, [selectedRole, step]);
+
+  // Fetch institutions on mount
+  useEffect(() => {
+    fetchInstitutions();
+  }, []);
+
+  // Fetch colleges when institution is selected
+  useEffect(() => {
+    if (selectedInstitution) {
+      fetchColleges(selectedInstitution);
+    }
+  }, [selectedInstitution]);
+
+  // Fetch departments when college is selected
+  useEffect(() => {
+    if (selectedCollege) {
+      fetchDepartments(selectedCollege);
+    }
+  }, [selectedCollege]);
+
+  const fetchInstitutions = async () => {
+    try {
+      const data = await institutionsApi.getAllInstitutions();
+      setInstitutions(data.filter(inst => inst.is_active));
+    } catch (err) {
+      console.error('Error fetching institutions:', err);
+    }
+  };
+
+  const fetchColleges = async (institutionId: number) => {
+    try {
+      const data = await institutionsApi.getCollegesByInstitution(institutionId);
+      setColleges(data.filter(col => col.is_active));
+    } catch (err) {
+      console.error('Error fetching colleges:', err);
+    }
+  };
+
+  const fetchDepartments = async (collegeId: number) => {
+    try {
+      const data = await institutionsApi.getDepartmentsByCollege(collegeId);
+      setDepartments(data.filter(dept => dept.is_active));
+    } catch (err) {
+      console.error('Error fetching departments:', err);
+    }
+  };
 
   const fetchCourses = async () => {
     try {
@@ -84,11 +139,13 @@ export const Onboarding: React.FC = () => {
           role: selectedRole,
           phone_number: formData.phoneNumber || undefined,
           matric_number: formData.matricNumber || undefined,
-          department: formData.department || undefined,
+          department: selectedDepartment?.toString() || formData.department || undefined,
           level: formData.level || undefined,
           staff_id: formData.staffId || undefined,
           courses: selectedCourses.length > 0 ? selectedCourses.join(',') : undefined,
           assigned_lecturer: formData.assignedLecturer || undefined,
+          institution: selectedInstitution || undefined,
+          college: selectedCollege || undefined,
           avatar_url: profileImage || undefined,
           notifications_enabled: permissions.notifications,
           location_enabled: permissions.location,
@@ -266,6 +323,76 @@ export const Onboarding: React.FC = () => {
       </div>
 
       <div className="space-y-4">
+        {/* Institution Selection */}
+        <div>
+          <label className="block text-sm font-medium text-zinc-400 mb-1.5">Institution</label>
+          <select
+            value={selectedInstitution || ''}
+            onChange={(e) => {
+              const value = e.target.value ? Number(e.target.value) : null;
+              setSelectedInstitution(value);
+              setSelectedCollege(null);
+              setSelectedDepartment(null);
+              setColleges([]);
+              setDepartments([]);
+            }}
+            className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg p-3 focus:ring-1 focus:ring-primary outline-none"
+          >
+            <option value="">Select Institution</option>
+            {institutions.map(inst => (
+              <option key={inst.id} value={inst.id}>
+                {inst.short_name} - {inst.full_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* College Selection */}
+        {selectedInstitution && (
+          <div>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">College/Faculty</label>
+            <select
+              value={selectedCollege || ''}
+              onChange={(e) => {
+                const value = e.target.value ? Number(e.target.value) : null;
+                setSelectedCollege(value);
+                setSelectedDepartment(null);
+                setDepartments([]);
+              }}
+              className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg p-3 focus:ring-1 focus:ring-primary outline-none"
+            >
+              <option value="">Select College/Faculty</option>
+              {colleges.map(col => (
+                <option key={col.id} value={col.id}>
+                  {col.code} - {col.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Department Selection */}
+        {selectedCollege && (
+          <div>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Department</label>
+            <select
+              value={selectedDepartment || ''}
+              onChange={(e) => {
+                const value = e.target.value ? Number(e.target.value) : null;
+                setSelectedDepartment(value);
+              }}
+              className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg p-3 focus:ring-1 focus:ring-primary outline-none"
+            >
+              <option value="">Select Department</option>
+              {departments.map(dept => (
+                <option key={dept.id} value={dept.id}>
+                  {dept.code} - {dept.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {(selectedRole === UserRole.STUDENT || selectedRole === UserRole.CLASS_REP) && (
             <>
                 <Input 
@@ -275,22 +402,13 @@ export const Onboarding: React.FC = () => {
                     value={formData.matricNumber}
                     onChange={handleInputChange}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                    <Input 
-                        name="department"
-                        label="Department" 
-                        placeholder="Comp. Sci" 
-                        value={formData.department}
-                        onChange={handleInputChange}
-                    />
-                    <Input 
-                        name="level"
-                        label="Level" 
-                        placeholder="400" 
-                        value={formData.level}
-                        onChange={handleInputChange}
-                    />
-                </div>
+                <Input 
+                    name="level"
+                    label="Level" 
+                    placeholder="e.g. 100, 200, 300, 400" 
+                    value={formData.level}
+                    onChange={handleInputChange}
+                />
             </>
         )}
 
