@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
 import { LogOut, LayoutDashboard, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download } from 'lucide-react';
 import { UserRole } from '../types';
@@ -54,6 +55,31 @@ if (typeof window !== 'undefined') {
 export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
   const [isDark, setIsDark] = useState(true);
   const [installPrompt, setInstallPrompt] = useState<any>(deferredPromptEvent);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Update URL when page changes
+  useEffect(() => {
+    if (currentPage && currentPage !== 'dashboard') {
+      const newPath = `/dashboard/${currentPage}`;
+      if (location.pathname !== newPath && location.pathname !== '/dashboard') {
+        navigate(newPath, { replace: true });
+      }
+    } else if (currentPage === 'dashboard' && location.pathname !== '/dashboard') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [currentPage, navigate, location.pathname]);
+
+  // Parse URL on mount to set correct page
+  useEffect(() => {
+    const pathParts = location.pathname.split('/');
+    if (pathParts.length > 2 && pathParts[1] === 'dashboard') {
+      const page = pathParts[2];
+      if (page && page !== currentPage) {
+        setCurrentPage(page);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Initialize theme state based on document class

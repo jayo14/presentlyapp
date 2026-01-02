@@ -127,7 +127,7 @@ const AppContent: React.FC = () => {
         />
         
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
             <ProtectedRoute>
               {user && (
