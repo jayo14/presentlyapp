@@ -52,27 +52,46 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
     
     <!-- Performance: Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://basemaps.cartocdn.com" />
     
     <!-- Performance: DNS Prefetch for API and CDN -->
-    <link rel="dns-prefetch" href="https://presentlyapp.vercel.app" />
     <link rel="dns-prefetch" href="https://basemaps.cartocdn.com" />
     
-    <!-- Font loading with display=swap for better FCP -->
+    <!-- Font loading with display=swap for better FCP - Use swap for immediate text display -->
     <link 
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" 
-      rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'" 
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" 
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     </noscript>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/icon-192.png" as="image" type="image/png" />
     
     <!-- Accessibility: Skip to content link styles -->
     <style>
+      /* Critical CSS - inline for faster render */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #09090b;
+        color: #f4f4f5;
+        min-height: 100vh;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
       .skip-to-content {
         position: absolute;
         left: -9999px;
