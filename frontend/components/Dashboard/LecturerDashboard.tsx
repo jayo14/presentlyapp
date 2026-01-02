@@ -7,6 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { courseApi, sessionApi, AttendanceSession } from '../../services/api/attendance';
 import { venueApi } from '../../services/api/venues';
 import { Venue as VenueType } from '../../types';
+import { analyticsApi, LecturerDashboardAnalytics, CourseAttendanceAnalytics } from '../../services/api/analytics';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -40,10 +41,15 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   const [courses, setCourses] = useState<Course[]>([]);
   const [venues, setVenues] = useState<Venue[]>([]);
   
+  // Dashboard analytics state
+  const [dashboardAnalytics, setDashboardAnalytics] = useState<LecturerDashboardAnalytics | null>(null);
+  const [courseAnalytics, setCourseAnalytics] = useState<CourseAttendanceAnalytics | null>(null);
+  
   // Loading states
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [venuesLoading, setVenuesLoading] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch real data on mount
@@ -51,7 +57,20 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     fetchCourses();
     fetchVenues();
     fetchSessions();
+    fetchDashboardAnalytics();
   }, []);
+
+  const fetchDashboardAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const data = await analyticsApi.getLecturerDashboard();
+      setDashboardAnalytics(data);
+    } catch (err) {
+      console.error('Error fetching dashboard analytics:', err);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   const fetchCourses = async () => {
     try {
@@ -125,22 +144,36 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   
   // Analytics State
   const [analyticsBenchmark, setAnalyticsBenchmark] = useState(70);
-  const [analyticsCourse, setAnalyticsCourse] = useState('CS402');
+  const [analyticsCourse, setAnalyticsCourse] = useState<string>('');
   const [analyticsSearch, setAnalyticsSearch] = useState('');
-  
-  // Mock Student Analytics Data
-  const [studentAnalytics] = useState([
-    { id: '1', name: 'Alice Baker', matric: 'ENG/21/001', attended: 28, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '2', name: 'Bob Charlie', matric: 'ENG/21/002', attended: 15, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '3', name: 'Charlie Delta', matric: 'ENG/21/003', attended: 22, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '4', name: 'David Echo', matric: 'ENG/21/004', attended: 29, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '5', name: 'Eve Foxtrot', matric: 'ENG/21/005', attended: 10, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '6', name: 'Frank Golf', matric: 'ENG/21/006', attended: 25, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '7', name: 'Grace Hotel', matric: 'ENG/21/007', attended: 18, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '8', name: 'Henry India', matric: 'ENG/21/008', attended: 30, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '9', name: 'Ivy Juliet', matric: 'ENG/21/009', attended: 20, total: 30, dept: 'Computer Science', level: '400' },
-    { id: '10', name: 'Jack Kilo', matric: 'ENG/21/010', attended: 5, total: 30, dept: 'Computer Science', level: '400' },
-  ]);
+
+  // Fetch course analytics when course or benchmark changes
+  useEffect(() => {
+    if (analyticsCourse && view === 'analytics') {
+      fetchCourseAnalytics(analyticsCourse, analyticsBenchmark);
+    }
+  }, [analyticsCourse, analyticsBenchmark, view]);
+
+  // Set default course when courses are loaded
+  useEffect(() => {
+    if (courses.length > 0 && !analyticsCourse) {
+      setAnalyticsCourse(courses[0].id);
+    }
+  }, [courses]);
+
+  const fetchCourseAnalytics = async (courseId: string, benchmark: number) => {
+    try {
+      setAnalyticsLoading(true);
+      setError(null);
+      const data = await analyticsApi.getCourseAttendance(parseInt(courseId), benchmark);
+      setCourseAnalytics(data);
+    } catch (err) {
+      console.error('Error fetching course analytics:', err);
+      setError('Failed to load course analytics');
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -197,25 +230,15 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
       return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
     });
 
-  // Analytics Processing
-  const processedAnalytics = studentAnalytics.map(s => ({
-      ...s,
-      percentage: Math.round((s.attended / s.total) * 100),
-  })).sort((a, b) => {
-      // Sort by percentage descending
-      if (b.percentage !== a.percentage) return b.percentage - a.percentage;
-      // Then by name alphabetical
-      return a.name.localeCompare(b.name);
-  });
-
-  const filteredAnalytics = processedAnalytics.filter(s => 
+  // Analytics Processing - use real data from courseAnalytics
+  const filteredAnalytics = courseAnalytics?.students.filter(s => 
       s.name.toLowerCase().includes(analyticsSearch.toLowerCase()) || 
       s.matric.toLowerCase().includes(analyticsSearch.toLowerCase())
-  );
+  ) || [];
   
-  const avgAttendance = Math.round(processedAnalytics.reduce((acc, curr) => acc + curr.percentage, 0) / processedAnalytics.length);
-  const belowBenchmarkCount = processedAnalytics.filter(s => s.percentage < analyticsBenchmark).length;
-  const aboveBenchmarkCount = processedAnalytics.length - belowBenchmarkCount;
+  const avgAttendance = courseAnalytics?.avg_attendance || 0;
+  const belowBenchmarkCount = courseAnalytics?.at_risk_count || 0;
+  const aboveBenchmarkCount = courseAnalytics?.good_standing_count || 0;
 
 
   // Handlers
@@ -633,8 +656,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             value={analyticsCourse}
                             onChange={(e) => setAnalyticsCourse(e.target.value)}
                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-lg p-3 appearance-none focus:ring-1 focus:ring-primary outline-none"
+                            disabled={coursesLoading}
                           >
-                              {courses.map(c => <option key={c.id} value={c.code}>{c.code} - {c.name}</option>)}
+                              <option value="">Select a course...</option>
+                              {courses.map(c => <option key={c.id} value={c.id}>{c.code} - {c.name}</option>)}
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={16} />
                       </div>
@@ -731,49 +756,65 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                               </tr>
                           </thead>
                           <tbody>
-                              {filteredAnalytics.map((student) => {
-                                  const isBelow = student.percentage < analyticsBenchmark;
-                                  return (
-                                      <tr key={student.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                                          <td className="p-4 font-medium text-zinc-900 dark:text-white">
-                                            <div>
-                                              <div className="font-medium">{student.name}</div>
-                                              <div className="text-xs text-zinc-500 md:hidden">{student.matric}</div>
-                                            </div>
-                                          </td>
-                                          <td className="p-4 hidden md:table-cell">{student.matric}</td>
-                                          <td className="p-4 hidden sm:table-cell">{student.attended} / {student.total}</td>
-                                          <td className="p-4">
-                                              <div className="flex items-center gap-2">
-                                                  <div className="w-12 sm:w-16 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                                                      <div 
-                                                          className={`h-full rounded-full ${isBelow ? 'bg-red-500' : 'bg-green-500'}`} 
-                                                          style={{ width: `${student.percentage}%` }}
-                                                      ></div>
-                                                  </div>
-                                                  <span className={`text-xs sm:text-sm ${isBelow ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}`}>{student.percentage}%</span>
-                                              </div>
-                                          </td>
-                                          <td className="p-4 text-right">
-                                              {isBelow ? (
-                                                  <span className="inline-flex items-center gap-1 text-red-500 bg-red-500/10 px-2 py-1 rounded text-xs font-bold">
-                                                      <AlertCircle size={12} className="hidden sm:inline" /> <span className="hidden sm:inline">At Risk</span><span className="sm:hidden">!</span>
-                                                  </span>
-                                              ) : (
-                                                  <span className="inline-flex items-center gap-1 text-green-500 bg-green-500/10 px-2 py-1 rounded text-xs font-bold">
-                                                      <CheckCircle2 size={12} className="hidden sm:inline" /> <span className="hidden sm:inline">Good</span><span className="sm:hidden">✓</span>
-                                                  </span>
-                                              )}
-                                          </td>
-                                      </tr>
-                                  );
-                              })}
-                              {filteredAnalytics.length === 0 && (
+                              {analyticsLoading ? (
                                   <tr>
                                       <td colSpan={5} className="p-8 text-center text-zinc-500">
-                                          No students found matching your search.
+                                          <div className="flex items-center justify-center gap-2">
+                                              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                              Loading analytics...
+                                          </div>
                                       </td>
                                   </tr>
+                              ) : filteredAnalytics.length === 0 && !analyticsCourse ? (
+                                  <tr>
+                                      <td colSpan={5} className="p-8 text-center text-zinc-500">
+                                          Please select a course to view analytics.
+                                      </td>
+                                  </tr>
+                              ) : filteredAnalytics.length === 0 ? (
+                                  <tr>
+                                      <td colSpan={5} className="p-8 text-center text-zinc-500">
+                                          No students found {analyticsSearch ? 'matching your search' : 'for this course'}.
+                                      </td>
+                                  </tr>
+                              ) : (
+                                  filteredAnalytics.map((student) => {
+                                      const isBelow = student.percentage < analyticsBenchmark;
+                                      return (
+                                          <tr key={student.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                                              <td className="p-4 font-medium text-zinc-900 dark:text-white">
+                                                <div>
+                                                  <div className="font-medium">{student.name}</div>
+                                                  <div className="text-xs text-zinc-500 md:hidden">{student.matric}</div>
+                                                </div>
+                                              </td>
+                                              <td className="p-4 hidden md:table-cell">{student.matric}</td>
+                                              <td className="p-4 hidden sm:table-cell">{student.attended} / {student.total}</td>
+                                              <td className="p-4">
+                                                  <div className="flex items-center gap-2">
+                                                      <div className="w-12 sm:w-16 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                                          <div 
+                                                              className={`h-full rounded-full ${isBelow ? 'bg-red-500' : 'bg-green-500'}`} 
+                                                              style={{ width: `${student.percentage}%` }}
+                                                          ></div>
+                                                      </div>
+                                                      <span className={`text-xs sm:text-sm ${isBelow ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}`}>{student.percentage}%</span>
+                                                  </div>
+                                              </td>
+                                              <td className="p-4 text-right">
+                                                  {isBelow ? (
+                                                      <span className="inline-flex items-center gap-1 text-red-500 bg-red-500/10 px-2 py-1 rounded text-xs font-bold">
+                                                          <AlertCircle size={12} className="hidden sm:inline" /> <span className="hidden sm:inline">At Risk</span><span className="sm:hidden">!</span>
+                                                      </span>
+                                                  ) : (
+                                                      <span className="inline-flex items-center gap-1 text-green-500 bg-green-500/10 px-2 py-1 rounded text-xs font-bold">
+                                                          <CheckCircle2 size={12} className="hidden sm:inline" /> <span className="hidden sm:inline">Good</span><span className="sm:hidden">✓</span>
+                                                      </span>
+                                                  )}
+                                              </td>
+                                          </tr>
+                                      );
+                                  })
                               )}
                           </tbody>
                       </table>
@@ -816,9 +857,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-            { label: "Total Sessions", value: "124", icon: <Calendar size={20} className="text-blue-400" /> },
-            { label: "Avg. Attendance", value: "85%", icon: <Users size={20} className="text-green-400" /> },
-            { label: "Active Now", value: sessions.filter(s => s.active && !isSessionExpired(s.endTime)).length.toString(), icon: <Clock size={20} className="text-primary" /> },
+            { label: "Total Sessions", value: dashboardAnalytics?.total_sessions.toString() || "0", icon: <Calendar size={20} className="text-blue-400" /> },
+            { label: "Avg. Attendance", value: `${dashboardAnalytics?.avg_attendance_percentage || 0}%`, icon: <Users size={20} className="text-green-400" /> },
+            { label: "Active Now", value: (dashboardAnalytics?.active_sessions_count || sessions.filter(s => s.active && !isSessionExpired(s.endTime)).length).toString(), icon: <Clock size={20} className="text-primary" /> },
         ].map((stat, i) => (
           <div key={i} className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl flex items-center justify-between shadow-sm">
             <div>
@@ -1039,14 +1080,20 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Weekly Overview</h2>
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl h-[300px] shadow-sm">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={[{ name: 'Mon', attendees: 40 }, { name: 'Tue', attendees: 55 }, { name: 'Wed', attendees: 48 }, { name: 'Thu', attendees: 60 }, { name: 'Fri', attendees: 38 }]}>
-                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} vertical={false} />
-                <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff' }} cursor={{ fill: '#71717a', opacity: 0.1 }} />
-                <Bar dataKey="attendees" fill="#ffca0d" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {analyticsLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-zinc-500">Loading...</div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dashboardAnalytics?.weekly_overview || []}>
+                  <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} vertical={false} />
+                  <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff' }} cursor={{ fill: '#71717a', opacity: 0.1 }} />
+                  <Bar dataKey="attendees" fill="#ffca0d" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
