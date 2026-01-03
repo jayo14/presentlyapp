@@ -96,11 +96,15 @@ class VenueAdmin(ModelAdmin):
 @admin.register(Course)
 class CourseAdmin(ModelAdmin):
     """Admin configuration for Course model"""
-    list_display = ['code', 'title', 'department', 'lecturer', 'credit_units', 'is_active', 'created_at']
-    list_filter = ['department', 'is_active', 'semester', 'level']
+    list_display = ['code', 'title', 'get_departments', 'lecturer', 'credit_units', 'is_active', 'created_at']
+    list_filter = ['is_active', 'semester', 'level']
     search_fields = ['code', 'title', 'description']
     ordering = ['code']
     readonly_fields = ['created_at', 'updated_at']
+
+    def get_departments(self, obj):
+        return ", ".join([d.name for d in obj.department.all()])
+    get_departments.short_description = 'Departments'
 
 
 @admin.register(AttendanceSession)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './services/api/queryClient';
 import { UserRole } from './types';
@@ -30,6 +30,14 @@ const NotFound = lazy(() => import('./components/NotFound').then(module => ({ de
 const UnauthorizedPage = lazy(() => import('./components/UnauthorizedPage').then(module => ({ default: module.UnauthorizedPage })));
 const ProtectedRoute = lazy(() => import('./components/ProtectedRoute').then(module => ({ default: module.ProtectedRoute })));
 
+// Admin Components
+const InstitutionManagement = lazy(() => import('./components/Admin/InstitutionManagement').then(module => ({ default: module.InstitutionManagement })));
+const InstitutionFormPage = lazy(() => import('./components/Admin/InstitutionFormPage').then(module => ({ default: module.InstitutionFormPage })));
+const UserManagement = lazy(() => import('./components/Admin/UserManagement').then(module => ({ default: module.UserManagement })));
+const CourseManagement = lazy(() => import('./components/Admin/CourseManagement').then(module => ({ default: module.CourseManagement })));
+const VenueManagement = lazy(() => import('./components/Admin/VenueManagement').then(module => ({ default: module.VenueManagement })));
+const DepartmentManagement = lazy(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
+
 // Loading fallback component
 const LoadingFallback: React.FC = () => (
   <div className="min-h-screen bg-background flex items-center justify-center" role="status" aria-live="polite" aria-label="Loading content">
@@ -40,36 +48,74 @@ const LoadingFallback: React.FC = () => (
   </div>
 );
 
+// Wrapper for Layout to handle props from context/hooks
+const DashboardLayout: React.FC = () => {
+    const { data: user, isLoading } = useCurrentUser();
+    const logoutMutation = useLogout();
+    const location = useLocation();
+    const navigate = useNavigate();
+    
+    // Determine current page from URL
+    const pathParts = location.pathname.split('/');
+    const currentPage = pathParts.length > 2 ? pathParts[2] : 'dashboard';
+
+    const handleLogout = async () => {
+        logoutMutation.mutate();
+    };
+
+    const handlePageChange = (page: string) => {
+         // This callback is less relevant now as Layout handles navigation, 
+         // but we keep it for Layout prop compatibility or manual overrides if needed.
+         if (page === 'dashboard') navigate('/dashboard');
+         else navigate(`/dashboard/${page}`);
+    };
+
+    if (isLoading) return <LoadingFallback />;
+    if (!user) return <Navigate to="/login" replace />;
+
+    return (
+        <Layout
+            userRole={user.role}
+            userName={user.full_name}
+            onLogout={handleLogout}
+            currentPage={currentPage}
+            setCurrentPage={handlePageChange}
+        />
+    );
+};
+
+const DashboardHome: React.FC = () => {
+    const { data: user } = useCurrentUser();
+    
+    if (!user) return null;
+
+    switch (user.role) {
+        case UserRole.STUDENT:
+            return <StudentDashboard userName={user.full_name} view="dashboard" />;
+        case UserRole.LECTURER:
+            return <LecturerDashboard userName={user.full_name} userProfile={user} view="dashboard" />;
+        case UserRole.ADMIN:
+            return <AdminDashboard userName={user.full_name} view="dashboard" />;
+        case UserRole.CLASS_REP:
+            return <ClassRepDashboard userName={user.full_name} view="dashboard" />;
+        default:
+            return <Navigate to="/unauthorized" replace />;
+    }
+};
+
+// Admin Route Guard
+const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { data: user, isLoading } = useCurrentUser();
+    
+    if (isLoading) return <LoadingFallback />;
+    if (!user || user.role !== UserRole.ADMIN) return <Navigate to="/unauthorized" replace />;
+
+    return <>{children}</>;
+};
+
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
-  const { data: user, isLoading, refetch } = useCurrentUser();
-  const logoutMutation = useLogout();
-  const [dashboardPage, setDashboardPage] = useState('dashboard');
-  const [previousRole, setPreviousRole] = useState<UserRole | null>(null);
-
-  // Poll for user role changes every 30 seconds
-  useEffect(() => {
-    if (!user) return;
-    
-    const pollInterval = setInterval(() => {
-      refetch();
-    }, 30000); // Poll every 30 seconds
-
-    return () => clearInterval(pollInterval);
-  }, [user, refetch]);
-
-  // Detect role changes and reset dashboard page
-  useEffect(() => {
-    if (user && previousRole && user.role !== previousRole) {
-      // Role has changed, reset to main dashboard view
-      setDashboardPage('dashboard');
-      // Force re-render by staying on dashboard route
-      navigate('/dashboard', { replace: true });
-    }
-    if (user) {
-      setPreviousRole(user.role);
-    }
-  }, [user, previousRole, navigate]);
+  const { data: user, isLoading } = useCurrentUser();
 
   useEffect(() => {
     if (!isLoading && user && !user.onboarding_complete) {
@@ -77,33 +123,9 @@ const AppContent: React.FC = () => {
     }
   }, [user, isLoading, navigate]);
 
-  const handleDashboardNavChange = (page: string) => {
-    setDashboardPage(page);
-  };
-
-  const handleLogout = async () => {
-    logoutMutation.mutate();
-  };
-
   if (isLoading) {
     return <LoadingFallback />;
   }
-
-  const renderDashboard = () => {
-    if (!user) return null;
-    switch (user.role) {
-      case UserRole.STUDENT:
-        return <StudentDashboard userName={user.full_name} view={dashboardPage} />;
-      case UserRole.LECTURER:
-        return <LecturerDashboard userName={user.full_name} userProfile={user} view={dashboardPage} />;
-      case UserRole.ADMIN:
-        return <AdminDashboard userName={user.full_name} view={dashboardPage} />;
-      case UserRole.CLASS_REP:
-        return <ClassRepDashboard userName={user.full_name} view={dashboardPage} />;
-      default:
-        return <Navigate to="/unauthorized" replace />;
-    }
-  };
 
   return (
     <Suspense fallback={<LoadingFallback />}>
@@ -127,27 +149,22 @@ const AppContent: React.FC = () => {
             }
           />
           
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute>
-                {user && (
-                  <Layout
-                    userRole={user.role}
-                    userName={user.full_name}
-                    onLogout={handleLogout}
-                    currentPage={dashboardPage}
-                    setCurrentPage={handleDashboardNavChange}
-                  >
-                    {dashboardPage === 'profile' && <ProfilePage userRole={user.role} userName={user.full_name} />}
-                    {dashboardPage === 'notifications' && <NotificationsPage />}
-                    {dashboardPage === 'settings' && <SettingsPage userRole={user.role} onLogout={handleLogout} />}
-                    {dashboardPage !== 'profile' && dashboardPage !== 'notifications' && dashboardPage !== 'settings' && renderDashboard()}
-                  </Layout>
-                )}
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+              <Route index element={<DashboardHome />} />
+              <Route path="profile" element={<ProfilePage userRole={user?.role} userName={user?.full_name} />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="settings" element={<SettingsPage userRole={user?.role} onLogout={() => {}} />} />
+              
+              {/* Admin Routes */}
+              <Route path="institutions" element={<AdminRoute><InstitutionManagement /></AdminRoute>} />
+              <Route path="institutions/new" element={<AdminRoute><InstitutionFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/edit" element={<AdminRoute><InstitutionFormPage /></AdminRoute>} />
+              <Route path="users" element={<AdminRoute><UserManagement /></AdminRoute>} />
+              <Route path="courses" element={<AdminRoute><CourseManagement /></AdminRoute>} />
+              <Route path="venues" element={<AdminRoute><VenueManagement /></AdminRoute>} />
+              <Route path="departments" element={<AdminRoute><DepartmentManagement /></AdminRoute>} />
+              <Route path="logs" element={<AdminRoute><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
+          </Route>
           
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="*" element={<NotFound onBack={() => navigate('/')} />} />

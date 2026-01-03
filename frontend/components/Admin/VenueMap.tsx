@@ -113,6 +113,16 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
   const [currentStyleIndex, setCurrentStyleIndex] = useState(0);
 
+  // Resize map when it becomes visible or container changes
+  useEffect(() => {
+    if (mapRef.current) {
+      const timer = setTimeout(() => {
+        mapRef.current.getMap().resize();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [venues.length, currentStyleIndex]);
+
   // Initialize map with pulsing animation
   useEffect(() => {
     const map = mapRef.current?.getMap();

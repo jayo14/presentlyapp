@@ -17,6 +17,8 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  
   const [formData, setFormData] = useState<Partial<Institution>>({
     full_name: institution?.full_name || '',
     short_name: institution?.short_name || '',
@@ -34,6 +36,22 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
     accreditation_status: institution?.accreditation_status || 'ACCREDITED',
     is_active: institution?.is_active !== false,
   });
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Handle click outside
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+  };
 
   const handleChange = (field: keyof Institution, value: any) => {
     setFormData(prev => ({
@@ -75,8 +93,14 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={handleOverlayClick}
+    >
+      <div 
+        ref={modalRef}
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
           <h2 className="text-xl font-bold text-foreground">
