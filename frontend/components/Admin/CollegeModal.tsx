@@ -19,6 +19,8 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  
   const [formData, setFormData] = useState<Partial<College>>({
     name: college?.name || '',
     code: college?.code || '',
@@ -34,6 +36,22 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
     established_year: college?.established_year || new Date().getFullYear(),
     is_active: college?.is_active !== false,
   });
+
+  // Handle ESC key
+  React.useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Handle click outside
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+  };
 
   const handleChange = (field: keyof College, value: any) => {
     setFormData(prev => ({
@@ -67,15 +85,21 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={handleOverlayClick}
+    >
+      <div 
+        ref={modalRef}
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
           <div>
             <h2 className="text-xl font-bold text-foreground">
               {college ? 'Edit College' : 'Create College'}
             </h2>
-            <p className="text-sm text-zinc-400 mt-1">{institution.full_name}</p>
+            {institution && <p className="text-sm text-zinc-400 mt-1">{institution.full_name}</p>}
           </div>
           <button
             onClick={onClose}

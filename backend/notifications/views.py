@@ -18,6 +18,8 @@ class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationSerializer
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Notification.objects.none()
         return Notification.objects.filter(user=self.request.user)
 
 
@@ -27,6 +29,8 @@ class NotificationDetailView(generics.RetrieveAPIView):
     serializer_class = NotificationSerializer
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Notification.objects.none()
         return Notification.objects.filter(user=self.request.user)
 
 
@@ -69,6 +73,8 @@ class FCMDeviceListView(generics.ListAPIView):
     serializer_class = FCMDeviceSerializer
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return FCMDevice.objects.none()
         return FCMDevice.objects.filter(user=self.request.user)
 
 
@@ -90,6 +96,8 @@ class FCMDeviceDetailView(generics.RetrieveAPIView):
     serializer_class = FCMDeviceSerializer
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return FCMDevice.objects.none()
         return FCMDevice.objects.filter(user=self.request.user)
 
 

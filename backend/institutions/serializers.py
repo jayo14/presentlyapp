@@ -99,13 +99,13 @@ class VenueSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
     
     def validate_boundary_coordinates(self, value):
-        """Validate that boundary coordinates are properly formatted"""
-        if value is not None:
+        """Validate that boundary coordinates are properly formatted if provided"""
+        if value is not None and len(value) > 0:
             if not isinstance(value, list):
                 raise serializers.ValidationError("Boundary coordinates must be an array")
             
             if len(value) < 3:
-                raise serializers.ValidationError("Boundary must have at least 3 coordinate pairs")
+                raise serializers.ValidationError("Boundary must have at least 3 coordinate pairs if provided")
             
             for coord in value:
                 if not isinstance(coord, list) or len(coord) != 2:
@@ -169,9 +169,10 @@ class OnboardingSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     """Serializer for Course model"""
-    department_name = serializers.CharField(source='department.name', read_only=True)
-    college_name = serializers.CharField(source='department.college.name', read_only=True)
-    institution_name = serializers.CharField(source='department.institution.full_name', read_only=True)
+    department = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all(), many=True)
+    department_name = serializers.SerializerMethodField()
+    college_name = serializers.SerializerMethodField()
+    institution_name = serializers.SerializerMethodField()
     lecturer_name = serializers.CharField(source='lecturer.full_name', read_only=True)
     enrolled_students_count = serializers.SerializerMethodField()
     applicable_levels = serializers.SerializerMethodField()
@@ -180,6 +181,20 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
+    
+    def get_department_name(self, obj):
+        """Return a comma-separated list of department names"""
+        return ", ".join([d.name for d in obj.department.all()])
+
+    def get_college_name(self, obj):
+        """Return first college name found"""
+        first_dept = obj.department.first()
+        return first_dept.college.name if first_dept and first_dept.college else None
+
+    def get_institution_name(self, obj):
+        """Return first institution name found"""
+        first_dept = obj.department.first()
+        return first_dept.institution.full_name if first_dept and first_dept.institution else None
     
     def get_enrolled_students_count(self, obj):
         """Get the count of enrolled students"""

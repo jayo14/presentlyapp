@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'notifications',
     'reports',
     'exam_clearance',
+    'accounts',
 ]
 
 MIDDLEWARE = [

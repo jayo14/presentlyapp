@@ -302,7 +302,7 @@ class Course(models.Model):
         (6, '6 Years'),
     ]
     
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses')
+    department = models.ManyToManyField(Department, related_name='courses')
     code = models.CharField(max_length=20)  # e.g., "CS402"
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
@@ -325,12 +325,11 @@ class Course(models.Model):
     
     class Meta:
         db_table = 'courses'
-        unique_together = [['department', 'code']]
+        # unique_together = [['department', 'code']] # Cannot use M2M in unique_together
         indexes = [
             models.Index(fields=['code']),
             models.Index(fields=['lecturer']),
             models.Index(fields=['is_active']),
-            models.Index(fields=['department']),
             models.Index(fields=['level']),
             models.Index(fields=['semester']),
         ]
@@ -340,13 +339,15 @@ class Course(models.Model):
     
     @property
     def institution(self):
-        """Get the institution this course belongs to"""
-        return self.department.institution
+        """Get the institution(s) this course belongs to (returns first department's institution)"""
+        first_dept = self.department.first()
+        return first_dept.institution if first_dept else None
     
     @property
     def college(self):
-        """Get the college this course belongs to"""
-        return self.department.college
+        """Get the college(s) this course belongs to (returns first department's college)"""
+        first_dept = self.department.first()
+        return first_dept.college if first_dept else None
     
     def get_enrolled_students_count(self):
         """Get the count of enrolled students"""
