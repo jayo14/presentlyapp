@@ -22,6 +22,8 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showMapHelper, setShowMapHelper] = useState(false);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  
   const [formData, setFormData] = useState<Partial<Venue>>({
     institution_id: venue?.institution_id || institutions[0]?.id || 0,
     name: venue?.name || '',
@@ -38,6 +40,22 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     verification_radius: venue?.verification_radius || 100,
     is_active: venue?.is_active !== false,
   });
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Handle click outside
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+  };
 
   const [boundaryInput, setBoundaryInput] = useState('');
 
@@ -125,8 +143,14 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={handleOverlayClick}
+    >
+      <div 
+        ref={modalRef}
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
           <h2 className="text-xl font-bold text-foreground">

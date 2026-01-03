@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, AlertCircle, BookOpen } from 'lucide-react';
+import { X, AlertCircle, BookOpen, Search } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Course, Department, College, Institution } from '../../types';
@@ -20,6 +20,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
   
   // Hierarchical state
   const [institutions, setInstitutions] = useState<Institution[]>([]);
@@ -27,9 +28,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({
   const [filteredDepartments, setFilteredDepartments] = useState<Department[]>(departments);
   const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
+  const [deptSearchTerm, setDeptSearchTerm] = useState('');
   
   const [formData, setFormData] = useState<Partial<Course>>({
-    department: course?.department || undefined,
+    department: course?.department || [],
     code: course?.code || '',
     title: course?.title || '',
     description: course?.description || '',
@@ -39,6 +41,22 @@ export const CourseModal: React.FC<CourseModalProps> = ({
     level: course?.level || '',
     is_active: course?.is_active !== false,
   });
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Handle click outside
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+  };
 
   // Load institutions on mount
   useEffect(() => {
@@ -128,6 +146,18 @@ export const CourseModal: React.FC<CourseModalProps> = ({
     }
   };
 
+  const toggleDepartment = (deptId: number) => {
+    const currentDepts = Array.isArray(formData.department) ? formData.department : (formData.department ? [formData.department] : []);
+    const newDepts = currentDepts.includes(deptId)
+      ? currentDepts.filter(id => id !== deptId)
+      : [...currentDepts, deptId];
+    
+    setFormData(prev => ({
+      ...prev,
+      department: newDepts as any
+    }));
+  };
+
   const handleChange = (field: keyof Course, value: any) => {
     setFormData(prev => ({
       ...prev,
@@ -147,8 +177,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({
       setError('Course code is required');
       return;
     }
-    if (!formData.department) {
-      setError('Department is required');
+    if (!formData.department || (Array.isArray(formData.department) && formData.department.length === 0)) {
+      setError('At least one department is required');
       return;
     }
     if (!formData.credit_units || formData.credit_units < 1) {
@@ -168,8 +198,14 @@ export const CourseModal: React.FC<CourseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={handleOverlayClick}
+    >
+      <div 
+        ref={modalRef}
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
           <h2 className="text-xl font-bold text-foreground">
@@ -237,27 +273,59 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                 </p>
               </div>
 
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-zinc-400 mb-2">
                   Department *
                 </label>
-                <select
-                  value={formData.department || ''}
-                  onChange={(e) => handleChange('department', e.target.value ? Number(e.target.value) : undefined)}
-                  disabled={!selectedInstitution}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                  required
-                >
-                  <option value="">Select Department</option>
-                  {filteredDepartments.map(dept => (
-                    <option key={dept.id} value={dept.id}>{dept.name}</option>
-                  ))}
-                </select>
-                {!selectedInstitution && (
-                  <p className="text-xs text-yellow-500 mt-1">
+                
+                {selectedInstitution ? (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                      <Input
+                        type="text"
+                        placeholder="Search departments..."
+                        value={deptSearchTerm}
+                        onChange={(e) => setDeptSearchTerm(e.target.value)}
+                        className="pl-9 h-9 text-sm"
+                      />
+                    </div>
+                    
+                    <div className="max-h-40 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-lg p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {filteredDepartments
+                        .filter(d => d.name.toLowerCase().includes(deptSearchTerm.toLowerCase()) || d.code.toLowerCase().includes(deptSearchTerm.toLowerCase()))
+                        .map(dept => (
+                          <button
+                            key={dept.id}
+                            type="button"
+                            onClick={() => toggleDepartment(dept.id)}
+                            className={`flex flex-col text-left px-3 py-2 rounded-lg text-sm transition-all border-2 ${
+                              Array.isArray(formData.department) && formData.department.includes(dept.id)
+                                ? 'bg-primary/10 border-primary text-primary shadow-sm'
+                                : 'bg-transparent border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-300'
+                            }`}
+                          >
+                            <div className="font-bold truncate">{dept.name}</div>
+                            <div className={`text-[10px] uppercase font-mono tracking-wider ${Array.isArray(formData.department) && formData.department.includes(dept.id) ? 'text-primary/80' : 'text-zinc-500'}`}>
+                              {dept.code}
+                            </div>
+                          </button>
+                        ))
+                      }
+                      {filteredDepartments.length === 0 && (
+                        <div className="col-span-full p-3 text-center text-xs text-zinc-500 italic">
+                          No departments found
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full px-4 py-2 bg-zinc-800/50 border border-zinc-700 border-dashed rounded-lg text-zinc-500 text-sm italic">
                     Please select an institution first
-                  </p>
+                  </div>
                 )}
+                
+                <input type="hidden" name="department" value={Array.isArray(formData.department) ? formData.department.join(',') : ''} required />
               </div>
             </div>
           </div>
@@ -332,12 +400,11 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                 <select
                   value={formData.semester || ''}
                   onChange={(e) => handleChange('semester', e.target.value)}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                  className="w-full h-12 px-4 bg-zinc-800 border border-zinc-700 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
                 >
                   <option value="">Select Semester</option>
-                  <option value="First Semester">First Semester</option>
-                  <option value="Second Semester">Second Semester</option>
-                  <option value="Both Semesters">Both Semesters</option>
+                  <option value="FIRST">First Semester</option>
+                  <option value="SECOND">Second Semester</option>
                 </select>
               </div>
             </div>

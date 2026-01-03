@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Logo } from './Logo';
 import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap, Building2, Building } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   userRole?: UserRole;
   userName?: string;
   onLogout: () => void;
@@ -53,16 +53,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   const location = useLocation();
 
   // Update URL when page changes
-  useEffect(() => {
-    if (currentPage && currentPage !== 'dashboard') {
-      const newPath = `/dashboard/${currentPage}`;
-      if (location.pathname !== newPath && location.pathname !== '/dashboard') {
-        navigate(newPath, { replace: true });
+  const handleNavClick = (id: string) => {
+      setCurrentPage(id);
+      if (id === 'dashboard') {
+          navigate('/dashboard');
+      } else {
+          navigate(`/dashboard/${id}`);
       }
-    } else if (currentPage === 'dashboard' && location.pathname !== '/dashboard') {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [currentPage, navigate, location.pathname]);
+  };
 
   // Parse URL on mount to set correct page
   useEffect(() => {
@@ -72,8 +70,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       if (page && page !== currentPage) {
         setCurrentPage(page);
       }
+    } else if (location.pathname === '/dashboard') {
+        setCurrentPage('dashboard');
     }
-  }, [location.pathname, currentPage, setCurrentPage]);
+  }, [location.pathname, setCurrentPage]);
 
   useEffect(() => {
     // Initialize theme state based on document class
@@ -222,12 +222,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               icon={item.icon}
               label={item.label}
               isActive={currentPage === item.id}
-              onClick={setCurrentPage}
+              onClick={handleNavClick}
               collapsed={sidebarCollapsed}
             />
           ))}
           <button 
-            onClick={() => setCurrentPage('notifications')}
+            onClick={() => handleNavClick('notifications')}
             className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
             title={sidebarCollapsed ? 'Notifications' : undefined}
           >
@@ -320,7 +320,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           {navItems.slice(0, 4).map(item => (
             <button
               key={item.id}
-              onClick={() => setCurrentPage(item.id)}
+              onClick={() => handleNavClick(item.id)}
               className={`flex flex-col items-center justify-center gap-0.5 transition-all duration-200 min-w-[48px] sm:min-w-[56px] flex-shrink-0 ${
                 currentPage === item.id 
                   ? 'text-primary scale-105' 
@@ -348,6 +348,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       <main className="flex-1 overflow-y-auto h-screen bg-zinc-50 dark:bg-black scroll-smooth transition-colors duration-300">
         <div className="max-w-7xl mx-auto p-4 md:p-8 mb-20 md:mb-0">
             {children}
+            <Outlet />
         </div>
       </main>
     </div>

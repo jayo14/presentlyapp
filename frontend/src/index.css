@@ -1,9 +1,9 @@
+/* MapLibre GL CSS - required for map rendering */
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* MapLibre GL CSS - required for map rendering */
-@import 'maplibre-gl/dist/maplibre-gl.css';
 
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */

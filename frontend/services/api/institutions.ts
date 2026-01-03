@@ -54,6 +54,13 @@ export const institutionsApi = {
     // Handle paginated response
     return response.data.results || response.data;
   },
+  getDepartmentsByFilter: async (filters: { institution?: number; college?: number }): Promise<Department[]> => {
+    const params = new URLSearchParams();
+    if (filters.institution) params.append('institution', filters.institution.toString());
+    if (filters.college) params.append('college', filters.college.toString());
+    const response = await apiClient.get(`/departments/?${params.toString()}`);
+    return response.data.results || response.data;
+  },
   createDepartment: async (data: Omit<Department, 'id'>): Promise<Department> => {
     const response = await apiClient.post('/departments/', data);
     return response.data;

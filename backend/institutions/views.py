@@ -16,6 +16,7 @@ from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
     Attendance, Venue, UserRole, EmailVerificationOTP
 )
+from accounts.models import UserDevice
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
@@ -260,6 +261,80 @@ def login_view(request):
     serializer = UserLoginSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         user = serializer.validated_data['user']
+        
+        # Security: Device Tracking
+        try:
+            user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown Device')
+            # Handle proxy headers for IP
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                ip_address = x_forwarded_for.split(',')[0]
+            else:
+                ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
+            
+            # Simple device fingerprinting (user agent + IP)
+            # In production, use a library like 'user-agents' to parse the UA string for a better name
+            import re
+            device_name = "Unknown Device"
+            if 'Mobile' in user_agent:
+                device_name = "Mobile Device"
+            elif 'Windows' in user_agent:
+                device_name = "Windows PC"
+            elif 'Macintosh' in user_agent:
+                device_name = "Mac"
+            elif 'Linux' in user_agent:
+                device_name = "Linux Machine"
+                
+            # Check if device exists
+            device, created = UserDevice.objects.get_or_create(
+                user=user,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                defaults={'device_name': device_name}
+            )
+            
+            if not created:
+                # Update last login
+                device.last_login = timezone.now()
+                device.save()
+            else:
+                # New device detected - Send security alert
+                subject = 'New Login Detected - Presently'
+                
+                html_message = f"""
+                <!DOCTYPE html>
+                <html>
+                <body style="font-family: Arial, sans-serif; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                        <h2 style="color: #c0392b;">New Login Detected</h2>
+                        <p>Hello {user.full_name},</p>
+                        <p>We detected a login to your Presently account from a new device.</p>
+                        
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <p><strong>Device:</strong> {device_name}</p>
+                            <p><strong>IP Address:</strong> {ip_address}</p>
+                            <p><strong>Time:</strong> {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
+                        </div>
+                        
+                        <p>If this was you, you can ignore this email.</p>
+                        <p style="font-weight: bold;">If you did not log in, please secure your account immediately by changing your password.</p>
+                    </div>
+                </body>
+                </html>
+                """
+                
+                send_mail(
+                    subject,
+                    f"New login detected from {device_name} ({ip_address})",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    html_message=html_message,
+                    fail_silently=True,
+                )
+        except Exception as e:
+            # Don't block login on tracking error
+            print(f"Device tracking error: {e}")
+            
         tokens = get_tokens_for_user(user)
         return Response({
             'success': True,
@@ -530,7 +605,7 @@ class InstitutionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = Institution.objects.all()
+        queryset = Institution.objects.all().order_by('full_name')
         # Non-admin users can only see active institutions
         if self.request.user.role != UserRole.ADMIN:
             queryset = queryset.filter(is_active=True)
@@ -578,9 +653,9 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         institution_id = self.request.query_params.get('institution', None)
         
         if college_id:
-            queryset = queryset.filter(college_id=college_id)
+            queryset = queryset.filter(college=college_id)
         if institution_id:
-            queryset = queryset.filter(institution_id=institution_id)
+            queryset = queryset.filter(institution=institution_id)
         
         # Non-admin users can only see active departments
         if self.request.user.role != UserRole.ADMIN:
@@ -601,7 +676,7 @@ class VenueViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = Venue.objects.all()
+        queryset = Venue.objects.all().order_by('name')
         institution_id = self.request.query_params.get('institution', None)
         
         if institution_id:
@@ -640,12 +715,12 @@ class CourseViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = Course.objects.all()
+        queryset = Course.objects.all().order_by('code')
         department_id = self.request.query_params.get('department', None)
         lecturer_id = self.request.query_params.get('lecturer', None)
         
         if department_id:
-            queryset = queryset.filter(department_id=department_id)
+            queryset = queryset.filter(department=department_id)
         if lecturer_id:
             queryset = queryset.filter(lecturer_id=lecturer_id)
         
@@ -681,7 +756,7 @@ class CourseViewSet(viewsets.ModelViewSet):
                 'name': enrollment.student.full_name,
                 'email': enrollment.student.email,
                 'matric_number': enrollment.student.matric_number,
-                'department': enrollment.student.department,
+                'department': enrollment.student.department.name if enrollment.student.department else None,
                 'level': enrollment.student.level,
                 'enrolled_at': enrollment.enrolled_at,
                 'status': enrollment.status
@@ -760,7 +835,7 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
         
-        queryset = CourseEnrollment.objects.all()
+        queryset = CourseEnrollment.objects.all().order_by('-enrolled_at')
         student_id = self.request.query_params.get('student', None)
         course_id = self.request.query_params.get('course', None)
         is_active = self.request.query_params.get('active', None)
@@ -888,7 +963,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = AttendanceSession.objects.all()
+        queryset = AttendanceSession.objects.all().order_by('-start_time')
         course_id = self.request.query_params.get('course', None)
         is_active = self.request.query_params.get('active', None)
         
@@ -1073,7 +1148,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = Attendance.objects.all()
+        queryset = Attendance.objects.all().order_by('-checked_in_at')
         session_id = self.request.query_params.get('session', None)
         student_id = self.request.query_params.get('student', None)
         

@@ -6,24 +6,20 @@ import { Department, Institution, College } from '../../types';
 
 interface DepartmentModalProps {
   department?: Department;
-  institutions: Institution[];
-  colleges: College[];
   onSave: (data: Partial<Department>) => Promise<void>;
   onClose: () => void;
 }
 
 export const DepartmentModal: React.FC<DepartmentModalProps> = ({
   department,
-  institutions,
-  colleges,
   onSave,
   onClose
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  
   const [formData, setFormData] = useState<Partial<Department>>({
-    institution_id: department?.institution_id || institutions[0]?.id || 0,
-    college_id: department?.college_id || 0,
     name: department?.name || '',
     code: department?.code || '',
     abbreviation: department?.abbreviation || '',
@@ -39,17 +35,21 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
     is_active: department?.is_active !== false,
   });
 
-  const [filteredColleges, setFilteredColleges] = useState<College[]>([]);
-
+  // Handle ESC key
   useEffect(() => {
-    if (formData.institution_id) {
-      const filtered = colleges.filter(c => c.institution_id === formData.institution_id);
-      setFilteredColleges(filtered);
-      if (filtered.length > 0 && !department) {
-        setFormData(prev => ({ ...prev, college_id: filtered[0].id }));
-      }
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Handle click outside
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
     }
-  }, [formData.institution_id, colleges]);
+  };
 
   const handleChange = (field: keyof Department, value: any) => {
     setFormData(prev => ({
@@ -70,14 +70,6 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
       setError('Department code is required');
       return;
     }
-    if (!formData.institution_id) {
-      setError('Institution is required');
-      return;
-    }
-    if (!formData.college_id) {
-      setError('College is required');
-      return;
-    }
 
     try {
       setLoading(true);
@@ -91,8 +83,14 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={handleOverlayClick}
+    >
+      <div 
+        ref={modalRef}
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
           <h2 className="text-xl font-bold text-foreground">
@@ -114,49 +112,6 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
               <p className="text-red-500 text-sm">{error}</p>
             </div>
           )}
-
-          {/* Institutional Affiliation */}
-          <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Institutional Affiliation</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  Institution *
-                </label>
-                <select
-                  value={formData.institution_id}
-                  onChange={(e) => handleChange('institution_id', Number(e.target.value))}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
-                  required
-                >
-                  {institutions.map(inst => (
-                    <option key={inst.id} value={inst.id}>{inst.short_name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  College *
-                </label>
-                <select
-                  value={formData.college_id}
-                  onChange={(e) => handleChange('college_id', Number(e.target.value))}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
-                  required
-                  disabled={filteredColleges.length === 0}
-                >
-                  {filteredColleges.length > 0 ? (
-                    filteredColleges.map(college => (
-                      <option key={college.id} value={college.id}>{college.name}</option>
-                    ))
-                  ) : (
-                    <option value="">No colleges available</option>
-                  )}
-                </select>
-              </div>
-            </div>
-          </div>
 
           {/* Basic Information */}
           <div>
