@@ -10,7 +10,9 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
 // Firebase configuration
-// These values are safe to expose in the service worker as they're public identifiers
+// IMPORTANT: Replace these placeholder values with your actual Firebase configuration
+// before deploying to production. These values are public identifiers and safe to expose.
+// Get them from Firebase Console > Project Settings > General > Your apps > Web app
 const firebaseConfig = {
   apiKey: "YOUR_FIREBASE_API_KEY",
   authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
