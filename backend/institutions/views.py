@@ -1002,6 +1002,26 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 'error': 'This session has ended'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Check if session is within time range
+        if not session.is_within_time_range():
+            return Response({
+                'success': False,
+                'error': 'This session is not currently running'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if already checked in
+        existing_attendance = Attendance.objects.filter(
+            session=session,
+            student=request.user
+        ).first()
+        
+        if existing_attendance:
+            return Response({
+                'success': False,
+                'error': 'You have already checked in to this session',
+                'attendance': AttendanceSerializer(existing_attendance).data
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         # Get student location
         student_lat = request.data.get('latitude')
         student_lon = request.data.get('longitude')
@@ -1034,6 +1054,14 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
             location_data['radius']
         )
         
+        if not is_verified:
+            return Response({
+                'success': False,
+                'error': f'You are too far from the session location ({distance:.1f}m). You must be within {location_data["radius"]} meters.',
+                'distance': float(distance),
+                'required_radius': location_data['radius']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         # Determine status based on time
         now = timezone.now()
         grace_period = timezone.timedelta(minutes=15)  # 15 minutes grace period
@@ -1060,83 +1088,18 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
             
             response_data = {
                 'success': True,
-                'message': 'Check-in successful' if is_verified else 'Check-in recorded but location not verified',
+                'message': f'Check-in successful! Status: {status_value}',
                 'attendance': serializer.data,
                 'location_verified': is_verified,
                 'distance_from_venue': float(distance),
             }
             
-            if not is_verified:
-                response_data['warning'] = f'You are {distance:.1f} meters from the venue. Check-in recorded but may be flagged.'
-            
             return Response(response_data, status=status.HTTP_201_CREATED)
-        # Check if session is within time range
-        if not session.is_within_time_range():
-            return Response({
+        else:
+             return Response({
                 'success': False,
-                'error': 'This session is not currently running'
+                'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Check if already checked in
-        existing_attendance = Attendance.objects.filter(
-            session=session,
-            student=request.user
-        ).first()
-        
-        if existing_attendance:
-            return Response({
-                'success': False,
-                'error': 'You have already checked in to this session',
-                'attendance': AttendanceSerializer(existing_attendance).data
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Get student location
-        student_lat = request.data.get('latitude')
-        student_lng = request.data.get('longitude')
-        
-        location_verified = False
-        distance_from_venue = None
-        
-        if student_lat and student_lng:
-            # Verify GPS location
-            location_verified = session.verify_location(student_lat, student_lng)
-            
-            if session.latitude and session.longitude:
-                from haversine import haversine, Unit
-                session_location = (float(session.latitude), float(session.longitude))
-                student_location = (float(student_lat), float(student_lng))
-                distance_from_venue = haversine(session_location, student_location, unit=Unit.METERS)
-            
-            if not location_verified:
-                return Response({
-                    'success': False,
-                    'error': f'You are too far from the session location. You must be within {session.location_radius} meters.',
-                    'distance': distance_from_venue,
-                    'required_radius': session.location_radius
-                }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Determine attendance status (PRESENT or LATE)
-        now = timezone.now()
-        late_threshold = session.start_time + timezone.timedelta(minutes=15)  # 15 minutes grace period
-        attendance_status = 'LATE' if now > late_threshold else 'PRESENT'
-        
-        # Create attendance record
-        attendance = Attendance.objects.create(
-            session=session,
-            student=request.user,
-            latitude=student_lat,
-            longitude=student_lng,
-            location_verified=location_verified,
-            status=attendance_status
-        )
-        
-        return Response({
-            'success': True,
-            'message': f'Check-in successful! Status: {attendance_status}',
-            'attendance': AttendanceSerializer(attendance).data,
-            'distance_from_venue': distance_from_venue,
-            'location_verified': location_verified
-        }, status=status.HTTP_201_CREATED)
 
 
 class AttendanceViewSet(viewsets.ModelViewSet):
@@ -1271,6 +1234,13 @@ def public_check_in_view(request, session_code):
                 'error': 'This session is not active'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Check if session has ended
+        if timezone.now() > session.end_time:
+            return Response({
+                'success': False,
+                'error': 'This session has ended'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         # Check if session is within time range
         if not session.is_within_time_range():
             return Response({
@@ -1293,48 +1263,79 @@ def public_check_in_view(request, session_code):
         
         # Get student location
         student_lat = request.data.get('latitude')
-        student_lng = request.data.get('longitude')
+        student_lon = request.data.get('longitude')
+        student_elevation = request.data.get('elevation')
         
-        location_verified = False
-        distance_from_venue = None
+        if not student_lat or not student_lon:
+            return Response({
+                'success': False,
+                'error': 'Location data is required for check-in'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
-        if student_lat and student_lng:
-            # Verify GPS location
-            location_verified = session.verify_location(student_lat, student_lng)
-            
-            if session.latitude and session.longitude:
-                from haversine import haversine, Unit
-                session_location = (float(session.latitude), float(session.longitude))
-                student_location = (float(student_lat), float(student_lng))
-                distance_from_venue = haversine(session_location, student_location, unit=Unit.METERS)
-            
-            if not location_verified:
-                return Response({
-                    'success': False,
-                    'error': f'You are too far from the session location. You must be within {session.location_radius} meters.',
-                    'distance': distance_from_venue,
-                    'required_radius': session.location_radius
-                }, status=status.HTTP_400_BAD_REQUEST)
+        # Get location data from session
+        location_data = session.get_location_coords()
         
-        # Determine attendance status (PRESENT or LATE)
-        now = timezone.now()
-        late_threshold = session.start_time + timezone.timedelta(minutes=15)  # 15 minutes grace period
-        attendance_status = 'LATE' if now > late_threshold else 'PRESENT'
+        if not location_data.get('latitude') or not location_data.get('longitude'):
+            return Response({
+                'success': False,
+                'error': 'Session location is not configured'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Create attendance record
-        attendance = Attendance.objects.create(
-            session=session,
-            student=request.user,
-            latitude=student_lat,
-            longitude=student_lng,
-            location_verified=location_verified,
-            status=attendance_status
+        # Verify location
+        is_verified, distance = verify_location(
+            float(student_lat),
+            float(student_lon),
+            float(student_elevation) if student_elevation else None,
+            location_data['latitude'],
+            location_data['longitude'],
+            location_data['elevation'],
+            location_data['boundary'],
+            location_data['radius']
         )
         
-        return Response({
-            'success': True,
-            'message': f'Check-in successful! Status: {attendance_status}',
-            'attendance': AttendanceSerializer(attendance).data,
-            'distance_from_venue': distance_from_venue,
-            'location_verified': location_verified
-        }, status=status.HTTP_201_CREATED)
+        if not is_verified:
+            return Response({
+                'success': False,
+                'error': f'You are too far from the session location ({distance:.1f}m). You must be within {location_data["radius"]} meters.',
+                'distance': float(distance),
+                'required_radius': location_data['radius']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Determine status based on time
+        now = timezone.now()
+        grace_period = timezone.timedelta(minutes=15)  # 15 minutes grace period
+        status_value = 'PRESENT'
+        
+        if now > session.start_time + grace_period:
+            status_value = 'LATE'
+        
+        # Create attendance record
+        attendance_data = {
+            'session': session.id,
+            'student': request.user.id,
+            'latitude': student_lat,
+            'longitude': student_lon,
+            'elevation': student_elevation,
+            'location_verified': is_verified,
+            'distance_from_venue': distance,
+            'status': status_value,
+        }
+        
+        serializer = AttendanceSerializer(data=attendance_data)
+        if serializer.is_valid():
+            attendance = serializer.save()
+            
+            response_data = {
+                'success': True,
+                'message': f'Check-in successful! Status: {status_value}',
+                'attendance': serializer.data,
+                'location_verified': is_verified,
+                'distance_from_venue': float(distance),
+            }
+            
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+             return Response({
+                'success': False,
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
