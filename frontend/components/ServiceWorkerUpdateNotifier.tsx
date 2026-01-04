@@ -63,8 +63,9 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
 
     // Listen for controller change (when new SW takes over)
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      // Reload the page to use the new service worker
-      window.location.reload();
+      // Reload the page to use the new service worker - DISABLED to prevent loops
+      // window.location.reload();
+      console.log('Controller changed, new SW active');
     });
 
     // Check for updates every 60 minutes
