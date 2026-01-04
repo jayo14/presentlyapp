@@ -126,6 +126,7 @@ export const usePushNotifications = (
         const sent = await sendTokenToServer(result.token);
         
         if (!sent) {
+          setError('Failed to register device with server. Push notifications may not work properly.');
           console.warn('[usePushNotifications] Token obtained but not sent to server');
         }
       } else if (result.error) {

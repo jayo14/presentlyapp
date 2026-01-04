@@ -235,6 +235,13 @@ self.addEventListener('sync', (event) => {
 
 /**
  * Sync attendance data when back online
+ * 
+ * Note: This implementation needs authentication headers to work properly.
+ * In a production environment, you should:
+ * 1. Store auth tokens in IndexedDB
+ * 2. Retrieve them in the service worker
+ * 3. Add them to the fetch headers
+ * 4. Implement token refresh logic if needed
  */
 async function syncAttendanceData() {
   try {
@@ -249,10 +256,13 @@ async function syncAttendanceData() {
     // Sync each record with the backend
     for (const record of pendingRecords) {
       try {
+        // TODO: Add authentication headers
+        // const authToken = await getAuthToken(); // Retrieve from IndexedDB
         const response = await fetch('/api/attendance/check-in/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            // 'Authorization': `Bearer ${authToken}`,
           },
           body: JSON.stringify(record),
         });

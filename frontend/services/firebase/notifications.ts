@@ -200,7 +200,13 @@ export const sendTokenToServer = async (
   userId?: string
 ): Promise<boolean> => {
   try {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const API_URL = import.meta.env.VITE_API_URL;
+    
+    // Ensure API URL is configured
+    if (!API_URL) {
+      console.error('[FCM] API URL not configured. Cannot send token to server.');
+      return false;
+    }
     
     // TODO: Update this endpoint based on your backend API
     const response = await fetch(`${API_URL}/api/notifications/register-device/`, {
