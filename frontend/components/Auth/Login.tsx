@@ -34,8 +34,24 @@ export const Login: React.FC = () => {
     loginMutation.mutate({ email, password }, {
       onError: (error: any) => {
         setIsRedirecting(false);
+        // Extract error message from API response
+        let errorMessage = 'Invalid credentials. Please try again.';
+        const errorData = error.response?.data;
+        
+        if (errorData) {
+          if (errorData.errors?.non_field_errors) {
+            errorMessage = errorData.errors.non_field_errors[0];
+          } else if (errorData.non_field_errors) {
+            errorMessage = errorData.non_field_errors[0];
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        }
+
         toast.error('Login Failed', {
-          description: error.message || 'Invalid credentials. Please try again.'
+          description: errorMessage
         });
       },
       onSuccess: () => {
@@ -75,12 +91,6 @@ export const Login: React.FC = () => {
         </div>
 
         <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-2xl shadow-2xl">
-          {loginMutation.error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-              {loginMutation.error.message}
-            </div>
-          )}
-          
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input 
               label="Email" 

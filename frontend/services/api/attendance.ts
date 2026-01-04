@@ -72,7 +72,7 @@ export const courseApi = {
   // Get all courses (optionally filtered)
   getAll: async (filters?: { department?: number; lecturer?: number }): Promise<Course[]> => {
     const response = await apiClient.get('/courses/', { params: filters });
-    return response.data;
+    return response.data.results || response.data;
   },
 
   // Get course by ID

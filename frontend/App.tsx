@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './services/api/queryClient';
 import { UserRole } from './types';
@@ -33,6 +33,8 @@ const ProtectedRoute = lazy(() => import('./components/ProtectedRoute').then(mod
 // Admin Components
 const InstitutionManagement = lazy(() => import('./components/Admin/InstitutionManagement').then(module => ({ default: module.InstitutionManagement })));
 const InstitutionFormPage = lazy(() => import('./components/Admin/InstitutionFormPage').then(module => ({ default: module.InstitutionFormPage })));
+const CollegeFormPage = lazy(() => import('./components/Admin/CollegeFormPage').then(module => ({ default: module.CollegeFormPage })));
+const DepartmentFormPage = lazy(() => import('./components/Admin/DepartmentFormPage').then(module => ({ default: module.DepartmentFormPage })));
 const UserManagement = lazy(() => import('./components/Admin/UserManagement').then(module => ({ default: module.UserManagement })));
 const CourseManagement = lazy(() => import('./components/Admin/CourseManagement').then(module => ({ default: module.CourseManagement })));
 const VenueManagement = lazy(() => import('./components/Admin/VenueManagement').then(module => ({ default: module.VenueManagement })));
@@ -64,8 +66,6 @@ const DashboardLayout: React.FC = () => {
     };
 
     const handlePageChange = (page: string) => {
-         // This callback is less relevant now as Layout handles navigation, 
-         // but we keep it for Layout prop compatibility or manual overrides if needed.
          if (page === 'dashboard') navigate('/dashboard');
          else navigate(`/dashboard/${page}`);
     };
@@ -80,7 +80,9 @@ const DashboardLayout: React.FC = () => {
             onLogout={handleLogout}
             currentPage={currentPage}
             setCurrentPage={handlePageChange}
-        />
+        >
+            <Outlet context={{ onLogout: handleLogout }} />
+        </Layout>
     );
 };
 
@@ -109,6 +111,26 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     
     if (isLoading) return <LoadingFallback />;
     if (!user || user.role !== UserRole.ADMIN) return <Navigate to="/unauthorized" replace />;
+
+    return <>{children}</>;
+};
+
+// Lecturer Route Guard
+const LecturerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { data: user, isLoading } = useCurrentUser();
+    
+    if (isLoading) return <LoadingFallback />;
+    if (!user || user.role !== UserRole.LECTURER) return <Navigate to="/unauthorized" replace />;
+
+    return <>{children}</>;
+};
+
+// Class Rep Route Guard
+const ClassRepRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { data: user, isLoading } = useCurrentUser();
+    
+    if (isLoading) return <LoadingFallback />;
+    if (!user || (user.role !== UserRole.CLASS_REP && user.role !== UserRole.ADMIN)) return <Navigate to="/unauthorized" replace />;
 
     return <>{children}</>;
 };
@@ -151,19 +173,57 @@ const AppContent: React.FC = () => {
           
           <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route index element={<DashboardHome />} />
-              <Route path="profile" element={<ProfilePage userRole={user?.role} userName={user?.full_name} />} />
+              <Route path="profile" element={<ProfilePage />} />
               <Route path="notifications" element={<NotificationsPage />} />
-              <Route path="settings" element={<SettingsPage userRole={user?.role} onLogout={() => {}} />} />
+              <Route path="settings" element={<SettingsPage />} />
               
-              {/* Admin Routes */}
+              {/* Common Routes with RBAC */}
+              <Route path="analytics" element={
+                  user?.role === UserRole.LECTURER ? (
+                      <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="analytics" /></LecturerRoute>
+                  ) : user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
+                      <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="analytics" /></ProtectedRoute>
+                  ) : <Navigate to="/unauthorized" replace />
+              } />
+
+              <Route path="courses" element={
+                  user?.role === UserRole.ADMIN ? (
+                      <AdminRoute><CourseManagement /></AdminRoute>
+                  ) : user?.role === UserRole.LECTURER ? (
+                      <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="courses" /></LecturerRoute>
+                  ) : <Navigate to="/unauthorized" replace />
+              } />
+
+              <Route path="timetable" element={
+                  user?.role === UserRole.LECTURER ? (
+                      <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="timetable" /></LecturerRoute>
+                  ) : user?.role === UserRole.CLASS_REP ? (
+                      <ClassRepRoute><ClassRepDashboard userName={user.full_name} view="timetable" /></ClassRepRoute>
+                  ) : user?.role === UserRole.STUDENT ? (
+                      <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="timetable" /></ProtectedRoute>
+                  ) : <Navigate to="/unauthorized" replace />
+              } />
+
+              {/* Admin Specific Routes */}
               <Route path="institutions" element={<AdminRoute><InstitutionManagement /></AdminRoute>} />
               <Route path="institutions/new" element={<AdminRoute><InstitutionFormPage /></AdminRoute>} />
+              <Route path="institutions/:id" element={<AdminRoute><InstitutionManagement /></AdminRoute>} />
               <Route path="institutions/:id/edit" element={<AdminRoute><InstitutionFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/new" element={<AdminRoute><CollegeFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId" element={<AdminRoute><InstitutionManagement /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId/edit" element={<AdminRoute><CollegeFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId/departments/new" element={<AdminRoute><DepartmentFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId/departments/:deptId/edit" element={<AdminRoute><DepartmentFormPage /></AdminRoute>} />
               <Route path="users" element={<AdminRoute><UserManagement /></AdminRoute>} />
-              <Route path="courses" element={<AdminRoute><CourseManagement /></AdminRoute>} />
               <Route path="venues" element={<AdminRoute><VenueManagement /></AdminRoute>} />
               <Route path="departments" element={<AdminRoute><DepartmentManagement /></AdminRoute>} />
               <Route path="logs" element={<AdminRoute><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
+
+              {/* Lecturer Specific Routes */}
+              <Route path="reports" element={<LecturerRoute><LecturerDashboard userName={user?.full_name || ''} userProfile={user} view="reports" /></LecturerRoute>} />
+
+              {/* Class Rep Specific Routes */}
+              <Route path="class-mgmt" element={<ClassRepRoute><ClassRepDashboard userName={user?.full_name || ''} view="class-mgmt" /></ClassRepRoute>} />
           </Route>
           
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
