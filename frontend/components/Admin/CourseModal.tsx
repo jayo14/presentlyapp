@@ -324,8 +324,6 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                     Please select an institution first
                   </div>
                 )}
-                
-                <input type="hidden" name="department" value={Array.isArray(formData.department) ? formData.department.join(',') : ''} required />
               </div>
             </div>
           </div>

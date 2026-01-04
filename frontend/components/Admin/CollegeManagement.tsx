@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { GraduationCap, Plus, Edit2, Trash2, Search, ArrowLeft, Mail, Phone, AlertCircle, Loader, Building, MapPin, Users, ChevronRight } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -17,7 +17,8 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
   institution,
   onBack
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { id, collegeId } = useParams<{ id: string; collegeId: string }>();
+  const navigate = useNavigate();
   const [colleges, setColleges] = useState<College[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,6 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
   const [showCollegeModal, setShowCollegeModal] = useState(false);
   const [editingCollege, setEditingCollege] = useState<College | null>(null);
   
-  const collegeId = searchParams.get('college_id');
   const [selectedCollege, setSelectedCollege] = useState<College | null>(null);
 
   useEffect(() => {
@@ -33,15 +33,24 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
   }, [institution.id]);
 
   useEffect(() => {
-    if (collegeId && colleges.length > 0) {
-      const college = colleges.find(c => c.id.toString() === collegeId);
-      if (college) {
-        setSelectedCollege(college);
-      }
-    } else if (!collegeId) {
+    if (collegeId) {
+      const fetchSelected = async () => {
+        try {
+          setLoading(true);
+          const college = await institutionsApi.getCollegeById(Number(collegeId));
+          setSelectedCollege(college);
+        } catch (err) {
+          console.error('Failed to fetch selected college:', err);
+          navigate(`/dashboard/institutions/${id}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSelected();
+    } else {
       setSelectedCollege(null);
     }
-  }, [collegeId, colleges]);
+  }, [collegeId, id]);
 
   const loadColleges = async () => {
     try {
@@ -64,13 +73,11 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
   );
 
   const handleCreateCollege = () => {
-    setEditingCollege(null);
-    setShowCollegeModal(true);
+    navigate(`/dashboard/institutions/${id}/colleges/new`);
   };
 
   const handleEditCollege = (college: College) => {
-    setEditingCollege(college);
-    setShowCollegeModal(true);
+    navigate(`/dashboard/institutions/${id}/colleges/${college.id}/edit`);
   };
 
   const handleSaveCollege = async (formData: Partial<College>) => {
@@ -106,10 +113,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
   };
 
   const handleCollegeClick = (college: College) => {
-    setSearchParams({ 
-      institution_id: institution.id.toString(),
-      college_id: college.id.toString() 
-    });
+    navigate(`/dashboard/institutions/${id}/colleges/${college.id}`);
   };
 
   if (selectedCollege) {
@@ -118,7 +122,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
         institution={institution}
         college={selectedCollege}
         onBack={() => {
-          setSearchParams({ institution_id: institution.id.toString() });
+          navigate(`/dashboard/institutions/${id}`);
         }}
       />
     );

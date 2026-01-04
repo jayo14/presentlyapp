@@ -8,7 +8,7 @@ from .models import User, Institution, College, Department, Venue, Course, Atten
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ModelAdmin):
     """Admin configuration for custom User model"""
-    list_display = ['email', 'full_name', 'role', 'onboarding_complete', 'is_active', 'date_joined']
+    list_display = ['email', 'full_name', 'role', 'matric_number', 'staff_id', 'department', 'institution', 'college', 'onboarding_complete', 'is_active', 'last_login', 'date_joined']
     list_filter = ['role', 'onboarding_complete', 'is_active', 'is_staff']
     search_fields = ['email', 'full_name', 'matric_number', 'staff_id']
     ordering = ['-date_joined']

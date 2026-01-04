@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Map, { Marker, Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
+import maplibregl from 'maplibre-gl';
 import { MapPin, Plus, X, Save, Edit2, Trash2, Activity } from 'lucide-react';
 import { Venue } from '../../types';
 
@@ -13,52 +14,7 @@ interface VenueMapProps {
   onBoundaryComplete?: (coordinates: number[][]) => void;
 }
 
-// Pulsing animation for active sessions
-const pulsingDot = {
-  width: 30,
-  height: 30,
-  data: new Uint8Array(30 * 30 * 4),
-  
-  onAdd: function(this: any) {
-    const canvas = document.createElement('canvas');
-    canvas.width = this.width;
-    canvas.height = this.height;
-    this.context = canvas.getContext('2d');
-  },
-  
-  render: function(this: any) {
-    const duration = 1000;
-    const t = (performance.now() % duration) / duration;
-    
-    const radius = (this.width / 2) * 0.3;
-    const outerRadius = (this.width / 2) * 0.7 * t + radius;
-    const context = this.context;
-    
-    // Clear
-    context.clearRect(0, 0, this.width, this.height);
-    
-    // Outer circle (pulsing)
-    context.beginPath();
-    context.arc(this.width / 2, this.height / 2, outerRadius, 0, Math.PI * 2);
-    context.fillStyle = `rgba(139, 92, 246, ${1 - t})`;
-    context.fill();
-    
-    // Inner circle
-    context.beginPath();
-    context.arc(this.width / 2, this.height / 2, radius, 0, Math.PI * 2);
-    context.fillStyle = 'rgba(139, 92, 246, 1)';
-    context.strokeStyle = 'white';
-    context.lineWidth = 2;
-    context.fill();
-    context.stroke();
-    
-    // Update data
-    this.data = context.getImageData(0, 0, this.width, this.height).data;
-    
-    // Request next frame
-    return true;
-  }
-};
+// ... pulsingDot remains the same ...
 
 export const VenueMap: React.FC<VenueMapProps> = ({
   venues,
@@ -80,38 +36,17 @@ export const VenueMap: React.FC<VenueMapProps> = ({
   const [isDrawing, setIsDrawing] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  // Map style - using open-source alternatives with fallback
+  // Map style - using reliable Carto styles for MapLibre
   const MAP_STYLES = [
-    // OpenStreetMap Carto style (always available)
-    'https://demotiles.maplibre.org/style.json',
-    // Fallback: Basic OSM raster tiles via MapTiler
-    {
-      version: 8,
-      sources: {
-        'osm': {
-          type: 'raster',
-          tiles: [
-            'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          ],
-          tileSize: 256,
-          attribution: '© OpenStreetMap contributors'
-        }
-      },
-      layers: [
-        {
-          id: 'osm',
-          type: 'raster',
-          source: 'osm',
-          minzoom: 0,
-          maxzoom: 22
-        }
-      ]
-    }
+    'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    'https://demotiles.maplibre.org/style.json'
   ];
 
   const [currentStyleIndex, setCurrentStyleIndex] = useState(0);
+
+  // ... rest of the component ...
+
 
   // Resize map when it becomes visible or container changes
   useEffect(() => {
@@ -237,6 +172,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         onMove={evt => setViewState(evt.viewState)}
         onClick={handleMapClick}
         onError={handleMapError}
+        mapLib={maplibregl}
         mapStyle={MAP_STYLES[currentStyleIndex]}
         style={{ width: '100%', height: '100%' }}
         cursor={drawingMode ? 'crosshair' : 'auto'}

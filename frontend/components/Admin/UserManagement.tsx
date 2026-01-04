@@ -307,43 +307,90 @@ export const UserManagement: React.FC = () => {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleViewUser(user)}
-                        className="text-zinc-400 hover:text-zinc-200 transition-colors"
+                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-all"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleSendEmail(user.email)}
-                        className="text-zinc-400 hover:text-zinc-200 transition-colors"
-                        title="Send Email"
-                      >
-                        <Mail className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleResetPassword(user.id, user.email)}
-                        className="text-zinc-400 hover:text-zinc-200 transition-colors"
-                        title="Reset Password"
-                      >
-                        <Key className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleSuspendUser(user.id, user.is_active !== false)}
-                        className={`transition-colors ${
-                          user.is_active !== false
-                            ? 'text-yellow-400 hover:text-yellow-300'
-                            : 'text-green-400 hover:text-green-300'
-                        }`}
-                        title={user.is_active !== false ? 'Suspend User' : 'Activate User'}
-                      >
-                        {user.is_active !== false ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="text-red-400 hover:text-red-300 transition-colors"
-                        title="Delete User"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowActionsMenu(showActionsMenu === user.id ? null : user.id)}
+                          className={`p-2 rounded-lg transition-all ${
+                            showActionsMenu === user.id 
+                              ? 'bg-primary text-white' 
+                              : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
+                          }`}
+                          title="More Actions"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+
+                        {showActionsMenu === user.id && (
+                          <>
+                            <div 
+                              className="fixed inset-0 z-10" 
+                              onClick={() => setShowActionsMenu(null)}
+                            ></div>
+                            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-zinc-900 border border-zinc-800 shadow-2xl z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                              <button
+                                onClick={() => {
+                                  handleSendEmail(user.email);
+                                  setShowActionsMenu(null);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+                              >
+                                <Mail className="w-4 h-4" />
+                                <span>Send Email</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleResetPassword(user.id, user.email);
+                                  setShowActionsMenu(null);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+                              >
+                                <Key className="w-4 h-4" />
+                                <span>Reset Password</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleSuspendUser(user.id, user.is_active !== false);
+                                  setShowActionsMenu(null);
+                                }}
+                                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                                  user.is_active !== false
+                                    ? 'text-yellow-500 hover:bg-yellow-500/10'
+                                    : 'text-green-500 hover:bg-green-500/10'
+                                }`}
+                              >
+                                {user.is_active !== false ? (
+                                  <>
+                                    <UserX className="w-4 h-4" />
+                                    <span>Suspend User</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <UserCheck className="w-4 h-4" />
+                                    <span>Activate User</span>
+                                  </>
+                                )}
+                              </button>
+                              <div className="h-px bg-zinc-800 my-1"></div>
+                              <button
+                                onClick={() => {
+                                  handleDeleteUser(user.id);
+                                  setShowActionsMenu(null);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                <span>Delete User</span>
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </td>
                 </tr>
