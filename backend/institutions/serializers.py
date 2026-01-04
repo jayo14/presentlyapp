@@ -284,7 +284,7 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
     
     def get_is_within_time(self, obj):
         """Check if session is currently active"""
-        return obj.is_within_time()
+        return obj.is_within_time_range()
     
     def create(self, validated_data):
         # Session code and QR URL will be auto-generated in model's save method
