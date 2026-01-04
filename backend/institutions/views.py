@@ -720,17 +720,25 @@ class CourseViewSet(viewsets.ModelViewSet):
         lecturer_id = self.request.query_params.get('lecturer', None)
         
         if department_id:
-            queryset = queryset.filter(department=department_id)
+            queryset = queryset.filter(department__id=department_id)
         if lecturer_id:
             queryset = queryset.filter(lecturer_id=lecturer_id)
         
-        # Lecturers can only see their own courses
+        # Lecturers can see their own courses (including inactive ones)
         if self.request.user.role == UserRole.LECTURER:
             queryset = queryset.filter(lecturer=self.request.user)
-        
-        # Only show active courses
-        queryset = queryset.filter(is_active=True)
+        else:
+            # Non-lecturers (students) only see active courses
+            queryset = queryset.filter(is_active=True)
+            
         return queryset
+
+    def perform_create(self, serializer):
+        """Auto-assign the lecturer if the user is a lecturer"""
+        if self.request.user.role == UserRole.LECTURER:
+            serializer.save(lecturer=self.request.user)
+        else:
+            serializer.save()
     
     @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
     def enrolled_students(self, request, pk=None):
