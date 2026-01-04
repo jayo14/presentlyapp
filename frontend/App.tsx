@@ -22,6 +22,7 @@ const ForgotPassword = lazy(() => import('./components/Auth/ForgotPassword').the
 const ResetPassword = lazy(() => import('./components/Auth/ResetPassword').then(module => ({ default: module.ResetPassword })));
 const StudentDashboard = lazy(() => import('./components/Dashboard/StudentDashboard').then(module => ({ default: module.StudentDashboard })));
 const LecturerDashboard = lazy(() => import('./components/Dashboard/LecturerDashboard').then(module => ({ default: module.LecturerDashboard })));
+const CreateSessionPage = lazy(() => import('./components/Attendance/CreateSessionPage').then(module => ({ default: module.CreateSessionPage })));
 const AdminDashboard = lazy(() => import('./components/Dashboard/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
 const ClassRepDashboard = lazy(() => import('./components/Dashboard/ClassRepDashboard').then(module => ({ default: module.ClassRepDashboard })));
 const ProfilePage = lazy(() => import('./components/Profile/ProfilePage').then(module => ({ default: module.ProfilePage })));
@@ -193,6 +194,10 @@ const AppContent: React.FC = () => {
                   ) : user?.role === UserRole.LECTURER ? (
                       <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="courses" /></LecturerRoute>
                   ) : <Navigate to="/unauthorized" replace />
+              } />
+
+              <Route path="sessions/new" element={
+                  <LecturerRoute><CreateSessionPage /></LecturerRoute>
               } />
 
               <Route path="timetable" element={
