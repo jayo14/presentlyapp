@@ -2,7 +2,7 @@ import apiClient from './client';
 
 export interface Course {
   id: number;
-  department: number;
+  department: number[];
   department_name?: string;
   code: string;
   title: string;
