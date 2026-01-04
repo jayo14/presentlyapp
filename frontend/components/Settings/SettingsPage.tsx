@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useCurrentUser } from '../../hooks/useAuth';
 import ChangePasswordModal from './ChangePasswordModal';
+import { PushNotificationSettings } from '../PushNotifications/PushNotificationSettings';
 
 interface SettingsPageProps {
   userRole?: UserRole;
@@ -221,20 +222,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
           title="Notifications" 
           description="Control how and when you want to be notified." 
         />
-        <div className="space-y-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2 shadow-sm">
-            {[
-                { label: 'Email Notifications', desc: 'Receive attendance summaries via email.', state: emailNotifs, setter: setEmailNotifs },
-                { label: 'Push Notifications', desc: 'Receive real-time alerts on your device.', state: pushNotifs, setter: setPushNotifs },
-                { label: 'Class Reminders', desc: 'Notify me 15 minutes before class starts.', state: reminderBeforeClass, setter: setReminderBeforeClass },
-            ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors rounded-lg">
-                    <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{item.label}</p>
-                        <p className="text-xs text-zinc-500">{item.desc}</p>
-                    </div>
-                    <Switch checked={item.state} onCheckedChange={item.setter} />
-                </div>
-            ))}
+        <div className="space-y-4">
+          <div className="space-y-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2 shadow-sm">
+              {[
+                  { label: 'Email Notifications', desc: 'Receive attendance summaries via email.', state: emailNotifs, setter: setEmailNotifs },
+                  { label: 'Class Reminders', desc: 'Notify me 15 minutes before class starts.', state: reminderBeforeClass, setter: setReminderBeforeClass },
+              ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors rounded-lg">
+                      <div>
+                          <p className="text-sm font-medium text-zinc-900 dark:text-white">{item.label}</p>
+                          <p className="text-xs text-zinc-500">{item.desc}</p>
+                      </div>
+                      <Switch checked={item.state} onCheckedChange={item.setter} />
+                  </div>
+              ))}
+          </div>
+          
+          {/* Push Notification Settings */}
+          <PushNotificationSettings />
         </div>
       </section>
 
