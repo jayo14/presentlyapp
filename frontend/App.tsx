@@ -11,6 +11,7 @@ import { LandingPage } from './components/LandingPage';
 import { Login } from './components/Auth/Login';
 import { Register } from './components/Auth/Register';
 import { Layout } from './components/Layout';
+import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
 
 // Lazy load less critical components
 const Onboarding = lazy(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
@@ -239,6 +240,7 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Toaster position="top-right" richColors closeButton />
+        <ServiceWorkerUpdateNotifier />
         <AppContent />
       </BrowserRouter>
     </QueryClientProvider>
