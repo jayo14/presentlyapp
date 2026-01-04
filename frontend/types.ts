@@ -95,7 +95,7 @@ export interface Department {
 
 export interface Course {
   id: number;
-  department: number;
+  department: number[];
   department_name?: string;
   code: string;
   title: string;
