@@ -262,7 +262,7 @@ export const VenueManagement: React.FC = () => {
               <div className="flex items-center gap-2 text-zinc-400">
                 <Map className="w-4 h-4" />
                 <span>
-                  {venue.latitude.toFixed(6)}, {venue.longitude.toFixed(6)}
+                  {Number(venue.latitude).toFixed(6)}, {Number(venue.longitude).toFixed(6)}
                   {venue.elevation && ` @ ${venue.elevation}m`}
                 </span>
               </div>

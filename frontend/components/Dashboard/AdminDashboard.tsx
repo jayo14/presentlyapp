@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Map as MapIcon, ShieldAlert, Activity, Search, MapPin, Settings, Plus, Edit2, Trash2, CheckCircle, XCircle, FileText, Filter, AlertTriangle, Info, Clock, Download, X, Layers, CreditCard, Building2 } from 'lucide-react';
+import { Users, Map as MapIcon, ShieldAlert, Activity, Search, MapPin, Settings, Plus, Edit2, Trash2, CheckCircle, XCircle, FileText, Filter, AlertTriangle, Info, Clock, Download, X, Layers, Building2 } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
-import { Switch } from '../Switch';
 import { InstitutionManagement } from '../Admin/InstitutionManagement';
 import UserManagement from '../Admin/UserManagement';
 import VenueManagement from '../Admin/VenueManagement';
@@ -46,12 +45,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     security_alerts: 3,
   });
   const [activityData, setActivityData] = useState<SystemActivity[]>([]);
-  const [alerts, setAlerts] = useState<SystemAlert[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   
-  // System Config State
-  const [paymentGatewayEnabled, setPaymentGatewayEnabled] = useState(false);
-
   useEffect(() => {
     if (view === 'dashboard') {
       loadSystemData();
@@ -61,29 +56,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   const loadSystemData = async () => {
     try {
       setStatsLoading(true);
-      const [stats, activity, alertsData, config] = await Promise.all([
+      const [stats, activity] = await Promise.all([
         systemApi.getStats(),
         systemApi.getActivity(),
-        systemApi.getAlerts(),
-        systemApi.getConfig(),
       ]);
       setSystemStats(stats);
       setActivityData(activity);
-      setAlerts(alertsData);
-      setPaymentGatewayEnabled(config.payment_gateway_enabled);
     } catch (error) {
       console.error('Failed to load system data:', error);
     } finally {
       setStatsLoading(false);
-    }
-  };
-
-  const togglePaymentGateway = async (checked: boolean) => {
-    setPaymentGatewayEnabled(checked);
-    try {
-      await systemApi.updateConfig({ payment_gateway_enabled: checked });
-    } catch (error) {
-      console.error('Failed to update payment gateway setting:', error);
     }
   };
 
@@ -245,8 +227,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
              ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+        <div className="grid grid-cols-1 gap-8">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
                 <h3 className="font-bold text-zinc-900 dark:text-white mb-4">System Activity</h3>
                 <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
@@ -274,41 +256,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                     </ResponsiveContainer>
                 </div>
             </div>
-             <div className="space-y-6">
-                 {/* System Controls Card */}
-                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
-                    <h3 className="font-bold text-zinc-900 dark:text-white mb-4">System Controls</h3>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                            <div>
-                                <p className="text-sm font-medium text-zinc-900 dark:text-white flex items-center gap-2"><CreditCard size={14}/> Payment Gateway</p>
-                                <p className="text-xs text-zinc-500">Enable/Disable onboarding payments.</p>
-                            </div>
-                            <Switch checked={paymentGatewayEnabled} onCheckedChange={togglePaymentGateway} />
-                        </div>
-                    </div>
-                </div>
-
-                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
-                    <h3 className="font-bold text-zinc-900 dark:text-white mb-4">Recent Alerts</h3>
-                    <div className="space-y-3">
-                        <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                            <AlertTriangle size={18} className="text-red-500 mt-0.5" />
-                            <div>
-                                <p className="text-sm font-bold text-zinc-900 dark:text-white">Suspicious Login Detected</p>
-                                <p className="text-xs text-zinc-500">Multiple failed attempts from IP 192.168.1.1</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                            <Info size={18} className="text-yellow-500 mt-0.5" />
-                            <div>
-                                <p className="text-sm font-bold text-zinc-900 dark:text-white">High Server Load</p>
-                                <p className="text-xs text-zinc-500">CPU usage exceeded 85% for 5 mins.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-             </div>
         </div>
     </div>
   );

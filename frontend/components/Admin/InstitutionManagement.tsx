@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Building2, Plus, Edit2, Trash2, Search, Filter, MapPin, Users, Award, AlertCircle, Loader } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Building2, Plus, Edit2, Trash2, Search, Filter, MapPin, Users, Award, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Institution } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
-import InstitutionModal from './InstitutionModal';
 import CollegeManagement from './CollegeManagement';
 
 interface InstitutionWithStats extends Institution {
@@ -13,7 +12,7 @@ interface InstitutionWithStats extends Institution {
 }
 
 export const InstitutionManagement: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { id, collegeId } = useParams<{ id: string; collegeId: string }>();
   const navigate = useNavigate();
   const [institutions, setInstitutions] = useState<InstitutionWithStats[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,12 +22,80 @@ export const InstitutionManagement: React.FC = () => {
   const [selectedInstitution, setSelectedInstitution] = useState<InstitutionWithStats | null>(null);
   const [showCollegeTab, setShowCollegeTab] = useState(false);
 
-  // Check URL params for deep drill-down
-  const institutionId = searchParams.get('institution_id');
-  const collegeId = searchParams.get('college_id');
-  const departmentId = searchParams.get('department_id');
+  useEffect(() => {
+    if (id) {
+      const fetchSelected = async () => {
+        try {
+          setLoading(true);
+          const inst = await institutionsApi.getInstitutionById(Number(id));
+          setSelectedInstitution(inst as InstitutionWithStats);
+          setShowCollegeTab(true);
+        } catch (err) {
+          console.error('Failed to fetch selected institution:', err);
+          navigate('/dashboard/institutions'); // Redirect if not found
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSelected();
+    } else {
+      setSelectedInstitution(null);
+      setShowCollegeTab(false);
+    }
+  }, [id, navigate]);
 
-  // ... (useEffect and loadInstitutions remain same)
+  // Load institutions list for the grid
+  useEffect(() => {
+    if (!id) {
+      loadInstitutions();
+    }
+  }, [id]);
+
+  const loadInstitutions = async () => {
+    try {
+      setLoading(true);
+      const data = await institutionsApi.getAllInstitutions();
+      
+      // Ensure data is an array before processing
+      const results = (data as any)?.results || data;
+      const institutionsArray = Array.isArray(results) ? results : [];
+      
+      const institutionsWithStats = await Promise.all(
+        institutionsArray.map(async (inst: Institution) => {
+          if (!inst || !inst.id) return { ...inst, collegeCount: 0 };
+          try {
+            const colleges = await institutionsApi.getCollegesByInstitution(inst.id);
+            const collegeResults = (colleges as any)?.results || colleges;
+            return {
+              ...inst,
+              collegeCount: Array.isArray(collegeResults) ? collegeResults.length : 0
+            };
+          } catch (e) {
+            return { ...inst, collegeCount: 0 };
+          }
+        })
+      );
+      
+      setInstitutions(institutionsWithStats as InstitutionWithStats[]);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load institutions');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredInstitutions = (institutions || []).filter(inst => {
+    if (!inst) return false;
+    const matchesSearch = 
+      (inst.full_name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+      (inst.short_name || '').toLowerCase().includes((searchTerm || '').toLowerCase());
+    
+    const matchesFilter = filterType === 'all' || inst.institution_type === filterType;
+    
+    return matchesSearch && matchesFilter;
+  });
 
   const handleCreateInstitution = () => {
     navigate('/dashboard/institutions/new');
@@ -53,13 +120,13 @@ export const InstitutionManagement: React.FC = () => {
   };
   
   const handleInstitutionClick = (inst: InstitutionWithStats) => {
-      setSearchParams({ institution_id: inst.id.toString() });
+      navigate(`/dashboard/institutions/${inst.id}`);
   };
 
-  if (institutionId && !selectedInstitution && loading) {
+  if (id && !selectedInstitution && loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <Loader className="w-10 h-10 animate-spin text-primary" />
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
         <p className="text-zinc-500 animate-pulse">Loading institution details...</p>
       </div>
     );
@@ -70,7 +137,7 @@ export const InstitutionManagement: React.FC = () => {
       <CollegeManagement 
         institution={selectedInstitution}
         onBack={() => {
-          setSearchParams({});
+          navigate('/dashboard/institutions');
         }}
       />
     );
@@ -92,8 +159,206 @@ export const InstitutionManagement: React.FC = () => {
           Add Institution
         </Button>
       </div>
-      
-      {/* ... rest of the component */}
+
+      {/* Error Message */}
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-red-500 font-semibold">Error</p>
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+          <p className="text-zinc-400 text-sm">Total Institutions</p>
+          <p className="text-2xl font-bold text-foreground">{(institutions || []).length}</p>
+        </div>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+          <p className="text-zinc-400 text-sm">Active Institutions</p>
+          <p className="text-2xl font-bold text-emerald-500">
+            {(institutions || []).filter(i => i?.is_active).length}
+          </p>
+        </div>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+          <p className="text-zinc-400 text-sm">Total Colleges</p>
+          <p className="text-2xl font-bold text-primary">
+            {(institutions || []).reduce((sum, inst) => sum + (inst?.collegeCount || 0), 0)}
+          </p>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
+          <Input
+            type="text"
+            placeholder="Search institutions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-11 bg-zinc-900 border-zinc-800"
+          />
+        </div>
+        
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors h-11"
+        >
+          <option value="all">All Types</option>
+          <option value="UNIVERSITY">Universities</option>
+          <option value="POLYTECHNIC">Polytechnics</option>
+          <option value="COLLEGE">Colleges</option>
+          <option value="INSTITUTE">Institutes</option>
+        </select>
+      </div>
+
+      {/* Loading State */}
+      {loading && (institutions || []).length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <p className="text-zinc-500 animate-pulse">Fetching institutions...</p>
+        </div>
+      )}
+
+      {/* Institutions Grid */}
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredInstitutions.map(inst => (
+            <div
+              key={inst.id}
+              className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 hover:shadow-xl transition-all cursor-pointer group flex flex-col h-full relative"
+              onClick={() => handleInstitutionClick(inst)}
+            >
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {inst.logo_url ? (
+                        <img 
+                          src={inst.logo_url} 
+                          alt={`${inst.short_name} Logo`} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).parentElement?.classList.add('fallback-icon');
+                          }}
+                        />
+                      ) : (
+                        <Building2 className="w-6 h-6 text-zinc-500" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1" title={inst.full_name}>
+                        {inst.full_name}
+                      </h3>
+                      <p className="text-xs font-medium text-zinc-500">{inst.short_name} • {inst.abbreviation}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900/80 backdrop-blur-sm p-1 rounded-lg">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditInstitution(inst);
+                      }}
+                      className="p-1.5 hover:bg-zinc-800 rounded-md transition-colors text-zinc-400 hover:text-white"
+                      title="Edit institution"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteInstitution(inst.id);
+                      }}
+                      className="p-1.5 hover:bg-zinc-800 rounded-md transition-colors text-red-400 hover:text-red-300"
+                      title="Delete institution"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {inst.description && (
+                  <p className="text-sm text-zinc-400 mb-4 line-clamp-2 leading-relaxed flex-1">
+                    {inst.description}
+                  </p>
+                )}
+
+                <div className="space-y-3 pt-4 mt-auto border-t border-zinc-800/50">
+                  <div className="flex items-center justify-between text-sm text-zinc-400">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-zinc-500" />
+                      <span className="truncate max-w-[120px]" title={`${inst.city}, ${inst.state_province || inst.country}`}>
+                        {inst.city}, {inst.state_province || inst.country}
+                      </span>
+                    </div>
+                    {inst.collegeCount !== undefined && (
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-zinc-500" />
+                        <span>{inst.collegeCount} College{inst.collegeCount !== 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {inst.institution_type && (
+                       <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-wide">
+                        {inst.institution_type}
+                      </span>
+                    )}
+                    
+                    {inst.accreditation_status && (
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wide ${
+                        inst.accreditation_status === 'ACCREDITED'
+                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                          : inst.accreditation_status === 'PROVISIONAL'
+                          ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                          : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                      }`}>
+                        {inst.accreditation_status}
+                      </span>
+                    )}
+  
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wide ml-auto ${
+                      inst.is_active 
+                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
+                        : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                    }`}>
+                      {inst.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {inst.cover_image_url && (
+                <div className="h-24 w-full relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent z-10"></div>
+                    <img src={inst.cover_image_url} alt="Cover" className="w-full h-full object-cover opacity-50" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && filteredInstitutions.length === 0 && (
+        <div className="text-center py-20 bg-zinc-900/30 border border-dashed border-zinc-800 rounded-3xl">
+          <Building2 className="w-16 h-16 text-zinc-800 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-zinc-400">No institutions found</h3>
+          <p className="text-zinc-500 text-sm mt-1 mb-6">Start by adding a new educational institution to the system.</p>
+          <Button onClick={handleCreateInstitution} variant="secondary">
+            <Plus className="w-4 h-4 mr-2" />
+            Add First Institution
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { UserRole } from '../../types';
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -12,12 +13,17 @@ import { useCurrentUser } from '../../hooks/useAuth';
 import ChangePasswordModal from './ChangePasswordModal';
 
 interface SettingsPageProps {
-  userRole: UserRole;
-  onLogout: () => void;
+  userRole?: UserRole;
+  onLogout?: () => void;
 }
 
-export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole, onLogout }) => {
+export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRole, onLogout: propOnLogout }) => {
   const { data: user, isLoading } = useCurrentUser();
+  const context = useOutletContext<{ onLogout: () => void }>();
+  
+  const userRole = user?.role || propUserRole || UserRole.STUDENT;
+  const onLogout = propOnLogout || context?.onLogout || (() => {});
+
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);

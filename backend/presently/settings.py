@@ -364,6 +364,17 @@ UNFOLD = {
                     },
                 ],
             },
+            {
+                "title": "Security",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "User Devices",
+                        "icon": "devices",
+                        "link": lambda request: "/admin/accounts/userdevice/",
+                    },
+                ],
+            },
         ],
     },
 }

@@ -142,11 +142,39 @@ apiClient.interceptors.response.use(
 
     // Show user-friendly error messages for other errors
     const status = error.response?.status;
-    // Extract actual error message from API response - check multiple possible fields
-    const errorMessage = error.response?.data?.error || 
-                        error.response?.data?.message || 
-                        error.response?.data?.detail ||
-                        error.message;
+    
+    // Improved error message extraction
+    let errorMessage = '';
+    const errorData = error.response?.data;
+    
+    if (errorData) {
+      if (typeof errorData === 'string') {
+        errorMessage = errorData;
+      } else if (errorData.errors) {
+        // Handle {"success":false,"errors":{"non_field_errors":["Invalid email or password."]}}
+        const errors = errorData.errors;
+        if (errors.non_field_errors && Array.isArray(errors.non_field_errors)) {
+          errorMessage = errors.non_field_errors[0];
+        } else if (typeof errors === 'object') {
+          // Join multiple field errors
+          errorMessage = Object.entries(errors)
+            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join(' | ');
+        }
+      } else if (errorData.non_field_errors && Array.isArray(errorData.non_field_errors)) {
+        errorMessage = errorData.non_field_errors[0];
+      } else if (errorData.detail) {
+        errorMessage = errorData.detail;
+      } else if (errorData.error) {
+        errorMessage = errorData.error;
+      } else if (errorData.message) {
+        errorMessage = errorData.message;
+      }
+    }
+    
+    if (!errorMessage) {
+      errorMessage = error.message;
+    }
 
     // Only show toast for errors that aren't handled by components
     if (!originalRequest._skipGlobalErrorHandler) {

@@ -10,13 +10,17 @@ import {
 import { useCurrentUser } from '../../hooks/useAuth';
 
 interface ProfilePageProps {
-  userRole: UserRole;
-  userName: string;
+  userRole?: UserRole;
+  userName?: string;
 }
 
-export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole, userName }) => {
+export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole, userName: propUserName }) => {
   const { data: user, isLoading } = useCurrentUser();
   const [isEditing, setIsEditing] = useState(false);
+  
+  const userRole = user?.role || propUserRole || UserRole.STUDENT;
+  const userName = user?.full_name || propUserName || 'User';
+
   const [userData, setUserData] = useState({
     name: userName,
     email: '',
