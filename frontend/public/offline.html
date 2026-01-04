@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Presently</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #09090b 0%, #18181b 100%);
+      color: #f4f4f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 500px;
+      padding: 2rem;
+      background: rgba(39, 39, 42, 0.5);
+      border-radius: 1rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 202, 13, 0.1);
+    }
+
+    .icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      opacity: 0.8;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.8;
+      }
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #ffca0d;
+    }
+
+    p {
+      font-size: 1.125rem;
+      color: #a1a1aa;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 0.875rem 2rem;
+      background: #ffca0d;
+      color: #000;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255, 202, 13, 0.3);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .features {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(161, 161, 170, 0.2);
+    }
+
+    .features h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #f4f4f5;
+    }
+
+    .features ul {
+      list-style: none;
+      text-align: left;
+      display: inline-block;
+    }
+
+    .features li {
+      margin-bottom: 0.75rem;
+      color: #a1a1aa;
+      font-size: 0.95rem;
+    }
+
+    .features li::before {
+      content: "✓";
+      color: #ffca0d;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 0.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+      color: #fca5a5;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+
+      .icon {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="#ffca0d" stroke-width="2"/>
+      <path d="M12 6v6l4 2" stroke="#ffca0d" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+
+    <div class="status">
+      <span class="status-dot"></span>
+      <span>No Internet Connection</span>
+    </div>
+
+    <h1>You're Offline</h1>
+    <p>
+      It looks like you've lost your internet connection. 
+      Don't worry, some features are still available offline.
+    </p>
+
+    <button class="button" onclick="window.location.reload()">
+      Try Again
+    </button>
+
+    <div class="features">
+      <h2>Available Offline</h2>
+      <ul>
+        <li>View cached attendance records</li>
+        <li>Browse your timetable</li>
+        <li>Access profile information</li>
+        <li>View previously loaded analytics</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Check connection status
+    function checkConnection() {
+      if (navigator.onLine) {
+        window.location.reload();
+      }
+    }
+
+    // Listen for online event
+    window.addEventListener('online', checkConnection);
+
+    // Check every 5 seconds
+    setInterval(checkConnection, 5000);
+  </script>
+</body>
+</html>
