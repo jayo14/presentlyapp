@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => {
         // Source maps for debugging (disable in production for performance)
         sourcemap: mode !== 'production',
         // Target modern browsers for smaller bundle size
-        target: 'esnext',
+        target: 'es2020',
         // Enable CSS code splitting and minification
         cssCodeSplit: true,
         cssMinify: true,

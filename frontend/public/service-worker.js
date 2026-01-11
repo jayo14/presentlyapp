@@ -1,4 +1,4 @@
-const CACHE_NAME = 'presently-v4';
+const CACHE_NAME = 'presently-v5';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -16,7 +16,7 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// Install Event - Cache critical assets immediately
+// Install Event
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -25,7 +25,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate Event - Clean up old caches
+// Activate Event
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -40,46 +40,41 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-/**
- * Optimized Fetch Strategy:
- * 1. API & Auth: Network Only (to avoid stale auth states)
- * 2. Navigation (SPA): Stale-While-Revalidate (Instant load)
- * 3. Static Assets: Cache First with Background Update
- */
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // 1. API Requests - Always Network Only for accuracy and security
-  if (url.pathname.startsWith('/api/') || url.origin !== self.location.origin) {
-    return; // Let browser handle normally
+  // 1. Dev Server / HMR Bypassing
+  if (url.pathname.includes('@vite') || url.pathname.includes('hot-update')) {
+    return;
   }
 
-  // 2. Navigation requests (SPA) - Stale-While-Revalidate for instant startup
+  // 2. API & Auth Bypassing - Always Network
+  if (url.pathname.startsWith('/api/') || url.origin !== self.location.origin) {
+    return;
+  }
+
+  // 3. Navigation (SPA) - Network First, falling back to cached index.html
   if (request.mode === 'navigate') {
     event.respondWith(
-      caches.match('/index.html').then((cachedResponse) => {
-        const fetchPromise = fetch(request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', responseToCache));
           }
-          return networkResponse;
-        }).catch(() => {
-          // Offline fallback
-          return cachedResponse || caches.match('/offline.html');
-        });
-
-        return cachedResponse || fetchPromise;
-      })
+          return response;
+        })
+        .catch(() => {
+          return caches.match('/index.html') || caches.match('/offline.html');
+        })
     );
     return;
   }
 
-  // 3. Static Assets - Stale-While-Revalidate
+  // 4. Static Assets - Stale-While-Revalidate
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request).then((networkResponse) => {
