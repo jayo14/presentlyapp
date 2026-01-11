@@ -286,6 +286,16 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
         """Check if session is currently active"""
         return obj.is_within_time_range()
     
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        request = self.context.get('request')
+        # Hide sensitive session data from students
+        if request and hasattr(request.user, 'role') and request.user.role == 'STUDENT':
+            ret.pop('session_code', None)
+            ret.pop('qr_code_url', None)
+            ret.pop('qr_code_data', None)
+        return ret
+    
     def create(self, validated_data):
         # Session code and QR URL will be auto-generated in model's save method
         return super().create(validated_data)
@@ -295,6 +305,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
     """Serializer for Attendance model"""
     student_name = serializers.CharField(source='student.full_name', read_only=True)
     student_matric = serializers.CharField(source='student.matric_number', read_only=True)
+    student_avatar = serializers.URLField(source='student.avatar_url', read_only=True)
+    student_department = serializers.CharField(source='student.department', read_only=True)
     course_code = serializers.CharField(source='session.course.code', read_only=True)
     
     class Meta:

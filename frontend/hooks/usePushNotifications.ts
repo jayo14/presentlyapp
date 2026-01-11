@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getFirebaseMessaging } from '../services/firebase/config';
+import { tokenManager } from '../services/api/client';
 import {
   subscribeToPushNotifications,
   getNotificationPermission,
@@ -122,12 +123,16 @@ export const usePushNotifications = (
         setToken(result.token);
         
         // Send token to server
-        // You can get userId from your auth context if needed
-        const sent = await sendTokenToServer(result.token);
-        
-        if (!sent) {
-          setError('Failed to register device with server. Push notifications may not work properly.');
-          console.warn('[usePushNotifications] Token obtained but not sent to server');
+        const accessToken = tokenManager.getAccessToken();
+        if (accessToken) {
+          const sent = await sendTokenToServer(result.token, accessToken);
+          
+          if (!sent) {
+            setError('Failed to register device with server. Push notifications may not work properly.');
+            console.warn('[usePushNotifications] Token obtained but not sent to server');
+          }
+        } else {
+           console.warn('[usePushNotifications] No access token available. Cannot register device.');
         }
       } else if (result.error) {
         setError(result.error);

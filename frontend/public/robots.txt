@@ -20,7 +20,7 @@ Allow: /register
 Allow: /forgot-password
 
 # Sitemap location
-Sitemap: https://presently.app/sitemap.xml
+Sitemap: https://presentlyapp.vercel.app/sitemap.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1
