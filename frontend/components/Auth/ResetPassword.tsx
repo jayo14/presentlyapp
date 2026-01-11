@@ -5,6 +5,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
 import { useResetPassword, useVerifyResetToken } from '../../hooks/useAuth';
+import { SEO } from '../SEO';
 
 type PageState = 'form' | 'success' | 'error' | 'loading' | 'invalid-link';
 
@@ -90,6 +91,7 @@ export const ResetPassword: React.FC = () => {
   if (pageState === 'loading' || verifyTokenMutation.isPending) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+        <SEO title="Verifying Reset Link | Presently" />
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-zinc-400">Verifying reset link...</p>
@@ -99,11 +101,17 @@ export const ResetPassword: React.FC = () => {
   }
 
   if (pageState === 'invalid-link') {
-    // ... render invalid link UI
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+        <SEO title="Invalid Reset Link | Presently" />
+        {/* Invalid Link UI */}
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+      <SEO title="Reset Password | Presently" />
        {/* UI for form, success, and error states */}
     </div>
   );

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -140,6 +141,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# WhiteNoise storage to serve compressed and cached static files
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
@@ -198,9 +210,13 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # Email Configuration
-# For development, use console backend (prints emails to console)
-# For production, configure SMTP settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+
+if RESEND_API_KEY:
+    EMAIL_BACKEND = 'presently.email_backend.ResendEmailBackend'
+else:
+    # For development/fallback, use console backend (prints emails to console)
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # For production with real email (Gmail example):
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

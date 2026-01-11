@@ -991,6 +991,20 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         """Student check-in to a session with GPS verification"""
         session = self.get_object()
         
+        # Verify session code
+        code = request.data.get('code')
+        if not code:
+             return Response({
+                'success': False,
+                'error': 'Session code is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        if code != session.session_code:
+             return Response({
+                'success': False,
+                'error': 'Invalid session code'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         if request.user.role != UserRole.STUDENT:
             return Response({
                 'success': False,

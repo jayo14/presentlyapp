@@ -7,6 +7,7 @@ import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRegister, useCurrentUser } from '../../hooks/useAuth';
 import { toast } from 'sonner';
+import { SEO } from '../SEO';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -60,6 +61,10 @@ export const Register: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+      <SEO 
+        title="Register | Presently"
+        description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
+      />
        <button onClick={onBack} className="absolute top-8 left-8 text-zinc-400 hover:text-white flex items-center gap-2">
             <ArrowLeft size={18} /> Back
         </button>

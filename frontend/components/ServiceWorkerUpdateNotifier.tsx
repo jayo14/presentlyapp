@@ -61,12 +61,9 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
       }
     });
 
-    // Listen for controller change (when new SW takes over)
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      // Reload the page to use the new service worker - DISABLED to prevent loops
-      // window.location.reload();
-      console.log('Controller changed, new SW active');
-    });
+    // Note: We deliberately do NOT listen to 'controllerchange' here to avoid reload loops.
+    // The update button triggers SKIP_WAITING, which activates the new SW.
+    // The user will get the new version on next navigation or refresh.
 
     // Check for updates every 60 minutes
     const updateInterval = setInterval(() => {
@@ -83,6 +80,10 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
       // Tell the waiting service worker to skip waiting and become active
       waitingWorker.postMessage({ type: 'SKIP_WAITING' });
       setShowUpdatePrompt(false);
+      
+      // Reload the page to load the new version
+      // We do this on explicit user action, so it's safe from infinite loops
+      window.location.reload();
     }
   };
 
