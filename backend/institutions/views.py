@@ -11,6 +11,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 import secrets
+import firebase_admin
+from firebase_admin import auth as firebase_auth
+from presently.firebase_config import initialize_firebase
 
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
@@ -37,6 +40,87 @@ def get_tokens_for_user(user):
 
 
 # Authentication Views
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def google_auth_view(request):
+    """
+    Authenticate user using Google ID token from Firebase
+    """
+    id_token = request.data.get('id_token')
+    
+    if not id_token:
+        return Response({
+            'success': False,
+            'error': 'ID token is required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Initialize Firebase if not already
+    initialize_firebase()
+    
+    try:
+        # Verify the Firebase ID token
+        decoded_token = firebase_auth.verify_id_token(id_token)
+        uid = decoded_token.get('uid')
+        email = decoded_token.get('email')
+        name = decoded_token.get('name', '')
+        picture = decoded_token.get('picture', '')
+        
+        if not email:
+            return Response({
+                'success': False,
+                'error': 'Email not provided by Google'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Get or create user
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'full_name': name,
+                'is_active': True,
+                'email_verified': True, # Google emails are already verified
+                'email_verified_at': timezone.now(),
+                'avatar_url': picture
+            }
+        )
+        
+        # If user existed but email wasn't verified, mark it verified
+        if not created and not user.email_verified:
+            user.email_verified = True
+            user.email_verified_at = timezone.now()
+            if picture and not user.avatar_url:
+                user.avatar_url = picture
+            user.save()
+            
+        # Generate tokens
+        tokens = get_tokens_for_user(user)
+        
+        return Response({
+            'success': True,
+            'message': 'Google authentication successful',
+            'user': {
+                'id': str(user.id),
+                'email': user.email,
+                'full_name': user.full_name,
+                'role': user.role,
+                'onboarding_complete': user.onboarding_complete,
+                'avatar_url': user.avatar_url
+            },
+            'tokens': tokens,
+            'requires_onboarding': not user.onboarding_complete
+        }, status=status.HTTP_200_OK)
+        
+    except firebase_admin.exceptions.FirebaseError as e:
+        return Response({
+            'success': False,
+            'error': f'Firebase authentication failed: {str(e)}'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': f'An unexpected error occurred: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_view(request):

@@ -100,6 +100,18 @@ export const authApi = {
     return result;
   },
 
+  // Google Auth
+  googleAuth: async (idToken: string): Promise<AuthResponse> => {
+    const response = await apiClient.post('/auth/google-auth/', { id_token: idToken });
+    const result = response.data;
+    
+    if (result.success && result.tokens) {
+      tokenManager.setTokens(result.tokens.access, result.tokens.refresh);
+    }
+    
+    return result;
+  },
+
   // Logout
   logout: async (): Promise<void> => {
     const refreshToken = tokenManager.getRefreshToken();

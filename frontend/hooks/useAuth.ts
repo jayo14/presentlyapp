@@ -56,6 +56,26 @@ export const useLogin = () => {
   });
 };
 
+// Hook for Google auth
+export const useGoogleAuth = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (idToken: string) => authApi.googleAuth(idToken),
+    onSuccess: (response: AuthResponse) => {
+      if (response.success && response.user) {
+        queryClient.setQueryData(queryKeys.currentUser, response.user);
+        if (response.requires_onboarding) {
+          navigate('/onboarding', { replace: true });
+        } else {
+          navigate('/dashboard', { replace: true });
+        }
+      }
+    },
+  });
+};
+
 // Hook for user logout
 export const useLogout = () => {
   const queryClient = useQueryClient();
