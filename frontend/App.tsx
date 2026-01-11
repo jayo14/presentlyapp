@@ -139,16 +139,33 @@ const ClassRepRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user, isLoading, isError } = useCurrentUser();
+  const [loadTimeout, setLoadTimeout] = useState(false);
+
+  // Safeguard: If loading takes too long (e.g., 10 seconds), show content anyway or an error
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        console.warn('[AppContent] Loading is taking too long, triggering safeguard.');
+        setLoadTimeout(true);
+      }
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   useEffect(() => {
     if (!isLoading && user && !user.onboarding_complete) {
+      console.log('[AppContent] Redirecting to onboarding');
       navigate('/onboarding', { replace: true });
     }
   }, [user, isLoading, navigate]);
 
-  if (isLoading) {
+  if (isLoading && !loadTimeout) {
     return <LoadingFallback />;
+  }
+
+  if (isError && !user) {
+    console.error('[AppContent] Auth error detected');
   }
 
   return (
