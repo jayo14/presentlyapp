@@ -9,7 +9,7 @@ import { useRegister, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth'
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +20,35 @@ export const Register: React.FC = () => {
   const googleAuthMutation = useGoogleAuth();
   const { data: user, isLoading } = useCurrentUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Handle redirect result
+  useEffect(() => {
+    const handleRedirect = async () => {
+      const auth = getFirebaseAuth();
+      if (!auth) return;
+
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const idToken = await result.user.getIdToken();
+          setIsRedirecting(true);
+          googleAuthMutation.mutate(idToken, {
+            onSuccess: () => {
+              toast.success('Registration Successful');
+            },
+            onError: (error: any) => {
+              setIsRedirecting(false);
+              toast.error('Google Auth Failed');
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error getting redirect result", error);
+      }
+    };
+
+    handleRedirect();
+  }, [googleAuthMutation]);
 
   // Auto-redirect if user is already logged in
   useEffect(() => {
@@ -59,23 +88,7 @@ export const Register: React.FC = () => {
 
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken();
-      
-      setIsRedirecting(true);
-      googleAuthMutation.mutate(idToken, {
-        onError: (error: any) => {
-          setIsRedirecting(false);
-          toast.error('Google Auth Failed', {
-            description: error.response?.data?.error || 'Authentication failed'
-          });
-        },
-        onSuccess: () => {
-          toast.success('Account Ready', {
-            description: 'Authentication successful! Redirecting...'
-          });
-        }
-      });
+      await signInWithRedirect(auth, provider);
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         console.error('Google Auth Popup Error:', error);
