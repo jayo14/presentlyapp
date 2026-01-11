@@ -7,6 +7,7 @@
 
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getMessaging, Messaging, isSupported } from 'firebase/messaging';
+import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 
 // Firebase configuration from environment variables
 // These values should be set in .env.local file
@@ -22,6 +23,7 @@ const firebaseConfig = {
 
 let app: FirebaseApp | null = null;
 let messaging: Messaging | null = null;
+let auth: Auth | null = null;
 
 /**
  * Initialize Firebase App
@@ -35,7 +37,7 @@ export const initializeFirebase = (): FirebaseApp | null => {
 
   // Validate that we have the minimum required config
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    console.warn('[Firebase] Firebase configuration is incomplete. Push notifications will not be available.');
+    console.warn('[Firebase] Firebase configuration is incomplete. Authentication and Push notifications will not be available.');
     console.warn('[Firebase] Please configure Firebase environment variables. See FIREBASE_SETUP.md');
     return null;
   }
@@ -48,6 +50,19 @@ export const initializeFirebase = (): FirebaseApp | null => {
     console.error('[Firebase] Error initializing Firebase:', error);
     return null;
   }
+};
+
+/**
+ * Get Firebase Auth instance
+ */
+export const getFirebaseAuth = (): Auth | null => {
+  if (auth) return auth;
+  
+  const firebaseApp = initializeFirebase();
+  if (!firebaseApp) return null;
+  
+  auth = getAuth(firebaseApp);
+  return auth;
 };
 
 /**
@@ -103,4 +118,4 @@ export const getFirebaseConfigStatus = () => {
   };
 };
 
-export { app, messaging, firebaseConfig };
+export { app, messaging, auth, firebaseConfig, GoogleAuthProvider };
