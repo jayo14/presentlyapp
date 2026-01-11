@@ -5,6 +5,7 @@ import { Input } from '../Input';
 import { Logo } from '../Logo';
 import { useRequestPasswordReset } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '../SEO';
 
 type PageState = 'form' | 'sent' | 'error';
 
@@ -33,6 +34,10 @@ export const ForgotPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+      <SEO 
+        title="Forgot Password | Presently"
+        description="Reset your Presently password to regain access to your account."
+      />
       <button 
         onClick={onBack} 
         className="absolute top-8 left-8 text-zinc-400 hover:text-white flex items-center gap-2 transition-colors"

@@ -192,12 +192,12 @@ export const setupForegroundMessageHandler = (
  * Your backend should store this token to send push notifications later
  * 
  * @param token - FCM token
- * @param userId - User ID to associate with the token
+ * @param accessToken - Authentication token
  * @returns Success status
  */
 export const sendTokenToServer = async (
   token: string,
-  userId?: string
+  accessToken: string
 ): Promise<boolean> => {
   try {
     const API_URL = import.meta.env.VITE_API_URL;
@@ -208,19 +208,22 @@ export const sendTokenToServer = async (
       return false;
     }
     
-    // TODO: Update this endpoint based on your backend API
-    const response = await fetch(`${API_URL}/api/notifications/register-device/`, {
+    if (!accessToken) {
+      console.error('[FCM] Access token missing. Cannot send token to server.');
+      return false;
+    }
+    
+    const response = await fetch(`${API_URL}/api/notifications/devices/register/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Add authentication headers if needed
-        // 'Authorization': `Bearer ${yourAuthToken}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        fcm_token: token,
-        user_id: userId,
-        device_type: 'web',
+        registration_token: token,
+        device_type: 'WEB',
         browser: navigator.userAgent,
+        device_id: navigator.userAgent, // Use user agent as simplistic ID for now
       }),
     });
 
@@ -229,6 +232,12 @@ export const sendTokenToServer = async (
       return true;
     } else {
       console.error('[FCM] Failed to send token to server:', response.statusText);
+      try {
+        const errorData = await response.json();
+        console.error('[FCM] Server error:', errorData);
+      } catch (e) {
+        // Ignore json parse error
+      }
       return false;
     }
   } catch (error) {

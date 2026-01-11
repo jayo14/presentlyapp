@@ -7,6 +7,7 @@ import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin, useCurrentUser } from '../../hooks/useAuth';
 import { toast } from 'sonner';
+import { SEO } from '../SEO';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -79,6 +80,10 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+      <SEO 
+        title="Login | Presently"
+        description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
+      />
       <button onClick={onBack} className="absolute top-8 left-8 text-zinc-400 hover:text-white flex items-center gap-2">
         <ArrowLeft size={18} /> Back
       </button>

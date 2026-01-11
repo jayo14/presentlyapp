@@ -10,6 +10,7 @@ import {
   Zap, MonitorPlay, Pause, Volume2, Maximize2
 } from 'lucide-react';
 import { useCurrentUser } from '../hooks/useAuth';
+import { SEO } from './SEO';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -69,6 +70,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
 
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-primary selection:text-black overflow-x-hidden">
+      <SEO 
+        title="Presently | Smart Attendance Management for Schools"
+        description="The modern attendance tracking system for universities and schools. Features GPS verification, QR code check-in, real-time analytics, and fraud prevention."
+      />
       
       {/* --- Navbar --- */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl supports-[backdrop-filter]:bg-black/60">

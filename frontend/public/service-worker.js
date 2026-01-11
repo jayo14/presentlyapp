@@ -37,8 +37,10 @@ self.addEventListener('install', (event) => {
 // Activate Event
 self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activating...');
-  // Tell the active service worker to take control of the page immediately.
-  event.waitUntil(self.clients.claim());
+  
+  // Note: We removed self.clients.claim() to prevent "controllerchange" events
+  // from firing immediately on activation, which can cause reload loops in some clients.
+  // The new service worker will take control only on next page load or when manually claimed.
   
   event.waitUntil(
     caches.keys().then((cacheNames) => {
