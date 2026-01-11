@@ -10,7 +10,7 @@ interface LayoutProps {
   userName?: string;
   onLogout: () => void;
   currentPage: string;
-  setCurrentPage: (page: string) => void;
+  setCurrentPage?: (page: string) => void;
 }
 
 interface NavItemProps {
@@ -54,26 +54,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
   // Update URL when page changes
   const handleNavClick = (id: string) => {
-      setCurrentPage(id);
       if (id === 'dashboard') {
           navigate('/dashboard');
       } else {
           navigate(`/dashboard/${id}`);
       }
-  };
-
-  // Parse URL on mount to set correct page
-  useEffect(() => {
-    const pathParts = location.pathname.split('/');
-    if (pathParts.length > 2 && pathParts[1] === 'dashboard') {
-      const page = pathParts[2];
-      if (page && page !== currentPage) {
-        setCurrentPage(page);
+      
+      if (setCurrentPage) {
+          setCurrentPage(id);
       }
-    } else if (location.pathname === '/dashboard') {
-        setCurrentPage('dashboard');
-    }
-  }, [location.pathname, setCurrentPage]);
+  };
 
   useEffect(() => {
     // Initialize theme state based on document class

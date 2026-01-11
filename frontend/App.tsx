@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './services/api/queryClient';
@@ -59,18 +59,20 @@ const DashboardLayout: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     
-    // Determine current page from URL
+    // Determine current page directly from URL to avoid state sync loops
     const pathParts = location.pathname.split('/');
-    const currentPage = pathParts.length > 2 ? pathParts[2] : 'dashboard';
+    const currentPage = pathParts.length > 2 && pathParts[1] === 'dashboard' ? pathParts[2] : 'dashboard';
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(() => {
         logoutMutation.mutate();
-    };
+    }, [logoutMutation]);
 
-    const handlePageChange = (page: string) => {
-         if (page === 'dashboard') navigate('/dashboard');
-         else navigate(`/dashboard/${page}`);
-    };
+    const handlePageChange = useCallback((page: string) => {
+         const targetPath = page === 'dashboard' ? '/dashboard' : `/dashboard/${page}`;
+         if (location.pathname !== targetPath) {
+            navigate(targetPath);
+         }
+    }, [navigate, location.pathname]);
 
     if (isLoading) return <LoadingFallback />;
     if (!user) return <Navigate to="/login" replace />;
