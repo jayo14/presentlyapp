@@ -46,8 +46,14 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET') return;
 
-  // 1. Dev Server / HMR Bypassing
-  if (url.pathname.includes('@vite') || url.pathname.includes('hot-update')) {
+  // 1. Dev Server / HMR / Source Bypassing
+  // Bypass Vite internal files, hot updates, and source files in development
+  if (
+    url.pathname.includes('@vite') || 
+    url.pathname.includes('hot-update') || 
+    url.pathname.startsWith('/src/') ||
+    url.hostname === 'localhost' && url.port === '3000' && !url.pathname.match(/\.(png|jpg|jpeg|svg|gif|webp|woff|woff2|json|ico)$/)
+  ) {
     return;
   }
 
@@ -74,18 +80,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. Static Assets - Stale-While-Revalidate
+  // 4. Static Assets - Cache First, then Network
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
-      const fetchPromise = fetch(request).then((networkResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
         }
         return networkResponse;
-      }).catch(() => cachedResponse);
-
-      return cachedResponse || fetchPromise;
+      });
+    }).catch(() => {
+      // If both fail, return a basic error response instead of undefined
+      return new Response('Resource not available', { status: 404 });
     })
   );
 });
