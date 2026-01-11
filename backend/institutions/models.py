@@ -259,6 +259,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             models.Index(fields=['role']),
             models.Index(fields=['matric_number']),
             models.Index(fields=['staff_id']),
+            models.Index(fields=['onboarding_complete']),
         ]
         ordering = ['-date_joined']
     
@@ -625,6 +626,7 @@ class Attendance(models.Model):
             models.Index(fields=['session']),
             models.Index(fields=['student']),
             models.Index(fields=['checked_in_at']),
+            models.Index(fields=['status']),
         ]
     
     def __str__(self):

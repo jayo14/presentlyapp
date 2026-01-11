@@ -11,8 +11,12 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 import secrets
+import logging
 import firebase_admin
 from firebase_admin import auth as firebase_auth
+from google.oauth2 import id_token as google_id_token
+from google.auth.transport import requests as google_requests
+from django.conf import settings
 from presently.firebase_config import initialize_firebase
 
 from .models import (
@@ -28,6 +32,8 @@ from .serializers import (
 )
 from .geolocation_utils import verify_location, calculate_distance
 
+# Configure logging
+auth_logger = logging.getLogger('auth_events')
 
 # Helper function to generate tokens
 def get_tokens_for_user(user):
@@ -44,11 +50,12 @@ def get_tokens_for_user(user):
 @permission_classes([AllowAny])
 def google_auth_view(request):
     """
-    Authenticate user using Google ID token from Firebase
+    Authenticate user using Google ID token from Firebase with additional verification.
     """
-    id_token = request.data.get('id_token')
+    id_token_str = request.data.get('id_token')
     
-    if not id_token:
+    if not id_token_str:
+        auth_logger.warning("Google Auth attempted without ID token.")
         return Response({
             'success': False,
             'error': 'ID token is required'
@@ -59,17 +66,32 @@ def google_auth_view(request):
     
     try:
         # Verify the Firebase ID token
-        decoded_token = firebase_auth.verify_id_token(id_token)
+        decoded_token = firebase_auth.verify_id_token(id_token_str)
         uid = decoded_token.get('uid')
         email = decoded_token.get('email')
         name = decoded_token.get('name', '')
         picture = decoded_token.get('picture', '')
         
         if not email:
+            auth_logger.error(f"Google Auth failed: Email not provided. UID: {uid}")
             return Response({
                 'success': False,
                 'error': 'Email not provided by Google'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Optional: Secondary validation using Google's own libraries and GOOGLE_CLIENT_ID
+        if settings.GOOGLE_CLIENT_ID:
+            try:
+                # This ensures the token was intended for our specific client
+                google_id_token.verify_oauth2_token(
+                    id_token_str, 
+                    google_requests.Request(), 
+                    settings.GOOGLE_CLIENT_ID
+                )
+            except Exception as e:
+                auth_logger.error(f"Secondary Google Token validation failed: {str(e)}")
+                # Depending on strictness, we might choose to fail here
+                # return Response({'error': 'Token validation failed'}, status=401)
             
         # Get or create user
         user, created = User.objects.get_or_create(
@@ -77,19 +99,20 @@ def google_auth_view(request):
             defaults={
                 'full_name': name,
                 'is_active': True,
-                'email_verified': True, # Google emails are already verified
+                'email_verified': True, 
                 'email_verified_at': timezone.now(),
                 'avatar_url': picture
             }
         )
         
-        # If user existed but email wasn't verified, mark it verified
-        if not created and not user.email_verified:
-            user.email_verified = True
-            user.email_verified_at = timezone.now()
-            if picture and not user.avatar_url:
-                user.avatar_url = picture
-            user.save()
+        if created:
+            auth_logger.info(f"New user created via Google Auth: {email}")
+        else:
+            auth_logger.info(f"User logged in via Google Auth: {email}")
+            if not user.email_verified:
+                user.email_verified = True
+                user.email_verified_at = timezone.now()
+                user.save()
             
         # Generate tokens
         tokens = get_tokens_for_user(user)
@@ -110,14 +133,16 @@ def google_auth_view(request):
         }, status=status.HTTP_200_OK)
         
     except firebase_admin.exceptions.FirebaseError as e:
+        auth_logger.error(f"Firebase Auth Error: {str(e)}")
         return Response({
             'success': False,
             'error': f'Firebase authentication failed: {str(e)}'
         }, status=status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
+        auth_logger.error(f"Unexpected Auth Error: {str(e)}")
         return Response({
             'success': False,
-            'error': f'An unexpected error occurred: {str(e)}'
+            'error': 'An unexpected error occurred during authentication.'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
