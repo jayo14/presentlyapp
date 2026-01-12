@@ -182,3 +182,12 @@ export const formatDistance = (meters: number): string => {
   }
   return `${(meters / 1000).toFixed(2)}km`;
 };
+
+export const geolocationService = {
+  getCurrentPosition,
+  calculateDistance,
+  pointInPolygon,
+  checkLocationPermission,
+  verifyVenueLocation,
+  formatDistance,
+};

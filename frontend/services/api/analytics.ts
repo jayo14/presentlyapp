@@ -4,6 +4,7 @@ export interface LecturerDashboardAnalytics {
   total_sessions: number;
   avg_attendance_percentage: number;
   active_sessions_count: number;
+  total_students?: number;
   weekly_overview: Array<{
     name: string;
     attendees: number;

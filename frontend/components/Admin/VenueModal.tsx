@@ -3,6 +3,7 @@ import { X, AlertCircle, MapPin, Map as MapIcon } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface VenueModalProps {
   venue?: Venue;
@@ -22,7 +23,8 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showMapHelper, setShowMapHelper] = useState(false);
-  const modalRef = React.useRef<HTMLDivElement>(null);
+  
+  const { modalRef, modalProps } = useModalAccessibility(true, onClose);
   
   const [formData, setFormData] = useState<Partial<Venue>>({
     institution_id: venue?.institution_id || institutions[0]?.id || 0,
@@ -40,15 +42,6 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     verification_radius: venue?.verification_radius || 100,
     is_active: venue?.is_active !== false,
   });
-
-  // Handle ESC key
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
 
   // Handle click outside
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -148,17 +141,19 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       onClick={handleOverlayClick}
     >
       <div 
-        ref={modalRef}
-        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+        {...modalProps}
+        aria-labelledby="modal-title"
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto outline-none"
       >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
-          <h2 className="text-xl font-bold text-foreground">
+          <h2 id="modal-title" className="text-xl font-bold text-foreground">
             {venue ? 'Edit Venue' : 'Create Venue'}
           </h2>
           <button
             onClick={onClose}
             className="text-zinc-400 hover:text-foreground transition-colors"
+            aria-label="Close dialog"
           >
             <X className="w-6 h-6" />
           </button>

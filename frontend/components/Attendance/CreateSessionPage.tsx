@@ -7,8 +7,9 @@ import { useCurrentUser } from '../../hooks/useAuth';
 import { institutionsApi } from '../../services/api/institutions';
 import { courseApi, sessionApi } from '../../services/api/attendance';
 import { venueApi } from '../../services/api/venues';
-import { Institution, College, Department, Course, Venue } from '../../types';
+import { Institution, College, Department, Course, Venue, Session } from '../../types';
 import { toast } from 'sonner';
+import { SessionDetailDialog } from './SessionDetailDialog';
 
 export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
@@ -35,6 +36,7 @@ export const CreateSessionPage: React.FC = () => {
     // UI State
     const [loading, setLoading] = useState(false);
     const [deptSearchTerm, setDeptSearchTerm] = useState('');
+    const [createdSession, setCreatedSession] = useState<Session | null>(null);
 
     useEffect(() => {
         loadInitialData();
@@ -140,7 +142,7 @@ export const CreateSessionPage: React.FC = () => {
                 durationInMinutes *= 60;
             }
 
-            await sessionApi.create({
+            const session = await sessionApi.create({
                 course: parseInt(selectedCourse),
                 venue: parseInt(selectedVenue),
                 // Calculate end time based on duration? 
@@ -159,7 +161,7 @@ export const CreateSessionPage: React.FC = () => {
             });
 
             toast.success('Session created successfully');
-            navigate('/dashboard');
+            setCreatedSession(session as any);
         } catch (err) {
             console.error(err);
             toast.error('Failed to create session');
@@ -170,13 +172,22 @@ export const CreateSessionPage: React.FC = () => {
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Escape') {
-             // Optional: ask for confirmation if dirty?
-             navigate('/dashboard');
+             if (createdSession) {
+                 navigate('/dashboard');
+             } else {
+                 navigate('/dashboard');
+             }
         }
     };
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 animate-in slide-in-from-right-4 duration-300 pb-12" onKeyDown={handleKeyDown}>
+            {createdSession && (
+                <SessionDetailDialog 
+                    session={createdSession as any} 
+                    onClose={() => navigate('/dashboard')} 
+                />
+            )}
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')} aria-label="Go back">
                     <ArrowLeft size={20} />

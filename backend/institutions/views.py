@@ -815,9 +815,9 @@ class CourseViewSet(viewsets.ModelViewSet):
     """ViewSet for Course CRUD"""
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    
+
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'available', 'enrolled_students']:
             return [IsAuthenticated()]
         return [IsLecturerOrAdmin()]
     
@@ -927,8 +927,8 @@ class CourseViewSet(viewsets.ModelViewSet):
                 'credit_units': course.credit_units,
                 'semester': course.semester,
                 'level': course.level,
-                'department': course.department.id if course.department else None,
-                'department_name': course.department.name if course.department else None,
+                'department': list(course.department.values_list('id', flat=True)),
+                'department_name': ", ".join([d.name for d in course.department.all()]),
                 'lecturer_name': course.lecturer.full_name if course.lecturer else None,
                 'enrollment_count': enrollment_count,
                 'can_enroll': course.id not in enrolled_course_ids,
@@ -1095,6 +1095,28 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         
         return queryset
     
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def end(self, request, pk=None):
+        """Lecturer manually ends a session"""
+        session = self.get_object()
+        
+        # Check if user is the lecturer for this course or an admin
+        if request.user.role != UserRole.ADMIN and session.course.lecturer != request.user:
+            return Response({
+                'success': False,
+                'error': 'Permission denied'
+            }, status=status.HTTP_403_FORBIDDEN)
+            
+        session.is_active = False
+        session.end_time = timezone.now()
+        session.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Session ended successfully',
+            'end_time': session.end_time
+        })
+
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def check_in(self, request, pk=None):
         """Student check-in to a session with GPS verification"""
