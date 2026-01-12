@@ -3,6 +3,7 @@ import { X, AlertCircle, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { authApi } from '../../services/api/auth';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface ChangePasswordModalProps {
   onClose: () => void;
@@ -15,6 +16,8 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  const { modalProps } = useModalAccessibility(true, onClose);
   
   const [formData, setFormData] = useState({
     oldPassword: '',
@@ -114,7 +117,11 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl max-w-md w-full shadow-2xl">
+      <div 
+        {...modalProps}
+        aria-labelledby="modal-title"
+        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl max-w-md w-full shadow-2xl outline-none"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
@@ -122,13 +129,14 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
               <Lock size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">Change Password</h2>
+              <h2 id="modal-title" className="text-xl font-bold text-zinc-900 dark:text-white">Change Password</h2>
               <p className="text-sm text-zinc-500">Update your account password</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+            aria-label="Close dialog"
           >
             <X className="w-6 h-6" />
           </button>

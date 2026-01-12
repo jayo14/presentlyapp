@@ -4,23 +4,16 @@ import { Button } from '../Button';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 import { AnimatePresence, motion } from 'framer-motion';
 import { studentApi, StudentDashboardData, EnrolledCourse, TimetableEntry, StudentAnalytics } from '../../services/api/student';
+import { sessionApi } from '../../services/api/attendance';
+import { geolocationService } from '../../services/geolocation';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 import { toast } from 'sonner';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface StudentDashboardProps {
   userName: string;
   view?: string;
 }
-
-// Mock Database mapping Session Codes to Course Codes for validation
-const MOCK_SESSION_DATABASE: Record<string, string> = {
-    'AWD82X9L': 'CS402',
-    'DB301QWZ': 'CS301',
-    'ENG101XS': 'ENG101',
-    'MTH202AB': 'MTH202',
-    'PHY101ZZ': 'PHY101',
-    'GNS101XY': 'GNS101'
-};
 
 // Enhanced Mark Attendance Modal
 const MarkAttendanceModal = ({ 
@@ -30,7 +23,7 @@ const MarkAttendanceModal = ({
 }: { 
     isOpen: boolean; 
     onClose: () => void; 
-    onVerify: (code: string) => Promise<boolean>;
+    onVerify: (code: string, location: any) => Promise<boolean>;
 }) => {
     const [activeTab, setActiveTab] = useState<'scan' | 'code'>('scan');
     const [sessionCode, setSessionCode] = useState('');
@@ -38,6 +31,8 @@ const MarkAttendanceModal = ({
     const [errorMsg, setErrorMsg] = useState('');
     const [isCameraActive, setIsCameraActive] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
+    
+    const { modalProps } = useModalAccessibility(isOpen, onClose);
 
     // Reset state on open
     useEffect(() => {
@@ -90,35 +85,23 @@ const MarkAttendanceModal = ({
     };
 
     const processAttendance = async (codeToVerify: string) => {
-        if (!codeToVerify || codeToVerify.length < 8) return;
+        if (!codeToVerify || codeToVerify.length < 6) return;
 
         try {
             // Step 1: Geolocation Check
             setStatus('locating');
             
-            await new Promise<void>((resolve, reject) => {
-                if (!navigator.geolocation) {
-                    // Fallback for non-supported browsers or insecure contexts
-                    console.warn("Geolocation not supported/secure.");
-                    setTimeout(resolve, 1000); 
-                    return;
-                }
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        setTimeout(resolve, 1500); 
-                    },
-                    (error) => {
-                         // Fallback on error for demo purposes
-                        console.warn("Locating failed, proceeding in mock mode");
-                        setTimeout(resolve, 1000);
-                    },
-                    { enableHighAccuracy: true, timeout: 5000 }
-                );
-            });
+            const position = await geolocationService.getCurrentPosition();
+            
+            const locationData = {
+                latitude: position.latitude,
+                longitude: position.longitude,
+                elevation: position.altitude
+            };
 
-            // Step 2: Code Verification
+            // Step 2: Code Verification & Check-in
             setStatus('verifying');
-            const success = await onVerify(codeToVerify);
+            const success = await onVerify(codeToVerify, locationData);
             
             if (success) {
                 setStatus('success');
@@ -127,12 +110,14 @@ const MarkAttendanceModal = ({
                 }, 2000);
             } else {
                 setStatus('error');
-                setErrorMsg("Invalid or expired session code.");
+                // errorMsg is set in onVerify if it returns false/throws, 
+                // but if it strictly returns boolean, we might need to set a generic message here
+                // assuming handleAttendanceCheckIn handles the error toast/state via promise rejection or return value
             }
 
         } catch (err: any) {
             setStatus('error');
-            setErrorMsg(typeof err === 'string' ? err : "An unexpected error occurred.");
+            setErrorMsg(err.message || "An unexpected error occurred.");
         }
     };
 
@@ -154,16 +139,19 @@ const MarkAttendanceModal = ({
             `}</style>
 
             <motion.div 
+                {...modalProps}
+                aria-label="Mark Attendance"
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col relative h-[550px]"
+                className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col relative h-[550px] outline-none"
             >
                 {/* Header */}
                 <div className="p-4 flex justify-between items-center z-20 bg-gradient-to-b from-zinc-900/90 to-transparent absolute top-0 left-0 right-0 pointer-events-none">
                     <button 
                         onClick={onClose} 
                         className="bg-black/40 hover:bg-black/60 text-white p-2 rounded-full backdrop-blur-sm transition-colors pointer-events-auto"
+                        aria-label="Close dialog"
                     >
                         <X size={20} />
                     </button>
@@ -234,7 +222,7 @@ const MarkAttendanceModal = ({
                                         />
                                         <Button 
                                             className="w-full h-14 text-lg font-bold rounded-xl" 
-                                            disabled={sessionCode.length < 8} 
+                                            disabled={sessionCode.length < 6} 
                                             onClick={() => processAttendance(sessionCode)}
                                         >
                                             Verify & Mark
@@ -439,30 +427,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     { name: 'Absent', value: dashboardData.attendance_stats.total_absent, color: '#ef4444' },
   ] : [];
 
-  const verifyAttendanceCode = async (code: string): Promise<boolean> => {
-      await new Promise(r => setTimeout(r, 1500)); // Simulate network check
-
-      // 1. Identify Course from Code
-      const courseCode = MOCK_SESSION_DATABASE[code.toUpperCase()];
-      
-      if (!courseCode) {
-          // In real app, this returns false. 
-          // But to be UX friendly in this mock:
-          // If the code isn't in our tiny database, let's pretend it failed.
-          return false;
+  const handleAttendanceCheckIn = async (code: string, location: any): Promise<boolean> => {
+      try {
+          await sessionApi.checkInByCode(code, location);
+          await loadDashboardData();
+          return true;
+      } catch (err: any) {
+          console.error("Check-in failed:", err);
+          throw new Error(err.response?.data?.error || err.message || "Failed to check in");
       }
-
-      // 2. Find Course Data
-      const course = enrolledCourses.find(c => c.course_code === courseCode);
-      if (!course) return false;
-
-      // 3. Check if course is active
-      if (!course.is_active) return false;
-
-      // 4. Success Logic - reload dashboard data to get updated attendance
-      await loadDashboardData();
-
-      return true;
   };
 
   // --- Views ---
@@ -791,22 +764,26 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
        <div className="pt-4">
            <h3 className="font-bold text-zinc-900 dark:text-white mb-4 px-1">Recent Activity</h3>
            <div className="space-y-3">
-               {[{ code: 'CS301', status: 'Present', time: 'Yesterday, 2:00 PM' }, { code: 'ENG101', status: 'Late', time: 'Wed, 11:15 AM' }].map((activity, i) => (
-                   <div key={i} className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
-                       <div className="flex items-center gap-4">
-                           <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 text-sm">
-                               {activity.code.substring(0,2)}
+               {recentActivity.length === 0 ? (
+                   <p className="text-sm text-zinc-500 italic px-1">No recent activity recorded.</p>
+               ) : (
+                   recentActivity.map((activity) => (
+                       <div key={activity.id} className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
+                           <div className="flex items-center gap-4">
+                               <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 text-sm">
+                                   {activity.course_code?.substring(0,2) || 'AT'}
+                               </div>
+                               <div>
+                                   <p className="font-bold text-zinc-900 dark:text-white text-sm">{activity.course_code} {activity.type === 'attendance' ? 'Class' : ''}</p>
+                                   <p className="text-xs text-zinc-500">{new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                               </div>
                            </div>
-                           <div>
-                               <p className="font-bold text-zinc-900 dark:text-white text-sm">{activity.code} Class</p>
-                               <p className="text-xs text-zinc-500">{activity.time}</p>
-                           </div>
+                           <span className={`text-xs font-bold px-2 py-1 rounded-md ${activity.status === 'PRESENT' ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400'}`}>
+                               {activity.status || 'Success'}
+                           </span>
                        </div>
-                       <span className={`text-xs font-bold px-2 py-1 rounded-md ${activity.status === 'Present' ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400'}`}>
-                           {activity.status}
-                       </span>
-                   </div>
-               ))}
+                   ))
+               )}
            </div>
        </div>
 
@@ -814,7 +791,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
        <MarkAttendanceModal 
         isOpen={isAttendanceModalOpen}
         onClose={() => setIsAttendanceModalOpen(false)}
-        onVerify={verifyAttendanceCode}
+        onVerify={handleAttendanceCheckIn}
        />
 
        <CourseRegistrationDialog

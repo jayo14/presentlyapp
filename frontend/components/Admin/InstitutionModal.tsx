@@ -3,6 +3,7 @@ import { X, AlertCircle } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Institution } from '../../types';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface InstitutionModalProps {
   institution?: Institution;
@@ -17,7 +18,8 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const modalRef = React.useRef<HTMLDivElement>(null);
+  
+  const { modalRef, modalProps } = useModalAccessibility(true, onClose);
   
   const [formData, setFormData] = useState<Partial<Institution>>({
     full_name: institution?.full_name || '',
@@ -36,15 +38,6 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
     accreditation_status: institution?.accreditation_status || 'ACCREDITED',
     is_active: institution?.is_active !== false,
   });
-
-  // Handle ESC key
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
 
   // Handle click outside
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -98,17 +91,19 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
       onClick={handleOverlayClick}
     >
       <div 
-        ref={modalRef}
-        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        {...modalProps}
+        aria-labelledby="modal-title"
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
       >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
-          <h2 className="text-xl font-bold text-foreground">
+          <h2 id="modal-title" className="text-xl font-bold text-foreground">
             {institution ? 'Edit Institution' : 'Create Institution'}
           </h2>
           <button
             onClick={onClose}
             className="text-zinc-400 hover:text-foreground transition-colors"
+            aria-label="Close dialog"
           >
             <X className="w-6 h-6" />
           </button>

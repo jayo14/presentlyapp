@@ -26,6 +26,8 @@ const CreateSessionPage = lazy(() => import('./components/Attendance/CreateSessi
 const AdminDashboard = lazy(() => import('./components/Dashboard/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
 const ClassRepDashboard = lazy(() => import('./components/Dashboard/ClassRepDashboard').then(module => ({ default: module.ClassRepDashboard })));
 const ProfilePage = lazy(() => import('./components/Profile/ProfilePage').then(module => ({ default: module.ProfilePage })));
+const SessionsPage = lazy(() => import('./components/Dashboard/SessionsPage').then(module => ({ default: module.SessionsPage })));
+const PublicCheckInPage = lazy(() => import('./components/Attendance/PublicCheckInPage').then(module => ({ default: module.PublicCheckInPage })));
 const NotificationsPage = lazy(() => import('./components/Notifications/NotificationsPage').then(module => ({ default: module.NotificationsPage })));
 const SettingsPage = lazy(() => import('./components/Settings/SettingsPage').then(module => ({ default: module.SettingsPage })));
 const NotFound = lazy(() => import('./components/NotFound').then(module => ({ default: module.NotFound })));
@@ -182,6 +184,7 @@ const AppContent: React.FC = () => {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/email-verification" element={<EmailVerificationSent />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/check-in/:sessionCode" element={<Suspense fallback={<LoadingFallback />}><PublicCheckInPage /></Suspense>} />
           
           <Route
             path="/onboarding"
@@ -195,6 +198,7 @@ const AppContent: React.FC = () => {
           <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route index element={<DashboardHome />} />
               <Route path="profile" element={<ProfilePage />} />
+              <Route path="sessions" element={<SessionsPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
               

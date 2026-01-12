@@ -5,6 +5,7 @@ import { Input } from '../Input';
 import { studentApi, AvailableCourse } from '../../services/api/student';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface CourseRegistrationDialogProps {
   isOpen: boolean;
@@ -24,6 +25,8 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   const [searchTerm, setSearchTerm] = useState('');
   const [enrollingCourseId, setEnrollingCourseId] = useState<number | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<string>('all');
+  
+  const { modalProps } = useModalAccessibility(isOpen, onClose);
 
   useEffect(() => {
     if (isOpen) {
@@ -103,14 +106,16 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <motion.div
+        {...modalProps}
+        aria-labelledby="reg-dialog-title"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col outline-none"
       >
         <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
           <div>
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Course Registration</h2>
+            <h2 id="reg-dialog-title" className="text-2xl font-bold text-zinc-900 dark:text-white">Course Registration</h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
               Browse and enroll in available courses
             </p>
@@ -118,6 +123,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
           <button
             onClick={onClose}
             className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+            aria-label="Close dialog"
           >
             <X className="w-6 h-6 text-zinc-500" />
           </button>

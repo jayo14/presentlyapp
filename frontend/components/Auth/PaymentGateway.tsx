@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { UserRole } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface PaymentGatewayProps {
   role: UserRole;
@@ -15,6 +16,8 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState<'details' | 'processing' | 'success'>('details');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'transfer' | 'ussd'>('card');
+  
+  const { modalProps } = useModalAccessibility(true, onCancel);
   
   // Form States
   const [cardNumber, setCardNumber] = useState('');
@@ -66,9 +69,11 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
       <motion.div 
+        {...modalProps}
+        aria-labelledby="payment-title"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-y-auto md:overflow-hidden"
+        className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-y-auto md:overflow-hidden outline-none"
       >
         {/* Left Side: Order Summary */}
         <div className="w-full md:w-5/12 bg-zinc-950 p-6 md:p-8 border-b md:border-b-0 md:border-r border-zinc-800 flex flex-col relative overflow-hidden shrink-0">
@@ -119,13 +124,13 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
 
         {/* Right Side: Payment Form */}
         <div className="w-full md:w-7/12 p-6 md:p-8 bg-zinc-900 relative flex flex-col md:overflow-y-auto">
-            <button onClick={onCancel} className="absolute top-4 right-4 text-zinc-500 hover:text-white p-2 z-10">
+            <button onClick={onCancel} className="absolute top-4 right-4 text-zinc-500 hover:text-white p-2 z-10" aria-label="Close dialog">
                 <X size={20} />
             </button>
 
             {step === 'details' && (
                 <div className="h-full flex flex-col">
-                    <h3 className="text-xl font-bold text-white mb-6">Payment Details</h3>
+                    <h3 id="payment-title" className="text-xl font-bold text-white mb-6">Payment Details</h3>
                     
                     {/* Payment Method Tabs */}
                     <div className="flex gap-3 mb-6">

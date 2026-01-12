@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Logo } from './Logo';
-import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap, Building2, Building } from 'lucide-react';
+import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap, Building2, Building, Timer, Menu, X } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface LayoutProps {
@@ -49,6 +49,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   const [installPrompt, setInstallPrompt] = useState<any>(deferredPromptEvent);
   const [isAppInstalled, setIsAppInstalled] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -63,6 +64,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       if (setCurrentPage) {
           setCurrentPage(id);
       }
+      setIsMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -147,7 +149,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         ];
       case UserRole.LECTURER:
         return [
-          { id: 'dashboard', icon: Home, label: 'Sessions' },
+          { id: 'dashboard', icon: Home, label: 'Home' },
+          { id: 'sessions', icon: Timer, label: 'Sessions' },
           { id: 'analytics', icon: BarChart3, label: 'Analytics' },
           { id: 'courses', icon: BookOpen, label: 'Courses' },
           { id: 'reports', icon: FileText, label: 'Reports' },
@@ -288,7 +291,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
       {/* Mobile Header (Top) */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-20 transition-colors duration-300">
-        <Logo className="text-zinc-900 dark:text-white" />
+        <div className="flex items-center gap-3">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <Menu size={24} />
+            </button>
+            <Logo className="text-zinc-900 dark:text-white" />
+        </div>
         <div className="flex items-center gap-4">
              {installPrompt && (
                <button onClick={handleInstallClick} className="text-primary hover:text-primary-hover transition-colors">
@@ -298,10 +306,63 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
              <button onClick={toggleTheme} className="text-zinc-500 dark:text-zinc-400 hover:text-primary transition-colors">
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
              </button>
-            <button onClick={onLogout} className="text-zinc-500 dark:text-zinc-400 hover:text-red-500 dark:hover:text-white">
-                <LogOut size={20} />
-            </button>
         </div>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+          <div className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in duration-200" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
+      {/* Mobile Sidebar */}
+      <div className={`fixed inset-y-0 left-0 w-72 bg-white dark:bg-zinc-950 z-50 transform transition-transform duration-300 ease-in-out md:hidden flex flex-col border-r border-zinc-200 dark:border-zinc-800 shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="p-6 flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+              <Logo className="text-zinc-900 dark:text-white" />
+              <button onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white p-1 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
+                  <X size={24} />
+              </button>
+          </div>
+          
+          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+              {navItems.map(item => (
+                <NavItem 
+                  key={item.id} 
+                  id={item.id}
+                  icon={item.icon}
+                  label={item.label}
+                  isActive={currentPage === item.id}
+                  onClick={handleNavClick}
+                />
+              ))}
+              <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-4 mx-2"></div>
+              <button 
+                onClick={() => handleNavClick('notifications')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+              >
+                <Bell size={18} />
+                Notifications
+              </button>
+          </nav>
+
+          <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+              <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                     {userName.charAt(0)}
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                      <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{userName}</p>
+                      <p className="text-xs text-zinc-500 truncate capitalize">{userRole?.toLowerCase().replace('_', ' ')}</p>
+                  </div>
+              </div>
+              
+              <button 
+                onClick={onLogout}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-900/30"
+              >
+                <LogOut size={18} />
+                Sign Out
+              </button>
+          </div>
       </div>
 
       {/* Mobile Bottom Navigation - Dock Style with Glassmorphism */}

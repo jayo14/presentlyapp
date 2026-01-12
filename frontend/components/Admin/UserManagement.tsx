@@ -5,6 +5,7 @@ import { Input } from '../Input';
 import { User, UserRole } from '../../types';
 import apiClient from '../../services/api/client';
 import { toast } from 'sonner';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 export const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -15,6 +16,8 @@ export const UserManagement: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
+  
+  const { modalProps } = useModalAccessibility(showModal, () => setShowModal(false));
 
   useEffect(() => {
     loadUsers();
@@ -410,12 +413,17 @@ export const UserManagement: React.FC = () => {
       {/* User Details Modal */}
       {showModal && selectedUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div 
+            {...modalProps}
+            aria-labelledby="user-details-title"
+            className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
+          >
             <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-foreground">User Details</h3>
+              <h3 id="user-details-title" className="text-xl font-bold text-foreground">User Details</h3>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-zinc-400 hover:text-white transition-colors"
+                aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
               </button>
