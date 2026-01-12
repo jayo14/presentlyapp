@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { sessionApi, CheckInData } from '../../services/api/attendance';
 import { getCurrentPosition, verifyVenueLocation, formatDistance } from '../../services/geolocation';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface AttendanceCheckInProps {
   isOpen: boolean;
@@ -23,6 +24,8 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [locationInfo, setLocationInfo] = useState<string | null>(null);
   const [checkInResult, setCheckInResult] = useState<any>(null);
+  
+  const { modalProps } = useModalAccessibility(isOpen, onClose);
 
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,9 +109,13 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div 
+        {...modalProps}
+        aria-labelledby="checkin-title"
+        className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl outline-none"
+      >
         {/* Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6" aria-live="polite">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             {status === 'idle' && <MapPin className="w-8 h-8 text-primary" />}
             {status === 'locating' && <Loader className="w-8 h-8 text-primary animate-spin" />}
@@ -116,7 +123,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
             {status === 'success' && <CheckCircle className="w-8 h-8 text-green-500" />}
             {status === 'error' && <XCircle className="w-8 h-8 text-red-500" />}
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">
+          <h2 id="checkin-title" className="text-2xl font-bold text-foreground mb-2">
             {status === 'idle' && 'Check In to Session'}
             {status === 'locating' && 'Getting Location...'}
             {status === 'verifying' && 'Verifying...'}

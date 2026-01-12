@@ -97,6 +97,12 @@ export const courseApi = {
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/courses/${id}/`);
   },
+
+  // Get all course enrollments (optionally filtered)
+  getAllEnrollments: async (filters?: { student?: string; course?: number; active?: boolean }): Promise<any[]> => {
+    const response = await apiClient.get('/course-enrollments/', { params: filters });
+    return response.data.results || response.data;
+  },
 };
 
 // Attendance Session API
@@ -104,7 +110,7 @@ export const sessionApi = {
   // Get all sessions (optionally filtered)
   getAll: async (filters?: { course?: number; active?: boolean }): Promise<AttendanceSession[]> => {
     const response = await apiClient.get('/sessions/', { params: filters });
-    return response.data;
+    return response.data.results || response.data;
   },
 
   // Get session by ID
@@ -135,6 +141,18 @@ export const sessionApi = {
     const response = await apiClient.post(`/sessions/${sessionId}/check_in/`, data);
     return response.data.attendance;
   },
+
+  // Check in by session code (student only)
+  checkInByCode: async (code: string, data: CheckInData): Promise<Attendance> => {
+    const response = await apiClient.post(`/check-in/${code}/`, data);
+    return response.data.attendance || response.data;
+  },
+
+  // End a session (lecturer/admin only)
+  end: async (sessionId: number): Promise<AttendanceSession> => {
+    const response = await apiClient.post(`/sessions/${sessionId}/end/`);
+    return response.data;
+  },
 };
 
 // Attendance API
@@ -142,7 +160,7 @@ export const attendanceApi = {
   // Get all attendance records (optionally filtered)
   getAll: async (filters?: { session?: number; student?: string }): Promise<Attendance[]> => {
     const response = await apiClient.get('/attendances/', { params: filters });
-    return response.data;
+    return response.data.results || response.data;
   },
 
   // Get attendance by ID

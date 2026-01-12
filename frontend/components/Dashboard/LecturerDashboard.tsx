@@ -11,10 +11,13 @@ import { Venue as VenueType } from '../../types';
 import { analyticsApi, LecturerDashboardAnalytics, CourseAttendanceAnalytics } from '../../services/api/analytics';
 import { UserProfile } from '../../services/api/auth';
 import { CourseManagement } from './CourseManagement';
+import { LecturerAnalytics } from './LecturerAnalytics';
 import { institutionsApi } from '../../services/api/institutions';
 import { Department, Course as CourseType } from '../../types';
 import { coursesApi } from '../../services/api/courses';
 import { toast } from 'sonner';
+import { SessionDetailDialog } from '../Attendance/SessionDetailDialog';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -35,6 +38,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   // Modal states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  
+  const { modalProps: deleteModalProps } = useModalAccessibility(isDeleteModalOpen, () => setIsDeleteModalOpen(false));
 
   // Dashboard analytics state
   const [dashboardAnalytics, setDashboardAnalytics] = useState<LecturerDashboardAnalytics | null>(null);
@@ -159,7 +165,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   }
   
   if (view === 'analytics') {
-       return <div className="p-8 text-center text-zinc-500">Analytics Module Loading...</div>;
+       return <LecturerAnalytics />;
   }
 
   // Default Dashboard View
@@ -204,7 +210,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                     </div>
                     <h3 className="text-zinc-500 text-sm font-medium">Total Students</h3>
                 </div>
-                <p className="text-3xl font-bold text-zinc-900 dark:text-white">-</p>
+                <p className="text-3xl font-bold text-zinc-900 dark:text-white">{dashboardAnalytics?.total_students || 0}</p>
             </div>
         </div>
 
@@ -212,7 +218,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
             <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
                 <h3 className="font-bold text-zinc-900 dark:text-white">Recent Sessions</h3>
-                <Button variant="ghost" size="sm">View All</Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/sessions')}>View All</Button>
             </div>
             <div className="p-6">
                 {sessions.length === 0 ? (
@@ -225,26 +231,46 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                         <Button variant="secondary" onClick={() => navigate('/dashboard/sessions/new')}>Create Session</Button>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {sessions.map(session => (
-                            <div key={session.id} className="flex items-center justify-between p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {sessions.slice(0, 6).map(session => (
+                            <div 
+                                key={session.id} 
+                                onClick={() => setSelectedSession(session)}
+                                className="flex items-center justify-between p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-all cursor-pointer group hover:border-primary/30"
+                            >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
+                                    <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                                         {session.course_code?.substring(0,2) || 'CS'}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-zinc-900 dark:text-white">{session.course_code}</h4>
-                                        <div className="flex items-center gap-2 text-sm text-zinc-500">
+                                        <h4 className="font-bold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{session.course_code}</h4>
+                                        <div className="flex items-center gap-2 text-xs text-zinc-500">
                                             <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(session.created_at).toLocaleDateString()}</span>
                                             <span className="flex items-center gap-1"><Clock size={12}/> {new Date(session.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                     <span className={`px-2 py-1 rounded-md text-xs font-bold ${session.is_active ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
-                                         {session.is_active ? 'ACTIVE' : 'ENDED'}
-                                     </span>
-                                     <Button variant="ghost" size="icon"><MoreVertical size={16}/></Button>
+                                     {(() => {
+                                         const isExpired = session.is_active && new Date(session.end_time) < new Date();
+                                         return (
+                                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider ${session.is_active && !isExpired ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+                                                 {session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED'}
+                                             </span>
+                                         );
+                                     })()}
+                                     <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSessionToDelete(session.id.toString());
+                                            setIsDeleteModalOpen(true);
+                                        }}
+                                        className="text-zinc-400 hover:text-red-500"
+                                     >
+                                        <Trash2 size={16}/>
+                                     </Button>
                                 </div>
                             </div>
                         ))}
@@ -253,14 +279,29 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             </div>
         </div>
 
+      {selectedSession && (
+        <SessionDetailDialog 
+            session={selectedSession as any} 
+            onClose={() => setSelectedSession(null)}
+            onSessionEnded={() => {
+                fetchSessions();
+                fetchDashboardAnalytics();
+            }}
+        />
+      )}
+
 
 
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95">
+            <div 
+                {...deleteModalProps}
+                aria-labelledby="delete-title"
+                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 outline-none"
+            >
                 <div className="flex items-center gap-4 mb-4">
                     <div className="bg-red-500/10 p-3 rounded-full text-red-500"><Trash2 size={24} /></div>
-                    <div><h3 className="text-lg font-bold text-zinc-900 dark:text-white">Delete Session?</h3><p className="text-sm text-zinc-500">This action cannot be undone.</p></div>
+                    <div><h3 id="delete-title" className="text-lg font-bold text-zinc-900 dark:text-white">Delete Session?</h3><p className="text-sm text-zinc-500">This action cannot be undone.</p></div>
                 </div>
                 <div className="flex gap-3 mt-6">
                     <Button variant="secondary" className="flex-1" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>

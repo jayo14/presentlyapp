@@ -6,7 +6,7 @@ from .views import (
     register_view, login_view, google_auth_view, logout_view, current_user_view,
     complete_onboarding_view, change_password_view,
     send_verification_otp_view, verify_email_otp_view,
-    request_password_reset_view, reset_password_view, verify_reset_token_view,
+    request_password_reset_view, reset_password_view, verify_reset_token_view, public_check_in_view,
     InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
     CourseViewSet, CourseEnrollmentViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet,
     VenueViewSet, TimetableViewSet
@@ -46,7 +46,7 @@ urlpatterns = [
     path('auth/password-reset/confirm/', reset_password_view, name='reset-password'),
     
     # Public check-in (QR code URL)
-    path('check-in/<str:session_code>/', __import__('institutions.views', fromlist=['public_check_in_view']).public_check_in_view, name='public-check-in'),
+    path('check-in/<str:session_code>/', public_check_in_view, name='public-check-in'),
     
     # Include router URLs
     path('', include(router.urls)),

@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { Users, CheckCircle2, XCircle, Search, FileText, Calendar, Plus, Trash2, Clock, MapPin, Upload, Sparkles, Loader2, Save, X } from 'lucide-react';
 import { Input } from '../Input';
 import { analyzeTimetableImage } from '../../services/geminiService';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface ClassRepDashboardProps {
   userName: string;
@@ -35,6 +36,9 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
       venue: ''
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { modalProps: manualEntryProps } = useModalAccessibility(isTimetableModalOpen, () => setIsTimetableModalOpen(false));
+  const { modalProps: aiScanProps } = useModalAccessibility(isAiScanOpen, () => setIsAiScanOpen(false));
 
   const handleAddEntry = (e: React.FormEvent) => {
       e.preventDefault();
@@ -173,10 +177,14 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
             {/* Manual Entry Modal */}
             {isTimetableModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95">
+                    <div 
+                        {...manualEntryProps}
+                        aria-labelledby="manual-entry-title"
+                        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 outline-none"
+                    >
                         <div className="mb-6 flex justify-between items-center">
-                            <h3 className="text-xl font-bold text-white">Add Timetable Entry</h3>
-                            <button onClick={() => setIsTimetableModalOpen(false)}><X size={20} className="text-zinc-500 hover:text-white"/></button>
+                            <h3 id="manual-entry-title" className="text-xl font-bold text-white">Add Timetable Entry</h3>
+                            <button onClick={() => setIsTimetableModalOpen(false)} aria-label="Close dialog"><X size={20} className="text-zinc-500 hover:text-white"/></button>
                         </div>
                         <form onSubmit={handleAddEntry} className="space-y-4">
                             <Input 
@@ -231,15 +239,19 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
             {/* AI Scan Modal */}
             {isAiScanOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 text-center">
+                    <div 
+                        {...aiScanProps}
+                        aria-labelledby="ai-scan-title"
+                        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 text-center outline-none"
+                    >
                         <div className="flex justify-end">
-                            <button onClick={() => setIsAiScanOpen(false)}><X size={20} className="text-zinc-500 hover:text-white"/></button>
+                            <button onClick={() => setIsAiScanOpen(false)} aria-label="Close dialog"><X size={20} className="text-zinc-500 hover:text-white"/></button>
                         </div>
                         <div className="mb-6">
                             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
                                 <Sparkles size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Scan Timetable</h3>
+                            <h3 id="ai-scan-title" className="text-xl font-bold text-white mb-2">Scan Timetable</h3>
                             <p className="text-zinc-400 text-sm">Upload a photo of your class schedule, and AI will automatically extract the details.</p>
                         </div>
                         

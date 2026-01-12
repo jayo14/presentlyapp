@@ -4,7 +4,7 @@ import { Input } from '../Input';
 import { PasswordInput } from '../PasswordInput';
 import { Logo } from '../Logo';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLogin, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
@@ -13,6 +13,7 @@ import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const loginMutation = useLogin();
@@ -20,7 +21,16 @@ export const Login: React.FC = () => {
   const { data: user, isLoading } = useCurrentUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  const redirectTo = searchParams.get('redirect_to') || '/dashboard';
+  const message = searchParams.get('message');
+
   // Handle redirect result
+  useEffect(() => {
+    if (message) {
+        toast.info(message, { id: 'login-message' });
+    }
+  }, [message]);
+
   useEffect(() => {
     const handleRedirect = async () => {
       const auth = getFirebaseAuth();
@@ -53,13 +63,21 @@ export const Login: React.FC = () => {
   useEffect(() => {
     if (user && !isLoading) {
       setIsRedirecting(true);
+      const pendingCheckIn = localStorage.getItem('pending_checkin');
+      const explicitRedirect = searchParams.get('redirect_to');
+
       if (!user.onboarding_complete) {
         navigate('/onboarding', { replace: true });
+      } else if (explicitRedirect) {
+        navigate(explicitRedirect, { replace: true });
+      } else if (pendingCheckIn) {
+        localStorage.removeItem('pending_checkin');
+        navigate(`/check-in/${pendingCheckIn}`, { replace: true });
       } else {
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

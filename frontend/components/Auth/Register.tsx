@@ -4,7 +4,7 @@ import { Input } from '../Input';
 import { PasswordInput } from '../PasswordInput';
 import { Logo } from '../Logo';
 import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRegister, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
@@ -13,6 +13,7 @@ import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +21,8 @@ export const Register: React.FC = () => {
   const googleAuthMutation = useGoogleAuth();
   const { data: user, isLoading } = useCurrentUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  const redirectTo = searchParams.get('redirect_to') || '/dashboard';
 
   // Handle redirect result
   useEffect(() => {
@@ -56,10 +59,10 @@ export const Register: React.FC = () => {
       if (!user.onboarding_complete) {
         navigate('/onboarding', { replace: true });
       } else {
-        navigate('/dashboard', { replace: true });
+        navigate(redirectTo, { replace: true });
       }
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, redirectTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

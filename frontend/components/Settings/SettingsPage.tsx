@@ -12,6 +12,7 @@ import {
 import { useCurrentUser } from '../../hooks/useAuth';
 import ChangePasswordModal from './ChangePasswordModal';
 import { PushNotificationSettings } from '../PushNotifications/PushNotificationSettings';
+import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface SettingsPageProps {
   userRole?: UserRole;
@@ -29,6 +30,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [pendingSignature, setPendingSignature] = useState<string | null>(null);
+  
+  const { modalProps: reportModalProps } = useModalAccessibility(isReportModalOpen, () => setIsReportModalOpen(false));
   
   // Preference States - Initialize from user data when available
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
@@ -381,13 +384,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
       {/* Report Issue Modal */}
       {isReportModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
+            <div 
+                {...reportModalProps}
+                aria-labelledby="report-title"
+                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200 outline-none"
+            >
                 <div className="flex justify-between items-start mb-4">
                     <div>
-                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Report an Issue</h3>
+                        <h3 id="report-title" className="text-xl font-bold text-zinc-900 dark:text-white">Report an Issue</h3>
                         <p className="text-sm text-zinc-500">We appreciate your feedback!</p>
                     </div>
-                    <button onClick={() => setIsReportModalOpen(false)} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
+                    <button onClick={() => setIsReportModalOpen(false)} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white" aria-label="Close dialog">
                         <AlertTriangle size={20} className="hidden" /> {/* Dummy to keep imports happy if unused */}
                         <span className="text-2xl">&times;</span>
                     </button>

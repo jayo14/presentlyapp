@@ -34,7 +34,7 @@ class StudentDashboardAnalyticsView(APIView):
         enrollments = CourseEnrollment.objects.filter(
             student=user,
             is_active=True
-        ).select_related('course', 'course__department')
+        ).select_related('course').prefetch_related('course__department')
         
         enrolled_courses = []
         total_present = 0
@@ -216,11 +216,19 @@ class LecturerDashboardAnalyticsView(APIView):
         for session in weekly_sessions:
             day_name = session['start_time'].strftime('%a')
             weekly_data[day_name] += session['attendee_count']
+            
+        # Get total unique students enrolled in lecturer's courses
+        from institutions.models import CourseEnrollment
+        total_students = CourseEnrollment.objects.filter(
+            course__in=lecturer_courses,
+            is_active=True
+        ).values('student').distinct().count()
         
         return Response({
             'total_sessions': total_sessions,
             'avg_attendance_percentage': avg_attendance_pct,
             'active_sessions_count': active_sessions,
+            'total_students': total_students,
             'weekly_overview': [
                 {'name': day, 'attendees': count} 
                 for day, count in weekly_data.items()
