@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.utils import timezone
+from django.utils import timezone as django_timezone
 from django.core.validators import EmailValidator
 import uuid
 import random
@@ -237,11 +237,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     notifications_enabled = models.BooleanField(default=True)
     location_enabled = models.BooleanField(default=False)
     dark_mode = models.BooleanField(default=True)
+    timezone = models.CharField(max_length=50, default='UTC', help_text="User's preferred timezone")
     
     # Django required fields
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateTimeField(default=django_timezone.now)
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -503,6 +504,9 @@ class AttendanceSession(models.Model):
     title = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     
+    # Code expiry
+    expiry_time = models.DateTimeField(blank=True, null=True, help_text="Time when the session code expires")
+    
     # QR code data (will store URL for external access)
     qr_code_url = models.URLField(blank=True, null=True, help_text="URL that the QR code points to")
     
@@ -547,6 +551,13 @@ class AttendanceSession(models.Model):
             import string
             self.session_code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         
+        # Set expiry time if not set (default 30 mins after start)
+        if not self.expiry_time and self.start_time:
+            expiry = self.start_time + django_timezone.timedelta(minutes=30)
+            if self.end_time and expiry > self.end_time:
+                expiry = self.end_time
+            self.expiry_time = expiry
+        
         # Generate QR code URL if not set
         if not self.qr_code_url:
             from django.conf import settings
@@ -564,7 +575,7 @@ class AttendanceSession(models.Model):
     
     def is_within_time_range(self):
         """Check if current time is within session time"""
-        now = timezone.now()
+        now = django_timezone.now()
         return self.start_time <= now <= self.end_time
     
     def verify_location(self, student_lat, student_lng):
@@ -655,13 +666,24 @@ class EmailVerificationOTP(models.Model):
     
     def is_valid(self):
         """Check if OTP is still valid"""
-        return not self.is_used and timezone.now() < self.expires_at
+        return not self.is_used and django_timezone.now() < self.expires_at
     
     @staticmethod
     def generate_otp():
-        """Generate a 6-digit OTP"""
-        import random
-        return ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        """Generate a cryptographically secure 6-digit OTP"""
+        import secrets
+        return ''.join(secrets.choice(string.digits) for _ in range(6))
+    
+    @classmethod
+    def create_otp(cls, user):
+        """Create a new OTP for user"""
+        otp = cls.generate_otp()
+        expires_at = django_timezone.now() + django_timezone.timedelta(minutes=15)  # 15 minutes validity
+        return cls.objects.create(
+            user=user,
+            otp=otp,
+            expires_at=expires_at
+        )
 
 
 class Timetable(models.Model):
@@ -706,18 +728,3 @@ class Timetable(models.Model):
     
     def __str__(self):
         return f"{self.course.code} - {self.get_day_of_week_display()} {self.start_time}"
-    def generate_otp():
-        """Generate a cryptographically secure 6-digit OTP"""
-        import secrets
-        return ''.join(secrets.choice(string.digits) for _ in range(6))
-    
-    @classmethod
-    def create_otp(cls, user):
-        """Create a new OTP for user"""
-        otp = cls.generate_otp()
-        expires_at = timezone.now() + timezone.timedelta(minutes=15)  # 15 minutes validity
-        return cls.objects.create(
-            user=user,
-            otp=otp,
-            expires_at=expires_at
-        )

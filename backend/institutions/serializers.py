@@ -139,7 +139,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'institution', 'institution_name', 'college', 'college_name',
             'phone_number', 'matric_number', 'department', 'level',
             'staff_id', 'courses', 'assigned_lecturer',
-            'notifications_enabled', 'location_enabled', 'dark_mode',
+            'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'email', 'created_at', 'updated_at']
@@ -153,7 +153,7 @@ class OnboardingSerializer(serializers.ModelSerializer):
         fields = [
             'role', 'phone_number', 'matric_number', 'department', 'level',
             'staff_id', 'courses', 'assigned_lecturer', 'institution', 'college',
-            'avatar_url', 'notifications_enabled', 'location_enabled', 'dark_mode'
+            'avatar_url', 'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone'
         ]
     
     def update(self, instance, validated_data):

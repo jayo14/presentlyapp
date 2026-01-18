@@ -28,6 +28,7 @@ export interface OnboardingData {
   notifications_enabled?: boolean;
   location_enabled?: boolean;
   dark_mode?: boolean;
+  timezone?: string;
 }
 
 export interface UserProfile {
@@ -51,6 +52,7 @@ export interface UserProfile {
   notifications_enabled: boolean;
   location_enabled: boolean;
   dark_mode: boolean;
+  timezone: string;
   created_at: string;
   updated_at: string;
 }
