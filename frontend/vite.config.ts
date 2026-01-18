@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => {
                 if (id.includes('firebase')) {
                   return 'vendor-firebase';
                 }
-                return 'vendor-others';
+                // return 'vendor-others';
               }
             },
           },

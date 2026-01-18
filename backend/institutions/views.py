@@ -1136,6 +1136,13 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 'error': 'Invalid session code'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Check code expiry
+        if session.expiry_time and timezone.now() > session.expiry_time:
+             return Response({
+                'success': False,
+                'error': 'Session code has expired'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         if request.user.role != UserRole.STUDENT:
             return Response({
                 'success': False,
@@ -1385,6 +1392,13 @@ def public_check_in_view(request, session_code):
             return Response({
                 'success': False,
                 'error': 'This session is not active'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check code expiry
+        if session.expiry_time and timezone.now() > session.expiry_time:
+             return Response({
+                'success': False,
+                'error': 'Session code has expired'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if session has ended
