@@ -18,6 +18,7 @@ import { coursesApi } from '../../services/api/courses';
 import { toast } from 'sonner';
 import { SessionDetailDialog } from '../Attendance/SessionDetailDialog';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import { AttendanceReport } from './AttendanceReport';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -157,7 +158,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   }
 
   if (view === 'reports') {
-      return <div className="p-8 text-center text-zinc-500">Reports Module Loading...</div>;
+      return <AttendanceReport />;
   }
   
   if (view === 'timetable') {
