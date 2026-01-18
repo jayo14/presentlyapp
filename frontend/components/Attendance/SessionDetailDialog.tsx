@@ -141,9 +141,19 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
               <div className="bg-white p-4 rounded-2xl shadow-lg border border-zinc-100 mb-6">
                 <QRCodeSVG value={sessionUrl} size={200} level="H" includeMargin />
               </div>
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 group relative">
                 <div className="text-xs uppercase tracking-widest font-bold text-zinc-400">Session Code</div>
-                <div className="text-3xl font-black text-primary font-mono tracking-tighter">{session.session_code}</div>
+                <div 
+                  className="text-3xl font-black text-primary font-mono tracking-tighter cursor-pointer flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
+                  onClick={() => {
+                    navigator.clipboard.writeText(session.session_code);
+                    toast.success('Code copied to clipboard');
+                  }}
+                  title="Click to copy code"
+                >
+                  {session.session_code}
+                  <Copy size={20} className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
+                </div>
               </div>
             </div>
 

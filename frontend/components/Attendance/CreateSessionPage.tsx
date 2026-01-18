@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, BookOpen, Clock, Calendar, CheckCircle2, ChevronDown, Search } from 'lucide-react';
+import { ArrowLeft, MapPin, BookOpen, Clock, Calendar, CheckCircle2, ChevronDown, Search, Building2, GraduationCap, Edit2, X, AlertCircle, Check } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { useCurrentUser } from '../../hooks/useAuth';
@@ -25,9 +25,13 @@ export const CreateSessionPage: React.FC = () => {
     // Selection State
     const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
     const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
-    const [selectedDepartment, setSelectedDepartment] = useState<number | null>(null);
+    const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<string>('');
     const [selectedVenue, setSelectedVenue] = useState<string>('');
+    
+    // UX State
+    const [isHierarchyExpanded, setIsHierarchyExpanded] = useState(true);
+    const [deptSearchTerm, setDeptSearchTerm] = useState('');
     
     // Session Details State
     const [duration, setDuration] = useState<string>('60');
@@ -35,9 +39,9 @@ export const CreateSessionPage: React.FC = () => {
     
     // UI State
     const [loading, setLoading] = useState(false);
-    const [deptSearchTerm, setDeptSearchTerm] = useState('');
     const [createdSession, setCreatedSession] = useState<Session | null>(null);
 
+    // Initial Load & Defaults
     useEffect(() => {
         loadInitialData();
     }, [user]);
@@ -51,6 +55,8 @@ export const CreateSessionPage: React.FC = () => {
             setColleges([]);
             setDepartments([]);
         }
+        setSelectedDepartments([]);
+        setCourses([]);
     }, [selectedInstitution]);
 
     useEffect(() => {
@@ -59,17 +65,16 @@ export const CreateSessionPage: React.FC = () => {
         } else if (selectedInstitution) {
             loadDepartmentsByInstitution(selectedInstitution);
         }
+        setSelectedDepartments([]);
     }, [selectedCollege]);
 
     useEffect(() => {
-        if (selectedDepartment) {
-            loadCourses(selectedDepartment);
+        if (selectedDepartments.length > 0) {
+            loadCoursesForDepartments(selectedDepartments);
         } else {
-            // If no department selected, but we have institution, maybe show all? 
-            // Or wait for department. For now, clear courses to encourage specific selection.
              setCourses([]);
         }
-    }, [selectedDepartment]);
+    }, [selectedDepartments]);
 
     const loadInitialData = async () => {
         try {
@@ -81,13 +86,18 @@ export const CreateSessionPage: React.FC = () => {
             setInstitutions(Array.isArray(instData) ? instData : []);
             setVenues(Array.isArray(venuesData) ? venuesData : []);
 
-            // Pre-fill if user has data
+            // Smart Pre-fill
             if (user?.institution) {
                 setSelectedInstitution(user.institution);
-                // If user has college, set it (logic depends on if API returns it in profile)
                 if (user.college) setSelectedCollege(user.college);
-                // Same for department
-                if (user.department) setSelectedDepartment(user.department);
+                
+                if (user.department) {
+                    setSelectedDepartments([user.department]);
+                    // Only auto-collapse if we have a department. 
+                    // But since user might want to add more, maybe don't collapse?
+                    // Let's collapse for cleaner default, user can expand to add more.
+                    setIsHierarchyExpanded(false); 
+                }
             }
         } catch (err) {
             console.error('Failed to load initial data', err);
@@ -116,15 +126,26 @@ export const CreateSessionPage: React.FC = () => {
         } catch (err) { console.error(err); }
     };
 
-    const loadCourses = async (deptId: number) => {
+    const loadCoursesForDepartments = async (deptIds: number[]) => {
         try {
-            // Fetch courses filtered by department
-            // Also consider filtering by lecturer if needed, but requirements say "courses for that lecturer's institution and department"
-            // We can assume fetching by department is sufficient, or we could filter client-side if the API supported fetching all lecturer courses.
-            // Using the existing API:
-            const data = await courseApi.getAll({ department: deptId });
-            setCourses(Array.isArray(data) ? data : []);
+            // Fetch courses for ALL selected departments
+            const promises = deptIds.map(id => courseApi.getAll({ department: id }));
+            const results = await Promise.all(promises);
+            // Flatten and deduplicate by ID
+            const allCourses = results.flat();
+            const uniqueCourses = Array.from(new Map(allCourses.map(c => [c.id, c])).values());
+            setCourses(uniqueCourses);
         } catch (err) { console.error(err); }
+    };
+
+    const toggleDepartment = (deptId: number) => {
+        setSelectedDepartments(prev => {
+            if (prev.includes(deptId)) {
+                return prev.filter(id => id !== deptId);
+            } else {
+                return [...prev, deptId];
+            }
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -145,19 +166,9 @@ export const CreateSessionPage: React.FC = () => {
             const session = await sessionApi.create({
                 course: parseInt(selectedCourse),
                 venue: parseInt(selectedVenue),
-                // Calculate end time based on duration? 
-                // The API seems to take start/end time usually, but the previous modal took duration.
-                // Looking at the previous modal code:
-                /* 
-                   const endTime = new Date(Date.now() + durationInMs);
-                   ... 
-                   start_time: new Date().toISOString(),
-                   end_time: endTime.toISOString(),
-                */
-               // So we need to calculate times here.
-               start_time: new Date().toISOString(),
-               end_time: new Date(Date.now() + durationInMinutes * 60000).toISOString(),
-               is_active: true
+                start_time: new Date().toISOString(),
+                end_time: new Date(Date.now() + durationInMinutes * 60000).toISOString(),
+                is_active: true
             });
 
             toast.success('Session created successfully');
@@ -180,112 +191,170 @@ export const CreateSessionPage: React.FC = () => {
         }
     };
 
+    const QuickDurationChip = ({ label, mins }: { label: string, mins: number }) => (
+        <button
+            type="button"
+            onClick={() => { setDuration(mins.toString()); setDurationUnit('minutes'); }}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                duration === mins.toString() && durationUnit === 'minutes'
+                ? 'bg-primary text-black ring-2 ring-primary/20' 
+                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+            }`}
+        >
+            {label}
+        </button>
+    );
+
+    const filteredDepartments = departments.filter(d => 
+        d.name.toLowerCase().includes(deptSearchTerm.toLowerCase()) || 
+        d.code.toLowerCase().includes(deptSearchTerm.toLowerCase())
+    );
+
     return (
-        <div className="max-w-4xl mx-auto space-y-6 animate-in slide-in-from-right-4 duration-300 pb-12" onKeyDown={handleKeyDown}>
+        <div className="max-w-2xl mx-auto space-y-6 animate-in slide-in-from-right-4 duration-300 pb-12" onKeyDown={handleKeyDown}>
             {createdSession && (
                 <SessionDetailDialog 
                     session={createdSession as any} 
                     onClose={() => navigate('/dashboard')} 
                 />
             )}
-            <div className="flex items-center gap-4">
+            
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-2">
                 <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')} aria-label="Go back">
                     <ArrowLeft size={20} />
                 </Button>
                 <div>
-                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Create New Session</h2>
-                    <p className="text-zinc-500">Set up a new attendance session for your course.</p>
+                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Create Session</h2>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Context Selection */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Hierarchy Card */}
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-6">
-                        <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                            <div className="bg-blue-500/10 p-2 rounded-lg text-blue-500">
-                                <MapPin size={20} />
+            <form onSubmit={handleSubmit} className="space-y-6">
+                
+                {/* 1. Location / Context Section */}
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+                    {/* Collapsed View (Summary) */}
+                    {!isHierarchyExpanded && selectedDepartments.length > 0 ? (
+                        <div className="p-4 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
+                                    <Building2 size={20} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-zinc-500 uppercase tracking-wide font-bold">Departments</p>
+                                    <p className="font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                                        {selectedDepartments.length} Selected
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-zinc-900 dark:text-white">Location in Hierarchy</h3>
-                                <p className="text-xs text-zinc-500">Select the institutional hierarchy: Institution → College/Faculty → Department</p>
-                            </div>
+                            <Button variant="ghost" size="sm" onClick={() => setIsHierarchyExpanded(true)} type="button" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
+                                <Edit2 size={14} className="mr-2" /> Change
+                            </Button>
                         </div>
+                    ) : (
+                        /* Expanded View (Form) */
+                        <div className="p-6 space-y-5 animate-in slide-in-from-top-2">
+                            <div className="flex justify-between items-start">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-lg text-zinc-600 dark:text-zinc-400">
+                                        <MapPin size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-zinc-900 dark:text-white">Location Context</h3>
+                                        <p className="text-xs text-zinc-500">Where does this course belong?</p>
+                                    </div>
+                                </div>
+                                {selectedDepartments.length > 0 && (
+                                    <Button variant="ghost" size="icon" onClick={() => setIsHierarchyExpanded(false)} type="button" className="h-8 w-8 -mt-2 -mr-2 text-zinc-400">
+                                        <X size={16} />
+                                    </Button>
+                                )}
+                            </div>
 
-                        <div className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Institution <span className="text-red-500">*</span></label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedInstitution || ''}
-                                        onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none"
-                                        required
-                                    >
-                                        <option value="">Select Institution</option>
-                                        {institutions.map(inst => (
-                                            <option key={inst.id} value={inst.id}>{inst.full_name}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-zinc-500 uppercase mb-1.5">Institution</label>
+                                    <div className="relative">
+                                        <select
+                                            value={selectedInstitution || ''}
+                                            onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
+                                        >
+                                            <option value="">Select Institution</option>
+                                            {institutions.map(inst => (
+                                                <option key={inst.id} value={inst.id}>{inst.full_name}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-zinc-500 uppercase mb-1.5">College (Optional)</label>
+                                    <div className="relative">
+                                        <select
+                                            value={selectedCollege || ''}
+                                            onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
+                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50"
+                                            disabled={!selectedInstitution}
+                                        >
+                                            <option value="">All Colleges</option>
+                                            {colleges.map(col => (
+                                                <option key={col.id} value={col.id}>{col.name}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
+                                    </div>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">College / Faculty</label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedCollege || ''}
-                                        onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none disabled:opacity-50"
-                                        disabled={!selectedInstitution}
-                                    >
-                                        <option value="">Select College (Optional)</option>
-                                        {colleges.map(col => (
-                                            <option key={col.id} value={col.id}>{col.name}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-xs font-medium text-zinc-500 uppercase">Select Departments</label>
+                                    <span className="text-xs text-primary font-medium">{selectedDepartments.length} selected</span>
                                 </div>
-                                <p className="text-xs text-zinc-500 mt-1">Optional: Select a college to filter departments</p>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Department <span className="text-red-500">*</span></label>
                                 {selectedInstitution ? (
                                     <div className="space-y-3">
                                         <div className="relative">
                                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                                             <input
                                                 type="text"
-                                                placeholder="Search departments..."
+                                                placeholder="Filter departments..."
                                                 value={deptSearchTerm}
                                                 onChange={(e) => setDeptSearchTerm(e.target.value)}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                                             />
                                         </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
-                                            {departments
-                                                .filter(d => d.name.toLowerCase().includes(deptSearchTerm.toLowerCase()) || d.code.toLowerCase().includes(deptSearchTerm.toLowerCase()))
-                                                .map(dept => (
-                                                    <button
+                                        
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                                            {filteredDepartments.map(dept => {
+                                                const isSelected = selectedDepartments.includes(dept.id);
+                                                return (
+                                                    <div
                                                         key={dept.id}
-                                                        type="button"
-                                                        onClick={() => setSelectedDepartment(dept.id)}
-                                                        className={`text-left p-3 rounded-lg border text-sm transition-all ${
-                                                            selectedDepartment === dept.id
-                                                            ? 'bg-primary/5 border-primary text-primary shadow-sm' 
-                                                            : 'bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
+                                                        onClick={() => toggleDepartment(dept.id)}
+                                                        className={`cursor-pointer p-3 rounded-xl border transition-all relative group ${
+                                                            isSelected
+                                                            ? 'bg-primary/10 border-primary shadow-sm' 
+                                                            : 'bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                                                         }`}
                                                     >
-                                                        <div className="font-semibold truncate">{dept.name}</div>
-                                                        <div className="text-xs opacity-70 font-mono">{dept.code}</div>
-                                                    </button>
-                                                ))
-                                            }
-                                            {departments.length === 0 && (
-                                                <div className="col-span-full text-center py-4 text-zinc-500 text-sm italic">
+                                                        <div className="flex justify-between items-start">
+                                                            <div>
+                                                                <h4 className={`font-semibold text-sm ${isSelected ? 'text-primary' : 'text-zinc-900 dark:text-white'}`}>{dept.name}</h4>
+                                                                <p className="text-xs opacity-70 font-mono mt-0.5">{dept.code}</p>
+                                                            </div>
+                                                            {isSelected && (
+                                                                <div className="bg-primary text-black rounded-full p-0.5">
+                                                                    <Check size={12} strokeWidth={3} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            {filteredDepartments.length === 0 && (
+                                                <div className="col-span-full text-center py-6 text-zinc-500 text-sm italic bg-zinc-50 dark:bg-zinc-950 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
                                                     No departments found.
                                                 </div>
                                             )}
@@ -298,126 +367,104 @@ export const CreateSessionPage: React.FC = () => {
                                 )}
                             </div>
                         </div>
+                    )}
+                </div>
+
+                {/* 2. Core Session Details */}
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm space-y-6">
+                    <div>
+                        <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Select Course</label>
+                        <div className="relative">
+                            <select
+                                value={selectedCourse}
+                                onChange={(e) => setSelectedCourse(e.target.value)}
+                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50 transition-all"
+                                disabled={selectedDepartments.length === 0}
+                                required
+                            >
+                                <option value="">Select a course...</option>
+                                {courses.map(course => (
+                                    <option key={course.id} value={course.id}>{course.code} - {course.title}</option>
+                                ))}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={20} />
+                        </div>
+                        {selectedDepartments.length === 0 && <p className="text-xs text-amber-500 mt-2 flex items-center gap-1"><AlertCircle size={12}/> Please select at least one department above first.</p>}
                     </div>
 
-                    {/* Session Details Card */}
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-6">
-                        <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                            <div className="bg-primary/10 p-2 rounded-lg text-primary">
-                                <BookOpen size={20} />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-zinc-900 dark:text-white">Session Details</h3>
-                                <p className="text-xs text-zinc-500">Configure the course and timing</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Venue</label>
+                            <div className="relative">
+                                <select
+                                    value={selectedVenue}
+                                    onChange={(e) => setSelectedVenue(e.target.value)}
+                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
+                                    required
+                                >
+                                    <option value="">Select venue...</option>
+                                    {venues.map(venue => (
+                                        <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
                             </div>
                         </div>
 
-                        <div className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Select Course <span className="text-red-500">*</span></label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedCourse}
-                                        onChange={(e) => setSelectedCourse(e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none disabled:opacity-50"
-                                        disabled={!selectedDepartment}
-                                        required
-                                    >
-                                        <option value="">Select a course...</option>
-                                        {courses.map(course => (
-                                            <option key={course.id} value={course.id}>{course.code} - {course.title}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
-                                </div>
-                                {!selectedDepartment && <p className="text-xs text-amber-500 mt-1">Select a department above to see available courses.</p>}
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Select Venue <span className="text-red-500">*</span></label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedVenue}
-                                        onChange={(e) => setSelectedVenue(e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none"
-                                        required
-                                    >
-                                        <option value="">Select a venue...</option>
-                                        {venues.map(venue => (
-                                            <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity || 'N/A'} seats)</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Duration <span className="text-red-500">*</span></label>
-                                <div className="flex gap-2">
+                        <div>
+                            <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Duration</label>
+                            <div className="flex gap-2 mb-2">
+                                <div className="relative flex-1">
                                     <Input 
                                         type="number" 
                                         min="1"
-                                        className="flex-1" 
+                                        className="w-full" 
                                         placeholder="60" 
                                         value={duration} 
                                         onChange={e => setDuration(e.target.value)} 
                                         required 
                                     />
-                                    <div className="relative w-1/3">
-                                        <select 
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-zinc-900 dark:text-white text-sm focus:ring-primary focus:border-primary outline-none appearance-none"
-                                            value={durationUnit}
-                                            onChange={(e) => setDurationUnit(e.target.value as any)}
-                                        >
-                                            <option value="minutes">Minutes</option>
-                                            <option value="hours">Hours</option>
-                                        </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
-                                    </div>
                                 </div>
-                                <p className="text-xs text-zinc-500 mt-1">Session will auto-expire after this time.</p>
+                                <div className="relative w-28">
+                                    <select 
+                                        className="w-full h-[42px] bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 text-sm focus:ring-primary focus:border-primary outline-none appearance-none"
+                                        value={durationUnit}
+                                        onChange={(e) => setDurationUnit(e.target.value as any)}
+                                    >
+                                        <option value="minutes">Mins</option>
+                                        <option value="hours">Hours</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
+                                </div>
+                            </div>
+                            <div className="flex gap-2 flex-wrap">
+                                <QuickDurationChip label="45m" mins={45} />
+                                <QuickDurationChip label="1h" mins={60} />
+                                <QuickDurationChip label="1.5h" mins={90} />
+                                <QuickDurationChip label="2h" mins={120} />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Column: Summary & Actions */}
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm sticky top-6">
-                        <h3 className="font-semibold text-zinc-900 dark:text-white mb-4">Start Session</h3>
-                        
-                        <div className="space-y-4 mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-                           <p>Please review your details before starting. Once started, students will be able to check in via QR code or geolocation.</p>
-                           
-                           {selectedCourse && (
-                               <div className="p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                                   <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Course</div>
-                                   <div className="font-semibold text-zinc-900 dark:text-white">
-                                       {courses.find(c => c.id.toString() === selectedCourse)?.code}
-                                   </div>
-                               </div>
-                           )}
-                           
-                           {selectedVenue && (
-                               <div className="p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                                   <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Venue</div>
-                                   <div className="font-semibold text-zinc-900 dark:text-white">
-                                       {venues.find(v => v.id.toString() === selectedVenue)?.name}
-                                   </div>
-                               </div>
-                           )}
+                {/* Action Bar */}
+                <div className="sticky bottom-4 z-10">
+                     <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4">
+                        <div className="hidden sm:block">
+                            <p className="text-sm font-medium text-zinc-900 dark:text-white">Ready to start?</p>
+                            <p className="text-xs text-zinc-500">Students can join immediately.</p>
                         </div>
-
-                        <div className="space-y-3">
-                            <Button type="submit" className="w-full justify-center" disabled={loading}>
-                                {loading ? 'Creating...' : 'Create & Start'}
-                            </Button>
-                            <Button variant="secondary" className="w-full justify-center" onClick={() => navigate('/dashboard')} type="button">
+                        <div className="flex gap-3 w-full sm:w-auto">
+                            <Button variant="secondary" className="flex-1 sm:flex-none" onClick={() => navigate('/dashboard')} type="button">
                                 Cancel
                             </Button>
+                            <Button type="submit" className="flex-1 sm:flex-none min-w-[140px]" disabled={loading}>
+                                {loading ? 'Starting...' : 'Create Session'}
+                            </Button>
                         </div>
-                    </div>
+                     </div>
                 </div>
+
             </form>
         </div>
     );
