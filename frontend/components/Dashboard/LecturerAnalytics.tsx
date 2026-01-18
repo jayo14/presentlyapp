@@ -295,128 +295,83 @@ export const LecturerAnalytics: React.FC = () => {
              ))}
           </div>
         ) : courseAnalytics ? (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            {/* Student Attendance Table */}
-            <div className="xl:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
-               <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
-                  <h4 className="font-bold">Student Participation</h4>
-                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{courseAnalytics.students.length} Total Enrolled</span>
-               </div>
-               <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-500 uppercase text-[10px] font-black tracking-widest border-b border-zinc-100 dark:border-zinc-800">
-                      <tr>
-                        <th className="px-6 py-4">Student</th>
-                        <th className="px-6 py-4">Matric No.</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4 text-right">Rate</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                      {courseAnalytics.students
-                        .filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.matric.includes(searchTerm))
-                        .slice(0, 10)
-                        .map(student => (
-                        <tr key={student.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-950/50 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="font-bold text-zinc-900 dark:text-white">{student.name}</div>
-                            <div className="text-[10px] text-zinc-500">{student.department} • Level {student.level}</div>
-                          </td>
-                          <td className="px-6 py-4 font-mono text-zinc-500">{student.matric}</td>
-                          <td className="px-6 py-4">
-                             {student.percentage >= courseAnalytics.benchmark ? (
-                               <span className="flex items-center gap-1.5 text-green-500 font-bold">
-                                 <CheckCircle2 size={14} /> Clear
-                               </span>
-                             ) : (
-                               <span className="flex items-center gap-1.5 text-red-500 font-bold">
-                                 <AlertCircle size={14} /> At Risk
-                               </span>
-                             )}
-                          </td>
-                          <td className="px-6 py-4 text-right font-black">
-                             {student.percentage.toFixed(0)}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-               </div>
-               {courseAnalytics.students.length > 10 && (
-                 <div className="p-4 bg-zinc-50/50 dark:bg-zinc-900/50 text-center border-t border-zinc-100 dark:border-zinc-800">
-                    <button className="text-xs font-bold text-primary hover:underline flex items-center gap-1 mx-auto">
-                      View all students <ArrowRight size={14} />
-                    </button>
-                 </div>
-               )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Course Summary Card */}
+            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                  <BookOpen size={120} />
+              </div>
+              <h4 className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-1">Course Summary</h4>
+              <h3 className="text-3xl font-black text-white mb-8">{courseAnalytics.course_code}</h3>
+              
+              <div className="grid grid-cols-2 gap-8 relative z-10 mb-8">
+                  <div>
+                    <span className="text-zinc-400 text-sm block mb-1">Total Sessions</span>
+                    <span className="text-2xl font-bold text-white">{courseAnalytics.total_sessions}</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-400 text-sm block mb-1">Benchmark</span>
+                    <span className="text-2xl font-bold text-primary">{courseAnalytics.benchmark}%</span>
+                  </div>
+              </div>
+              
+              <div className="pt-6 border-t border-zinc-800 relative z-10">
+                  <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 flex justify-between">
+                    <span>Health Status</span>
+                    <span className="text-white">{courseAnalytics.avg_attendance.toFixed(0)}%</span>
+                  </div>
+                  <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary" 
+                        style={{width: `${courseAnalytics.avg_attendance}%`}}
+                      ></div>
+                  </div>
+              </div>
             </div>
 
-            {/* Course Summary Sidebar */}
-            <div className="space-y-6">
-               <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                     <BookOpen size={80} />
-                  </div>
-                  <h4 className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-1">Course Summary</h4>
-                  <h3 className="text-2xl font-black text-white mb-6">{courseAnalytics.course_code}</h3>
-                  
-                  <div className="space-y-4 relative z-10">
-                     <div className="flex justify-between items-center text-sm">
-                        <span className="text-zinc-400">Total Sessions</span>
-                        <span className="font-bold text-white">{courseAnalytics.total_sessions}</span>
-                     </div>
-                     <div className="flex justify-between items-center text-sm">
-                        <span className="text-zinc-400">Benchmark</span>
-                        <span className="font-bold text-primary">{courseAnalytics.benchmark}%</span>
-                     </div>
-                     <div className="pt-4 border-t border-zinc-800">
-                        <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Health Status</div>
-                        <div className="flex items-center gap-3">
-                           <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-primary" 
-                                style={{width: `${courseAnalytics.avg_attendance}%`}}
-                              ></div>
-                           </div>
-                           <span className="text-sm font-black text-white">{courseAnalytics.avg_attendance.toFixed(0)}%</span>
+            {/* At-Risk Alerts */}
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm flex flex-col">
+              <div className="flex justify-between items-center mb-6">
+                <h4 className="font-bold flex items-center gap-2 text-lg">
+                    <AlertCircle size={20} className="text-red-500" />
+                    At-Risk Alerts
+                </h4>
+                <span className="bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 px-2 py-1 rounded-lg text-xs font-bold">
+                  {courseAnalytics.at_risk_count} Students
+                </span>
+              </div>
+              
+              <div className="flex-1 space-y-4 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                  {courseAnalytics.students
+                    .filter(s => s.percentage < courseAnalytics.benchmark)
+                    .map(student => (
+                    <div key={student.id} className="flex items-center gap-4 p-4 rounded-xl bg-red-50 dark:bg-red-900/5 border border-red-100 dark:border-red-900/10">
+                        <div className="w-10 h-10 rounded-full bg-red-200 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 font-bold">
+                          {student.name.substring(0, 1)}
                         </div>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
-                  <h4 className="font-bold mb-4 flex items-center gap-2">
-                     <AlertCircle size={18} className="text-red-500" />
-                     At-Risk Alerts
-                  </h4>
-                  <div className="space-y-4">
-                     {courseAnalytics.students
-                        .filter(s => s.percentage < courseAnalytics.benchmark)
-                        .slice(0, 3)
-                        .map(student => (
-                        <div key={student.id} className="flex items-center gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/10">
-                           <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 text-xs font-bold">
-                              {student.name.substring(0, 1)}
-                           </div>
-                           <div className="flex-1 min-w-0">
-                              <div className="text-sm font-bold truncate">{student.name}</div>
-                              <div className="text-[10px] text-zinc-500 font-medium italic">{student.percentage.toFixed(0)}% attendance rate</div>
-                           </div>
-                           <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400">
-                              <ArrowRight size={14} />
-                           </Button>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-zinc-900 dark:text-white truncate">{student.name}</div>
+                          <div className="text-xs text-red-600 dark:text-red-400 font-medium">
+                            {student.percentage.toFixed(0)}% attendance • {student.department}
+                          </div>
                         </div>
-                     ))}
-                     {courseAnalytics.at_risk_count > 3 && (
-                        <p className="text-xs text-center text-zinc-500 font-medium italic">
-                           + {courseAnalytics.at_risk_count - 3} more at risk students
-                        </p>
-                     )}
-                     <Button className="w-full bg-zinc-900 dark:bg-black border border-zinc-800 text-xs font-bold h-10">
-                        Send Bulk Reminders
-                     </Button>
-                  </div>
-               </div>
+                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary">
+                          <ArrowRight size={16} />
+                        </Button>
+                    </div>
+                  ))}
+                  {courseAnalytics.at_risk_count === 0 && (
+                    <div className="text-center py-12 text-zinc-500 italic">
+                      No students currently at risk.
+                    </div>
+                  )}
+              </div>
+              
+              <div className="pt-6 mt-auto border-t border-zinc-100 dark:border-zinc-800">
+                <Button className="w-full bg-zinc-900 dark:bg-black border border-zinc-800 font-bold h-12 rounded-xl hover:bg-zinc-800">
+                    Send Bulk Reminders
+                </Button>
+              </div>
             </div>
           </div>
         ) : (

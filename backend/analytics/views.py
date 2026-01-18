@@ -288,17 +288,27 @@ class CourseAttendanceAnalyticsView(APIView):
         
         # Get enrolled students for this course using the enrollment system
         from institutions.models import CourseEnrollment
-        enrolled_students = CourseEnrollment.objects.filter(
+        enrolled_student_ids = CourseEnrollment.objects.filter(
             course=course,
             is_active=True
-        ).select_related('student')
+        ).values_list('student_id', flat=True)
+        
+        # Get students who have attended at least one session but might not be enrolled
+        attending_student_ids = Attendance.objects.filter(
+            session__course=course
+        ).values_list('student_id', flat=True).distinct()
+        
+        # Combine both sets of student IDs
+        all_student_ids = set(enrolled_student_ids) | set(attending_student_ids)
+        
+        # Fetch user objects
+        all_students = User.objects.filter(id__in=all_student_ids)
         
         # Build student analytics
         student_analytics = []
         benchmark = int(request.GET.get('benchmark', 70))
         
-        for enrollment in enrolled_students:
-            student = enrollment.student
+        for student in all_students:
             attended_count = Attendance.objects.filter(
                 student=student,
                 session__course=course
