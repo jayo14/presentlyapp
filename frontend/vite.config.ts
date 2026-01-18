@@ -23,31 +23,7 @@ export default defineConfig(({ mode }) => {
         // Enable code splitting
         rollupOptions: {
           output: {
-            manualChunks: (id) => {
-              if (id.includes('node_modules')) {
-                // Core React dependencies - keep these together and load first
-                if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) {
-                  return 'vendor-react';
-                }
-                
-                // Specific large libraries
-                if (id.includes('@tanstack/react-query')) {
-                  return 'vendor-query';
-                }
-                if (id.includes('lucide-react') || id.includes('framer-motion')) {
-                  return 'vendor-ui';
-                }
-                if (id.includes('mapbox-gl') || id.includes('maplibre-gl') || id.includes('react-map-gl')) {
-                  return 'vendor-maps';
-                }
-                // if (id.includes('recharts') || id.includes('d3') || id.includes('react-smooth')) {
-                //   return 'vendor-charts';
-                // }
-                if (id.includes('firebase')) {
-                  return 'vendor-firebase';
-                }
-              }
-            },
+            // manualChunks removed to let Vite optimize chunks automatically and avoid circular dependencies
           },
         },
         // Optimize chunk size
