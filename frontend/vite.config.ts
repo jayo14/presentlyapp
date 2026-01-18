@@ -25,9 +25,12 @@ export default defineConfig(({ mode }) => {
           output: {
             manualChunks: (id) => {
               if (id.includes('node_modules')) {
-                if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                // Core React dependencies - keep these together and load first
+                if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) {
                   return 'vendor-react';
                 }
+                
+                // Specific large libraries
                 if (id.includes('@tanstack/react-query')) {
                   return 'vendor-query';
                 }
@@ -37,13 +40,12 @@ export default defineConfig(({ mode }) => {
                 if (id.includes('mapbox-gl') || id.includes('maplibre-gl') || id.includes('react-map-gl')) {
                   return 'vendor-maps';
                 }
-                if (id.includes('recharts')) {
-                  return 'vendor-charts';
-                }
+                // if (id.includes('recharts') || id.includes('d3') || id.includes('react-smooth')) {
+                //   return 'vendor-charts';
+                // }
                 if (id.includes('firebase')) {
                   return 'vendor-firebase';
                 }
-                // return 'vendor-others';
               }
             },
           },
