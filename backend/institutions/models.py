@@ -615,7 +615,7 @@ class Attendance(models.Model):
     
     # Distance from venue center (for analytics)
     distance_from_venue = models.DecimalField(
-        max_digits=8, 
+        max_digits=20, 
         decimal_places=2, 
         blank=True, 
         null=True,
