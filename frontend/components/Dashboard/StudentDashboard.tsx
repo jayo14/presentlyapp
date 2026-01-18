@@ -330,9 +330,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
   const [analyticsData, setAnalyticsData] = useState<StudentAnalytics | null>(null);
   
-  // Load dashboard data on mount
+  // Load dashboard data on mount and setup auto-refresh
   useEffect(() => {
     loadDashboardData();
+
+    const interval = setInterval(() => {
+        loadDashboardData();
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
   
   // Load timetable data when view changes to timetable

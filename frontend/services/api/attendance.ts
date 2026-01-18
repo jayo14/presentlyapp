@@ -50,6 +50,7 @@ export interface Attendance {
   student: string;
   student_name?: string;
   student_matric?: string;
+  student_department?: string;
   course_code?: string;
   checked_in_at: string;
   latitude?: number;

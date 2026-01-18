@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Q, Avg, F
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from datetime import timedelta
 from institutions.models import AttendanceSession, Attendance, Course, User, UserRole
 
@@ -163,6 +166,9 @@ class StudentDashboardAnalyticsView(APIView):
 
 class LecturerDashboardAnalyticsView(APIView):
     permission_classes = [IsAuthenticated]
+    
+    @method_decorator(cache_page(60))
+    @method_decorator(vary_on_headers('Authorization'))
     def get(self, request):
         """
         Get comprehensive dashboard analytics for lecturer
@@ -256,6 +262,9 @@ class AttendanceTrendsView(APIView):
 
 class CourseAttendanceAnalyticsView(APIView):
     permission_classes = [IsAuthenticated]
+    
+    @method_decorator(cache_page(30))
+    @method_decorator(vary_on_headers('Authorization'))
     def get(self, request, course_id):
         """
         Get detailed attendance analytics for a specific course
