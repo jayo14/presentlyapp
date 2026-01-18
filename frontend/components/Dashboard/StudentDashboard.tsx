@@ -594,7 +594,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       <h3 className="font-bold text-zinc-900 dark:text-white">Course Performance</h3>
                   </div>
                   <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                      {analyticsData?.course_performance.map((course) => (
+                      {analyticsData?.course_performance?.map((course) => (
                           <div key={course.course_code} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
                               <div className="flex-1">
                                   <div className="flex justify-between mb-2">

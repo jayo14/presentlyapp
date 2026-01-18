@@ -1238,7 +1238,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
             'longitude': student_lon,
             'elevation': student_elevation,
             'location_verified': is_verified,
-            'distance_from_venue': distance,
+            'distance_from_venue': round(distance, 2),
             'status': status_value,
         }
         
@@ -1484,7 +1484,7 @@ def public_check_in_view(request, session_code):
             'longitude': student_lon,
             'elevation': student_elevation,
             'location_verified': is_verified,
-            'distance_from_venue': distance,
+            'distance_from_venue': round(distance, 2),
             'status': status_value,
         }
         

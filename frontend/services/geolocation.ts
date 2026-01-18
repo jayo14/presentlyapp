@@ -11,46 +11,114 @@ export interface GeolocationPosition {
 }
 
 /**
- * Get current position with high accuracy
+ * Get current position with high accuracy and stability.
+ * Uses watchPosition to warm up GPS and find the best accuracy within a timeout.
  */
-export const getCurrentPosition = (): Promise<GeolocationPosition> => {
+export const getCurrentPosition = (
+  options: { 
+    timeout?: number; 
+    desiredAccuracy?: number; 
+    maxWait?: number 
+  } = {}
+): Promise<GeolocationPosition> => {
+  const { 
+    timeout = 30000, 
+    desiredAccuracy = 20, // meters
+    maxWait = 5000 // wait up to 5s for better accuracy if initial is poor
+  } = options;
+
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error('Geolocation is not supported by your browser'));
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
+    let bestPosition: GeolocationPosition | null = null;
+    let watchId: number;
+    let timerId: any;
+    let hasResolved = false;
+
+    const cleanup = () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+      if (timerId) clearTimeout(timerId);
+    };
+
+    const finish = (position: GeolocationPosition) => {
+      if (hasResolved) return;
+      hasResolved = true;
+      cleanup();
+      resolve(position);
+    };
+
+    const handleError = (error: GeolocationPositionError) => {
+      // If we have a cached position, use it instead of failing completely
+      if (bestPosition && !hasResolved) {
+        finish(bestPosition);
+        return;
+      }
+
+      if (hasResolved) return;
+      
+      let message = 'Failed to get location';
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          message = 'Location permission denied. Please enable location access.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          message = 'Location information unavailable. Please try again.';
+          break;
+        case error.TIMEOUT:
+          message = 'Location request timed out. Please try again.';
+          break;
+      }
+      hasResolved = true;
+      cleanup();
+      reject(new Error(message));
+    };
+
+    // Set absolute timeout
+    timerId = setTimeout(() => {
+      if (bestPosition) {
+        finish(bestPosition);
+      } else {
+        handleError({ code: 3, message: 'Timeout' } as GeolocationPositionError);
+      }
+    }, timeout);
+
+    watchId = navigator.geolocation.watchPosition(
       (position) => {
-        resolve({
+        const currentPos: GeolocationPosition = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           altitude: position.coords.altitude || undefined,
           accuracy: position.coords.accuracy,
           altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
-        });
-      },
-      (error) => {
-        let message = 'Failed to get location';
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            message = 'Location permission denied. Please enable location access.';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            message = 'Location information unavailable. Please try again.';
-            break;
-          case error.TIMEOUT:
-            message = 'Location request timed out. Please try again.';
-            break;
+        };
+
+        // If this is the first reading, or better accuracy than previous
+        if (!bestPosition || currentPos.accuracy < bestPosition.accuracy) {
+          bestPosition = currentPos;
         }
-        reject(new Error(message));
+
+        // If accuracy is good enough, return immediately
+        if (currentPos.accuracy <= desiredAccuracy) {
+          finish(currentPos);
+        }
       },
+      handleError,
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: timeout,
         maximumAge: 0
       }
     );
+    
+    // Safety fallback: if we haven't hit desired accuracy by maxWait, just return best we have
+    setTimeout(() => {
+        if (!hasResolved && bestPosition) {
+            finish(bestPosition);
+        }
+    }, maxWait);
   });
 };
 
