@@ -65,6 +65,11 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     osm.addTo(map);
     mapRef.current = map;
 
+    // Trigger resize after a short delay to ensure container is fully rendered
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+
     // --- GEOMAN SETUP ---
     map.pm.addControls({
       position: 'topleft',
@@ -220,6 +225,16 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       map.pm.disableDraw();
     }
   }, [drawingMode]);
+
+  // Handle Resize
+  useEffect(() => {
+    if (mapRef.current) {
+      const timer = setTimeout(() => {
+        mapRef.current?.invalidateSize();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [venues, selectedVenue]);
 
   return (
     <div className="relative w-full h-full group">

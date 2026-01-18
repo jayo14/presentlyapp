@@ -119,32 +119,32 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
         )}
 
         {/* Header */}
-        <div className="p-6 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center bg-zinc-50/50 dark:bg-zinc-900/50 flex-shrink-0">
-          <div>
-            <h3 id="dialog-title" className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-              <span className="p-1.5 bg-primary/10 rounded-lg text-primary">
+        <div className="p-4 sm:p-6 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center bg-zinc-50/50 dark:bg-zinc-900/50 flex-shrink-0">
+          <div className="min-w-0 pr-4">
+            <h3 id="dialog-title" className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              <span className="p-1.5 bg-primary/10 rounded-lg text-primary flex-shrink-0">
                 <Timer size={20} />
               </span>
-              Session Details
+              <span className="truncate">Session Details</span>
             </h3>
-            <p className="text-sm text-zinc-500 mt-1">{session.course_name} ({session.course_code})</p>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1 truncate">{session.course_name} ({session.course_code})</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-colors" aria-label="Close dialog">
+          <button onClick={onClose} className="p-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full transition-colors flex-shrink-0" aria-label="Close dialog">
             <X size={20} />
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-1">
-          <div className="grid md:grid-cols-2">
+        <div className="overflow-y-auto flex-1 custom-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-100 dark:divide-zinc-900">
             {/* Left Side: QR Code */}
-            <div className="p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/20">
-              <div className="bg-white p-4 rounded-2xl shadow-lg border border-zinc-100 mb-6">
-                <QRCodeSVG value={sessionUrl} size={200} level="H" includeMargin />
+            <div className="p-6 sm:p-8 flex flex-col items-center justify-center bg-zinc-50/30 dark:bg-zinc-900/20">
+              <div className="bg-white p-3 sm:p-4 rounded-2xl shadow-lg border border-zinc-100 mb-6 w-full max-w-[240px] aspect-square flex items-center justify-center">
+                <QRCodeSVG value={sessionUrl} size={200} level="H" includeMargin className="w-full h-full" />
               </div>
-              <div className="text-center space-y-2 group relative">
-                <div className="text-xs uppercase tracking-widest font-bold text-zinc-400">Session Code</div>
+              <div className="text-center space-y-2 group relative w-full">
+                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-zinc-400">Session Code</div>
                 <div 
-                  className="text-3xl font-black text-primary font-mono tracking-tighter cursor-pointer flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
+                  className="text-2xl sm:text-3xl font-black text-primary font-mono tracking-tighter cursor-pointer flex items-center justify-center gap-2 hover:opacity-80 transition-opacity break-all px-4"
                   onClick={() => {
                     navigator.clipboard.writeText(session.session_code);
                     toast.success('Code copied to clipboard');
@@ -152,65 +152,72 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
                   title="Click to copy code"
                 >
                   {session.session_code}
-                  <Copy size={20} className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
+                  <Copy size={18} className="flex-shrink-0 text-zinc-400 opacity-50 sm:opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
             </div>
 
             {/* Right Side: Stats & Info */}
-            <div className="p-8 space-y-8">
+            <div className="p-6 sm:p-8 space-y-6 sm:space-y-8">
               {/* Countdown */}
-              <div className="bg-zinc-900 dark:bg-black rounded-2xl p-6 border border-zinc-800 text-center relative overflow-hidden">
+              <div className="bg-zinc-900 dark:bg-black rounded-2xl p-4 sm:p-6 border border-zinc-800 text-center relative overflow-hidden">
                 <div className="relative z-10">
-                    <div className="text-xs uppercase tracking-wider text-zinc-500 font-bold mb-1">Time Remaining</div>
-                    <div className={`text-4xl font-mono font-bold tracking-tighter ${isExpired ? 'text-red-500' : 'text-primary'}`}>
+                    <div className="text-[10px] sm:text-xs uppercase tracking-wider text-zinc-500 font-bold mb-1">Time Remaining</div>
+                    <div className={`text-3xl sm:text-4xl font-mono font-bold tracking-tighter ${isExpired ? 'text-red-500' : 'text-primary'}`}>
                       {timeLeft}
                     </div>
                 </div>
                 {/* Background pattern */}
-                <div className="absolute top-0 right-0 -mr-4 -mt-4 opacity-5 text-white">
+                <div className="absolute top-0 right-0 -mr-4 -mt-4 opacity-5 text-white pointer-events-none">
                     <Clock size={100} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-                  <div className="text-zinc-500 mb-1 flex items-center gap-1.5"><Users size={14} /> <span className="text-[10px] font-bold uppercase">Students</span></div>
-                  <div className="text-xl font-bold">{session.attendee_count || 0}</div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="p-3 sm:p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                  <div className="text-zinc-500 mb-1 flex items-center gap-1.5">
+                    <Users size={14} className="flex-shrink-0" /> 
+                    <span className="text-[10px] font-bold uppercase truncate">Students</span>
+                  </div>
+                  <div className="text-lg sm:text-xl font-bold">{session.attendee_count || 0}</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-                  <div className="text-zinc-500 mb-1 flex items-center gap-1.5"><MapPin size={14} /> <span className="text-[10px] font-bold uppercase">Radius</span></div>
-                  <div className="text-xl font-bold">{session.location_radius}m</div>
+                <div className="p-3 sm:p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                  <div className="text-zinc-500 mb-1 flex items-center gap-1.5">
+                    <MapPin size={14} className="flex-shrink-0" /> 
+                    <span className="text-[10px] font-bold uppercase truncate">Radius</span>
+                  </div>
+                  <div className="text-lg sm:text-xl font-bold">{session.location_radius}m</div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <div className="text-xs font-bold text-zinc-400 uppercase tracking-wide">Share Link</div>
+                <div className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wide">Share Link</div>
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-zinc-100 dark:bg-zinc-900 px-4 py-2.5 rounded-xl text-sm font-medium truncate text-zinc-500 border border-zinc-200 dark:border-zinc-800">
+                  <div className="flex-1 bg-zinc-100 dark:bg-zinc-900 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium truncate text-zinc-500 border border-zinc-200 dark:border-zinc-800">
                     {sessionUrl}
                   </div>
-                  <Button variant="secondary" size="icon" onClick={handleCopyLink} title="Copy Link">
+                  <Button variant="secondary" size="icon" className="flex-shrink-0" onClick={handleCopyLink} title="Copy Link">
                     <Copy size={18} />
                   </Button>
                 </div>
               </div>
 
-              <div className="pt-4 flex flex-col gap-3">
+              <div className="pt-2 sm:pt-4 flex flex-col gap-3">
                 {session.is_active && !isExpired ? (
                   <Button 
-                      className="w-full bg-red-600 hover:bg-red-700 text-white border-none h-12 rounded-xl"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white border-none h-11 sm:h-12 rounded-xl text-sm"
                       onClick={handleEndSession}
                       isLoading={isEnding}
                   >
-                      <Power size={18} className="mr-2" /> End Session Early
+                      <Power size={18} className="mr-2 flex-shrink-0" /> 
+                      <span className="truncate">End Session Early</span>
                   </Button>
                 ) : (
                   <div className="flex items-center justify-center gap-2 p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl text-zinc-500 font-bold text-sm">
-                      <AlertTriangle size={18} /> Session Ended
+                      <AlertTriangle size={18} className="flex-shrink-0" /> Session Ended
                   </div>
                 )}
-                <Button variant="secondary" className="w-full h-12 rounded-xl" onClick={onClose}>
+                <Button variant="secondary" className="w-full h-11 sm:h-12 rounded-xl text-sm" onClick={onClose}>
                   Close Details
                 </Button>
               </div>

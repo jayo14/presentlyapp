@@ -57,12 +57,20 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   // Department data
   const [departments, setDepartments] = useState<Department[]>([]);
 
-  // Fetch real data on mount
+  // Fetch real data on mount and setup auto-refresh
   useEffect(() => {
     fetchCourses();
     fetchVenues();
     fetchSessions();
     fetchDashboardAnalytics();
+
+    // Auto-refresh data every 60 seconds
+    const interval = setInterval(() => {
+        fetchSessions();
+        fetchDashboardAnalytics();
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDashboardAnalytics = async () => {
@@ -223,44 +231,93 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             </div>
             <div className="p-6">
                 {sessions.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-500">
-                        <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Calendar className="text-zinc-400" size={24} />
+                    <div className="text-center py-16 text-zinc-500 bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
+                        <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Calendar className="text-zinc-400" size={32} />
                         </div>
-                        <h4 className="text-zinc-900 dark:text-white font-medium mb-1">No sessions yet</h4>
-                        <p className="text-sm mb-4">Create your first attendance session to get started.</p>
-                        <Button variant="secondary" onClick={() => navigate('/dashboard/sessions/new')}>Create Session</Button>
+                        <h4 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">No sessions recorded</h4>
+                        <p className="text-sm mb-8 max-w-xs mx-auto">Start taking attendance for your courses to see active and past sessions here.</p>
+                        <Button onClick={() => navigate('/dashboard/sessions/new')} className="rounded-xl px-8 h-12">Create Your First Session</Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {sessions.slice(0, 6).map(session => (
                             <div 
                                 key={session.id} 
                                 onClick={() => setSelectedSession(session)}
-                                className="flex items-center justify-between p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-all cursor-pointer group hover:border-primary/30"
+                                className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/40 cursor-pointer overflow-hidden flex flex-col justify-between min-h-[320px]"
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                        {session.course_code?.substring(0,2) || 'CS'}
+                                {/* Decorative Background Elements */}
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24 blur-3xl group-hover:bg-primary/10 transition-colors duration-700" />
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full -ml-16 -mb-16 blur-3xl transition-colors duration-700" />
+                                
+                                <div className="relative z-10 space-y-8">
+                                    {/* Card Top: Course & Status */}
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-black text-lg text-zinc-500 group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-inner group-hover:scale-110 group-hover:rotate-3">
+                                                {session.course_code?.substring(0,2) || 'CS'}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-2xl font-black text-zinc-900 dark:text-white group-hover:text-primary transition-colors tracking-tight mb-1">{session.course_code}</h4>
+                                                <p className="text-sm text-zinc-500 font-medium truncate max-w-[200px]">{session.course_name || 'Class Session'}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        {(() => {
+                                            const isExpired = session.is_active && new Date(session.end_time) < new Date();
+                                            const status = session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED';
+                                            const statusStyles = {
+                                                'ACTIVE': 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-900/50',
+                                                'EXPIRED': 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
+                                                'ENDED': 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                                            };
+                                            return (
+                                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.1em] border uppercase ${statusStyles[status]}`}>
+                                                    {status}
+                                                </span>
+                                            );
+                                        })()}
                                     </div>
-                                    <div>
-                                        <h4 className="font-bold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{session.course_code}</h4>
-                                        <div className="flex items-center gap-2 text-xs text-zinc-500">
-                                            <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(session.created_at).toLocaleDateString()}</span>
-                                            <span className="flex items-center gap-1"><Clock size={12}/> {new Date(session.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+
+                                    {/* Card Middle: Stats Grid */}
+                                    <div className="grid grid-cols-2 gap-6 p-6 bg-zinc-50/50 dark:bg-zinc-950/40 rounded-2xl border border-zinc-100 dark:border-zinc-800/50">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2 text-zinc-400">
+                                                <Calendar size={14} className="text-primary" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Session Date</span>
+                                            </div>
+                                            <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
+                                                {new Date(session.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2 text-zinc-400">
+                                                <Users size={14} className="text-blue-500" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Attendance</span>
+                                            </div>
+                                            <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
+                                                <span className="text-xl text-zinc-900 dark:text-white font-black">{session.attendee_count || 0}</span> <span className="text-zinc-500 font-medium">Present</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                     {(() => {
-                                         const isExpired = session.is_active && new Date(session.end_time) < new Date();
-                                         return (
-                                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider ${session.is_active && !isExpired ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
-                                                 {session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED'}
-                                             </span>
-                                         );
-                                     })()}
-                                     <Button 
+
+                                {/* Card Bottom: Actions */}
+                                <div className="relative z-10 flex items-center gap-4 mt-8">
+                                    <Button 
+                                        variant="secondary" 
+                                        className="flex-1 h-14 rounded-2xl text-xs font-black uppercase tracking-widest gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-primary dark:hover:bg-primary hover:text-black transition-all group/btn shadow-lg"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/dashboard/reports?courseId=${session.course}&sessionId=${session.id}`);
+                                        }}
+                                    >
+                                        <FileText size={18} className="group-hover/btn:scale-110 transition-transform" />
+                                        View Full Report
+                                    </Button>
+                                    
+                                    <Button 
                                         variant="ghost" 
                                         size="icon" 
                                         onClick={(e) => {
@@ -268,10 +325,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                                             setSessionToDelete(session.id.toString());
                                             setIsDeleteModalOpen(true);
                                         }}
-                                        className="text-zinc-400 hover:text-red-500"
-                                     >
-                                        <Trash2 size={16}/>
-                                     </Button>
+                                        className="h-14 w-14 rounded-2xl text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all border border-zinc-200 dark:border-zinc-800 hover:border-red-200"
+                                    >
+                                        <Trash2 size={20}/>
+                                    </Button>
                                 </div>
                             </div>
                         ))}
