@@ -162,6 +162,7 @@ export const Onboarding: React.FC = () => {
           notifications_enabled: permissions.notifications,
           location_enabled: permissions.location,
           dark_mode: permissions.darkMode,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         };
 
         completeOnboardingMutation.mutate(onboardingData);
