@@ -16,22 +16,12 @@ services:
   # Django Backend Web Service
   - type: web
     name: presently-backend
-    runtime: python
+    runtime: docker
     plan: free
     region: oregon
-    buildCommand: |
-      cd backend
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      python manage.py collectstatic --noinput
-      python manage.py migrate --noinput
-    startCommand: |
-      cd backend
-      gunicorn presently.wsgi:application --bind 0.0.0.0:$PORT
+    dockerContext: backend
     healthCheckPath: /api/health/
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.0
       - key: DEBUG
         value: "False"
       - key: SECRET_KEY
