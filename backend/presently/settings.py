@@ -111,10 +111,14 @@ DATABASES = {
 
 # Override with PostgreSQL if DATABASE_URL is set (production)
 if 'DATABASE_URL' in os.environ:
+    db_url = os.environ.get('DATABASE_URL')
+    is_postgres = db_url.startswith('postgres') or db_url.startswith('submit')
+    
     DATABASES['default'] = dj_database_url.config(
+        default=db_url,
         conn_max_age=600,
         conn_health_checks=True,
-        ssl_require=True
+        ssl_require=is_postgres
     )
 
 
