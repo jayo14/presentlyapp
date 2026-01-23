@@ -153,7 +153,7 @@ The application will be available at [http://localhost:3000](http://localhost:30
 - **Admin**: Full system management, institutions, users, and audit logs.
 - **Lecturer**: Session creation, QR code generation, real-time tracking, and reporting.
 - **Student**: QR check-in, attendance history, and performance tracking.
-- **Class Rep**: Class-level coordination and attendance assistance.
+<!---- **Class Rep**: Class-level coordination and attendance assistance. --->
 
 ---
 
