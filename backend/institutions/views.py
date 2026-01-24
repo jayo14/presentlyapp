@@ -36,6 +36,7 @@ from .geolocation_utils import verify_location, calculate_distance
 
 # Configure logging
 auth_logger = logging.getLogger('auth_events')
+logger = logging.getLogger(__name__)
 
 # Helper function to generate tokens
 def get_tokens_for_user(user):
@@ -784,14 +785,24 @@ class VenueViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
         return [IsAdminUser()]
+
+    def create(self, request, *args, **kwargs):
+        logger.info(f"Creating venue with data: {request.data}")
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error creating venue: {str(e)}")
+            raise
     
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
+        
+        user = self.request.user
         queryset = Venue.objects.all().order_by('name')
+        
+        # Filtering by query parameters
         institution_id = self.request.query_params.get('institution', None)
-        
-        
         if institution_id:
             queryset = queryset.filter(institution_id=institution_id)
         
@@ -803,8 +814,21 @@ class VenueViewSet(viewsets.ModelViewSet):
                 Q(building_name__icontains=name_search)
             )
         
-        # Non-admin users can only see active venues from their institution
-    
+        # Role-based access control
+        # Superusers and ADMIN role see everything
+        if user.is_superuser or user.role == UserRole.ADMIN:
+            return queryset
+        
+        # Others see active venues from their institution OR global venues
+        queryset = queryset.filter(is_active=True)
+        if user.institution:
+            queryset = queryset.filter(Q(institution=user.institution) | Q(institution__isnull=True))
+        else:
+            # If user has no institution, they only see global venues
+            queryset = queryset.filter(institution__isnull=True)
+            
+        return queryset
+
     @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
     def sessions(self, request, pk=None):
         """Get all sessions for this venue"""
