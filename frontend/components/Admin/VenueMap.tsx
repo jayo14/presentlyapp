@@ -3,18 +3,20 @@ import L from 'leaflet';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
-import { MapPin, X, Save, Layers, Map as MapIcon, Satellite } from 'lucide-react';
+import { MapPin, X, Save, Layers, Map as MapIcon, Satellite, RefreshCw } from 'lucide-react';
 import { Venue } from '../../types';
 import { Button } from '../Button';
 
 // Fix for default marker icons in Leaflet with Webpack/Vite
 // @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
+if (typeof window !== 'undefined' && L.Icon.Default) {
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+}
 
 interface VenueMapProps {
   venues: Venue[];
@@ -41,6 +43,16 @@ export const VenueMap: React.FC<VenueMapProps> = ({
   const layersRef = useRef<{ [key: string]: L.Layer }>({});
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
 
+  const handleRefresh = () => {
+    if (mapRef.current) {
+      mapRef.current.invalidateSize();
+      // If no venues, reset to default view
+      if (venues.length === 0) {
+        mapRef.current.setView([7.3775, 3.8936], 13);
+      }
+    }
+  };
+
   // Initialize Map
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -48,7 +60,9 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     const map = L.map(containerRef.current, {
         center: [7.3775, 3.8936], // Nigeria (Ibadan/Lagos area)
         zoom: 13,
-        zoomControl: false // We'll add it in custom position
+        zoomControl: false,
+        fadeAnimation: true,
+        markerZoomAnimation: true
     });
 
     L.control.zoom({ position: 'topright' }).addTo(map);
@@ -256,6 +270,14 @@ export const VenueMap: React.FC<VenueMapProps> = ({
                 title="Satellite View"
             >
                 <Satellite size={20} />
+            </button>
+            <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1 mx-2" />
+            <button 
+                onClick={handleRefresh}
+                className="p-2 rounded-lg text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                title="Refresh Map"
+            >
+                <RefreshCw size={20} />
             </button>
         </div>
       </div>
