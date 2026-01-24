@@ -8,7 +8,7 @@ import VenueManagement from '../Admin/VenueManagement';
 import DepartmentManagement from '../Admin/DepartmentManagement';
 import CourseManagement from '../Admin/CourseManagement';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { systemApi, SystemStats, SystemActivity, SystemAlert } from '../../services/api/system';
+import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '../../services/api/system';
 
 interface AdminDashboardProps {
   userName: string;
@@ -25,15 +25,6 @@ interface AdminUser {
     lastActive: string;
 }
 
-interface SystemLog {
-    id: string;
-    action: string;
-    user: string;
-    role: string;
-    timestamp: string;
-    type: 'info' | 'warning' | 'error' | 'success';
-}
-
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view = 'dashboard' }) => {
   // --- State Management ---
   
@@ -45,11 +36,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     security_alerts: 3,
   });
   const [activityData, setActivityData] = useState<SystemActivity[]>([]);
+  const [logs, setLogs] = useState<SystemLog[]>([]);
+  const [logCount, setLogCount] = useState(0);
+  const [logPage, setLogPage] = useState(1);
+  const [logType, setLogType] = useState('All Events');
   const [statsLoading, setStatsLoading] = useState(true);
+  const [logsLoading, setLogsLoading] = useState(false);
   
   useEffect(() => {
     if (view === 'dashboard') {
       loadSystemData();
+    } else if (view === 'logs') {
+      loadLogs(1);
     }
   }, [view]);
 
@@ -69,6 +67,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     }
   };
 
+  const loadLogs = async (page: number = 1, search?: string, type?: string) => {
+    try {
+      setLogsLoading(true);
+      const currentSearch = search !== undefined ? search : logSearch;
+      const currentType = type !== undefined ? type : logType;
+      
+      const response = await systemApi.getLogs({ 
+        page, 
+        action: currentSearch,
+        event_type: currentType !== 'All Events' ? currentType.toUpperCase() : undefined
+      });
+      setLogs(response.results);
+      setLogCount(response.count);
+      setLogPage(page);
+    } catch (error) {
+      console.error('Failed to load logs:', error);
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
   // Users State
   const [users, setUsers] = useState<AdminUser[]>([
       { id: '1', name: 'Dr. Sarah Johnson', email: 'sarah.j@uni.edu', role: 'Lecturer', status: 'Active', lastActive: '2 mins ago' },
@@ -77,16 +96,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       { id: '4', name: 'Jane Smith', email: 'jane.s@uni.edu', role: 'Student', status: 'Inactive', lastActive: '3 days ago' },
   ]);
   const [userSearch, setUserSearch] = useState('');
+  const [logSearch, setLogSearch] = useState('');
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
-
-  // Logs State (Mock Data)
-  const logs: SystemLog[] = [
-      { id: '1', action: 'User Login', user: 'Dr. Sarah Johnson', role: 'Lecturer', timestamp: '10:42 AM', type: 'info' },
-      { id: '2', action: 'Failed Login Attempt', user: 'Unknown IP', role: '-', timestamp: '10:40 AM', type: 'warning' },
-      { id: '3', action: 'System Config Update', user: 'Admin User', role: 'Admin', timestamp: '09:15 AM', type: 'success' },
-      { id: '4', action: 'Database Backup', user: 'System', role: 'System', timestamp: '02:00 AM', type: 'info' },
-  ];
 
   // --- Handlers ---
 
@@ -144,6 +156,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                     <p className="text-zinc-500">Track system activities and security events.</p>
                   </div>
                   <div className="flex gap-2">
+                      <Button variant="secondary" size="sm" onClick={() => loadLogs()}><Download size={16} className="mr-2"/> Refresh</Button>
                       <Button variant="secondary" size="sm"><Download size={16} className="mr-2"/> Export CSV</Button>
                   </div>
               </div>
@@ -152,44 +165,108 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                   <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex gap-4">
                       <div className="relative flex-1">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
-                          <input type="text" placeholder="Search logs..." className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-white focus:ring-1 focus:ring-primary outline-none" />
+                          <input 
+                            type="text" 
+                            placeholder="Search logs..." 
+                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-white focus:ring-1 focus:ring-primary outline-none"
+                            value={logSearch}
+                            onChange={(e) => {
+                                setLogSearch(e.target.value);
+                                loadLogs(1, e.target.value);
+                            }}
+                          />
                       </div>
-                      <select className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white text-sm rounded-lg px-3 focus:ring-primary focus:border-primary outline-none">
+                      <select 
+                        className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white text-sm rounded-lg px-3 focus:ring-primary focus:border-primary outline-none"
+                        value={logType}
+                        onChange={(e) => {
+                            setLogType(e.target.value);
+                            loadLogs(1, undefined, e.target.value);
+                        }}
+                      >
                           <option>All Events</option>
-                          <option>Info</option>
-                          <option>Warnings</option>
-                          <option>Errors</option>
+                          <option>Auth</option>
+                          <option>System</option>
+                          <option>Config</option>
+                          <option>Security</option>
+                          <option>Error</option>
                       </select>
                   </div>
-                  <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-400">
-                      <thead className="bg-zinc-50 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-200">
-                          <tr>
-                              <th className="p-4 font-medium">Type</th>
-                              <th className="p-4 font-medium">Action</th>
-                              <th className="p-4 font-medium">User</th>
-                              <th className="p-4 font-medium">Role</th>
-                              <th className="p-4 font-medium text-right">Timestamp</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {logs.map(log => (
-                              <tr key={log.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                                  <td className="p-4">
-                                      {log.type === 'info' && <Info size={18} className="text-blue-500" />}
-                                      {log.type === 'warning' && <AlertTriangle size={18} className="text-yellow-500" />}
-                                      {log.type === 'error' && <XCircle size={18} className="text-red-500" />}
-                                      {log.type === 'success' && <CheckCircle size={18} className="text-green-500" />}
-                                  </td>
-                                  <td className="p-4 text-zinc-900 dark:text-white font-medium">{log.action}</td>
-                                  <td className="p-4">{log.user}</td>
-                                  <td className="p-4">
-                                      <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-xs">{log.role}</span>
-                                  </td>
-                                  <td className="p-4 text-right font-mono text-xs">{log.timestamp}</td>
-                              </tr>
-                          ))}
-                      </tbody>
-                  </table>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-400">
+                        <thead className="bg-zinc-50 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-200">
+                            <tr>
+                                <th className="p-4 font-medium">Type</th>
+                                <th className="p-4 font-medium">Action</th>
+                                <th className="p-4 font-medium">User</th>
+                                <th className="p-4 font-medium">Role</th>
+                                <th className="p-4 font-medium text-right">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {logsLoading ? (
+                                Array(5).fill(0).map((_, i) => (
+                                    <tr key={i} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0">
+                                        <td colSpan={5} className="p-4">
+                                            <div className="h-4 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse w-full"></div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : logs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="p-8 text-center text-zinc-500">
+                                        No logs found.
+                                    </td>
+                                </tr>
+                            ) : logs.map(log => (
+                                <tr key={log.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                                    <td className="p-4">
+                                        {log.level === 'info' && <Info size={18} className="text-blue-500" title="Info" />}
+                                        {log.level === 'warning' && <AlertTriangle size={18} className="text-yellow-500" title="Warning" />}
+                                        {log.level === 'error' && <XCircle size={18} className="text-red-500" title="Error" />}
+                                        {log.level === 'success' && <CheckCircle size={18} className="text-green-500" title="Success" />}
+                                    </td>
+                                    <td className="p-4 text-zinc-900 dark:text-white font-medium">{log.action}</td>
+                                    <td className="p-4">{log.user_name || log.ip_address || 'System'}</td>
+                                    <td className="p-4">
+                                        <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-xs">{log.user_role || '-'}</span>
+                                    </td>
+                                    <td className="p-4 text-right font-mono text-xs">
+                                        {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        <br />
+                                        <span className="text-[10px] text-zinc-400">{new Date(log.timestamp).toLocaleDateString()}</span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                  </div>
+                  {/* Pagination Controls */}
+                  {logCount > 0 && (
+                      <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                          <p className="text-xs text-zinc-500">
+                              Showing <span className="font-medium text-zinc-900 dark:text-white">{logs.length}</span> of <span className="font-medium text-zinc-900 dark:text-white">{logCount}</span> logs
+                          </p>
+                          <div className="flex gap-2">
+                              <Button 
+                                variant="secondary" 
+                                size="sm" 
+                                disabled={logPage === 1 || logsLoading}
+                                onClick={() => loadLogs(logPage - 1)}
+                              >
+                                  Previous
+                              </Button>
+                              <Button 
+                                variant="secondary" 
+                                size="sm" 
+                                disabled={logs.length < 30 || (logPage * 30) >= logCount || logsLoading}
+                                onClick={() => loadLogs(logPage + 1)}
+                              >
+                                  Next
+                              </Button>
+                          </div>
+                      </div>
+                  )}
               </div>
           </div>
       );
