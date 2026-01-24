@@ -216,13 +216,31 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       }
     });
 
-    // Fit bounds if we have venues and haven't zoomed in manually yet
-    if (venues.length > 0 && map.getZoom() <= 6) {
+    // Fit bounds whenever venues list changes (filtering)
+    if (venues.length > 0) {
         const group = L.featureGroup(Object.values(markersRef.current));
-        map.fitBounds(group.getBounds().pad(0.1));
+        const bounds = group.getBounds();
+        
+        if (bounds.isValid()) {
+            // If only one venue, zoom in closer
+            if (venues.length === 1) {
+                map.setView([venues[0].latitude, venues[0].longitude], 16, { animate: true });
+            } else {
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16, animate: true });
+            }
+        }
+    } else if (map.getZoom() <= 6) {
+        // Reset to default view if no venues and we are zoomed out
+        map.setView([7.3775, 3.8936], 13);
     }
 
   }, [venues, selectedVenue, activeSessions]);
+
+  // Center on selected venue
+  useEffect(() => {
+    if (!mapRef.current || !selectedVenue) return;
+    mapRef.current.setView([selectedVenue.latitude, selectedVenue.longitude], 16, { animate: true });
+  }, [selectedVenue]);
 
   // Handle Drawing Mode
   useEffect(() => {

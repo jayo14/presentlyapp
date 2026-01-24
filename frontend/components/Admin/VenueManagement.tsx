@@ -97,12 +97,15 @@ export const VenueManagement: React.FC = () => {
 
   const handleSaveVenue = async (formData: Partial<Venue>) => {
     try {
+      let savedVenue: Venue;
       if (editingVenue) {
-        await venueApi.update(editingVenue.id, formData);
+        savedVenue = await venueApi.update(editingVenue.id, formData);
       } else {
-        await venueApi.create(formData);
+        savedVenue = await venueApi.create(formData);
       }
       await loadVenues(selectedInstitution || undefined);
+      setSelectedVenue(savedVenue);
+      setViewMode('map');
       setShowModal(false);
     } catch (err: any) {
       throw new Error(err.response?.data?.message || 'Failed to save venue');
@@ -234,6 +237,16 @@ export const VenueManagement: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                <button
+                  onClick={() => {
+                    setSelectedVenue(venue);
+                    setViewMode('map');
+                  }}
+                  className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-primary"
+                  title="View on map"
+                >
+                  <Map className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => handleEditVenue(venue)}
                   className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
