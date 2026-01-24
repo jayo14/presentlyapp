@@ -7,6 +7,7 @@ import { studentApi, StudentDashboardData, EnrolledCourse, TimetableEntry, Stude
 import { sessionApi } from '../../services/api/attendance';
 import { geolocationService } from '../../services/geolocation';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
+import { FindMyLocation } from '../Location/FindMyLocation';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
@@ -235,15 +236,20 @@ const MarkAttendanceModal = ({
 
                     {/* State: LOCATING */}
                     {status === 'locating' && (
-                        <div className="flex-1 flex flex-col items-center justify-center p-8 bg-zinc-900 text-center h-full">
-                            <div className="relative mb-6">
+                        <div className="flex-1 flex flex-col items-center justify-center p-8 bg-zinc-900 text-center h-full relative overflow-hidden">
+                            <div className="absolute inset-0 z-0 opacity-40">
+                                {/* Simple background map preview could go here if we wanted a real one, 
+                                    but for simple/lightweight we stick to the UI feedback */}
+                                <div className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent animate-pulse" />
+                            </div>
+                            <div className="relative mb-6 z-10">
                                 <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center animate-ping absolute inset-0"></div>
                                 <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center relative z-10">
                                     <MapPin size={40} className="text-blue-500" />
                                 </div>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Checking Location</h3>
-                            <p className="text-zinc-400 text-sm max-w-[200px]">
+                            <h3 className="text-xl font-bold text-white mb-2 z-10">Checking Location</h3>
+                            <p className="text-zinc-400 text-sm max-w-[200px] z-10">
                                 Verifying you are within range of the venue...
                             </p>
                         </div>
@@ -495,10 +501,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   if (view === 'analytics') {
       return (
           <div className="space-y-8 animate-in fade-in duration-500">
-              <div>
-                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Performance Insights</h2>
-                  <p className="text-zinc-500">Track your attendance trends and statistics.</p>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                      <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Performance Insights</h2>
+                      <p className="text-zinc-500">Track your attendance trends and statistics.</p>
+                  </div>
               </div>
+
+              {/* Location MVP Feature */}
+              <FindMyLocation className="shadow-lg shadow-primary/5" />
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
