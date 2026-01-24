@@ -778,6 +778,7 @@ class VenueViewSet(viewsets.ModelViewSet):
     """ViewSet for Venue CRUD"""
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
+    pagination_class = None
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:

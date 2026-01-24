@@ -141,7 +141,12 @@ export const VenueManagement: React.FC = () => {
         <div className="flex items-center gap-3">
           <MapPin className="w-8 h-8 text-primary" />
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Venue Management</h2>
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              Venue Management
+              <span className="text-xs font-normal bg-zinc-800 px-2 py-1 rounded-full text-zinc-400">
+                {filteredVenues.length}
+              </span>
+            </h2>
             <p className="text-sm text-zinc-400">Manage venue locations with geolocation data</p>
           </div>
         </div>
