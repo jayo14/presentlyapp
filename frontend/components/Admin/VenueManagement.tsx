@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map as MapIcon, List, Grid, X } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map as MapIcon, List, Grid, X as CloseIcon, RefreshCw } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
@@ -23,33 +23,32 @@ export const VenueManagement: React.FC = () => {
   const [newVenueBoundary, setNewVenueBoundary] = useState<number[][] | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
-  // Load institutions and venues
+  // Load initial data
   useEffect(() => {
     loadData();
   }, []);
 
+  // Filter-driven loading
   useEffect(() => {
-    if (selectedInstitution) {
-      loadVenues(selectedInstitution);
-    } else {
-      loadVenues();
-    }
+    loadVenues(selectedInstitution || undefined);
   }, [selectedInstitution]);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [institutionsData, venuesData] = await Promise.all([
-        institutionsApi.getAllInstitutions(),
-        venueApi.getAll()
-      ]);
-      setInstitutions(Array.isArray(institutionsData) ? institutionsData : []);
-      setVenues(Array.isArray(venuesData) ? venuesData : []);
+      const institutionsData = await institutionsApi.getAllInstitutions();
+      const currentInstitutions = Array.isArray(institutionsData) ? institutionsData : [];
+      setInstitutions(currentInstitutions);
+      
+      // If no institutions, still finish loading
+      if (currentInstitutions.length === 0) {
+          setLoading(false);
+      }
+      // loadVenues will be triggered by selectedInstitution effect if institutions exists
       setError(null);
     } catch (err) {
-      setError('Failed to load data');
+      setError('Failed to load institutions');
       console.error(err);
-    } finally {
       setLoading(false);
     }
   };
@@ -57,7 +56,9 @@ export const VenueManagement: React.FC = () => {
   const loadVenues = async (institutionId?: number) => {
     try {
       setLoading(true);
-      const filters = institutionId ? { institution: institutionId } : undefined;
+      const filters: any = {};
+      if (institutionId) filters.institution = institutionId;
+      
       const data = await venueApi.getAll(filters);
       setVenues(Array.isArray(data) ? data : []);
       setError(null);
@@ -69,11 +70,13 @@ export const VenueManagement: React.FC = () => {
     }
   };
 
-  const filteredVenues = Array.isArray(venues) ? venues.filter(venue =>
-    venue.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    venue.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    venue.building_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const filteredVenues = Array.isArray(venues) ? venues.filter(venue => {
+    const search = searchTerm.toLowerCase();
+    const nameMatch = venue.name?.toLowerCase().includes(search) ?? false;
+    const codeMatch = venue.code?.toLowerCase().includes(search) ?? false;
+    const buildingMatch = venue.building_name?.toLowerCase().includes(search) ?? false;
+    return nameMatch || codeMatch || buildingMatch;
+  }) : [];
 
   const handleCreateVenue = () => {
     setEditingVenue(null);
@@ -123,8 +126,12 @@ export const VenueManagement: React.FC = () => {
   const handleSaveVenue = async (formData: Partial<Venue>) => {
     try {
       let savedVenue: Venue;
-      if (editingVenue) {
-        savedVenue = await venueApi.update(editingVenue.id, formData);
+      // Determine if we are updating or creating
+      // Use formData.id if present (e.g. from map update), otherwise check editingVenue
+      const idToUpdate = formData.id || editingVenue?.id;
+
+      if (idToUpdate) {
+        savedVenue = await venueApi.update(idToUpdate, formData);
       } else {
         savedVenue = await venueApi.create(formData);
       }
@@ -133,7 +140,9 @@ export const VenueManagement: React.FC = () => {
       setViewMode('map');
       setShowModal(false);
     } catch (err: any) {
-      throw new Error(err.response?.data?.message || 'Failed to save venue');
+      console.error('Save venue error:', err);
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || 'Failed to save venue';
+      throw new Error(errorMsg);
     }
   };
 
@@ -144,6 +153,9 @@ export const VenueManagement: React.FC = () => {
 
     try {
       await venueApi.delete(id);
+      if (selectedVenue?.id === id) {
+        setSelectedVenue(null);
+      }
       await loadVenues(selectedInstitution || undefined);
     } catch (err) {
       setError('Failed to delete venue');
@@ -198,6 +210,18 @@ export const VenueManagement: React.FC = () => {
               <Grid className="w-4 h-4" />
             </button>
           </div>
+          <Button 
+            variant="secondary" 
+            size="icon" 
+            onClick={() => {
+                loadData();
+                loadVenues(selectedInstitution || undefined);
+            }}
+            disabled={loading}
+            title="Refresh Data"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
           {viewMode === 'map' && (
             <Button 
               variant={isDrawing ? 'primary' : 'secondary'} 
@@ -242,10 +266,13 @@ export const VenueManagement: React.FC = () => {
           />
           {searchTerm && (
             <button 
-              onClick={() => setSearchTerm('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
+              onClick={() => {
+                  setSearchTerm('');
+                  setSelectedVenue(null);
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
             >
-              <X size={16} />
+              <CloseIcon size={16} />
             </button>
           )}
         </div>
@@ -380,11 +407,37 @@ export const VenueManagement: React.FC = () => {
       </div>
       )}
 
-      {filteredVenues.length === 0 && !loading && viewMode === 'grid' && (
-        <div className="text-center py-12">
+      {filteredVenues.length === 0 && !loading && (
+        <div className="text-center py-12 bg-zinc-900/30 border border-dashed border-zinc-800 rounded-2xl">
           <MapPin className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-          <p className="text-zinc-400">No venues found</p>
-          <p className="text-zinc-500 text-sm mt-1">Create your first venue to get started</p>
+          <p className="text-zinc-400 font-medium">
+            {venues.length === 0 
+              ? "No venues created yet" 
+              : `No venues match your filters (${venues.length} total venues)`}
+          </p>
+          <p className="text-zinc-500 text-sm mt-1">
+            {venues.length === 0 
+              ? "Create your first venue to start mapping your campus" 
+              : "Try adjusting your search term or institution filter"}
+          </p>
+          <div className="flex justify-center gap-3 mt-6">
+            {venues.length > 0 && (
+              <Button 
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedInstitution(null);
+                }} 
+                variant="ghost" 
+                size="sm"
+              >
+                Clear all filters
+              </Button>
+            )}
+            <Button onClick={handleCreateVenue} variant="secondary" size="sm">
+              <Plus size={16} className="mr-2" /> 
+              {venues.length === 0 ? "Create First Venue" : "Add New Venue"}
+            </Button>
+          </div>
         </div>
       )}
 

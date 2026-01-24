@@ -217,8 +217,9 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     });
 
     // Fit bounds whenever venues list changes (filtering)
-    if (venues.length > 0) {
-        const group = L.featureGroup(Object.values(markersRef.current));
+    const currentMarkers = Object.values(markersRef.current);
+    if (venues.length > 0 && currentMarkers.length > 0) {
+        const group = L.featureGroup(currentMarkers);
         const bounds = group.getBounds();
         
         if (bounds.isValid()) {
