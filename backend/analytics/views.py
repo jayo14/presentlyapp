@@ -78,8 +78,8 @@ class StudentDashboardAnalyticsView(APIView):
                 'course_code': course.code,
                 'course_name': course.title,
                 'course_title': course.title,
-                'department': course.department.id if course.department else None,
-                'department_name': course.department.name if course.department else None,
+                'department': course.department.first().id if course.department.exists() else None,
+                'department_name': course.department.first().name if course.department.exists() else None,
                 'semester': course.semester,
                 'level': course.level,
                 'credit_units': course.credit_units,
@@ -220,8 +220,15 @@ class LecturerDashboardAnalyticsView(APIView):
         # Group by day of week
         weekly_data = {'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0}
         for session in weekly_sessions:
-            day_name = session['start_time'].strftime('%a')
-            weekly_data[day_name] += session['attendee_count']
+            st = session['start_time']
+            if isinstance(st, str):
+                from django.utils.dateparse import parse_datetime
+                st = parse_datetime(st)
+            
+            if st:
+                day_name = st.strftime('%a')
+                if day_name in weekly_data:
+                    weekly_data[day_name] += session['attendee_count']
             
         # Get total unique students enrolled in lecturer's courses
         from institutions.models import CourseEnrollment
@@ -307,8 +314,8 @@ class CourseAttendanceAnalyticsView(APIView):
             session__course=course
         ).values_list('student_id', flat=True).distinct()
         
-        # Combine both sets of student IDs
-        all_student_ids = set(enrolled_student_ids) | set(attending_student_ids)
+        # Combine both sets of student IDs and filter out None
+        all_student_ids = {sid for sid in (set(enrolled_student_ids) | set(attending_student_ids)) if sid}
         
         # Fetch user objects
         all_students = User.objects.filter(id__in=all_student_ids)

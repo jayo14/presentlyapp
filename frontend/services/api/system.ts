@@ -28,12 +28,20 @@ export interface SystemConfig {
 export interface SystemLog {
   id: number;
   event_type: string;
+  level: 'info' | 'warning' | 'error' | 'success';
   action: string;
   user_name?: string;
   user_role?: string;
   ip_address?: string;
   timestamp: string;
   details?: string;
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }
 
 export const systemApi = {
@@ -137,18 +145,29 @@ export const systemApi = {
     start_date?: string;
     end_date?: string;
     limit?: number;
-  }): Promise<SystemLog[]> => {
+    page?: number;
+    action?: string;
+  }): Promise<PaginatedResponse<SystemLog>> => {
     try {
       const response = await apiClient.get('/system/logs/', { params: filters });
-      // Handle paginated response
-      return response.data.results || response.data;
+      // Handle both paginated and non-paginated responses for backward compatibility
+      if (response.data.results) {
+        return response.data;
+      }
+      return {
+        count: response.data.length,
+        next: null,
+        previous: null,
+        results: response.data
+      };
     } catch (error) {
       // Return mock data if endpoint doesn't exist yet
       console.warn('System logs endpoint not available, using mock data');
-      return [
+      const mockData = [
         {
           id: 1,
           event_type: 'AUTH',
+          level: 'info' as const,
           action: 'User Login',
           user_name: 'Dr. Sarah Johnson',
           user_role: 'Lecturer',
@@ -157,6 +176,7 @@ export const systemApi = {
         {
           id: 2,
           event_type: 'AUTH',
+          level: 'warning' as const,
           action: 'Failed Login Attempt',
           ip_address: '192.168.1.100',
           user_role: '-',
@@ -165,6 +185,7 @@ export const systemApi = {
         {
           id: 3,
           event_type: 'CONFIG',
+          level: 'success' as const,
           action: 'System Config Update',
           user_name: 'Admin User',
           user_role: 'Admin',
@@ -173,12 +194,19 @@ export const systemApi = {
         {
           id: 4,
           event_type: 'SYSTEM',
+          level: 'info' as const,
           action: 'Database Backup',
           user_name: 'System',
           user_role: 'System',
           timestamp: new Date(Date.now() - 540 * 60000).toISOString(),
         },
       ];
+      return {
+        count: mockData.length,
+        next: null,
+        previous: null,
+        results: mockData
+      };
     }
   },
 };

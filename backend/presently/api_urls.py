@@ -57,5 +57,6 @@ urlpatterns = [
     path('analytics/', include('analytics.urls')),  # Real-time analytics, insights
     path('reports/', include('reports.urls')),  # PDF/Excel exports
     path('exam-clearance/', include('exam_clearance.urls')),  # Exam clearance management
+    path('system/', include('system.urls')),  # System logs, stats, config
 ]
 

@@ -1359,6 +1359,28 @@ class UserViewSet(viewsets.ModelViewSet):
         
         return super().partial_update(request, *args, **kwargs)
 
+    @action(detail=True, methods=['post'], url_path='reset-password')
+    def reset_password(self, request, pk=None):
+        """Reset a user's password (Admin only)"""
+        user = self.get_object()
+        new_password = request.data.get('password')
+        
+        if not new_password:
+            return Response({
+                'success': False,
+                'error': 'New password is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(new_password)
+        user.save()
+        
+        auth_logger.info(f"Password reset for user {user.email} by admin {request.user.email}")
+        
+        return Response({
+            'success': True,
+            'message': f'Password for {user.full_name} has been reset successfully.'
+        })
+
 
 
 @ratelimit(key='user', rate='5/m', block=True)
