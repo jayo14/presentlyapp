@@ -29,7 +29,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   const { modalRef, modalProps } = useModalAccessibility(true, onClose);
   
   const [formData, setFormData] = useState<Partial<Venue>>({
-    institution_id: venue?.institution_id || institutions[0]?.id || 0,
+    institution_id: venue?.institution_id || (institutions.length > 0 ? institutions[0].id : undefined),
     name: venue?.name || '',
     code: venue?.code || '',
     description: venue?.description || '',
@@ -120,7 +120,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       return;
     }
     if (!formData.institution_id) {
-      setError('Institution is required');
+      setError('Please select an institution. If none exist, please create one first in the Institutions tab.');
       return;
     }
     if (formData.latitude == null || formData.longitude == null) {
