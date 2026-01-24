@@ -791,16 +791,19 @@ class VenueViewSet(viewsets.ModelViewSet):
         queryset = Venue.objects.all().order_by('name')
         institution_id = self.request.query_params.get('institution', None)
         
+        
         if institution_id:
             queryset = queryset.filter(institution_id=institution_id)
         
-        # Non-admin users can only see active venues from their institution
-        if self.request.user.role != UserRole.ADMIN:
-            queryset = queryset.filter(is_active=True)
-            if self.request.user.institution:
-                queryset = queryset.filter(institution=self.request.user.institution)
+        name_search = self.request.query_params.get('name', None)
+        if name_search:
+            queryset = queryset.filter(
+                Q(name__icontains=name_search) |
+                Q(code__icontains=name_search) |
+                Q(building_name__icontains=name_search)
+            )
         
-        return queryset
+        # Non-admin users can only see active venues from their institution
     
     @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
     def sessions(self, request, pk=None):

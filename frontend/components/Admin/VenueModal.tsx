@@ -11,6 +11,7 @@ interface VenueModalProps {
   onSave: (data: Partial<Venue>) => Promise<void>;
   onClose: () => void;
   initialLocation?: {lat: number; lng: number} | null;
+  initialBoundary?: number[][] | null;
 }
 
 export const VenueModal: React.FC<VenueModalProps> = ({
@@ -18,7 +19,8 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   institutions,
   onSave,
   onClose,
-  initialLocation
+  initialLocation,
+  initialBoundary
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     latitude: initialLocation?.lat || venue?.latitude || 0,
     longitude: initialLocation?.lng || venue?.longitude || 0,
     elevation: venue?.elevation || undefined,
-    boundary_coordinates: venue?.boundary_coordinates || [],
+    boundary_coordinates: initialBoundary || venue?.boundary_coordinates || [],
     verification_radius: venue?.verification_radius || 100,
     is_active: venue?.is_active !== false,
   });
@@ -53,10 +55,12 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   const [boundaryInput, setBoundaryInput] = useState('');
 
   useEffect(() => {
-    if (venue?.boundary_coordinates) {
+    if (initialBoundary) {
+      setBoundaryInput(JSON.stringify(initialBoundary, null, 2));
+    } else if (venue?.boundary_coordinates) {
       setBoundaryInput(JSON.stringify(venue.boundary_coordinates, null, 2));
     }
-  }, [venue]);
+  }, [venue, initialBoundary]);
 
   const handleChange = (field: keyof Venue, value: any) => {
     setFormData(prev => ({
