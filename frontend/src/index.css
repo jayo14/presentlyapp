@@ -74,3 +74,16 @@
     scrollbar-color: #C1B66D transparent;
   }
 }
+
+/* Leaflet Map Fixes */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #09090b !important;
+  z-index: 1;
+}
+
+.leaflet-control-container .leaflet-top,
+.leaflet-control-container .leaflet-bottom {
+  z-index: 1000 !important;
+}

@@ -210,7 +210,7 @@ export const VenueManagement: React.FC = () => {
 
       {/* Map or Grid View */}
       {viewMode === 'map' ? (
-        <div className="flex-1 min-h-[600px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+        <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden relative">
           <VenueMap
             venues={filteredVenues}
             onVenueClick={handleVenueClick}

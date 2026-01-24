@@ -397,7 +397,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto h-screen bg-zinc-50 dark:bg-black scroll-smooth transition-colors duration-300">
-        <div className="max-w-7xl mx-auto p-4 md:p-8 mb-20 md:mb-0">
+        <div className="max-w-7xl mx-auto p-4 md:p-8 mb-20 md:mb-0 h-full flex flex-col">
             {children}
         </div>
       </main>
