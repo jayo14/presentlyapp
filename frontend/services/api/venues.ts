@@ -4,6 +4,7 @@ import { AttendanceSession } from './attendance';
 
 export interface VenueFilters {
   institution?: number;
+  name?: string;
 }
 
 // Venue API
