@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map, List, Grid } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map as MapIcon, List, Grid, X } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
@@ -20,6 +20,8 @@ export const VenueManagement: React.FC = () => {
   const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [newVenueLocation, setNewVenueLocation] = useState<{lat: number; lng: number} | null>(null);
+  const [newVenueBoundary, setNewVenueBoundary] = useState<number[][] | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   // Load institutions and venues
   useEffect(() => {
@@ -76,22 +78,45 @@ export const VenueManagement: React.FC = () => {
   const handleCreateVenue = () => {
     setEditingVenue(null);
     setNewVenueLocation(null);
+    setNewVenueBoundary(null);
+    setIsDrawing(false);
     setShowModal(true);
   };
 
   const handleMapClick = (lat: number, lng: number) => {
     // When clicking on map, prepare to create venue at that location
     setNewVenueLocation({ lat, lng });
+    setNewVenueBoundary(null);
     setEditingVenue(null);
     setShowModal(true);
   };
 
+  const handleBoundaryComplete = (coords: number[][]) => {
+    if (coords.length > 0) {
+        if (isDrawing) {
+            // New venue via drawing
+            setNewVenueLocation({ lat: coords[0][0], lng: coords[0][1] });
+            setNewVenueBoundary(coords);
+            setEditingVenue(null);
+            setIsDrawing(false);
+            setShowModal(true);
+        } else if (selectedVenue) {
+            // Updating existing venue boundary directly on map
+            handleSaveVenue({ ...selectedVenue, boundary_coordinates: coords });
+        }
+    }
+  };
+
   const handleVenueClick = (venue: Venue) => {
     setSelectedVenue(venue);
+    setIsDrawing(false);
+    setNewVenueBoundary(null);
   };
 
   const handleEditVenue = (venue: Venue) => {
     setEditingVenue(venue);
+    setIsDrawing(false);
+    setNewVenueBoundary(null);
     setShowModal(true);
   };
 
@@ -160,7 +185,7 @@ export const VenueManagement: React.FC = () => {
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Map className="w-4 h-4" />
+              <MapIcon className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('grid')}
@@ -173,6 +198,16 @@ export const VenueManagement: React.FC = () => {
               <Grid className="w-4 h-4" />
             </button>
           </div>
+          {viewMode === 'map' && (
+            <Button 
+              variant={isDrawing ? 'primary' : 'secondary'} 
+              onClick={() => setIsDrawing(!isDrawing)}
+              className="gap-2"
+            >
+              <MapIcon className="w-4 h-4" />
+              {isDrawing ? 'Cancel Drawing' : 'Draw Boundary'}
+            </Button>
+          )}
           <Button onClick={handleCreateVenue} className="gap-2">
             <Plus className="w-4 h-4" />
             Add Venue
@@ -192,28 +227,59 @@ export const VenueManagement: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-shrink-0">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
-          <Input
+      <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl flex flex-col md:flex-row gap-4 flex-shrink-0">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
+          <input
             type="text"
-            placeholder="Search venues..."
+            placeholder="Search by name, code or building..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setSelectedVenue(null); // Clear selection on search
+            }}
+            className="w-full pl-10 pr-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
           />
+          {searchTerm && (
+            <button 
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
         
-        <select
-          value={selectedInstitution || ''}
-          onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-          className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
-        >
-          <option value="">All Institutions</option>
-          {institutions.map(inst => (
-            <option key={inst.id} value={inst.id}>{inst.short_name}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+            <Building className="w-5 h-5 text-zinc-500 hidden md:block" />
+            <select
+              value={selectedInstitution || ''}
+              onChange={(e) => {
+                  setSelectedInstitution(e.target.value ? Number(e.target.value) : null);
+                  setSearchTerm(''); // Clear search when switching institutions
+              }}
+              className="px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary min-w-[200px]"
+            >
+              <option value="">All Institutions</option>
+              {institutions.map(inst => (
+                <option key={inst.id} value={inst.id}>{inst.short_name}</option>
+              ))}
+            </select>
+        </div>
+
+        {(searchTerm || selectedInstitution) && (
+            <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                    setSearchTerm('');
+                    setSelectedInstitution(null);
+                }}
+                className="text-zinc-500 hover:text-white"
+            >
+                Reset
+            </Button>
+        )}
       </div>
 
       {/* Map or Grid View */}
@@ -224,6 +290,8 @@ export const VenueManagement: React.FC = () => {
             onVenueClick={handleVenueClick}
             onMapClick={handleMapClick}
             selectedVenue={selectedVenue}
+            drawingMode={isDrawing}
+            onBoundaryComplete={handleBoundaryComplete}
           />
         </div>
       ) : (
@@ -250,7 +318,7 @@ export const VenueManagement: React.FC = () => {
                   className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-primary"
                   title="View on map"
                 >
-                  <Map className="w-4 h-4" />
+                  <MapIcon className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleEditVenue(venue)}
@@ -278,7 +346,7 @@ export const VenueManagement: React.FC = () => {
               )}
               
               <div className="flex items-center gap-2 text-zinc-400">
-                <Map className="w-4 h-4" />
+                <MapIcon className="w-4 h-4" />
                 <span>
                   {Number(venue.latitude).toFixed(6)}, {Number(venue.longitude).toFixed(6)}
                   {venue.elevation && ` @ ${venue.elevation}m`}
@@ -329,8 +397,10 @@ export const VenueManagement: React.FC = () => {
           onClose={() => {
             setShowModal(false);
             setNewVenueLocation(null);
+            setNewVenueBoundary(null);
           }}
           initialLocation={newVenueLocation}
+          initialBoundary={newVenueBoundary}
         />
       )}
     </div>
