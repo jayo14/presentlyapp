@@ -4,10 +4,11 @@ import { Logo } from './Logo';
 import { Button } from './Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowRight, CheckCircle2, QrCode, Smartphone, BarChart3, 
-  ShieldCheck, MapPin, Clock, Share2, Users, 
-  ChevronDown, ChevronUp, Star, Download, Menu, X, Play,
-  Zap, MonitorPlay, Pause, Volume2, Maximize2
+  CheckCircle2, ShieldCheck, MapPin, 
+  Server, Globe, Database, 
+  Building2, GraduationCap, Network, 
+  Fingerprint, Menu, X, ChevronDown, ChevronUp,
+  Zap
 } from 'lucide-react';
 import { useCurrentUser } from '../hooks/useAuth';
 import { SEO } from './SEO';
@@ -19,14 +20,18 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin }) => {
   const navigate = useNavigate();
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user } = useCurrentUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-  const [billingCycle, setBillingCycle] = useState<'semester' | 'session'>('semester');
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [currency, setCurrency] = useState<'USD' | 'NGN'>('USD');
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
+  const prices = {
+    individual: currency === 'USD' ? '$15' : '₦25,000',
+    department: currency === 'USD' ? '$500' : '₦800,000',
   };
 
   const scrollToSection = (id: string) => {
@@ -37,20 +42,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
     setMobileMenuOpen(false);
   };
 
-  const handleCTAClick = () => {
-    if (user) {
-      navigate('/dashboard');
-    } else {
-      onGetStarted();
-    }
-  };
-
-  const handleLoginClick = () => {
-    if (user) {
-      navigate('/dashboard');
-    } else {
-      onLogin();
-    }
+  const handleDashboardClick = () => {
+    navigate('/dashboard');
   };
 
   const fadeInUp = {
@@ -71,35 +64,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-primary selection:text-black overflow-x-hidden">
       <SEO 
-        title="Presently | Smart Attendance Management for Schools"
-        description="The modern attendance tracking system for universities and schools. Features GPS verification, QR code check-in, real-time analytics, and fraud prevention."
+        title="Presently | Academic Attendance Infrastructure"
+        description="Enterprise-grade attendance verification and academic intelligence infrastructure for universities. Real-time geofencing, audit-ready compliance, and institutional scale."
+        keywords="academic infrastructure, university attendance, geofencing, compliance, educational technology, enterprise software"
       />
       
       {/* --- Navbar --- */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl supports-[backdrop-filter]:bg-black/60">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/80 backdrop-blur-xl supports-[backdrop-filter]:bg-black/60">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Logo />
           
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-            <button onClick={() => scrollToSection('features')} className="hover:text-white transition-colors">Features</button>
-            <button onClick={() => scrollToSection('how-it-works')} className="hover:text-white transition-colors">How It Works</button>
-            <button onClick={() => scrollToSection('testimonials')} className="hover:text-white transition-colors">Testimonials</button>
-            <button onClick={() => scrollToSection('pricing')} className="hover:text-white transition-colors">Pricing</button>
+            <button onClick={() => scrollToSection('infrastructure')} className="hover:text-white transition-colors">Infrastructure</button>
+            <button onClick={() => scrollToSection('solutions')} className="hover:text-white transition-colors">Solutions</button>
+            <button onClick={() => scrollToSection('security')} className="hover:text-white transition-colors">Security</button>
+            <button onClick={() => scrollToSection('pricing')} className="hover:text-white transition-colors">Enterprise</button>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
             {user ? (
-              <Button onClick={handleLoginClick} size="sm" className="rounded-full px-6 shadow-primary/20">
+              <Button onClick={handleDashboardClick} size="sm" className="rounded-full px-6 shadow-primary/20">
                 Dashboard
               </Button>
             ) : (
               <>
-                <button onClick={handleLoginClick} className="text-sm font-medium text-white hover:text-primary transition-colors">
+                <button onClick={onLogin} className="text-sm font-medium text-white hover:text-primary transition-colors">
                   Sign In
                 </button>
-                <Button onClick={handleCTAClick} size="sm" className="rounded-full px-6 shadow-primary/20">
-                  Get Started
+                <Button onClick={onGetStarted} size="sm" className="rounded-full px-6 shadow-primary/20">
+                  Deploy Presently
                 </Button>
               </>
             )}
@@ -110,7 +104,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
             className="md:hidden text-white" 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
@@ -125,20 +118,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden bg-zinc-950 border-b border-zinc-800 p-6 space-y-4 overflow-hidden"
             >
-              <button onClick={() => scrollToSection('features')} className="block w-full text-left py-2 text-zinc-400">Features</button>
-              <button onClick={() => scrollToSection('pricing')} className="block w-full text-left py-2 text-zinc-400">Pricing</button>
+              <button onClick={() => scrollToSection('infrastructure')} className="block w-full text-left py-2 text-zinc-400">Infrastructure</button>
+              <button onClick={() => scrollToSection('solutions')} className="block w-full text-left py-2 text-zinc-400">Solutions</button>
+              <button onClick={() => scrollToSection('pricing')} className="block w-full text-left py-2 text-zinc-400">Enterprise</button>
               <div className="pt-4 border-t border-zinc-800 flex flex-col gap-3">
                 {user ? (
-                  <Button onClick={handleCTAClick} className="w-full justify-center">
-                    Go to Dashboard
+                  <Button onClick={handleDashboardClick} className="w-full justify-center">
+                    Dashboard
                   </Button>
                 ) : (
                   <>
-                    <Button onClick={handleLoginClick} variant="secondary" className="w-full justify-center">
+                    <Button onClick={onLogin} variant="secondary" className="w-full justify-center">
                       Sign In
                     </Button>
-                    <Button onClick={handleCTAClick} className="w-full justify-center">
-                      Get Started
+                    <Button onClick={onGetStarted} className="w-full justify-center">
+                      Deploy Presently
                     </Button>
                   </>
                 )}
@@ -150,9 +144,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
 
       {/* --- Hero Section --- */}
       <section className="pt-32 pb-20 md:pt-48 md:pb-32 px-6 relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-primary/10 rounded-full blur-[150px] -z-10 pointer-events-none mix-blend-screen" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] -z-10 pointer-events-none mix-blend-screen" />
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-900/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 -z-10"></div>
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
@@ -162,479 +155,431 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
             variants={staggerContainer}
             className="space-y-8 text-center lg:text-left z-10"
           >
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/80 border border-zinc-800 text-xs font-bold text-primary backdrop-blur-md hover:bg-zinc-900 transition-colors cursor-default shadow-lg shadow-black/20">
-                <Zap size={14} className="fill-primary" />
-                <span className="text-white font-normal">New:</span> Real-time Geofencing 2.0
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/50 border border-zinc-800 text-xs font-semibold text-primary/90 tracking-wide uppercase">
+                <ShieldCheck size={14} />
+                <span>Enterprise-Grade Verification</span>
             </motion.div>
             
-            <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.1]">
-              Attendance <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-200 relative inline-block pb-2">
-                Reimagined
-                <svg className="absolute w-full h-3 -bottom-1 left-0 text-primary/30" viewBox="0 0 100 10" preserveAspectRatio="none">
-                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" />
-                </svg>
-              </span>
+            <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.05]">
+              Academic <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-100">
+                Intelligence
+              </span> <br />
+              Infrastructure
             </motion.h1>
             
             <motion.p variants={fadeInUp} className="text-lg text-zinc-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Eliminate paper sheets and proxy attendance. Empower your institution with GPS-verified check-ins, instant analytics, and seamless reporting.
+              The system of record for university attendance. Presently replaces fragile paper trails with immutable, location-verified data logs—enabling real-time compliance, fraud prevention, and institutional scalability.
             </motion.p>
             
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Button size="lg" onClick={onGetStarted} className="h-14 px-8 text-lg rounded-full w-full sm:w-auto hover:scale-105 transition-transform duration-200">
-                Get Started Free <ArrowRight size={20} className="ml-2" />
+              <Button size="lg" onClick={onGetStarted} className="h-14 px-8 text-lg rounded-full w-full sm:w-auto">
+                Schedule Demo
               </Button>
-              <Button variant="secondary" size="lg" className="h-14 px-8 text-lg rounded-full w-full sm:w-auto gap-2 bg-white/5 hover:bg-white/10 backdrop-blur-sm border-white/10 text-white">
-                <Play size={18} fill="currentColor" /> Live Demo
+              <Button variant="secondary" size="lg" className="h-14 px-8 text-lg rounded-full w-full sm:w-auto gap-2 bg-transparent border-white/20 text-white hover:bg-white/5">
+                View Architecture
               </Button>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="flex items-center justify-center lg:justify-start gap-6 pt-4">
-               <div className="flex -space-x-4">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-black bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-500">
-                       <Users size={16} />
-                    </div>
-                  ))}
+            <motion.div variants={fadeInUp} className="pt-8 flex items-center justify-center lg:justify-start gap-8 text-zinc-500 text-sm font-medium">
+               <div className="flex items-center gap-2">
+                 <CheckCircle2 size={16} className="text-primary" /> SOC2 Compliant
                </div>
-               <div className="text-left">
-                  <div className="flex text-primary">
-                     <Star size={14} fill="currentColor" />
-                     <Star size={14} fill="currentColor" />
-                     <Star size={14} fill="currentColor" />
-                     <Star size={14} fill="currentColor" />
-                     <Star size={14} fill="currentColor" />
-                  </div>
-                  <p className="text-sm text-zinc-500 font-medium"><span className="text-white font-bold">4.9/5</span> from 20+ Universities</p>
+               <div className="flex items-center gap-2">
+                 <CheckCircle2 size={16} className="text-primary" /> 99.99% Uptime
+               </div>
+               <div className="flex items-center gap-2">
+                 <CheckCircle2 size={16} className="text-primary" /> GDPR Ready
                </div>
             </motion.div>
           </motion.div>
 
-          {/* Enhanced Hero Visual */}
+          {/* Hero Visual - Abstract Data Visualization */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-            transition={{ duration: 1, type: "spring" }}
-            className="relative mx-auto lg:mx-0 w-full max-w-[500px] lg:max-w-none perspective-1000"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+            className="relative hidden lg:block"
           >
-            <div className="relative z-10 transform hover:rotate-y-2 hover:rotate-x-2 transition-transform duration-500 preserve-3d">
-              {/* Main App Window */}
-              <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-2 shadow-2xl shadow-primary/20 relative">
-                 {/* Floating Badges */}
-                 <motion.div 
-                    animate={{ y: [0, -10, 0] }} 
-                    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                    className="absolute -left-8 top-12 bg-zinc-900 border border-zinc-700 p-3 rounded-xl shadow-xl z-20 hidden md:flex items-center gap-3"
-                 >
-                    <div className="bg-green-500/20 p-2 rounded-lg text-green-500"><CheckCircle2 size={20} /></div>
-                    <div>
-                       <p className="text-xs text-zinc-400">Attendance</p>
-                       <p className="text-sm font-bold text-white">Verified</p>
-                    </div>
-                 </motion.div>
-
-                 <motion.div 
-                    animate={{ y: [0, 10, 0] }} 
-                    transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
-                    className="absolute -right-6 bottom-20 bg-zinc-900 border border-zinc-700 p-3 rounded-xl shadow-xl z-20 hidden md:flex items-center gap-3"
-                 >
-                    <div className="bg-primary/20 p-2 rounded-lg text-primary"><MapPin size={20} /></div>
-                    <div>
-                       <p className="text-xs text-zinc-400">Location</p>
-                       <p className="text-sm font-bold text-white">Within Range</p>
-                    </div>
-                 </motion.div>
-
-                 {/* Window Content */}
-                 <div className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800/50">
-                    {/* Fake Browser Header */}
-                    <div className="h-10 bg-zinc-950 border-b border-zinc-800 flex items-center px-4 gap-2">
-                       <div className="flex gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
-                          <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                          <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
-                       </div>
-                       <div className="ml-4 bg-zinc-900 rounded-md px-3 py-1 text-[10px] text-zinc-500 w-48 text-center border border-zinc-800">presently.app/dashboard</div>
-                    </div>
-                    
-                    {/* Dashboard Mockup */}
-                    <div className="p-6 space-y-6">
-                        <div className="flex justify-between items-center">
-                           <div>
-                              <div className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">Good Morning</div>
-                              <div className="text-white font-bold text-2xl">Prof. Adeleke</div>
-                           </div>
-                           <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary font-bold">PA</div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                           <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                              <div className="flex items-center justify-between mb-2">
-                                 <span className="text-zinc-500 text-xs">Live Session</span>
-                                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                              </div>
-                              <div className="text-2xl font-bold text-white mb-1">CS 402</div>
-                              <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                                 <div className="bg-primary w-[75%] h-full"></div>
-                              </div>
-                              <div className="mt-2 text-xs text-zinc-400 flex justify-between">
-                                 <span>Attendance</span>
-                                 <span className="text-white font-bold">75%</span>
-                              </div>
-                           </div>
-                           <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col justify-center items-center text-center">
-                               <QrCode size={40} className="text-white mb-2" />
-                               <span className="text-xs text-zinc-500">Scan to Join</span>
-                           </div>
-                        </div>
-
-                        <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                           <div className="flex justify-between items-center mb-4">
-                              <span className="text-sm font-bold text-white">Recent Activity</span>
-                              <span className="text-xs text-primary">View All</span>
-                           </div>
-                           <div className="space-y-3">
-                              {[1,2,3].map(i => (
-                                 <div key={i} className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-xs text-zinc-500 border border-zinc-800">S{i}</div>
-                                    <div className="flex-1">
-                                       <div className="text-xs font-bold text-white">Student {i}</div>
-                                       <div className="text-[10px] text-zinc-500">Marked present via QR</div>
-                                    </div>
-                                    <div className="text-[10px] text-zinc-600">10:0{i} AM</div>
-                                 </div>
-                              ))}
-                           </div>
-                        </div>
-                    </div>
+            <div className="relative z-10 bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-2xl">
+              <div className="flex items-center justify-between mb-8 border-b border-zinc-800 pb-4">
+                 <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500/20"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/20"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500/20"></div>
                  </div>
+                 <div className="text-xs font-mono text-zinc-500">live_metrics_stream.json</div>
+              </div>
+              
+              <div className="space-y-4 font-mono text-xs">
+                <div className="flex justify-between text-zinc-400">
+                  <span>STATUS</span>
+                  <span className="text-green-500">SYSTEM_OPTIMAL</span>
+                </div>
+                <div className="h-px bg-zinc-800 my-2"></div>
+                
+                {[
+                  { label: "Active Sessions", val: "1,248", change: "+12%" },
+                  { label: "Verified Check-ins", val: "84,392", change: "+4.5%" },
+                  { label: "Geofence Integrity", val: "100%", change: "stable" },
+                  { label: "Fraud Attempts Blocked", val: "142", change: "-2%" }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                     <span className="text-zinc-500">{item.label}</span>
+                     <div className="flex items-center gap-3">
+                        <span className="text-white">{item.val}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${item.change.includes('+') ? 'bg-green-500/10 text-green-500' : item.change.includes('-') ? 'bg-red-500/10 text-red-500' : 'bg-zinc-800 text-zinc-400'}`}>
+                           {item.change}
+                        </span>
+                     </div>
+                  </div>
+                ))}
+
+                <div className="mt-8 p-4 bg-zinc-900/50 rounded border border-zinc-800">
+                   <div className="text-zinc-500 mb-2">&gt; recent_audit_log</div>
+                   <div className="space-y-1 text-zinc-400">
+                      <p><span className="text-blue-400">10:42:01</span> [INFO] Dept_CS_402: Session initialized</p>
+                      <p><span className="text-blue-400">10:42:05</span> [VERIFY] GPS handshake established</p>
+                      <p><span className="text-blue-400">10:42:12</span> [WARN] Device_ID_88392: Proxied request blocked</p>
+                      <p><span className="text-blue-400">10:42:15</span> [SUCCESS] Batch_Sync: 45 records committed</p>
+                   </div>
+                </div>
               </div>
             </div>
+            
+            {/* Background decorations */}
+            <div className="absolute -inset-4 bg-primary/5 rounded-2xl blur-xl -z-10"></div>
           </motion.div>
         </div>
       </section>
 
-      {/* --- Social Proof --- */}
-      <section className="py-10 border-y border-white/5 bg-white/[0.02]">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-sm font-medium text-zinc-500 mb-6 uppercase tracking-wider">Trusted by leading institutions</p>
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-            {/* Placeholder Logos for Universities */}
-            <span className="text-xl font-bold text-white flex items-center gap-2"><div className="w-8 h-8 bg-white/20 rounded-full"></div> University of Lagos</span>
-            <span className="text-xl font-bold text-white flex items-center gap-2"><div className="w-8 h-8 bg-white/20 rounded-full"></div> Covenant University</span>
-            <span className="text-xl font-bold text-white flex items-center gap-2"><div className="w-8 h-8 bg-white/20 rounded-full"></div> University of Ibadan</span>
-            <span className="text-xl font-bold text-white flex items-center gap-2"><div className="w-8 h-8 bg-white/20 rounded-full"></div> Ahmadu Bello University</span>
+      {/* --- Trust Section --- */}
+      <section className="py-12 border-y border-white/5 bg-zinc-950/50">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-sm font-medium text-zinc-500 text-center mb-8 uppercase tracking-widest">Trusted Infrastructure For</p>
+          <div className="flex flex-wrap justify-center gap-x-16 gap-y-8 opacity-40 grayscale">
+            {/* Stylized placeholder names for "Enterprise" feel */}
+            <div className="text-xl font-bold font-serif text-white">UNIVERSITY <span className="font-sans font-light">OF</span> LAGOS</div>
+            <div className="text-xl font-bold font-serif text-white">COVENANT <span className="font-sans font-light">UNIVERSITY</span></div>
+            <div className="text-xl font-bold font-serif text-white">A.B.U. <span className="font-sans font-light">ZARIA</span></div>
+            <div className="text-xl font-bold font-serif text-white">BABCOCK <span className="font-sans font-light">INSTITUTE</span></div>
           </div>
         </div>
       </section>
 
-      {/* --- Features Grid (Enhanced) --- */}
-      <section id="features" className="py-24 px-6 relative bg-zinc-950/50">
-         {/* Subtle pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Powerful Features for Modern Education</h2>
-            <p className="text-zinc-400 text-lg">Everything you need to streamline attendance management and boost engagement.</p>
+      {/* --- Infrastructure & Architecture --- */}
+      <section id="infrastructure" className="py-24 px-6 relative bg-black">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-20">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 max-w-2xl">
+              Not Just an App.<br />
+              <span className="text-zinc-500">Critical Academic Infrastructure.</span>
+            </h2>
+            <p className="text-zinc-400 text-lg max-w-3xl leading-relaxed">
+              Universities don't need another "tool". They need a system of record. Presently is architected to handle the complexity of institutional data, ensuring integrity, availability, and auditability at scale.
+            </p>
           </div>
 
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {[
-              {
-                icon: <MapPin className="text-primary" />,
-                title: "GPS-Verified Check-ins",
-                desc: "Location-based attendance ensures students are physically present in class within a set radius."
-              },
-              {
-                icon: <Clock className="text-primary" />,
-                title: "Smart Scheduling",
-                desc: "Integrated timetables ensure attendance only works during valid class hours."
-              },
-              {
-                icon: <BarChart3 className="text-primary" />,
-                title: "Real-Time Dashboards",
-                desc: "Live attendance tracking with instant updates and beautiful visualizations for lecturers."
-              },
-              {
-                icon: <ShieldCheck className="text-primary" />,
-                title: "Anti-Fraud Protection",
-                desc: "Smart rules and device validation prevent attendance manipulation and ensure accuracy."
-              },
-              {
-                icon: <Share2 className="text-primary" />,
-                title: "One-Click Exports",
-                desc: "Generate professional reports in PDF, Excel, or CSV format instantly for administration."
-              },
-              {
-                icon: <Smartphone className="text-primary" />,
-                title: "Smart Analytics",
-                desc: "Detailed insights and trends to help improve attendance and identify at-risk students."
-              }
-            ].map((feature, i) => (
-              <motion.div 
-                key={i} 
-                variants={fadeInUp}
-                className="bg-black/40 backdrop-blur-sm border border-zinc-800 p-8 rounded-2xl hover:bg-zinc-900/60 hover:border-primary/50 transition-all duration-300 group hover:-translate-y-1 shadow-lg hover:shadow-primary/5"
-              >
-                <div className="bg-zinc-900 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-black transition-all duration-300 shadow-inner">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">{feature.title}</h3>
-                <p className="text-zinc-400 leading-relaxed text-sm">{feature.desc}</p>
-                <div className="mt-6 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                    Learn more <ArrowRight size={16} className="ml-1" />
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+               <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
+                  <MapPin className="text-primary" />
+               </div>
+               <h3 className="text-xl font-bold text-white mb-3">Geofencing Engine</h3>
+               <p className="text-zinc-400 text-sm leading-relaxed">
+                  Proprietary polygon-based location verification ensures students are physically present. Accuracy down to 5 meters, with anti-spoofing heuristics.
+               </p>
+            </div>
 
-          {/* Stats Bar */}
-          <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             transition={{ duration: 0.6, delay: 0.4 }}
-             className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-zinc-800 pt-12 bg-zinc-900/30 rounded-3xl p-8 backdrop-blur-sm"
-          >
-             <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">99.9%</div>
-                <div className="text-zinc-500 font-medium">Accuracy Rate</div>
-             </div>
-             <div className="text-center border-l-0 md:border-l border-zinc-800">
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">10K+</div>
-                <div className="text-zinc-500 font-medium">Active Users</div>
-             </div>
-             <div className="text-center border-l-0 md:border-l border-zinc-800">
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">5min</div>
-                <div className="text-zinc-500 font-medium">Setup Time</div>
-             </div>
-          </motion.div>
+            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+               <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
+                  <Fingerprint className="text-primary" />
+               </div>
+               <h3 className="text-xl font-bold text-white mb-3">Device Fingerprinting</h3>
+               <p className="text-zinc-400 text-sm leading-relaxed">
+                  One-device-to-one-student enforcement. We analyze hardware IDs and network signatures to prevent "buddy punching" and proxy attendance.
+               </p>
+            </div>
+
+            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+               <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
+                  <Database className="text-primary" />
+               </div>
+               <h3 className="text-xl font-bold text-white mb-3">Immutable Audit Logs</h3>
+               <p className="text-zinc-400 text-sm leading-relaxed">
+                  Every check-in is a cryptographically verifiable event. Full audit trails for accreditation bodies, ensuring data cannot be retroactively altered.
+               </p>
+            </div>
+
+            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+               <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
+                  <Network className="text-primary" />
+               </div>
+               <h3 className="text-xl font-bold text-white mb-3">Offline-First Sync</h3>
+               <p className="text-zinc-400 text-sm leading-relaxed">
+                  Built for unstable network environments. Data is captured locally, cryptographically signed, and synced when connectivity is restored.
+               </p>
+            </div>
+
+            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+               <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
+                  <Server className="text-primary" />
+               </div>
+               <h3 className="text-xl font-bold text-white mb-3">SIS Integration</h3>
+               <p className="text-zinc-400 text-sm leading-relaxed">
+                  Seamlessly syncs with existing Student Information Systems (SIS) and LMS. Automated roster updates and gradebook synchronization.
+               </p>
+            </div>
+
+            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+               <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
+                  <Globe className="text-primary" />
+               </div>
+               <h3 className="text-xl font-bold text-white mb-3">Multi-Campus Ready</h3>
+               <p className="text-zinc-400 text-sm leading-relaxed">
+                  Unified management for institutions with multiple campuses or satellite locations. Global timezone support and localized compliance.
+               </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* --- How It Works (Enhanced with Video UI) --- */}
-      <section id="how-it-works" className="py-24 px-6 bg-zinc-950 border-t border-white/5 relative overflow-hidden">
-        {/* Background blob */}
-        <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2"></div>
-        
+      {/* --- Solutions by Role --- */}
+      <section id="solutions" className="py-24 px-6 bg-zinc-950 border-t border-white/5">
+         <div className="max-w-7xl mx-auto">
+            <h2 className="text-3xl font-bold text-white mb-16 text-center">Built for the Entire Institution</h2>
+            
+            <div className="space-y-24">
+               {/* For Admin */}
+               <div className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className="order-2 md:order-1">
+                     <div className="inline-flex items-center gap-2 text-primary font-bold mb-4">
+                        <Building2 size={20} /> For Administrators
+                     </div>
+                     <h3 className="text-4xl font-bold text-white mb-4">Data-Driven Accreditation</h3>
+                     <p className="text-zinc-400 text-lg mb-6">
+                        Stop guessing about facility utilization and student engagement. Get precise, exportable data for NUC/accreditation visits and funding defense.
+                     </p>
+                     <ul className="space-y-3 mb-8">
+                        {['Campus-wide utilization heatmaps', 'Automated compliance reporting', 'Fraud detection alerts'].map((item, i) => (
+                           <li key={i} className="flex items-center gap-3 text-zinc-300">
+                              <CheckCircle2 size={18} className="text-primary" /> {item}
+                           </li>
+                        ))}
+                     </ul>
+                     <Button variant="outline">Explore Admin Console</Button>
+                  </div>
+                  <div className="order-1 md:order-2 bg-zinc-900 rounded-2xl p-6 border border-zinc-800 rotate-2 hover:rotate-0 transition-transform duration-500">
+                     <div className="bg-black rounded-xl p-4 border border-zinc-800 space-y-4">
+                        <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
+                           <span className="text-sm font-bold text-white">Daily Attendance Report</span>
+                           <span className="text-xs text-zinc-500">Oct 24, 2025</span>
+                        </div>
+                        <div className="space-y-3">
+                           <div className="flex justify-between items-center">
+                              <span className="text-zinc-400 text-sm">Faculty of Engineering</span>
+                              <span className="text-green-500 text-sm font-bold">94.2%</span>
+                           </div>
+                           <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                              <div className="bg-green-500 w-[94%] h-full"></div>
+                           </div>
+                           <div className="flex justify-between items-center">
+                              <span className="text-zinc-400 text-sm">Faculty of Science</span>
+                              <span className="text-yellow-500 text-sm font-bold">88.5%</span>
+                           </div>
+                           <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+                              <div className="bg-yellow-500 w-[88%] h-full"></div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               {/* For Lecturers */}
+               <div className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 -rotate-2 hover:rotate-0 transition-transform duration-500">
+                      <div className="bg-black rounded-xl p-4 border border-zinc-800 flex items-center justify-center h-64">
+                         <div className="text-center space-y-4">
+                            <div className="inline-block p-4 bg-primary/20 rounded-full text-primary">
+                               <Zap size={32} />
+                            </div>
+                            <h4 className="text-white font-bold">Session Auto-Started</h4>
+                            <p className="text-zinc-500 text-sm">CSC 201 • Room A402</p>
+                            <div className="flex gap-2 justify-center">
+                               <span className="text-xs bg-zinc-800 text-white px-2 py-1 rounded">Geolocation: Active</span>
+                               <span className="text-xs bg-zinc-800 text-white px-2 py-1 rounded">QR: Dynamic</span>
+                            </div>
+                         </div>
+                      </div>
+                  </div>
+                  <div>
+                     <div className="inline-flex items-center gap-2 text-primary font-bold mb-4">
+                        <GraduationCap size={20} /> For Lecturers
+                     </div>
+                     <h3 className="text-4xl font-bold text-white mb-4">Focus on Teaching, Not Counting</h3>
+                     <p className="text-zinc-400 text-lg mb-6">
+                        Eliminate the 15-minute "roll call" ritual. Start your class, let the infrastructure handle verification, and get instant digital records.
+                     </p>
+                     <ul className="space-y-3 mb-8">
+                        {['Zero-touch session initiation', 'Real-time attendee list', 'Automated exam eligibility calculation'].map((item, i) => (
+                           <li key={i} className="flex items-center gap-3 text-zinc-300">
+                              <CheckCircle2 size={18} className="text-primary" /> {item}
+                           </li>
+                        ))}
+                     </ul>
+                     <Button variant="outline">Lecturer Features</Button>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      {/* --- Why Choose Presently (Stats/Proof) --- */}
+      <section className="py-24 px-6 relative overflow-hidden">
+         <div className="absolute inset-0 bg-primary/5 -skew-y-2 scale-110 -z-10"></div>
+         <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-16">Why Leading Institutions Choose Presently</h2>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+               <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
+                  <h3 className="text-5xl font-bold text-white mb-4">100%</h3>
+                  <p className="text-lg font-bold text-white mb-2">Audit Traceability</p>
+                  <p className="text-zinc-400 text-sm">Every data point is time-stamped, geo-tagged, and immutable.</p>
+               </div>
+               <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
+                  <h3 className="text-5xl font-bold text-white mb-4">85%</h3>
+                  <p className="text-lg font-bold text-white mb-2">Admin Time Saved</p>
+                  <p className="text-zinc-400 text-sm">Reduction in manual data entry and report compilation time.</p>
+               </div>
+               <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
+                  <h3 className="text-5xl font-bold text-white mb-4">0%</h3>
+                  <p className="text-lg font-bold text-white mb-2">Infrastructure Overhead</p>
+                  <p className="text-zinc-400 text-sm">Fully managed cloud solution. No servers to buy or maintain.</p>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      {/* --- Enterprise Pricing --- */}
+      <section id="pricing" className="py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How It Works</h2>
-             <p className="text-zinc-400">Get started in minutes with our simple, intuitive process.</p>
-          </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Institutional Licensing</h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-10">
+              Presently is deployed as academic infrastructure. Select the coverage model that fits your administrative scope.
+            </p>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="space-y-0 relative"
-            >
-              {/* Vertical Line */}
-              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-zinc-800"></div>
-
-              {[
-                { num: "01", title: "Sign Up & Choose Role", desc: "Create your account and select whether you're a student, lecturer, or class representative." },
-                { num: "02", title: "Mark or Track Attendance", desc: "Students scan QR codes or use GPS. Lecturers create sessions and monitor in real-time." },
-                { num: "03", title: "View Analytics", desc: "Access detailed insights, trends, and attendance patterns through beautiful dashboards." },
-                { num: "04", title: "Export & Share", desc: "Generate professional reports in PDF, Excel, or CSV format with one click." }
-              ].map((step, i) => (
-                <div key={i} className="flex gap-8 relative pb-12 last:pb-0 group">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full border-4 border-zinc-950 bg-zinc-800 group-hover:bg-primary group-hover:text-black flex items-center justify-center text-zinc-400 font-bold text-lg relative z-10 transition-colors duration-300">
-                      {step.num}
-                    </div>
-                    <div className="pt-2">
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">{step.title}</h3>
-                      <p className="text-zinc-400 leading-relaxed">{step.desc}</p>
-                    </div>
-                </div>
-              ))}
-            </motion.div>
-            
-            {/* Mock Video Player */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-                <div className="aspect-video bg-zinc-900 rounded-3xl border border-zinc-800 relative overflow-hidden group shadow-2xl shadow-black/50">
-                     {/* Video Content Placeholder */}
-                     {!isVideoPlaying ? (
-                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900">
-                             <div className="absolute inset-0 bg-gradient-to-tr from-zinc-900 via-zinc-800 to-zinc-900 opacity-50"></div>
-                             {/* Abstract graphic */}
-                             <div className="absolute inset-0 flex items-center justify-center opacity-30">
-                                 <div className="w-64 h-64 bg-primary rounded-full blur-[80px]"></div>
-                             </div>
-                             
-                             <div className="z-10 text-center space-y-4">
-                                 <button 
-                                    onClick={() => setIsVideoPlaying(true)}
-                                    className="w-20 h-20 bg-primary rounded-full flex items-center justify-center pl-1 shadow-[0_0_30px_rgba(255,202,13,0.4)] hover:scale-110 hover:shadow-[0_0_50px_rgba(255,202,13,0.6)] transition-all duration-300 group-hover:bg-white"
-                                 >
-                                    <Play size={32} className="text-black fill-black" />
-                                 </button>
-                                 <p className="text-white font-bold tracking-wide">Watch Demo</p>
-                             </div>
-
-                             {/* Fake UI Elements */}
-                             <div className="absolute bottom-6 left-6 right-6 flex items-center gap-4 text-white/50">
-                                 <Play size={20} fill="currentColor" />
-                                 <div className="h-1 bg-white/20 flex-1 rounded-full overflow-hidden">
-                                     <div className="w-1/3 h-full bg-primary"></div>
-                                 </div>
-                                 <span className="text-xs font-mono">01:24 / 03:45</span>
-                                 <Volume2 size={20} />
-                                 <Maximize2 size={20} />
-                             </div>
-                         </div>
-                     ) : (
-                         <div className="absolute inset-0 bg-black flex items-center justify-center">
-                             <div className="text-center">
-                                 <p className="text-zinc-500 mb-4">Demo video playing...</p>
-                                 <Button variant="outline" size="sm" onClick={() => setIsVideoPlaying(false)}>
-                                     <Pause size={16} className="mr-2" /> Pause
-                                 </Button>
-                             </div>
-                             {/* Progress Bar Animation */}
-                             <div className="absolute bottom-0 left-0 h-1 bg-primary w-full animate-[progress_10s_linear_infinite]">
-                                <style>{`
-                                    @keyframes progress { from { width: 0%; } to { width: 100%; } }
-                                `}</style>
-                             </div>
-                         </div>
-                     )}
-                </div>
-                {/* Decorative elements around video */}
-                <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full border-2 border-zinc-800 rounded-3xl bg-zinc-950/50"></div>
-                <div className="absolute -z-20 -bottom-12 -right-12 w-full h-full border-2 border-zinc-900 rounded-3xl bg-zinc-950/30"></div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- Pricing (Enhanced with Toggle) --- */}
-      <section id="pricing" className="py-24 px-6 relative">
-        <div className="absolute inset-0 bg-primary/5 -skew-y-3 transform origin-top-left -z-10"></div>
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Simple, Transparent Pricing</h2>
-            <p className="text-zinc-400 text-lg mb-8">Pay securely to access full features.</p>
-            
-            {/* Billing Toggle */}
-            <div className="inline-flex bg-zinc-900 border border-zinc-800 p-1 rounded-full relative">
+            {/* Currency Toggle */}
+            <div className="inline-flex bg-zinc-900 border border-zinc-800 p-1 rounded-full relative mb-12">
                  <button 
-                    onClick={() => setBillingCycle('semester')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all relative z-10 ${billingCycle === 'semester' ? 'text-black' : 'text-zinc-400 hover:text-white'}`}
-                    aria-label="Select per semester billing"
-                    aria-pressed={billingCycle === 'semester'}
+                    onClick={() => setCurrency('USD')}
+                    className={`px-8 py-2 rounded-full text-sm font-semibold transition-all relative z-10 ${currency === 'USD' ? 'text-black' : 'text-zinc-400 hover:text-white'}`}
                  >
-                     Per Semester
+                     USD
                  </button>
                  <button 
-                    onClick={() => setBillingCycle('session')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all relative z-10 ${billingCycle === 'session' ? 'text-black' : 'text-zinc-400 hover:text-white'}`}
-                    aria-label="Select per session billing (2x savings)"
-                    aria-pressed={billingCycle === 'session'}
+                    onClick={() => setCurrency('NGN')}
+                    className={`px-8 py-2 rounded-full text-sm font-semibold transition-all relative z-10 ${currency === 'NGN' ? 'text-black' : 'text-zinc-400 hover:text-white'}`}
                  >
-                     Per Session <span className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded-full ml-1 absolute -top-2 -right-2">2x</span>
+                     NGN
                  </button>
-                 {/* Sliding Background */}
-                 <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-primary rounded-full transition-all duration-300 ${billingCycle === 'semester' ? 'left-1' : 'left-[calc(50%+4px)]'}`}></div>
+                 <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-primary rounded-full transition-all duration-300 ${currency === 'USD' ? 'left-1' : 'left-[calc(50%+4px)]'}`}></div>
             </div>
           </div>
 
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start pt-8"
-          >
-            {/* Students Plan */}
-            <motion.div variants={fadeInUp} className="bg-black border border-zinc-800 rounded-3xl p-8 pt-10 mt-4 md:mt-0 hover:border-zinc-700 transition-colors">
-                <h3 className="text-xl font-bold text-white">Students</h3>
-               <p className="text-zinc-400 text-sm mt-2">For academic tracking & attendance.</p>
-               <div className="my-6">
-                   <span className="text-4xl font-bold text-white">₦ {billingCycle === 'semester' ? '1,000' : '2,000'}</span>
-                   <span className="text-zinc-500">/{billingCycle === 'semester' ? 'semester' : 'session'}</span>
-               </div>
-               <Button variant="secondary" className="w-full mb-8" disabled>Requires Registration</Button>
-               <ul className="space-y-4">
-                   {['Fast check-in (QR + GPS)', 'Attendance history & stats', 'Exam clearance PDF', 'Absence alerts', 'Digital signature'].map((feat, i) => (
-                       <li key={i} className="flex items-center gap-3 text-sm text-zinc-300">
-                           <CheckCircle2 size={16} className="text-zinc-600 flex-shrink-0" /> {feat}
-                       </li>
+          <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+             {/* Individual Practitioner */}
+             <div className="bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
+                <div className="mb-8">
+                   <h3 className="text-xl font-bold text-white mb-2">Individual Practitioner</h3>
+                   <p className="text-zinc-500 text-sm">For lecturers focused on streamlining classroom operations and eliminating manual administrative overhead.</p>
+                </div>
+                <div className="mb-8">
+                   <span className="text-4xl font-bold text-white">{prices.individual}</span>
+                   <span className="text-zinc-500 text-sm ml-2">/ semester</span>
+                </div>
+                <div className="flex-1 space-y-4 mb-8 text-sm">
+                   {[
+                      'Unlimited students per course',
+                      'Up to 5 concurrent courses',
+                      'GPS & Device verification',
+                      'Verified check-in logs',
+                      'Standard CSV/PDF exports'
+                   ].map((feat, i) => (
+                      <div key={i} className="flex items-start gap-3 text-zinc-300">
+                         <CheckCircle2 size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                         {feat}
+                      </div>
                    ))}
-               </ul>
-            </motion.div>
-
-            {/* Lecturers Plan (Highlighted) */}
-            <motion.div variants={fadeInUp} className="bg-zinc-900 border-2 border-primary rounded-3xl p-8 relative shadow-2xl shadow-primary/10 transform scale-105 z-10">
-               <div className="absolute top-0 right-0 left-0 bg-primary text-black text-center text-xs font-bold py-1.5 rounded-t-2xl">FULL ACCESS</div>
-               <div className="pt-4">
-                   <h3 className="text-xl font-bold text-white">Lecturers</h3>
-                   <p className="text-zinc-400 text-sm mt-2">For educators & course management.</p>
-                   <div className="my-6">
-                       <span className="text-4xl font-bold text-white">₦ {billingCycle === 'semester' ? '3,000' : '6,000'}</span>
-                       <span className="text-zinc-500">/{billingCycle === 'semester' ? 'semester' : 'session'}</span>
+                   <div className="pt-4 border-t border-zinc-800 space-y-2 opacity-50">
+                      <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Excludes</p>
+                      <p className="text-xs text-zinc-500">Institutional Admin Privileges, Departmental Audit Trails, SIS Integrations.</p>
                    </div>
-                   <Button className="w-full mb-8" size="lg" onClick={onGetStarted}>Get Started</Button>
-                   <ul className="space-y-4">
-                       {['Unlimited courses & sessions', 'Real-time attendance (QR + GPS)', 'Instant exports (PDF/Excel)', 'Automated exam clearance', 'Attendance validation alerts', 'Student reminders'].map((feat, i) => (
-                           <li key={i} className="flex items-center gap-3 text-sm text-zinc-300">
-                               <CheckCircle2 size={16} className="text-primary flex-shrink-0" /> {feat}
-                           </li>
-                       ))}
-                   </ul>
-               </div>
-            </motion.div>
-
-             {/* Departments Plan */}
-            <motion.div variants={fadeInUp} className="bg-black border border-zinc-800 rounded-3xl p-8 pt-10 mt-4 md:mt-0 hover:border-zinc-700 transition-colors">
-               <h3 className="text-xl font-bold text-white">Departments</h3>
-               <p className="text-zinc-400 text-sm mt-2">For centralized control.</p>
-               <div className="my-6">
-                   <span className="text-4xl font-bold text-white">Custom</span>
-               </div>
-               <Button variant="outline" className="w-full mb-8">Contact Sales</Button>
-               <ul className="space-y-4">
-                   {['All lecturer + student features', 'Department-wide dashboard', 'Bulk analytics & reports', 'Compliance tools', 'White-label branding', 'Dedicated support', 'SIS/LMS Integrations'].map((feat, i) => (
-                       <li key={i} className="flex items-center gap-3 text-sm text-zinc-300">
-                           <CheckCircle2 size={16} className="text-primary flex-shrink-0" /> {feat}
-                       </li>
-                   ))}
-               </ul>
-            </motion.div>
-          </motion.div>
-          
-          <div className="max-w-4xl mx-auto mt-20 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8">
-             <h3 className="text-xl font-bold text-white mb-4">How Billing Works</h3>
-             <div className="grid md:grid-cols-3 gap-6">
-                <div>
-                    <div className="font-bold text-white mb-2">1. Register & Select Role</div>
-                    <p className="text-sm text-zinc-400">Sign up and choose whether you are a Student or Lecturer.</p>
                 </div>
-                <div>
-                    <div className="font-bold text-white mb-2">2. Secure Payment</div>
-                    <p className="text-sm text-zinc-400">Pay the semester fee securely via card, transfer, or USSD.</p>
-                </div>
-                <div>
-                    <div className="font-bold text-white mb-2">3. Instant Access</div>
-                    <p className="text-sm text-zinc-400">Gain immediate access to your dashboard and features.</p>
-                </div>
+                <Button variant="secondary" className="w-full h-12" onClick={onGetStarted}>Deploy Individually</Button>
              </div>
+
+             {/* Departmental License */}
+             <div className="bg-zinc-900 border-2 border-primary/50 p-10 rounded-3xl flex flex-col relative shadow-2xl shadow-primary/5">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest">Administrative Standard</div>
+                <div className="mb-8">
+                   <h3 className="text-xl font-bold text-white mb-2">Departmental License</h3>
+                   <p className="text-zinc-500 text-sm">A centralized system of record for academic units requiring operational oversight, fraud prevention, and audit-ready reporting.</p>
+                </div>
+                <div className="mb-8">
+                   <span className="text-4xl font-bold text-white">{prices.department}</span>
+                   <span className="text-zinc-500 text-sm ml-2">/ semester / faculty</span>
+                </div>
+                <div className="flex-1 space-y-4 mb-8 text-sm">
+                   {[
+                      'Full Department/Faculty coverage',
+                      'Centralized Admin Dashboard',
+                      'Advanced Fraud Heuristics',
+                      'Compliance & Audit Reporting',
+                      'Bulk Data Management',
+                      'Priority Email Support'
+                   ].map((feat, i) => (
+                      <div key={i} className="flex items-start gap-3 text-white">
+                         <CheckCircle2 size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                         {feat}
+                      </div>
+                   ))}
+                </div>
+                <Button className="w-full h-12" onClick={onGetStarted}>Initialize Departmental Coverage</Button>
+             </div>
+
+             {/* Institutional Infrastructure */}
+             <div className="bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
+                <div className="mb-8">
+                   <h3 className="text-xl font-bold text-white mb-2">Institutional Infrastructure</h3>
+                   <p className="text-zinc-500 text-sm">Full-scale deployment for universities requiring a unified attendance backbone, complete compliance readiness, and deep technical integration.</p>
+                </div>
+                <div className="mb-8">
+                   <span className="text-2xl font-bold text-white tracking-tight italic">Custom Quote</span>
+                </div>
+                <div className="flex-1 space-y-4 mb-8 text-sm">
+                   {[
+                      'Total Institutional Visibility',
+                      'SIS/LMS/SSO Deep Integration',
+                      'Custom Data Retention Policies',
+                      'Accreditation Readiness Suite',
+                      'Dedicated Infrastructure Engineer',
+                      '99.9% Uptime SLA Guarantee'
+                   ].map((feat, i) => (
+                      <div key={i} className="flex items-start gap-3 text-zinc-300">
+                         <CheckCircle2 size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                         {feat}
+                      </div>
+                   ))}
+                </div>
+                <Button variant="outline" className="w-full h-12" onClick={onGetStarted}>Consult with Deployment Specialist</Button>
+             </div>
+          </div>
+
+          <div className="mt-12 text-center">
+             <p className="text-zinc-500 text-sm">
+                Upgrading from Individual to Departmental coverage is seamless; all historical course data is preserved and migrated to the centralized administrative console.
+             </p>
           </div>
         </div>
       </section>
@@ -642,29 +587,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       {/* --- FAQ --- */}
       <section className="py-24 px-6 bg-zinc-950 border-t border-white/5">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-             <h2 className="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-             <p className="text-zinc-400">Everything you need to know about Presently.</p>
-          </div>
+          <h2 className="text-3xl font-bold text-white mb-12 text-center">Common Questions</h2>
           <div className="space-y-4">
             {[
-              "How does GPS verification work?",
-              "What if my GPS is turned off or inaccurate?",
-              "Can attendance be faked or manipulated?",
-              "Does Presently work offline?",
-              "What devices and platforms are supported?",
-              "How do you ensure student privacy?",
-              "Can I integrate Presently with existing school systems?",
-              "What kind of support do you provide?"
-            ].map((question, i) => (
+              { q: "Can this integrate with our existing portal?", a: "Yes. Presently is API-first. We offer RESTful endpoints and webhooks to sync student rosters and push attendance grades directly to your Student Information System." },
+              { q: "How secure is the location data?", a: "We treat location data as sensitive PII. It is encrypted in transit and at rest. We do not track students outside of active class sessions. Compliance with NDPR and GDPR is standard." },
+              { q: "What happens if the internet cuts out?", a: "Our Offline-First architecture allows the app to cache encrypted attendance packets locally on the student's device and sync them automatically once connectivity is restored." },
+              { q: "Does it work for large lecture halls?", a: "Absolutely. Our infrastructure is stress-tested to handle thousands of concurrent write requests per second, making it suitable for large general courses (e.g., GST/GNS)." }
+            ].map((item, i) => (
               <div key={i} className="bg-black border border-zinc-800 rounded-xl overflow-hidden">
                 <button 
                   onClick={() => toggleFaq(i)}
-                  className="w-full flex items-center justify-between p-4 text-left font-medium text-white hover:bg-zinc-900 transition-colors"
-                  aria-expanded={openFaqIndex === i}
-                  aria-label={`Toggle answer for: ${question}`}
+                  className="w-full flex items-center justify-between p-6 text-left font-medium text-white hover:bg-zinc-900 transition-colors"
                 >
-                  {question}
+                  {item.q}
                   {openFaqIndex === i ? <ChevronUp className="text-zinc-500" /> : <ChevronDown className="text-zinc-500" />}
                 </button>
                 <AnimatePresence>
@@ -675,8 +611,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-4 pt-0 text-zinc-400 text-sm leading-relaxed border-t border-zinc-800 bg-zinc-900/30">
-                        Presently uses advanced geolocation technology to verify that a student is physically within the classroom's designated area when checking in. This prevents students from sharing codes remotely.
+                      <div className="p-6 pt-0 text-zinc-400 text-sm leading-relaxed border-t border-zinc-800 bg-zinc-900/30">
+                        {item.a}
                       </div>
                     </motion.div>
                   )}
@@ -684,62 +620,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
               </div>
             ))}
           </div>
-          <div className="text-center mt-12">
-             <p className="text-zinc-400 mb-4">Still have questions?</p>
-             <div className="flex justify-center gap-4">
-                <Button variant="secondary">Contact Support</Button>
-                <Button variant="ghost">Schedule Demo</Button>
-             </div>
-          </div>
         </div>
       </section>
 
-      {/* --- Install App --- */}
+      {/* --- CTA --- */}
       <section className="py-24 px-6">
-         <div className="max-w-5xl mx-auto bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-8 md:p-16 flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1 space-y-6">
-                <h2 className="text-3xl font-bold text-white">Install Presently on Your Device</h2>
-                <p className="text-zinc-400 text-lg">Get the full app experience directly from your home screen for quick access to attendance.</p>
-                
-                <div className="space-y-6 pt-4">
-                    <div className="flex items-start gap-4">
-                        <div className="bg-zinc-800 p-3 rounded-xl">
-                           <Smartphone size={24} className="text-primary" />
-                        </div>
-                        <div>
-                            <h4 className="text-white font-bold">Install for Android</h4>
-                            <p className="text-zinc-500 text-sm mb-2">Add to home screen for quick access.</p>
-                            <button 
-                              className="text-primary text-sm font-bold hover:underline"
-                              aria-label="Install Presently app for Android"
-                            >
-                              Install App
-                            </button>
-                        </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                        <div className="bg-zinc-800 p-3 rounded-xl">
-                           <Download size={24} className="text-white" />
-                        </div>
-                        <div>
-                            <h4 className="text-white font-bold">Install for iOS</h4>
-                            <p className="text-zinc-500 text-sm mb-2">Use 'Share' &gt; 'Add to Home Screen'.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="flex-1 flex justify-center">
-                 <div className="w-[280px] h-[580px] border-8 border-zinc-900 rounded-[3rem] bg-zinc-950 shadow-2xl relative overflow-hidden flex flex-col">
-                    <div className="absolute top-0 w-32 h-6 bg-zinc-900 rounded-b-xl left-1/2 -translate-x-1/2 z-20"></div>
-                    <div className="flex-1 bg-black flex flex-col items-center justify-center text-center p-6 space-y-4">
-                         <div className="bg-primary p-4 rounded-2xl mb-4">
-                            <QrCode size={48} className="text-black" />
-                         </div>
-                         <h3 className="text-white font-bold text-xl">Presently</h3>
-                         <p className="text-zinc-500 text-sm">Smart Attendance</p>
-                         <Button size="sm" className="w-full">Open App</Button>
-                    </div>
-                 </div>
+         <div className="max-w-5xl mx-auto bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-12 md:p-20 text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Modernize Your Institution Today</h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-10">
+               Join the forward-thinking universities using Presently to ensure compliance, improve student outcomes, and secure their data.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+               <Button size="lg" className="h-14 px-10 text-lg rounded-full" onClick={onGetStarted}>
+                  Request Infrastructure Audit
+               </Button>
+               <Button variant="secondary" size="lg" className="h-14 px-10 text-lg rounded-full" onClick={onLogin}>
+                  Login to Console
+               </Button>
             </div>
          </div>
       </section>
@@ -750,50 +647,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
                 <div className="col-span-2 lg:col-span-2 space-y-4 pr-8">
                     <Logo />
-                    <p className="text-zinc-400 leading-relaxed max-w-sm">
-                        Making attendance effortless for students, lecturers, and institutions across Africa. Join thousands who have already transformed their attendance experience.
+                    <p className="text-zinc-500 leading-relaxed max-w-sm mt-4">
+                        The operating system for academic attendance. Built for scale, security, and institutional intelligence.
                     </p>
-                    <div className="pt-4 space-y-2">
-                        <div className="flex gap-2">
-                            <input type="email" placeholder="Enter your email" className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-white w-full focus:ring-1 focus:ring-primary outline-none" />
-                            <Button size="sm">Subscribe</Button>
-                        </div>
-                        <p className="text-xs text-zinc-600">Stay updated with our newsletter.</p>
-                    </div>
                 </div>
                 <div>
-                    <h4 className="text-white font-bold mb-4">Product</h4>
+                    <h4 className="text-white font-bold mb-4">Platform</h4>
                     <ul className="space-y-2 text-zinc-500">
-                        <li><button className="hover:text-white transition-colors">Features</button></li>
-                        <li><button className="hover:text-white transition-colors">Pricing</button></li>
-                        <li><button className="hover:text-white transition-colors">How it Works</button></li>
-                        <li><button className="hover:text-white transition-colors">Security</button></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Infrastructure</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Compliance</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 className="text-white font-bold mb-4">Company</h4>
                     <ul className="space-y-2 text-zinc-500">
-                        <li><button className="hover:text-white transition-colors">About Us</button></li>
-                        <li><button className="hover:text-white transition-colors">Blog</button></li>
-                        <li><button className="hover:text-white transition-colors">Careers</button></li>
-                        <li><button className="hover:text-white transition-colors">Contact</button></li>
+                        <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Partners</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 className="text-white font-bold mb-4">Legal</h4>
                     <ul className="space-y-2 text-zinc-500">
-                        <li><button className="hover:text-white transition-colors">Privacy Policy</button></li>
-                        <li><button className="hover:text-white transition-colors">Terms of Service</button></li>
-                        <li><button className="hover:text-white transition-colors">Cookie Policy</button></li>
-                        <li><button className="hover:text-white transition-colors">GDPR</button></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">DPA</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">SLA</a></li>
                     </ul>
                 </div>
             </div>
             <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-zinc-600">
-                <p>&copy; {new Date().getFullYear()} Presently. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} Presently Inc. All rights reserved.</p>
                 <div className="flex gap-6">
-                    <span>Lagos, Nigeria</span>
-                    <span>hello@presently.app</span>
+                    <span className="flex items-center gap-2"><Globe size={14} /> Global Region</span>
                 </div>
             </div>
         </div>
