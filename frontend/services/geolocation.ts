@@ -1,3 +1,5 @@
+import { Geolocation, Position } from '@capacitor/geolocation';
+
 /**
  * Geolocation utilities for frontend attendance check-in
  */
@@ -27,19 +29,29 @@ export const getCurrentPosition = (
     maxWait = 5000 // wait up to 5s for better accuracy if initial is poor
   } = options;
 
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Geolocation is not supported by your browser'));
-      return;
+  return new Promise(async (resolve, reject) => {
+    try {
+      const permissionStatus = await checkLocationPermission();
+      if (!permissionStatus) {
+        // Try to request permission
+        const request = await Geolocation.requestPermissions();
+        if (request.location !== 'granted') {
+          reject(new Error('Location permission denied. Please enable location access.'));
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Error checking permissions:', e);
+      // Continue anyway, maybe it works
     }
 
     let bestPosition: GeolocationPosition | null = null;
-    let watchId: number;
+    let watchId: string | null = null;
     let timerId: any;
     let hasResolved = false;
 
     const cleanup = () => {
-      if (watchId) navigator.geolocation.clearWatch(watchId);
+      if (watchId) Geolocation.clearWatch({ id: watchId });
       if (timerId) clearTimeout(timerId);
     };
 
@@ -50,7 +62,7 @@ export const getCurrentPosition = (
       resolve(position);
     };
 
-    const handleError = (error: GeolocationPositionError) => {
+    const handleError = (error: any) => {
       // If we have a cached position, use it instead of failing completely
       if (bestPosition && !hasResolved) {
         finish(bestPosition);
@@ -60,17 +72,10 @@ export const getCurrentPosition = (
       if (hasResolved) return;
       
       let message = 'Failed to get location';
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          message = 'Location permission denied. Please enable location access.';
-          break;
-        case error.POSITION_UNAVAILABLE:
-          message = 'Location information unavailable. Please try again.';
-          break;
-        case error.TIMEOUT:
-          message = 'Location request timed out. Please try again.';
-          break;
+      if (error && error.message) {
+        message = error.message;
       }
+      
       hasResolved = true;
       cleanup();
       reject(new Error(message));
@@ -81,37 +86,48 @@ export const getCurrentPosition = (
       if (bestPosition) {
         finish(bestPosition);
       } else {
-        handleError({ code: 3, message: 'Timeout' } as GeolocationPositionError);
+        handleError({ code: 3, message: 'Timeout' });
       }
     }, timeout);
 
-    watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const currentPos: GeolocationPosition = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          altitude: position.coords.altitude || undefined,
-          accuracy: position.coords.accuracy,
-          altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
-        };
+    try {
+      watchId = await Geolocation.watchPosition(
+        {
+          enableHighAccuracy: true,
+          timeout: timeout,
+          maximumAge: 0
+        },
+        (position, err) => {
+          if (err) {
+            // Don't error out immediately on watch error, just log and wait for timeout or success
+            console.warn('Watch position error:', err);
+            return;
+          }
 
-        // If this is the first reading, or better accuracy than previous
-        if (!bestPosition || currentPos.accuracy < bestPosition.accuracy) {
-          bestPosition = currentPos;
-        }
+          if (position) {
+            const currentPos: GeolocationPosition = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              altitude: position.coords.altitude || undefined,
+              accuracy: position.coords.accuracy,
+              altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
+            };
 
-        // If accuracy is good enough, return immediately
-        if (currentPos.accuracy <= desiredAccuracy) {
-          finish(currentPos);
+            // If this is the first reading, or better accuracy than previous
+            if (!bestPosition || currentPos.accuracy < bestPosition.accuracy) {
+              bestPosition = currentPos;
+            }
+
+            // If accuracy is good enough, return immediately
+            if (currentPos.accuracy <= desiredAccuracy) {
+              finish(currentPos);
+            }
+          }
         }
-      },
-      handleError,
-      {
-        enableHighAccuracy: true,
-        timeout: timeout,
-        maximumAge: 0
-      }
-    );
+      );
+    } catch (err) {
+      handleError(err);
+    }
     
     // Safety fallback: if we haven't hit desired accuracy by maxWait, just return best we have
     setTimeout(() => {
@@ -176,14 +192,9 @@ export const pointInPolygon = (
  * Request and check location permission status
  */
 export const checkLocationPermission = async (): Promise<boolean> => {
-  if (!navigator.permissions) {
-    // Permissions API not supported, assume we need to request
-    return false;
-  }
-
   try {
-    const result = await navigator.permissions.query({ name: 'geolocation' });
-    return result.state === 'granted';
+    const status = await Geolocation.checkPermissions();
+    return status.location === 'granted';
   } catch (error) {
     console.error('Error checking location permission:', error);
     return false;
