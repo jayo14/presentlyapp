@@ -11,9 +11,9 @@ interface SEOProps {
 }
 
 export const SEO: React.FC<SEOProps> = ({
-  title = 'Presently | Smart Attendance Management System',
-  description = 'Modern, intelligent attendance tracking system for educational institutions. Track attendance with GPS verification, real-time analytics, and AI-powered insights.',
-  keywords = 'attendance, tracking, education, GPS, analytics, student, lecturer, institution',
+  title = 'Presently | Academic Intelligence Infrastructure',
+  description = 'The enterprise-grade operating system for university attendance. Presently delivers real-time location verification, audit-ready compliance logs, and institutional academic intelligence at scale.',
+  keywords = 'university attendance system, academic infrastructure, edtech enterprise, location verification, student compliance, higher education software',
   image = 'https://presentlyapp.vercel.app/og-image.png',
   url = 'https://presentlyapp.vercel.app/',
   type = 'website',
