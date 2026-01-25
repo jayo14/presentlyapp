@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Loader2, AlertCircle, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
 import { Button } from '../Button';
 import L from 'leaflet';
+import { geolocationService } from '../../services/geolocation';
 
 interface FindMyLocationProps {
   onLocationFound?: (location: { latitude: number; longitude: number; accuracy: number }) => void;
@@ -90,36 +91,24 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
 
   }, [location]);
 
-  const handleFindLocation = () => {
-    if (!('geolocation' in navigator)) {
-      setError('Geolocation is not supported by your browser');
-      return;
-    }
-
+  const handleFindLocation = async () => {
     setIsLocating(true);
     setError(null);
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const locationData = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy
-        };
-        setLocation(locationData);
-        setIsLocating(false);
-        onLocationFound?.(locationData);
-      },
-      (error) => {
-        setIsLocating(false);
-        setError(error.message || 'Failed to get location');
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
-    );
+    try {
+      const position = await geolocationService.getCurrentPosition();
+      const locationData = {
+        latitude: position.latitude,
+        longitude: position.longitude,
+        accuracy: position.accuracy
+      };
+      setLocation(locationData);
+      onLocationFound?.(locationData);
+    } catch (err: any) {
+      setError(err.message || 'Failed to get location');
+    } finally {
+      setIsLocating(false);
+    }
   };
 
   const handleRefreshMap = () => {

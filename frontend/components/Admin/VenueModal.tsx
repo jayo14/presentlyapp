@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import { geolocationService } from '../../services/geolocation';
 
 interface VenueModalProps {
   venue?: Venue;
@@ -85,25 +86,20 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     }
   };
 
-  const getCurrentLocation = () => {
-    if ('geolocation' in navigator) {
-      setLoading(true);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          handleChange('latitude', position.coords.latitude);
-          handleChange('longitude', position.coords.longitude);
-          if (position.coords.altitude) {
-            handleChange('elevation', position.coords.altitude);
-          }
-          setLoading(false);
-        },
-        (error) => {
-          setError('Failed to get current location: ' + error.message);
-          setLoading(false);
-        }
-      );
-    } else {
-      setError('Geolocation is not supported by your browser');
+  const getCurrentLocation = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const position = await geolocationService.getCurrentPosition();
+      handleChange('latitude', position.latitude);
+      handleChange('longitude', position.longitude);
+      if (position.altitude) {
+        handleChange('elevation', position.altitude);
+      }
+    } catch (err: any) {
+      setError('Failed to get current location: ' + (err.message || 'Unknown error'));
+    } finally {
+      setLoading(false);
     }
   };
 
