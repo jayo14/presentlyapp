@@ -16,6 +16,7 @@ export const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true); // Default to true
   const loginMutation = useLogin();
   const googleAuthMutation = useGoogleAuth();
   const { data: user, isLoading } = useCurrentUser();
@@ -41,7 +42,8 @@ export const Login: React.FC = () => {
         if (result) {
           const idToken = await result.user.getIdToken();
           setIsRedirecting(true);
-          googleAuthMutation.mutate(idToken, {
+          // Use the rememberMe state to respect user's checkbox preference
+          googleAuthMutation.mutate({ idToken, rememberMe }, {
             onSuccess: () => {
               toast.success('Login Successful');
             },
@@ -57,7 +59,7 @@ export const Login: React.FC = () => {
     };
 
     handleRedirect();
-  }, [googleAuthMutation]);
+  }, [googleAuthMutation, rememberMe]);
 
   // Auto-redirect if user is already logged in
   useEffect(() => {
@@ -82,7 +84,7 @@ export const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsRedirecting(true);
-    loginMutation.mutate({ email, password }, {
+    loginMutation.mutate({ email, password, rememberMe }, {
       onError: (error: any) => {
         setIsRedirecting(false);
         // Extract error message from API response
@@ -190,7 +192,12 @@ export const Login: React.FC = () => {
             
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-zinc-400 cursor-pointer">
-                <input type="checkbox" className="rounded border-zinc-800 bg-zinc-900 text-primary focus:ring-primary" />
+                <input 
+                  type="checkbox" 
+                  className="rounded border-zinc-800 bg-zinc-900 text-primary focus:ring-primary" 
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
                 Remember me
               </label>
               <button
