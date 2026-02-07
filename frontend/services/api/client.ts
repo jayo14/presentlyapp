@@ -28,17 +28,47 @@ const apiClient = axios.create({
 // Token management
 const TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const REMEMBER_ME_KEY = 'remember_me';
 
 export const tokenManager = {
-  getAccessToken: () => localStorage.getItem(TOKEN_KEY),
-  getRefreshToken: () => localStorage.getItem(REFRESH_TOKEN_KEY),
-  setTokens: (accessToken: string, refreshToken: string) => {
-    localStorage.setItem(TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  getAccessToken: () => {
+    // Check localStorage first, then sessionStorage
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+  },
+  getRefreshToken: () => {
+    // Check localStorage first, then sessionStorage
+    return localStorage.getItem(REFRESH_TOKEN_KEY) || sessionStorage.getItem(REFRESH_TOKEN_KEY);
+  },
+  setTokens: (accessToken: string, refreshToken: string, rememberMe: boolean = true) => {
+    // Store the rememberMe preference
+    localStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
+    
+    if (rememberMe) {
+      // Store in localStorage for persistent login
+      localStorage.setItem(TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      // Clear from sessionStorage if it exists
+      sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    } else {
+      // Store in sessionStorage for session-only login
+      sessionStorage.setItem(TOKEN_KEY, accessToken);
+      sessionStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      // Clear from localStorage if it exists
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+    }
   },
   clearTokens: () => {
+    // Clear from both storages
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(REMEMBER_ME_KEY);
+  },
+  getRememberMe: () => {
+    return localStorage.getItem(REMEMBER_ME_KEY) === 'true';
   },
 };
 
@@ -121,7 +151,9 @@ apiClient.interceptors.response.use(
 
         const { access, refresh } = response.data;
         // Update both access and refresh tokens (rotation enabled)
-        tokenManager.setTokens(access, refresh);
+        // Preserve the rememberMe preference when refreshing tokens
+        const rememberMe = tokenManager.getRememberMe();
+        tokenManager.setTokens(access, refresh, rememberMe);
 
         processQueue(null, access);
         originalRequest.headers.Authorization = `Bearer ${access}`;
