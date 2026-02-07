@@ -150,35 +150,31 @@ The application will be available at [http://localhost:3000](http://localhost:30
 
 ## 🚀 Deployment
 
-### Koyeb Deployment
+### Render Deployment (Recommended)
 
-This application is configured for easy deployment to Koyeb with git-driven deployment.
+This application is configured for easy deployment to Render with git-driven deployment.
 
 **Quick Start:**
-1. Create a Koyeb account at [koyeb.com](https://www.koyeb.com/)
+1. Create a Render account at [render.com](https://render.com/)
 2. Connect your GitHub repository
-3. Configure environment variables (see [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md))
-4. Deploy!
+3. Render will automatically detect and use the `render.yaml` configuration
+4. Configure any additional environment variables as needed
+5. Deploy!
 
-**Required Files:**
-- `Procfile` - Process configuration
-- `requirements.txt` - Python dependencies
-- `runtime.txt` - Python version specification
-- `bin/post_compile` - Build hook for static files
+**Configuration File:**
+- `render.yaml` - Complete service configuration including PostgreSQL, Redis, web service, and Celery worker
 
 **Required Environment Variables:**
-- `DJANGO_ALLOWED_HOSTS` or `ALLOWED_HOSTS`
-- `SECRET_KEY`
-- `DATABASE_URL` (PostgreSQL)
-- `REDIS_URL` (optional)
-- `DEBUG=False`
-
-For detailed deployment instructions, see [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md).
+- Most environment variables are auto-configured in `render.yaml`
+- `SECRET_KEY` - Generated automatically
+- `DATABASE_URL` - Auto-configured from PostgreSQL service
+- `REDIS_URL` - Auto-configured from Redis service
+- Additional environment variables can be configured in `render.yaml`
 
 ### Other Platforms
 
 The application also supports deployment to:
-- **Render**: See `render.yaml` for configuration
+- **Koyeb**: See [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md) for configuration (Note: Requires manual setup without Procfile)
 - **Vercel**: Frontend deployment configured in `vercel.json`
 - **Docker**: See `backend/Dockerfile` for containerization
 
