@@ -85,7 +85,7 @@ class StudentDashboardAnalyticsView(APIView):
                 'credit_units': course.credit_units,
                 'lecturer_name': course.lecturer.full_name if course.lecturer else None,
                 'is_active': enrollment.is_active,
-                'enrolled_at': enrollment.created_at.isoformat(),
+                'enrolled_at': enrollment.enrolled_at.isoformat(),
                 'attendance_percentage': attendance_percentage,
                 'sessions_attended': sessions_attended,
                 'total_sessions': total_sessions,
