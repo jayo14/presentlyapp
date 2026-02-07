@@ -219,14 +219,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               collapsed={sidebarCollapsed}
             />
           ))}
-          <button 
-            onClick={() => handleNavClick('notifications')}
-            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
-            title={sidebarCollapsed ? 'Notifications' : undefined}
-          >
-            <Bell size={18} className="flex-shrink-0" />
-            {!sidebarCollapsed && <span className="truncate">Notifications</span>}
-          </button>
+          {userRole !== UserRole.STUDENT && (
+            <button 
+              onClick={() => handleNavClick('notifications')}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+              title={sidebarCollapsed ? 'Notifications' : undefined}
+            >
+              <Bell size={18} className="flex-shrink-0" />
+              {!sidebarCollapsed && <span className="truncate">Notifications</span>}
+            </button>
+          )}
         </nav>
 
         <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
@@ -241,24 +243,35 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
              </button>
            )}
 
-           <button 
-              onClick={toggleTheme}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-200`}
-              title={sidebarCollapsed ? (isDark ? 'Dark Mode' : 'Light Mode') : undefined}
-           >
-              {!sidebarCollapsed && (
-                <div className="flex items-center gap-3 overflow-hidden">
-                   {isDark ? <Moon size={18} className="flex-shrink-0" /> : <Sun size={18} className="flex-shrink-0" />}
-                   <span className="truncate">{isDark ? 'Dark Mode' : 'Light Mode'}</span>
-                </div>
-              )}
-              {sidebarCollapsed && (isDark ? <Moon size={18} className="flex-shrink-0" /> : <Sun size={18} className="flex-shrink-0" />)}
-              {!sidebarCollapsed && (
-                <div className={`w-8 h-4 rounded-full p-0.5 flex flex-shrink-0 transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}`}>
-                   <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
-                </div>
-              )}
-           </button>
+           {userRole !== UserRole.STUDENT ? (
+             <button 
+               onClick={toggleTheme}
+               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-200`}
+               title={sidebarCollapsed ? (isDark ? 'Dark Mode' : 'Light Mode') : undefined}
+             >
+               {!sidebarCollapsed && (
+                 <div className="flex items-center gap-3 overflow-hidden">
+                    {isDark ? <Moon size={18} className="flex-shrink-0" /> : <Sun size={18} className="flex-shrink-0" />}
+                    <span className="truncate">{isDark ? 'Dark Mode' : 'Light Mode'}</span>
+                 </div>
+               )}
+               {sidebarCollapsed && (isDark ? <Moon size={18} className="flex-shrink-0" /> : <Sun size={18} className="flex-shrink-0" />)}
+               {!sidebarCollapsed && (
+                 <div className={`w-8 h-4 rounded-full p-0.5 flex flex-shrink-0 transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}`}>
+                    <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
+                 </div>
+               )}
+             </button>
+           ) : (
+             <button 
+               onClick={() => handleNavClick('notifications')}
+               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+               title={sidebarCollapsed ? 'Notifications' : undefined}
+             >
+               <Bell size={18} className="flex-shrink-0" />
+               {!sidebarCollapsed && <span className="truncate">Notifications</span>}
+             </button>
+           )}
 
           {!sidebarCollapsed && (
             <div className="flex items-center gap-3 px-4 py-3">
@@ -303,9 +316,18 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
                  <Download size={20} />
                </button>
              )}
-             <button onClick={toggleTheme} className="text-zinc-500 dark:text-zinc-400 hover:text-primary transition-colors">
-                {isDark ? <Sun size={20} /> : <Moon size={20} />}
-             </button>
+             {userRole !== UserRole.STUDENT ? (
+               <button onClick={toggleTheme} className="text-zinc-500 dark:text-zinc-400 hover:text-primary transition-colors">
+                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
+               </button>
+             ) : (
+               <button 
+                 onClick={() => handleNavClick('notifications')} 
+                 className={`transition-colors ${currentPage === 'notifications' ? 'text-primary' : 'text-zinc-500 dark:text-zinc-400 hover:text-primary'}`}
+               >
+                 <Bell size={20} />
+               </button>
+             )}
         </div>
       </div>
 
@@ -334,14 +356,18 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
                   onClick={handleNavClick}
                 />
               ))}
-              <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-4 mx-2"></div>
-              <button 
-                onClick={() => handleNavClick('notifications')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
-              >
-                <Bell size={18} />
-                Notifications
-              </button>
+              {userRole !== UserRole.STUDENT && (
+                <>
+                  <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-4 mx-2"></div>
+                  <button 
+                    onClick={() => handleNavClick('notifications')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+                  >
+                    <Bell size={18} />
+                    Notifications
+                  </button>
+                </>
+              )}
           </nav>
 
           <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
