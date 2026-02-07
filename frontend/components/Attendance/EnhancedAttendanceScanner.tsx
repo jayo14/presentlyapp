@@ -28,8 +28,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const [locationInfo, setLocationInfo] = useState('');
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isCameraPermissionDenied, setIsCameraPermissionDenied] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scanIntervalRef = useRef<number | null>(null);
 
   // Haptic feedback helper
   const triggerHaptic = async (style: ImpactStyle = ImpactStyle.Medium) => {
@@ -128,8 +131,120 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    if (scanIntervalRef.current) {
+      window.clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
     setIsCameraActive(false);
+    setIsScanning(false);
   };
+
+  // QR Code Scanner using canvas and image processing
+  const scanQRCode = () => {
+    if (!videoRef.current || !isCameraActive || status !== 'idle') {
+      return;
+    }
+
+    const video = videoRef.current;
+    
+    // Ensure video is ready
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+      return;
+    }
+
+    // Create canvas if it doesn't exist
+    if (!canvasRef.current) {
+      canvasRef.current = document.createElement('canvas');
+    }
+
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    
+    if (!context) return;
+
+    // Set canvas size to video size
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw current video frame to canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Get image data
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    
+    // Try to decode QR code using jsQR library (we'll need to add this)
+    try {
+      // Import jsQR dynamically
+      import('jsqr').then(({ default: jsQR }) => {
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+
+        if (code && code.data) {
+          // Found QR code!
+          const qrData = code.data;
+          console.log('QR Code detected:', qrData);
+          
+          // Extract session code from QR data
+          // Assuming QR contains URL like: https://presentlyapp.vercel.app/check-in/SESSIONCODE
+          // Or just the session code directly
+          let sessionCodeFromQR = qrData;
+          
+          // If it's a URL, extract the session code
+          if (qrData.includes('/check-in/')) {
+            const match = qrData.match(/\/check-in\/([A-Z0-9]+)/i);
+            if (match && match[1]) {
+              sessionCodeFromQR = match[1];
+            }
+          }
+          
+          // Stop scanning and process attendance
+          if (scanIntervalRef.current) {
+            window.clearInterval(scanIntervalRef.current);
+            scanIntervalRef.current = null;
+          }
+          setIsScanning(false);
+          
+          // Trigger haptic feedback
+          triggerHaptic(ImpactStyle.Medium);
+          
+          // Process the code
+          processAttendance(sessionCodeFromQR);
+        }
+      }).catch((err) => {
+        console.error('jsQR import error:', err);
+        // Fallback: show message to user
+        toast.error('QR scanner library not available. Please use manual entry.');
+        setMode('input');
+      });
+    } catch (err) {
+      console.error('QR scan error:', err);
+    }
+  };
+
+  // Start QR scanning loop when camera is active
+  useEffect(() => {
+    if (isCameraActive && mode === 'scan' && status === 'idle') {
+      setIsScanning(true);
+      // Scan every 300ms for QR codes
+      scanIntervalRef.current = window.setInterval(() => {
+        scanQRCode();
+      }, 300);
+    } else {
+      if (scanIntervalRef.current) {
+        window.clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+      setIsScanning(false);
+    }
+
+    return () => {
+      if (scanIntervalRef.current) {
+        window.clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+    };
+  }, [isCameraActive, mode, status]);
 
   const handleModeSwitch = async (newMode: ScanMode) => {
     await triggerHaptic(ImpactStyle.Light);
@@ -386,7 +501,9 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 {/* Instruction Text */}
                 <div className="absolute bottom-32 left-0 right-0 text-center">
                   <div className="inline-block px-6 py-3 bg-black/60 backdrop-blur-lg rounded-full">
-                    <p className="text-white font-medium">Position QR code within the frame</p>
+                    <p className="text-white font-medium">
+                      {isScanning ? 'Scanning for QR codes...' : 'Position QR code within the frame'}
+                    </p>
                   </div>
                 </div>
               </div>
