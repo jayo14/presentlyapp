@@ -15,5 +15,4 @@ capacitor.config.ts
 # Other ignore patterns
 .git/
 .gitignore
-*.md
-!frontend/**
+KOYEB_DEPLOYMENT.md
