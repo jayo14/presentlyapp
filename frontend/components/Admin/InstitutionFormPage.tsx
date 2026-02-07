@@ -269,7 +269,6 @@ export const InstitutionFormPage: React.FC = () => {
                 className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground text-sm placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors resize-none"
               />
             </div>
-            </div>
             <div>
               <label className="block text-sm font-semibold text-zinc-400 mb-2">Website URL</label>
               <div className="relative">
