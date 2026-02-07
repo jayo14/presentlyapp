@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, ArrowLeft, Save, X, ChevronDown, BookOpen, Layers, MapPin } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, ArrowLeft, Save, X, ChevronDown, BookOpen, Layers, MapPin, Users } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Course, Department, College, Institution } from '../../types';
@@ -212,6 +212,11 @@ export const CourseManagement: React.FC<CourseManagementProps> = ({ userInstitut
                     {course.level && (
                         <span className="flex items-center gap-1.5">
                             <BookOpen size={14} /> {course.level} Lvl
+                        </span>
+                    )}
+                    {typeof course.enrolled_students_count === 'number' && (
+                        <span className="flex items-center gap-1.5 text-primary font-medium">
+                            <Users size={14} /> {course.enrolled_students_count} Enrolled
                         </span>
                     )}
                   </div>
