@@ -40,13 +40,12 @@ export const tokenManager = {
     return localStorage.getItem(REFRESH_TOKEN_KEY) || sessionStorage.getItem(REFRESH_TOKEN_KEY);
   },
   setTokens: (accessToken: string, refreshToken: string, rememberMe: boolean = true) => {
-    // Store the rememberMe preference
-    localStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
-    
     if (rememberMe) {
       // Store in localStorage for persistent login
       localStorage.setItem(TOKEN_KEY, accessToken);
       localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      // Store the rememberMe preference in localStorage
+      localStorage.setItem(REMEMBER_ME_KEY, 'true');
       // Clear from sessionStorage if it exists
       sessionStorage.removeItem(TOKEN_KEY);
       sessionStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -54,21 +53,33 @@ export const tokenManager = {
       // Store in sessionStorage for session-only login
       sessionStorage.setItem(TOKEN_KEY, accessToken);
       sessionStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      // Store the rememberMe preference in sessionStorage (so it's cleared when session ends)
+      sessionStorage.setItem(REMEMBER_ME_KEY, 'false');
       // Clear from localStorage if it exists
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(REMEMBER_ME_KEY);
     }
   },
   clearTokens: () => {
     // Clear from both storages
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(REMEMBER_ME_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(REMEMBER_ME_KEY);
+    sessionStorage.removeItem(REMEMBER_ME_KEY);
   },
   getRememberMe: () => {
-    return localStorage.getItem(REMEMBER_ME_KEY) === 'true';
+    // Check localStorage first for persistent preference, then sessionStorage
+    const localPref = localStorage.getItem(REMEMBER_ME_KEY);
+    const sessionPref = sessionStorage.getItem(REMEMBER_ME_KEY);
+    
+    if (localPref === 'true') return true;
+    if (sessionPref === 'false') return false;
+    
+    // Default to true if no preference is stored
+    return true;
   },
 };
 
