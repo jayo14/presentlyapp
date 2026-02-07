@@ -158,6 +158,8 @@ class OnboardingSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         from .models import CourseEnrollment, Course, UserRole
+        import logging
+        logger = logging.getLogger(__name__)
         
         # Extract courses before updating
         courses_data = validated_data.pop('courses', None)
@@ -173,21 +175,39 @@ class OnboardingSerializer(serializers.ModelSerializer):
         # Handle course enrollment for students
         if instance.role == UserRole.STUDENT and courses_data:
             # Parse course IDs from comma-separated string
-            course_ids = [int(cid.strip()) for cid in courses_data.split(',') if cid.strip().isdigit()]
+            course_ids = []
+            invalid_ids = []
+            
+            for cid in courses_data.split(','):
+                cid = cid.strip()
+                if not cid:
+                    continue
+                if cid.isdigit():
+                    course_ids.append(int(cid))
+                else:
+                    invalid_ids.append(cid)
+            
+            # Log invalid course IDs
+            if invalid_ids:
+                logger.warning(f"Invalid course IDs during onboarding for user {instance.email}: {', '.join(invalid_ids)}")
             
             # Enroll student in selected courses
+            enrolled_count = 0
             for course_id in course_ids:
                 try:
                     course = Course.objects.get(id=course_id, is_active=True)
                     # Create enrollment if it doesn't exist
-                    CourseEnrollment.objects.get_or_create(
+                    enrollment, created = CourseEnrollment.objects.get_or_create(
                         student=instance,
                         course=course,
                         defaults={'is_active': True}
                     )
+                    if created:
+                        enrolled_count += 1
                 except Course.DoesNotExist:
-                    # Skip invalid course IDs
-                    pass
+                    logger.warning(f"Course with ID {course_id} not found for user {instance.email}")
+            
+            logger.info(f"Enrolled user {instance.email} in {enrolled_count} courses during onboarding")
         
         return instance
 
