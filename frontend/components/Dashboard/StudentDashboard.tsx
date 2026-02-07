@@ -141,7 +141,7 @@ const MarkAttendanceModal = ({
 
             <motion.div 
                 {...modalProps}
-                aria-label="Mark Attendance"
+                aria-labelledby="attendance-modal-title"
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
@@ -149,6 +149,7 @@ const MarkAttendanceModal = ({
             >
                 {/* Header */}
                 <div className="p-4 flex justify-between items-center z-20 bg-gradient-to-b from-zinc-900/90 to-transparent absolute top-0 left-0 right-0 pointer-events-none">
+                    <h2 id="attendance-modal-title" className="sr-only">Mark Attendance</h2>
                     <button 
                         onClick={onClose} 
                         className="bg-black/40 hover:bg-black/60 text-white p-2 rounded-full backdrop-blur-sm transition-colors pointer-events-auto"
