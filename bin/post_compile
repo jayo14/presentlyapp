@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# post_compile hook for Koyeb buildpack
+# This script runs after dependencies are installed
+
+set -e
+
+echo "-----> Post-compile: Collecting static files"
+cd backend
+python manage.py collectstatic --noinput
+
+echo "-----> Post-compile: Complete"
