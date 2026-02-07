@@ -65,8 +65,7 @@ echo "-----> Post-compile: Complete"
 
 2. **Connect your Git repository**
    - Select GitHub as the deployment option
-   - Choose your repository and branch
-   - Or use: `https://github.com/CodeGallantX/presently-2`
+   - Choose your repository and branch containing this application
 
 3. **Configure the service**
    - Builder: Keep "Buildpack" selected
