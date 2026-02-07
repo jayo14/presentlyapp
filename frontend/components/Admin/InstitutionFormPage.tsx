@@ -259,8 +259,9 @@ export const InstitutionFormPage: React.FC = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Street Address</label>
+              <label htmlFor="institution-address" className="block text-sm font-semibold text-zinc-400 mb-2">Street Address</label>
               <textarea
+                id="institution-address"
                 value={formData.address || ''}
                 onChange={(e) => handleChange('address', e.target.value)}
                 placeholder="Full street address, building name, etc."
