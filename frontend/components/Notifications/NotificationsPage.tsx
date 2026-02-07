@@ -19,7 +19,7 @@ export const NotificationsPage: React.FC = () => {
       const data = await notificationsApi.getAll();
       setNotifications(data);
       setError(null);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to load notifications:', err);
       setError('Failed to load notifications');
       toast.error('Failed to load notifications');
