@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 // API Base URL - Django backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api';
 
 // List of endpoints that gracefully handle 404s with fallback data
 const GRACEFUL_404_ENDPOINTS = [
@@ -28,17 +28,58 @@ const apiClient = axios.create({
 // Token management
 const TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const REMEMBER_ME_KEY = 'remember_me';
 
 export const tokenManager = {
-  getAccessToken: () => localStorage.getItem(TOKEN_KEY),
-  getRefreshToken: () => localStorage.getItem(REFRESH_TOKEN_KEY),
-  setTokens: (accessToken: string, refreshToken: string) => {
-    localStorage.setItem(TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  getAccessToken: () => {
+    // Check localStorage first, then sessionStorage
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+  },
+  getRefreshToken: () => {
+    // Check localStorage first, then sessionStorage
+    return localStorage.getItem(REFRESH_TOKEN_KEY) || sessionStorage.getItem(REFRESH_TOKEN_KEY);
+  },
+  setTokens: (accessToken: string, refreshToken: string, rememberMe: boolean = true) => {
+    if (rememberMe) {
+      // Store in localStorage for persistent login
+      localStorage.setItem(TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      // Store the rememberMe preference in localStorage
+      localStorage.setItem(REMEMBER_ME_KEY, 'true');
+      // Clear from sessionStorage if it exists
+      sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    } else {
+      // Store in sessionStorage for session-only login
+      sessionStorage.setItem(TOKEN_KEY, accessToken);
+      sessionStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      // Store the rememberMe preference in sessionStorage (so it's cleared when session ends)
+      sessionStorage.setItem(REMEMBER_ME_KEY, 'false');
+      // Clear from localStorage if it exists
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(REMEMBER_ME_KEY);
+    }
   },
   clearTokens: () => {
+    // Clear from both storages
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(REMEMBER_ME_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    sessionStorage.removeItem(REMEMBER_ME_KEY);
+  },
+  getRememberMe: () => {
+    // Check localStorage first for persistent preference, then sessionStorage
+    const localPref = localStorage.getItem(REMEMBER_ME_KEY);
+    const sessionPref = sessionStorage.getItem(REMEMBER_ME_KEY);
+    
+    if (localPref === 'true') return true;
+    if (sessionPref === 'false') return false;
+    
+    // Default to true if no preference is stored
+    return true;
   },
 };
 
@@ -121,7 +162,9 @@ apiClient.interceptors.response.use(
 
         const { access, refresh } = response.data;
         // Update both access and refresh tokens (rotation enabled)
-        tokenManager.setTokens(access, refresh);
+        // Preserve the rememberMe preference when refreshing tokens
+        const rememberMe = tokenManager.getRememberMe();
+        tokenManager.setTokens(access, refresh, rememberMe);
 
         processQueue(null, access);
         originalRequest.headers.Authorization = `Bearer ${access}`;
