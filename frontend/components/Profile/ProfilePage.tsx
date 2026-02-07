@@ -73,7 +73,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole
   );
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 md:pb-8 animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto pb-20 md:pb-8 pt-4 md:pt-0 animate-in fade-in duration-500">
       
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
@@ -82,7 +82,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole
       ) : (
         <>
           {/* Cover Image & Header */}
-          <div className="relative mb-20 sm:mb-24">
+          <div className="relative mb-24 sm:mb-24">
          <div className="h-32 sm:h-48 md:h-64 w-full rounded-xl sm:rounded-2xl overflow-hidden relative group">
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 dark:from-zinc-900 dark:to-zinc-800"></div>
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
