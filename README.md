@@ -148,6 +148,42 @@ The application will be available at [http://localhost:3000](http://localhost:30
 
 ---
 
+## 🚀 Deployment
+
+### Koyeb Deployment
+
+This application is configured for easy deployment to Koyeb with git-driven deployment.
+
+**Quick Start:**
+1. Create a Koyeb account at [koyeb.com](https://www.koyeb.com/)
+2. Connect your GitHub repository
+3. Configure environment variables (see [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md))
+4. Deploy!
+
+**Required Files:**
+- `Procfile` - Process configuration
+- `requirements.txt` - Python dependencies
+- `runtime.txt` - Python version specification
+- `bin/post_compile` - Build hook for static files
+
+**Required Environment Variables:**
+- `DJANGO_ALLOWED_HOSTS` or `ALLOWED_HOSTS`
+- `SECRET_KEY`
+- `DATABASE_URL` (PostgreSQL)
+- `REDIS_URL` (optional)
+- `DEBUG=False`
+
+For detailed deployment instructions, see [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md).
+
+### Other Platforms
+
+The application also supports deployment to:
+- **Render**: See `render.yaml` for configuration
+- **Vercel**: Frontend deployment configured in `vercel.json`
+- **Docker**: See `backend/Dockerfile` for containerization
+
+---
+
 ## 👥 User Roles
 
 - **Admin**: Full system management, institutions, users, and audit logs.
