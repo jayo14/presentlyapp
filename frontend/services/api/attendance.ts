@@ -13,6 +13,7 @@ export interface Course {
   semester?: string;
   level?: string;
   is_active: boolean;
+  enrolled_students_count?: number;
   created_at: string;
   updated_at: string;
 }
