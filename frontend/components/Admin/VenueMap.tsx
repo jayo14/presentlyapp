@@ -108,10 +108,25 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       const layer = e.layer;
       if (e.shape === 'Polygon') {
         const coords = layer.getLatLngs()[0].map((latlng: L.LatLng) => [latlng.lat, latlng.lng]);
-        // Close polygon if needed by backend (usually backend expects explicit closure or handled there)
+        
+        // Add click handler to the newly drawn polygon
+        layer.on('click', (clickEvent: L.LeafletMouseEvent) => {
+          L.DomEvent.stopPropagation(clickEvent);
+          // Calculate center of polygon for venue marker
+          const center = layer.getBounds().getCenter();
+          onMapClick?.(center.lat, center.lng);
+        });
+        
+        // Style the temporary polygon
+        layer.setStyle({
+          color: '#ffca0d',
+          fillColor: '#ffca0d',
+          fillOpacity: 0.2,
+          weight: 2
+        });
+        
+        // Callback with coordinates
         onBoundaryComplete?.(coords);
-        // Remove the temporary drawn layer, as it will be re-rendered from venues data
-        map.removeLayer(layer);
       }
     });
 
@@ -195,20 +210,46 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       // 2. Render Boundary Polygon
       if (venue.boundary_coordinates && venue.boundary_coordinates.length >= 3) {
         const polygon = L.polygon(venue.boundary_coordinates as L.LatLngExpression[], {
-          color: isActive ? '#ef4444' : '#6366f1',
-          fillColor: isActive ? '#ef4444' : '#6366f1',
-          fillOpacity: 0.1,
-          weight: 2
+          color: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
+          fillColor: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
+          fillOpacity: isSelected ? 0.2 : 0.1,
+          weight: isSelected ? 3 : 2,
+          className: 'venue-polygon'
         }).addTo(map);
+
+        // Add hover effect
+        polygon.on('mouseover', function() {
+          this.setStyle({ fillOpacity: 0.3, weight: 3 });
+        });
+        polygon.on('mouseout', function() {
+          this.setStyle({ 
+            fillOpacity: isSelected ? 0.2 : 0.1,
+            weight: isSelected ? 3 : 2
+          });
+        });
+
+        // Add click handler to polygon
+        polygon.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          onVenueClick?.(venue);
+        });
 
         // Enable editing for the selected venue's boundary
         if (isSelected) {
             polygon.pm.enable({
                 allowSelfIntersection: false,
             });
+            
+            // Update boundary when edited
             polygon.on('pm:edit', (e: any) => {
                 const updatedCoords = polygon.getLatLngs()[0].map((latlng: any) => [latlng.lat, latlng.lng]);
                 onBoundaryComplete?.(updatedCoords);
+            });
+            
+            // Show tooltip indicating editability
+            polygon.bindTooltip('Click and drag vertices to edit boundary', { 
+              sticky: true,
+              className: 'custom-tooltip'
             });
         }
 
@@ -330,11 +371,44 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       {drawingMode && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-zinc-900 text-white px-6 py-3 rounded-2xl shadow-2xl border border-zinc-800 flex items-center gap-4 animate-in slide-in-from-top-4">
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              <p className="text-sm font-bold tracking-tight">Drawing Mode Active</p>
-              <div className="h-4 w-[1px] bg-zinc-700" />
-              <p className="text-xs text-zinc-400">Click map to start drawing polygon</p>
+              <div>
+                <p className="text-sm font-bold tracking-tight">Drawing Mode Active</p>
+                <p className="text-xs text-zinc-400 mt-1">Click map to draw polygon • Click inside polygon to create venue</p>
+              </div>
           </div>
       )}
+      
+      {selectedVenue && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-primary/90 text-black px-6 py-3 rounded-2xl shadow-2xl border-2 border-primary flex items-center gap-4 animate-in slide-in-from-top-4">
+              <div className="w-2 h-2 bg-black rounded-full animate-pulse" />
+              <div>
+                <p className="text-sm font-bold tracking-tight">{selectedVenue.name} Selected</p>
+                <p className="text-xs text-black/70 mt-1">Click and drag vertices to edit boundary • Changes saved automatically</p>
+              </div>
+          </div>
+      )}
+      
+      <style>{`
+        .custom-tooltip {
+          background-color: rgba(0, 0, 0, 0.8);
+          border: 1px solid #ffca0d;
+          border-radius: 8px;
+          padding: 6px 12px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #ffca0d;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .venue-polygon {
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        .venue-polygon:hover {
+          filter: brightness(1.2);
+        }
+      `}</style>
     </div>
   );
 };
