@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Plus, Edit2, Trash2, Search, Building2, GraduationCap, AlertCircle, Loader, ArrowLeft } from 'lucide-react';
+import { BookOpen, Plus, Edit2, Trash2, Search, Building2, GraduationCap, AlertCircle, Loader, ArrowLeft, Users } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Course, Department, College, Institution } from '../../types';
@@ -332,6 +332,13 @@ export const CourseManagement: React.FC = () => {
               {course.lecturer_name && (
                 <div className="text-zinc-400">
                   Lecturer: {course.lecturer_name}
+                </div>
+              )}
+
+              {typeof course.enrolled_students_count === 'number' && (
+                <div className="flex items-center gap-2 text-zinc-400">
+                  <Users className="w-4 h-4" />
+                  <span>{course.enrolled_students_count} Student{course.enrolled_students_count !== 1 ? 's' : ''} Enrolled</span>
                 </div>
               )}
 
