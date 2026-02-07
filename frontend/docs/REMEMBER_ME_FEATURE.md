@@ -107,16 +107,12 @@ tokenManager.setTokens(newAccessToken, newRefreshToken, rememberMe);
 
 ## Browser Compatibility
 
-This feature works in all modern browsers that support:
-- localStorage API
-- sessionStorage API
+This feature works in all modern browsers with support for:
+- localStorage API (widely supported since IE 8)
+- sessionStorage API (widely supported since IE 8)
 - ES6+ JavaScript features
 
-Compatible with:
-- Chrome/Edge (latest versions)
-- Firefox (latest versions)
-- Safari (latest versions)
-- All modern mobile browsers
+The feature is compatible with all current desktop and mobile browsers.
 
 ## Future Enhancements
 
