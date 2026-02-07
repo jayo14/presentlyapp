@@ -1,5 +1,7 @@
 # Koyeb Deployment Guide
 
+> **⚠️ Note:** This guide is outdated. The Procfile has been removed from this repository as the project now prioritizes Render.com deployment (see `render.yaml`). For Koyeb deployment, you will need to manually configure the run command and build process in the Koyeb dashboard.
+
 This guide explains how to deploy the Presently Django application to Koyeb.
 
 ## Prerequisites
