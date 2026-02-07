@@ -141,7 +141,7 @@ const MarkAttendanceModal = ({
 
             <motion.div 
                 {...modalProps}
-                aria-label="Mark Attendance"
+                aria-labelledby="attendance-modal-title"
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
@@ -157,6 +157,7 @@ const MarkAttendanceModal = ({
                         <X size={20} />
                     </button>
                     <div className="bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-white border border-white/10">
+                        <h2 id="attendance-modal-title" className="sr-only">Mark Attendance</h2>
                         Attendance Mode
                     </div>
                 </div>
