@@ -44,7 +44,7 @@ export const PublicCheckInPage: React.FC = () => {
       setError(null);
 
       // Using the public endpoint which returns session details
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      const API_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api/';
       const response = await fetch(`${API_URL}/check-in/${sessionCode}/`, {
           headers: {
               'Authorization': `Bearer ${localStorage.getItem('access_token')}`
@@ -122,7 +122,7 @@ export const PublicCheckInPage: React.FC = () => {
       setAutoEnrolling(true);
       toast.info('Automatically enrolling you in the course...');
       
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      const API_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api/';
       const response = await fetch(`${API_URL}/course-enrollments/enroll/`, {
           method: 'POST',
           headers: {
