@@ -32,6 +32,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const scanIntervalRef = useRef<number | null>(null);
 
   // Haptic feedback helper
@@ -152,19 +153,22 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       return;
     }
 
-    // Create canvas if it doesn't exist
+    // Create canvas and context once
     if (!canvasRef.current) {
       canvasRef.current = document.createElement('canvas');
+      contextRef.current = canvasRef.current.getContext('2d', { willReadFrequently: true });
     }
 
     const canvas = canvasRef.current;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
+    const context = contextRef.current;
     
     if (!context) return;
 
-    // Set canvas size to video size
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // Set canvas size to video size (only if changed)
+    if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+    }
 
     // Draw current video frame to canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -226,10 +230,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   useEffect(() => {
     if (isCameraActive && mode === 'scan' && status === 'idle') {
       setIsScanning(true);
-      // Scan every 300ms for QR codes
+      // Scan every 500ms for QR codes (better performance than 300ms)
       scanIntervalRef.current = window.setInterval(() => {
         scanQRCode();
-      }, 300);
+      }, 500);
     } else {
       if (scanIntervalRef.current) {
         window.clearInterval(scanIntervalRef.current);
