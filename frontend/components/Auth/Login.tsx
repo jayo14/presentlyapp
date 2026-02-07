@@ -42,8 +42,8 @@ export const Login: React.FC = () => {
         if (result) {
           const idToken = await result.user.getIdToken();
           setIsRedirecting(true);
-          // Use the rememberMe preference (default to true for Google auth)
-          googleAuthMutation.mutate({ idToken, rememberMe: true }, {
+          // Use the rememberMe state to respect user's checkbox preference
+          googleAuthMutation.mutate({ idToken, rememberMe }, {
             onSuccess: () => {
               toast.success('Login Successful');
             },
@@ -59,7 +59,7 @@ export const Login: React.FC = () => {
     };
 
     handleRedirect();
-  }, [googleAuthMutation]);
+  }, [googleAuthMutation, rememberMe]);
 
   // Auto-redirect if user is already logged in
   useEffect(() => {
