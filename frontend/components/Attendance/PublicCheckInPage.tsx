@@ -184,7 +184,7 @@ export const PublicCheckInPage: React.FC = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
         <p className="text-zinc-400 font-medium">Preparing attendance check-in...</p>
       </div>
@@ -193,19 +193,44 @@ export const PublicCheckInPage: React.FC = () => {
 
   if (error && !session) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 text-center">
-        <div className="bg-red-500/10 p-4 rounded-full text-red-500 mb-6">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 text-center">
+        <div className="bg-red-500/10 p-6 rounded-full text-red-500 mb-6">
           <AlertCircle size={48} />
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">Invalid Session</h2>
         <p className="text-zinc-400 mb-8 max-w-md">{error}</p>
-        <Button onClick={() => navigate('/')}>Back to Home</Button>
+        <Button onClick={() => navigate('/dashboard')} variant="secondary">
+          Back to Dashboard
+        </Button>
+      </div>
+    );
+  }
+  
+  // If loading failed but we don't have error, show generic error
+  if (!loading && !session && !authLoading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 text-center">
+        <div className="bg-red-500/10 p-6 rounded-full text-red-500 mb-6">
+          <AlertCircle size={48} />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Session Not Found</h2>
+        <p className="text-zinc-400 mb-8 max-w-md">
+          The attendance session you're trying to access could not be found or is no longer available.
+        </p>
+        <div className="flex gap-3">
+          <Button onClick={() => navigate('/dashboard')} variant="secondary">
+            Back to Dashboard
+          </Button>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
