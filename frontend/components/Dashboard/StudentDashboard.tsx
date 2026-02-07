@@ -149,6 +149,7 @@ const MarkAttendanceModal = ({
             >
                 {/* Header */}
                 <div className="p-4 flex justify-between items-center z-20 bg-gradient-to-b from-zinc-900/90 to-transparent absolute top-0 left-0 right-0 pointer-events-none">
+                    <h2 id="attendance-modal-title" className="sr-only">Mark Attendance</h2>
                     <button 
                         onClick={onClose} 
                         className="bg-black/40 hover:bg-black/60 text-white p-2 rounded-full backdrop-blur-sm transition-colors pointer-events-auto"
@@ -157,7 +158,6 @@ const MarkAttendanceModal = ({
                         <X size={20} />
                     </button>
                     <div className="bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-white border border-white/10">
-                        <h2 id="attendance-modal-title" className="sr-only">Mark Attendance</h2>
                         Attendance Mode
                     </div>
                 </div>
