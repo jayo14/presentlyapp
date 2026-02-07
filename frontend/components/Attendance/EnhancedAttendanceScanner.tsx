@@ -352,7 +352,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
             {/* Enhanced Scanning Frame */}
             {isCameraActive && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div 
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                role="status"
+                aria-label="QR code scanning area - position QR code within the frame"
+              >
                 {/* Vignette Overlay */}
                 <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/30 to-black/60" />
 
