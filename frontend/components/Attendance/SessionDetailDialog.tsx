@@ -141,18 +141,49 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
               <div className="bg-white p-3 sm:p-4 rounded-2xl shadow-lg border border-zinc-100 mb-6 w-full max-w-[240px] aspect-square flex items-center justify-center">
                 <QRCodeSVG value={sessionUrl} size={200} level="H" includeMargin className="w-full h-full" />
               </div>
-              <div className="text-center space-y-2 group relative w-full">
-                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-zinc-400">Session Code</div>
-                <div 
-                  className="text-2xl sm:text-3xl font-black text-primary font-mono tracking-tighter cursor-pointer flex items-center justify-center gap-2 hover:opacity-80 transition-opacity break-all px-4"
-                  onClick={() => {
-                    navigator.clipboard.writeText(session.session_code);
-                    toast.success('Code copied to clipboard');
-                  }}
-                  title="Click to copy code"
-                >
-                  {session.session_code}
-                  <Copy size={18} className="flex-shrink-0 text-zinc-400 opacity-50 sm:opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="text-center space-y-3 group relative w-full">
+                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-zinc-400 flex items-center justify-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                  Session Code
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                </div>
+                
+                <div className="relative">
+                  {/* Animated Background Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 rounded-2xl blur-xl animate-pulse"></div>
+                  
+                  {/* Code Container */}
+                  <div 
+                    className="relative bg-gradient-to-br from-zinc-900 to-black dark:from-zinc-950 dark:to-zinc-900 border-2 border-primary/20 rounded-2xl p-4 sm:p-6 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:scale-[1.02] active:scale-[0.98] group/code"
+                    onClick={() => {
+                      navigator.clipboard.writeText(session.session_code);
+                      toast.success('Code copied to clipboard');
+                    }}
+                    title="Click to copy code"
+                  >
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 rounded-2xl"></div>
+                    
+                    {/* Code Display */}
+                    <div className="relative flex items-center justify-center gap-3">
+                      <div className="text-2xl sm:text-4xl font-black text-primary font-mono tracking-wider break-all select-all">
+                        {session.session_code}
+                      </div>
+                      <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center opacity-0 group-hover/code:opacity-100 transition-all duration-300 transform group-hover/code:rotate-12">
+                        <Copy size={16} className="sm:w-5 sm:h-5 text-primary" />
+                      </div>
+                    </div>
+                    
+                    {/* Copy Hint */}
+                    <div className="mt-3 text-[10px] sm:text-xs text-zinc-500 font-medium opacity-0 group-hover/code:opacity-100 transition-opacity duration-300">
+                      Click to copy
+                    </div>
+                  </div>
+                </div>
+                
+                {/* QR Alternative Text */}
+                <div className="text-[10px] text-zinc-500 pt-2">
+                  Students can scan QR or enter this code
                 </div>
               </div>
             </div>
