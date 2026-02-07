@@ -1107,6 +1107,57 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         return [IsLecturerOrAdmin()]
     
+    def perform_create(self, serializer):
+        """Create session and notify enrolled students"""
+        session = serializer.save()
+        
+        # Notify all enrolled students about the new session
+        from notifications.models import Notification, NotificationType
+        from notifications.services import NotificationService
+        
+        try:
+            # Get all enrolled students for this course
+            enrolled_students = CourseEnrollment.objects.filter(
+                course=session.course,
+                is_active=True
+            ).select_related('student')
+            
+            # Create notifications for each enrolled student
+            for enrollment in enrolled_students:
+                student = enrollment.student
+                
+                # Create in-app notification
+                notification = Notification.objects.create(
+                    user=student,
+                    title=f"New Session: {session.course.code}",
+                    message=f"A new attendance session has been created for {session.course.title}. Session starts at {session.start_time.strftime('%I:%M %p')}.",
+                    notification_type=NotificationType.SESSION_STARTED,
+                    data={
+                        'session_id': str(session.id),
+                        'course_id': str(session.course.id),
+                        'course_code': session.course.code,
+                        'course_name': session.course.title,
+                        'session_code': session.session_code,
+                        'venue_name': session.venue.name if session.venue else None,
+                        'start_time': session.start_time.isoformat(),
+                        'end_time': session.end_time.isoformat(),
+                    }
+                )
+                
+                # Send push notification
+                NotificationService.send_push_notification(
+                    user=student,
+                    title=notification.title,
+                    message=notification.message,
+                    data=notification.data,
+                    notification_type=NotificationType.SESSION_STARTED
+                )
+                
+            logger.info(f"Sent notifications to {enrolled_students.count()} students for session {session.id}")
+        except Exception as e:
+            logger.error(f"Error sending session notifications: {str(e)}")
+            # Don't fail session creation if notifications fail
+    
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()

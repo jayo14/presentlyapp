@@ -196,8 +196,9 @@ export const Onboarding: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+  const handleImageUpload = async (e?: React.ChangeEvent<HTMLInputElement>) => {
+    // If called from file input
+    if (e && e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -205,6 +206,30 @@ export const Onboarding: React.FC = () => {
         }
       };
       reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  const handleCameraClick = async () => {
+    try {
+      const { CameraService } = await import('../../services/camera');
+      const photoData = await CameraService.capturePhoto({
+        quality: 80,
+        allowEditing: true,
+        width: 512,
+        height: 512,
+      });
+      
+      if (photoData) {
+        setPendingImage(photoData);
+      }
+    } catch (error) {
+      console.error('Camera error:', error);
+      // Fallback to file input if camera fails
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.onchange = (e) => handleImageUpload(e as React.ChangeEvent<HTMLInputElement>);
+      fileInput.click();
     }
   };
 
@@ -294,10 +319,13 @@ export const Onboarding: React.FC = () => {
            </div>
            
            {!pendingImage && (
-             <label className="absolute bottom-0 right-0 bg-primary text-black p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110">
+             <button 
+               type="button"
+               onClick={handleCameraClick}
+               className="absolute bottom-0 right-0 bg-primary text-black p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110"
+             >
                 <Camera size={16} />
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-             </label>
+             </button>
            )}
         </div>
 
