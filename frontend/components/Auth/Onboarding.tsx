@@ -228,7 +228,7 @@ export const Onboarding: React.FC = () => {
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
       fileInput.accept = 'image/*';
-      fileInput.onchange = (e) => handleImageUpload(e as any);
+      fileInput.onchange = (e) => handleImageUpload(e as React.ChangeEvent<HTMLInputElement>);
       fileInput.click();
     }
   };
