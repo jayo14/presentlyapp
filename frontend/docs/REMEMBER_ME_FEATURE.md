@@ -112,11 +112,11 @@ This feature works in all modern browsers that support:
 - sessionStorage API
 - ES6+ JavaScript features
 
-Tested on:
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+Compatible with:
+- Chrome/Edge (latest versions)
+- Firefox (latest versions)
+- Safari (latest versions)
+- All modern mobile browsers
 
 ## Future Enhancements
 
