@@ -11,6 +11,7 @@ export interface RegisterData {
 export interface LoginData {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 export interface OnboardingData {
@@ -84,7 +85,8 @@ export const authApi = {
     const result = response.data;
     
     if (result.success && result.tokens) {
-      tokenManager.setTokens(result.tokens.access, result.tokens.refresh);
+      // Default to rememberMe = true for registration
+      tokenManager.setTokens(result.tokens.access, result.tokens.refresh, true);
     }
     
     return result;
@@ -96,19 +98,21 @@ export const authApi = {
     const result = response.data;
     
     if (result.success && result.tokens) {
-      tokenManager.setTokens(result.tokens.access, result.tokens.refresh);
+      // Use rememberMe preference from login data, default to true
+      const rememberMe = data.rememberMe !== undefined ? data.rememberMe : true;
+      tokenManager.setTokens(result.tokens.access, result.tokens.refresh, rememberMe);
     }
     
     return result;
   },
 
   // Google Auth
-  googleAuth: async (idToken: string): Promise<AuthResponse> => {
+  googleAuth: async (idToken: string, rememberMe: boolean = true): Promise<AuthResponse> => {
     const response = await apiClient.post('/auth/google-auth/', { id_token: idToken });
     const result = response.data;
     
     if (result.success && result.tokens) {
-      tokenManager.setTokens(result.tokens.access, result.tokens.refresh);
+      tokenManager.setTokens(result.tokens.access, result.tokens.refresh, rememberMe);
     }
     
     return result;
@@ -179,12 +183,12 @@ export const authApi = {
   },
 
   // Verify email with OTP
-  verifyEmailOTP: async (email: string, otp: string): Promise<AuthResponse> => {
+  verifyEmailOTP: async (email: string, otp: string, rememberMe: boolean = true): Promise<AuthResponse> => {
     const response = await apiClient.post('/auth/email-verification/verify/', { email, otp });
     const result = response.data;
     
     if (result.success && result.tokens) {
-      tokenManager.setTokens(result.tokens.access, result.tokens.refresh);
+      tokenManager.setTokens(result.tokens.access, result.tokens.refresh, rememberMe);
     }
     
     return result;

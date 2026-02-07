@@ -62,7 +62,8 @@ export const useGoogleAuth = () => {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (idToken: string) => authApi.googleAuth(idToken),
+    mutationFn: ({ idToken, rememberMe }: { idToken: string; rememberMe?: boolean }) => 
+      authApi.googleAuth(idToken, rememberMe),
     onSuccess: (response: AuthResponse) => {
       if (response.success && response.user) {
         queryClient.setQueryData(queryKeys.currentUser, response.user);
