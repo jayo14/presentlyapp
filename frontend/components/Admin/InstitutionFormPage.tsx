@@ -250,6 +250,26 @@ export const InstitutionFormPage: React.FC = () => {
               />
             </div>
             <div>
+              <label className="block text-sm font-semibold text-zinc-400 mb-2">Postal Code</label>
+              <Input
+                value={formData.postal_code || ''}
+                onChange={(e) => handleChange('postal_code', e.target.value)}
+                placeholder="e.g., 100001"
+                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-zinc-400 mb-2">Street Address</label>
+              <textarea
+                value={formData.address || ''}
+                onChange={(e) => handleChange('address', e.target.value)}
+                placeholder="Full street address, building name, etc."
+                rows={3}
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground text-sm placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors resize-none"
+              />
+            </div>
+            </div>
+            <div>
               <label className="block text-sm font-semibold text-zinc-400 mb-2">Website URL</label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
