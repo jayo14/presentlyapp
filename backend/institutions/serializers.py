@@ -157,6 +157,11 @@ class OnboardingSerializer(serializers.ModelSerializer):
         ]
     
     def update(self, instance, validated_data):
+        from .models import CourseEnrollment, Course, UserRole
+        
+        # Extract courses before updating
+        courses_data = validated_data.pop('courses', None)
+        
         # Update all provided fields
         for field, value in validated_data.items():
             setattr(instance, field, value)
@@ -164,6 +169,26 @@ class OnboardingSerializer(serializers.ModelSerializer):
         # Mark onboarding as complete
         instance.onboarding_complete = True
         instance.save()
+        
+        # Handle course enrollment for students
+        if instance.role == UserRole.STUDENT and courses_data:
+            # Parse course IDs from comma-separated string
+            course_ids = [int(cid.strip()) for cid in courses_data.split(',') if cid.strip().isdigit()]
+            
+            # Enroll student in selected courses
+            for course_id in course_ids:
+                try:
+                    course = Course.objects.get(id=course_id, is_active=True)
+                    # Create enrollment if it doesn't exist
+                    CourseEnrollment.objects.get_or_create(
+                        student=instance,
+                        course=course,
+                        defaults={'is_active': True}
+                    )
+                except Course.DoesNotExist:
+                    # Skip invalid course IDs
+                    pass
+        
         return instance
 
 
