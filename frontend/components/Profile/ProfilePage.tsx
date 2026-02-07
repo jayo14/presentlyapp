@@ -35,6 +35,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole
     office: '',
     specialization: ''
   });
+  
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
 
   // Update userData when user data is loaded
   useEffect(() => {
@@ -53,8 +56,49 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole
         office: '', // Can be added to backend later
         specialization: user.courses || ''
       });
+      setProfileImage(user.avatar_url || null);
     }
   }, [user, userName]);
+  
+  const handleProfileImageClick = async () => {
+    try {
+      const { CameraService } = await import('../../services/camera');
+      const photoData = await CameraService.capturePhoto({
+        quality: 80,
+        allowEditing: true,
+        width: 512,
+        height: 512,
+      });
+      
+      if (photoData) {
+        setProfileImage(photoData);
+        // TODO: Upload to backend
+        // await updateUserProfile({ avatar_url: photoData });
+      }
+    } catch (error) {
+      console.error('Camera error:', error);
+    }
+  };
+  
+  const handleCoverImageClick = async () => {
+    try {
+      const { CameraService } = await import('../../services/camera');
+      const photoData = await CameraService.capturePhoto({
+        quality: 80,
+        allowEditing: true,
+        width: 1200,
+        height: 400,
+      });
+      
+      if (photoData) {
+        setCoverImage(photoData);
+        // TODO: Upload to backend
+        // await updateUserProfile({ cover_url: photoData });
+      }
+    } catch (error) {
+      console.error('Camera error:', error);
+    }
+  };
 
   const getRoleBadgeColor = () => {
     switch (userRole) {
@@ -87,7 +131,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 dark:from-zinc-900 dark:to-zinc-800"></div>
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
             <div className="absolute inset-0 bg-primary/5"></div>
-            <button className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-lg backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100">
+            <button 
+              onClick={handleCoverImageClick}
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-lg backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
+            >
                 <Camera size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
          </div>
@@ -98,11 +145,18 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole
                 <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 sm:gap-6 w-full md:w-auto">
                     <div className="relative group">
                         <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full border-4 sm:border-[6px] border-white dark:border-black bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative shadow-xl">
-                             <div className="w-full h-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-400 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-900">
-                                {userData.name.charAt(0)}
-                            </div>
+                             {profileImage ? (
+                               <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                             ) : (
+                               <div className="w-full h-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-400 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-900">
+                                  {userData.name.charAt(0)}
+                               </div>
+                             )}
                         </div>
-                        <button className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-primary text-black p-1.5 sm:p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100">
+                        <button 
+                          onClick={handleProfileImageClick}
+                          className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-primary text-black p-1.5 sm:p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100"
+                        >
                              <Camera size={14} className="sm:w-4 sm:h-4" />
                         </button>
                     </div>
