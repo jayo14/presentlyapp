@@ -255,6 +255,48 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
         layersRef.current[venue.id] = polygon;
       }
+      
+      // 3. Render Radius Circle (if radius is defined and no boundary polygon)
+      if (venue.radius && venue.radius > 0 && (!venue.boundary_coordinates || venue.boundary_coordinates.length < 3)) {
+        const circle = L.circle([venue.latitude, venue.longitude], {
+          radius: venue.radius, // radius in meters
+          color: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
+          fillColor: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
+          fillOpacity: isSelected ? 0.15 : 0.08,
+          weight: isSelected ? 2.5 : 1.5,
+          dashArray: '5, 5', // dashed circle for radius
+          className: 'venue-radius-circle'
+        }).addTo(map);
+
+        // Add hover effect
+        circle.on('mouseover', function() {
+          this.setStyle({ fillOpacity: 0.25, weight: 2.5 });
+        });
+        circle.on('mouseout', function() {
+          this.setStyle({ 
+            fillOpacity: isSelected ? 0.15 : 0.08,
+            weight: isSelected ? 2.5 : 1.5
+          });
+        });
+
+        // Add click handler to circle
+        circle.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          onVenueClick?.(venue);
+        });
+
+        // Add radius label tooltip
+        const radiusText = venue.radius >= 1000 
+          ? `${(venue.radius / 1000).toFixed(1)}km radius`
+          : `${venue.radius}m radius`;
+        circle.bindTooltip(radiusText, { 
+          permanent: isSelected,
+          direction: 'center',
+          className: 'radius-label-tooltip'
+        });
+
+        layersRef.current[`${venue.id}_circle`] = circle;
+      }
     });
 
     // Fit bounds whenever venues list changes (filtering)
@@ -400,12 +442,32 @@ export const VenueMap: React.FC<VenueMapProps> = ({
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         
+        .radius-label-tooltip {
+          background-color: rgba(0, 0, 0, 0.75);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 6px;
+          padding: 4px 8px;
+          font-size: 11px;
+          font-weight: 600;
+          color: white;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
         .venue-polygon {
           cursor: pointer;
           transition: all 0.2s ease;
         }
         
         .venue-polygon:hover {
+          filter: brightness(1.2);
+        }
+        
+        .venue-radius-circle {
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        .venue-radius-circle:hover {
           filter: brightness(1.2);
         }
       `}</style>
