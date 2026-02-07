@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 // API Base URL - Django backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api/';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api';
 
 // List of endpoints that gracefully handle 404s with fallback data
 const GRACEFUL_404_ENDPOINTS = [
