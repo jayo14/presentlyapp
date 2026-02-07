@@ -1,0 +1,18 @@
+# Ignore Python backend files - these are for Koyeb deployment
+backend/
+requirements.txt
+runtime.txt
+render.yaml
+docker-compose.yml
+bin/
+
+# Ignore mobile files
+mobile/
+android/
+ios/
+capacitor.config.ts
+
+# Other ignore patterns
+.git/
+.gitignore
+KOYEB_DEPLOYMENT.md
