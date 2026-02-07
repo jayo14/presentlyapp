@@ -64,9 +64,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-primary selection:text-black overflow-x-hidden">
       <SEO 
-        title="Presently | Academic Attendance Infrastructure"
-        description="Enterprise-grade attendance verification and academic intelligence infrastructure for universities. Real-time geofencing, audit-ready compliance, and institutional scale."
-        keywords="academic infrastructure, university attendance, geofencing, compliance, educational technology, enterprise software"
+        title="Presently | Location-Verified Attendance Infrastructure for Universities"
+        description="Location-verified attendance infrastructure for universities. Eliminate paper attendance, proxy sign-ins, and unverifiable records with real-time geofencing, device fingerprinting, and audit-ready compliance."
+        keywords="university attendance system, location-verified attendance, academic infrastructure, compliance attendance, geofencing education, attendance fraud prevention, SIS integration"
       />
       
       {/* --- Navbar --- */}
@@ -78,8 +78,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
             <button onClick={() => scrollToSection('infrastructure')} className="hover:text-white transition-colors">Infrastructure</button>
             <button onClick={() => scrollToSection('solutions')} className="hover:text-white transition-colors">Solutions</button>
-            <button onClick={() => scrollToSection('security')} className="hover:text-white transition-colors">Security</button>
-            <button onClick={() => scrollToSection('pricing')} className="hover:text-white transition-colors">Enterprise</button>
+            <button onClick={() => scrollToSection('security')} className="hover:text-white transition-colors">System Metrics</button>
+            <button onClick={() => scrollToSection('pricing')} className="hover:text-white transition-colors">Pricing</button>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
@@ -120,7 +120,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
             >
               <button onClick={() => scrollToSection('infrastructure')} className="block w-full text-left py-2 text-zinc-400">Infrastructure</button>
               <button onClick={() => scrollToSection('solutions')} className="block w-full text-left py-2 text-zinc-400">Solutions</button>
-              <button onClick={() => scrollToSection('pricing')} className="block w-full text-left py-2 text-zinc-400">Enterprise</button>
+              <button onClick={() => scrollToSection('security')} className="block w-full text-left py-2 text-zinc-400">System Metrics</button>
+              <button onClick={() => scrollToSection('pricing')} className="block w-full text-left py-2 text-zinc-400">Pricing</button>
               <div className="pt-4 border-t border-zinc-800 flex flex-col gap-3">
                 {user ? (
                   <Button onClick={handleDashboardClick} className="w-full justify-center">
@@ -157,39 +158,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/50 border border-zinc-800 text-xs font-semibold text-primary/90 tracking-wide uppercase">
                 <ShieldCheck size={14} />
-                <span>Enterprise-Grade Verification</span>
+                <span>Location-Verified Academic Records</span>
             </motion.div>
             
             <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.05]">
-              Academic <br />
+              Location-Verified <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-100">
-                Intelligence
+                Attendance
               </span> <br />
               Infrastructure
             </motion.h1>
             
             <motion.p variants={fadeInUp} className="text-lg text-zinc-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              The system of record for university attendance. Presently replaces fragile paper trails with immutable, location-verified data logs—enabling real-time compliance, fraud prevention, and institutional scalability.
+              Presently eliminates paper attendance, proxy sign-ins, and unverifiable records. Real-time geofencing and device fingerprinting deliver immutable, audit-ready data for universities.
+            </motion.p>
+            
+            <motion.p variants={fadeInUp} className="text-base text-zinc-500 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Built for lecturers who need zero-friction attendance, departments requiring fraud prevention, and institutions mandating compliance-ready records.
             </motion.p>
             
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Button size="lg" onClick={onGetStarted} className="h-14 px-8 text-lg rounded-full w-full sm:w-auto">
-                Schedule Demo
+                Request Demo
               </Button>
               <Button variant="secondary" size="lg" className="h-14 px-8 text-lg rounded-full w-full sm:w-auto gap-2 bg-transparent border-white/20 text-white hover:bg-white/5">
-                View Architecture
+                View Documentation
               </Button>
             </motion.div>
 
             <motion.div variants={fadeInUp} className="pt-8 flex items-center justify-center lg:justify-start gap-8 text-zinc-500 text-sm font-medium">
                <div className="flex items-center gap-2">
-                 <CheckCircle2 size={16} className="text-primary" /> SOC2 Compliant
+                 <CheckCircle2 size={16} className="text-primary" /> Audit-Ready Logs
                </div>
                <div className="flex items-center gap-2">
-                 <CheckCircle2 size={16} className="text-primary" /> 99.99% Uptime
+                 <CheckCircle2 size={16} className="text-primary" /> 99.9% Uptime
                </div>
                <div className="flex items-center gap-2">
-                 <CheckCircle2 size={16} className="text-primary" /> GDPR Ready
+                 <CheckCircle2 size={16} className="text-primary" /> NDPR Compliant
                </div>
             </motion.div>
           </motion.div>
@@ -253,6 +258,94 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
         </div>
       </section>
 
+      {/* --- 3-Audience Clarity Strip --- */}
+      <section className="py-16 px-6 bg-zinc-950 border-y border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* For Lecturers */}
+            <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-zinc-900 w-10 h-10 rounded-lg flex items-center justify-center border border-zinc-800">
+                  <GraduationCap size={20} className="text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-white">For Lecturers</h3>
+              </div>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-4">
+                Zero-friction attendance capture. Start your session, verification happens automatically. No roll calls, no manual entry, instant digital records.
+              </p>
+              <ul className="space-y-2 text-xs text-zinc-500">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>One-tap session activation</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Real-time attendance visibility</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Automated exam eligibility reports</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* For Departments / Faculties */}
+            <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-zinc-900 w-10 h-10 rounded-lg flex items-center justify-center border border-zinc-800">
+                  <Building2 size={20} className="text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-white">For Departments</h3>
+              </div>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-4">
+                Centralized oversight across all courses and lecturers. Fraud prevention, anomaly detection, and compliance-ready audit trails for academic unit management.
+              </p>
+              <ul className="space-y-2 text-xs text-zinc-500">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Departmental dashboard with real-time metrics</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Proxy detection and fraud alerts</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Exportable compliance reports</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* For Institutions */}
+            <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-zinc-900 w-10 h-10 rounded-lg flex items-center justify-center border border-zinc-800">
+                  <Network size={20} className="text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-white">For Institutions</h3>
+              </div>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-4">
+                Campus-wide system of record for accreditation and funding defense. Multi-campus support, SIS integration, and immutable data for regulatory compliance.
+              </p>
+              <ul className="space-y-2 text-xs text-zinc-500">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Institution-wide visibility and analytics</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Accreditation-ready data exports</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Deep SIS/LMS integration</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* --- Trust Section --- */}
       <section className="py-12 border-y border-white/5 bg-zinc-950/50">
         <div className="max-w-7xl mx-auto px-6">
@@ -272,11 +365,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
         <div className="max-w-7xl mx-auto">
           <div className="mb-20">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 max-w-2xl">
-              Not Just an App.<br />
-              <span className="text-zinc-500">Critical Academic Infrastructure.</span>
+              Infrastructure Built for <br />
+              <span className="text-zinc-500">Academic Verification at Scale</span>
             </h2>
             <p className="text-zinc-400 text-lg max-w-3xl leading-relaxed">
-              Universities don't need another "tool". They need a system of record. Presently is architected to handle the complexity of institutional data, ensuring integrity, availability, and auditability at scale.
+              Universities require systems of record, not tools. Presently is architected as institutional infrastructure—ensuring data integrity, auditability, and fraud prevention across thousands of concurrent sessions.
             </p>
           </div>
 
@@ -285,9 +378,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <MapPin className="text-primary" />
                </div>
-               <h3 className="text-xl font-bold text-white mb-3">Geofencing Engine</h3>
+               <h3 className="text-xl font-bold text-white mb-3">Location Verification Engine</h3>
                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Proprietary polygon-based location verification ensures students are physically present. Accuracy down to 5 meters, with anti-spoofing heuristics.
+                  Polygon-based geofencing ensures physical presence within designated boundaries. Prevents GPS spoofing and enforces location integrity down to 5-meter accuracy.
                </p>
             </div>
 
@@ -297,7 +390,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                </div>
                <h3 className="text-xl font-bold text-white mb-3">Device Fingerprinting</h3>
                <p className="text-zinc-400 text-sm leading-relaxed">
-                  One-device-to-one-student enforcement. We analyze hardware IDs and network signatures to prevent "buddy punching" and proxy attendance.
+                  One-device-per-student enforcement through hardware ID and network signature analysis. Eliminates proxy attendance and multi-device fraud attempts.
                </p>
             </div>
 
@@ -307,7 +400,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                </div>
                <h3 className="text-xl font-bold text-white mb-3">Immutable Audit Logs</h3>
                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Every check-in is a cryptographically verifiable event. Full audit trails for accreditation bodies, ensuring data cannot be retroactively altered.
+                  Cryptographically signed attendance records that cannot be retroactively altered. Full audit trails satisfy accreditation bodies and regulatory requirements.
                </p>
             </div>
 
@@ -315,9 +408,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Network className="text-primary" />
                </div>
-               <h3 className="text-xl font-bold text-white mb-3">Offline-First Sync</h3>
+               <h3 className="text-xl font-bold text-white mb-3">Offline-First Architecture</h3>
                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Built for unstable network environments. Data is captured locally, cryptographically signed, and synced when connectivity is restored.
+                  Attendance capture continues during network disruptions. Data is signed locally and synced when connectivity restores, ensuring zero data loss.
                </p>
             </div>
 
@@ -325,9 +418,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Server className="text-primary" />
                </div>
-               <h3 className="text-xl font-bold text-white mb-3">SIS Integration</h3>
+               <h3 className="text-xl font-bold text-white mb-3">Student Information System Integration</h3>
                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Seamlessly syncs with existing Student Information Systems (SIS) and LMS. Automated roster updates and gradebook synchronization.
+                  Direct integration with existing SIS and LMS platforms. Automated roster synchronization and gradebook updates without manual intervention.
                </p>
             </div>
 
@@ -335,9 +428,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Globe className="text-primary" />
                </div>
-               <h3 className="text-xl font-bold text-white mb-3">Multi-Campus Ready</h3>
+               <h3 className="text-xl font-bold text-white mb-3">Multi-Campus Deployment</h3>
                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Unified management for institutions with multiple campuses or satellite locations. Global timezone support and localized compliance.
+                  Unified management across multiple campuses and satellite locations. Global timezone support with localized compliance configurations.
                </p>
             </div>
           </div>
@@ -347,32 +440,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       {/* --- Solutions by Role --- */}
       <section id="solutions" className="py-24 px-6 bg-zinc-950 border-t border-white/5">
          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-white mb-16 text-center">Built for the Entire Institution</h2>
+            <h2 className="text-3xl font-bold text-white mb-16 text-center">Built for Every Level of Academic Administration</h2>
             
             <div className="space-y-24">
                {/* For Admin */}
                <div className="grid md:grid-cols-2 gap-12 items-center">
                   <div className="order-2 md:order-1">
                      <div className="inline-flex items-center gap-2 text-primary font-bold mb-4">
-                        <Building2 size={20} /> For Administrators
+                        <Building2 size={20} /> For Institutions & Registrars
                      </div>
-                     <h3 className="text-4xl font-bold text-white mb-4">Data-Driven Accreditation</h3>
+                     <h3 className="text-4xl font-bold text-white mb-4">Accreditation-Ready Data Infrastructure</h3>
                      <p className="text-zinc-400 text-lg mb-6">
-                        Stop guessing about facility utilization and student engagement. Get precise, exportable data for NUC/accreditation visits and funding defense.
+                        Campus-wide visibility into facility utilization, student engagement patterns, and attendance trends. Exportable data sets meet accreditation body requirements and support funding defense.
                      </p>
                      <ul className="space-y-3 mb-8">
-                        {['Campus-wide utilization heatmaps', 'Automated compliance reporting', 'Fraud detection alerts'].map((item, i) => (
+                        {['Multi-campus utilization analytics', 'Automated compliance reporting for NUC/accreditation', 'Real-time fraud detection and anomaly alerts'].map((item, i) => (
                            <li key={i} className="flex items-center gap-3 text-zinc-300">
                               <CheckCircle2 size={18} className="text-primary" /> {item}
                            </li>
                         ))}
                      </ul>
-                     <Button variant="outline">Explore Admin Console</Button>
+                     <Button variant="outline">Explore Institutional Console</Button>
                   </div>
                   <div className="order-1 md:order-2 bg-zinc-900 rounded-2xl p-6 border border-zinc-800 rotate-2 hover:rotate-0 transition-transform duration-500">
                      <div className="bg-black rounded-xl p-4 border border-zinc-800 space-y-4">
                         <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
-                           <span className="text-sm font-bold text-white">Daily Attendance Report</span>
+                           <span className="text-sm font-bold text-white">Campus Attendance Overview</span>
                            <span className="text-xs text-zinc-500">Oct 24, 2025</span>
                         </div>
                         <div className="space-y-3">
@@ -403,11 +496,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                             <div className="inline-block p-4 bg-primary/20 rounded-full text-primary">
                                <Zap size={32} />
                             </div>
-                            <h4 className="text-white font-bold">Session Auto-Started</h4>
-                            <p className="text-zinc-500 text-sm">CSC 201 • Room A402</p>
+                            <h4 className="text-white font-bold">Session Initialized</h4>
+                            <p className="text-zinc-500 text-sm">CSC 201 • Lecture Hall A402</p>
                             <div className="flex gap-2 justify-center">
-                               <span className="text-xs bg-zinc-800 text-white px-2 py-1 rounded">Geolocation: Active</span>
-                               <span className="text-xs bg-zinc-800 text-white px-2 py-1 rounded">QR: Dynamic</span>
+                               <span className="text-xs bg-zinc-800 text-white px-2 py-1 rounded">Location: Verified</span>
+                               <span className="text-xs bg-zinc-800 text-white px-2 py-1 rounded">QR: Active</span>
                             </div>
                          </div>
                       </div>
@@ -416,18 +509,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                      <div className="inline-flex items-center gap-2 text-primary font-bold mb-4">
                         <GraduationCap size={20} /> For Lecturers
                      </div>
-                     <h3 className="text-4xl font-bold text-white mb-4">Focus on Teaching, Not Counting</h3>
+                     <h3 className="text-4xl font-bold text-white mb-4">Eliminate Manual Attendance</h3>
                      <p className="text-zinc-400 text-lg mb-6">
-                        Eliminate the 15-minute "roll call" ritual. Start your class, let the infrastructure handle verification, and get instant digital records.
+                        No more 15-minute roll calls. Session activation is instantaneous, verification is automatic, and records are generated in real-time. Focus on teaching, not administration.
                      </p>
                      <ul className="space-y-3 mb-8">
-                        {['Zero-touch session initiation', 'Real-time attendee list', 'Automated exam eligibility calculation'].map((item, i) => (
+                        {['One-tap session initiation with QR generation', 'Live student check-in visibility', 'Automated exam eligibility calculations'].map((item, i) => (
                            <li key={i} className="flex items-center gap-3 text-zinc-300">
                               <CheckCircle2 size={18} className="text-primary" /> {item}
                            </li>
                         ))}
                      </ul>
-                     <Button variant="outline">Lecturer Features</Button>
+                     <Button variant="outline">View Lecturer Features</Button>
                   </div>
                </div>
             </div>
@@ -435,26 +528,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       </section>
 
       {/* --- Why Choose Presently (Stats/Proof) --- */}
-      <section className="py-24 px-6 relative overflow-hidden">
+      <section id="security" className="py-24 px-6 relative overflow-hidden">
          <div className="absolute inset-0 bg-primary/5 -skew-y-2 scale-110 -z-10"></div>
          <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-16">Why Leading Institutions Choose Presently</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-16">System Integrity & Operational Metrics</h2>
             
             <div className="grid md:grid-cols-3 gap-8">
                <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
                   <h3 className="text-5xl font-bold text-white mb-4">100%</h3>
                   <p className="text-lg font-bold text-white mb-2">Audit Traceability</p>
-                  <p className="text-zinc-400 text-sm">Every data point is time-stamped, geo-tagged, and immutable.</p>
+                  <p className="text-zinc-400 text-sm">Every check-in is timestamped, geo-tagged, and cryptographically signed. Immutable records for accreditation and compliance.</p>
                </div>
                <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
-                  <h3 className="text-5xl font-bold text-white mb-4">85%</h3>
-                  <p className="text-lg font-bold text-white mb-2">Admin Time Saved</p>
-                  <p className="text-zinc-400 text-sm">Reduction in manual data entry and report compilation time.</p>
+                  <h3 className="text-5xl font-bold text-white mb-4">99.9%</h3>
+                  <p className="text-lg font-bold text-white mb-2">System Uptime SLA</p>
+                  <p className="text-zinc-400 text-sm">Infrastructure-grade availability monitored 24/7. Downtime incidents logged and reported transparently.</p>
                </div>
                <div className="bg-black border border-zinc-800 p-8 rounded-2xl">
-                  <h3 className="text-5xl font-bold text-white mb-4">0%</h3>
-                  <p className="text-lg font-bold text-white mb-2">Infrastructure Overhead</p>
-                  <p className="text-zinc-400 text-sm">Fully managed cloud solution. No servers to buy or maintain.</p>
+                  <h3 className="text-5xl font-bold text-white mb-4">&lt;200ms</h3>
+                  <p className="text-lg font-bold text-white mb-2">Check-In Latency</p>
+                  <p className="text-zinc-400 text-sm">Sub-second response time for attendance verification. Optimized for high-concurrency scenarios and large lecture halls.</p>
                </div>
             </div>
          </div>
@@ -464,9 +557,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       <section id="pricing" className="py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Institutional Licensing</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Deployment Models</h2>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-10">
-              Presently is deployed as academic infrastructure. Select the coverage model that fits your administrative scope.
+              Presently scales from individual lecturer deployment to institution-wide infrastructure. Select the coverage model aligned with your administrative scope and compliance requirements.
             </p>
 
             {/* Currency Toggle */}
@@ -491,8 +584,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
              {/* Individual Practitioner */}
              <div className="bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
                 <div className="mb-8">
-                   <h3 className="text-xl font-bold text-white mb-2">Individual Practitioner</h3>
-                   <p className="text-zinc-500 text-sm">For lecturers focused on streamlining classroom operations and eliminating manual administrative overhead.</p>
+                   <h3 className="text-xl font-bold text-white mb-2">Lecturer License</h3>
+                   <p className="text-zinc-500 text-sm">For individual lecturers requiring classroom-level attendance management with location verification and digital record generation.</p>
                 </div>
                 <div className="mb-8">
                    <span className="text-4xl font-bold text-white">{prices.individual}</span>
@@ -502,9 +595,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                    {[
                       'Unlimited students per course',
                       'Up to 5 concurrent courses',
-                      'GPS & Device verification',
-                      'Verified check-in logs',
-                      'Standard CSV/PDF exports'
+                      'GPS & device fingerprint verification',
+                      'Digital attendance records',
+                      'CSV/PDF export capability'
                    ].map((feat, i) => (
                       <div key={i} className="flex items-start gap-3 text-zinc-300">
                          <CheckCircle2 size={16} className="text-primary mt-0.5 flex-shrink-0" />
@@ -513,31 +606,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                    ))}
                    <div className="pt-4 border-t border-zinc-800 space-y-2 opacity-50">
                       <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Excludes</p>
-                      <p className="text-xs text-zinc-500">Institutional Admin Privileges, Departmental Audit Trails, SIS Integrations.</p>
+                      <p className="text-xs text-zinc-500">Institutional admin access, departmental oversight, SIS integrations, audit reporting.</p>
                    </div>
                 </div>
-                <Button variant="secondary" className="w-full h-12" onClick={onGetStarted}>Deploy Individually</Button>
+                <Button variant="secondary" className="w-full h-12" onClick={onGetStarted}>Deploy as Lecturer</Button>
              </div>
 
              {/* Departmental License */}
              <div className="bg-zinc-900 border-2 border-primary/50 p-10 rounded-3xl flex flex-col relative shadow-2xl shadow-primary/5">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest">Administrative Standard</div>
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest">Recommended</div>
                 <div className="mb-8">
                    <h3 className="text-xl font-bold text-white mb-2">Departmental License</h3>
-                   <p className="text-zinc-500 text-sm">A centralized system of record for academic units requiring operational oversight, fraud prevention, and audit-ready reporting.</p>
+                   <p className="text-zinc-500 text-sm">Centralized system of record for academic departments requiring operational oversight, fraud prevention, and compliance-ready audit trails.</p>
                 </div>
                 <div className="mb-8">
                    <span className="text-4xl font-bold text-white">{prices.department}</span>
-                   <span className="text-zinc-500 text-sm ml-2">/ semester / faculty</span>
+                   <span className="text-zinc-500 text-sm ml-2">/ semester / department</span>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 text-sm">
                    {[
-                      'Full Department/Faculty coverage',
-                      'Centralized Admin Dashboard',
-                      'Advanced Fraud Heuristics',
-                      'Compliance & Audit Reporting',
-                      'Bulk Data Management',
-                      'Priority Email Support'
+                      'Full departmental coverage',
+                      'Centralized administrative dashboard',
+                      'Fraud detection and anomaly alerts',
+                      'Compliance audit reporting',
+                      'Bulk roster management',
+                      'Priority technical support'
                    ].map((feat, i) => (
                       <div key={i} className="flex items-start gap-3 text-white">
                          <CheckCircle2 size={16} className="text-primary mt-0.5 flex-shrink-0" />
@@ -545,26 +638,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                       </div>
                    ))}
                 </div>
-                <Button className="w-full h-12" onClick={onGetStarted}>Initialize Departmental Coverage</Button>
+                <Button className="w-full h-12" onClick={onGetStarted}>Deploy Departmentally</Button>
              </div>
 
              {/* Institutional Infrastructure */}
              <div className="bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
                 <div className="mb-8">
-                   <h3 className="text-xl font-bold text-white mb-2">Institutional Infrastructure</h3>
-                   <p className="text-zinc-500 text-sm">Full-scale deployment for universities requiring a unified attendance backbone, complete compliance readiness, and deep technical integration.</p>
+                   <h3 className="text-xl font-bold text-white mb-2">Institutional License</h3>
+                   <p className="text-zinc-500 text-sm">Campus-wide attendance infrastructure for universities requiring unified system of record, deep technical integration, and total institutional visibility.</p>
                 </div>
                 <div className="mb-8">
-                   <span className="text-2xl font-bold text-white tracking-tight italic">Custom Quote</span>
+                   <span className="text-2xl font-bold text-white tracking-tight italic">Custom Pricing</span>
                 </div>
                 <div className="flex-1 space-y-4 mb-8 text-sm">
                    {[
-                      'Total Institutional Visibility',
-                      'SIS/LMS/SSO Deep Integration',
-                      'Custom Data Retention Policies',
-                      'Accreditation Readiness Suite',
-                      'Dedicated Infrastructure Engineer',
-                      '99.9% Uptime SLA Guarantee'
+                      'Institution-wide deployment',
+                      'SIS/LMS/SSO deep integration',
+                      'Custom data retention policies',
+                      'Accreditation-ready data exports',
+                      'Dedicated infrastructure engineer',
+                      '99.9% uptime SLA guarantee'
                    ].map((feat, i) => (
                       <div key={i} className="flex items-start gap-3 text-zinc-300">
                          <CheckCircle2 size={16} className="text-primary mt-0.5 flex-shrink-0" />
@@ -572,13 +665,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                       </div>
                    ))}
                 </div>
-                <Button variant="outline" className="w-full h-12" onClick={onGetStarted}>Consult with Deployment Specialist</Button>
+                <Button variant="outline" className="w-full h-12" onClick={onGetStarted}>Request Institutional Consultation</Button>
              </div>
           </div>
 
           <div className="mt-12 text-center">
              <p className="text-zinc-500 text-sm">
-                Upgrading from Individual to Departmental coverage is seamless; all historical course data is preserved and migrated to the centralized administrative console.
+                All deployment models include cryptographic audit logs, offline-first architecture, and NDPR compliance. Upgrade paths preserve historical data.
              </p>
           </div>
         </div>
@@ -590,10 +683,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           <h2 className="text-3xl font-bold text-white mb-12 text-center">Common Questions</h2>
           <div className="space-y-4">
             {[
-              { q: "Can this integrate with our existing portal?", a: "Yes. Presently is API-first. We offer RESTful endpoints and webhooks to sync student rosters and push attendance grades directly to your Student Information System." },
-              { q: "How secure is the location data?", a: "We treat location data as sensitive PII. It is encrypted in transit and at rest. We do not track students outside of active class sessions. Compliance with NDPR and GDPR is standard." },
-              { q: "What happens if the internet cuts out?", a: "Our Offline-First architecture allows the app to cache encrypted attendance packets locally on the student's device and sync them automatically once connectivity is restored." },
-              { q: "Does it work for large lecture halls?", a: "Absolutely. Our infrastructure is stress-tested to handle thousands of concurrent write requests per second, making it suitable for large general courses (e.g., GST/GNS)." }
+              { q: "Does Presently integrate with our existing Student Information System?", a: "Yes. Presently provides RESTful APIs and webhook integrations for bidirectional data synchronization with most SIS platforms. Student rosters, course enrollments, and attendance records can be automatically synced without manual intervention." },
+              { q: "How is location data secured and who has access to it?", a: "Location data is encrypted in transit (TLS 1.3) and at rest (AES-256). Access is restricted to authorized institutional administrators. Location tracking is active only during verified attendance sessions. Presently is NDPR compliant and supports GDPR data subject requests." },
+              { q: "What happens if network connectivity fails during a session?", a: "Presently uses an offline-first architecture. Attendance records are cryptographically signed and stored locally on student devices, then automatically synchronized when connectivity is restored. No data loss occurs during network outages." },
+              { q: "Can the system handle large lecture halls with hundreds of concurrent check-ins?", a: "Yes. Infrastructure is designed for high-concurrency scenarios. Stress-tested to handle thousands of simultaneous write operations with sub-200ms latency. Suitable for general education courses and large auditoriums." }
             ].map((item, i) => (
               <div key={i} className="bg-black border border-zinc-800 rounded-xl overflow-hidden">
                 <button 
@@ -626,16 +719,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       {/* --- CTA --- */}
       <section className="py-24 px-6">
          <div className="max-w-5xl mx-auto bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-12 md:p-20 text-center">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Modernize Your Institution Today</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Deploy Verified Attendance Infrastructure</h2>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-10">
-               Join the forward-thinking universities using Presently to ensure compliance, improve student outcomes, and secure their data.
+               Join universities using Presently to eliminate proxy attendance, ensure regulatory compliance, and maintain audit-ready records for accreditation.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
                <Button size="lg" className="h-14 px-10 text-lg rounded-full" onClick={onGetStarted}>
-                  Request Infrastructure Audit
+                  Request Demo
                </Button>
                <Button variant="secondary" size="lg" className="h-14 px-10 text-lg rounded-full" onClick={onLogin}>
-                  Login to Console
+                  Access Console
                </Button>
             </div>
          </div>
@@ -648,7 +741,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                 <div className="col-span-2 lg:col-span-2 space-y-4 pr-8">
                     <Logo />
                     <p className="text-zinc-500 leading-relaxed max-w-sm mt-4">
-                        The operating system for academic attendance. Built for scale, security, and institutional intelligence.
+                        Location-verified attendance infrastructure for universities. Built for compliance, audit readiness, and fraud prevention at institutional scale.
                     </p>
                 </div>
                 <div>
