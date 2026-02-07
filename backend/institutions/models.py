@@ -196,6 +196,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(max_length=200)
     role = models.CharField(max_length=20, choices=UserRole.choices, default=UserRole.STUDENT)
     avatar_url = models.URLField(blank=True, null=True)
+    profile_image = models.URLField(blank=True, null=True, help_text="User's profile picture URL")
+    cover_image = models.URLField(blank=True, null=True, help_text="User's cover/banner image URL")
     onboarding_complete = models.BooleanField(default=False)
     
     # Email verification
