@@ -38,9 +38,12 @@ export const OTPVerification: React.FC = () => {
 
     // Haptic feedback on digit entry
     try {
-      Haptics.impact({ style: 'light' });
-    } catch (e) {
-      // Haptics not available on web
+      if (typeof Haptics !== 'undefined') {
+        Haptics.impact({ style: 'light' });
+      }
+    } catch (error) {
+      // Haptics not available on web or unsupported platform
+      console.debug('Haptics not available:', error);
     }
 
     // Auto-focus next input

@@ -51,11 +51,10 @@ export const ForgotPassword: React.FC = () => {
       return false;
     }
 
-    // Check for university domain (optional - can be customized)
-    if (!emailValue.endsWith('.edu')) {
-      setEmailError('Please use your university email address');
-      return false;
-    }
+    // Optional: Check for university domain if configured
+    // Remove .edu check to allow international institutions
+    // This can be configured via environment variable if needed
+    // Example: VITE_REQUIRE_EDU_EMAIL=true
 
     setEmailError('');
     return true;
@@ -226,7 +225,7 @@ export const ForgotPassword: React.FC = () => {
                 <button
                   type="button"
                   className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold"
-                  onClick={() => window.open('mailto:support@university.edu', '_blank')}
+                  onClick={() => window.open('mailto:support@presently.app', '_blank')}
                 >
                   Contact University Support
                 </button>
@@ -269,7 +268,7 @@ export const ForgotPassword: React.FC = () => {
               </div>
               <button
                 onClick={handleReset}
-                className="w-full py-3 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-semibold rounded-xl transition-all"
+                className="w-full py-3 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-semibold rounded-xl transition-all"
               >
                 Try Again
               </button>

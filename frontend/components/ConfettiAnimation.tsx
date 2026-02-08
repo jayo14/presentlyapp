@@ -42,7 +42,7 @@ export const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [active]);
+  }, [active, duration, count]); // Added duration and count to dependencies
 
   if (!isActive) return null;
 
