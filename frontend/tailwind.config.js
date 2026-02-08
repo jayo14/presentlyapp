@@ -17,10 +17,10 @@ export default {
       },
       colors: {
         primary: {
-          DEFAULT: '#ffca0d',
-          hover: '#e6b60b',
-          dark: '#d4a50a',
-          foreground: '#000000',
+          DEFAULT: '#C1B66D',
+          hover: '#b3a962',
+          dark: '#a69c58',
+          foreground: '#002368',
         },
         background: '#09090b',
         surface: '#18181b',
