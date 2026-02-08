@@ -259,43 +259,82 @@ export const Onboarding: React.FC = () => {
 
   // --- Step Content Renderers ---
 
-  const renderRoleSelection = () => (
-    <div className="space-y-4">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Choose your role</h2>
-        <p className="text-zinc-600">How will you use Presently?</p>
+  const renderRoleSelection = () => {
+    const roles = [
+      { 
+        id: UserRole.STUDENT, 
+        icon: GraduationCap, 
+        label: 'Student', 
+        desc: 'I want to track my attendance, grades and academic progress.',
+        features: ['View schedule', 'Submit assignments', 'Track grades']
+      },
+      { 
+        id: UserRole.LECTURER, 
+        icon: Briefcase, 
+        label: 'Lecturer', 
+        desc: 'I want to manage classes, record attendance, and export reports.',
+        features: ['Create sessions', 'Generate reports', 'Manage courses']
+      },
+      { 
+        id: UserRole.CLASS_REP, 
+        icon: UserCheck, 
+        label: 'Class Rep', 
+        desc: 'I want to assist with class management and student coordination.',
+        features: ['View attendance', 'Coordinate classes', 'Send announcements']
+      },
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-zinc-900 mb-2">How will you use Presently?</h2>
+          <p className="text-zinc-600">Select your role to get started</p>
+          <p className="text-xs text-zinc-500 mt-2">Step 1 of {totalSteps}</p>
+        </div>
+        
+        <div className="grid gap-4">
+          {roles.map((role) => (
+            <button
+              key={role.id}
+              onClick={() => setSelectedRole(role.id)}
+              className={`flex flex-col p-5 rounded-xl border-2 transition-all w-full text-left group hover:shadow-md
+                ${selectedRole === role.id 
+                  ? 'border-primary bg-primary/10 shadow-md' 
+                  : 'border-zinc-200 bg-white hover:border-primary/30'
+                }`}
+            >
+              <div className="flex items-start gap-4 mb-3">
+                <div className={`p-3 rounded-xl transition-colors ${selectedRole === role.id ? 'bg-primary text-white' : 'bg-zinc-100 text-zinc-600 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                  <role.icon size={28} />
+                </div>
+                <div className="flex-1">
+                  <p className={`text-lg font-bold transition-colors mb-1 ${selectedRole === role.id ? 'text-primary' : 'text-zinc-900'}`}>
+                    {role.label}
+                  </p>
+                  <p className="text-sm text-zinc-600 leading-relaxed">{role.desc}</p>
+                </div>
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-300'}`}>
+                   {selectedRole === role.id && <Check size={16} className="text-white" />}
+                </div>
+              </div>
+              
+              {/* Features List */}
+              <div className="flex flex-wrap gap-2 ml-16">
+                {role.features.map((feature, idx) => (
+                  <span 
+                    key={idx}
+                    className={`text-xs px-2 py-1 rounded-full ${selectedRole === role.id ? 'bg-primary/20 text-primary' : 'bg-zinc-100 text-zinc-600'}`}
+                  >
+                    {feature}
+                  </span>
+                ))}
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
-      
-      <div className="grid gap-4">
-        {[
-          { id: UserRole.STUDENT, icon: GraduationCap, label: 'Student', desc: 'Track attendance & view analytics' },
-          { id: UserRole.LECTURER, icon: Briefcase, label: 'Lecturer', desc: 'Manage courses & attendance sessions' },
-          { id: UserRole.CLASS_REP, icon: UserCheck, label: 'Class Rep', desc: 'Assist with class management' },
-        ].map((role) => (
-          <button
-            key={role.id}
-            onClick={() => setSelectedRole(role.id)}
-            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all w-full text-left group
-              ${selectedRole === role.id 
-                ? 'border-primary bg-primary/10' 
-                : 'border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-sm'
-              }`}
-          >
-            <div className={`p-3 rounded-xl transition-colors ${selectedRole === role.id ? 'bg-primary text-white' : 'bg-zinc-100 text-zinc-600 group-hover:text-zinc-900'}`}>
-              <role.icon size={24} />
-            </div>
-            <div>
-              <p className={`font-bold transition-colors ${selectedRole === role.id ? 'text-primary' : 'text-zinc-900'}`}>{role.label}</p>
-              <p className="text-xs text-zinc-500">{role.desc}</p>
-            </div>
-            <div className={`ml-auto w-5 h-5 rounded-full border flex items-center justify-center transition-all ${selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-300'}`}>
-               {selectedRole === role.id && <Check size={14} className="text-white" />}
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderPersonalDetails = () => (
     <div className="space-y-6">
@@ -357,81 +396,101 @@ export const Onboarding: React.FC = () => {
   const renderAcademicDetails = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Institutional Details</h2>
+        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Link your Institution</h2>
         <p className="text-zinc-600">
-           {selectedRole === UserRole.LECTURER ? 'Tell us about your teaching role.' : 'Tell us about your course of study.'}
+           {selectedRole === UserRole.LECTURER ? 'Tell us about your teaching role.' : 'Select your academic location.'}
         </p>
-        <p className="text-xs text-zinc-500 mt-2">{step} of {totalSteps}</p>
+        <p className="text-xs text-zinc-500 mt-2">Step 3 of {totalSteps}</p>
       </div>
 
       <div className="space-y-4">
         {/* Institution Selection */}
         <div>
-          <label className="block text-sm font-medium text-zinc-700 mb-1.5">Institution</label>
-          <select
-            value={selectedInstitution || ''}
-            onChange={(e) => {
-              const value = e.target.value ? Number(e.target.value) : null;
-              setSelectedInstitution(value);
-              setSelectedCollege(null);
-              setSelectedDepartment(null);
-              setColleges([]);
-              setDepartments([]);
-            }}
-            className="w-full bg-white border border-zinc-300 text-zinc-900 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-          >
-            <option value="">Select Institution</option>
-            {institutions.map(inst => (
-              <option key={inst.id} value={inst.id}>
-                {inst.short_name} - {inst.full_name}
-              </option>
-            ))}
-          </select>
+          <label className="block text-sm font-medium text-zinc-700 mb-2 flex items-center gap-2">
+            <span>Institution</span>
+            {selectedInstitution && <Check size={16} className="text-green-600" />}
+          </label>
+          <div className="relative">
+            <select
+              value={selectedInstitution || ''}
+              onChange={(e) => {
+                const value = e.target.value ? Number(e.target.value) : null;
+                setSelectedInstitution(value);
+                setSelectedCollege(null);
+                setSelectedDepartment(null);
+                setColleges([]);
+                setDepartments([]);
+              }}
+              className="w-full bg-white border-2 border-zinc-300 text-zinc-900 rounded-xl p-3.5 pl-4 pr-10 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-zinc-400"
+            >
+              <option value="">Select your institution</option>
+              {institutions.map(inst => (
+                <option key={inst.id} value={inst.id}>
+                  {inst.short_name} - {inst.full_name}
+                </option>
+              ))}
+            </select>
+            <ChevronRight size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none rotate-90" />
+          </div>
         </div>
 
         {/* College Selection */}
         {selectedInstitution && (
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-1.5">College/Faculty</label>
-            <select
-              value={selectedCollege || ''}
-              onChange={(e) => {
-                const value = e.target.value ? Number(e.target.value) : null;
-                setSelectedCollege(value);
-                setSelectedDepartment(null);
-                setDepartments([]);
-              }}
-              className="w-full bg-white border border-zinc-300 text-zinc-900 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-            >
-              <option value="">Select College/Faculty</option>
-              {colleges.map(col => (
-                <option key={col.id} value={col.id}>
-                  {col.code} - {col.name}
-                </option>
-              ))}
-            </select>
+          <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+            <label className="block text-sm font-medium text-zinc-700 mb-2 flex items-center gap-2">
+              <span>College/Faculty</span>
+              {selectedCollege && <Check size={16} className="text-green-600" />}
+            </label>
+            <div className="relative">
+              <select
+                value={selectedCollege || ''}
+                onChange={(e) => {
+                  const value = e.target.value ? Number(e.target.value) : null;
+                  setSelectedCollege(value);
+                  setSelectedDepartment(null);
+                  setDepartments([]);
+                }}
+                disabled={colleges.length === 0}
+                className="w-full bg-white border-2 border-zinc-300 text-zinc-900 rounded-xl p-3.5 pl-4 pr-10 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">Select college/faculty</option>
+                {colleges.map(col => (
+                  <option key={col.id} value={col.id}>
+                    {col.code} - {col.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronRight size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none rotate-90" />
+            </div>
           </div>
         )}
 
         {/* Department Selection */}
         {selectedCollege && (
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-1.5">Department</label>
-            <select
-              value={selectedDepartment || ''}
-              onChange={(e) => {
-                const value = e.target.value ? Number(e.target.value) : null;
-                setSelectedDepartment(value);
-              }}
-              className="w-full bg-white border border-zinc-300 text-zinc-900 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-            >
-              <option value="">Select Department</option>
-              {departments.map(dept => (
-                <option key={dept.id} value={dept.id}>
-                  {dept.code} - {dept.name}
-                </option>
-              ))}
-            </select>
+          <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+            <label className="block text-sm font-medium text-zinc-700 mb-2 flex items-center gap-2">
+              <span>Department</span>
+              {selectedDepartment && <Check size={16} className="text-green-600" />}
+            </label>
+            <div className="relative">
+              <select
+                value={selectedDepartment || ''}
+                onChange={(e) => {
+                  const value = e.target.value ? Number(e.target.value) : null;
+                  setSelectedDepartment(value);
+                }}
+                disabled={departments.length === 0}
+                className="w-full bg-white border-2 border-zinc-300 text-zinc-900 rounded-xl p-3.5 pl-4 pr-10 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">Select department</option>
+                {departments.map(dept => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.code} - {dept.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronRight size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none rotate-90" />
+            </div>
           </div>
         )}
 
