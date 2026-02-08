@@ -71,16 +71,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
     setPendingSignature(null);
   };
 
-  const SectionHeader = ({ icon: Icon, title }: { icon: any, title: string }) => (
-    <div className="mb-4">
-      <h2 className="text-2xl font-bold text-white">{title}</h2>
+  const SectionHeader = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
+    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="bg-primary/10 p-2 rounded-lg text-primary">
+        <Icon size={24} />
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">{title}</h2>
+        <p className="text-sm text-zinc-500">{description}</p>
+      </div>
     </div>
   );
 
   return (
     <div className="max-w-3xl mx-auto pb-20 animate-in fade-in duration-500">
       
-      {/* Header with back button for mobile-like experience */}
+      {/* Header with title matching design */}
       <div className="flex items-center mb-8 pt-4 pb-6 border-b border-zinc-800">
         <h1 className="text-xl font-bold text-white">
           {userRole === UserRole.LECTURER ? 'Lecturer Settings' : 'Settings'}
@@ -88,136 +94,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
       </div>
       
       {/* Account Settings - Available to All */}
-      <section className="px-6 mb-8">
-        <SectionHeader 
-          icon={User} 
-          title="Account"
-        />
+      <section className="px-6">
+        <h2 className="text-2xl font-bold text-white mb-4">Account</h2>
         {isLoading ? (
           <div className="text-center py-8 text-zinc-500">Loading user data...</div>
         ) : (
-          <div className="space-y-3">
-            {/* Edit Profile Button */}
-            <button className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
-                <User size={24} className="text-white" />
-              </div>
-              <span className="flex-1 text-white font-semibold text-base text-left">
-                Edit Profile
-              </span>
-              <ChevronRight size={20} className="text-text-muted" />
-            </button>
-
-            {/* Change Phone Number */}
-            <button className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
-                <Phone size={24} className="text-white" />
-              </div>
-              <span className="flex-1 text-white font-semibold text-base text-left">
-                Change Phone Number
-              </span>
-              <ChevronRight size={20} className="text-text-muted" />
-            </button>
-
-            {/* Notification Preferences */}
-            <button className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
-                <Bell size={24} className="text-white" />
-              </div>
-              <span className="flex-1 text-white font-semibold text-base text-left">
-                Notification Preferences
-              </span>
-              <ChevronRight size={20} className="text-text-muted" />
-            </button>
-
-            {/* Password Change */}
-            <button 
-              onClick={() => setIsPasswordModalOpen(true)}
-              className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
-            >
-              <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
-                <Lock size={24} className="text-white" />
-              </div>
-              <span className="flex-1 text-white font-semibold text-base text-left">
-                Change Password
-              </span>
-              <ChevronRight size={20} className="text-text-muted" />
-            </button>
-          </div>
-        )}
-      </section>
-
-      {/* Appearance & Accessibility */}
-      <section className="px-6 mb-8">
-        <SectionHeader 
-          icon={Eye} 
-          title="Appearance"
-        />
-        <div className="bg-surface rounded-2xl p-4 flex items-center justify-between">
-          <div className="flex items-center flex-1">
-            <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
-              {darkMode ? <Moon size={24} className="text-white" /> : <Sun size={24} className="text-white" />}
-            </div>
-            <span className="text-white font-semibold text-base">
-              Dark Mode
-            </span>
-          </div>
-          <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
-        </div>
-      </section>
-
-      {/* Privacy & Security - Mostly Student/Lecturer */}
-      {(userRole === UserRole.STUDENT || userRole === UserRole.LECTURER) && (
-      <section className="px-6 mb-8">
-        <SectionHeader 
-          icon={Shield} 
-          title="Privacy & Security"
-        />
-        <div className="space-y-3">
-          {/* Two-Factor Authentication */}
-          <button className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
-              <Shield size={24} className="text-white" />
-            </div>
-            <span className="flex-1 text-white font-semibold text-base text-left">
-              Two-Factor Authentication
-            </span>
-            <ChevronRight size={20} className="text-text-muted" />
-          </button>
-
-          {/* Data Export Preferences */}
-          <button className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
-              <Database size={24} className="text-white" />
-            </div>
-            <span className="flex-1 text-white font-semibold text-base text-left">
-              Data Export Preferences
-            </span>
-            <ChevronRight size={20} className="text-text-muted" />
-          </button>
-        </div>
-      </section>
-      )}
-
-      {/* Legacy detailed sections (collapsed by default) */}
-      <details className="px-6 mb-8">
-        <summary className="cursor-pointer text-text-secondary hover:text-white transition-colors">
-          Show Advanced Settings
-        </summary>
-        <div className="mt-6 space-y-6">
-          {/* Original detailed form fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input 
                 label="Full Name" 
                 defaultValue={user?.full_name || ''} 
                 placeholder="Your full name"
-                className="bg-zinc-50 dark:bg-zinc-950"
               />
               <Input 
                 label="Email" 
                 defaultValue={user?.email || ''} 
                 disabled 
-                className="opacity-70 bg-zinc-50 dark:bg-zinc-950"
               />
               {userRole === UserRole.STUDENT && (
                 <>
@@ -225,19 +117,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                     label="Matric Number" 
                     defaultValue={user?.matric_number || ''} 
                     placeholder="Your matric number"
-                    className="bg-zinc-50 dark:bg-zinc-950"
                   />
                   <Input 
                     label="Department" 
                     defaultValue={user?.department || ''} 
                     placeholder="Your department"
-                    className="bg-zinc-50 dark:bg-zinc-950"
                   />
                   <Input 
                     label="Level" 
                     defaultValue={user?.level || ''} 
                     placeholder="Current level"
-                    className="bg-zinc-50 dark:bg-zinc-950"
                   />
                 </>
               )}
@@ -247,13 +136,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                     label="Staff ID" 
                     defaultValue={user?.staff_id || ''} 
                     placeholder="Your staff ID"
-                    className="bg-zinc-50 dark:bg-zinc-950"
                   />
                   <Input 
                     label="Department" 
                     defaultValue={user?.department || ''} 
                     placeholder="Your department"
-                    className="bg-zinc-50 dark:bg-zinc-950"
                   />
                 </>
               )}
@@ -262,7 +149,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                 defaultValue={user?.institution_name || ''} 
                 placeholder="Your institution"
                 disabled
-                className="opacity-70 bg-zinc-50 dark:bg-zinc-950"
               />
               {user?.college_name && (
                 <Input 
@@ -330,17 +216,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                     </label>
                 )}
             </div>
-           )}
-          </div>
+          )}
         </div>
-      </details>
+        )}
+      </section>
 
-      {/* Notification Settings - collapsed legacy section */}
-      <details className="px-6 mb-8">
-        <summary className="cursor-pointer text-text-secondary hover:text-white transition-colors">
-          Show Notification Settings
-        </summary>
-        <div className="mt-6">
+      {/* Notification Settings - All Roles */}
+      <section>
+        <SectionHeader 
+          icon={Bell} 
+          title="Notifications" 
+          description="Control how and when you want to be notified." 
+        />
+        <div className="space-y-4">
           <div className="space-y-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2 shadow-sm">
               {[
                   { label: 'Email Notifications', desc: 'Receive attendance summaries via email.', state: emailNotifs, setter: setEmailNotifs },
