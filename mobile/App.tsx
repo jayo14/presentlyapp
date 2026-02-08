@@ -18,6 +18,10 @@ import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentCoursesScreen from './screens/StudentCoursesScreen';
 import SessionsScreen from './screens/SessionsScreen';
 import AnalyticsScreen from './screens/AnalyticsScreen';
+import NotificationsScreen from './screens/NotificationsScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import LecturerSettingsScreen from './screens/LecturerSettingsScreen';
+import NewAttendanceSessionScreen from './screens/NewAttendanceSessionScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -153,6 +157,12 @@ export default function App() {
           <Stack.Screen name="MainApp" component={MainTabs} />
           
           <Stack.Screen name="StudentCourses" component={StudentCoursesScreen} /> {/* For direct navigation */}
+          
+          {/* New Screens */}
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="Settings" component={LecturerSettingsScreen} />
+          <Stack.Screen name="NewAttendanceSession" component={NewAttendanceSessionScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
