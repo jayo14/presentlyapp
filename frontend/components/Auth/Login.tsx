@@ -144,33 +144,33 @@ export const Login: React.FC = () => {
   // Show loading state while checking auth or redirecting
   if (isLoading || isRedirecting) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-light-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-zinc-400">{isRedirecting ? 'Redirecting to dashboard...' : 'Loading...'}</p>
+          <p className="text-light-text-secondary">{isRedirecting ? 'Redirecting to dashboard...' : 'Loading...'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-light-background flex flex-col items-center justify-center p-4 relative">
       <SEO 
         title="Login | Presently"
         description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
       />
-      <button onClick={onBack} className="absolute top-8 left-8 text-zinc-400 hover:text-white flex items-center gap-2">
+      <button onClick={onBack} className="absolute top-8 left-8 text-light-text hover:text-light-text-secondary flex items-center gap-2 transition-colors">
         <ArrowLeft size={18} /> Back
       </button>
 
       <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="text-center mb-8">
           <Logo className="justify-center mb-6 text-2xl" />
-          <h2 className="text-2xl font-bold text-white">Welcome back</h2>
-          <p className="text-zinc-400 mt-2">Enter your credentials to access your account.</p>
+          <h2 className="text-2xl font-bold text-light-text">Welcome back</h2>
+          <p className="text-light-text-secondary mt-2">Enter your credentials to access your account.</p>
         </div>
 
-        <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-2xl shadow-2xl">
+        <div className="bg-light-surface border border-light-border p-8 rounded-2xl shadow-lg">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input 
               label="Email" 
@@ -191,10 +191,10 @@ export const Login: React.FC = () => {
             />
             
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-zinc-400 cursor-pointer">
+              <label className="flex items-center gap-2 text-light-text-secondary cursor-pointer">
                 <input 
                   type="checkbox" 
-                  className="rounded border-zinc-800 bg-zinc-900 text-primary focus:ring-primary" 
+                  className="rounded border-light-border bg-white text-primary focus:ring-primary focus:ring-2" 
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
@@ -203,7 +203,7 @@ export const Login: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/forgot-password')}
-                className="text-primary hover:underline"
+                className="text-primary hover:underline font-semibold"
               >
                 Forgot password?
               </button>
@@ -215,19 +215,19 @@ export const Login: React.FC = () => {
           </form>
 
           <div className="my-6 flex items-center gap-4">
-              <div className="h-px bg-zinc-800 flex-1"></div>
-              <span className="text-xs text-zinc-500 uppercase">Or continue with</span>
-              <div className="h-px bg-zinc-800 flex-1"></div>
+              <div className="h-px bg-light-border flex-1"></div>
+              <span className="text-xs text-light-text-tertiary uppercase">Or continue with</span>
+              <div className="h-px bg-light-border flex-1"></div>
           </div>
 
           <button 
             type="button"
             onClick={handleGoogleLogin}
             disabled={googleAuthMutation.isPending || isRedirecting}
-            className="w-full bg-white text-black font-medium h-12 rounded-lg flex items-center justify-center gap-3 hover:bg-zinc-200 transition-colors disabled:opacity-50"
+            className="w-full bg-white border border-light-border text-light-text font-medium h-12 rounded-xl flex items-center justify-center gap-3 hover:bg-light-card transition-colors disabled:opacity-50"
           >
             {googleAuthMutation.isPending ? (
-              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-2 border-light-text border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -239,9 +239,9 @@ export const Login: React.FC = () => {
             Google
           </button>
 
-          <div className="mt-6 text-center text-sm text-zinc-500">
+          <div className="mt-6 text-center text-sm text-light-text-secondary">
             Don't have an account?{' '}
-            <button onClick={() => navigate('/register')} className="text-primary font-medium hover:underline">
+            <button onClick={() => navigate('/register')} className="text-primary font-semibold hover:underline">
               Sign up
             </button>
           </div>
