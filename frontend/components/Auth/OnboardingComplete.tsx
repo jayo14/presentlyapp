@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 import { UserRole } from '../../types';
 
+// Constants
+const AUTO_REDIRECT_SECONDS = 10; // Auto-redirect countdown duration
+
 interface OnboardingCompleteProps {
   userName?: string;
   userRole?: UserRole;
@@ -24,7 +27,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
   userRole = UserRole.STUDENT 
 }) => {
   const navigate = useNavigate();
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(AUTO_REDIRECT_SECONDS);
   const [autoRedirect, setAutoRedirect] = useState(true);
 
   useEffect(() => {
