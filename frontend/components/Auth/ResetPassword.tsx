@@ -56,7 +56,7 @@ export const ResetPassword: React.FC = () => {
   
   const getStrengthColor = () => {
     if (passwordStrength < 40) return 'bg-red-500';
-    if (passwordStrength < 70) return 'bg-primary';
+    if (passwordStrength < 70) return 'bg-yellow-500';
     return 'bg-primary';
   };
 
