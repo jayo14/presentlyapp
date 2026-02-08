@@ -172,3 +172,10 @@ export const useVerifyEmailOTP = () => {
     },
   });
 };
+
+// Hook for resending email verification
+export const useResendEmailVerification = () => {
+  return useMutation({
+    mutationFn: (email: string) => authApi.sendVerificationOTP(email),
+  });
+};
