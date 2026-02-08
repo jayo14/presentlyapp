@@ -6,6 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrentUser, useSendVerificationOTP } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 
+// Constants
+const VERIFICATION_POLL_INTERVAL = 10000; // 10 seconds
+const RESEND_COOLDOWN_SECONDS = 60; // 60 seconds
+
 export const EmailVerificationSent: React.FC = () => {
   const navigate = useNavigate();
   const { data: user, refetch: refetchUser } = useCurrentUser();
@@ -33,7 +37,7 @@ export const EmailVerificationSent: React.FC = () => {
       } catch (error) {
         console.debug('Polling error:', error);
       }
-    }, 10000); // Poll every 10 seconds
+    }, VERIFICATION_POLL_INTERVAL);
 
     return () => clearInterval(pollInterval);
   }, [isPolling, refetchUser, navigate]);
@@ -52,7 +56,7 @@ export const EmailVerificationSent: React.FC = () => {
     if (user?.email) {
       sendVerificationMutation.mutate(user.email, {
         onSuccess: () => {
-          setResendCooldown(60); // 60 second cooldown
+          setResendCooldown(RESEND_COOLDOWN_SECONDS);
           setLastSentTime(new Date());
           toast.success('Verification email sent!');
         },
