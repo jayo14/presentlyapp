@@ -165,7 +165,7 @@ export const ResetPassword: React.FC = () => {
           <h2 className="text-lg font-semibold text-text-secondary dark:text-dark-text-secondary mb-4">
             Create new password
           </h2>
-          <div className="p-3 bg-warning/10 dark:bg-warning-dark/10 border border-warning dark:border-warning-dark rounded-lg">
+          <div className="p-3 bg-warning/10 dark:bg-warning-dark/10 border border-warning dark:border-warning-dark rounded-lg" role="alert">
             <p className="text-sm text-warning dark:text-warning-dark">
               Your new password must be different from previous used passwords for security.
             </p>
@@ -187,7 +187,6 @@ export const ResetPassword: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 autoComplete="new-password"
-                onPaste={(e) => e.preventDefault()}
                 className="w-full px-4 py-3.5 pr-12 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all"
               />
               <button
@@ -218,7 +217,6 @@ export const ResetPassword: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="new-password"
-                onPaste={(e) => e.preventDefault()}
                 className="w-full px-4 py-3.5 pr-12 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all"
               />
               <button
