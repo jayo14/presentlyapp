@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { UserRole } from '../../types';
-import { Button } from '../Button';
-import { Input } from '../Input';
-import { 
-  User, Mail, Phone, MapPin, Calendar, Briefcase, GraduationCap, 
-  BookOpen, Award, Clock, Edit2, Camera, Shield, Hash, Building,
-  Check, Users, Globe, Link as LinkIcon, Loader
-} from 'lucide-react';
+import React from 'react';
+import { ArrowLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight, Loader } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '../../hooks/useAuth';
+import { UserRole } from '../../types';
 
 interface ProfilePageProps {
   userRole?: UserRole;
@@ -15,338 +10,131 @@ interface ProfilePageProps {
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ userRole: propUserRole, userName: propUserName }) => {
+  const navigate = useNavigate();
   const { data: user, isLoading } = useCurrentUser();
-  const [isEditing, setIsEditing] = useState(false);
   
+  const userAvatar = user?.avatar_url || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400';
+  const userName = user?.full_name || propUserName || 'Dr. Sarah Smith';
   const userRole = user?.role || propUserRole || UserRole.STUDENT;
-  const userName = user?.full_name || propUserName || 'User';
+  const userRoleDisplay = userRole === UserRole.LECTURER 
+    ? 'Senior Lecturer - Computer Science' 
+    : user?.department || 'Computer Science';
 
-  const [userData, setUserData] = useState({
-    name: userName,
-    email: '',
-    phone: '',
-    location: '',
-    bio: '',
-    matricNumber: '',
-    department: '',
-    level: '',
-    cgpa: '',
-    staffId: '',
-    office: '',
-    specialization: ''
-  });
-  
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [coverImage, setCoverImage] = useState<string | null>(null);
-
-  // Update userData when user data is loaded
-  useEffect(() => {
-    if (user) {
-      setUserData({
-        name: user.full_name || userName,
-        email: user.email || '',
-        phone: user.phone_number || '',
-        location: user.institution_name || '',
-        bio: '', // Can be added to backend later
-        matricNumber: user.matric_number || '',
-        department: user.department || '',
-        level: user.level || '',
-        cgpa: '', // Can be calculated from backend
-        staffId: user.staff_id || '',
-        office: '', // Can be added to backend later
-        specialization: user.courses || ''
-      });
-      setProfileImage(user.avatar_url || null);
-    }
-  }, [user, userName]);
-  
-  const handleProfileImageClick = async () => {
-    try {
-      const { CameraService } = await import('../../services/camera');
-      const photoData = await CameraService.capturePhoto({
-        quality: 80,
-        allowEditing: true,
-        width: 512,
-        height: 512,
-      });
-      
-      if (photoData) {
-        setProfileImage(photoData);
-        // TODO: Upload to backend
-        // await updateUserProfile({ avatar_url: photoData });
-      }
-    } catch (error) {
-      console.error('Camera error:', error);
-    }
-  };
-  
-  const handleCoverImageClick = async () => {
-    try {
-      const { CameraService } = await import('../../services/camera');
-      const photoData = await CameraService.capturePhoto({
-        quality: 80,
-        allowEditing: true,
-        width: 1200,
-        height: 400,
-      });
-      
-      if (photoData) {
-        setCoverImage(photoData);
-        // TODO: Upload to backend
-        // await updateUserProfile({ cover_url: photoData });
-      }
-    } catch (error) {
-      console.error('Camera error:', error);
-    }
-  };
-
-  const getRoleBadgeColor = () => {
-    switch (userRole) {
-      case UserRole.ADMIN: return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
-      case UserRole.LECTURER: return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case UserRole.CLASS_REP: return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
-      default: return 'bg-primary/10 text-primary border-primary/20';
-    }
-  };
-
-  const SectionTitle = ({ icon: Icon, title }: { icon: any, title: string }) => (
-      <div className="flex items-center gap-2 mb-4">
-          <Icon size={18} className="text-primary" />
-          <h3 className="font-bold text-zinc-900 dark:text-white">{title}</h3>
+  if (isLoading) {
+    return (
+      <div className="max-w-3xl mx-auto flex items-center justify-center h-64">
+        <Loader className="w-8 h-8 animate-spin text-primary" />
       </div>
-  );
+    );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 md:pb-8 pt-4 md:pt-0 animate-in fade-in duration-500">
-      
-      {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <>
-          {/* Cover Image & Header */}
-          <div className="relative mb-24 sm:mb-24">
-         <div className="h-32 sm:h-48 md:h-64 w-full rounded-xl sm:rounded-2xl overflow-hidden relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-zinc-800 to-zinc-700 dark:from-zinc-900 dark:to-zinc-800"></div>
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-            <div className="absolute inset-0 bg-primary/5"></div>
-            <button 
-              onClick={handleCoverImageClick}
-              className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-lg backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
-            >
-                <Camera size={16} className="sm:w-[18px] sm:h-[18px]" />
-            </button>
-         </div>
-         
-         {/* Profile Card Overlay */}
-         <div className="absolute -bottom-12 sm:-bottom-16 left-0 right-0 px-3 sm:px-4 md:px-8">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-3 sm:gap-4">
-                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 sm:gap-6 w-full md:w-auto">
-                    <div className="relative group">
-                        <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full border-4 sm:border-[6px] border-white dark:border-black bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative shadow-xl">
-                             {profileImage ? (
-                               <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                             ) : (
-                               <div className="w-full h-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-400 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-900">
-                                  {userData.name.charAt(0)}
-                               </div>
-                             )}
-                        </div>
-                        <button 
-                          onClick={handleProfileImageClick}
-                          className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-primary text-black p-1.5 sm:p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100"
-                        >
-                             <Camera size={14} className="sm:w-4 sm:h-4" />
-                        </button>
-                    </div>
-                    <div className="text-center sm:text-left mb-2 sm:mb-2 md:mb-4">
-                        <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-zinc-900 dark:text-white mb-1">{userData.name}</h1>
-                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                             <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide border ${getRoleBadgeColor()}`}>
-                                {userRole.replace('_', ' ')}
-                            </span>
-                            <span className="text-zinc-500 text-xs sm:text-sm flex items-center gap-1">
-                                <MapPin size={12} /> {userData.location}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div className="mb-2 md:mb-4 w-full md:w-auto md:ml-auto">
-                    {isEditing ? (
-                        <div className="flex gap-2 w-full">
-                            <Button variant="secondary" onClick={() => setIsEditing(false)} className="flex-1 text-sm sm:text-base py-2 sm:py-2.5">Cancel</Button>
-                            <Button onClick={() => setIsEditing(false)} className="flex-1 text-sm sm:text-base py-2 sm:py-2.5">Save Changes</Button>
-                        </div>
-                    ) : (
-                        <Button variant="outline" onClick={() => setIsEditing(true)} className="w-full bg-white dark:bg-zinc-900 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 text-sm sm:text-base py-2 sm:py-2.5">
-                            <Edit2 size={14} className="mr-2 sm:w-4 sm:h-4" /> Edit Profile
-                        </Button>
-                    )}
-                </div>
-            </div>
-         </div>
+    <div className="max-w-3xl mx-auto min-h-screen pb-8 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 pt-4">
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+        >
+          <ArrowLeft size={24} className="text-white" />
+        </button>
+        <h1 className="text-xl font-bold text-white">Profile</h1>
+        <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+          <Share2 size={24} className="text-white" />
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-0 md:px-4">
-        
-        {/* Left Sidebar */}
-        <div className="lg:col-span-4 space-y-6">
-            
-            {/* Intro / Bio Card */}
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
-                <SectionTitle icon={User} title="About" />
-                {isEditing ? (
-                    <textarea 
-                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 text-sm text-zinc-900 dark:text-zinc-300 focus:ring-1 focus:ring-primary outline-none resize-none"
-                        rows={4}
-                        value={userData.bio}
-                        onChange={(e) => setUserData({...userData, bio: e.target.value})}
-                    />
-                ) : (
-                    <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
-                        {userData.bio}
-                    </p>
-                )}
-                
-                <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
-                    <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
-                        <Mail size={16} className="text-zinc-400" />
-                        <span>{userData.email || 'No email'}</span>
-                    </div>
-                    {userData.phone && (
-                      <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
-                          <Phone size={16} className="text-zinc-400" />
-                          <span>{userData.phone}</span>
-                      </div>
-                    )}
-                    {user?.institution_name && (
-                      <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
-                          <Building size={16} className="text-zinc-400" />
-                          <span>{user.institution_name}</span>
-                      </div>
-                    )}
-                    {user?.college_name && (
-                      <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
-                          <GraduationCap size={16} className="text-zinc-400" />
-                          <span>{user.college_name}</span>
-                      </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
-                 <SectionTitle icon={Award} title="Overview" />
-                 <div className="grid grid-cols-2 gap-4">
-                     {(userRole === UserRole.STUDENT || userRole === UserRole.CLASS_REP) && (
-                         <>
-                            <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-center">
-                                <div className="text-2xl font-bold text-zinc-900 dark:text-white">{userData.cgpa}</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-wide mt-1">CGPA</div>
-                            </div>
-                            <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-center">
-                                <div className="text-2xl font-bold text-zinc-900 dark:text-white">92%</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-wide mt-1">Attendance</div>
-                            </div>
-                            <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-center">
-                                <div className="text-2xl font-bold text-zinc-900 dark:text-white">6</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-wide mt-1">Courses</div>
-                            </div>
-                            <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-center">
-                                <div className="text-2xl font-bold text-zinc-900 dark:text-white">{userData.level}</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-wide mt-1">Level</div>
-                            </div>
-                         </>
-                     )}
-                      {userRole === UserRole.LECTURER && (
-                         <>
-                            <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-center">
-                                <div className="text-2xl font-bold text-zinc-900 dark:text-white">450+</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-wide mt-1">Students</div>
-                            </div>
-                            <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-center">
-                                <div className="text-2xl font-bold text-zinc-900 dark:text-white">4.8</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-wide mt-1">Rating</div>
-                            </div>
-                         </>
-                     )}
-                 </div>
-            </div>
+      {/* Profile Section */}
+      <div className="flex flex-col items-center mb-8">
+        {/* Avatar with gold border */}
+        <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-primary mb-6">
+          <img 
+            src={userAvatar}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
         </div>
 
-        {/* Main Content */}
-        <div className="lg:col-span-8 space-y-6">
-            
-            {/* Detailed Info Form */}
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8 shadow-sm">
-                <SectionTitle icon={Briefcase} title="Academic Information" />
-                
-                <div className="grid md:grid-cols-2 gap-x-6 gap-y-6 mt-6">
-                     {(userRole === UserRole.STUDENT || userRole === UserRole.CLASS_REP) && (
-                        <>
-                            <Input label="Full Name" value={userData.name} disabled={!isEditing} onChange={(e) => setUserData({...userData, name: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Matriculation Number" value={userData.matricNumber} disabled className="opacity-70 bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Department" value={userData.department} disabled={!isEditing} onChange={(e) => setUserData({...userData, department: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Level" value={userData.level} disabled={!isEditing} onChange={(e) => setUserData({...userData, level: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Email Address" value={userData.email} disabled className="opacity-70 bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Phone Number" value={userData.phone} disabled={!isEditing} onChange={(e) => setUserData({...userData, phone: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                        </>
-                     )}
-
-                     {userRole === UserRole.LECTURER && (
-                        <>
-                            <Input label="Full Name" value={userData.name} disabled={!isEditing} onChange={(e) => setUserData({...userData, name: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Staff ID" value={userData.staffId} disabled className="opacity-70 bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Department" value={userData.department} disabled={!isEditing} onChange={(e) => setUserData({...userData, department: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Office Location" value={userData.office} disabled={!isEditing} onChange={(e) => setUserData({...userData, office: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <div className="md:col-span-2">
-                                <Input label="Specialization" value={userData.specialization} disabled={!isEditing} onChange={(e) => setUserData({...userData, specialization: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            </div>
-                        </>
-                     )}
-                     
-                     {userRole === UserRole.ADMIN && (
-                        <>
-                            <Input label="Full Name" value={userData.name} disabled={!isEditing} onChange={(e) => setUserData({...userData, name: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Admin Role" value="Super Administrator" disabled className="opacity-70 bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Department" value="IT Support" disabled={!isEditing} className="bg-zinc-50 dark:bg-zinc-950" />
-                            <Input label="Clearance" value="Level 5" disabled className="opacity-70 bg-zinc-50 dark:bg-zinc-950" />
-                        </>
-                     )}
-                </div>
-            </div>
-
-            {/* Recent Activity Stream */}
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
-                    <SectionTitle icon={Clock} title="Recent Activity" />
-                    <Button variant="ghost" size="sm" className="text-zinc-500">View All</Button>
-                </div>
-                
-                <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-0 before:w-[2px] before:bg-zinc-100 dark:before:bg-zinc-800">
-                    {[
-                        { title: userRole === UserRole.STUDENT ? 'Attended CS402 Class' : 'Created CS402 Session', time: '2 hours ago', icon: Check },
-                        { title: 'Updated Profile Information', time: '1 day ago', icon: Edit2 },
-                        { title: 'Logged in from New Device', time: '3 days ago', icon: Shield },
-                    ].map((activity, i) => (
-                        <div key={i} className="flex gap-4 relative">
-                            <div className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 border-2 border-primary/20 flex items-center justify-center shrink-0 z-10">
-                                <activity.icon size={16} className="text-primary" />
-                            </div>
-                            <div className="pt-2">
-                                <p className="text-sm font-medium text-zinc-900 dark:text-white">{activity.title}</p>
-                                <p className="text-xs text-zinc-500 mt-1">{activity.time}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-
+        {/* User Info */}
+        <h2 className="text-3xl font-bold text-white mb-2 text-center">
+          {userName}
+        </h2>
+        <p className="text-text-secondary text-base text-center">
+          {userRoleDisplay}
+        </p>
       </div>
-        </>
-      )}
+
+      {/* Stats Cards */}
+      <div className="flex gap-4 mb-8 px-6">
+        <div className="flex-1 bg-surface border border-primary/30 rounded-3xl py-6 flex flex-col items-center">
+          <span className="text-white text-4xl font-bold mb-1">6</span>
+          <span className="text-text-secondary text-sm">Active Courses</span>
+        </div>
+
+        <div className="flex-1 bg-surface border border-primary/30 rounded-3xl py-6 flex flex-col items-center">
+          <span className="text-white text-4xl font-bold mb-1">124</span>
+          <span className="text-text-secondary text-sm">Total Sessions</span>
+        </div>
+      </div>
+
+      {/* Account Section */}
+      <div className="px-6 mb-8">
+        <h3 className="text-white text-2xl font-bold mb-4">Account</h3>
+
+        <div className="space-y-3">
+          {/* Settings */}
+          <button 
+            onClick={() => navigate('/dashboard/settings')}
+            className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
+              <Settings size={24} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-semibold text-base text-left">
+              Settings
+            </span>
+            <ChevronRight size={20} className="text-text-muted" />
+          </button>
+
+          {/* Notifications */}
+          <button 
+            onClick={() => navigate('/dashboard/notifications')}
+            className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
+              <Bell size={24} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-semibold text-base text-left">
+              Notifications
+            </span>
+            <ChevronRight size={20} className="text-text-muted" />
+          </button>
+
+          {/* Help & Support */}
+          <button className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors">
+            <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center mr-4">
+              <HelpCircle size={24} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-semibold text-base text-left">
+              Help & Support
+            </span>
+            <ChevronRight size={20} className="text-text-muted" />
+          </button>
+        </div>
+      </div>
+
+      {/* Logout Button */}
+      <div className="px-6">
+        <button 
+          onClick={() => navigate('/login')}
+          className="w-full bg-transparent border border-red-500/30 rounded-2xl py-4 flex items-center justify-center hover:bg-red-500/10 transition-colors"
+        >
+          <LogOut size={20} className="text-red-500 mr-2" />
+          <span className="text-red-500 font-bold text-base">
+            Logout
+          </span>
+        </button>
+      </div>
     </div>
   );
 };
