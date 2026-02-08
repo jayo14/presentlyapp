@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Smartphone } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SEO } from '../SEO';
 import { useVerifyEmailOTP, useResendEmailVerification } from '../../hooks/useAuth';
+import { CircularProgress } from '../CircularProgress';
+import { Haptics } from '@capacitor/haptics';
 
 export const OTPVerification: React.FC = () => {
   const navigate = useNavigate();
@@ -34,9 +36,27 @@ export const OTPVerification: React.FC = () => {
     newOtp[index] = value.slice(-1); // Take only last character
     setOtp(newOtp);
 
+    // Haptic feedback on digit entry
+    try {
+      Haptics.impact({ style: 'light' });
+    } catch (e) {
+      // Haptics not available on web
+    }
+
     // Auto-focus next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-submit on 6th digit
+    if (index === 5 && value) {
+      const completeOtp = [...newOtp];
+      completeOtp[5] = value;
+      if (completeOtp.every(digit => digit !== '') && email) {
+        setTimeout(() => {
+          verifyMutation.mutate({ email, otp: completeOtp.join('') });
+        }, 300);
+      }
     }
   };
 
@@ -81,31 +101,51 @@ export const OTPVerification: React.FC = () => {
   };
 
   const isOtpComplete = otp.every(digit => digit !== '');
+  const progress = (60 - countdown) / 60 * 100;
+
+  // Format phone number for display
+  const formatPhoneDisplay = (phoneNum: string) => {
+    if (!phoneNum) return '';
+    const cleaned = phoneNum.replace(/\D/g, '');
+    const last2 = cleaned.slice(-2);
+    return `+1 (555) *** ***${last2}`;
+  };
 
   return (
-    <div className="min-h-screen bg-light-background flex flex-col p-4 relative">
+    <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col p-4 relative">
       <SEO title="OTP Verification | Presently" />
       
-      {/* Back Button */}
+      {/* Back Button - Hidden on mobile <768px */}
       <button 
         onClick={() => navigate(-1)} 
-        className="absolute top-6 left-6 text-light-text hover:text-light-text-secondary flex items-center gap-2 transition-colors"
+        className="hidden md:flex absolute top-6 left-6 text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary items-center gap-2 transition-colors"
       >
         <ArrowLeft size={20} />
+        <span>Back</span>
       </button>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-4">
-        {/* Title and Description */}
+        {/* Header */}
         <div className="text-center mb-8 w-full">
-          <h1 className="text-3xl font-bold text-light-text mb-4">Enter the 6-digit code sent to your mobile</h1>
-          <p className="text-primary text-base">
-            We've sent a code to {phone || email}
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-3">
+            OTP Verification
+          </h1>
+          <p className="text-base text-text-secondary dark:text-dark-text-secondary mb-6">
+            Enter the 6-digit code sent to your mobile
           </p>
+          
+          {/* Phone Display Card */}
+          <div className="bg-background-secondary dark:bg-dark-background-secondary rounded-2xl px-6 py-4 mb-6 inline-flex items-center gap-3 shadow-sm">
+            <Smartphone className="w-5 h-5 text-primary dark:text-dark-primary-DEFAULT" />
+            <span className="text-lg font-semibold text-primary dark:text-dark-primary-DEFAULT">
+              {formatPhoneDisplay(phone) || email}
+            </span>
+          </div>
         </div>
 
-        {/* OTP Input */}
-        <div className="flex gap-3 justify-center mb-8" onPaste={handlePaste}>
+        {/* OTP Input - Larger on mobile */}
+        <div className="flex gap-2 md:gap-3 justify-center mb-8" onPaste={handlePaste}>
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -116,53 +156,69 @@ export const OTPVerification: React.FC = () => {
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className={`w-14 h-14 text-center text-2xl font-bold bg-white border-2 rounded-2xl text-light-text focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${
-                digit ? 'border-primary' : 'border-light-border'
+              className={`w-11 h-11 mobile:w-[44px] mobile:h-[44px] md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold bg-background-tertiary dark:bg-dark-background-tertiary border-2 rounded-xl md:rounded-2xl text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 transition-all ${
+                digit ? 'border-primary dark:border-dark-primary-DEFAULT' : 'border-border-light dark:border-dark-border-light'
               }`}
               aria-label={`Digit ${index + 1}`}
             />
           ))}
         </div>
 
-        {/* Resend Timer */}
-        <div className="flex items-center gap-2 text-primary mb-8">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span className="font-semibold">
-            {canResend ? 'You can resend now' : `Resend in 0:${countdown.toString().padStart(2, '0')}`}
-          </span>
-        </div>
-
-        {/* Timer Display */}
-        <div className="flex gap-4 mb-12">
-          <div className="bg-light-card px-6 py-3 rounded-xl">
-            <div className="text-2xl font-bold text-light-text">00</div>
-            <div className="text-xs text-light-text-secondary">Min</div>
-          </div>
-          <div className="bg-light-card px-6 py-3 rounded-xl">
-            <div className="text-2xl font-bold text-light-text">{countdown.toString().padStart(2, '0')}</div>
-            <div className="text-xs text-light-text-secondary">Sec</div>
-          </div>
+        {/* Circular Timer Display */}
+        <div className="mb-8">
+          <CircularProgress 
+            percentage={progress} 
+            size={100} 
+            strokeWidth={8}
+            className="mb-4"
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">
+                0:{countdown.toString().padStart(2, '0')}
+              </div>
+            </div>
+          </CircularProgress>
         </div>
 
         {/* Verify Button */}
         <button
           onClick={handleVerify}
           disabled={!isOtpComplete || verifyMutation.isPending}
-          className="w-full py-4 bg-primary hover:bg-primary-hover text-light-text font-bold rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+          className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mb-6"
         >
-          {verifyMutation.isPending ? 'Verifying...' : 'Verify'}
+          {verifyMutation.isPending ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Verifying...
+            </span>
+          ) : 'Verify'}
         </button>
 
-        {/* Resend Link */}
-        <button
-          onClick={handleResend}
-          disabled={!canResend || resendMutation.isPending}
-          className="text-light-text hover:underline font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {resendMutation.isPending ? 'Sending...' : "Didn't receive the code?"}
-        </button>
+        {/* Footer - Resend Section */}
+        <div className="text-center">
+          <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-2">
+            Didn't receive the code?
+          </p>
+          <button
+            onClick={handleResend}
+            disabled={!canResend || resendMutation.isPending}
+            className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+          >
+            {resendMutation.isPending ? 'Sending...' : canResend ? 'Resend SMS' : `Resend in 0:${countdown.toString().padStart(2, '0')}`}
+          </button>
+        </div>
+
+        {/* Error Message */}
+        {verifyMutation.isError && (
+          <div className="mt-4 p-3 bg-error/10 dark:bg-error-dark/10 border border-error dark:border-error-dark rounded-lg">
+            <p className="text-sm text-error dark:text-error-dark text-center">
+              Invalid or expired code. Please try again.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
