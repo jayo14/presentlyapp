@@ -361,7 +361,7 @@ export const Onboarding: React.FC = () => {
         <p className="text-zinc-600">
            {selectedRole === UserRole.LECTURER ? 'Tell us about your teaching role.' : 'Tell us about your course of study.'}
         </p>
-        <p className="text-xs text-zinc-500 mt-2">3 of {totalSteps}</p>
+        <p className="text-xs text-zinc-500 mt-2">{step} of {totalSteps}</p>
       </div>
 
       <div className="space-y-4">
