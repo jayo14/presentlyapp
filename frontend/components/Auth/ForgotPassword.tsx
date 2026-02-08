@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, ArrowLeft, RotateCcw, Lock } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
-import { Logo } from '../Logo';
 import { useRequestPasswordReset } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { SEO } from '../SEO';
@@ -30,114 +29,84 @@ export const ForgotPassword: React.FC = () => {
   };
 
   const onBack = () => navigate(-1);
-  const onLoginClick = () => navigate('/login');
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-light-background flex flex-col p-4 relative">
       <SEO 
         title="Forgot Password | Presently"
         description="Reset your Presently password to regain access to your account."
       />
+      
+      {/* Back Button - Top Left */}
       <button 
         onClick={onBack} 
-        className="absolute top-8 left-8 text-zinc-400 hover:text-white flex items-center gap-2 transition-colors"
+        className="absolute top-6 left-6 text-light-text hover:text-light-text-secondary flex items-center gap-2 transition-colors"
       >
-        <ArrowLeft size={18} /> Back
+        <ArrowLeft size={20} />
       </button>
 
-      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="text-center mb-8">
-          <Logo className="justify-center mb-6 text-2xl" />
-          <h2 className="text-2xl font-bold text-white">Reset your password</h2>
-          <p className="text-zinc-400 mt-2">
-            {pageState === 'form' && "Enter your email to receive a password reset link"}
-            {pageState === 'sent' && "Check your email for the reset link"}
-            {pageState === 'error' && "Something went wrong"}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-4">
+        {/* Icon */}
+        <div className="mb-8 flex justify-center">
+          <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center relative">
+            <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-primary-dark flex items-center justify-center">
+                <RotateCcw size={32} className="text-white" />
+                <Lock size={16} className="text-white absolute" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Title and Description */}
+        <div className="text-center mb-8 w-full">
+          <h1 className="text-3xl font-bold text-light-text mb-4">Reset Password</h1>
+          <p className="text-light-text-secondary text-base">
+            Enter your registered university email address and we'll send you a secure link to reset your password.
           </p>
         </div>
 
-        <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-2xl shadow-2xl">
+        {/* Form or Success Message */}
+        <div className="w-full space-y-6">
           {pageState === 'form' && (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {requestPasswordResetMutation.error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm flex items-start gap-2">
-                  <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
-                  <span>{requestPasswordResetMutation.error.message}</span>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-light-text mb-3">
+                  University Email
+                </label>
+                <div className="relative">
+                  <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
+                  <input
+                    type="email"
+                    placeholder="name@university.edu"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={requestPasswordResetMutation.isPending}
+                    className="w-full pl-12 pr-4 py-4 bg-white border border-light-border rounded-xl text-light-text placeholder:text-light-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  />
                 </div>
-              )}
+              </div>
 
-              <Input
-                label="Email Address"
-                type="email"
-                placeholder="name@university.edu"
-                icon={<Mail size={16} />}
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={requestPasswordResetMutation.isPending}
-              />
-
-              <Button
+              <button
                 type="submit"
                 disabled={requestPasswordResetMutation.isPending || !email}
-                className="w-full mt-6"
-                isLoading={requestPasswordResetMutation.isPending}
+                className="w-full py-4 bg-primary hover:bg-primary-hover text-light-text font-bold rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send Reset Link
-              </Button>
+                {requestPasswordResetMutation.isPending ? 'Sending...' : 'Send Reset Link'}
+              </button>
 
-              <div className="mt-4 text-center text-sm">
-                <p className="text-zinc-400">
-                  Remember your password?{' '}
-                  <button
-                    type="button"
-                    onClick={onLoginClick}
-                    className="text-primary hover:underline font-medium"
-                  >
-                    Sign in
-                  </button>
-                </p>
+              <div className="text-center text-sm">
+                <span className="text-light-text-secondary">Having trouble? </span>
+                <button
+                  type="button"
+                  className="text-primary hover:underline font-semibold"
+                >
+                  Contact University Support
+                </button>
               </div>
             </form>
-          )}
-
-          {pageState === 'sent' && (
-            <div className="space-y-6 text-center">
-              <div className="flex justify-center">
-                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-full">
-                  <CheckCircle size={48} className="text-green-500" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Email sent!</h3>
-                <p className="text-zinc-400 text-sm">
-                  We've sent a password reset link to <span className="font-medium text-white">{email}</span>
-                </p>
-              </div>
-              <Button onClick={onLoginClick} className="w-full">
-                Back to Sign In
-              </Button>
-            </div>
-          )}
-
-          {pageState === 'error' && (
-            <div className="space-y-6 text-center">
-              <div className="flex justify-center">
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-full">
-                  <AlertCircle size={48} className="text-red-500" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Something went wrong</h3>
-                <p className="text-zinc-400 text-sm">
-                  {requestPasswordResetMutation.error?.message || 'We could not send a reset link.'}
-                </p>
-              </div>
-              <Button onClick={handleReset} className="w-full">
-                Try Again
-              </Button>
-            </div>
           )}
         </div>
       </div>
