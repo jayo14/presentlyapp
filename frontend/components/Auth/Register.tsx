@@ -108,35 +108,35 @@ export const Register: React.FC = () => {
   // Show loading state while checking auth
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-light-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-zinc-400">Loading...</p>
+          <p className="text-light-text-secondary">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-light-background flex flex-col items-center justify-center p-4 relative">
       <SEO 
         title="Register | Presently"
         description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
       />
-       <button onClick={onBack} className="absolute top-8 left-8 text-zinc-400 hover:text-white flex items-center gap-2">
+       <button onClick={onBack} className="absolute top-8 left-8 text-light-text hover:text-light-text-secondary flex items-center gap-2 transition-colors">
             <ArrowLeft size={18} /> Back
         </button>
 
       <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="text-center mb-8">
             <Logo className="justify-center mb-6 text-2xl" />
-            <h2 className="text-2xl font-bold text-white">Create an account</h2>
-            <p className="text-zinc-400 mt-2">Get started with smart attendance management.</p>
+            <h2 className="text-2xl font-bold text-light-text">Create an account</h2>
+            <p className="text-light-text-secondary mt-2">Get started with smart attendance management.</p>
         </div>
 
-        <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-2xl shadow-2xl">
+        <div className="bg-light-surface border border-light-border p-8 rounded-2xl shadow-lg">
           {registerMutation.error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
               {registerMutation.error.message}
             </div>
           )}
@@ -169,7 +169,7 @@ export const Register: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-light-text-tertiary">
                 By clicking "Create Account", you agree to our <a href="#" className="underline">Terms</a> and <a href="#" className="underline">Privacy Policy</a>.
             </p>
 
@@ -179,19 +179,19 @@ export const Register: React.FC = () => {
           </form>
 
           <div className="my-6 flex items-center gap-4">
-              <div className="h-px bg-zinc-800 flex-1"></div>
-              <span className="text-xs text-zinc-500 uppercase">Or sign up with</span>
-              <div className="h-px bg-zinc-800 flex-1"></div>
+              <div className="h-px bg-light-border flex-1"></div>
+              <span className="text-xs text-light-text-tertiary uppercase">Or sign up with</span>
+              <div className="h-px bg-light-border flex-1"></div>
           </div>
 
           <button 
             type="button"
             onClick={handleGoogleLogin}
             disabled={googleAuthMutation.isPending || isRedirecting}
-            className="w-full bg-white text-black font-medium h-12 rounded-lg flex items-center justify-center gap-3 hover:bg-zinc-200 transition-colors disabled:opacity-50"
+            className="w-full bg-white border border-light-border text-light-text font-medium h-12 rounded-xl flex items-center justify-center gap-3 hover:bg-light-card transition-colors disabled:opacity-50"
           >
             {googleAuthMutation.isPending ? (
-              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-2 border-light-text border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -203,9 +203,9 @@ export const Register: React.FC = () => {
             Google
           </button>
 
-          <div className="mt-6 text-center text-sm text-zinc-500">
+          <div className="mt-6 text-center text-sm text-light-text-secondary">
             Already have an account?{' '}
-            <button onClick={onLoginClick} className="text-primary font-medium hover:underline">
+            <button onClick={onLoginClick} className="text-primary font-semibold hover:underline">
               Log in
             </button>
           </div>

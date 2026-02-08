@@ -17,6 +17,7 @@ import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNot
 const Onboarding = lazy(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
 const EmailVerificationSent = lazy(() => import('./components/Auth/EmailVerificationSent').then(module => ({ default: module.EmailVerificationSent })));
 const VerifyEmail = lazy(() => import('./components/Auth/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
+const OTPVerification = lazy(() => import('./components/Auth/OTPVerification').then(module => ({ default: module.OTPVerification })));
 const AuthCallback = lazy(() => import('./components/Auth/Callback').then(module => ({ default: module.AuthCallback })));
 const ForgotPassword = lazy(() => import('./components/Auth/ForgotPassword').then(module => ({ default: module.ForgotPassword })));
 const ResetPassword = lazy(() => import('./components/Auth/ResetPassword').then(module => ({ default: module.ResetPassword })));
@@ -181,6 +182,7 @@ const AppContent: React.FC = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/email-verification" element={<EmailVerificationSent />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
