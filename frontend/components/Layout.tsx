@@ -302,8 +302,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         </div>
       </aside>
 
-      {/* Mobile Header (Top) - Hidden on mobile, shown on tablets/desktop only */}
-      <div className="hidden lg:flex md:hidden items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-20 transition-colors duration-300">
+      {/* Mobile Header (Top) - Hidden on mobile (< 768px) */}
+      <div className="hidden lg:flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-20 transition-colors duration-300">
         <div className="flex items-center gap-3">
             <button onClick={() => setIsMobileMenuOpen(true)} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
                 <Menu size={24} />
