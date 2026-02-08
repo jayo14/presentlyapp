@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Eye, EyeOff, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Key, Info, CheckCircle2, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useResetPassword, useVerifyResetToken } from '../../hooks/useAuth';
 import { SEO } from '../SEO';
+import { PasswordStrengthMeter } from '../PasswordStrengthMeter';
+import { ConfettiAnimation } from '../ConfettiAnimation';
+import { toast } from 'sonner';
 
 type PageState = 'form' | 'success' | 'error' | 'loading' | 'invalid-link';
 
@@ -66,15 +69,32 @@ export const ResetPassword: React.FC = () => {
     return 'Strong password!';
   };
 
-  const isPasswordValid = passwordStrength >= 70 && password === confirmPassword && password.length > 0;
+  // Check password requirements
+  const requirements = [
+    { label: 'At least 8 characters', met: password.length >= 8 },
+    { label: 'Contains uppercase letter', met: /[A-Z]/.test(password) },
+    { label: 'Contains number', met: /[0-9]/.test(password) },
+    { label: 'Contains special character', met: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
+  ];
+
+  const allRequirementsMet = requirements.every(req => req.met);
+  const passwordsMatch = password && confirmPassword && password === confirmPassword;
+  const isPasswordValid = allRequirementsMet && passwordsMatch;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isPasswordValid || !uid || !token) return;
     
     resetPasswordMutation.mutate({ uid, token, newPassword: password }, {
-      onSuccess: () => setPageState('success'),
-      onError: () => setPageState('error'),
+      onSuccess: () => {
+        setPageState('success');
+        toast.success('Password reset successful!');
+      },
+      onError: (error: any) => {
+        setPageState('error');
+        const errorMessage = error?.response?.data?.message || 'Failed to reset password';
+        toast.error(errorMessage);
+      },
     });
   };
 
@@ -83,11 +103,11 @@ export const ResetPassword: React.FC = () => {
 
   if (pageState === 'loading' || verifyTokenMutation.isPending) {
     return (
-      <div className="min-h-screen bg-light-background flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col items-center justify-center">
         <SEO title="Verifying Reset Link | Presently" />
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-light-text-secondary">Verifying reset link...</p>
+          <div className="w-16 h-16 border-4 border-primary dark:border-dark-primary-DEFAULT border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-text-secondary dark:text-dark-text-secondary">Verifying reset link...</p>
         </div>
       </div>
     );
@@ -95,14 +115,14 @@ export const ResetPassword: React.FC = () => {
 
   if (pageState === 'invalid-link') {
     return (
-      <div className="min-h-screen bg-light-background flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col items-center justify-center p-4">
         <SEO title="Invalid Reset Link | Presently" />
         <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold text-light-text mb-4">Invalid Reset Link</h2>
-          <p className="text-light-text-secondary mb-6">This password reset link is invalid or has expired.</p>
+          <h2 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-4">Invalid Reset Link</h2>
+          <p className="text-text-secondary dark:text-dark-text-secondary mb-6">This password reset link is invalid or has expired.</p>
           <button
             onClick={() => navigate('/forgot-password')}
-            className="px-6 py-3 bg-primary hover:bg-primary-hover text-light-text font-semibold rounded-full transition-all"
+            className="px-6 py-3 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-semibold rounded-xl transition-all"
           >
             Request New Link
           </button>
@@ -116,33 +136,49 @@ export const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-light-background flex flex-col p-4 relative">
+    <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col p-4 relative">
       <SEO title="Reset Password | Presently" />
       
-      {/* Back Button */}
+      {/* Back Button - Hidden on mobile */}
       <button 
         onClick={onBack} 
-        className="absolute top-6 left-6 text-light-text hover:text-light-text-secondary flex items-center gap-2 transition-colors"
+        className="hidden md:flex absolute top-6 left-6 text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary items-center gap-2 transition-colors"
       >
         <ArrowLeft size={20} />
+        <span>Back</span>
       </button>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-start w-full max-w-md mx-auto px-4 pt-16">
+      <div className="flex-1 flex flex-col items-center justify-start w-full max-w-md mx-auto px-4 pt-12 md:pt-16">
+        {/* Header with Key Icon */}
+        <div className="mb-8 flex justify-center">
+          <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-dark-primary-DEFAULT/10 flex items-center justify-center">
+            <Key className="w-8 h-8 text-primary dark:text-dark-primary-DEFAULT" />
+          </div>
+        </div>
+
         {/* Title and Description */}
         <div className="text-center mb-8 w-full">
-          <h1 className="text-3xl font-bold text-light-text mb-4">Create new password</h1>
-          <p className="text-light-text-secondary text-base">
-            Your new password must be different from previous used passwords for security.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-3">
+            Reset Password
+          </h1>
+          <h2 className="text-lg font-semibold text-text-secondary dark:text-dark-text-secondary mb-4">
+            Create new password
+          </h2>
+          <div className="p-3 bg-warning/10 dark:bg-warning-dark/10 border border-warning dark:border-warning-dark rounded-lg" role="alert">
+            <p className="text-sm text-warning dark:text-warning-dark">
+              Your new password must be different from previous used passwords for security.
+            </p>
+          </div>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full space-y-6">
           {/* New Password */}
           <div>
-            <label className="block text-sm font-semibold text-light-text mb-3">
+            <label className="block text-sm font-medium text-text-secondary dark:text-dark-text-secondary mb-2 flex items-center gap-2">
               New Password
+              <Info className="w-4 h-4 text-text-tertiary dark:text-dark-text-tertiary" />
             </label>
             <div className="relative">
               <input
@@ -150,41 +186,28 @@ export const ResetPassword: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-4 py-4 pr-12 bg-white border border-light-border rounded-xl text-light-text placeholder:text-light-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                autoComplete="new-password"
+                className="w-full px-4 py-3.5 pr-12 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:text-primary-dark transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-text-tertiary dark:text-dark-text-tertiary hover:text-text-primary dark:hover:text-dark-text-primary transition-colors"
+                aria-label="Toggle password visibility"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
-          {/* Password Strength */}
+          {/* Password Strength Meter */}
           {password && (
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-sm">
-                <span className="font-semibold text-light-text">Password strength</span>
-                <span className="font-bold text-light-text">{passwordStrength} / 100</span>
-              </div>
-              <div className="h-2 bg-light-border rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${getStrengthColor()} transition-all duration-300`}
-                  style={{ width: `${passwordStrength}%` }}
-                />
-              </div>
-              <div className="flex items-center gap-2 text-sm text-primary font-semibold">
-                {passwordStrength >= 70 && <BadgeCheck size={16} />}
-                <span>{getStrengthLabel()}</span>
-              </div>
-            </div>
+            <PasswordStrengthMeter password={password} showRequirements={true} />
           )}
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-semibold text-light-text mb-3">
+            <label className="block text-sm font-medium text-text-secondary dark:text-dark-text-secondary mb-2">
               Confirm New Password
             </label>
             <div className="relative">
@@ -193,30 +216,56 @@ export const ResetPassword: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-4 pr-12 bg-white border border-light-border rounded-xl text-light-text placeholder:text-light-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                autoComplete="new-password"
+                className="w-full px-4 py-3.5 pr-12 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:text-primary-dark transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-text-tertiary dark:text-dark-text-tertiary hover:text-text-primary dark:hover:text-dark-text-primary transition-colors"
+                aria-label="Toggle confirm password visibility"
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
-          {/* Password mismatch error */}
-          {confirmPassword && password !== confirmPassword && (
-            <p className="text-red-500 text-sm">Passwords do not match</p>
+          {/* Match Indicator */}
+          {confirmPassword && (
+            <div className={`flex items-center gap-2 text-sm ${
+              passwordsMatch 
+                ? 'text-success dark:text-success-dark' 
+                : 'text-error dark:text-error-dark'
+            }`}>
+              {passwordsMatch ? (
+                <>
+                  <CheckCircle2 size={16} />
+                  <span>Passwords match</span>
+                </>
+              ) : (
+                <>
+                  <X size={16} />
+                  <span>Passwords do not match</span>
+                </>
+              )}
+            </div>
           )}
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={!isPasswordValid || resetPasswordMutation.isPending}
-            className="w-full py-4 bg-primary hover:bg-primary-hover text-light-text font-bold rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mt-8"
+            className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mt-8"
           >
-            {resetPasswordMutation.isPending ? 'Updating...' : 'Update Password'}
+            {resetPasswordMutation.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Updating Password...
+              </span>
+            ) : 'Update Password'}
           </button>
 
           {/* Cancel Link */}
@@ -224,11 +273,20 @@ export const ResetPassword: React.FC = () => {
             <button
               type="button"
               onClick={handleBackToLogin}
-              className="text-primary hover:underline font-semibold text-sm"
+              className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold text-sm"
             >
               Cancel and return to login
             </button>
           </div>
+
+          {/* Error Message */}
+          {pageState === 'error' && (
+            <div className="p-3 bg-error/10 dark:bg-error-dark/10 border border-error dark:border-error-dark rounded-lg">
+              <p className="text-sm text-error dark:text-error-dark text-center">
+                Failed to reset password. Please try again.
+              </p>
+            </div>
+          )}
         </form>
       </div>
     </div>
@@ -238,8 +296,12 @@ export const ResetPassword: React.FC = () => {
 // Password Reset Success Component
 const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackToLogin }) => {
   const [countdown, setCountdown] = useState(5);
+  const [showConfetti, setShowConfetti] = useState(true);
+  const [cancelRedirect, setCancelRedirect] = useState(false);
 
   useEffect(() => {
+    if (cancelRedirect) return;
+
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -252,46 +314,72 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [onBackToLogin]);
+  }, [onBackToLogin, cancelRedirect]);
+
+  const handleCancelRedirect = () => {
+    setCancelRedirect(true);
+    setCountdown(0);
+  };
 
   return (
-    <div className="min-h-screen bg-light-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col items-center justify-center p-4 relative">
       <SEO title="Password Reset Successful | Presently" />
       
-      {/* Success Icon */}
-      <div className="mb-8 flex justify-center">
-        <div className="w-40 h-40 rounded-full bg-primary/10 flex items-center justify-center relative">
-          <div className="w-32 h-32 rounded-full bg-primary flex items-center justify-center">
-            <div className="w-24 h-24 rounded-full bg-primary-dark flex items-center justify-center">
-              <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
+      {/* Confetti Animation */}
+      <ConfettiAnimation active={showConfetti} duration={3000} count={40} />
+
+      {/* Success Card */}
+      <div className="max-w-md w-full bg-background-secondary dark:bg-dark-background-secondary rounded-2xl p-8 shadow-lg text-center">
+        {/* Success Icon with Animation */}
+        <div className="mb-6 flex justify-center">
+          <div className="w-24 h-24 rounded-full bg-success/10 dark:bg-success-dark/10 flex items-center justify-center relative">
+            <div className="w-20 h-20 rounded-full bg-success/20 dark:bg-success-dark/20 flex items-center justify-center animate-pulse-ring">
+              <CheckCircle2 className="w-12 h-12 text-success dark:text-success-dark animate-checkmark" />
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Title and Message */}
-      <div className="text-center max-w-md mb-8">
-        <h1 className="text-4xl font-bold text-light-text mb-4">Password Reset Successful!</h1>
-        <p className="text-light-text-secondary text-lg">
+        {/* Title */}
+        <h1 className="text-2xl md:text-3xl font-bold text-success dark:text-success-dark mb-4">
+          Password Reset Successful!
+        </h1>
+
+        {/* Message */}
+        <p className="text-base text-text-secondary dark:text-dark-text-secondary mb-6">
           Your password has been successfully updated. You can now log in to{' '}
-          <span className="text-primary font-semibold">Presently</span> with your new credentials.
+          <span className="text-primary dark:text-dark-primary-DEFAULT font-semibold">Presently</span>{' '}
+          with your new credentials.
         </p>
+
+        {/* Login Button */}
+        <button
+          onClick={onBackToLogin}
+          className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-xl transition-all shadow-md mb-4"
+        >
+          Back to Login
+        </button>
+
+        {/* Countdown or Cancel */}
+        {!cancelRedirect && countdown > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm text-text-tertiary dark:text-dark-text-tertiary">
+              Redirecting you in {countdown} seconds...
+            </p>
+            <button
+              onClick={handleCancelRedirect}
+              className="text-xs text-primary dark:text-dark-primary-DEFAULT hover:underline"
+            >
+              Cancel redirect
+            </button>
+          </div>
+        )}
+
+        {cancelRedirect && (
+          <p className="text-sm text-text-tertiary dark:text-dark-text-tertiary">
+            Auto-redirect cancelled
+          </p>
+        )}
       </div>
-
-      {/* Button */}
-      <button
-        onClick={onBackToLogin}
-        className="w-full max-w-md py-4 bg-primary hover:bg-primary-hover text-light-text font-bold rounded-full transition-all shadow-md mb-4"
-      >
-        Back to Login
-      </button>
-
-      {/* Countdown */}
-      <p className="text-light-text-secondary text-sm">
-        Redirecting you in {countdown} seconds...
-      </p>
     </div>
   );
 };
