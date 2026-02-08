@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Home, BookOpen, QrCode, Clock, BarChart3, Plus } from 'lucide-react-native';
+import { Home, BookOpen, QrCode, Clock, BarChart3, Plus, FileText, Bell, User } from 'lucide-react-native';
 
 import SplashScreen from './screens/SplashScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
@@ -18,6 +18,10 @@ import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentCoursesScreen from './screens/StudentCoursesScreen';
 import SessionsScreen from './screens/SessionsScreen';
 import AnalyticsScreen from './screens/AnalyticsScreen';
+import NotificationsScreen from './screens/NotificationsScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import LecturerSettingsScreen from './screens/LecturerSettingsScreen';
+import NewAttendanceSessionScreen from './screens/NewAttendanceSessionScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,38 +70,6 @@ function MainTabs() {
           ),
         }}
       />
-      {/* Courses Tab */}
-      <Tab.Screen
-        name="Courses"
-        component={StudentCoursesScreen}
-        options={{
-          tabBarIcon: ({ color, focused }) => (
-            <BookOpen size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
-          ),
-        }}
-      />
-      {/* Mark Attendance Tab (FAB) */}
-      <Tab.Screen
-        name="MarkAttendanceFAB"
-        component={EmptyScreen} // This screen won't be rendered, it's just a tab item
-        options={{
-          tabBarIcon: () => (
-            <TouchableOpacity 
-              onPress={() => {
-                // Direct navigation or modal trigger for attendance
-                // For now, let's navigate to the dashboard which has the modal trigger
-                // Or a dedicated attendance screen if we create one
-                (navigation as any).navigate('Home'); // Navigate to Home tab
-              }}
-              className="absolute -top-8 w-16 h-16 bg-primary rounded-full items-center justify-center shadow-xl shadow-primary/30"
-              style={{ elevation: 10 }} // for Android shadow
-            >
-              <QrCode size={32} color="#002368" strokeWidth={3} />
-            </TouchableOpacity>
-          ),
-          tabBarLabel: () => null, // Hide label for FAB
-        }}
-      />
       {/* Sessions Tab */}
       <Tab.Screen
         name="Sessions"
@@ -108,13 +80,34 @@ function MainTabs() {
           ),
         }}
       />
-      {/* Analytics Tab */}
+      {/* Courses Tab */}
       <Tab.Screen
-        name="Analytics"
+        name="Courses"
+        component={StudentCoursesScreen}
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            <BookOpen size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+      {/* Records Tab */}
+      <Tab.Screen
+        name="Records"
         component={AnalyticsScreen}
         options={{
           tabBarIcon: ({ color, focused }) => (
-            <BarChart3 size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+            <FileText size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+      {/* Profile Tab */}
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <User size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />
@@ -153,6 +146,12 @@ export default function App() {
           <Stack.Screen name="MainApp" component={MainTabs} />
           
           <Stack.Screen name="StudentCourses" component={StudentCoursesScreen} /> {/* For direct navigation */}
+          
+          {/* New Screens */}
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="Settings" component={LecturerSettingsScreen} />
+          <Stack.Screen name="NewAttendanceSession" component={NewAttendanceSessionScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
