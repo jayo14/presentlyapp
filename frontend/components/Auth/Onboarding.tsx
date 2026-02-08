@@ -52,7 +52,7 @@ export const Onboarding: React.FC = () => {
   const [permissions, setPermissions] = useState({
     notifications: false,
     location: false,
-    darkMode: true
+    darkMode: false
   });
 
   // Fetch courses when user selects student role and reaches course selection step
@@ -262,8 +262,8 @@ export const Onboarding: React.FC = () => {
   const renderRoleSelection = () => (
     <div className="space-y-4">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Choose your role</h2>
-        <p className="text-zinc-500">How will you use Presently?</p>
+        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Choose your role</h2>
+        <p className="text-zinc-600">How will you use Presently?</p>
       </div>
       
       <div className="grid gap-4">
@@ -277,19 +277,19 @@ export const Onboarding: React.FC = () => {
             onClick={() => setSelectedRole(role.id)}
             className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all w-full text-left group
               ${selectedRole === role.id 
-                ? 'border-primary bg-primary/5' 
-                : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 hover:bg-zinc-900'
+                ? 'border-primary bg-primary/10' 
+                : 'border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-sm'
               }`}
           >
-            <div className={`p-3 rounded-xl transition-colors ${selectedRole === role.id ? 'bg-primary text-black' : 'bg-zinc-800 text-zinc-400 group-hover:text-white'}`}>
+            <div className={`p-3 rounded-xl transition-colors ${selectedRole === role.id ? 'bg-primary text-white' : 'bg-zinc-100 text-zinc-600 group-hover:text-zinc-900'}`}>
               <role.icon size={24} />
             </div>
             <div>
-              <p className={`font-bold transition-colors ${selectedRole === role.id ? 'text-primary' : 'text-white'}`}>{role.label}</p>
+              <p className={`font-bold transition-colors ${selectedRole === role.id ? 'text-primary' : 'text-zinc-900'}`}>{role.label}</p>
               <p className="text-xs text-zinc-500">{role.desc}</p>
             </div>
-            <div className={`ml-auto w-5 h-5 rounded-full border flex items-center justify-center transition-all ${selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-600'}`}>
-               {selectedRole === role.id && <Check size={14} className="text-black" />}
+            <div className={`ml-auto w-5 h-5 rounded-full border flex items-center justify-center transition-all ${selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-300'}`}>
+               {selectedRole === role.id && <Check size={14} className="text-white" />}
             </div>
           </button>
         ))}
@@ -300,19 +300,19 @@ export const Onboarding: React.FC = () => {
   const renderPersonalDetails = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Personal Details</h2>
-        <p className="text-zinc-500">Let's set up your profile.</p>
+        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Personal Details</h2>
+        <p className="text-zinc-600">Let's set up your profile.</p>
       </div>
 
       <div className="flex flex-col items-center mb-8 gap-4">
         <div className="relative group cursor-pointer">
-           <div className="w-28 h-28 rounded-full bg-zinc-800 overflow-hidden border-4 border-zinc-900 ring-2 ring-zinc-800 group-hover:ring-primary transition-all">
+           <div className="w-28 h-28 rounded-full bg-zinc-100 overflow-hidden border-4 border-zinc-200 ring-2 ring-zinc-100 group-hover:ring-primary transition-all">
               {pendingImage ? (
                   <img src={pendingImage} alt="Preview" className="w-full h-full object-cover opacity-80" />
               ) : profileImage ? (
                   <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                  <div className="w-full h-full flex items-center justify-center text-zinc-600">
+                  <div className="w-full h-full flex items-center justify-center text-zinc-400">
                       <User size={40} />
                   </div>
               )}
@@ -322,7 +322,7 @@ export const Onboarding: React.FC = () => {
              <button 
                type="button"
                onClick={handleCameraClick}
-               className="absolute bottom-0 right-0 bg-primary text-black p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110"
+               className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110"
              >
                 <Camera size={16} />
              </button>
@@ -357,16 +357,17 @@ export const Onboarding: React.FC = () => {
   const renderAcademicDetails = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Academic Info</h2>
-        <p className="text-zinc-500">
+        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Institutional Details</h2>
+        <p className="text-zinc-600">
            {selectedRole === UserRole.LECTURER ? 'Tell us about your teaching role.' : 'Tell us about your course of study.'}
         </p>
+        <p className="text-xs text-zinc-500 mt-2">3 of {totalSteps}</p>
       </div>
 
       <div className="space-y-4">
         {/* Institution Selection */}
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-1.5">Institution</label>
+          <label className="block text-sm font-medium text-zinc-700 mb-1.5">Institution</label>
           <select
             value={selectedInstitution || ''}
             onChange={(e) => {
@@ -377,7 +378,7 @@ export const Onboarding: React.FC = () => {
               setColleges([]);
               setDepartments([]);
             }}
-            className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg p-3 focus:ring-1 focus:ring-primary outline-none"
+            className="w-full bg-white border border-zinc-300 text-zinc-900 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           >
             <option value="">Select Institution</option>
             {institutions.map(inst => (
@@ -391,7 +392,7 @@ export const Onboarding: React.FC = () => {
         {/* College Selection */}
         {selectedInstitution && (
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">College/Faculty</label>
+            <label className="block text-sm font-medium text-zinc-700 mb-1.5">College/Faculty</label>
             <select
               value={selectedCollege || ''}
               onChange={(e) => {
@@ -400,7 +401,7 @@ export const Onboarding: React.FC = () => {
                 setSelectedDepartment(null);
                 setDepartments([]);
               }}
-              className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg p-3 focus:ring-1 focus:ring-primary outline-none"
+              className="w-full bg-white border border-zinc-300 text-zinc-900 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
             >
               <option value="">Select College/Faculty</option>
               {colleges.map(col => (
@@ -415,14 +416,14 @@ export const Onboarding: React.FC = () => {
         {/* Department Selection */}
         {selectedCollege && (
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Department</label>
+            <label className="block text-sm font-medium text-zinc-700 mb-1.5">Department</label>
             <select
               value={selectedDepartment || ''}
               onChange={(e) => {
                 const value = e.target.value ? Number(e.target.value) : null;
                 setSelectedDepartment(value);
               }}
-              className="w-full bg-zinc-900 border border-zinc-800 text-white rounded-lg p-3 focus:ring-1 focus:ring-primary outline-none"
+              className="w-full bg-white border border-zinc-300 text-zinc-900 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
             >
               <option value="">Select Department</option>
               {departments.map(dept => (
@@ -455,10 +456,10 @@ export const Onboarding: React.FC = () => {
 
         {selectedRole === UserRole.STUDENT && (
              <div className="w-full">
-                 <label className="block text-sm font-medium text-zinc-400 mb-1.5">Digital Signature <span className="text-zinc-600 font-normal">(Optional)</span></label>
-                 <div className="border border-dashed border-zinc-800 bg-zinc-900/30 rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-900 hover:border-primary/50 cursor-pointer transition-colors group">
-                    <Upload className="h-6 w-6 text-zinc-600 group-hover:text-primary mb-2 transition-colors" />
-                    <p className="text-xs text-zinc-500 group-hover:text-zinc-300">Upload signature image</p>
+                 <label className="block text-sm font-medium text-zinc-700 mb-1.5">Digital Signature <span className="text-zinc-500 font-normal">(Optional)</span></label>
+                 <div className="border border-dashed border-zinc-300 bg-zinc-50 rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-100 hover:border-primary/50 cursor-pointer transition-colors group">
+                    <Upload className="h-6 w-6 text-zinc-400 group-hover:text-primary mb-2 transition-colors" />
+                    <p className="text-xs text-zinc-500 group-hover:text-zinc-700">Upload signature image</p>
                  </div>
             </div>
         )}
@@ -498,8 +499,8 @@ export const Onboarding: React.FC = () => {
   const renderCourseRegistration = () => (
     <div className="space-y-6 h-full flex flex-col">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-white mb-2">Register Courses</h2>
-        <p className="text-zinc-500">Select courses to add to your dashboard.</p>
+        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Register Courses</h2>
+        <p className="text-zinc-600">Select courses to add to your dashboard.</p>
       </div>
 
       {coursesLoading ? (
@@ -508,7 +509,7 @@ export const Onboarding: React.FC = () => {
         </div>
       ) : coursesError ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <p className="text-red-400 text-sm">{coursesError}</p>
+          <p className="text-red-600 text-sm">{coursesError}</p>
           <Button size="sm" onClick={fetchCourses}>
             Retry
           </Button>
@@ -528,33 +529,33 @@ export const Onboarding: React.FC = () => {
                         onClick={() => toggleCourseSelection(course.id)}
                         className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
                             isSelected 
-                                ? 'bg-primary/10 border-primary shadow-lg shadow-primary/5' 
-                                : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                                ? 'bg-primary/10 border-primary shadow-md' 
+                                : 'bg-white border-zinc-300 hover:border-zinc-400 hover:shadow-sm'
                         }`}
                     >
                         <div className="text-left">
                             <div className="flex items-center gap-2">
-                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-white'}`}>{course.code}</span>
+                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-zinc-900'}`}>{course.code}</span>
                                  {course.level && (
-                                   <span className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">{course.level}L</span>
+                                   <span className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded">{course.level}L</span>
                                  )}
                             </div>
-                            <p className="text-xs text-zinc-400 mt-1">{course.title}</p>
+                            <p className="text-xs text-zinc-600 mt-1">{course.title}</p>
                             {course.lecturer_name && (
-                              <p className="text-[10px] text-zinc-600 mt-0.5">{course.lecturer_name}</p>
+                              <p className="text-[10px] text-zinc-500 mt-0.5">{course.lecturer_name}</p>
                             )}
                         </div>
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
-                            isSelected ? 'bg-primary border-primary text-black' : 'border-zinc-600 bg-transparent'
+                            isSelected ? 'bg-primary border-primary text-white' : 'border-zinc-300 bg-transparent'
                         }`}>
-                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-500" />}
+                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-400" />}
                         </div>
                     </button>
                 );
             })}
           </div>
           
-          <div className="text-center text-xs text-zinc-600 pt-2">
+          <div className="text-center text-xs text-zinc-500 pt-2">
             You selected {selectedCourses.length} courses.
           </div>
         </>
@@ -565,8 +566,8 @@ export const Onboarding: React.FC = () => {
   const renderPreferences = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Permissions</h2>
-        <p className="text-zinc-500">Customize your app experience.</p>
+        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Permissions</h2>
+        <p className="text-zinc-600">Customize your app experience.</p>
       </div>
 
       <div className="space-y-3">
@@ -598,20 +599,20 @@ export const Onboarding: React.FC = () => {
                 onClick={() => togglePermission(item.id as any)}
                 className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all
                     ${item.state 
-                        ? 'bg-zinc-900 border-primary/30' 
-                        : 'bg-zinc-900/50 border-transparent hover:bg-zinc-900'
+                        ? 'bg-white border-primary/30 shadow-sm' 
+                        : 'bg-zinc-50 border-zinc-200 hover:bg-white'
                     }`}
             >
                 <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-black' : 'bg-zinc-800 text-zinc-400'}`}>
+                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-white' : 'bg-zinc-200 text-zinc-600'}`}>
                         <item.icon size={20} />
                     </div>
                     <div className="text-left">
-                        <p className={`font-medium transition-colors ${item.state ? 'text-white' : 'text-zinc-400'}`}>{item.label}</p>
+                        <p className={`font-medium transition-colors ${item.state ? 'text-zinc-900' : 'text-zinc-600'}`}>{item.label}</p>
                         <p className="text-xs text-zinc-500">{item.desc}</p>
                     </div>
                 </div>
-                <div className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}>
+                <div className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-300 justify-start'}`}>
                     <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
                 </div>
             </div>
@@ -621,19 +622,19 @@ export const Onboarding: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F5F5F0] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Header Logo */}
         <div className="flex justify-center mb-8">
             <Logo />
         </div>
 
-        <div className="bg-zinc-950 border border-zinc-900 p-6 md:p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+        <div className="bg-white border border-zinc-200 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden">
              {/* Error Display */}
              {error && (
-               <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm flex items-start gap-3">
+               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-3">
                  <div className="flex-1">{error}</div>
-                 <button onClick={() => setError('')} className="text-red-400 hover:text-red-300">
+                 <button onClick={() => setError('')} className="text-red-500 hover:text-red-700">
                    <X size={16} />
                  </button>
                </div>
@@ -642,7 +643,7 @@ export const Onboarding: React.FC = () => {
              {/* Progress Bar */}
              <div className="flex gap-2 mb-8 px-2">
                 {Array.from({ length: totalSteps }).map((_, i) => (
-                  <div key={i} className="flex-1 h-1.5 rounded-full bg-zinc-900 overflow-hidden">
+                  <div key={i} className="flex-1 h-1.5 rounded-full bg-zinc-200 overflow-hidden">
                       <div 
                         className={`h-full bg-primary transition-all duration-500 ease-out ${step >= i + 1 ? 'w-full' : 'w-0'}`} 
                       />
@@ -670,7 +671,7 @@ export const Onboarding: React.FC = () => {
                     </motion.div>
                 </AnimatePresence>
 
-                <div className="flex gap-4 mt-8 pt-6 border-t border-zinc-900">
+                <div className="flex gap-4 mt-8 pt-6 border-t border-zinc-200">
                     {step > 1 && (
                         <Button variant="secondary" onClick={handleBack} className="px-4">
                             <ChevronLeft size={20} />
@@ -690,7 +691,7 @@ export const Onboarding: React.FC = () => {
             </div>
         </div>
         
-        <p className="text-center text-zinc-600 text-xs mt-6">
+        <p className="text-center text-zinc-500 text-xs mt-6">
             Step {step} of {totalSteps}
         </p>
       </div>
