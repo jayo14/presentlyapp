@@ -391,33 +391,98 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           </div>
       </div>
 
-      {/* Mobile Bottom Navigation - Dock Style with Glassmorphism */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 flex justify-center pb-2 sm:pb-4 px-2 sm:px-4 z-50 pointer-events-none">
-        <div className="pointer-events-auto bg-white/60 dark:bg-zinc-900/60 backdrop-blur-2xl border border-white/20 dark:border-zinc-700/30 rounded-full shadow-2xl px-4 sm:px-8 md:px-10 py-1.5 sm:py-2 flex items-center gap-4 sm:gap-8 md:gap-10 max-w-full overflow-x-auto scrollbar-hide">
-          {navItems.slice(0, 4).map(item => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              className={`flex flex-col items-center justify-center gap-0.5 transition-all duration-200 min-w-[48px] sm:min-w-[56px] flex-shrink-0 ${
-                currentPage === item.id 
-                  ? 'text-primary scale-105' 
-                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:scale-105'
-              }`}
-            >
-              <div className={`p-1.5 sm:p-2 rounded-xl transition-all duration-200 ${
-                currentPage === item.id 
-                  ? 'bg-primary/10 shadow-md' 
-                  : 'hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'
-              }`}>
-                <item.icon size={20} className="sm:w-[22px] sm:h-[22px]" strokeWidth={currentPage === item.id ? 2.5 : 2} />
-              </div>
-              <span className={`text-[8px] sm:text-[9px] font-medium transition-all duration-200 mt-0.5 whitespace-nowrap ${
-                currentPage === item.id ? 'font-semibold' : ''
-              }`}>
-                {item.label}
-              </span>
-            </button>
-          ))}
+      {/* Mobile Bottom Navigation - Redesigned to match UI */}
+      <div className="md:hidden fixed bottom-3 left-3 right-3 z-50 pointer-events-none">
+        <div className="pointer-events-auto bg-surface rounded-[2rem] shadow-2xl px-3 py-2 flex items-center justify-around max-w-full">
+          {/* Home */}
+          <button
+            onClick={() => handleNavClick('dashboard')}
+            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
+          >
+            <Home 
+              size={24} 
+              className={currentPage === 'dashboard' ? 'text-primary' : 'text-text-muted'}
+              strokeWidth={currentPage === 'dashboard' ? 2.5 : 2}
+            />
+            <span className={`text-[10px] font-medium ${currentPage === 'dashboard' ? 'text-primary' : 'text-text-muted'}`}>
+              Home
+            </span>
+          </button>
+
+          {/* Sessions */}
+          <button
+            onClick={() => handleNavClick('sessions')}
+            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
+          >
+            <Calendar 
+              size={24} 
+              className={currentPage === 'sessions' ? 'text-primary' : 'text-text-muted'}
+              strokeWidth={currentPage === 'sessions' ? 2.5 : 2}
+            />
+            <span className={`text-[10px] font-medium ${currentPage === 'sessions' ? 'text-primary' : 'text-text-muted'}`}>
+              Sessions
+            </span>
+          </button>
+
+          {/* Courses */}
+          <button
+            onClick={() => handleNavClick('courses')}
+            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
+          >
+            <GraduationCap 
+              size={24} 
+              className={currentPage === 'courses' ? 'text-primary' : 'text-text-muted'}
+              strokeWidth={currentPage === 'courses' ? 2.5 : 2}
+            />
+            <span className={`text-[10px] font-medium ${currentPage === 'courses' ? 'text-primary' : 'text-text-muted'}`}>
+              Courses
+            </span>
+          </button>
+
+          {/* Records/Analytics */}
+          <button
+            onClick={() => handleNavClick('analytics')}
+            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
+          >
+            <BarChart3 
+              size={24} 
+              className={currentPage === 'analytics' ? 'text-primary' : 'text-text-muted'}
+              strokeWidth={currentPage === 'analytics' ? 2.5 : 2}
+            />
+            <span className={`text-[10px] font-medium ${currentPage === 'analytics' ? 'text-primary' : 'text-text-muted'}`}>
+              Records
+            </span>
+          </button>
+
+          {/* Profile/Alerts - Shows Profile for lecturers, Alerts/Notifications for students */}
+          <button
+            onClick={() => handleNavClick(userRole === UserRole.STUDENT ? 'notifications' : 'profile')}
+            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
+          >
+            {userRole === UserRole.STUDENT ? (
+              <>
+                <Bell 
+                  size={24} 
+                  className={(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary' : 'text-text-muted'}
+                  strokeWidth={(currentPage === 'notifications' || currentPage === 'alerts') ? 2.5 : 2}
+                />
+                <span className={`text-[10px] font-medium ${(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary' : 'text-text-muted'}`}>
+                  Alerts
+                </span>
+              </>
+            ) : (
+              <>
+                <User 
+                  size={24} 
+                  className={currentPage === 'profile' ? 'text-primary' : 'text-text-muted'}
+                  strokeWidth={currentPage === 'profile' ? 2.5 : 2}
+                />
+                <span className={`text-[10px] font-medium ${currentPage === 'profile' ? 'text-primary' : 'text-text-muted'}`}>
+                  Profile
+                </span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
