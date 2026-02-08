@@ -84,15 +84,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
   );
 
   return (
-    <div className="max-w-3xl mx-auto space-y-12 pb-20 animate-in fade-in duration-500">
+    <div className="max-w-3xl mx-auto pb-20 animate-in fade-in duration-500">
+      
+      {/* Header with title matching design */}
+      <div className="flex items-center mb-8 pt-4 pb-6 border-b border-zinc-800">
+        <h1 className="text-xl font-bold text-white">
+          {userRole === UserRole.LECTURER ? 'Lecturer Settings' : 'Settings'}
+        </h1>
+      </div>
       
       {/* Account Settings - Available to All */}
-      <section>
-        <SectionHeader 
-          icon={User} 
-          title="Account Settings" 
-          description="Manage your profile and personal details." 
-        />
+      <section className="px-6">
+        <h2 className="text-2xl font-bold text-white mb-4">Account</h2>
         {isLoading ? (
           <div className="text-center py-8 text-zinc-500">Loading user data...</div>
         ) : (

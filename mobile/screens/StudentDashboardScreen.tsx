@@ -50,7 +50,10 @@ export default function StudentDashboardScreen({ navigation }: any) {
             </Text>
             <Text className="text-white text-3xl font-bold mt-1">Hello, {MOCK_DATA.userName.split(' ')[0]}</Text>
           </View>
-          <TouchableOpacity className="w-12 h-12 rounded-full bg-surface items-center justify-center border border-zinc-800">
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Notifications')}
+            className="w-12 h-12 rounded-full bg-surface items-center justify-center border border-zinc-800"
+          >
             <Bell size={24} color="#C1B66D" />
           </TouchableOpacity>
         </View>
