@@ -114,6 +114,13 @@ export const OTPVerification: React.FC = () => {
     return `+1 (555) *** ***${last2}`;
   };
 
+  // Format countdown time
+  const formatCountdown = () => {
+    const minutes = Math.floor(countdown / 60);
+    const seconds = countdown % 60;
+    return seconds < 60 ? seconds : `${minutes}:${String(seconds).padStart(2, '0')}`;
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col p-4 relative">
       <SEO title="OTP Verification | Presently" />
@@ -156,7 +163,7 @@ export const OTPVerification: React.FC = () => {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className={`w-12 h-12 md:w-14 md:h-14 text-center text-2xl font-bold bg-white dark:bg-dark-background-tertiary border-2 rounded-2xl text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 transition-all ${
-                digit ? 'border-[#3B82F6]' : 'border-[#E0E0E0] dark:border-dark-border-light'
+                digit ? 'border-[#FDB913]' : 'border-[#E0E0E0] dark:border-dark-border-light'
               }`}
               aria-label={`Digit ${index + 1}`}
             />
@@ -172,7 +179,7 @@ export const OTPVerification: React.FC = () => {
               </svg>
             </div>
             <span className="text-[#8B7355] dark:text-dark-text-tertiary font-medium">
-              Resend in {countdown < 10 ? '0' : ''}{countdown < 60 ? countdown : `${Math.floor(countdown / 60)}:${String(countdown % 60).padStart(2, '0')}`}
+              Resend in {countdown < 10 ? '0' : ''}{formatCountdown()}
             </span>
           </div>
           
