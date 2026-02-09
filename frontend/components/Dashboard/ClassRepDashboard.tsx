@@ -145,14 +145,19 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                                 <div className="space-y-3">
                                     {dayEntries.map(entry => (
                                         <div key={entry.id} className="bg-zinc-950 p-4 rounded-lg flex items-center justify-between group">
-                                            <div className="flex items-center gap-4">
+                                            <div className="flex items-center gap-4 flex-1">
                                                 <div className="bg-zinc-900 p-2 rounded text-zinc-400">
                                                     <Clock size={18} />
                                                 </div>
-                                                <div>
+                                                <div className="flex-1">
                                                     <p className="text-white font-bold">{entry.courseCode}</p>
                                                     <p className="text-sm text-zinc-500">{entry.startTime} - {entry.endTime}</p>
+                                                    {/* Mobile: Show venue on new line */}
+                                                    <p className="md:hidden text-xs text-zinc-500 mt-1 flex items-center">
+                                                        <MapPin size={12} className="mr-1" /> {entry.venue}
+                                                    </p>
                                                 </div>
+                                                {/* Desktop: Show venue inline */}
                                                 <div className="hidden md:flex items-center text-zinc-500 text-sm ml-4">
                                                     <MapPin size={14} className="mr-1" /> {entry.venue}
                                                 </div>
