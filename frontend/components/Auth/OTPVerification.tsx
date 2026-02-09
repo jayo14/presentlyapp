@@ -115,40 +115,36 @@ export const OTPVerification: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col p-4 relative">
+    <div className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col p-4 relative">
       <SEO title="OTP Verification | Presently" />
       
-      {/* Back Button - Hidden on mobile <768px */}
+      {/* Back Button - Always visible */}
       <button 
         onClick={() => navigate(-1)} 
-        className="hidden md:flex absolute top-6 left-6 text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary items-center gap-2 transition-colors"
+        className="absolute top-6 left-6 text-text-primary dark:text-dark-text-primary hover:text-text-secondary dark:hover:text-dark-text-secondary transition-colors"
       >
-        <ArrowLeft size={20} />
-        <span>Back</span>
+        <ArrowLeft size={24} strokeWidth={2.5} />
       </button>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8 w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-3">
-            OTP Verification
-          </h1>
-          <p className="text-base text-text-secondary dark:text-dark-text-secondary mb-6">
-            Enter the 6-digit code sent to your mobile
-          </p>
-          
-          {/* Phone Display Card */}
-          <div className="bg-background-secondary dark:bg-dark-background-secondary rounded-2xl px-6 py-4 mb-6 inline-flex items-center gap-3 shadow-sm">
-            <Smartphone className="w-5 h-5 text-primary dark:text-dark-primary-DEFAULT" />
-            <span className="text-lg font-semibold text-primary dark:text-dark-primary-DEFAULT">
-              {formatPhoneDisplay(phone) || email}
-            </span>
-          </div>
-        </div>
+      {/* Title at top */}
+      <div className="text-center pt-6 pb-8">
+        <h1 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">
+          OTP Verification
+        </h1>
+      </div>
 
-        {/* OTP Input - Larger on mobile */}
-        <div className="flex gap-2 md:gap-3 justify-center mb-8" onPaste={handlePaste}>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-start w-full max-w-md mx-auto px-4">
+        {/* Header */}
+        <h2 className="text-3xl md:text-4xl font-black text-text-primary dark:text-dark-text-primary mb-4 text-center">
+          Enter the 6-digit code sent to your mobile
+        </h2>
+        <p className="text-sm text-[#8B7355] dark:text-dark-text-secondary mb-6 text-center">
+          We've sent a code to {formatPhoneDisplay(phone) || email}
+        </p>
+
+        {/* OTP Input - Larger boxes */}
+        <div className="flex gap-3 justify-center mb-8 mt-8" onPaste={handlePaste}>
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -159,35 +155,53 @@ export const OTPVerification: React.FC = () => {
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className={`w-11 h-11 mobile:w-[44px] mobile:h-[44px] md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold bg-background-tertiary dark:bg-dark-background-tertiary border-2 rounded-xl md:rounded-2xl text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 transition-all ${
-                digit ? 'border-primary dark:border-dark-primary-DEFAULT' : 'border-border-light dark:border-dark-border-light'
+              className={`w-12 h-12 md:w-14 md:h-14 text-center text-2xl font-bold bg-white dark:bg-dark-background-tertiary border-2 rounded-2xl text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 transition-all ${
+                digit ? 'border-[#3B82F6]' : 'border-[#E0E0E0] dark:border-dark-border-light'
               }`}
               aria-label={`Digit ${index + 1}`}
             />
           ))}
         </div>
 
-        {/* Circular Timer Display */}
-        <div className="mb-8">
-          <CircularProgress 
-            percentage={progress} 
-            size={100} 
-            strokeWidth={8}
-            className="mb-4"
-          >
-            <div className="text-center">
-              <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">
-                0:{countdown.toString().padStart(2, '0')}
-              </div>
+        {/* Countdown Timer and Resend */}
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-5 h-5 rounded-full border-2 border-[#8B7355] dark:border-dark-text-tertiary flex items-center justify-center">
+              <svg className="w-3 h-3 text-[#8B7355] dark:text-dark-text-tertiary" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
             </div>
-          </CircularProgress>
+            <span className="text-[#8B7355] dark:text-dark-text-tertiary font-medium">
+              Resend in {countdown < 10 ? '0' : ''}{countdown < 60 ? countdown : `${Math.floor(countdown / 60)}:${String(countdown % 60).padStart(2, '0')}`}
+            </span>
+          </div>
+          
+          {/* Time Display Boxes */}
+          <div className="flex gap-4 justify-center mb-6">
+            <div className="text-center">
+              <div className="bg-[#F5E6B3] dark:bg-dark-background-secondary rounded-2xl px-6 py-3 mb-1">
+                <span className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">
+                  {Math.floor(countdown / 60).toString().padStart(2, '0')}
+                </span>
+              </div>
+              <span className="text-xs text-[#8B7355] dark:text-dark-text-tertiary">Min</span>
+            </div>
+            <div className="text-center">
+              <div className="bg-[#F5E6B3] dark:bg-dark-background-secondary rounded-2xl px-6 py-3 mb-1">
+                <span className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">
+                  {(countdown % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
+              <span className="text-xs text-[#8B7355] dark:text-dark-text-tertiary">Sec</span>
+            </div>
+          </div>
         </div>
 
         {/* Verify Button */}
         <button
           onClick={handleVerify}
           disabled={!isOtpComplete || verifyMutation.isPending}
-          className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+          className="w-full py-5 bg-[#FDB913] hover:bg-[#E5A912] text-black font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mb-6"
         >
           {verifyMutation.isPending ? (
             <span className="flex items-center justify-center gap-2">
@@ -202,16 +216,9 @@ export const OTPVerification: React.FC = () => {
 
         {/* Footer - Resend Section */}
         <div className="text-center">
-          <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-2">
+          <p className="text-sm text-text-primary dark:text-dark-text-primary font-medium mb-0">
             Didn't receive the code?
           </p>
-          <button
-            onClick={handleResend}
-            disabled={!canResend || resendMutation.isPending}
-            className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-          >
-            {resendMutation.isPending ? 'Sending...' : canResend ? 'Resend SMS' : `Resend in 0:${countdown.toString().padStart(2, '0')}`}
-          </button>
         </div>
 
         {/* Error Message */}
