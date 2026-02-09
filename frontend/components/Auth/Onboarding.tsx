@@ -395,7 +395,18 @@ export const Onboarding: React.FC = () => {
 
   const renderAcademicDetails = () => (
     <div className="space-y-6">
-      <div className="text-center mb-6">
+      {/* Mobile Header */}
+      <div className="md:hidden text-center mb-6">
+        <p className="text-sm font-medium text-text-secondary dark:text-dark-text-secondary mb-2">Institutional Details</p>
+        <p className="text-xs text-text-tertiary dark:text-dark-text-tertiary mb-4">{totalSteps} of {totalSteps}</p>
+        <h2 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-3">Link your Institution</h2>
+        <p className="text-base text-text-secondary dark:text-dark-text-secondary px-2">
+          Almost there! Select your specific academic location to finalize your profile.
+        </p>
+      </div>
+
+      {/* Desktop Header */}
+      <div className="hidden md:block text-center mb-6">
         <h2 className="text-2xl font-bold text-zinc-900 mb-2">Link your Institution</h2>
         <p className="text-zinc-600">
            {selectedRole === UserRole.LECTURER ? 'Tell us about your teaching role.' : 'Select your academic location.'}
