@@ -7,6 +7,7 @@ import { Button } from '../Button';
 import { notificationsApi, Notification as ApiNotification } from '../../services/api/notifications';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 
 type TabType = 'all' | 'unread' | 'important' | 'system';
 
@@ -143,14 +144,106 @@ export const NotificationsPage: React.FC = () => {
     );
   }
 
-  return (
+  // Mobile Layout (matching the dark theme design)
+  const mobileLayout = (
+    <div className="min-h-screen bg-zinc-950 pb-24">
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-10 bg-zinc-950 border-b border-zinc-800">
+        <div className="flex items-center justify-between p-4">
+          <button 
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+          >
+            <ArrowLeft size={24} className="text-white" />
+          </button>
+          <h1 className="text-xl font-bold text-white">Notifications</h1>
+          <button 
+            onClick={() => navigate('/dashboard/settings#notifications')}
+            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+            aria-label="Notification Settings"
+          >
+            <Settings size={24} className="text-zinc-400" />
+          </button>
+        </div>
+
+        {/* Mobile Tabs */}
+        <div className="flex gap-6 px-4 pb-3 overflow-x-auto">
+          {[
+            { id: 'all', label: 'All' },
+            { id: 'unread', label: 'Unread' },
+            { id: 'important', label: 'Important' },
+          ].map(tab => (
+            <button 
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as TabType)}
+              className={`pb-2 text-sm font-medium whitespace-nowrap transition-all ${
+                activeTab === tab.id 
+                  ? 'text-primary border-b-2 border-primary' 
+                  : 'text-zinc-400'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile Notifications List */}
+      <div className="p-4 space-y-3">
+        {filteredNotifications.length > 0 ? (
+          filteredNotifications.map((notification) => (
+            <div 
+              key={notification.id} 
+              className="bg-zinc-900 rounded-xl p-4 flex items-start gap-3"
+            >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
+                {getIcon(notification.type)}
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h3 className="font-semibold text-white text-base leading-tight">
+                    {notification.title}
+                  </h3>
+                  {!notification.is_read && (
+                    <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
+                  )}
+                </div>
+                <p className="text-zinc-400 text-sm mb-2">
+                  {formatTimeAgo(notification.created_at)}
+                </p>
+                {notification.message && (
+                  <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2">
+                    {notification.message}
+                  </p>
+                )}
+              </div>
+
+              {notification.type === 'ALERT' && (
+                <ChevronRight size={20} className="text-zinc-600 shrink-0 mt-1" />
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-20">
+            <Bell size={48} className="mx-auto text-zinc-600 mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">No notifications</h3>
+            <p className="text-zinc-400">You're all caught up!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Desktop Layout (unchanged)
+  const desktopLayout = (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500 pb-24 md:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-border dark:border-zinc-800 px-4">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-lg transition-colors mobile:hidden"
+            className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-lg transition-colors"
           >
             <ArrowLeft size={24} className="text-text-primary" />
           </button>
@@ -351,5 +444,13 @@ export const NotificationsPage: React.FC = () => {
         )}
       </div>
     </div>
+  );
+
+  return (
+    <ResponsiveContainer
+      mobileChildren={mobileLayout}
+    >
+      {desktopLayout}
+    </ResponsiveContainer>
   );
 };
