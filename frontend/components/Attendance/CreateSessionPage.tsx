@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, BookOpen, Clock, Calendar, CheckCircle2, ChevronDown, Search, Building2, GraduationCap, Edit2, X, AlertCircle, Check } from 'lucide-react';
+import { ArrowLeft, MapPin, BookOpen, Clock, Calendar, CheckCircle2, ChevronDown, Search, Building2, GraduationCap, Edit2, X, AlertCircle, Check, Target } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { useCurrentUser } from '../../hooks/useAuth';
@@ -10,6 +10,7 @@ import { venueApi } from '../../services/api/venues';
 import { Institution, College, Department, Course, Venue, Session } from '../../types';
 import { toast } from 'sonner';
 import { SessionDetailDialog } from './SessionDetailDialog';
+import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 
 export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
@@ -36,6 +37,12 @@ export const CreateSessionPage: React.FC = () => {
     // Session Details State
     const [duration, setDuration] = useState<string>('60');
     const [durationUnit, setDurationUnit] = useState<'minutes' | 'hours'>('minutes');
+    
+    // Verification Methods State
+    const [qrCodeEnabled, setQrCodeEnabled] = useState(true);
+    const [digitCodeEnabled, setDigitCodeEnabled] = useState(false);
+    const [gpsEnabled, setGpsEnabled] = useState(true);
+    const [geofenceRadius, setGeofenceRadius] = useState(250);
     
     // UI State
     const [loading, setLoading] = useState(false);
@@ -210,7 +217,167 @@ export const CreateSessionPage: React.FC = () => {
         d.code.toLowerCase().includes(deptSearchTerm.toLowerCase())
     );
 
-    return (
+    // Mobile Layout (matching the dark theme design)
+    const mobileLayout = (
+        <div className="min-h-screen bg-zinc-950 pb-24" onKeyDown={handleKeyDown}>
+            {createdSession && (
+                <SessionDetailDialog 
+                    session={createdSession as any} 
+                    onClose={() => navigate('/dashboard')} 
+                />
+            )}
+
+            {/* Mobile Header */}
+            <div className="flex items-center p-4 border-b border-zinc-800">
+                <button 
+                    onClick={() => navigate(-1)}
+                    className="p-2 hover:bg-zinc-800 rounded-lg transition-colors mr-3"
+                >
+                    <ArrowLeft size={24} className="text-white" />
+                </button>
+                <h1 className="text-xl font-bold text-white">New Attendance Session</h1>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-4 space-y-6">
+                {/* Course Selection */}
+                <div>
+                    <label className="block text-white text-sm font-semibold mb-3">Course Selection</label>
+                    <div className="relative">
+                        <select
+                            value={selectedCourse}
+                            onChange={(e) => setSelectedCourse(e.target.value)}
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-base outline-none appearance-none pr-10"
+                            required
+                        >
+                            <option value="">Search course...</option>
+                            {courses.map(course => (
+                                <option key={course.id} value={course.id}>{course.code} - {course.title}</option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-primary pointer-events-none" size={20} />
+                    </div>
+                </div>
+
+                {/* Lecture Hall */}
+                <div>
+                    <label className="block text-white text-sm font-semibold mb-3">Lecture Hall</label>
+                    <div className="relative">
+                        <select
+                            value={selectedVenue}
+                            onChange={(e) => setSelectedVenue(e.target.value)}
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-base outline-none appearance-none pr-10"
+                            required
+                        >
+                            <option value="">Select location</option>
+                            {venues.map(venue => (
+                                <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
+                            ))}
+                        </select>
+                        <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-primary pointer-events-none" size={20} />
+                    </div>
+                </div>
+
+                {/* Verification Methods */}
+                <div>
+                    <label className="block text-white text-sm font-semibold mb-3">Verification Methods</label>
+                    <div className="space-y-3">
+                        {/* QR Code */}
+                        <div className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                    <div className="w-6 h-6 grid grid-cols-2 gap-0.5">
+                                        <div className="bg-primary rounded-sm"></div>
+                                        <div className="bg-primary rounded-sm"></div>
+                                        <div className="bg-primary rounded-sm"></div>
+                                        <div className="bg-primary rounded-sm"></div>
+                                    </div>
+                                </div>
+                                <span className="text-white font-medium">QR Code</span>
+                            </div>
+                            <div 
+                                onClick={() => setQrCodeEnabled(!qrCodeEnabled)}
+                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${qrCodeEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
+                            >
+                                <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                            </div>
+                        </div>
+
+                        {/* 8-Digit Code */}
+                        <div className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                    <span className="text-primary font-bold text-xs">123</span>
+                                </div>
+                                <span className="text-white font-medium">8-Digit Code</span>
+                            </div>
+                            <div 
+                                onClick={() => setDigitCodeEnabled(!digitCodeEnabled)}
+                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${digitCodeEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
+                            >
+                                <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                            </div>
+                        </div>
+
+                        {/* GPS Verification */}
+                        <div className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                    <Target size={20} className="text-primary" />
+                                </div>
+                                <span className="text-white font-medium">GPS Verification</span>
+                            </div>
+                            <div 
+                                onClick={() => setGpsEnabled(!gpsEnabled)}
+                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${gpsEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
+                            >
+                                <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Geofence Radius */}
+                {gpsEnabled && (
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <label className="block text-white text-sm font-semibold">Geofence Radius</label>
+                            <span className="text-primary text-lg font-bold">{geofenceRadius}m</span>
+                        </div>
+                        <div className="relative">
+                            <input
+                                type="range"
+                                min="50"
+                                max="500"
+                                step="10"
+                                value={geofenceRadius}
+                                onChange={(e) => setGeofenceRadius(parseInt(e.target.value))}
+                                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer slider-primary"
+                                style={{
+                                    background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${((geofenceRadius - 50) / 450) * 100}%, #27272a ${((geofenceRadius - 50) / 450) * 100}%, #27272a 100%)`
+                                }}
+                            />
+                            <div className="flex justify-between mt-2 text-xs text-zinc-500">
+                                <span>50m</span>
+                                <span>500m</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Create Button */}
+                <button 
+                    type="submit"
+                    disabled={loading || !selectedCourse || !selectedVenue}
+                    className="w-full bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {loading ? 'Creating...' : 'Create Session'}
+                </button>
+            </form>
+        </div>
+    );
+
+    // Desktop Layout (unchanged)
+    const desktopLayout = (
         <div className="max-w-2xl mx-auto space-y-6 animate-in slide-in-from-right-4 duration-300 pb-12" onKeyDown={handleKeyDown}>
             {createdSession && (
                 <SessionDetailDialog 
@@ -467,5 +634,13 @@ export const CreateSessionPage: React.FC = () => {
 
             </form>
         </div>
+    );
+
+    return (
+        <ResponsiveContainer
+            mobileChildren={mobileLayout}
+        >
+            {desktopLayout}
+        </ResponsiveContainer>
     );
 };
