@@ -704,14 +704,6 @@ export const Onboarding: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        {/* Back Button */}
-        <button 
-          onClick={() => window.history.back()} 
-          className="mb-4 text-text-primary dark:text-dark-text-primary hover:text-text-secondary dark:hover:text-dark-text-secondary transition-colors"
-        >
-          <ArrowLeft size={24} strokeWidth={2.5} />
-        </button>
-
         {/* Header Logo */}
         <div className="flex justify-center mb-8">
             <Logo />
