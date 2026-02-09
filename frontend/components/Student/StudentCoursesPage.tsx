@@ -106,7 +106,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
           filteredCourses.map((course) => {
             const attendance = course.attendance_percentage || 0;
             const getStatusBadge = () => {
-              if (attendance >= 90) return { text: 'Active', bg: 'bg-[#2A4A2A]', color: 'text-[#4CAF50]' };
+              if (attendance >= 90) return { text: 'Excellent', bg: 'bg-[#2A4A2A]', color: 'text-[#4CAF50]' };
               if (attendance >= 75) return { text: 'Active', bg: 'bg-[#2A4A2A]', color: 'text-[#4CAF50]' };
               if (attendance >= 60) return { text: 'Warning', bg: 'bg-[#4A3A2A]', color: 'text-[#FFA500]' };
               return { text: 'Low', bg: 'bg-[#4A2A2A]', color: 'text-[#F44336]' };
