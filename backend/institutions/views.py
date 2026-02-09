@@ -152,24 +152,56 @@ def google_auth_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_view(request):
-    """Register a new user"""
+    """Register a new user and send email verification OTP"""
     serializer = UserRegistrationSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        tokens = get_tokens_for_user(user)
-        return Response({
-            'success': True,
-            'message': 'User registered successfully',
-            'user': {
-                'id': str(user.id),
-                'email': user.email,
-                'full_name': user.full_name,
-                'role': user.role,
-                'onboarding_complete': user.onboarding_complete
-            },
-            'tokens': tokens,
-            'requires_onboarding': True
-        }, status=status.HTTP_201_CREATED)
+        
+        # Create and send OTP for email verification
+        try:
+            # Create OTP
+            otp_obj = EmailVerificationOTP.create_otp(user)
+            
+            # Send verification email
+            send_verification_email(user, otp_obj.otp)
+            
+            logger.info(f"User registered: {user.email}, OTP sent")
+            
+            return Response({
+                'success': True,
+                'message': 'User registered successfully. Please verify your email.',
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'full_name': user.full_name,
+                    'role': user.role,
+                    'email_verified': user.email_verified,
+                    'onboarding_complete': user.onboarding_complete
+                },
+                'requires_email_verification': True,
+                'requires_onboarding': True
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            logger.error(f"Failed to send OTP after registration for {user.email}: {str(e)}")
+            # User is created but OTP failed - they can request resend
+            return Response({
+                'success': True,
+                'message': 'User registered successfully. Failed to send verification email.',
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'full_name': user.full_name,
+                    'role': user.role,
+                    'email_verified': user.email_verified,
+                    'onboarding_complete': user.onboarding_complete
+                },
+                'requires_email_verification': True,
+                'requires_onboarding': True,
+                'otp_send_failed': True,
+                'error': 'Failed to send verification email. Please request a new code.'
+            }, status=status.HTTP_201_CREATED)
+            
     return Response({
         'success': False,
         'errors': serializer.errors
