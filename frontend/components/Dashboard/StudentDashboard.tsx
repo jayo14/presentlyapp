@@ -227,7 +227,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               </div>
 
               {/* Charts Layout - Circular Chart First */}
-              <div className="grid md:grid-cols-12 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                   {/* Pie Chart (Donut) */}
                   <div className="md:col-span-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl shadow-sm flex flex-col justify-center">
                       <h3 className="font-bold text-zinc-900 dark:text-white mb-6">Status Breakdown</h3>
