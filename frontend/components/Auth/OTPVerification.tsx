@@ -237,6 +237,114 @@ export const OTPVerification: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Mobile Layout - Main Content */}
+      <div className="md:hidden flex-1 flex flex-col w-full max-w-md mx-auto px-6 pt-16">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-6">
+            OTP Verification
+          </h1>
+          
+          <h2 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-6">
+            Enter the 6-digit code sent to your mobile
+          </h2>
+          
+          <p className="text-base text-text-secondary dark:text-dark-text-secondary">
+            We've sent a code to <span className="font-semibold text-primary dark:text-dark-primary-DEFAULT">{formatPhoneDisplay(phone) || email}</span>
+          </p>
+        </div>
+
+        {/* OTP Input */}
+        <div className="flex gap-2 justify-center mb-10" onPaste={handlePaste}>
+          {otp.map((digit, index) => (
+            <input
+              key={index}
+              ref={(el) => (inputRefs.current[index] = el)}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              className={`w-12 h-12 text-center text-2xl font-bold bg-background-tertiary dark:bg-dark-background-tertiary border-2 rounded-xl text-text-primary dark:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 transition-all ${
+                index === 0 && !digit ? 'border-blue-500 dark:border-blue-400' : 
+                digit ? 'border-primary dark:border-dark-primary-DEFAULT' : 'border-border-light dark:border-dark-border-light'
+              }`}
+              aria-label={`Digit ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Resend Timer - Centered */}
+        <div className="flex items-center justify-center gap-2 mb-10">
+          <svg className="w-5 h-5 text-primary dark:text-dark-primary-DEFAULT" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2"/>
+          </svg>
+          <span className="text-base font-medium text-primary dark:text-dark-primary-DEFAULT">
+            Resend in 0:{countdown.toString().padStart(2, '0')}
+          </span>
+        </div>
+
+        {/* Time Display - Minutes and Seconds */}
+        <div className="flex gap-4 justify-center mb-16">
+          <div className="flex flex-col items-center">
+            <div className="bg-background-tertiary dark:bg-dark-background-tertiary rounded-2xl px-6 py-3 mb-2">
+              <span className="text-3xl font-bold text-text-secondary dark:text-dark-text-secondary">00</span>
+            </div>
+            <span className="text-sm text-text-tertiary dark:text-dark-text-tertiary">Min</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="bg-background-tertiary dark:bg-dark-background-tertiary rounded-2xl px-6 py-3 mb-2">
+              <span className="text-3xl font-bold text-text-secondary dark:text-dark-text-secondary">{countdown.toString().padStart(2, '0')}</span>
+            </div>
+            <span className="text-sm text-text-tertiary dark:text-dark-text-tertiary">Sec</span>
+          </div>
+        </div>
+
+        <div className="flex-1"></div>
+
+        {/* Error Message */}
+        {verifyMutation.isError && (
+          <div className="mb-6 p-3 bg-error/10 dark:bg-error-dark/10 border border-error dark:border-error-dark rounded-lg">
+            <p className="text-sm text-error dark:text-error-dark text-center">
+              Invalid or expired code. Please try again.
+            </p>
+          </div>
+        )}
+
+        {/* Verify Button */}
+        <button
+          onClick={handleVerify}
+          disabled={!isOtpComplete || verifyMutation.isPending}
+          className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-2xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mb-6 text-lg"
+        >
+          {verifyMutation.isPending ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Verifying...
+            </span>
+          ) : 'Verify'}
+        </button>
+
+        {/* Footer - Resend Section */}
+        <div className="text-center pb-6">
+          <p className="text-base text-text-primary dark:text-dark-text-primary font-semibold mb-2">
+            Didn't receive the code?
+          </p>
+          <button
+            onClick={handleResend}
+            disabled={!canResend || resendMutation.isPending}
+            className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+          >
+            {resendMutation.isPending ? 'Sending...' : canResend ? 'Resend SMS' : `Resend in 0:${countdown.toString().padStart(2, '0')}`}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
