@@ -70,7 +70,162 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
     );
   }
 
-  return (
+  // Mobile Layout (Design 4)
+  const mobileLayout = (
+    <div className="min-h-screen bg-[#3A3A2F] text-white pb-20">
+      {/* Header */}
+      <div className="p-4 flex items-center justify-between border-b border-[#2A2A25]">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => window.history.back()} 
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <h1 className="text-xl font-bold">My Courses</h1>
+        </div>
+      </div>
+
+      {/* Course Cards */}
+      <div className="p-4 space-y-4">
+        {filteredCourses.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-[#2A2A25] rounded-full mb-4">
+              <BookOpen size={32} className="text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">
+              {searchTerm ? 'No courses found' : 'No courses yet'}
+            </h3>
+            <p className="text-gray-400 mb-6">
+              {searchTerm ? 'Try adjusting your search' : 'Start by registering for courses'}
+            </p>
+          </div>
+        ) : (
+          filteredCourses.map((course) => {
+            const attendance = course.attendance_percentage || 0;
+            const getStatusBadge = () => {
+              if (attendance >= 90) return { text: 'Excellent', bg: 'bg-[#2A4A2A]', color: 'text-[#4CAF50]' };
+              if (attendance >= 75) return { text: 'Active', bg: 'bg-[#2A4A2A]', color: 'text-[#4CAF50]' };
+              if (attendance >= 60) return { text: 'Warning', bg: 'bg-[#4A3A2A]', color: 'text-[#FFA500]' };
+              return { text: 'Low', bg: 'bg-[#4A2A2A]', color: 'text-[#F44336]' };
+            };
+            
+            const status = getStatusBadge();
+            const getProgressColor = () => {
+              if (attendance >= 90) return '#FFD700';
+              if (attendance >= 75) return '#4CAF50';
+              if (attendance >= 60) return '#FFA500';
+              return '#F44336';
+            };
+            
+            // Generate course thumbnail based on course name
+            const getCourseImage = (name: string) => {
+              const colors = [
+                'from-blue-500 to-cyan-500',
+                'from-purple-500 to-pink-500',
+                'from-green-500 to-emerald-500',
+                'from-orange-500 to-red-500',
+                'from-indigo-500 to-purple-500'
+              ];
+              const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+              const colorIndex = hash % colors.length;
+              return colors[colorIndex];
+            };
+            
+            return (
+              <div 
+                key={course.id}
+                className="bg-[#2A2A25] rounded-2xl overflow-hidden"
+              >
+                {/* Course Thumbnail */}
+                <div className={`h-24 bg-gradient-to-br ${getCourseImage(course.course_name)} relative flex items-center justify-center`}>
+                  <div className="absolute top-2 right-2">
+                    <span className={`px-2 py-1 ${status.bg} ${status.color} text-xs font-bold rounded`}>
+                      {status.text}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Course Info */}
+                <div className="p-4">
+                  <h3 className="font-bold text-lg mb-1 truncate">{course.course_name}</h3>
+                  <p className="text-sm text-gray-400 mb-3">
+                    {course.course_code} • {course.lecturer_name || 'Prof. Not Assigned'}
+                  </p>
+                  
+                  {/* Attendance Progress */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-400">Attendance</span>
+                    <span className="text-sm font-bold" style={{ color: getProgressColor() }}>
+                      {Math.round(attendance)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-[#1A1A15] rounded-full h-1.5">
+                    <div 
+                      className="h-full rounded-full transition-all"
+                      style={{ 
+                        width: `${attendance}%`,
+                        backgroundColor: getProgressColor()
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Floating Add Button */}
+      <button 
+        onClick={() => setIsRegistrationOpen(true)}
+        className="fixed bottom-24 right-6 w-14 h-14 bg-[#FFD700] rounded-full flex items-center justify-center text-black shadow-lg"
+      >
+        <Plus size={28} />
+      </button>
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-[#2A2A25] border-t border-[#3A3A30] px-6 py-3 flex justify-between items-center">
+        <button className="flex flex-col items-center gap-1 text-gray-400">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="text-xs">Home</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 text-[#FFD700]">
+          <GraduationCap size={24} />
+          <span className="text-xs">Courses</span>
+        </button>
+        <button 
+          className="w-14 h-14 -mt-7 bg-[#FFD700] rounded-2xl flex items-center justify-center text-black"
+        >
+          <QrCode size={28} />
+        </button>
+        <button className="flex flex-col items-center gap-1 text-gray-400">
+          <TrendingUp size={24} />
+          <span className="text-xs">Analytics</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 text-gray-400">
+          <User size={24} />
+          <span className="text-xs">Profile</span>
+        </button>
+      </div>
+
+      {/* Course Registration Dialog */}
+      <CourseRegistrationDialog
+        isOpen={isRegistrationOpen}
+        onClose={() => {
+          setIsRegistrationOpen(false);
+          loadCourses();
+        }}
+      />
+    </div>
+  );
+
+  // Desktop Layout (unchanged)
+  const desktopLayout = (
     <div className="min-h-screen bg-light-background dark:bg-dark-background p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -237,6 +392,20 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         />
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* Mobile View */}
+      <div className="md:hidden">
+        {mobileLayout}
+      </div>
+      
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        {desktopLayout}
+      </div>
+    </>
   );
 };
 
