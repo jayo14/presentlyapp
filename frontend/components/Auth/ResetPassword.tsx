@@ -139,7 +139,7 @@ export const ResetPassword: React.FC = () => {
     <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col p-4 relative">
       <SEO title="Reset Password | Presently" />
       
-      {/* Back Button - Hidden on mobile */}
+      {/* Back Button - Desktop */}
       <button 
         onClick={onBack} 
         className="hidden md:flex absolute top-6 left-6 text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary items-center gap-2 transition-colors"
@@ -148,8 +148,17 @@ export const ResetPassword: React.FC = () => {
         <span>Back</span>
       </button>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-start w-full max-w-md mx-auto px-4 pt-12 md:pt-16">
+      {/* Back Button - Mobile Only (Top Left) */}
+      <button 
+        onClick={onBack} 
+        className="md:hidden absolute top-6 left-6 text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary transition-colors"
+        aria-label="Go back"
+      >
+        <ArrowLeft size={24} />
+      </button>
+
+      {/* Main Content - Desktop */}
+      <div className="hidden md:flex flex-1 flex-col items-center justify-start w-full max-w-md mx-auto px-4 pt-12 md:pt-16">
         {/* Header with Key Icon */}
         <div className="mb-8 flex justify-center">
           <div className="w-16 h-16 rounded-full bg-primary/10 dark:bg-dark-primary-DEFAULT/10 flex items-center justify-center">
@@ -289,6 +298,138 @@ export const ResetPassword: React.FC = () => {
           )}
         </form>
       </div>
+
+      {/* Main Content - Mobile */}
+      <div className="md:hidden flex-1 flex flex-col w-full max-w-md mx-auto px-6 pt-16">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
+            Reset Password
+          </h1>
+          
+          <h2 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-6">
+            Create new password
+          </h2>
+          
+          <p className="text-base text-text-secondary dark:text-dark-text-secondary">
+            Your new password must be different from previous used passwords for security.
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="w-full space-y-5 flex-1">
+          {/* New Password */}
+          <div>
+            <label className="block text-base font-bold text-text-primary dark:text-dark-text-primary mb-3">
+              New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
+                autoComplete="new-password"
+                className="w-full px-4 py-4 pr-14 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-2xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all text-base"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary dark:text-dark-primary-DEFAULT transition-colors p-1"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Password Strength */}
+          {password && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-semibold text-text-primary dark:text-dark-text-primary">Password strength</span>
+                <span className="font-bold text-text-primary dark:text-dark-text-primary">{passwordStrength} / 100</span>
+              </div>
+              <div className="w-full h-2 bg-background-tertiary dark:bg-dark-background-tertiary rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-300 ${getStrengthColor()}`}
+                  style={{ width: `${passwordStrength}%` }}
+                ></div>
+              </div>
+              {passwordStrength >= 70 && (
+                <div className="flex items-center gap-2 text-primary dark:text-dark-primary-DEFAULT">
+                  <CheckCircle2 size={16} />
+                  <span className="text-sm font-medium">{getStrengthLabel()}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Confirm Password */}
+          <div>
+            <label className="block text-base font-bold text-text-primary dark:text-dark-text-primary mb-3">
+              Confirm New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                className="w-full px-4 py-4 pr-14 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-2xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all text-base"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary dark:text-dark-primary-DEFAULT transition-colors p-1"
+                aria-label="Toggle confirm password visibility"
+              >
+                {showConfirmPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1"></div>
+
+          {/* Error Message */}
+          {pageState === 'error' && (
+            <div className="p-3 bg-error/10 dark:bg-error-dark/10 border border-error dark:border-error-dark rounded-lg">
+              <p className="text-sm text-error dark:text-error-dark text-center">
+                Failed to reset password. Please try again.
+              </p>
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={!isPasswordValid || resetPasswordMutation.isPending}
+            className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-2xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+          >
+            {resetPasswordMutation.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Updating Password...
+              </span>
+            ) : 'Update Password'}
+          </button>
+
+          {/* Cancel Link */}
+          <div className="text-center pb-6">
+            <button
+              type="button"
+              onClick={handleBackToLogin}
+              className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold text-base"
+            >
+              Cancel and return to login
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
@@ -328,8 +469,20 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
       {/* Confetti Animation */}
       <ConfettiAnimation active={showConfetti} duration={3000} count={40} />
 
-      {/* Success Card */}
-      <div className="max-w-md w-full bg-background-secondary dark:bg-dark-background-secondary rounded-2xl p-8 shadow-lg text-center">
+      {/* Three Dots Menu - Mobile Only */}
+      <button 
+        className="md:hidden absolute top-6 right-6 text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary transition-colors"
+        aria-label="Menu"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+          <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+        </svg>
+      </button>
+
+      {/* Desktop Layout - Hidden on mobile */}
+      <div className="hidden md:block max-w-md w-full bg-background-secondary dark:bg-dark-background-secondary rounded-2xl p-8 shadow-lg text-center">
         {/* Success Icon with Animation */}
         <div className="mb-6 flex justify-center">
           <div className="w-24 h-24 rounded-full bg-success/10 dark:bg-success-dark/10 flex items-center justify-center relative">
@@ -376,6 +529,56 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
 
         {cancelRedirect && (
           <p className="text-sm text-text-tertiary dark:text-dark-text-tertiary">
+            Auto-redirect cancelled
+          </p>
+        )}
+      </div>
+
+      {/* Mobile Layout - Shown only on mobile */}
+      <div className="md:hidden w-full max-w-md mx-auto flex flex-col items-center justify-center flex-1 px-6">
+        {/* Success Icon with Concentric Circles */}
+        <div className="mb-12 flex justify-center">
+          <div className="relative w-64 h-64 flex items-center justify-center">
+            {/* Outer Circle */}
+            <div className="absolute w-64 h-64 rounded-full bg-primary/5 dark:bg-dark-primary-DEFAULT/5"></div>
+            {/* Middle Circle */}
+            <div className="absolute w-48 h-48 rounded-full bg-primary/10 dark:bg-dark-primary-DEFAULT/10"></div>
+            {/* Inner Circle with Checkmark */}
+            <div className="relative w-32 h-32 rounded-full bg-primary dark:bg-dark-primary-DEFAULT flex items-center justify-center shadow-lg">
+              <CheckCircle2 className="w-16 h-16 text-primary-foreground dark:text-dark-primary-foreground" strokeWidth={3} />
+            </div>
+          </div>
+        </div>
+
+        {/* Title */}
+        <h1 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-6 text-center">
+          Password Reset Successful!
+        </h1>
+
+        {/* Message */}
+        <p className="text-base text-text-secondary dark:text-dark-text-secondary mb-12 text-center px-4">
+          Your password has been successfully updated. You can now log in to{' '}
+          <span className="text-primary dark:text-dark-primary-DEFAULT font-semibold">Presently</span>{' '}
+          with your new credentials.
+        </p>
+
+        {/* Login Button */}
+        <button
+          onClick={onBackToLogin}
+          className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-2xl transition-all shadow-md mb-6 text-lg"
+        >
+          Back to Login
+        </button>
+
+        {/* Countdown */}
+        {!cancelRedirect && countdown > 0 && (
+          <p className="text-base text-text-tertiary dark:text-dark-text-tertiary text-center">
+            Redirecting you in {countdown} seconds...
+          </p>
+        )}
+
+        {cancelRedirect && (
+          <p className="text-base text-text-tertiary dark:text-dark-text-tertiary text-center">
             Auto-redirect cancelled
           </p>
         )}
