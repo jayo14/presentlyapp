@@ -395,20 +395,34 @@ export const Onboarding: React.FC = () => {
 
   const renderAcademicDetails = () => (
     <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Link your Institution</h2>
-        <p className="text-zinc-600">
-           {selectedRole === UserRole.LECTURER ? 'Tell us about your teaching role.' : 'Select your academic location.'}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">
+            Institutional Details
+          </h2>
+          <span className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
+            3 of 3
+          </span>
+        </div>
+        
+        {/* Progress bar matching the design */}
+        <div className="w-full h-1.5 bg-[#E0E0E0] dark:bg-dark-background-tertiary rounded-full overflow-hidden mb-6">
+          <div className="h-full bg-[#FDB913] transition-all duration-300" style={{ width: '100%' }} />
+        </div>
+
+        <h3 className="text-3xl md:text-4xl font-black text-text-primary dark:text-dark-text-primary mb-3">
+          Link your Institution
+        </h3>
+        <p className="text-sm text-[#8B7355] dark:text-dark-text-secondary">
+          Almost there! Select your specific academic location to finalize your profile.
         </p>
-        <p className="text-xs text-zinc-500 mt-2">Step 3 of {totalSteps}</p>
       </div>
 
       <div className="space-y-4">
         {/* Institution Selection */}
         <div>
-          <label className="block text-sm font-medium text-zinc-700 mb-2 flex items-center gap-2">
-            <span>Institution</span>
-            {selectedInstitution && <Check size={16} className="text-green-600" />}
+          <label className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+            Select University
           </label>
           <div className="relative">
             <select
@@ -421,7 +435,7 @@ export const Onboarding: React.FC = () => {
                 setColleges([]);
                 setDepartments([]);
               }}
-              className="w-full bg-white border-2 border-zinc-300 text-zinc-900 rounded-xl p-3.5 pl-4 pr-10 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-zinc-400"
+              className="w-full bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light text-text-primary dark:text-dark-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
             >
               <option value="">Select your institution</option>
               {institutions.map(inst => (
@@ -430,16 +444,18 @@ export const Onboarding: React.FC = () => {
                 </option>
               ))}
             </select>
-            <ChevronRight size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none rotate-90" />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
+              <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary -rotate-90" strokeWidth={2.5} />
+              <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary rotate-90" strokeWidth={2.5} />
+            </div>
           </div>
         </div>
 
         {/* College Selection */}
         {selectedInstitution && (
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-            <label className="block text-sm font-medium text-zinc-700 mb-2 flex items-center gap-2">
-              <span>College/Faculty</span>
-              {selectedCollege && <Check size={16} className="text-green-600" />}
+            <label className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+              Select Faculty
             </label>
             <div className="relative">
               <select
@@ -451,7 +467,7 @@ export const Onboarding: React.FC = () => {
                   setDepartments([]);
                 }}
                 disabled={colleges.length === 0}
-                className="w-full bg-white border-2 border-zinc-300 text-zinc-900 rounded-xl p-3.5 pl-4 pr-10 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light text-text-primary dark:text-dark-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="">Select college/faculty</option>
                 {colleges.map(col => (
@@ -460,7 +476,10 @@ export const Onboarding: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <ChevronRight size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none rotate-90" />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
+                <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary -rotate-90" strokeWidth={2.5} />
+                <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary rotate-90" strokeWidth={2.5} />
+              </div>
             </div>
           </div>
         )}
@@ -468,9 +487,8 @@ export const Onboarding: React.FC = () => {
         {/* Department Selection */}
         {selectedCollege && (
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-            <label className="block text-sm font-medium text-zinc-700 mb-2 flex items-center gap-2">
-              <span>Department</span>
-              {selectedDepartment && <Check size={16} className="text-green-600" />}
+            <label className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+              Select Department
             </label>
             <div className="relative">
               <select
@@ -480,7 +498,7 @@ export const Onboarding: React.FC = () => {
                   setSelectedDepartment(value);
                 }}
                 disabled={departments.length === 0}
-                className="w-full bg-white border-2 border-zinc-300 text-zinc-900 rounded-xl p-3.5 pl-4 pr-10 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light text-text-primary dark:text-dark-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="">Select department</option>
                 {departments.map(dept => (
@@ -489,7 +507,10 @@ export const Onboarding: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <ChevronRight size={20} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none rotate-90" />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
+                <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary -rotate-90" strokeWidth={2.5} />
+                <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary rotate-90" strokeWidth={2.5} />
+              </div>
             </div>
           </div>
         )}
@@ -681,34 +702,44 @@ export const Onboarding: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
+        {/* Back Button */}
+        <button 
+          onClick={() => window.history.back()} 
+          className="mb-4 text-text-primary dark:text-dark-text-primary hover:text-text-secondary dark:hover:text-dark-text-secondary transition-colors"
+        >
+          <ArrowLeft size={24} strokeWidth={2.5} />
+        </button>
+
         {/* Header Logo */}
         <div className="flex justify-center mb-8">
             <Logo />
         </div>
 
-        <div className="bg-white border border-zinc-200 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden">
+        <div className="bg-white dark:bg-dark-background-secondary border border-[#E0E0E0] dark:border-dark-border-light p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden">
              {/* Error Display */}
              {error && (
-               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-3">
+               <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm flex items-start gap-3">
                  <div className="flex-1">{error}</div>
-                 <button onClick={() => setError('')} className="text-red-500 hover:text-red-700">
+                 <button onClick={() => setError('')} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
                    <X size={16} />
                  </button>
                </div>
              )}
              
-             {/* Progress Bar */}
-             <div className="flex gap-2 mb-8 px-2">
-                {Array.from({ length: totalSteps }).map((_, i) => (
-                  <div key={i} className="flex-1 h-1.5 rounded-full bg-zinc-200 overflow-hidden">
-                      <div 
-                        className={`h-full bg-primary transition-all duration-500 ease-out ${step >= i + 1 ? 'w-full' : 'w-0'}`} 
-                      />
-                  </div>
-                ))}
-            </div>
+             {/* Progress Bar - Only show for non-first steps */}
+             {step > 1 && (
+               <div className="flex gap-2 mb-8 px-2">
+                  {Array.from({ length: totalSteps }).map((_, i) => (
+                    <div key={i} className="flex-1 h-1.5 rounded-full bg-[#E0E0E0] dark:bg-dark-background-tertiary overflow-hidden">
+                        <div 
+                          className={`h-full bg-[#FDB913] transition-all duration-500 ease-out ${step >= i + 1 ? 'w-full' : 'w-0'}`} 
+                        />
+                    </div>
+                  ))}
+              </div>
+             )}
 
             <div className="min-h-[400px] flex flex-col">
                 <AnimatePresence mode="wait" custom={direction}>
@@ -730,22 +761,35 @@ export const Onboarding: React.FC = () => {
                     </motion.div>
                 </AnimatePresence>
 
-                <div className="flex gap-4 mt-8 pt-6 border-t border-zinc-200">
+                <div className="flex gap-4 mt-8 pt-6 border-t border-[#E0E0E0] dark:border-dark-border-light">
                     {step > 1 && (
-                        <Button variant="secondary" onClick={handleBack} className="px-4">
+                        <button 
+                          onClick={handleBack} 
+                          className="px-4 py-3 bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light rounded-full hover:bg-[#F5F5F0] dark:hover:bg-dark-background-primary transition-colors"
+                        >
                             <ChevronLeft size={20} />
-                        </Button>
+                        </button>
                     )}
-                    <Button 
-                        className="flex-1" 
-                        size="lg" 
+                    <button 
+                        className="flex-1 py-5 bg-[#FDB913] hover:bg-[#E5A912] text-black font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
                         onClick={handleNext}
                         disabled={(step === 1 && !selectedRole) || (pendingImage !== null) || completeOnboardingMutation.isPending}
-                        isLoading={completeOnboardingMutation.isPending}
                     >
-                        {step === totalSteps ? 'Finish Setup' : 'Continue'}
-                        {step < totalSteps && !completeOnboardingMutation.isPending && <ChevronRight size={18} className="ml-2" />}
-                    </Button>
+                        {completeOnboardingMutation.isPending ? (
+                          <>
+                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Setting up...
+                          </>
+                        ) : (
+                          <>
+                            {step === totalSteps ? 'Finish Setup' : 'Continue'}
+                            {step < totalSteps && <ChevronRight size={18} className="ml-1" strokeWidth={2.5} />}
+                          </>
+                        )}
+                    </button>
                 </div>
             </div>
         </div>
