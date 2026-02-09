@@ -559,16 +559,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                           <span className="text-red-500">REM</span>
                       </div>
                       <div className="absolute top-2 right-20 text-2xl font-bold">
-                          15m
+                          {/* Calculate remaining time if available */}
+                          {nextClass.end_time ? 
+                              Math.max(0, Math.floor((new Date(nextClass.end_time).getTime() - Date.now()) / 60000)) + 'm' 
+                              : 'Live'}
                       </div>
                       
                       <div className="mb-3">
-                          <span className="px-2 py-1 bg-[#FFD700] text-black text-xs font-bold rounded">Lecture Hall B</span>
+                          <span className="px-2 py-1 bg-[#FFD700] text-black text-xs font-bold rounded">
+                              {nextClass.venue || 'Lecture Hall'}
+                          </span>
                       </div>
                       
-                      <h3 className="text-xl font-bold mb-1">{nextClass.name || 'CS101 - Algorithm Design'}</h3>
+                      <h3 className="text-xl font-bold mb-1">{nextClass.name}</h3>
                       <p className="text-sm text-gray-300 mb-4">
-                          {nextClass.lecturer || 'Prof. Sarah Jenkins'} • {nextClass.time || '10:00 AM - 11:30 AM'}
+                          {nextClass.lecturer || 'Lecturer TBA'} • {nextClass.time || 'Time TBA'}
                       </p>
                       
                       <button 
@@ -621,15 +626,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                   {/* Stats Grid */}
                   <div className="grid grid-cols-3 gap-3">
                       <div className="text-center p-3 bg-[#3A3A30] rounded-xl">
-                          <div className="text-2xl font-bold mb-1">{dashboardData?.attendance_stats?.total_sessions || 42}</div>
+                          <div className="text-2xl font-bold mb-1">{dashboardData?.attendance_stats?.total_sessions || 0}</div>
                           <div className="text-xs text-gray-400">Classes</div>
                       </div>
                       <div className="text-center p-3 bg-[#2A4A2A] rounded-xl">
-                          <div className="text-2xl font-bold text-[#4CAF50] mb-1">{dashboardData?.attendance_stats?.total_present || 38}</div>
+                          <div className="text-2xl font-bold text-[#4CAF50] mb-1">{dashboardData?.attendance_stats?.total_present || 0}</div>
                           <div className="text-xs text-[#4CAF50]">Attended</div>
                       </div>
                       <div className="text-center p-3 bg-[#4A2A2A] rounded-xl">
-                          <div className="text-2xl font-bold text-[#F44336] mb-1">{dashboardData?.attendance_stats?.total_absent || 4}</div>
+                          <div className="text-2xl font-bold text-[#F44336] mb-1">{dashboardData?.attendance_stats?.total_absent || 0}</div>
                           <div className="text-xs text-[#F44336]">Missed</div>
                       </div>
                   </div>
