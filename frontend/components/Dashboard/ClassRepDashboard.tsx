@@ -153,7 +153,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                                                     <p className="text-white font-bold">{entry.courseCode}</p>
                                                     <p className="text-sm text-zinc-500">{entry.startTime} - {entry.endTime}</p>
                                                     {/* Mobile: Show venue on new line */}
-                                                    <p className="md:hidden text-xs text-zinc-500 mt-1 flex items-center">
+                                                    <p className="md:hidden text-sm text-zinc-500 mt-1 flex items-center">
                                                         <MapPin size={12} className="mr-1" /> {entry.venue}
                                                     </p>
                                                 </div>
