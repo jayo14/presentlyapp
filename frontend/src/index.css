@@ -87,3 +87,38 @@
 .leaflet-control-container .leaflet-bottom {
   z-index: 1000 !important;
 }
+
+/* Custom Range Slider Styles */
+@layer utilities {
+  input[type="range"].slider-primary::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFD700;
+    cursor: pointer;
+    border: 2px solid #09090b;
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+  }
+
+  input[type="range"].slider-primary::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFD700;
+    cursor: pointer;
+    border: 2px solid #09090b;
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+  }
+
+  input[type="range"].slider-primary::-webkit-slider-runnable-track {
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  input[type="range"].slider-primary::-moz-range-track {
+    height: 8px;
+    border-radius: 4px;
+  }
+}
