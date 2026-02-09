@@ -61,81 +61,98 @@ export default {
           hover: '#A0780A',            // Darker goldenrod for hover states
           foreground: '#FFFFFF',       // White text on primary
         },
-        // LIGHT MODE - Text Colors
-        text: {
-          primary: '#1A1A1A',          // Near black
+        // LIGHT MODE - Text Colors (both naming conventions)
+        'light-text': {
+          DEFAULT: '#1A1A1A',          // Near black
           secondary: '#4A4A4A',        // Dark gray
           tertiary: '#7A7A7A',         // Medium gray
           disabled: '#B0B0B0',         // Light gray
         },
+        text: {
+          DEFAULT: '#1A1A1A',          // Near black
+          primary: '#1A1A1A',          // Near black
+          secondary: '#4A4A4A',        // Dark gray
+          tertiary: '#7A7A7A',         // Medium gray
+          muted: '#7A7A7A',            // Medium gray
+          disabled: '#B0B0B0',         // Light gray
+        },
         // LIGHT MODE - Background Colors
+        'light-background': {
+          DEFAULT: '#FFFFFF',          // Pure white
+        },
+        'light-surface': '#FAFAFA',    // Off-white for cards
+        'light-card': '#F5F5F5',       // Light gray for hover states
         background: {
           DEFAULT: '#FFFFFF',          // Pure white
           primary: '#FFFFFF',          // Pure white
           secondary: '#FAFAFA',        // Off-white for cards
           tertiary: '#F5F5F5',         // Light gray for inputs
         },
-        // LIGHT MODE - Border & Divider Colors
+        // LIGHT MODE - Border Colors
+        'light-border': {
+          DEFAULT: '#E0E0E0',          // Very light gray
+          medium: '#CCCCCC',           // Light gray
+          heavy: '#B0B0B0',            // Medium gray
+        },
         border: {
           DEFAULT: '#E0E0E0',          // Very light gray
           light: '#E0E0E0',            // Very light gray
           medium: '#CCCCCC',           // Light gray
           heavy: '#B0B0B0',            // Medium gray
         },
+        // DARK MODE - Primary Brand Colors
+        'dark-primary': {
+          DEFAULT: '#FFD700',          // Gold - brighter for dark mode
+          light: '#FFE44D',            // Light Gold
+          accent: '#FFEE99',           // Pale Gold
+          hover: '#FFE44D',            // Light Gold for hover
+          foreground: '#121212',       // Near black text on gold
+        },
+        // DARK MODE - Text Colors
+        'dark-text': {
+          DEFAULT: '#F5F5F5',          // Near white
+          primary: '#F5F5F5',          // Near white
+          secondary: '#CCCCCC',        // Light gray
+          tertiary: '#999999',         // Medium gray
+          disabled: '#666666',         // Dark gray
+        },
+        // DARK MODE - Background Colors
+        'dark-background': {
+          DEFAULT: '#121212',          // Near black
+          primary: '#121212',          // Near black
+          secondary: '#1E1E1E',        // Dark gray
+          tertiary: '#2A2A2A',         // Medium dark gray
+        },
+        'dark-surface': '#1E1E1E',     // Dark gray for cards
+        'dark-card': '#2A2A2A',        // Medium dark gray for hover states
+        // DARK MODE - Border Colors
+        'dark-border': {
+          DEFAULT: '#333333',          // Dark gray
+          light: '#333333',            // Dark gray
+          medium: '#444444',           // Medium gray
+          heavy: '#555555',            // Light gray
+        },
         // Status & Feedback Colors (work in both modes)
         success: {
           DEFAULT: '#228B22',          // Forest Green
-          dark: '#32CD32',             // Lime Green (for dark mode)
+          light: '#32CD32',            // Lime Green (for dark mode)
+          dark: '#32CD32',             // Lime Green (backward compat)
         },
         warning: {
           DEFAULT: '#FF8C00',          // Dark Orange
-          dark: '#FFA500',             // Orange (for dark mode)
+          light: '#FFA500',            // Orange (for dark mode)
+          dark: '#FFA500',             // Orange (backward compat)
         },
         error: {
           DEFAULT: '#B22222',          // Firebrick
-          dark: '#FF4444',             // Light Red (for dark mode)
+          light: '#FF4444',            // Light Red (for dark mode)
+          dark: '#FF4444',             // Light Red (backward compat)
         },
         info: {
           DEFAULT: '#1E90FF',          // Dodger Blue
-          dark: '#6495ED',             // Cornflower Blue (for dark mode)
+          light: '#6495ED',            // Cornflower Blue (for dark mode)
+          dark: '#6495ED',             // Cornflower Blue (backward compat)
         },
-        // DARK MODE - Override with 'dark:' prefix
-        dark: {
-          // Primary Brand Colors for Dark Mode
-          primary: {
-            DEFAULT: '#FFD700',        // Gold - brighter for dark mode
-            light: '#FFE44D',          // Light Gold
-            accent: '#FFEE99',         // Pale Gold
-            hover: '#FFE44D',          // Light Gold for hover
-            foreground: '#121212',     // Near black text on gold
-          },
-          // Text Colors for Dark Mode
-          text: {
-            primary: '#F5F5F5',        // Near white
-            secondary: '#CCCCCC',      // Light gray
-            tertiary: '#999999',       // Medium gray
-            disabled: '#666666',       // Dark gray
-          },
-          // Background Colors for Dark Mode
-          background: {
-            primary: '#121212',        // Near black
-            secondary: '#1E1E1E',      // Dark gray
-            tertiary: '#2A2A2A',       // Medium dark gray
-          },
-          // Border & Divider Colors for Dark Mode
-          border: {
-            light: '#333333',          // Dark gray
-            medium: '#444444',         // Medium gray
-            heavy: '#555555',          // Light gray
-          },
-        },
-        // Legacy support (backward compatible)
-        surface: '#FFFFFF',
-        foreground: '#1A1A1A',
-        'text-primary': '#1A1A1A',
-        'text-secondary': '#4A4A4A',
-        'text-tertiary': '#7A7A7A',
-        'text-muted': '#7A7A7A',
       }
     },
   },

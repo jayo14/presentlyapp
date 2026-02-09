@@ -22,6 +22,7 @@ const AuthCallback = lazy(() => import('./components/Auth/Callback').then(module
 const ForgotPassword = lazy(() => import('./components/Auth/ForgotPassword').then(module => ({ default: module.ForgotPassword })));
 const ResetPassword = lazy(() => import('./components/Auth/ResetPassword').then(module => ({ default: module.ResetPassword })));
 const StudentDashboard = lazy(() => import('./components/Dashboard/StudentDashboard').then(module => ({ default: module.StudentDashboard })));
+const StudentCoursesPage = lazy(() => import('./components/Student/StudentCoursesPage').then(module => ({ default: module.default })));
 const LecturerDashboard = lazy(() => import('./components/Dashboard/LecturerDashboard').then(module => ({ default: module.LecturerDashboard })));
 const CreateSessionPage = lazy(() => import('./components/Attendance/CreateSessionPage').then(module => ({ default: module.CreateSessionPage })));
 const AdminDashboard = lazy(() => import('./components/Dashboard/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
@@ -218,6 +219,8 @@ const AppContent: React.FC = () => {
                       <AdminRoute><CourseManagement /></AdminRoute>
                   ) : user?.role === UserRole.LECTURER ? (
                       <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="courses" /></LecturerRoute>
+                  ) : user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
+                      <ProtectedRoute><StudentCoursesPage userName={user?.full_name || ''} /></ProtectedRoute>
                   ) : <Navigate to="/unauthorized" replace />
               } />
 

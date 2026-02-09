@@ -45,7 +45,11 @@ if (typeof window !== 'undefined') {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    // Initialize from localStorage or default to false
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme === 'dark';
+  });
   const [installPrompt, setInstallPrompt] = useState<any>(deferredPromptEvent);
   const [isAppInstalled, setIsAppInstalled] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -68,8 +72,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   };
 
   useEffect(() => {
-    // Initialize theme state based on document class
-    setIsDark(document.documentElement.classList.contains('dark'));
+    // Apply theme on mount based on stored preference
+    const savedTheme = localStorage.getItem('theme');
+    const shouldBeDark = savedTheme === 'dark';
+    setIsDark(shouldBeDark);
+    
+    if (shouldBeDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     
     // Check if app is already installed
     const checkIfInstalled = () => {
@@ -123,6 +135,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   const toggleTheme = () => {
     const newIsDark = !isDark;
     setIsDark(newIsDark);
+    
+    // Persist to localStorage
+    localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
+    
     if (newIsDark) {
       document.documentElement.classList.add('dark');
     } else {
@@ -302,34 +318,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         </div>
       </aside>
 
-      {/* Mobile Header (Top) - Hidden on mobile (< 1024px) */}
-      <div className="hidden lg:flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-20 transition-colors duration-300">
-        <div className="flex items-center gap-3">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
-                <Menu size={24} />
-            </button>
-            <Logo className="text-zinc-900 dark:text-white" />
-        </div>
-        <div className="flex items-center gap-4">
-             {installPrompt && (
-               <button onClick={handleInstallClick} className="text-primary hover:text-primary-hover transition-colors">
-                 <Download size={20} />
-               </button>
-             )}
-             {userRole !== UserRole.STUDENT ? (
-               <button onClick={toggleTheme} className="text-zinc-500 dark:text-zinc-400 hover:text-primary transition-colors">
-                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
-               </button>
-             ) : (
-               <button 
-                 onClick={() => handleNavClick('notifications')} 
-                 className={`transition-colors ${currentPage === 'notifications' ? 'text-primary' : 'text-zinc-500 dark:text-zinc-400 hover:text-primary'}`}
-               >
-                 <Bell size={20} />
-               </button>
-             )}
-        </div>
-      </div>
+      {/* Desktop Header - REMOVED for cleaner desktop experience */}
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
@@ -393,7 +382,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
       {/* Mobile Bottom Navigation - Redesigned to match UI */}
       <div className="md:hidden fixed bottom-3 left-3 right-3 z-50 pointer-events-none">
-        <div className="pointer-events-auto bg-surface rounded-[2rem] shadow-2xl px-3 py-2 flex items-center justify-around max-w-full">
+        <div className="pointer-events-auto bg-white dark:bg-dark-surface rounded-[2rem] shadow-2xl border border-light-border dark:border-dark-border px-3 py-2 flex items-center justify-around max-w-full">
           {/* Home */}
           <button
             onClick={() => handleNavClick('dashboard')}
@@ -401,10 +390,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           >
             <Home 
               size={24} 
-              className={currentPage === 'dashboard' ? 'text-primary' : 'text-text-muted'}
+              className={currentPage === 'dashboard' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
               strokeWidth={currentPage === 'dashboard' ? 2.5 : 2}
             />
-            <span className={`text-[10px] font-medium ${currentPage === 'dashboard' ? 'text-primary' : 'text-text-muted'}`}>
+            <span className={`text-[10px] font-medium ${currentPage === 'dashboard' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
               Home
             </span>
           </button>
@@ -416,10 +405,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           >
             <Calendar 
               size={24} 
-              className={currentPage === 'sessions' ? 'text-primary' : 'text-text-muted'}
+              className={currentPage === 'sessions' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
               strokeWidth={currentPage === 'sessions' ? 2.5 : 2}
             />
-            <span className={`text-[10px] font-medium ${currentPage === 'sessions' ? 'text-primary' : 'text-text-muted'}`}>
+            <span className={`text-[10px] font-medium ${currentPage === 'sessions' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
               Sessions
             </span>
           </button>
@@ -431,10 +420,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           >
             <GraduationCap 
               size={24} 
-              className={currentPage === 'courses' ? 'text-primary' : 'text-text-muted'}
+              className={currentPage === 'courses' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
               strokeWidth={currentPage === 'courses' ? 2.5 : 2}
             />
-            <span className={`text-[10px] font-medium ${currentPage === 'courses' ? 'text-primary' : 'text-text-muted'}`}>
+            <span className={`text-[10px] font-medium ${currentPage === 'courses' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
               Courses
             </span>
           </button>
@@ -446,10 +435,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           >
             <BarChart3 
               size={24} 
-              className={currentPage === 'analytics' ? 'text-primary' : 'text-text-muted'}
+              className={currentPage === 'analytics' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
               strokeWidth={currentPage === 'analytics' ? 2.5 : 2}
             />
-            <span className={`text-[10px] font-medium ${currentPage === 'analytics' ? 'text-primary' : 'text-text-muted'}`}>
+            <span className={`text-[10px] font-medium ${currentPage === 'analytics' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
               Records
             </span>
           </button>
@@ -463,10 +452,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               <>
                 <Bell 
                   size={24} 
-                  className={(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary' : 'text-text-muted'}
+                  className={(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
                   strokeWidth={(currentPage === 'notifications' || currentPage === 'alerts') ? 2.5 : 2}
                 />
-                <span className={`text-[10px] font-medium ${(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary' : 'text-text-muted'}`}>
+                <span className={`text-[10px] font-medium ${(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
                   Alerts
                 </span>
               </>
@@ -474,10 +463,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               <>
                 <User 
                   size={24} 
-                  className={currentPage === 'profile' ? 'text-primary' : 'text-text-muted'}
+                  className={currentPage === 'profile' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
                   strokeWidth={currentPage === 'profile' ? 2.5 : 2}
                 />
-                <span className={`text-[10px] font-medium ${currentPage === 'profile' ? 'text-primary' : 'text-text-muted'}`}>
+                <span className={`text-[10px] font-medium ${currentPage === 'profile' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
                   Profile
                 </span>
               </>
