@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
 import { Button } from '../Button';
+import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 
 interface ProfilePageProps {
   userRole?: UserRole;
@@ -46,10 +47,125 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     );
   }
 
-  return (
+  // Mobile Layout (matching the dark theme design)
+  const mobileLayout = (
+    <div className="min-h-screen bg-zinc-950 pb-24">
+      {/* Mobile Header */}
+      <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+        >
+          <ArrowLeft size={24} className="text-white" />
+        </button>
+        <h1 className="text-xl font-bold text-white">Profile</h1>
+        <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+          <Share2 size={24} className="text-zinc-400" />
+        </button>
+      </div>
+
+      {/* Profile Section */}
+      <div className="flex flex-col items-center pt-8 pb-6 px-4">
+        {/* Avatar with gold border */}
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary mb-4 shadow-lg">
+          <img 
+            src={userAvatar}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* User Info */}
+        <h2 className="text-2xl font-bold text-white mb-2 text-center">
+          {userName}
+        </h2>
+        <p className="text-zinc-400 text-sm text-center">
+          {userRoleDisplay}
+        </p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 gap-4 px-4 mb-8">
+        <div className="bg-zinc-900 border border-primary/30 rounded-2xl p-5 text-center">
+          <span className="text-white text-3xl font-bold block mb-1">6</span>
+          <span className="text-zinc-400 text-sm">Active Courses</span>
+        </div>
+        <div className="bg-zinc-900 border border-primary/30 rounded-2xl p-5 text-center">
+          <span className="text-white text-3xl font-bold block mb-1">124</span>
+          <span className="text-zinc-400 text-sm">Total Sessions</span>
+        </div>
+      </div>
+
+      {/* Account Section */}
+      <div className="px-4 mb-8">
+        <h3 className="text-white text-lg font-semibold mb-4">Account</h3>
+        
+        <div className="space-y-3">
+          {/* Settings */}
+          <button 
+            onClick={() => navigate('/dashboard/settings')}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <Settings size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Settings
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+
+          {/* Notifications */}
+          <button 
+            onClick={() => navigate('/dashboard/notifications')}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <Bell size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Notifications
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+
+          {/* Help & Support */}
+          <button 
+            onClick={() => window.location.href = 'mailto:support@presently.app'}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <HelpCircle size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Help & Support
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Logout Button */}
+      <div className="px-4">
+        <button 
+          onClick={handleLogout}
+          disabled={logoutMutation.isPending}
+          className="w-full bg-blue-900/30 border border-red-500/50 rounded-2xl py-4 flex items-center justify-center hover:bg-red-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <LogOut size={20} className="text-red-500 mr-2" />
+          <span className="text-red-500 font-semibold text-base">
+            {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+
+  // Desktop Layout (unchanged)
+  const desktopLayout = (
     <div className="max-w-3xl mx-auto min-h-screen pb-24 md:pb-8 animate-in fade-in duration-500">
       {/* Header - Hidden on mobile per spec */}
-      <div className="hidden md:flex items-center justify-between mb-8 pt-4 px-4">
+      <div className="flex items-center justify-between mb-8 pt-4 px-4">
         <button 
           onClick={() => navigate(-1)}
           className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-lg transition-colors"
@@ -208,5 +324,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </button>
       </div>
     </div>
+  );
+
+  return (
+    <ResponsiveContainer
+      mobileChildren={mobileLayout}
+    >
+      {desktopLayout}
+    </ResponsiveContainer>
   );
 };
