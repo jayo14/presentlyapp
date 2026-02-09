@@ -179,49 +179,50 @@ def register_view(request):
 
 def send_verification_email(user, otp_code):
     """Send OTP verification email"""
-    subject = 'Verify Your Email - Presently'
-    
-    html_message = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-            .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
-            .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
-            .otp-box {{ background: white; border: 2px dashed #667eea; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }}
-            .otp-code {{ font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px; }}
-            .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>🎓 Presently</h1>
-                <p>Verify Your Email Address</p>
-            </div>
-            <div class="content">
-                <h2>Hello {user.full_name},</h2>
-                <p>Thank you for signing up for Presently! To complete your registration, please verify your email address using the OTP code below:</p>
-                
-                <div class="otp-box">
-                    <p style="margin: 0; color: #666;">Your Verification Code</p>
-                    <div class="otp-code">{otp_code}</div>
-                    <p style="margin: 10px 0 0 0; color: #999; font-size: 14px;">This code will expire in 15 minutes</p>
-                </div>
-                
-                <p>If you didn't create an account with Presently, please ignore this email.</p>
-            </div>
-            <div class="footer">
-                <p>© 2026 Presently. All rights reserved.</p>
-            </div>
+    try:
+        subject = 'Verify Your Email - Presently'
+        
+        html_message = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+        .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+        .otp-box {{ background: white; border: 2px dashed #667eea; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }}
+        .otp-code {{ font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px; }}
+        .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Presently</h1>
+            <p>Verify Your Email Address</p>
         </div>
-    </body>
-    </html>
-    """
-    
-    plain_message = f"""
+        <div class="content">
+            <h2>Hello {user.full_name},</h2>
+            <p>Thank you for signing up for Presently! To complete your registration, please verify your email address using the OTP code below:</p>
+            
+            <div class="otp-box">
+                <p style="margin: 0; color: #666;">Your Verification Code</p>
+                <div class="otp-code">{otp_code}</div>
+                <p style="margin: 10px 0 0 0; color: #999; font-size: 14px;">This code will expire in 15 minutes</p>
+            </div>
+            
+            <p>If you didn't create an account with Presently, please ignore this email.</p>
+        </div>
+        <div class="footer">
+            <p>© 2026 Presently. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+        """
+        
+        plain_message = f"""
 Hello {user.full_name},
 
 Thank you for signing up for Presently!
@@ -232,16 +233,25 @@ This code will expire in 15 minutes.
 
 Best regards,
 The Presently Team
-    """
-    
-    send_mail(
-        subject,
-        plain_message,
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email],
-        html_message=html_message,
-        fail_silently=False,
-    )
+        """
+        
+        from django.core.mail import EmailMultiAlternatives
+        
+        msg = EmailMultiAlternatives(
+            subject,
+            plain_message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email]
+        )
+        msg.attach_alternative(html_message, "text/html")
+        msg.send(fail_silently=False)
+        
+        logger.info(f"Verification email sent to {user.email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {user.email}: {str(e)}", exc_info=True)
+        raise
 
 
 @api_view(['POST'])
@@ -272,7 +282,17 @@ def send_verification_otp_view(request):
         otp_obj = EmailVerificationOTP.create_otp(user)
         
         # Send email
-        send_verification_email(user, otp_obj.otp)
+        try:
+            send_verification_email(user, otp_obj.otp)
+        except Exception as e:
+            logger.error(f"Failed to send OTP email: {str(e)}")
+            return Response({
+                'success': False,
+                'error': 'Failed to send verification email',
+                'details': str(e) if settings.DEBUG else None
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        logger.info(f"OTP sent to {email}")
         
         return Response({
             'success': True,
@@ -556,9 +576,55 @@ def request_password_reset_view(request):
         # Create reset link
         reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
         
-        # Send email
-        subject = 'Password Reset Request'
-        message = f"""
+        # Send email with HTML template
+        subject = 'Password Reset Request - Presently'
+        
+        html_message = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+        .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+        .button {{ display: inline-block; background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }}
+        .button:hover {{ background: #5568d3; }}
+        .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+        .warning {{ background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Presently</h1>
+            <p>Password Reset Request</p>
+        </div>
+        <div class="content">
+            <h2>Hello {user.full_name},</h2>
+            <p>You requested to reset your password for your Presently account.</p>
+            
+            <p style="text-align: center;">
+                <a href="{reset_link}" class="button">Reset Password</a>
+            </p>
+            
+            <p style="color: #666; font-size: 14px;">Or copy and paste this link into your browser:</p>
+            <p style="background: #fff; padding: 10px; border-radius: 5px; word-break: break-all; font-size: 12px;">{reset_link}</p>
+            
+            <div class="warning">
+                <strong>⚠️ Security Notice:</strong><br>
+                This link will expire in 24 hours. If you did not request this password reset, please ignore this email and your password will remain unchanged.
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 Presently. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+        """
+        
+        plain_message = f"""
 Hello {user.full_name},
 
 You requested to reset your password for your Presently account.
@@ -574,13 +640,18 @@ Best regards,
 The Presently Team
         """
         
-        send_mail(
+        from django.core.mail import EmailMultiAlternatives
+        
+        msg = EmailMultiAlternatives(
             subject,
-            message,
+            plain_message,
             settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
+            [user.email]
         )
+        msg.attach_alternative(html_message, "text/html")
+        msg.send(fail_silently=False)
+        
+        logger.info(f"Password reset email sent to {email}")
         
         return Response({
             'success': True,
@@ -589,14 +660,17 @@ The Presently Team
         
     except User.DoesNotExist:
         # Don't reveal if user exists or not for security
+        logger.warning(f"Password reset requested for non-existent email: {email}")
         return Response({
             'success': True,
             'message': 'Password reset email sent successfully'
         }, status=status.HTTP_200_OK)
     except Exception as e:
+        logger.error(f"Failed to send password reset email to {email}: {str(e)}", exc_info=True)
         return Response({
             'success': False,
-            'error': 'Failed to send password reset email'
+            'error': 'Failed to send password reset email',
+            'details': str(e) if settings.DEBUG else None
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
