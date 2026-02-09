@@ -7,12 +7,14 @@ import { Switch } from '../Switch';
 import { 
   User, Bell, Shield, Smartphone, HelpCircle, LogOut, 
   Moon, Sun, Globe, Lock, Upload, Mail, AlertTriangle, 
-  FileText, ChevronRight, Laptop, Eye, Check, X, Database, Server
+  FileText, ChevronRight, Laptop, Eye, Check, X, Database, Server, ArrowLeft, Phone
 } from 'lucide-react';
 import { useCurrentUser } from '../../hooks/useAuth';
 import ChangePasswordModal from './ChangePasswordModal';
 import { PushNotificationSettings } from '../PushNotifications/PushNotificationSettings';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
+import { useNavigate } from 'react-router-dom';
 
 interface SettingsPageProps {
   userRole?: UserRole;
@@ -83,7 +85,132 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
     </div>
   );
 
-  return (
+  const navigate = useNavigate();
+
+  // Mobile Layout (matching the dark theme design)
+  const mobileLayout = (
+    <div className="min-h-screen bg-zinc-950 pb-24">
+      {/* Mobile Header */}
+      <div className="flex items-center p-4 border-b border-zinc-800">
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-2 hover:bg-zinc-800 rounded-lg transition-colors mr-3"
+        >
+          <ArrowLeft size={24} className="text-white" />
+        </button>
+        <h1 className="text-xl font-bold text-white">
+          {userRole === UserRole.LECTURER ? 'Lecturer Settings' : 'Settings'}
+        </h1>
+      </div>
+
+      {/* Account Section */}
+      <div className="p-4">
+        <h2 className="text-white text-lg font-semibold mb-4">Account</h2>
+        
+        <div className="space-y-3">
+          {/* Edit Profile */}
+          <button 
+            onClick={() => {/* Handle edit profile */}}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <User size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Edit Profile
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+
+          {/* Change Phone Number */}
+          <button 
+            onClick={() => {/* Handle change phone */}}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <Phone size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Change Phone Number
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+
+          {/* Notification Preferences */}
+          <button 
+            onClick={() => {/* Handle notification prefs */}}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <Bell size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Notification Preferences
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Appearance Section */}
+      <div className="p-4 mt-6">
+        <h2 className="text-white text-lg font-semibold mb-4">Appearance</h2>
+        
+        {/* Dark Mode Toggle */}
+        <div className="bg-zinc-900 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Moon size={22} className="text-primary" />
+            </div>
+            <span className="text-white font-medium text-base">
+              Dark Mode
+            </span>
+          </div>
+          <div className={`w-12 h-6 rounded-full p-1 flex transition-colors ${darkMode ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}>
+            <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+          </div>
+        </div>
+      </div>
+
+      {/* Privacy & Security Section */}
+      <div className="p-4 mt-6">
+        <h2 className="text-white text-lg font-semibold mb-4">Privacy & Security</h2>
+        
+        <div className="space-y-3">
+          {/* Two-Factor Authentication */}
+          <button 
+            onClick={() => {/* Handle 2FA */}}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <Lock size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Two-Factor Authentication
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+
+          {/* Data Export Preferences */}
+          <button 
+            onClick={() => {/* Handle data export */}}
+            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <Database size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-white font-medium text-base text-left">
+              Data Export Preferences
+            </span>
+            <ChevronRight size={20} className="text-zinc-600" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Desktop Layout (unchanged)
+  const desktopLayout = (
     <div className="max-w-3xl mx-auto pb-20 animate-in fade-in duration-500">
       
       {/* Header with title matching design */}
@@ -435,6 +562,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
       )}
 
     </div>
+  );
+
+  return (
+    <ResponsiveContainer
+      mobileChildren={mobileLayout}
+    >
+      {desktopLayout}
+    </ResponsiveContainer>
   );
 };
 
