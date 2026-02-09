@@ -522,7 +522,197 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   }
 
   // Default Dashboard View (Clean Redesign)
-  return (
+  
+  // Mobile Layout (Design 3)
+  const mobileDashboardLayout = (
+      <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white pb-20">
+          {/* Welcome Header */}
+          <div className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-white text-lg font-bold">
+                      {userName.charAt(0)}
+                  </div>
+                  <div>
+                      <p className="text-xs text-gray-400">Welcome back</p>
+                      <h1 className="text-lg font-bold">Hello, {userName.split(' ')[0]}!</h1>
+                  </div>
+              </div>
+              <button className="relative w-10 h-10 bg-[#2A2A25] rounded-full flex items-center justify-center">
+                  <Activity size={20} />
+                  <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+              </button>
+          </div>
+
+          {/* HAPPENING NOW Section */}
+          {nextClass && (
+              <div className="px-4 mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-bold uppercase tracking-wider">Happening Now</span>
+                      <div className="flex items-center gap-1 text-red-500">
+                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                          <span className="text-xs font-bold uppercase">Live</span>
+                      </div>
+                  </div>
+                  
+                  <div className="bg-[#4A5C4A] rounded-2xl p-4 relative overflow-hidden">
+                      <div className="absolute top-2 right-2 px-2 py-1 bg-[#2A2A25] rounded-lg text-xs font-medium">
+                          <span className="text-red-500">REM</span>
+                      </div>
+                      <div className="absolute top-2 right-20 text-2xl font-bold">
+                          15m
+                      </div>
+                      
+                      <div className="mb-3">
+                          <span className="px-2 py-1 bg-[#FFD700] text-black text-xs font-bold rounded">Lecture Hall B</span>
+                      </div>
+                      
+                      <h3 className="text-xl font-bold mb-1">{nextClass.name || 'CS101 - Algorithm Design'}</h3>
+                      <p className="text-sm text-gray-300 mb-4">
+                          {nextClass.lecturer || 'Prof. Sarah Jenkins'} • {nextClass.time || '10:00 AM - 11:30 AM'}
+                      </p>
+                      
+                      <button 
+                          onClick={() => setIsAttendanceModalOpen(true)}
+                          className="w-full bg-[#FFD700] text-black py-3 rounded-xl font-bold flex items-center justify-center gap-2"
+                      >
+                          <QrCode size={20} />
+                          Mark Attendance
+                      </button>
+                  </div>
+              </div>
+          )}
+
+          {/* Attendance Summary */}
+          <div className="px-4 mb-6">
+              <h2 className="text-xl font-bold mb-4">Attendance Summary</h2>
+              <div className="bg-[#2A2A25] rounded-xl p-6">
+                  {/* Circular Chart */}
+                  <div className="flex justify-center mb-6">
+                      <div className="relative w-40 h-40">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
+                              {/* Background circle */}
+                              <circle
+                                  cx="80"
+                                  cy="80"
+                                  r="70"
+                                  fill="none"
+                                  stroke="#4A4A3F"
+                                  strokeWidth="16"
+                              />
+                              {/* Progress circle */}
+                              <circle
+                                  cx="80"
+                                  cy="80"
+                                  r="70"
+                                  fill="none"
+                                  stroke="#FFD700"
+                                  strokeWidth="16"
+                                  strokeDasharray={`${(avgAttendance / 100) * 440} 440`}
+                                  strokeLinecap="round"
+                              />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <div className="text-4xl font-bold">{avgAttendance.toFixed(1)}%</div>
+                              <div className="text-xs text-gray-400 uppercase">Overall</div>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-3 gap-3">
+                      <div className="text-center p-3 bg-[#3A3A30] rounded-xl">
+                          <div className="text-2xl font-bold mb-1">{dashboardData?.attendance_stats?.total_sessions || 42}</div>
+                          <div className="text-xs text-gray-400">Classes</div>
+                      </div>
+                      <div className="text-center p-3 bg-[#2A4A2A] rounded-xl">
+                          <div className="text-2xl font-bold text-[#4CAF50] mb-1">{dashboardData?.attendance_stats?.total_present || 38}</div>
+                          <div className="text-xs text-[#4CAF50]">Attended</div>
+                      </div>
+                      <div className="text-center p-3 bg-[#4A2A2A] rounded-xl">
+                          <div className="text-2xl font-bold text-[#F44336] mb-1">{dashboardData?.attendance_stats?.total_absent || 4}</div>
+                          <div className="text-xs text-[#F44336]">Missed</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="px-4 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold">Recent Activity</h2>
+                  <button className="text-[#FFD700] text-sm font-medium">View All</button>
+              </div>
+              
+              <div className="space-y-3">
+                  {recentActivity.slice(0, 3).map((activity, index) => {
+                      const isPresent = activity.status === 'PRESENT';
+                      const iconBg = isPresent ? 'bg-[#2A4A2A]' : 'bg-[#4A2A2A]';
+                      
+                      return (
+                          <div key={activity.id} className="bg-[#2A2A25] rounded-xl p-4 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 ${iconBg} rounded-lg flex items-center justify-center`}>
+                                      {isPresent ? <CheckCircle2 size={20} className="text-[#4CAF50]" /> : <X size={20} className="text-[#F44336]" />}
+                                  </div>
+                                  <div>
+                                      <p className="font-bold text-sm">{activity.course_code} - {activity.course_name?.split(' ').slice(0, 2).join(' ')}</p>
+                                      <p className="text-xs text-gray-400">{new Date(activity.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(activity.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</p>
+                                  </div>
+                              </div>
+                              <span className={`text-xs font-bold px-2 py-1 rounded ${
+                                  isPresent ? 'bg-[#2A4A2A] text-[#4CAF50]' : 'bg-[#4A2A2A] text-[#F44336]'
+                              }`}>
+                                  {isPresent ? 'Present' : 'Missed'}
+                              </span>
+                          </div>
+                      );
+                  })}
+              </div>
+          </div>
+
+          {/* Bottom Navigation */}
+          <div className="fixed bottom-0 left-0 right-0 bg-[#2A2A25] border-t border-[#3A3A30] px-6 py-3 flex justify-between items-center">
+              <button className="flex flex-col items-center gap-1 text-[#FFD700]">
+                  <Home size={24} />
+                  <span className="text-xs">Home</span>
+              </button>
+              <button className="flex flex-col items-center gap-1 text-gray-400">
+                  <BookOpen size={24} />
+                  <span className="text-xs">Courses</span>
+              </button>
+              <button 
+                  onClick={() => setIsAttendanceModalOpen(true)}
+                  className="w-14 h-14 -mt-7 bg-[#FFD700] rounded-2xl flex items-center justify-center text-black"
+              >
+                  <QrCode size={28} />
+              </button>
+              <button className="flex flex-col items-center gap-1 text-gray-400">
+                  <BarChart size={24} />
+                  <span className="text-xs">Analytics</span>
+              </button>
+              <button className="flex flex-col items-center gap-1 text-gray-400">
+                  <User size={24} />
+                  <span className="text-xs">Profile</span>
+              </button>
+          </div>
+
+          {/* Modals */}
+          <EnhancedAttendanceScanner
+           isOpen={isAttendanceModalOpen}
+           onClose={() => setIsAttendanceModalOpen(false)}
+           onVerify={handleAttendanceCheckIn}
+          />
+
+          <CourseRegistrationDialog
+           isOpen={isRegistrationOpen}
+           onClose={() => setIsRegistrationOpen(false)}
+           onSuccess={handleRegistrationSuccess}
+          />
+      </div>
+  );
+
+  // Desktop Layout (unchanged)
+  const desktopDashboardLayout = (
     <div className="space-y-6 animate-in fade-in duration-500">
        {/* Greeting Header */}
        <div className="flex justify-between items-end mb-2">
@@ -702,5 +892,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         onSuccess={handleRegistrationSuccess}
        />
     </div>
+  );
+
+  return (
+      <>
+          {/* Mobile View */}
+          <div className="md:hidden">
+              {mobileDashboardLayout}
+          </div>
+          
+          {/* Desktop View */}
+          <div className="hidden md:block">
+              {desktopDashboardLayout}
+          </div>
+      </>
   );
 }
