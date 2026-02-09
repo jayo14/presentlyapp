@@ -276,6 +276,151 @@ export const ForgotPassword: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile Layout - Main Content */}
+      <div className="md:hidden flex-1 flex flex-col w-full max-w-md mx-auto px-6 pt-16">
+        {/* Icon with Lock and Concentric Circles */}
+        <div className="mb-8 flex justify-center">
+          <div className="relative w-40 h-40 flex items-center justify-center">
+            {/* Outer Circle */}
+            <div className="absolute w-40 h-40 rounded-full bg-primary/5 dark:bg-dark-primary-DEFAULT/5"></div>
+            {/* Middle Circle */}
+            <div className="absolute w-28 h-28 rounded-full bg-primary/10 dark:bg-dark-primary-DEFAULT/10"></div>
+            {/* Inner Circle with Lock */}
+            <div className="relative w-20 h-20 rounded-full bg-primary dark:bg-dark-primary-DEFAULT flex items-center justify-center shadow-lg">
+              <Lock className="w-10 h-10 text-primary-foreground dark:text-dark-primary-foreground" strokeWidth={2.5} />
+            </div>
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
+            Forgot Password
+          </h1>
+          
+          <h2 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-6">
+            Reset Password
+          </h2>
+          
+          <p className="text-base text-text-secondary dark:text-dark-text-secondary px-2">
+            Enter your registered university email address and we'll send you a secure link to reset your password.
+          </p>
+        </div>
+
+        {/* Form Section */}
+        <div className="w-full space-y-6 flex-1 flex flex-col">
+          {pageState === 'form' && (
+            <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col">
+              {/* Email Input */}
+              <div>
+                <label className="block text-base font-bold text-text-primary dark:text-dark-text-primary mb-3">
+                  University Email
+                </label>
+                <div className="relative">
+                  <Mail size={22} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary dark:text-dark-primary-DEFAULT z-10" />
+                  <input
+                    type="email"
+                    placeholder="name@university.edu"
+                    required
+                    value={email}
+                    onChange={handleEmailChange}
+                    disabled={requestPasswordResetMutation.isPending}
+                    className={`w-full pl-14 pr-4 py-4 bg-background-tertiary dark:bg-dark-background-tertiary border rounded-2xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 transition-all text-base ${
+                      emailError 
+                        ? 'border-error dark:border-error-dark focus:border-error dark:focus:border-error-dark' 
+                        : 'border-border-light dark:border-dark-border-light focus:border-primary dark:focus:border-dark-primary-DEFAULT'
+                    }`}
+                  />
+                </div>
+                {emailError && (
+                  <p className="mt-2 text-sm text-error dark:text-error-dark flex items-center gap-1">
+                    <AlertCircle size={16} />
+                    {emailError}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex-1"></div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={requestPasswordResetMutation.isPending || !email || !!emailError || cooldownRemaining > 0}
+                className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-2xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
+              >
+                {requestPasswordResetMutation.isPending ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : cooldownRemaining > 0 ? (
+                  <>Wait {formatCooldown(cooldownRemaining)}</>
+                ) : (
+                  'Send Reset Link'
+                )}
+              </button>
+
+              {/* Support Link */}
+              <div className="text-center text-base pb-6">
+                <span className="text-text-tertiary dark:text-dark-text-tertiary">Having trouble? </span>
+                <button
+                  type="button"
+                  className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold"
+                  onClick={() => window.open('mailto:support@presently.app', '_blank')}
+                >
+                  Contact University Support
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Success Status */}
+          {pageState === 'sent' && (
+            <div className="text-center space-y-6 flex-1 flex flex-col justify-center">
+              <div className="w-20 h-20 rounded-full bg-success/10 dark:bg-success-dark/10 flex items-center justify-center mx-auto">
+                <CheckCircle className="w-12 h-12 text-success dark:text-success-dark" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-success dark:text-success-dark">Link sent!</h3>
+                <p className="text-text-secondary dark:text-dark-text-secondary text-base">
+                  Check your email for the password reset link.
+                </p>
+              </div>
+              <button
+                onClick={handleReset}
+                className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold text-base"
+              >
+                Send to a different email
+              </button>
+            </div>
+          )}
+
+          {/* Error Status */}
+          {pageState === 'error' && (
+            <div className="text-center space-y-6 flex-1 flex flex-col justify-center">
+              <div className="w-20 h-20 rounded-full bg-error/10 dark:bg-error-dark/10 flex items-center justify-center mx-auto">
+                <AlertCircle className="w-12 h-12 text-error dark:text-error-dark" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-error dark:text-error-dark">Something went wrong</h3>
+                <p className="text-text-secondary dark:text-dark-text-secondary text-base">
+                  We couldn't send the reset link. Please try again.
+                </p>
+              </div>
+              <button
+                onClick={handleReset}
+                className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-semibold rounded-2xl transition-all text-lg"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
