@@ -59,7 +59,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           <ArrowLeft size={24} className="text-white" />
         </button>
         <h1 className="text-xl font-bold text-white">Profile</h1>
-        <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+        <button className="p-2 hover:bg-zinc-800 rounded-full transition-colors">
           <Share2 size={24} className="text-zinc-400" />
         </button>
       </div>
@@ -173,7 +173,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           <ArrowLeft size={24} className="text-text-primary" />
         </button>
         <h1 className="text-xl font-bold text-text-primary">Profile</h1>
-        <button className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-lg transition-colors">
+        <button className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-full transition-colors">
           <Share2 size={24} className="text-text-primary" />
         </button>
       </div>
