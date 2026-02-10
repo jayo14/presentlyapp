@@ -398,21 +398,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             </span>
           </button>
 
-          {/* Sessions */}
-          <button
-            onClick={() => handleNavClick('sessions')}
-            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
-          >
-            <Calendar 
-              size={24} 
-              className={currentPage === 'sessions' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
-              strokeWidth={currentPage === 'sessions' ? 2.5 : 2}
-            />
-            <span className={`text-[10px] font-medium ${currentPage === 'sessions' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
-              Sessions
-            </span>
-          </button>
-
           {/* Courses */}
           <button
             onClick={() => handleNavClick('courses')}
