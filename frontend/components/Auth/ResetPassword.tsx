@@ -515,22 +515,5 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
         )}
       </div>
     </div>
-          Back to Login
-        </button>
-
-        {/* Countdown */}
-        {!cancelRedirect && countdown > 0 && (
-          <p className="text-base text-text-tertiary dark:text-dark-text-tertiary text-center">
-            Redirecting you in {countdown} seconds...
-          </p>
-        )}
-
-        {cancelRedirect && (
-          <p className="text-base text-text-tertiary dark:text-dark-text-tertiary text-center">
-            Auto-redirect cancelled
-          </p>
-        )}
-      </div>
-    </div>
   );
 };
