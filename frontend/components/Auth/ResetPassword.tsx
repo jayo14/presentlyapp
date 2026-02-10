@@ -6,6 +6,7 @@ import { SEO } from '../SEO';
 import { PasswordStrengthMeter } from '../PasswordStrengthMeter';
 import { ConfettiAnimation } from '../ConfettiAnimation';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 type PageState = 'form' | 'success' | 'error' | 'loading' | 'invalid-link';
 
@@ -136,33 +137,26 @@ export const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col p-4 relative">
+    <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white flex flex-col p-4 relative">
       <SEO title="Reset Password | Presently" />
       
-      {/* Back Button - Always visible */}
+      {/* Back Button */}
       <button 
         onClick={onBack} 
-        className="absolute top-6 left-6 text-text-primary dark:text-dark-text-primary hover:text-text-secondary dark:hover:text-dark-text-secondary transition-colors"
+        className="absolute top-6 left-6 text-gray-300 hover:text-white transition-colors"
       >
-        <ArrowLeft size={24} strokeWidth={2.5} />
+        <ArrowLeft size={24} />
       </button>
 
-      {/* Title at top */}
-      <div className="text-center pt-6 pb-8">
-        <h1 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">
-          Reset Password
-        </h1>
-      </div>
-
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-start justify-start w-full max-w-md mx-auto px-4">
+      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-4">
         {/* Heading */}
-        <h2 className="text-3xl md:text-4xl font-black text-text-primary dark:text-dark-text-primary mb-3">
+        <h2 className="text-3xl font-bold text-white mb-3 text-center">
           Create new password
         </h2>
         
         {/* Subtitle */}
-        <p className="text-sm text-[#8B7355] dark:text-dark-text-secondary mb-8">
+        <p className="text-gray-400 mb-8 text-center">
           Your new password must be different from previous used passwords for security.
         </p>
 
@@ -170,7 +164,7 @@ export const ResetPassword: React.FC = () => {
         <form onSubmit={handleSubmit} className="w-full space-y-6">
           {/* New Password */}
           <div>
-            <label className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               New Password
             </label>
             <div className="relative">
@@ -180,12 +174,12 @@ export const ResetPassword: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 autoComplete="new-password"
-                className="w-full px-4 py-4 pr-12 bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light rounded-2xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT transition-all"
+                className="w-full px-4 py-3 pr-12 bg-[#2A2A25] border border-[#3A3A30] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#FFD700] transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B7355] dark:text-dark-text-tertiary hover:text-text-primary dark:hover:text-dark-text-primary transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 aria-label="Toggle password visibility"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -197,31 +191,28 @@ export const ResetPassword: React.FC = () => {
           {password && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-text-primary dark:text-dark-text-primary">Password strength</span>
-                <span className="font-bold text-text-primary dark:text-dark-text-primary">{passwordStrength} / 100</span>
+                <span className="font-medium text-gray-300">Password strength</span>
+                <span className="font-bold text-white">{passwordStrength}%</span>
               </div>
-              <div className="w-full h-2 bg-[#E0E0E0] dark:bg-dark-background-tertiary rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-[#2A2A25] rounded-full overflow-hidden">
                 <div 
-                  className={`h-full transition-all duration-300 ${getStrengthColor()}`}
+                  className={`h-full transition-all duration-300 ${
+                    passwordStrength < 40 ? 'bg-red-500' : 
+                    passwordStrength < 70 ? 'bg-yellow-500' : 
+                    'bg-[#FFD700]'
+                  }`}
                   style={{ width: `${passwordStrength}%` }}
                 />
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="text-sm">
                 {passwordStrength >= 70 && (
-                  <>
-                    <div className="w-5 h-5 rounded-full bg-[#FDB913] flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium text-[#8B7355] dark:text-dark-text-secondary">{getStrengthLabel()}</span>
-                  </>
+                  <span className="text-[#FFD700]">✓ {getStrengthLabel()}</span>
                 )}
                 {passwordStrength < 70 && passwordStrength >= 40 && (
-                  <span className="text-sm font-medium text-yellow-600 dark:text-yellow-500">{getStrengthLabel()}</span>
+                  <span className="text-yellow-500">{getStrengthLabel()}</span>
                 )}
                 {passwordStrength < 40 && password && (
-                  <span className="text-sm font-medium text-red-600 dark:text-red-500">{getStrengthLabel()}</span>
+                  <span className="text-red-500">{getStrengthLabel()}</span>
                 )}
               </div>
             </div>
@@ -229,7 +220,7 @@ export const ResetPassword: React.FC = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Confirm New Password
             </label>
             <div className="relative">
@@ -239,12 +230,12 @@ export const ResetPassword: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="new-password"
-                className="w-full px-4 py-4 pr-12 bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light rounded-2xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT transition-all"
+                className="w-full px-4 py-3 pr-12 bg-[#2A2A25] border border-[#3A3A30] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#FFD700] transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B7355] dark:text-dark-text-tertiary hover:text-text-primary dark:hover:text-dark-text-primary transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 aria-label="Toggle confirm password visibility"
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -455,111 +446,70 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white flex flex-col items-center justify-center p-4 relative">
       <SEO title="Password Reset Successful | Presently" />
       
       {/* Confetti Animation */}
       <ConfettiAnimation active={showConfetti} duration={3000} count={40} />
 
-      {/* Three dots menu at top right */}
-      <div className="absolute top-8 right-8">
-        <div className="flex gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-text-tertiary dark:bg-dark-text-tertiary"></div>
-          <div className="w-1.5 h-1.5 rounded-full bg-text-tertiary dark:bg-dark-text-tertiary"></div>
-          <div className="w-1.5 h-1.5 rounded-full bg-text-tertiary dark:bg-dark-text-tertiary"></div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="max-w-md w-full text-center flex flex-col items-center">
-        {/* Success Icon with concentric circles */}
-        <div className="mb-8 flex justify-center">
-          <div className="w-56 h-56 rounded-full bg-[#F5E6B3] dark:bg-[#F5E6B3]/20 flex items-center justify-center relative">
-            <div className="w-40 h-40 rounded-full bg-[#FDB913] dark:bg-[#FDB913] flex items-center justify-center">
-              <CheckCircle2 className="w-20 h-20 text-black" strokeWidth={3} />
+        {/* Success Icon with Animation */}
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 260,
+            damping: 20,
+            delay: 0.1
+          }}
+          className="mb-8 flex justify-center"
+        >
+          <div className="relative">
+            {/* Outer rings */}
+            <div className="absolute inset-0 rounded-full bg-[#4A4A3F] opacity-20 animate-ping" style={{ animationDuration: '2s' }}></div>
+            <div className="absolute inset-0 rounded-full bg-[#4A4A3F] opacity-40"></div>
+            
+            {/* Inner circle */}
+            <div className="relative w-32 h-32 bg-[#FFD700] rounded-full flex items-center justify-center">
+              <CheckCircle2 size={64} className="text-[#3A3A2F]" strokeWidth={3} />
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-black text-text-primary dark:text-dark-text-primary mb-4">
-          Password Reset<br />Successful!
+        <h1 className="text-4xl font-bold text-white mb-4">
+          Password Changed!
         </h1>
 
         {/* Message */}
-        <p className="text-base text-text-secondary dark:text-dark-text-secondary mb-12 px-4">
+        <p className="text-gray-400 mb-12 px-4">
           Your password has been successfully updated. You can now log in to{' '}
-          <span className="text-[#FDB913] dark:text-[#FDB913] font-semibold">Presently</span>{' '}
+          <span className="text-[#FFD700] font-semibold">Presently</span>{' '}
           with your new credentials.
         </p>
 
         {/* Login Button */}
         <button
           onClick={onBackToLogin}
-          className="w-full max-w-md py-5 bg-[#FDB913] hover:bg-[#E5A912] text-black font-bold text-lg rounded-full transition-all shadow-lg mb-4"
+          className="w-full max-w-md py-4 bg-[#FFD700] hover:bg-[#FFE44D] text-[#2A2A25] font-bold text-lg rounded-xl transition-all shadow-lg mb-4"
         >
           Back to Login
         </button>
 
         {/* Countdown */}
         {!cancelRedirect && countdown > 0 && (
-          <p className="text-sm text-text-tertiary dark:text-dark-text-tertiary">
-            Redirecting you in {countdown} seconds...
-          </p>
+          <button
+            onClick={handleCancelRedirect}
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            Redirecting in {countdown} seconds... <span className="underline">Cancel</span>
+          </button>
         )}
 
         {cancelRedirect && (
-          <p className="text-sm text-text-tertiary dark:text-dark-text-tertiary">
-            Auto-redirect cancelled
-          </p>
-        )}
-      </div>
-
-      {/* Mobile Layout - Shown only on mobile */}
-      <div className="md:hidden w-full max-w-md mx-auto flex flex-col items-center justify-center flex-1 px-6">
-        {/* Success Icon with Concentric Circles */}
-        <div className="mb-12 flex justify-center">
-          <div className="relative w-64 h-64 flex items-center justify-center">
-            {/* Outer Circle */}
-            <div className="absolute w-64 h-64 rounded-full bg-primary/5 dark:bg-dark-primary-DEFAULT/5"></div>
-            {/* Middle Circle */}
-            <div className="absolute w-48 h-48 rounded-full bg-primary/10 dark:bg-dark-primary-DEFAULT/10"></div>
-            {/* Inner Circle with Checkmark */}
-            <div className="relative w-32 h-32 rounded-full bg-primary dark:bg-dark-primary-DEFAULT flex items-center justify-center shadow-lg">
-              <CheckCircle2 className="w-16 h-16 text-primary-foreground dark:text-dark-primary-foreground" strokeWidth={3} />
-            </div>
-          </div>
-        </div>
-
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-6 text-center">
-          Password Reset Successful!
-        </h1>
-
-        {/* Message */}
-        <p className="text-base text-text-secondary dark:text-dark-text-secondary mb-12 text-center px-4">
-          Your password has been successfully updated. You can now log in to{' '}
-          <span className="text-primary dark:text-dark-primary-DEFAULT font-semibold">Presently</span>{' '}
-          with your new credentials.
-        </p>
-
-        {/* Login Button */}
-        <button
-          onClick={onBackToLogin}
-          className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-2xl transition-all shadow-md mb-6 text-lg"
-        >
-          Back to Login
-        </button>
-
-        {/* Countdown */}
-        {!cancelRedirect && countdown > 0 && (
-          <p className="text-base text-text-tertiary dark:text-dark-text-tertiary text-center">
-            Redirecting you in {countdown} seconds...
-          </p>
-        )}
-
-        {cancelRedirect && (
-          <p className="text-base text-text-tertiary dark:text-dark-text-tertiary text-center">
+          <p className="text-sm text-gray-500">
             Auto-redirect cancelled
           </p>
         )}

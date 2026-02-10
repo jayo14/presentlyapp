@@ -343,29 +343,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       );
                   })}
               </div>
-
-              {/* Bottom Navigation */}
-              <div className="fixed bottom-0 left-0 right-0 bg-[#2A2A25] border-t border-[#3A3A30] px-6 py-3 flex justify-between items-center">
-                  <button className="flex flex-col items-center gap-1 text-gray-400">
-                      <Home size={24} />
-                      <span className="text-xs">Home</span>
-                  </button>
-                  <button className="flex flex-col items-center gap-1 text-gray-400">
-                      <BookOpen size={24} />
-                      <span className="text-xs">Courses</span>
-                  </button>
-                  <button className="w-14 h-14 -mt-7 bg-[#FFD700] rounded-2xl flex items-center justify-center text-black">
-                      <QrCode size={28} />
-                  </button>
-                  <button className="flex flex-col items-center gap-1 text-[#FFD700]">
-                      <BarChart size={24} />
-                      <span className="text-xs">Analytics</span>
-                  </button>
-                  <button className="flex flex-col items-center gap-1 text-gray-400">
-                      <User size={24} />
-                      <span className="text-xs">Profile</span>
-                  </button>
-              </div>
           </div>
       );
 
@@ -673,32 +650,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       );
                   })}
               </div>
-          </div>
-
-          {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-[#2A2A25] border-t border-[#3A3A30] px-6 py-3 flex justify-between items-center">
-              <button className="flex flex-col items-center gap-1 text-[#FFD700]">
-                  <Home size={24} />
-                  <span className="text-xs">Home</span>
-              </button>
-              <button className="flex flex-col items-center gap-1 text-gray-400">
-                  <BookOpen size={24} />
-                  <span className="text-xs">Courses</span>
-              </button>
-              <button 
-                  onClick={() => setIsAttendanceModalOpen(true)}
-                  className="w-14 h-14 -mt-7 bg-[#FFD700] rounded-2xl flex items-center justify-center text-black"
-              >
-                  <QrCode size={28} />
-              </button>
-              <button className="flex flex-col items-center gap-1 text-gray-400">
-                  <BarChart size={24} />
-                  <span className="text-xs">Analytics</span>
-              </button>
-              <button className="flex flex-col items-center gap-1 text-gray-400">
-                  <User size={24} />
-                  <span className="text-xs">Profile</span>
-              </button>
           </div>
 
           {/* Modals */}
