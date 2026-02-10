@@ -16,6 +16,12 @@
 }
 
 @layer base {
+  /* CSS variables for theme colors */
+  :root {
+    --color-primary: 184 134 11; /* Light mode primary */
+    --color-primary-dark: 255 215 0; /* Dark mode primary */
+  }
+  
   /* Root CSS variables removed - using Tailwind theme colors instead */
 }
 
@@ -43,11 +49,11 @@
   }
   
   :root {
-    scrollbar-color: #B8860B transparent;
+    scrollbar-color: rgb(var(--color-primary)) transparent;
   }
   
   .dark {
-    scrollbar-color: #FFD700 transparent;
+    scrollbar-color: rgb(var(--color-primary-dark)) transparent;
   }
 }
 
