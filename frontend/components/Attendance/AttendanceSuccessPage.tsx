@@ -166,38 +166,6 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
           </button>
         </motion.div>
       </div>
-
-      {/* Bottom Navigation */}
-      <div className="bg-[#2A2A25] border-t border-[#3A3A30] px-6 py-4 flex justify-between items-center">
-        <button className="flex flex-col items-center gap-1 text-gray-400">
-          <Home size={24} />
-          <span className="text-xs">Home</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-400">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span className="text-xs">Courses</span>
-        </button>
-        <button className="w-14 h-14 -mt-7 bg-[#FFD700] rounded-2xl flex items-center justify-center text-black">
-          <CheckCircle2 size={28} />
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-400">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 3v18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M18 17V9l-5 5-5-5v8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span className="text-xs">Analytics</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-400">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span className="text-xs">Profile</span>
-        </button>
-      </div>
     </div>
   );
 };
