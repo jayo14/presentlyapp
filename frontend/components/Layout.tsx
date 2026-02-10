@@ -25,7 +25,7 @@ interface NavItemProps {
 const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onClick, collapsed = false }) => (
   <button 
     onClick={() => onClick(id)}
-    className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${isActive ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+    className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-full text-sm font-medium transition-all duration-200 ${isActive ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
     title={collapsed ? label : undefined}
   >
     <Icon size={18} className="flex-shrink-0" />
@@ -238,7 +238,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           {userRole !== UserRole.STUDENT && (
             <button 
               onClick={() => handleNavClick('notifications')}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-full text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
               title={sidebarCollapsed ? 'Notifications' : undefined}
             >
               <Bell size={18} className="flex-shrink-0" />
@@ -251,7 +251,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
            {installPrompt && (
              <button 
                onClick={handleInstallClick}
-               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-all duration-200 mb-2`}
+               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-full text-sm font-medium text-primary hover:bg-primary/10 transition-all duration-200 mb-2`}
                title={sidebarCollapsed ? 'Install App' : undefined}
              >
                <Download size={18} className="flex-shrink-0" />
@@ -262,7 +262,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
            {userRole !== UserRole.STUDENT ? (
              <button 
                onClick={toggleTheme}
-               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-200`}
+               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} px-4 py-2 rounded-full text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-200`}
                title={sidebarCollapsed ? (isDark ? 'Dark Mode' : 'Light Mode') : undefined}
              >
                {!sidebarCollapsed && (
@@ -281,7 +281,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
            ) : (
              <button 
                onClick={() => handleNavClick('notifications')}
-               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
                title={sidebarCollapsed ? 'Notifications' : undefined}
              >
                <Bell size={18} className="flex-shrink-0" />
@@ -309,7 +309,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           )}
           <button 
             onClick={onLogout}
-            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-all duration-200`}
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-full text-sm font-medium text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-all duration-200`}
             title={sidebarCollapsed ? 'Sign Out' : undefined}
           >
             <LogOut size={18} className="flex-shrink-0" />
@@ -350,7 +350,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
                   <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-4 mx-2"></div>
                   <button 
                     onClick={() => handleNavClick('notifications')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
                   >
                     <Bell size={18} />
                     Notifications
