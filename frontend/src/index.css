@@ -16,37 +16,13 @@
 }
 
 @layer base {
+  /* CSS variables for theme colors */
   :root {
-    --background: 224 71% 4%; /* #010409 */
-    --foreground: 210 40% 98%;
-
-    --card: 224 71% 4%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 224 71% 4%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 52 47% 65%; /* #C1B66D */
-    --primary-foreground: 220 100% 20%; /* #002368 */
-
-    --secondary: 220 100% 20%; /* #002368 */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
-
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 213 94% 68%;
-
-    --radius: 0.5rem;
+    --color-primary: 184 134 11; /* Light mode primary */
+    --color-primary-dark: 255 215 0; /* Dark mode primary */
   }
+  
+  /* Root CSS variables removed - using Tailwind theme colors instead */
 }
 
 /* Custom Scrollbar Styles */
@@ -60,18 +36,24 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: #C1B66D;
-    @apply rounded-full;
+    @apply bg-primary rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #002368;
+    @apply bg-primary-hover dark:bg-dark-primary-hover;
   }
 
   /* Firefox support */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #C1B66D transparent;
+  }
+  
+  :root {
+    scrollbar-color: rgb(var(--color-primary)) transparent;
+  }
+  
+  .dark {
+    scrollbar-color: rgb(var(--color-primary-dark)) transparent;
   }
 }
 
@@ -79,7 +61,7 @@
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
-  background-color: #09090b !important;
+  @apply bg-zinc-950 dark:bg-zinc-950;
   z-index: 1;
 }
 
@@ -96,9 +78,14 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #FFD700;
+    background: rgb(184, 134, 11); /* primary color light mode */
     cursor: pointer;
-    border: 2px solid #09090b;
+    border: 2px solid rgb(9, 9, 11);
+    box-shadow: 0 2px 4px rgba(184, 134, 11, 0.3);
+  }
+
+  .dark input[type="range"].slider-primary::-webkit-slider-thumb {
+    background: rgb(255, 215, 0); /* dark-primary color dark mode */
     box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
   }
 
@@ -106,9 +93,14 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #FFD700;
+    background: rgb(184, 134, 11);
     cursor: pointer;
-    border: 2px solid #09090b;
+    border: 2px solid rgb(9, 9, 11);
+    box-shadow: 0 2px 4px rgba(184, 134, 11, 0.3);
+  }
+  
+  .dark input[type="range"].slider-primary::-moz-range-thumb {
+    background: rgb(255, 215, 0);
     box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
   }
 

@@ -22,7 +22,14 @@ export const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({
   const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
   const [isActive, setIsActive] = useState(active);
 
-  const colors = ['#FFD700', '#B8860B', '#DAA520', '#228B22', '#32CD32'];
+  // Theme-aware confetti colors - gold tones for brand identity and green for success
+  const colors = [
+    'rgb(184, 134, 11)',   // primary - Dark Goldenrod
+    'rgb(255, 215, 0)',    // Gold
+    'rgb(218, 165, 32)',   // Goldenrod
+    'rgb(34, 139, 34)',    // Forest Green (success)
+    'rgb(50, 205, 50)',    // Lime Green (success-light)
+  ];
 
   useEffect(() => {
     if (active) {
