@@ -251,9 +251,10 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
             </select>
           </div>
         </div>
+      </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
-          {loading ? (
+      <div className="flex-1 overflow-y-auto p-6">
+        {loading ? (
             <div className="flex items-center justify-center h-64">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
@@ -339,15 +340,6 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
               ))}
             </div>
           )}
-        </div>
-
-        <div className="p-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {filteredCourses.filter(c => c.can_enroll).length} available
-          </p>
-          <Button onClick={onClose} variant="secondary">
-            Close
-          </Button>
         </div>
       </motion.div>
     </div>
