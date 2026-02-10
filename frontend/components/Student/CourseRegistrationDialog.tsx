@@ -27,7 +27,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   const [selectedSemester, setSelectedSemester] = useState<string>('all');
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [lastEnrolledCourse, setLastEnrolledCourse] = useState<string>('');
-  const [courseCode, setCourseCode] = useState('');
+  const [inputCourseCode, setInputCourseCode] = useState('');
   
   const { modalProps } = useModalAccessibility(isOpen, onClose);
 
@@ -109,6 +109,18 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
     }
   };
 
+  const handleEnrollByCourseCode = () => {
+    const course = courses.find(c => c.code.toUpperCase() === inputCourseCode.toUpperCase());
+    if (course && course.can_enroll) {
+      handleEnroll(course.id);
+      setInputCourseCode('');
+    } else if (course && !course.can_enroll) {
+      toast.error('Already enrolled in this course');
+    } else {
+      toast.error('Course not found');
+    }
+  };
+
   const semesters = Array.from(new Set(courses.map(c => c.semester).filter(Boolean)));
 
   if (!isOpen) return null;
@@ -185,25 +197,14 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
               <Input
                 type="text"
                 placeholder="e.g. CS101"
-                value={courseCode}
-                onChange={(e) => setCourseCode(e.target.value)}
+                value={inputCourseCode}
+                onChange={(e) => setInputCourseCode(e.target.value)}
                 className="flex-1"
                 maxLength={10}
               />
               <Button 
-                onClick={() => {
-                  // Find course by code and enroll
-                  const course = courses.find(c => c.code.toUpperCase() === courseCode.toUpperCase());
-                  if (course && course.can_enroll) {
-                    handleEnroll(course.id);
-                    setCourseCode('');
-                  } else if (course && !course.can_enroll) {
-                    toast.error('Already enrolled in this course');
-                  } else {
-                    toast.error('Course not found');
-                  }
-                }}
-                disabled={!courseCode.trim()}
+                onClick={handleEnrollByCourseCode}
+                disabled={!inputCourseCode.trim()}
                 className="whitespace-nowrap"
               >
                 Register Course →
