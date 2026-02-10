@@ -98,8 +98,8 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     });
 
     map.pm.setPathOptions({
-      color: '#ffca0d',
-      fillColor: '#ffca0d',
+      color: 'rgb(184, 134, 11)', // primary color
+      fillColor: 'rgb(184, 134, 11)',
       fillOpacity: 0.2,
     });
 
@@ -119,8 +119,8 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         
         // Style the temporary polygon
         layer.setStyle({
-          color: '#ffca0d',
-          fillColor: '#ffca0d',
+          color: 'rgb(184, 134, 11)', // primary color
+          fillColor: 'rgb(184, 134, 11)',
           fillOpacity: 0.2,
           weight: 2
         });
@@ -176,7 +176,8 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       const isSelected = selectedVenue?.id === venue.id;
 
       // 1. Render Marker
-      const markerColor = isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#3b82f6');
+      // Use semantic colors: red for active sessions, primary for selected, blue for default
+      const markerColor = isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(59, 130, 246)');
       
       const customIcon = L.divIcon({
         className: 'custom-div-icon',
@@ -210,8 +211,8 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       // 2. Render Boundary Polygon
       if (venue.boundary_coordinates && venue.boundary_coordinates.length >= 3) {
         const polygon = L.polygon(venue.boundary_coordinates as L.LatLngExpression[], {
-          color: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
-          fillColor: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
+          color: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
+          fillColor: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
           fillOpacity: isSelected ? 0.2 : 0.1,
           weight: isSelected ? 3 : 2,
           className: 'venue-polygon'
@@ -260,8 +261,8 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       if (venue.radius && venue.radius > 0 && (!venue.boundary_coordinates || venue.boundary_coordinates.length < 3)) {
         const circle = L.circle([venue.latitude, venue.longitude], {
           radius: venue.radius, // radius in meters
-          color: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
-          fillColor: isActive ? '#ef4444' : (isSelected ? '#ffca0d' : '#6366f1'),
+          color: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
+          fillColor: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
           fillOpacity: isSelected ? 0.15 : 0.08,
           weight: isSelected ? 2.5 : 1.5,
           dashArray: '5, 5', // dashed circle for radius
@@ -433,12 +434,12 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       <style>{`
         .custom-tooltip {
           background-color: rgba(0, 0, 0, 0.8);
-          border: 1px solid #ffca0d;
+          border: 1px solid rgb(184, 134, 11);
           border-radius: 8px;
           padding: 6px 12px;
           font-size: 12px;
           font-weight: 600;
-          color: #ffca0d;
+          color: rgb(184, 134, 11);
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         
