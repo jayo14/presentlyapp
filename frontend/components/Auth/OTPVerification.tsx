@@ -138,7 +138,7 @@ export const OTPVerification: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-white mb-4">
-            Verify your email
+            Verify your {email ? 'email' : 'phone number'}
           </h1>
           <p className="text-gray-400 mb-2">
             Enter the 6-digit code we sent to
