@@ -133,9 +133,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   ];
 
   const attendanceStatusData = dashboardData?.attendance_stats ? [
-    { name: 'Present', value: dashboardData.attendance_stats.total_present, color: '#22c55e' },
-    { name: 'Late', value: dashboardData.attendance_stats.total_late, color: '#eab308' },
-    { name: 'Absent', value: dashboardData.attendance_stats.total_absent, color: '#ef4444' },
+    { name: 'Present', value: dashboardData.attendance_stats.total_present, color: 'rgb(34, 197, 94)' },
+    { name: 'Late', value: dashboardData.attendance_stats.total_late, color: 'rgb(234, 179, 8)' },
+    { name: 'Absent', value: dashboardData.attendance_stats.total_absent, color: 'rgb(239, 68, 68)' },
   ] : [];
 
   const handleAttendanceCheckIn = async (code: string, location: any): Promise<boolean> => {
