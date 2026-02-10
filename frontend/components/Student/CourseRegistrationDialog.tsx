@@ -25,6 +25,9 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   const [searchTerm, setSearchTerm] = useState('');
   const [enrollingCourseId, setEnrollingCourseId] = useState<number | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<string>('all');
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  const [lastEnrolledCourse, setLastEnrolledCourse] = useState<string>('');
+  const [inputCourseCode, setInputCourseCode] = useState('');
   
   const { modalProps } = useModalAccessibility(isOpen, onClose);
 
@@ -79,6 +82,13 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
       setError(null);
       await studentApi.enrollInCourse(courseId);
       
+      const enrolledCourse = courses.find(c => c.id === courseId);
+      if (enrolledCourse) {
+        setLastEnrolledCourse(`${enrolledCourse.code} (${enrolledCourse.title})`);
+        setShowSuccessBanner(true);
+        setTimeout(() => setShowSuccessBanner(false), 5000); // Hide after 5 seconds
+      }
+      
       setCourses(courses.map(c => 
         c.id === courseId ? { ...c, can_enroll: false } : c
       ));
@@ -96,6 +106,18 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
       });
     } finally {
       setEnrollingCourseId(null);
+    }
+  };
+
+  const handleEnrollByCourseCode = () => {
+    const course = courses.find(c => c.code.toUpperCase() === inputCourseCode.toUpperCase());
+    if (course && course.can_enroll) {
+      handleEnroll(course.id);
+      setInputCourseCode('');
+    } else if (course && !course.can_enroll) {
+      toast.error('Already enrolled in this course');
+    } else {
+      toast.error('Course not found');
     }
   };
 
@@ -130,6 +152,34 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         </div>
 
         <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 space-y-4">
+          {/* Success Banner - matching Design 2 */}
+          {showSuccessBanner && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-500 dark:border-green-700 rounded-xl flex items-start gap-3 relative"
+            >
+              <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <Check className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-green-800 dark:text-green-300 font-bold text-sm mb-1">
+                  Course Added Successfully
+                </h3>
+                <p className="text-green-700 dark:text-green-400 text-xs">
+                  {lastEnrolledCourse} has been added to your schedule.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowSuccessBanner(false)}
+                className="flex-shrink-0 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          )}
+
           {error && (
             <div className="p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/50 rounded-lg flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
@@ -137,22 +187,63 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
+          {/* Add via Code Section - matching Design 2 */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Add via Code</h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Enter the unique 6-digit code provided by your course instructor.
+            </p>
+            <div className="flex gap-3">
               <Input
                 type="text"
-                placeholder="Search courses..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                placeholder="e.g. CS101"
+                value={inputCourseCode}
+                onChange={(e) => setInputCourseCode(e.target.value)}
+                className="flex-1"
+                maxLength={10}
               />
+              <Button 
+                onClick={handleEnrollByCourseCode}
+                disabled={!inputCourseCode.trim()}
+                className="whitespace-nowrap"
+              >
+                Register Course →
+              </Button>
             </div>
+          </div>
 
-            <select
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-              className="px-4 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+          {/* OR Divider */}
+          <div className="relative flex items-center justify-center py-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-zinc-200 dark:border-zinc-700"></div>
+            </div>
+            <div className="relative px-4 bg-white dark:bg-zinc-900">
+              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase">OR BROWSE</span>
+            </div>
+          </div>
+
+          {/* Browse Department Section - matching Design 2 */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Browse Department</h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Find open electives and major courses.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
+                <Input
+                  type="text"
+                  placeholder="Search for departments..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <select
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+                className="px-4 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
             >
               <option value="all">All Semesters</option>
               {semesters.map(sem => (
@@ -161,9 +252,10 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
             </select>
           </div>
         </div>
+      </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
-          {loading ? (
+      <div className="flex-1 overflow-y-auto p-6">
+        {loading ? (
             <div className="flex items-center justify-center h-64">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
@@ -249,15 +341,6 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
               ))}
             </div>
           )}
-        </div>
-
-        <div className="p-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {filteredCourses.filter(c => c.can_enroll).length} available
-          </p>
-          <Button onClick={onClose} variant="secondary">
-            Close
-          </Button>
         </div>
       </motion.div>
     </div>
