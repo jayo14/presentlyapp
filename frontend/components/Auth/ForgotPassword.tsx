@@ -299,10 +299,6 @@ export const ForgotPassword: React.FC = () => {
             Forgot Password
           </h1>
           
-          <h2 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-6">
-            Reset Password
-          </h2>
-          
           <p className="text-base text-text-secondary dark:text-dark-text-secondary px-2">
             Enter your registered university email address and we'll send you a secure link to reset your password.
           </p>
