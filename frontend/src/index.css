@@ -18,8 +18,35 @@
 @layer base {
   /* CSS variables for theme colors */
   :root {
-    --color-primary: 184 134 11; /* Light mode primary */
-    --color-primary-dark: 255 215 0; /* Dark mode primary */
+    --background: 224 71% 4%; /* #010409 */
+    --foreground: 210 40% 98%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 52 47% 65%; /* #FFD700 */
+    --primary-foreground: 220 100% 20%; /* #09090b */
+
+    --secondary: 220 100% 20%; /* #09090b */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 213 94% 68%;
+
+    --radius: 0.5rem;
   }
   
   /* Root CSS variables removed - using Tailwind theme colors instead */
@@ -36,24 +63,18 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary rounded-full;
+    background-color: #FFD700;
+    @apply rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-hover dark:bg-dark-primary-hover;
+    background-color: #09090b;
   }
 
   /* Firefox support */
   * {
     scrollbar-width: thin;
-  }
-  
-  :root {
-    scrollbar-color: rgb(var(--color-primary)) transparent;
-  }
-  
-  .dark {
-    scrollbar-color: rgb(var(--color-primary-dark)) transparent;
+    scrollbar-color: #FFD700 transparent;
   }
 }
 
