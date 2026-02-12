@@ -1,3 +1,4 @@
+from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone as django_timezone
@@ -44,8 +45,7 @@ class Institution(models.Model):
     state_province = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     address = models.TextField()
-    latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True)
+    location = gis_models.PointField(blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     
     # Institution details
@@ -444,8 +444,7 @@ class Venue(models.Model):
     has_microphone = models.BooleanField(default=False)
     
     # Geolocation with elevation
-    latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True, help_text="Venue center latitude")
-    longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True, help_text="Venue center longitude")
+    location = gis_models.PointField(blank=True, null=True, help_text="Venue center location")
     elevation = models.DecimalField(
         max_digits=8, 
         decimal_places=2, 
@@ -455,11 +454,10 @@ class Venue(models.Model):
     )
     
     # Boundary/polygon for precise location mapping
-    # Stored as JSON array of coordinate pairs: [[lat, lng], [lat, lng], ...]
-    boundary_coordinates = models.JSONField(
+    boundary = gis_models.PolygonField(
         blank=True, 
         null=True,
-        help_text="Polygon boundary coordinates as array of [latitude, longitude] pairs"
+        help_text="Polygon boundary of the venue"
     )
     
     # Location verification settings

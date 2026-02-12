@@ -7,6 +7,7 @@ import UserManagement from '../Admin/UserManagement';
 import VenueManagement from '../Admin/VenueManagement';
 import DepartmentManagement from '../Admin/DepartmentManagement';
 import CourseManagement from '../Admin/CourseManagement';
+import Map from '../Map';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '../../services/api/system';
 
@@ -332,6 +333,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
+            </div>
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-zinc-900 dark:text-white mb-4">Live Venue Map</h3>
+              <Map center={[51.505, -0.09]} zoom={13} />
             </div>
         </div>
     </div>

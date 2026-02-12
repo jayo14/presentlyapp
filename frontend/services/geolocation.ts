@@ -269,4 +269,34 @@ export const geolocationService = {
   checkLocationPermission,
   verifyVenueLocation,
   formatDistance,
+  
+  // Geocoding using Nominatim
+  geocode: async (address: string): Promise<{ lat: number; lon: number } | null> => {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+      }
+      return null;
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return null;
+    }
+  },
+
+  // Reverse geocoding using Nominatim
+  reverseGeocode: async (lat: number, lon: number): Promise<string | null> => {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+      const data = await response.json();
+      if (data && data.display_name) {
+        return data.display_name;
+      }
+      return null;
+    } catch (error) {
+      console.error('Reverse geocoding error:', error);
+      return null;
+    }
+  },
 };

@@ -61,8 +61,8 @@ export const CourseModal: React.FC<CourseModalProps> = ({
     if (course && departments.length > 0) {
       const dept = departments.find(d => d.id === course.department);
       if (dept) {
-        setSelectedInstitution(dept.institution_id);
-        setSelectedCollege(dept.college_id);
+        setSelectedInstitution(dept.institution || dept.institution_id);
+        setSelectedCollege(dept.college || dept.college_id);
       }
     }
   }, [course, departments]);

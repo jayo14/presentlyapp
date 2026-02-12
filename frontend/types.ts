@@ -39,7 +39,8 @@ export interface Institution {
 
 export interface College {
   id: number;
-  institution_id: number;
+  institution: number;
+  institution_id?: number;
   name: string;
   code: string; // Abbreviation (e.g., "COS", "COLENG")
   abbreviation: string;
@@ -60,6 +61,7 @@ export interface College {
   established_year?: number;
   logo_url?: string;
   is_active: boolean;
+  departmentCount?: number;
   
   created_at: string;
   updated_at: string;
@@ -67,8 +69,10 @@ export interface College {
 
 export interface Department {
   id: number;
-  college_id: number;
-  institution_id: number;
+  college: number;
+  institution: number;
+  college_id?: number;
+  institution_id?: number;
   name: string;
   code: string;
   abbreviation: string;
@@ -113,7 +117,8 @@ export interface Course {
 
 export interface Venue {
   id: number;
-  institution_id: number;
+  institution: number;
+  institution_id?: number;
   institution_name?: string;
   name: string;
   code: string;
@@ -149,7 +154,9 @@ export interface User {
   onboarding_complete: boolean;
   
   // Institutional Affiliation
+  institution?: number;
   institution_id?: number;
+  college?: number;
   college_id?: number;
 }
 

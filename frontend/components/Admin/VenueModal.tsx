@@ -30,7 +30,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   const { modalRef, modalProps } = useModalAccessibility(true, onClose);
   
   const [formData, setFormData] = useState<Partial<Venue>>({
-    institution_id: venue?.institution_id || (institutions.length > 0 ? institutions[0].id : undefined),
+    institution: venue?.institution || venue?.institution_id || (institutions.length > 0 ? institutions[0].id : undefined),
     name: venue?.name || '',
     code: venue?.code || '',
     description: venue?.description || '',
@@ -115,7 +115,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       setError('Venue code is required');
       return;
     }
-    if (!formData.institution_id) {
+    if (!formData.institution) {
       setError('Please select an institution. If none exist, please create one first in the Institutions tab.');
       return;
     }
@@ -177,8 +177,8 @@ export const VenueModal: React.FC<VenueModalProps> = ({
                   Institution *
                 </label>
                 <select
-                  value={formData.institution_id}
-                  onChange={(e) => handleChange('institution_id', Number(e.target.value))}
+                  value={formData.institution}
+                  onChange={(e) => handleChange('institution', Number(e.target.value))}
                   className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
                   required
                 >
