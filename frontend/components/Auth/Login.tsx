@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
-import { Box, Input, Checkbox, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
+import { Box, Input, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
 import { Button } from '../Button';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 
@@ -297,14 +297,20 @@ export const Login: React.FC = () => {
               
               {/* Remember Me & Forgot Password */}
               <HStack justify="space-between" fontSize="sm">
-                <Checkbox
-                  isChecked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  colorScheme="yellow"
-                  borderColor={inputBorder}
-                >
+                <HStack gap={2}>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    style={{
+                      accentColor: '#FFD700',
+                      width: '16px',
+                      height: '16px',
+                      cursor: 'pointer'
+                    }}
+                  />
                   <Text color={textSecondary}>Remember me</Text>
-                </Checkbox>
+                </HStack>
                 <Box
                   as="button"
                   type="button"
