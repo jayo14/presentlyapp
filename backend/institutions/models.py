@@ -530,13 +530,14 @@ class AttendanceSession(models.Model):
     def get_location_coords(self):
         """Get location coordinates, preferring venue over legacy fields"""
         if self.venue:
-            return {
-                'latitude': float(self.venue.latitude),
-                'longitude': float(self.venue.longitude),
+            coords = {
+                'latitude': float(self.venue.location.y) if self.venue.location else None,
+                'longitude': float(self.venue.location.x) if self.venue.location else None,
                 'elevation': float(self.venue.elevation) if self.venue.elevation else None,
-                'boundary': self.venue.boundary_coordinates,
+                'boundary': self.venue.boundary.coords if self.venue.boundary else None,
                 'radius': self.venue.verification_radius
             }
+            return coords
         return {
             'latitude': float(self.latitude) if self.latitude else None,
             'longitude': float(self.longitude) if self.longitude else None,
@@ -565,9 +566,9 @@ class AttendanceSession(models.Model):
             self.qr_code_url = f"{frontend_url}/check-in/{self.session_code}"
         
         # Use venue location if not specified
-        if self.venue and not self.latitude and not self.longitude:
-            self.latitude = self.venue.latitude
-            self.longitude = self.venue.longitude
+        if self.venue and not self.latitude and not self.longitude and self.venue.location:
+            self.latitude = self.venue.location.y
+            self.longitude = self.venue.location.x
             if not self.location_radius and self.venue.gps_radius:
                 self.location_radius = self.venue.gps_radius
         

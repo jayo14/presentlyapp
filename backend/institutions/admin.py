@@ -84,7 +84,7 @@ class VenueAdmin(ModelAdmin):
             'fields': ('building_name', 'floor_number', 'room_number', 'capacity')
         }),
         ('Geolocation', {
-            'fields': ('latitude', 'longitude', 'elevation', 'boundary_coordinates', 'verification_radius'),
+            'fields': ('location', 'elevation', 'boundary', 'verification_radius'),
             'description': 'Use the map widget to set location coordinates. You can also manually enter coordinates.'
         }),
         ('Status', {

@@ -61,29 +61,38 @@ class UserLoginSerializer(serializers.Serializer):
 
 class InstitutionSerializer(serializers.ModelSerializer):
     """Serializer for Institution model"""
-    latitude = serializers.SerializerMethodField()
-    longitude = serializers.SerializerMethodField()
+    latitude = serializers.FloatField(required=False, allow_null=True)
+    longitude = serializers.FloatField(required=False, allow_null=True)
 
     class Meta:
         model = Institution
         fields = [
             'id', 'full_name', 'short_name', 'abbreviation', 'description', 'website_url',
             'contact_email', 'contact_phone', 'country', 'state_province', 'city',
-            'address', 'latitude', 'longitude', 'postal_code', 'established_year',
+            'address', 'latitude', 'longitude', 'location', 'postal_code', 'established_year',
             'institution_type', 'accreditation_status', 'logo_url', 'cover_image_url',
             'is_active', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'location']
 
-    def get_latitude(self, obj):
-        if obj.location:
-            return obj.location.y
-        return None
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.location:
+            ret['latitude'] = instance.location.y
+            ret['longitude'] = instance.location.x
+        return ret
 
-    def get_longitude(self, obj):
-        if obj.location:
-            return obj.location.x
-        return None
+    def validate(self, attrs):
+        from django.contrib.gis.geos import Point
+        latitude = attrs.pop('latitude', None)
+        longitude = attrs.pop('longitude', None)
+        
+        if latitude is not None and longitude is not None:
+            attrs['location'] = Point(longitude, latitude)
+        elif latitude is not None or longitude is not None:
+            raise serializers.ValidationError("Both latitude and longitude must be provided together.")
+            
+        return attrs
 
 
 class CollegeSerializer(serializers.ModelSerializer):
@@ -110,9 +119,13 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class VenueSerializer(serializers.ModelSerializer):
     """Serializer for Venue model"""
     institution_name = serializers.CharField(source='institution.full_name', read_only=True)
-    latitude = serializers.SerializerMethodField()
-    longitude = serializers.SerializerMethodField()
-    boundary_coordinates = serializers.SerializerMethodField()
+    latitude = serializers.FloatField(required=False, allow_null=True)
+    longitude = serializers.FloatField(required=False, allow_null=True)
+    boundary_coordinates = serializers.ListField(
+        child=serializers.ListField(child=serializers.FloatField()),
+        required=False,
+        allow_null=True
+    )
 
     class Meta:
         model = Venue
@@ -120,25 +133,47 @@ class VenueSerializer(serializers.ModelSerializer):
             'id', 'institution', 'institution_name', 'college', 'name', 'code', 'description',
             'building', 'building_name', 'floor_number', 'room_number', 'capacity',
             'venue_type', 'has_projector', 'has_computers', 'has_whiteboard', 'has_microphone',
-            'latitude', 'longitude', 'elevation', 'boundary_coordinates',
+            'latitude', 'longitude', 'location', 'elevation', 'boundary_coordinates', 'boundary',
             'gps_radius', 'verification_radius', 'is_active', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'location', 'boundary']
 
-    def get_latitude(self, obj):
-        if obj.location:
-            return obj.location.y
-        return None
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.location:
+            ret['latitude'] = instance.location.y
+            ret['longitude'] = instance.location.x
+        if instance.boundary:
+            # Transform from [[lng, lat], ...] (exterior ring) to [[lat, lng], ...]
+            ret['boundary_coordinates'] = [[c[1], c[0]] for c in instance.boundary.coords[0]]
+        return ret
 
-    def get_longitude(self, obj):
-        if obj.location:
-            return obj.location.x
-        return None
-
-    def get_boundary_coordinates(self, obj):
-        if obj.boundary:
-            return obj.boundary.coords
-        return None
+    def validate(self, attrs):
+        from django.contrib.gis.geos import Point, Polygon
+        latitude = attrs.pop('latitude', None)
+        longitude = attrs.pop('longitude', None)
+        boundary_coords = attrs.pop('boundary_coordinates', None)
+        
+        if latitude is not None and longitude is not None:
+            # Point(x, y) where x is longitude, y is latitude
+            attrs['location'] = Point(longitude, latitude)
+        elif latitude is not None or longitude is not None:
+            raise serializers.ValidationError({"latitude": "Both latitude and longitude must be provided together."})
+            
+        if boundary_coords is not None:
+            if len(boundary_coords) < 3:
+                raise serializers.ValidationError({"boundary_coordinates": "Boundary must have at least 3 coordinate pairs."})
+            
+            # Ensure the polygon is closed
+            if boundary_coords[0] != boundary_coords[-1]:
+                boundary_coords.append(boundary_coords[0])
+            
+            # GeoDjango Polygon expects [lng, lat] pairs
+            # Frontend sends [lat, lng]
+            geo_coords = [(float(c[1]), float(c[0])) for c in boundary_coords]
+            attrs['boundary'] = Polygon(geo_coords)
+            
+        return attrs
     
     def validate_boundary_coordinates(self, value):
         """Validate that boundary coordinates are properly formatted if provided"""
