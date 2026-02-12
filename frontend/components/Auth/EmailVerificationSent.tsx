@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Logo } from '../Logo';
-import { Mail, ArrowLeft, CheckCircle, ExternalLink, HelpCircle, Loader } from 'lucide-react';
-import { Button } from '../Button';
+import { Mail, ArrowLeft, ExternalLink, HelpCircle, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser, useSendVerificationOTP } from '../../hooks/useAuth';
 import { toast } from 'sonner';
+import { Box, VStack, HStack, Text, Heading, Spinner } from '@chakra-ui/react';
 
 // Constants
 const VERIFICATION_POLL_INTERVAL = 10000; // 10 seconds
@@ -91,124 +92,171 @@ export const EmailVerificationSent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-zinc-950 flex flex-col items-center justify-center p-4 relative">
-      {/* Header - Hidden on mobile */}
-      <button 
-        onClick={() => navigate(-1)} 
-        className="absolute top-8 left-8 text-text-secondary hover:text-text-primary flex items-center gap-2 transition-colors mobile:hidden"
+    <Box 
+      minH="100vh" 
+      bg="#09090b"
+      color="white" 
+      display="flex" 
+      alignItems="center" 
+      justifyContent="center" 
+      p={4}
+      position="relative"
+    >
+      {/* Back Button */}
+      <Box
+        as="button"
+        onClick={() => navigate(-1)}
+        position="absolute"
+        top={8}
+        left={8}
+        color="gray.300"
+        _hover={{ color: "white" }}
+        display="flex"
+        alignItems="center"
+        gap={2}
+        transition="colors 0.2s"
       >
         <ArrowLeft size={18} /> Back
-      </button>
+      </Box>
 
-      <div className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="text-center mb-8">
+      <Box w="full" maxW="2xl">
+        <VStack mb={8} textAlign="center">
           <Logo className="justify-center mb-8 text-2xl" />
           
           {/* Mail Icon with animation */}
-          <div className="mb-6 flex justify-center">
-            <div className="bg-primary/10 dark:bg-primary/20 p-6 rounded-full">
-              <Mail size={48} className="text-primary" />
-            </div>
-          </div>
+          <Box mb={6}>
+            <Box bg="rgba(255, 215, 0, 0.1)" p={6} borderRadius="full">
+              <Mail size={48} color="#FFD700" />
+            </Box>
+          </Box>
 
           {/* Header */}
-          <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
+          <Heading as="h2" size="xl" color="white" mb={3}>
             Verify your Email
-          </h2>
+          </Heading>
           
           {/* Message */}
-          <p className="text-text-secondary text-base leading-relaxed max-w-xl mx-auto mb-4">
+          <Text color="gray.400" fontSize="base" lineHeight="relaxed" maxW="xl" mb={4}>
             We've sent a verification link to your university email address. 
             Please click the link to confirm your account and access Presently.
-          </p>
+          </Text>
           
           {/* Email Display */}
-          <p className="text-primary font-semibold text-lg">{user?.email}</p>
-        </div>
+          <Text color="#FFD700" fontWeight="semibold" fontSize="lg">
+            {user?.email}
+          </Text>
+        </VStack>
 
-        <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 p-6 md:p-8 rounded-2xl shadow-lg space-y-4">
-          {/* Primary Action - Check Inbox / Open Mail App */}
-          {emailProvider ? (
-            <Button 
-              onClick={() => window.open(emailProvider.url, '_blank')}
-              variant="primary"
-              className="w-full"
-              size="lg"
-            >
-              <Mail size={18} className="mr-2" />
-              Open {emailProvider.name}
-              <ExternalLink size={16} className="ml-2" />
-            </Button>
-          ) : (
-            <Button 
-              variant="primary"
-              className="w-full"
-              size="lg"
-              disabled
-            >
-              <Mail size={18} className="mr-2" />
-              Check Inbox
-            </Button>
-          )}
-
-          {/* Secondary Action - Resend Email */}
-          <Button 
-            onClick={handleResend}
-            variant="secondary"
-            className="w-full"
-            size="lg"
-            disabled={resendCooldown > 0}
-            isLoading={sendVerificationMutation.isPending}
-          >
-            {sendVerificationMutation.isSuccess && resendCooldown === 0 ? (
-              <>
-                <CheckCircle size={18} className="mr-2" />
-                Email Sent!
-              </>
-            ) : resendCooldown > 0 ? (
-              `Resend Email (${resendCooldown}s)`
-            ) : (
-              'Resend Verification Email'
-            )}
-          </Button>
-
-          {/* Status Indicator */}
-          {lastSentTime && (
-            <p className="text-text-secondary text-sm text-center">
-              Last sent: {formatLastSentTime(lastSentTime)}
-            </p>
-          )}
-
-          {/* Polling Indicator */}
-          {isPolling && (
-            <div className="flex items-center justify-center gap-2 text-text-secondary text-sm pt-2">
-              <Loader size={14} className="animate-spin" />
-              <span>Checking verification status...</span>
-            </div>
-          )}
-
-          {/* Support Section */}
-          <div className="pt-4 border-t border-border dark:border-zinc-800">
-            <div className="flex items-center justify-center gap-2 text-text-secondary text-sm">
-              <HelpCircle size={16} />
-              <span>Having trouble?</span>
-              <button 
-                onClick={() => window.location.href = 'mailto:support@presently.app'}
-                className="text-primary hover:underline font-medium"
+        <Box 
+          bg="#18181b"
+          borderWidth={1}
+          borderColor="#27272a"
+          p={{ base: 6, md: 8 }}
+          borderRadius="2xl"
+          shadow="lg"
+        >
+          <VStack gap={4} align="stretch">
+            {/* Primary Action - Check Inbox / Open Mail App */}
+            {emailProvider ? (
+              <Button 
+                onClick={() => window.open(emailProvider.url, '_blank')}
+                w="full"
+                size="lg"
+                bg="#FFD700"
+                color="#09090b"
+                borderRadius="full"
+                fontWeight="bold"
+                _hover={{ bg: "#FFE44D" }}
+                transition="all 0.2s"
               >
-                Contact Support
-              </button>
-            </div>
-          </div>
-        </div>
+                <Mail size={18} style={{ marginRight: '8px' }} />
+                Open {emailProvider.name}
+                <ExternalLink size={16} style={{ marginLeft: '8px' }} />
+              </Button>
+            ) : (
+              <Button 
+                w="full"
+                size="lg"
+                bg="#FFD700"
+                color="#09090b"
+                borderRadius="full"
+                fontWeight="bold"
+                disabled
+              >
+                <Mail size={18} style={{ marginRight: '8px' }} />
+                Check Inbox
+              </Button>
+            )}
+
+            {/* Secondary Action - Resend Email */}
+            <Button 
+              onClick={handleResend}
+              w="full"
+              size="lg"
+              bg="#27272a"
+              borderWidth={1}
+              borderColor="#3f3f46"
+              color="white"
+              borderRadius="full"
+              fontWeight="medium"
+              _hover={{ bg: "#3f3f46" }}
+              transition="colors 0.2s"
+              disabled={resendCooldown > 0}
+              loading={sendVerificationMutation.isPending}
+            >
+              {sendVerificationMutation.isSuccess && resendCooldown === 0 ? (
+                <HStack>
+                  <CheckCircle size={18} />
+                  <Text>Email Sent!</Text>
+                </HStack>
+              ) : resendCooldown > 0 ? (
+                `Resend Email (${resendCooldown}s)`
+              ) : (
+                'Resend Verification Email'
+              )}
+            </Button>
+
+            {/* Status Indicator */}
+            {lastSentTime && (
+              <Text color="gray.400" fontSize="sm" textAlign="center">
+                Last sent: {formatLastSentTime(lastSentTime)}
+              </Text>
+            )}
+
+            {/* Polling Indicator */}
+            {isPolling && (
+              <HStack justify="center" color="gray.400" fontSize="sm" pt={2}>
+                <Spinner size="sm" />
+                <Text>Checking verification status...</Text>
+              </HStack>
+            )}
+
+            {/* Support Section */}
+            <Box pt={4} borderTopWidth={1} borderTopColor="#27272a">
+              <HStack justify="center" color="gray.400" fontSize="sm" gap={2}>
+                <HelpCircle size={16} />
+                <Text>Having trouble?</Text>
+                <Box
+                  as="button"
+                  onClick={() => window.location.href = 'mailto:support@presently.app'}
+                  color="#FFD700"
+                  _hover={{ textDecoration: "underline" }}
+                  fontWeight="medium"
+                >
+                  Contact Support
+                </Box>
+              </HStack>
+            </Box>
+          </VStack>
+        </Box>
 
         {/* Additional Help Text */}
-        <div className="mt-6 text-center">
-          <p className="text-text-secondary text-sm">
+        <Box mt={6} textAlign="center">
+          <Text color="gray.400" fontSize="sm">
             Didn't receive the email? Check your spam folder or try resending.
-          </p>
-        </div>
-      </div>
-    </div>
+          </Text>
+        </Box>
+      </Box>
+    </Box>
   );
 };
