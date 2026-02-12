@@ -7,7 +7,7 @@ import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/con
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { Box, Input, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
-import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ export const Register: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const registerMutation = useRegister();
   const googleAuthMutation = useGoogleAuth();
   const { data: user, isLoading } = useCurrentUser();
@@ -267,13 +268,13 @@ export const Register: React.FC = () => {
                     size={16} 
                   />
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     pl={10}
-                    pr={4}
+                    pr={12}
                     py={3}
                     bg="#27272a"
                     borderColor="#3f3f46"
@@ -282,6 +283,21 @@ export const Register: React.FC = () => {
                     _placeholder={{ color: "gray.500" }}
                     _focus={{ borderColor: "#FFD700", outline: "none" }}
                   />
+                  <Box
+                    as="button"
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    position="absolute"
+                    right="12px"
+                    top="50%"
+                    transform="translateY(-50%)"
+                    color="#6B7280"
+                    _hover={{ color: "#FFD700" }}
+                    transition="color 0.2s"
+                    cursor="pointer"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </Box>
                 </Box>
               </Box>
               
