@@ -2,7 +2,20 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 // API Base URL - Django backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api';
+// Ensure /api suffix is present to avoid 404 errors
+const rawApiUrl = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api';
+let API_BASE_URL = rawApiUrl;
+
+// Normalize the URL: remove trailing slash and ensure /api suffix
+if (!API_BASE_URL.endsWith('/api')) {
+  API_BASE_URL = API_BASE_URL.replace(/\/$/, '') + '/api';
+}
+
+// Log for debugging in development
+if (import.meta.env.DEV) {
+  console.log('[API Client] Raw API URL:', rawApiUrl);
+  console.log('[API Client] Final API Base URL:', API_BASE_URL);
+}
 
 // List of endpoints that gracefully handle 404s with fallback data
 const GRACEFUL_404_ENDPOINTS = [
