@@ -7,7 +7,6 @@ import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/con
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { Box, Input, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
-import { Logo } from '../Logo';
 import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
 
 export const Register: React.FC = () => {
@@ -155,7 +154,6 @@ export const Register: React.FC = () => {
 
       <Box w="full" maxW="md">
         <VStack mb={8} textAlign="center">
-          <Logo className="justify-center mb-6 text-2xl" />
           <Heading as="h2" size="xl" color="white">
             Create an account
           </Heading>

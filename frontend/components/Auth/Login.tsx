@@ -8,7 +8,6 @@ import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase
 import { Box, Input, Checkbox, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
 import { ColorModeButton, useColorModeValue } from '@/components/ui/color-mode';
-import { Logo } from '../Logo';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -211,9 +210,8 @@ export const Login: React.FC = () => {
       </Box>
 
       <Box w="full" maxW="md">
-        {/* Logo and Title */}
+        {/* Title */}
         <VStack mb={8} textAlign="center">
-          <Logo className="justify-center mb-6 text-2xl" />
           <Heading as="h2" size="2xl" color={textPrimary} mb={2}>
             Welcome back
           </Heading>
