@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../Button';
-import { Input } from '../Input';
-import { PasswordInput } from '../PasswordInput';
-import { Logo } from '../Logo';
-import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRegister, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { Box, Input, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
+import { Logo } from '../Logo';
+import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -108,109 +107,266 @@ export const Register: React.FC = () => {
   // Show loading state while checking auth
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-light-background dark:bg-dark-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary dark:border-dark-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">Loading...</p>
-        </div>
-      </div>
+      <Box 
+        minH="100vh" 
+        display="flex" 
+        alignItems="center" 
+        justifyContent="center"
+        bg="#09090b"
+      >
+        <VStack gap={4}>
+          <Spinner size="xl" color="yellow.400" thickness="4px" />
+          <Text color="gray.400">Loading...</Text>
+        </VStack>
+      </Box>
     );
   }
 
   return (
-    <div className="min-h-screen bg-light-background dark:bg-dark-background flex flex-col items-center justify-center p-4 relative">
+    <Box 
+      minH="100vh" 
+      bg="#09090b"
+      display="flex" 
+      flexDirection="column" 
+      alignItems="center" 
+      justifyContent="center" 
+      p={4}
+      position="relative"
+    >
       <SEO 
         title="Register | Presently"
         description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
       />
-       <button onClick={onBack} className="absolute top-8 left-8 text-light-text dark:text-dark-text hover:text-light-text-secondary dark:hover:text-dark-text-secondary flex items-center gap-2 transition-colors">
-            <ArrowLeft size={18} /> Back
-        </button>
+      <Box
+        as="button"
+        onClick={onBack}
+        position="absolute"
+        top={8}
+        left={8}
+        color="gray.300"
+        _hover={{ color: "white" }}
+        display="flex"
+        alignItems="center"
+        gap={2}
+        transition="colors 0.2s"
+      >
+        <ArrowLeft size={18} /> Back
+      </Box>
 
-      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="text-center mb-8">
-            <Logo className="justify-center mb-6 text-2xl" />
-            <h2 className="text-2xl font-bold text-light-text dark:text-dark-text">Create an account</h2>
-            <p className="text-light-text-secondary dark:text-dark-text-secondary mt-2">Get started with smart attendance management.</p>
-        </div>
+      <Box w="full" maxW="md">
+        <VStack mb={8} textAlign="center">
+          <Logo className="justify-center mb-6 text-2xl" />
+          <Heading as="h2" size="xl" color="white">
+            Create an account
+          </Heading>
+          <Text color="gray.400" mt={2}>
+            Get started with smart attendance management.
+          </Text>
+        </VStack>
 
-        <div className="bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border p-8 rounded-2xl shadow-lg">
+        <Box 
+          bg="#18181b"
+          borderWidth={1}
+          borderColor="#27272a"
+          p={8}
+          borderRadius="2xl"
+          shadow="lg"
+        >
           {registerMutation.error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
-              {registerMutation.error.message}
-            </div>
+            <Box p={3} bg="rgba(239, 68, 68, 0.1)" borderWidth={1} borderColor="#ef4444" borderRadius="lg" mb={4}>
+              <Text fontSize="sm" color="#ef4444">
+                {registerMutation.error.message}
+              </Text>
+            </Box>
           )}
           
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input 
-                label="Full Name" 
-                type="text" 
-                placeholder="John Doe" 
-                icon={<UserIcon size={16} />} 
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
-            <Input 
-              label="Email" 
-              type="email" 
-              placeholder="name@university.edu" 
-              icon={<Mail size={16} />} 
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <PasswordInput 
-              label="Password" 
-              placeholder="••••••••" 
-              icon={<Lock size={16} />} 
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            
-            <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
-                By clicking "Create Account", you agree to our <a href="#" className="underline">Terms</a> and <a href="#" className="underline">Privacy Policy</a>.
-            </p>
+          <form onSubmit={handleSubmit}>
+            <VStack gap={4} align="stretch">
+              {/* Full Name Input */}
+              <Box>
+                <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
+                  Full Name
+                </Text>
+                <Box position="relative">
+                  <UserIcon 
+                    style={{ 
+                      position: 'absolute', 
+                      left: '12px', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)',
+                      color: '#6B7280'
+                    }} 
+                    size={16} 
+                  />
+                  <Input
+                    type="text"
+                    placeholder="John Doe"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    pl={10}
+                    pr={4}
+                    py={3}
+                    bg="#27272a"
+                    borderColor="#3f3f46"
+                    borderRadius="full"
+                    color="white"
+                    _placeholder={{ color: "gray.500" }}
+                    _focus={{ borderColor: "#FFD700", outline: "none" }}
+                  />
+                </Box>
+              </Box>
 
-            <Button type="submit" className="w-full" size="lg" isLoading={registerMutation.isPending}>
-              Create Account
-            </Button>
+              {/* Email Input */}
+              <Box>
+                <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
+                  Email
+                </Text>
+                <Box position="relative">
+                  <Mail 
+                    style={{ 
+                      position: 'absolute', 
+                      left: '12px', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)',
+                      color: '#6B7280'
+                    }} 
+                    size={16} 
+                  />
+                  <Input
+                    type="email"
+                    placeholder="name@university.edu"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    pl={10}
+                    pr={4}
+                    py={3}
+                    bg="#27272a"
+                    borderColor="#3f3f46"
+                    borderRadius="full"
+                    color="white"
+                    _placeholder={{ color: "gray.500" }}
+                    _focus={{ borderColor: "#FFD700", outline: "none" }}
+                  />
+                </Box>
+              </Box>
+
+              {/* Password Input */}
+              <Box>
+                <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
+                  Password
+                </Text>
+                <Box position="relative">
+                  <Lock 
+                    style={{ 
+                      position: 'absolute', 
+                      left: '12px', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)',
+                      color: '#6B7280'
+                    }} 
+                    size={16} 
+                  />
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    pl={10}
+                    pr={4}
+                    py={3}
+                    bg="#27272a"
+                    borderColor="#3f3f46"
+                    borderRadius="full"
+                    color="white"
+                    _placeholder={{ color: "gray.500" }}
+                    _focus={{ borderColor: "#FFD700", outline: "none" }}
+                  />
+                </Box>
+              </Box>
+              
+              <Text fontSize="xs" color="gray.500">
+                By clicking "Create Account", you agree to our{' '}
+                <Box as="a" href="#" textDecoration="underline">Terms</Box>
+                {' '}and{' '}
+                <Box as="a" href="#" textDecoration="underline">Privacy Policy</Box>.
+              </Text>
+
+              <Button
+                type="submit"
+                loading={registerMutation.isPending}
+                w="full"
+                size="lg"
+                bg="#FFD700"
+                color="#09090b"
+                borderRadius="full"
+                fontWeight="bold"
+                _hover={{ bg: "#FFE44D" }}
+                transition="all 0.2s"
+              >
+                Create Account
+              </Button>
+            </VStack>
           </form>
 
-          <div className="my-6 flex items-center gap-4">
-              <div className="h-px bg-light-border dark:bg-dark-border flex-1"></div>
-              <span className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary uppercase">Or sign up with</span>
-              <div className="h-px bg-light-border dark:bg-dark-border flex-1"></div>
-          </div>
+          {/* Divider */}
+          <HStack my={6} gap={4}>
+            <Box h="1px" bg="#27272a" flex={1} />
+            <Text fontSize="xs" color="gray.500" textTransform="uppercase">
+              Or sign up with
+            </Text>
+            <Box h="1px" bg="#27272a" flex={1} />
+          </HStack>
 
-          <button 
+          {/* Google Sign Up */}
+          <Button
             type="button"
             onClick={handleGoogleLogin}
             disabled={googleAuthMutation.isPending || isRedirecting}
-            className="w-full bg-white dark:bg-dark-card border border-light-border dark:border-dark-border text-light-text dark:text-dark-text font-medium h-12 rounded-xl flex items-center justify-center gap-3 hover:bg-light-card dark:hover:bg-dark-background transition-colors disabled:opacity-50"
+            w="full"
+            bg="white"
+            borderWidth={1}
+            borderColor="#27272a"
+            color="#09090b"
+            fontWeight="medium"
+            h={12}
+            borderRadius="full"
+            _hover={{ bg: "#f4f4f5" }}
+            transition="colors 0.2s"
+            _disabled={{ opacity: 0.5 }}
           >
             {googleAuthMutation.isPending ? (
-              <div className="w-5 h-5 border-2 border-light-text dark:border-dark-text border-t-transparent rounded-full animate-spin"></div>
+              <Spinner size="sm" color="#09090b" />
             ) : (
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <HStack gap={3}>
+                <svg width="20" height="20" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-              </svg>
+                </svg>
+                <Text>Google</Text>
+              </HStack>
             )}
-            Google
-          </button>
+          </Button>
 
-          <div className="mt-6 text-center text-sm text-light-text-secondary dark:text-dark-text-secondary">
+          {/* Login Link */}
+          <Text mt={6} textAlign="center" fontSize="sm" color="gray.400">
             Already have an account?{' '}
-            <button onClick={onLoginClick} className="text-primary dark:text-dark-primary font-semibold hover:underline">
+            <Box
+              as="button"
+              onClick={onLoginClick}
+              color="#FFD700"
+              fontWeight="semibold"
+              _hover={{ textDecoration: "underline" }}
+            >
               Log in
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Box>
+          </Text>
+        </Box>
+      </Box>
+    </Box>
   );
 };
