@@ -8,6 +8,10 @@ import { institutionsApi } from '../../services/api/institutions';
 import CollegeModal from './CollegeModal';
 import { DepartmentManagement } from './DepartmentManagement';
 
+interface CollegeWithStats extends College {
+  departmentCount?: number;
+}
+
 interface CollegeManagementProps {
   institution: Institution;
   onBack: () => void;
@@ -19,7 +23,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
 }) => {
   const { id, collegeId } = useParams<{ id: string; collegeId: string }>();
   const navigate = useNavigate();
-  const [colleges, setColleges] = useState<College[]>([]);
+  const [colleges, setColleges] = useState<CollegeWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,7 +61,25 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
       setLoading(true);
       const data = await institutionsApi.getCollegesByInstitution(institution.id);
       const results = data.results || data;
-      setColleges(Array.isArray(results) ? results : []);
+      const collegesArray = Array.isArray(results) ? results : [];
+
+      const collegesWithStats = await Promise.all(
+        collegesArray.map(async (college: College) => {
+          if (!college || !college.id) return { ...college, departmentCount: 0 };
+          try {
+            const departments = await institutionsApi.getDepartmentsByCollege(college.id);
+            const departmentResults = (departments as any)?.results || departments;
+            return {
+              ...college,
+              departmentCount: Array.isArray(departmentResults) ? departmentResults.length : 0
+            };
+          } catch (e) {
+            return { ...college, departmentCount: 0 };
+          }
+        })
+      );
+      
+      setColleges(collegesWithStats);
       setError(null);
     } catch (err) {
       setError('Failed to load colleges');
@@ -164,9 +186,9 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
           <p className="text-2xl font-bold text-foreground mt-1">{colleges.length}</p>
         </div>
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-          <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold">Active Status</p>
-          <p className="text-2xl font-bold text-emerald-500 mt-1">
-            {colleges.filter(c => c.is_active).length} <span className="text-sm font-normal text-zinc-500">Active</span>
+          <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold">Total Departments</p>
+          <p className="text-2xl font-bold text-cyan-500 mt-1">
+            {colleges.reduce((sum, college) => sum + (college.departmentCount || 0), 0)}
           </p>
         </div>
       </div>
@@ -257,6 +279,12 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
                       <span>{college.office_location}</span>
                     </div>
                   )}
+                   {college.departmentCount !== undefined && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                        <Users className="w-4 h-4 text-zinc-500" />
+                        <span>{college.departmentCount} Department{college.departmentCount !== 1 ? 's' : ''}</span>
+                    </div>
+                    )}
                 </div>
               </div>
               

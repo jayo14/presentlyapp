@@ -61,11 +61,29 @@ class UserLoginSerializer(serializers.Serializer):
 
 class InstitutionSerializer(serializers.ModelSerializer):
     """Serializer for Institution model"""
-    
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+
     class Meta:
         model = Institution
-        fields = '__all__'
+        fields = [
+            'id', 'full_name', 'short_name', 'abbreviation', 'description', 'website_url',
+            'contact_email', 'contact_phone', 'country', 'state_province', 'city',
+            'address', 'latitude', 'longitude', 'postal_code', 'established_year',
+            'institution_type', 'accreditation_status', 'logo_url', 'cover_image_url',
+            'is_active', 'created_at', 'updated_at'
+        ]
         read_only_fields = ['created_at', 'updated_at']
+
+    def get_latitude(self, obj):
+        if obj.location:
+            return obj.location.y
+        return None
+
+    def get_longitude(self, obj):
+        if obj.location:
+            return obj.location.x
+        return None
 
 
 class CollegeSerializer(serializers.ModelSerializer):
@@ -92,11 +110,35 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class VenueSerializer(serializers.ModelSerializer):
     """Serializer for Venue model"""
     institution_name = serializers.CharField(source='institution.full_name', read_only=True)
-    
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+    boundary_coordinates = serializers.SerializerMethodField()
+
     class Meta:
         model = Venue
-        fields = '__all__'
+        fields = [
+            'id', 'institution', 'institution_name', 'college', 'name', 'code', 'description',
+            'building', 'building_name', 'floor_number', 'room_number', 'capacity',
+            'venue_type', 'has_projector', 'has_computers', 'has_whiteboard', 'has_microphone',
+            'latitude', 'longitude', 'elevation', 'boundary_coordinates',
+            'gps_radius', 'verification_radius', 'is_active', 'created_at', 'updated_at'
+        ]
         read_only_fields = ['created_at', 'updated_at']
+
+    def get_latitude(self, obj):
+        if obj.location:
+            return obj.location.y
+        return None
+
+    def get_longitude(self, obj):
+        if obj.location:
+            return obj.location.x
+        return None
+
+    def get_boundary_coordinates(self, obj):
+        if obj.boundary:
+            return obj.boundary.coords
+        return None
     
     def validate_boundary_coordinates(self, value):
         """Validate that boundary coordinates are properly formatted if provided"""
