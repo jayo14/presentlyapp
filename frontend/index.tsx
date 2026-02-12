@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import App from './App';
 import { reportWebVitals } from './utils/reportWebVitals';
+import { Provider } from '@/components/ui/provider';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -28,9 +29,11 @@ if ('serviceWorker' in navigator) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
+    <Provider>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </Provider>
   </React.StrictMode>
 );
 
