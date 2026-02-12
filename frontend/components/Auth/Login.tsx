@@ -20,7 +20,7 @@ export const Login: React.FC = () => {
   const { data: user, isLoading } = useCurrentUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Theme-aware colors - hardcoded for dark mode
+  // Theme-aware colors (dark mode optimized)
   const bgColor = '#09090b';
   const cardBg = '#18181b';
   const cardBorder = '#27272a';
