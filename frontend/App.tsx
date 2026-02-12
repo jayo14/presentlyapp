@@ -5,6 +5,8 @@ import { queryClient } from './services/api/queryClient';
 import { UserRole } from './types';
 import { useCurrentUser, useLogout } from './hooks/useAuth';
 import { Toaster } from 'sonner';
+import { offlineSyncManager } from './src/utils/offlineSync';
+import { OfflineIndicator } from './src/components/OfflineIndicator';
 
 // Eager load critical components for initial page
 import { LandingPage } from './components/LandingPage';
@@ -269,9 +271,16 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  // Initialize offline sync manager
+  useEffect(() => {
+    offlineSyncManager.init();
+    return () => offlineSyncManager.cleanup();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <OfflineIndicator />
         <Toaster position="top-right" richColors closeButton />
         <ServiceWorkerUpdateNotifier />
         <AppContent />
