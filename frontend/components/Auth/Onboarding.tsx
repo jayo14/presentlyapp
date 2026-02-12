@@ -412,9 +412,14 @@ export const Onboarding: React.FC = () => {
     }
 
     if (state.step === 2) {
-      if (state.formData.phoneNumber && !/^[\d\s\+\-\(\)]+$/.test(state.formData.phoneNumber)) {
-        dispatch({ type: 'SET_VALIDATION_ERROR', payload: { field: 'phoneNumber', error: 'Invalid phone number format' } });
-        return false;
+      if (state.formData.phoneNumber && state.formData.phoneNumber.trim()) {
+        // More restrictive phone validation: must start with + and have at least 10 digits
+        const phoneRegex = /^\+?\d{10,15}$/;
+        const cleanedPhone = state.formData.phoneNumber.replace(/[\s\-\(\)]/g, '');
+        if (!phoneRegex.test(cleanedPhone)) {
+          dispatch({ type: 'SET_VALIDATION_ERROR', payload: { field: 'phoneNumber', error: 'Invalid phone number. Must be 10-15 digits, optionally starting with +' } });
+          return false;
+        }
       }
     }
 
@@ -633,6 +638,7 @@ export const Onboarding: React.FC = () => {
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-zinc-900 mb-2">How will you use Presently?</h2>
           <p className="text-zinc-600">Select your role to get started</p>
+          <p className="text-xs text-zinc-500 mt-2">Step 1 of {totalSteps}</p>
         </div>
         
         <div className="grid gap-4">
