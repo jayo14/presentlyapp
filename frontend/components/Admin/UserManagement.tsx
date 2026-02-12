@@ -6,6 +6,7 @@ import { User, UserRole } from '../../types';
 import apiClient from '../../services/api/client';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import { Box, Button as ChakraButton, HStack, Text } from '@chakra-ui/react';
 
 export const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -17,20 +18,29 @@ export const UserManagement: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
   
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+
   const { modalProps } = useModalAccessibility(showModal, () => setShowModal(false));
 
   useEffect(() => {
-    loadUsers();
-  }, [roleFilter]);
+    loadUsers(currentPage);
+  }, [roleFilter, currentPage]);
 
-  const loadUsers = async () => {
+  const loadUsers = async (page: number) => {
     try {
       setLoading(true);
-      const params = roleFilter !== 'all' ? { role: roleFilter } : {};
+      const params: any = { page };
+      if (roleFilter !== 'all') {
+        params.role = roleFilter;
+      }
       const response = await apiClient.get('/users/', { params });
-      // Handle paginated response from Django REST Framework
-      const usersData = response.data.results || response.data;
-      setUsers(Array.isArray(usersData) ? usersData : []);
+      
+      setUsers(response.data.results || []);
+      setTotalPages(response.data.total_pages || 1);
+      setTotalUsers(response.data.count || 0);
+      
       setError(null);
     } catch (err: any) {
       const errorMsg = 'Failed to load users';
@@ -145,8 +155,8 @@ export const UserManagement: React.FC = () => {
         user.name || 'No Name',
         user.email,
         user.role,
-        user.institution_id || 'N/A',
-        user.college_id || 'N/A',
+        user.institution || user.institution_id || 'N/A',
+        user.college || user.college_id || 'N/A',
         user.onboarding_complete ? 'Yes' : 'No'
       ].join(','))
     ].join('\n');
@@ -401,6 +411,30 @@ export const UserManagement: React.FC = () => {
             </tbody>
           </table>
         </div>
+        <HStack justify="space-between" p={4}>
+          <Text fontSize="sm" color="zinc.400">
+            Showing {users.length} of {totalUsers} users
+          </Text>
+          <HStack>
+            <ChakraButton
+              onClick={() => setCurrentPage(currentPage - 1)}
+              isDisabled={currentPage === 1}
+              size="sm"
+            >
+              Previous
+            </ChakraButton>
+            <Text fontSize="sm" p={2}>
+              {currentPage} / {totalPages}
+            </Text>
+            <ChakraButton
+              onClick={() => setCurrentPage(currentPage + 1)}
+              isDisabled={currentPage === totalPages}
+              size="sm"
+            >
+              Next
+            </ChakraButton>
+          </HStack>
+        </HStack>
       </div>
 
       {filteredUsers.length === 0 && !loading && (
