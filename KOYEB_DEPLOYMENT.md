@@ -10,6 +10,7 @@ This guide explains how to deploy the Presently Django application to Koyeb.
 - Git repository connected to Koyeb
 - PostgreSQL database (can be provisioned on Koyeb)
 - Redis instance (optional, for caching and Celery)
+- **APT Buildpack**: Required for GIS libraries (GDAL, GEOS). Ensure the `Aptfile` in the root is used.
 
 ## Project Structure
 
@@ -71,6 +72,7 @@ echo "-----> Post-compile: Complete"
 
 3. **Configure the service**
    - Builder: Keep "Buildpack" selected
+   - **Buildpacks**: Add `https://github.com/heroku/heroku-buildpack-apt` before the Python buildpack if your platform supports it.
    - The buildpack will automatically detect Python and use the Procfile
    - Run command: (Auto-detected from Procfile, or manually set if needed)
      ```

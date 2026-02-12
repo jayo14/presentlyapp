@@ -186,6 +186,13 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# GIS Library Paths (for GeoDjango)
+# These are often needed on platforms like Heroku, Render, or Koyeb
+if os.environ.get('GDAL_LIBRARY_PATH'):
+    GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
+if os.environ.get('GEOS_LIBRARY_PATH'):
+    GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
+
 # Custom User Model
 AUTH_USER_MODEL = 'institutions.User'
 
