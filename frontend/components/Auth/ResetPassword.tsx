@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Eye, EyeOff, Key, Info, CheckCircle2, X } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useResetPassword, useVerifyResetToken } from '../../hooks/useAuth';
 import { SEO } from '../SEO';
-import { PasswordStrengthMeter } from '../PasswordStrengthMeter';
 import { ConfettiAnimation } from '../ConfettiAnimation';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { Box, Input, VStack, HStack, Text, Heading, Spinner, Progress } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
 
 type PageState = 'form' | 'success' | 'error' | 'loading' | 'invalid-link';
 
@@ -104,31 +105,55 @@ export const ResetPassword: React.FC = () => {
 
   if (pageState === 'loading' || verifyTokenMutation.isPending) {
     return (
-      <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col items-center justify-center">
+      <Box 
+        minH="100vh" 
+        display="flex" 
+        alignItems="center" 
+        justifyContent="center"
+        bg="#09090b"
+      >
         <SEO title="Verifying Reset Link | Presently" />
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary dark:border-dark-primary-DEFAULT border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-text-secondary dark:text-dark-text-secondary">Verifying reset link...</p>
-        </div>
-      </div>
+        <VStack gap={4}>
+          <Spinner size="xl" color="yellow.400" thickness="4px" />
+          <Text color="gray.400">Verifying reset link...</Text>
+        </VStack>
+      </Box>
     );
   }
 
   if (pageState === 'invalid-link') {
     return (
-      <div className="min-h-screen bg-background-primary dark:bg-dark-background-primary flex flex-col items-center justify-center p-4">
+      <Box 
+        minH="100vh" 
+        display="flex" 
+        alignItems="center" 
+        justifyContent="center"
+        bg="#09090b"
+        p={4}
+      >
         <SEO title="Invalid Reset Link | Presently" />
-        <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-4">Invalid Reset Link</h2>
-          <p className="text-text-secondary dark:text-dark-text-secondary mb-6">This password reset link is invalid or has expired.</p>
-          <button
+        <VStack gap={6} textAlign="center" maxW="md">
+          <Heading as="h2" size="xl" color="white">
+            Invalid Reset Link
+          </Heading>
+          <Text color="gray.400">
+            This password reset link is invalid or has expired.
+          </Text>
+          <Button
             onClick={() => navigate('/forgot-password')}
-            className="px-6 py-3 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-semibold rounded-xl transition-all"
+            bg="#FFD700"
+            color="#09090b"
+            borderRadius="full"
+            fontWeight="semibold"
+            _hover={{ bg: "#FFE44D" }}
+            transition="all 0.2s"
+            px={6}
+            py={3}
           >
             Request New Link
-          </button>
-        </div>
-      </div>
+          </Button>
+        </VStack>
+      </Box>
     );
   }
 
@@ -137,283 +162,219 @@ export const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white flex flex-col p-4 relative">
+    <Box 
+      minH="100vh" 
+      bg="#09090b"
+      color="white" 
+      display="flex" 
+      flexDirection="column" 
+      alignItems="center" 
+      justifyContent="center" 
+      p={4}
+      position="relative"
+    >
       <SEO title="Reset Password | Presently" />
       
       {/* Back Button */}
-      <button 
-        onClick={onBack} 
-        className="absolute top-6 left-6 text-gray-300 hover:text-white transition-colors"
+      <Box
+        as="button"
+        onClick={onBack}
+        position="absolute"
+        top={6}
+        left={6}
+        color="gray.300"
+        _hover={{ color: "white" }}
+        transition="colors 0.2s"
       >
-        <ArrowLeft size={24} />
-      </button>
+        <ArrowLeft size={20} />
+      </Box>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-4">
+      <Box w="full" maxW="md">
         {/* Heading */}
-        <h2 className="text-3xl font-bold text-white mb-3 text-center">
-          Create new password
-        </h2>
-        
-        {/* Subtitle */}
-        <p className="text-gray-400 mb-8 text-center">
-          Your new password must be different from previous used passwords for security.
-        </p>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="w-full space-y-6">
-          {/* New Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              New Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                autoComplete="new-password"
-                className="w-full px-4 py-3 pr-12 bg-[#2A2A25] border border-[#3A3A30] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#FFD700] transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                aria-label="Toggle password visibility"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Password Strength Meter */}
-          {password && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-gray-300">Password strength</span>
-                <span className="font-bold text-white">{passwordStrength}%</span>
-              </div>
-              <div className="w-full h-2 bg-[#2A2A25] rounded-full overflow-hidden">
-                <div 
-                  className={`h-full transition-all duration-300 ${
-                    passwordStrength < 40 ? 'bg-red-500' : 
-                    passwordStrength < 70 ? 'bg-yellow-500' : 
-                    'bg-[#FFD700]'
-                  }`}
-                  style={{ width: `${passwordStrength}%` }}
-                />
-              </div>
-              <div className="text-sm">
-                {passwordStrength >= 70 && (
-                  <span className="text-[#FFD700]">✓ {getStrengthLabel()}</span>
-                )}
-                {passwordStrength < 70 && passwordStrength >= 40 && (
-                  <span className="text-yellow-500">{getStrengthLabel()}</span>
-                )}
-                {passwordStrength < 40 && password && (
-                  <span className="text-red-500">{getStrengthLabel()}</span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Confirm Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Confirm New Password
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete="new-password"
-                className="w-full px-4 py-3 pr-12 bg-[#2A2A25] border border-[#3A3A30] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#FFD700] transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                aria-label="Toggle confirm password visibility"
-              >
-                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={!isPasswordValid || resetPasswordMutation.isPending}
-            className="w-full py-5 bg-[#FDB913] hover:bg-[#E5A912] text-black font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mt-12"
-          >
-            {resetPasswordMutation.isPending ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Updating Password...
-              </span>
-            ) : 'Update Password'}
-          </button>
-
-          {/* Cancel Link */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={handleBackToLogin}
-              className="text-[#8B7355] dark:text-dark-primary-DEFAULT hover:underline font-medium text-base"
-            >
-              Cancel and return to login
-            </button>
-          </div>
-
-          {/* Error Message */}
-          {pageState === 'error' && (
-            <div className="p-3 bg-error/10 dark:bg-error-dark/10 border border-error dark:border-error-dark rounded-lg">
-              <p className="text-sm text-error dark:text-error-dark text-center">
-                Failed to reset password. Please try again.
-              </p>
-            </div>
-          )}
-        </form>
-      </div>
-
-      {/* Main Content - Mobile */}
-      <div className="md:hidden flex-1 flex flex-col w-full max-w-md mx-auto px-6 pt-16">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-            Reset Password
-          </h1>
-          
-          <h2 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary mb-6">
+        <VStack mb={8} textAlign="center">
+          <Heading as="h2" size="2xl" color="white" mb={2}>
             Create new password
-          </h2>
-          
-          <p className="text-base text-text-secondary dark:text-dark-text-secondary">
+          </Heading>
+          <Text color="gray.400">
             Your new password must be different from previous used passwords for security.
-          </p>
-        </div>
+          </Text>
+        </VStack>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="w-full space-y-5 flex-1">
-          {/* New Password */}
-          <div>
-            <label className="block text-base font-bold text-text-primary dark:text-dark-text-primary mb-3">
-              New Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                autoComplete="new-password"
-                className="w-full px-4 py-4 pr-14 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-2xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all text-base"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary dark:text-dark-primary-DEFAULT transition-colors p-1"
-                aria-label="Toggle password visibility"
-              >
-                {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
-              </button>
-            </div>
-          </div>
+        {/* Form Card */}
+        <Box 
+          bg="#18181b"
+          borderWidth={1}
+          borderColor="#27272a"
+          p={8}
+          borderRadius="2xl"
+          shadow="lg"
+        >
+          <form onSubmit={handleSubmit}>
+            <VStack gap={4} align="stretch">
+              {/* New Password */}
+              <Box>
+                <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
+                  New Password
+                </Text>
+                <Box position="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    autoComplete="new-password"
+                    px={4}
+                    pr={12}
+                    py={3}
+                    bg="#27272a"
+                    borderColor="#3f3f46"
+                    borderRadius="full"
+                    color="white"
+                    _placeholder={{ color: "gray.500" }}
+                    _focus={{ borderColor: "#FFD700", outline: "none" }}
+                  />
+                  <Box
+                    as="button"
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    position="absolute"
+                    right={4}
+                    top="50%"
+                    transform="translateY(-50%)"
+                    color="gray.400"
+                    _hover={{ color: "white" }}
+                    transition="colors 0.2s"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </Box>
+                </Box>
+              </Box>
 
-          {/* Password Strength */}
-          {password && (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center text-sm">
-                <span className="font-semibold text-text-primary dark:text-dark-text-primary">Password strength</span>
-                <span className="font-bold text-text-primary dark:text-dark-text-primary">{passwordStrength} / 100</span>
-              </div>
-              <div className="w-full h-2 bg-background-tertiary dark:bg-dark-background-tertiary rounded-full overflow-hidden">
-                <div 
-                  className={`h-full transition-all duration-300 ${getStrengthColor()}`}
-                  style={{ width: `${passwordStrength}%` }}
-                ></div>
-              </div>
-              {passwordStrength >= 70 && (
-                <div className="flex items-center gap-2 text-primary dark:text-dark-primary-DEFAULT">
-                  <CheckCircle2 size={16} />
-                  <span className="text-sm font-medium">{getStrengthLabel()}</span>
-                </div>
+              {/* Password Strength Meter */}
+              {password && (
+                <VStack gap={2} align="stretch">
+                  <HStack justify="space-between" fontSize="sm">
+                    <Text fontWeight="medium" color="gray.300">
+                      Password strength
+                    </Text>
+                    <Text fontWeight="bold" color="white">
+                      {passwordStrength}%
+                    </Text>
+                  </HStack>
+                  <Progress 
+                    value={passwordStrength}
+                    size="sm"
+                    borderRadius="full"
+                    sx={{
+                      '& > div': {
+                        bg: passwordStrength < 40 ? '#ef4444' : 
+                            passwordStrength < 70 ? '#eab308' : 
+                            '#FFD700'
+                      }
+                    }}
+                  />
+                  <Text fontSize="sm" color={
+                    passwordStrength >= 70 ? "#FFD700" :
+                    passwordStrength >= 40 ? "#eab308" :
+                    "#ef4444"
+                  }>
+                    {password && (passwordStrength >= 70 ? '✓ ' : '') + getStrengthLabel()}
+                  </Text>
+                </VStack>
               )}
-            </div>
-          )}
 
-          {/* Confirm Password */}
-          <div>
-            <label className="block text-base font-bold text-text-primary dark:text-dark-text-primary mb-3">
-              Confirm New Password
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete="new-password"
-                className="w-full px-4 py-4 pr-14 bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-2xl text-text-primary dark:text-dark-text-primary placeholder:text-text-tertiary dark:placeholder:dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-primary dark:focus:border-dark-primary-DEFAULT transition-all text-base"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary dark:text-dark-primary-DEFAULT transition-colors p-1"
-                aria-label="Toggle confirm password visibility"
+              {/* Confirm Password */}
+              <Box>
+                <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
+                  Confirm New Password
+                </Text>
+                <Box position="relative">
+                  <Input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    px={4}
+                    pr={12}
+                    py={3}
+                    bg="#27272a"
+                    borderColor="#3f3f46"
+                    borderRadius="full"
+                    color="white"
+                    _placeholder={{ color: "gray.500" }}
+                    _focus={{ borderColor: "#FFD700", outline: "none" }}
+                  />
+                  <Box
+                    as="button"
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    position="absolute"
+                    right={4}
+                    top="50%"
+                    transform="translateY(-50%)"
+                    color="gray.400"
+                    _hover={{ color: "white" }}
+                    transition="colors 0.2s"
+                  >
+                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Error Message */}
+              {pageState === 'error' && (
+                <Box p={3} bg="rgba(239, 68, 68, 0.1)" borderWidth={1} borderColor="#ef4444" borderRadius="lg">
+                  <Text fontSize="sm" color="#ef4444" textAlign="center">
+                    Failed to reset password. Please try again.
+                  </Text>
+                </Box>
+              )}
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={!isPasswordValid || resetPasswordMutation.isPending}
+                w="full"
+                size="lg"
+                bg="#FFD700"
+                color="#09090b"
+                borderRadius="full"
+                fontWeight="bold"
+                _hover={{ bg: "#FFE44D" }}
+                transition="all 0.2s"
+                _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
+                mt={6}
               >
-                {showConfirmPassword ? <EyeOff size={22} /> : <Eye size={22} />}
-              </button>
-            </div>
-          </div>
+                {resetPasswordMutation.isPending ? (
+                  <HStack>
+                    <Spinner size="sm" color="#09090b" />
+                    <Text>Updating Password...</Text>
+                  </HStack>
+                ) : (
+                  'Update Password'
+                )}
+              </Button>
 
-          <div className="flex-1"></div>
-
-          {/* Error Message */}
-          {pageState === 'error' && (
-            <div className="p-3 bg-error/10 dark:bg-error-dark/10 border border-error dark:border-error-dark rounded-lg">
-              <p className="text-sm text-error dark:text-error-dark text-center">
-                Failed to reset password. Please try again.
-              </p>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={!isPasswordValid || resetPasswordMutation.isPending}
-            className="w-full py-4 bg-primary hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:hover:bg-dark-primary-hover text-primary-foreground dark:text-dark-primary-foreground font-bold rounded-2xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-          >
-            {resetPasswordMutation.isPending ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Updating Password...
-              </span>
-            ) : 'Update Password'}
-          </button>
-
-          {/* Cancel Link */}
-          <div className="text-center pb-6">
-            <button
-              type="button"
-              onClick={handleBackToLogin}
-              className="text-primary dark:text-dark-primary-DEFAULT hover:underline font-semibold text-base"
-            >
-              Cancel and return to login
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              {/* Cancel Link */}
+              <Text textAlign="center" mt={2}>
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={handleBackToLogin}
+                  color="gray.400"
+                  _hover={{ textDecoration: "underline" }}
+                  fontWeight="medium"
+                  fontSize="sm"
+                >
+                  Cancel and return to login
+                </Box>
+              </Text>
+            </VStack>
+          </form>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
@@ -446,14 +407,23 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
   };
 
   return (
-    <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white flex flex-col items-center justify-center p-4 relative">
+    <Box 
+      minH="100vh" 
+      bg="#09090b"
+      color="white" 
+      display="flex" 
+      alignItems="center" 
+      justifyContent="center"
+      p={4}
+      position="relative"
+    >
       <SEO title="Password Reset Successful | Presently" />
       
       {/* Confetti Animation */}
       <ConfettiAnimation active={showConfetti} duration={3000} count={40} />
 
       {/* Main Content */}
-      <div className="max-w-md w-full text-center flex flex-col items-center">
+      <VStack maxW="md" w="full" textAlign="center">
         {/* Success Icon with Animation */}
         <motion.div
           initial={{ scale: 0 }}
@@ -464,56 +434,96 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
             damping: 20,
             delay: 0.1
           }}
-          className="mb-8 flex justify-center"
         >
-          <div className="relative">
+          <Box position="relative" mb={8}>
             {/* Outer rings */}
-            <div className="absolute inset-0 rounded-full bg-[#4A4A3F] opacity-20 animate-ping" style={{ animationDuration: '2s' }}></div>
-            <div className="absolute inset-0 rounded-full bg-[#4A4A3F] opacity-40"></div>
+            <Box 
+              position="absolute" 
+              inset={0} 
+              borderRadius="full" 
+              bg="#3f3f46"
+              opacity={0.2}
+              animation="ping 2s cubic-bezier(0, 0, 0.2, 1) infinite"
+            />
+            <Box 
+              position="absolute" 
+              inset={0} 
+              borderRadius="full" 
+              bg="#3f3f46"
+              opacity={0.4}
+            />
             
             {/* Inner circle */}
-            <div className="relative w-32 h-32 bg-[#FFD700] rounded-full flex items-center justify-center">
-              <CheckCircle2 size={64} className="text-[#3A3A2F]" strokeWidth={3} />
-            </div>
-          </div>
+            <Box
+              w={32}
+              h={32}
+              bg="#FFD700"
+              borderRadius="full"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              position="relative"
+            >
+              <CheckCircle2 size={64} color="#09090b" strokeWidth={3} />
+            </Box>
+          </Box>
         </motion.div>
 
         {/* Title */}
-        <h1 className="text-4xl font-bold text-white mb-4">
+        <Heading as="h1" size="2xl" color="white" mb={4}>
           Password Changed!
-        </h1>
+        </Heading>
 
         {/* Message */}
-        <p className="text-gray-400 mb-12 px-4">
+        <Text color="gray.400" mb={12} px={4}>
           Your password has been successfully updated. You can now log in to{' '}
-          <span className="text-[#FFD700] font-semibold">Presently</span>{' '}
+          <Box as="span" color="#FFD700" fontWeight="semibold">
+            Presently
+          </Box>{' '}
           with your new credentials.
-        </p>
+        </Text>
 
         {/* Login Button */}
-        <button
+        <Button
           onClick={onBackToLogin}
-          className="w-full max-w-md py-4 bg-[#FFD700] hover:bg-[#FFE44D] text-[#2A2A25] font-bold text-lg rounded-xl transition-all shadow-lg mb-4"
+          w="full"
+          maxW="md"
+          size="lg"
+          bg="#FFD700"
+          color="#09090b"
+          borderRadius="full"
+          fontWeight="bold"
+          _hover={{ bg: "#FFE44D" }}
+          transition="all 0.2s"
+          shadow="lg"
+          mb={4}
         >
           Back to Login
-        </button>
+        </Button>
 
         {/* Countdown */}
         {!cancelRedirect && countdown > 0 && (
-          <button
+          <Box
+            as="button"
             onClick={handleCancelRedirect}
-            className="text-sm text-gray-400 hover:text-white transition-colors"
+            fontSize="sm"
+            color="gray.400"
+            _hover={{ color: "white" }}
+            transition="colors 0.2s"
           >
-            Redirecting in {countdown} seconds... <span className="underline">Cancel</span>
-          </button>
+            Redirecting in {countdown} seconds...{' '}
+            <Box as="span" textDecoration="underline">
+              Cancel
+            </Box>
+          </Box>
         )}
 
         {cancelRedirect && (
-          <p className="text-sm text-gray-500">
+          <Text fontSize="sm" color="gray.500">
             Auto-redirect cancelled
-          </p>
+          </Text>
         )}
-      </div>
-    </div>
+      </VStack>
+    </Box>
   );
 };

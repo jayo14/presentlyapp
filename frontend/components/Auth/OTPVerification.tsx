@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Smartphone } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SEO } from '../SEO';
 import { useVerifyEmailOTP, useResendEmailVerification } from '../../hooks/useAuth';
-import { CircularProgress } from '../CircularProgress';
 import { Haptics } from '@capacitor/haptics';
+import { Box, Input, VStack, HStack, Text, Heading, Spinner } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
 
 export const OTPVerification: React.FC = () => {
   const navigate = useNavigate();
@@ -122,36 +123,51 @@ export const OTPVerification: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white flex flex-col p-4 relative">
+    <Box 
+      minH="100vh" 
+      bg="#09090b"
+      color="white" 
+      display="flex" 
+      flexDirection="column" 
+      alignItems="center" 
+      justifyContent="center" 
+      p={4}
+      position="relative"
+    >
       <SEO title="OTP Verification | Presently" />
       
       {/* Back Button */}
-      <button 
-        onClick={() => navigate(-1)} 
-        className="absolute top-6 left-6 text-gray-300 hover:text-white transition-colors"
+      <Box
+        as="button"
+        onClick={() => navigate(-1)}
+        position="absolute"
+        top={6}
+        left={6}
+        color="gray.300"
+        _hover={{ color: "white" }}
+        transition="colors 0.2s"
       >
-        <ArrowLeft size={24} />
-      </button>
+        <ArrowLeft size={20} />
+      </Box>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-4">
+      <Box w="full" maxW="md">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-white mb-4">
+        <VStack mb={12} textAlign="center">
+          <Heading as="h1" size="2xl" color="white" mb={4}>
             Verify your {email ? 'email' : 'phone number'}
-          </h1>
-          <p className="text-gray-400 mb-2">
+          </Heading>
+          <Text color="gray.400" mb={2}>
             Enter the 6-digit code we sent to
-          </p>
-          <p className="text-[#FFD700] font-medium">
+          </Text>
+          <Text color="#FFD700" fontWeight="medium">
             {email || formatPhoneDisplay(phone)}
-          </p>
-        </div>
+          </Text>
+        </VStack>
 
         {/* OTP Input */}
-        <div className="flex gap-3 justify-center mb-8" onPaste={handlePaste}>
+        <HStack gap={3} justify="center" mb={8} onPaste={handlePaste}>
           {otp.map((digit, index) => (
-            <input
+            <Input
               key={index}
               ref={(el) => (inputRefs.current[index] = el)}
               type="text"
@@ -160,74 +176,117 @@ export const OTPVerification: React.FC = () => {
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className={`w-12 h-14 text-center text-2xl font-bold bg-[#2A2A25] border-2 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700] transition-all ${
-                digit ? 'border-[#FFD700]' : 'border-[#3A3A30]'
-              }`}
-              aria-label={`Digit ${index + 1}`}
+              w={12}
+              h={14}
+              textAlign="center"
+              fontSize="2xl"
+              fontWeight="bold"
+              bg="#18181b"
+              borderWidth={2}
+              borderColor={digit ? "#FFD700" : "#27272a"}
+              borderRadius="xl"
+              color="white"
+              _focus={{ 
+                outline: "none", 
+                ring: 2,
+                ringColor: "#FFD700",
+                borderColor: "#FFD700"
+              }}
+              transition="all 0.2s"
             />
           ))}
-        </div>
+        </HStack>
 
         {/* Timer Display */}
-        <div className="flex gap-4 justify-center mb-8">
-          <div className="text-center">
-            <div className="bg-[#2A2A25] rounded-xl px-6 py-3 mb-2 border border-[#3A3A30]">
-              <span className="text-3xl font-bold text-white">
+        <HStack gap={4} justify="center" mb={8}>
+          <VStack gap={0} textAlign="center">
+            <Box 
+              bg="#18181b"
+              borderRadius="xl"
+              px={6}
+              py={3}
+              mb={2}
+              borderWidth={1}
+              borderColor="#27272a"
+            >
+              <Text fontSize="3xl" fontWeight="bold" color="white">
                 {Math.floor(countdown / 60).toString().padStart(2, '0')}
-              </span>
-            </div>
-            <span className="text-xs text-gray-400">Minutes</span>
-          </div>
-          <div className="flex items-center text-3xl font-bold text-gray-500 pb-8">:</div>
-          <div className="text-center">
-            <div className="bg-[#2A2A25] rounded-xl px-6 py-3 mb-2 border border-[#3A3A30]">
-              <span className="text-3xl font-bold text-white">
+              </Text>
+            </Box>
+            <Text fontSize="xs" color="gray.400">Minutes</Text>
+          </VStack>
+          <Text fontSize="3xl" fontWeight="bold" color="gray.500" pb={8}>:</Text>
+          <VStack gap={0} textAlign="center">
+            <Box 
+              bg="#18181b"
+              borderRadius="xl"
+              px={6}
+              py={3}
+              mb={2}
+              borderWidth={1}
+              borderColor="#27272a"
+            >
+              <Text fontSize="3xl" fontWeight="bold" color="white">
                 {(countdown % 60).toString().padStart(2, '0')}
-              </span>
-            </div>
-            <span className="text-xs text-gray-400">Seconds</span>
-          </div>
-        </div>
+              </Text>
+            </Box>
+            <Text fontSize="xs" color="gray.400">Seconds</Text>
+          </VStack>
+        </HStack>
 
         {/* Verify Button */}
-        <button
+        <Button
           onClick={handleVerify}
           disabled={!isOtpComplete || verifyMutation.isPending}
-          className="w-full py-4 bg-[#FFD700] hover:bg-[#FFE44D] text-[#2A2A25] font-bold text-lg rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-6 flex items-center justify-center gap-2"
+          w="full"
+          size="lg"
+          bg="#FFD700"
+          color="#09090b"
+          borderRadius="full"
+          fontWeight="bold"
+          _hover={{ bg: "#FFE44D" }}
+          transition="all 0.2s"
+          _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
+          mb={6}
         >
           {verifyMutation.isPending ? (
-            <>
-              <div className="w-5 h-5 border-2 border-[#2A2A25] border-t-transparent rounded-full animate-spin"></div>
-              Verifying...
-            </>
+            <HStack>
+              <Spinner size="sm" color="#09090b" />
+              <Text>Verifying...</Text>
+            </HStack>
           ) : (
             'Verify Code'
           )}
-        </button>
+        </Button>
 
         {/* Resend Section */}
-        <div className="text-center">
-          <p className="text-gray-400 text-sm mb-2">
+        <VStack gap={2} textAlign="center">
+          <Text color="gray.400" fontSize="sm">
             Didn't receive the code?
-          </p>
-          <button
+          </Text>
+          <Box
+            as="button"
             onClick={handleResend}
             disabled={!canResend || resendMutation.isPending}
-            className="text-[#FFD700] font-medium hover:text-[#FFE44D] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            color="#FFD700"
+            fontWeight="medium"
+            _hover={{ color: "#FFE44D" }}
+            transition="colors 0.2s"
+            _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
           >
             {resendMutation.isPending ? 'Sending...' : canResend ? 'Resend Code' : `Resend in ${countdown}s`}
-          </button>
-        </div>
+          </Box>
+        </VStack>
 
         {/* Error Message */}
         {verifyMutation.isError && (
-          <div className="mt-6 p-4 bg-red-900/20 border border-red-700 rounded-xl">
-            <p className="text-sm text-red-400 text-center">
+          <Box mt={6} p={4} bg="rgba(239, 68, 68, 0.1)" borderWidth={1} borderColor="#ef4444" borderRadius="xl">
+            <Text fontSize="sm" color="#ef4444" textAlign="center">
               Invalid or expired code. Please try again.
-            </p>
-          </div>
+            </Text>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
