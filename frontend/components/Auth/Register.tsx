@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
-import { Box, Input, Stack, Text, Heading, VStack, HStack, Spinner, Alert } from '@chakra-ui/react';
+import { Box, Input, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '../Logo';
 import { Mail, Lock, User as UserIcon, ArrowLeft } from 'lucide-react';
@@ -173,12 +173,11 @@ export const Register: React.FC = () => {
           shadow="lg"
         >
           {registerMutation.error && (
-            <Alert.Root status="error" mb={4} borderRadius="lg">
-              <Alert.Icon />
-              <Alert.Description fontSize="sm">
+            <Box p={3} bg="rgba(239, 68, 68, 0.1)" borderWidth={1} borderColor="#ef4444" borderRadius="lg" mb={4}>
+              <Text fontSize="sm" color="#ef4444">
                 {registerMutation.error.message}
-              </Alert.Description>
-            </Alert.Root>
+              </Text>
+            </Box>
           )}
           
           <form onSubmit={handleSubmit}>
