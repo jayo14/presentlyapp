@@ -2,7 +2,11 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 // API Base URL - Django backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api';
+// Ensure /api suffix is present
+let API_BASE_URL = import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api';
+if (!API_BASE_URL.endsWith('/api')) {
+  API_BASE_URL = API_BASE_URL.replace(/\/$/, '') + '/api';
+}
 
 // List of endpoints that gracefully handle 404s with fallback data
 const GRACEFUL_404_ENDPOINTS = [
