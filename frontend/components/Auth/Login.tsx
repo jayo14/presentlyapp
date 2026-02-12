@@ -7,6 +7,7 @@ import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/con
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { Box, Input, Checkbox, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
+import { ColorModeButton, useColorModeValue } from '@/components/ui/color-mode';
 import { Logo } from '../Logo';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 
@@ -15,11 +16,21 @@ export const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(true); // Default to true
+  const [rememberMe, setRememberMe] = useState(true);
   const loginMutation = useLogin();
   const googleAuthMutation = useGoogleAuth();
   const { data: user, isLoading } = useCurrentUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Theme-aware colors
+  const bgColor = useColorModeValue('white', '#09090b');
+  const cardBg = useColorModeValue('#f9fafb', '#18181b');
+  const cardBorder = useColorModeValue('#e5e7eb', '#27272a');
+  const inputBg = useColorModeValue('white', '#27272a');
+  const inputBorder = useColorModeValue('#d1d5db', '#3f3f46');
+  const textPrimary = useColorModeValue('#111827', 'white');
+  const textSecondary = useColorModeValue('#6b7280', '#a1a1aa');
+  const iconColor = useColorModeValue('#9ca3af', '#6b7280');
 
   const redirectTo = searchParams.get('redirect_to') || '/dashboard';
   const message = searchParams.get('message');
@@ -148,11 +159,11 @@ export const Login: React.FC = () => {
         display="flex" 
         alignItems="center" 
         justifyContent="center"
-        bg="#3A3A2F"
+        bg={bgColor}
       >
         <VStack gap={4}>
           <Spinner size="xl" color="yellow.400" thickness="4px" />
-          <Text color="gray.400">
+          <Text color={textSecondary}>
             {isRedirecting ? 'Redirecting to dashboard...' : 'Loading...'}
           </Text>
         </VStack>
@@ -163,8 +174,8 @@ export const Login: React.FC = () => {
   return (
     <Box 
       minH="100vh" 
-      bg="#3A3A2F" 
-      color="white" 
+      bg={bgColor}
+      color={textPrimary}
       display="flex" 
       flexDirection="column" 
       alignItems="center" 
@@ -177,6 +188,11 @@ export const Login: React.FC = () => {
         description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
       />
       
+      {/* Theme Toggle Button */}
+      <Box position="absolute" top={6} right={6}>
+        <ColorModeButton />
+      </Box>
+      
       {/* Back Button */}
       <Box 
         as="button"
@@ -184,8 +200,8 @@ export const Login: React.FC = () => {
         position="absolute"
         top={6}
         left={6}
-        color="gray.300"
-        _hover={{ color: "white" }}
+        color={textSecondary}
+        _hover={{ color: textPrimary }}
         display="flex"
         alignItems="center"
         gap={2}
@@ -197,29 +213,29 @@ export const Login: React.FC = () => {
       <Box w="full" maxW="md">
         {/* Logo and Title */}
         <VStack mb={8} textAlign="center">
-          <Logo className="justify-center mb-6 text-2xl text-white" />
-          <Heading as="h2" size="2xl" color="white" mb={2}>
+          <Logo className="justify-center mb-6 text-2xl" />
+          <Heading as="h2" size="2xl" color={textPrimary} mb={2}>
             Welcome back
           </Heading>
-          <Text color="gray.400">
+          <Text color={textSecondary}>
             Enter your credentials to access your account.
           </Text>
         </VStack>
 
         {/* Login Form Card */}
         <Box 
-          bg="#2A2A25" 
+          bg={cardBg}
           borderWidth={1}
-          borderColor="#3A3A30"
+          borderColor={cardBorder}
           p={6}
           borderRadius="2xl"
-          shadow="xl"
+          shadow="lg"
         >
           <form onSubmit={handleSubmit}>
             <VStack gap={4} align="stretch">
               {/* Email Input */}
               <Box>
-                <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
+                <Text as="label" fontSize="sm" fontWeight="medium" color={textPrimary} mb={2} display="block">
                   Email
                 </Text>
                 <Box position="relative">
@@ -229,7 +245,7 @@ export const Login: React.FC = () => {
                       left: '12px', 
                       top: '50%', 
                       transform: 'translateY(-50%)',
-                      color: '#6B7280'
+                      color: iconColor
                     }} 
                     size={18} 
                   />
@@ -242,11 +258,11 @@ export const Login: React.FC = () => {
                     pl={10}
                     pr={4}
                     py={3}
-                    bg="#3A3A30"
-                    borderColor="#4A4A3F"
-                    borderRadius="xl"
-                    color="white"
-                    _placeholder={{ color: "gray.500" }}
+                    bg={inputBg}
+                    borderColor={inputBorder}
+                    borderRadius="full"
+                    color={textPrimary}
+                    _placeholder={{ color: textSecondary }}
                     _focus={{ borderColor: "#FFD700", outline: "none" }}
                   />
                 </Box>
@@ -254,7 +270,7 @@ export const Login: React.FC = () => {
 
               {/* Password Input */}
               <Box>
-                <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
+                <Text as="label" fontSize="sm" fontWeight="medium" color={textPrimary} mb={2} display="block">
                   Password
                 </Text>
                 <Box position="relative">
@@ -264,7 +280,7 @@ export const Login: React.FC = () => {
                       left: '12px', 
                       top: '50%', 
                       transform: 'translateY(-50%)',
-                      color: '#6B7280'
+                      color: iconColor
                     }} 
                     size={18} 
                   />
@@ -277,11 +293,11 @@ export const Login: React.FC = () => {
                     pl={10}
                     pr={4}
                     py={3}
-                    bg="#3A3A30"
-                    borderColor="#4A4A3F"
-                    borderRadius="xl"
-                    color="white"
-                    _placeholder={{ color: "gray.500" }}
+                    bg={inputBg}
+                    borderColor={inputBorder}
+                    borderRadius="full"
+                    color={textPrimary}
+                    _placeholder={{ color: textSecondary }}
                     _focus={{ borderColor: "#FFD700", outline: "none" }}
                   />
                 </Box>
@@ -293,9 +309,9 @@ export const Login: React.FC = () => {
                   isChecked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   colorScheme="yellow"
-                  borderColor="#4A4A3F"
+                  borderColor={inputBorder}
                 >
-                  <Text color="gray.400">Remember me</Text>
+                  <Text color={textSecondary}>Remember me</Text>
                 </Checkbox>
                 <Box
                   as="button"
@@ -316,9 +332,9 @@ export const Login: React.FC = () => {
                 disabled={loginMutation.isPending}
                 w="full"
                 bg="#FFD700"
-                color="#2A2A25"
+                color="#09090b"
                 py={3}
-                borderRadius="xl"
+                borderRadius="full"
                 fontWeight="bold"
                 _hover={{ bg: "#FFE44D" }}
                 transition="all 0.2s"
@@ -326,7 +342,7 @@ export const Login: React.FC = () => {
               >
                 {loginMutation.isPending ? (
                   <HStack>
-                    <Spinner size="sm" color="#2A2A25" />
+                    <Spinner size="sm" color="#09090b" />
                     <Text>Signing in...</Text>
                   </HStack>
                 ) : (
@@ -338,11 +354,11 @@ export const Login: React.FC = () => {
 
           {/* Divider */}
           <HStack my={6} gap={4}>
-            <Box h="1px" bg="#3A3A30" flex={1} />
-            <Text fontSize="xs" color="gray.500" textTransform="uppercase">
+            <Box h="1px" bg={cardBorder} flex={1} />
+            <Text fontSize="xs" color={textSecondary} textTransform="uppercase">
               Or continue with
             </Text>
-            <Box h="1px" bg="#3A3A30" flex={1} />
+            <Box h="1px" bg={cardBorder} flex={1} />
           </HStack>
 
           {/* Google Sign In */}
@@ -351,19 +367,19 @@ export const Login: React.FC = () => {
             onClick={handleGoogleLogin}
             disabled={googleAuthMutation.isPending || isRedirecting}
             w="full"
-            bg="#3A3A30"
+            bg={inputBg}
             borderWidth={1}
-            borderColor="#4A4A3F"
-            color="white"
+            borderColor={inputBorder}
+            color={textPrimary}
             fontWeight="medium"
             py={3}
-            borderRadius="xl"
-            _hover={{ bg: "#4A4A3F" }}
+            borderRadius="full"
+            _hover={{ bg: cardBg }}
             transition="colors 0.2s"
             _disabled={{ opacity: 0.5 }}
           >
             {googleAuthMutation.isPending ? (
-              <Spinner size="sm" color="white" />
+              <Spinner size="sm" />
             ) : (
               <HStack gap={3}>
                 <svg width="20" height="20" viewBox="0 0 24 24">
@@ -378,7 +394,7 @@ export const Login: React.FC = () => {
           </Button>
 
           {/* Sign Up Link */}
-          <Text mt={6} textAlign="center" fontSize="sm" color="gray.400">
+          <Text mt={6} textAlign="center" fontSize="sm" color={textSecondary}>
             Don't have an account?{' '}
             <Box
               as="button"
