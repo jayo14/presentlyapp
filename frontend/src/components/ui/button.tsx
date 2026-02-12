@@ -12,8 +12,7 @@ export const Button = forwardRef<HTMLButtonElement, CustomButtonProps>(
     return (
       <ChakraButton
         ref={ref}
-        disabled={disabled || loading}
-        loading={loading}
+        disabled={disabled}
         borderRadius="full"
         fontWeight="medium"
         transition="all 0.2s"
