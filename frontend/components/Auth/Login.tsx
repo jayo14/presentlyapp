@@ -6,8 +6,7 @@ import { SEO } from '../SEO';
 import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { Box, Input, Checkbox, Stack, Text, Heading, VStack, HStack, Spinner } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
-import { ColorModeButton, useColorModeValue } from '@/components/ui/color-mode';
+import { Button } from '../Button';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -21,15 +20,15 @@ export const Login: React.FC = () => {
   const { data: user, isLoading } = useCurrentUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Theme-aware colors
-  const bgColor = useColorModeValue('white', '#09090b');
-  const cardBg = useColorModeValue('#f9fafb', '#18181b');
-  const cardBorder = useColorModeValue('#e5e7eb', '#27272a');
-  const inputBg = useColorModeValue('white', '#27272a');
-  const inputBorder = useColorModeValue('#d1d5db', '#3f3f46');
-  const textPrimary = useColorModeValue('#111827', 'white');
-  const textSecondary = useColorModeValue('#6b7280', '#a1a1aa');
-  const iconColor = useColorModeValue('#9ca3af', '#6b7280');
+  // Theme-aware colors - hardcoded for dark mode
+  const bgColor = '#09090b';
+  const cardBg = '#18181b';
+  const cardBorder = '#27272a';
+  const inputBg = '#27272a';
+  const inputBorder = '#3f3f46';
+  const textPrimary = 'white';
+  const textSecondary = '#a1a1aa';
+  const iconColor = '#6b7280';
 
   const redirectTo = searchParams.get('redirect_to') || '/dashboard';
   const message = searchParams.get('message');
@@ -186,11 +185,6 @@ export const Login: React.FC = () => {
         title="Login | Presently"
         description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
       />
-      
-      {/* Theme Toggle Button */}
-      <Box position="absolute" top={6} right={6}>
-        <ColorModeButton />
-      </Box>
       
       {/* Back Button */}
       <Box 
