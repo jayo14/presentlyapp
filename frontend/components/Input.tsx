@@ -13,7 +13,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, className = ''
       <div className="relative">
         <input
           className={`
-            w-full bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-lg px-4 py-2.5 text-text-primary dark:text-dark-text-primary placeholder-text-tertiary dark:placeholder-dark-text-tertiary
+            w-full bg-background-tertiary dark:bg-dark-background-tertiary border border-border-light dark:border-dark-border-light rounded-full px-4 py-2.5 text-text-primary dark:text-dark-text-primary placeholder-text-tertiary dark:placeholder-dark-text-tertiary
             focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none dark:focus:border-dark-primary-DEFAULT dark:focus:ring-dark-primary-DEFAULT transition-all
             ${icon ? 'pl-10' : ''}
             ${error ? 'border-error focus:border-error focus:ring-error dark:border-error-dark dark:focus:border-error-dark dark:focus:ring-error-dark' : ''}
