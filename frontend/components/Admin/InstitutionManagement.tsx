@@ -207,7 +207,7 @@ export const InstitutionManagement: React.FC = () => {
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
-          className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors h-11"
+          className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full text-foreground focus:outline-none focus:border-primary transition-colors h-11"
         >
           <option value="all">All Types</option>
           <option value="UNIVERSITY">Universities</option>

@@ -1,20 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon } from 'lucide-react';
+import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon, RotateCcw, Edit3 } from 'lucide-react';
 import { Button } from '../Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
+import { AttendanceSuccessPage } from './AttendanceSuccessPage';
 
 interface EnhancedAttendanceScannerProps {
   isOpen: boolean;
   onClose: () => void;
-  onVerify: (code: string, location: any) => Promise<boolean>;
+  onVerify: (code: string, location: any) => Promise<any>; // Changed to return attendance data
 }
 
 type ScanMode = 'scan' | 'input';
 type ScanStatus = 'idle' | 'locating' | 'verifying' | 'success' | 'error';
+
+interface AttendanceData {
+  courseCode?: string;
+  courseName?: string;
+  location?: string;
+  sessionCode?: string;
+}
 
 export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps> = ({
   isOpen,
@@ -29,6 +37,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isCameraPermissionDenied, setIsCameraPermissionDenied] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(null);
+  const [checkInTime, setCheckInTime] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -77,6 +87,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setLocationInfo('');
       setMode('scan');
       setIsCameraPermissionDenied(false);
+      setAttendanceData(null);
+      setCheckInTime('');
     } else {
       // Clean up camera when closing
       stopCamera();
@@ -230,10 +242,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   useEffect(() => {
     if (isCameraActive && mode === 'scan' && status === 'idle') {
       setIsScanning(true);
-      // Scan every 500ms for QR codes (better performance than 300ms)
+      // Scan every 250ms for faster QR code detection
       scanIntervalRef.current = window.setInterval(() => {
         scanQRCode();
-      }, 500);
+      }, 250);
     } else {
       if (scanIntervalRef.current) {
         window.clearInterval(scanIntervalRef.current);
@@ -288,16 +300,30 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setLocationInfo('Verifying session and location...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const success = await onVerify(codeToVerify, location);
+      const attendanceResponse = await onVerify(codeToVerify, location);
 
-      if (success) {
+      if (attendanceResponse) {
         setStatus('success');
+        
+        // Capture time of check-in
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true 
+        });
+        setCheckInTime(timeStr);
+        
+        // Extract actual course info from API response
+        setAttendanceData({
+          courseCode: attendanceResponse.course_code || (codeToVerify.length >= 6 ? codeToVerify.substring(0, 6).toUpperCase() : codeToVerify.toUpperCase()),
+          courseName: attendanceResponse.course_name || 'Course Session',
+          location: attendanceResponse.venue_name || `Location (±${location.accuracy?.toFixed(0)}m)`,
+          sessionCode: codeToVerify
+        });
+        
         setLocationInfo('✓ Attendance marked successfully!');
         await triggerHaptic(ImpactStyle.Heavy);
-        
-        setTimeout(() => {
-          onClose();
-        }, 2000);
       } else {
         throw new Error('Verification failed');
       }
@@ -313,7 +339,39 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     processAttendance(sessionCode);
   };
 
+  const handleRetry = async () => {
+    await triggerHaptic(ImpactStyle.Light);
+    setStatus('idle');
+    setErrorMsg('');
+    setLocationInfo('');
+    setSessionCode('');
+  };
+
+  const handleSwitchToManual = async () => {
+    await triggerHaptic(ImpactStyle.Light);
+    setStatus('idle');
+    setErrorMsg('');
+    setLocationInfo('');
+    setSessionCode('');
+    setMode('input');
+  };
+
   if (!isOpen) return null;
+
+  // Show success page when attendance is successfully marked
+  if (status === 'success' && attendanceData) {
+    return (
+      <div className="fixed inset-0 z-[100]">
+        <AttendanceSuccessPage
+          courseCode={attendanceData.courseCode}
+          courseName={attendanceData.courseName}
+          location={attendanceData.location}
+          time={checkInTime}
+          onBackToHome={onClose}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[100] bg-black">
@@ -486,14 +544,53 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   
                   {/* Main Frame */}
                   <div className="absolute inset-0 rounded-3xl border-2 border-white/30 bg-white/5 backdrop-blur-[2px] overflow-hidden">
-                    {/* Corner Indicators - Enhanced Size */}
-                    <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary rounded-tl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]" />
-                    <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-primary rounded-tr-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]" />
-                    <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary rounded-bl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]" />
-                    <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary rounded-br-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]" />
+                    {/* Corner Indicators - Animated */}
+                    <motion.div 
+                      className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary rounded-tl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
+                      animate={{ 
+                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <motion.div 
+                      className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-primary rounded-tr-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
+                      animate={{ 
+                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.15 }}
+                    />
+                    <motion.div 
+                      className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary rounded-bl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
+                      animate={{ 
+                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+                    />
+                    <motion.div 
+                      className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary rounded-br-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
+                      animate={{ 
+                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.45 }}
+                    />
                     
                     {/* Animated Scanning Line */}
                     <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent scan-line-anim shadow-[0_0_20px_rgba(255,202,13,0.9)]" />
+                    
+                    {/* Additional scanning effect - horizontal bars */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      <motion.div 
+                        className="absolute left-0 right-0 h-8 bg-gradient-to-b from-primary/20 to-transparent blur-sm"
+                        animate={{ 
+                          top: ['0%', '100%'],
+                        }}
+                        transition={{ 
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear"
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Center Crosshair */}
@@ -502,13 +599,30 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   </div>
                 </div>
 
-                {/* Instruction Text */}
-                <div className="absolute bottom-32 left-0 right-0 text-center">
-                  <div className="inline-block px-6 py-3 bg-black/60 backdrop-blur-lg rounded-full">
-                    <p className="text-white font-medium">
+                {/* Instruction Text with Animation */}
+                <div className="absolute bottom-32 left-0 right-0 text-center px-4">
+                  <motion.div 
+                    className="inline-block px-6 py-3 bg-black/60 backdrop-blur-lg rounded-full"
+                    animate={{ 
+                      scale: isScanning ? [1, 1.05, 1] : 1,
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: isScanning ? Infinity : 0,
+                    }}
+                  >
+                    <p className="text-white font-medium flex items-center gap-2 justify-center">
+                      {isScanning && (
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Loader2 className="w-4 h-4" />
+                        </motion.span>
+                      )}
                       {isScanning ? 'Scanning for QR codes...' : 'Position QR code within the frame'}
                     </p>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             )}
@@ -554,8 +668,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           </motion.div>
         )}
 
-        {/* Loading/Success/Error States */}
-        {(status === 'locating' || status === 'verifying' || status === 'success') && (
+        {/* Loading States */}
+        {(status === 'locating' || status === 'verifying') && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -580,16 +694,92 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   <p className="text-white/60">Checking your attendance...</p>
                 </>
               )}
+            </div>
+          </motion.div>
+        )}
 
-              {status === 'success' && (
-                <>
-                  <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="w-16 h-16 text-green-400" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-white mb-2">Success!</h3>
-                  <p className="text-white/60">Attendance marked successfully</p>
-                </>
-              )}
+        {/* Dedicated Error Screen */}
+        {status === 'error' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="absolute inset-0 flex items-center justify-center bg-black/95 backdrop-blur-lg p-6"
+          >
+            <div className="w-full max-w-md text-center">
+              {/* Error Icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15,
+                  delay: 0.1
+                }}
+                className="mb-6"
+              >
+                <div className="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <XCircle className="w-16 h-16 text-red-400" />
+                </div>
+              </motion.div>
+
+              {/* Error Message */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <h3 className="text-2xl font-bold text-white mb-3">Verification Failed</h3>
+                <p className="text-red-400 text-base mb-2">{errorMsg}</p>
+              </motion.div>
+
+              {/* Helpful Tips */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 mb-6 text-left"
+              >
+                <p className="text-white/80 text-sm font-semibold mb-2">💡 Troubleshooting Tips:</p>
+                <ul className="text-white/60 text-sm space-y-2">
+                  <li>• Make sure you're within the required range</li>
+                  <li>• Check if the session is still active</li>
+                  <li>• Ensure your location services are enabled</li>
+                  <li>• Try again with a stable internet connection</li>
+                </ul>
+              </motion.div>
+
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="space-y-3"
+              >
+                <button
+                  onClick={handleRetry}
+                  className="w-full bg-primary hover:bg-primary/90 text-black font-bold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
+                >
+                  <RotateCcw className="w-5 h-5" />
+                  Try Again
+                </button>
+                
+                <button
+                  onClick={handleSwitchToManual}
+                  className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 border border-white/20"
+                >
+                  <Edit3 className="w-5 h-5" />
+                  Enter Code Manually
+                </button>
+
+                <button
+                  onClick={onClose}
+                  className="w-full text-white/60 hover:text-white font-medium py-3 transition-colors"
+                >
+                  Cancel
+                </button>
+              </motion.div>
             </div>
           </motion.div>
         )}

@@ -110,6 +110,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const avgAttendance = dashboardData?.attendance_stats?.average_attendance || 0;
   const nextClass = dashboardData?.next_class;
   const recentActivity = dashboardData?.recent_activity || [];
+  
+  // UI Constants
+  const MAX_RECENT_ACTIVITY_MOBILE = 5; // Show up to 5 recent activities on mobile dashboard
 
   // Handler to dismiss warning
   const handleDismissWarning = () => {
@@ -138,11 +141,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     { name: 'Absent', value: dashboardData.attendance_stats.total_absent, color: 'rgb(239, 68, 68)' },
   ] : [];
 
-  const handleAttendanceCheckIn = async (code: string, location: any): Promise<boolean> => {
+  const handleAttendanceCheckIn = async (code: string, location: any): Promise<any> => {
       try {
-          await sessionApi.checkInByCode(code, location);
+          const attendanceData = await sessionApi.checkInByCode(code, location);
           await loadDashboardData();
-          return true;
+          return attendanceData; // Return the full attendance object
       } catch (err: any) {
           console.error("Check-in failed:", err);
           throw new Error(err.response?.data?.error || err.message || "Failed to check in");
@@ -500,155 +503,307 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
   // Default Dashboard View (Clean Redesign)
   
-  // Mobile Layout (Design 3)
+  // Mobile Layout (Modern Redesign with Enhanced UX)
   const mobileDashboardLayout = (
-      <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white pb-20">
-          {/* Welcome Header */}
-          <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-white text-lg font-bold">
-                      {userName.charAt(0)}
-                  </div>
-                  <div>
-                      <p className="text-xs text-gray-400">Welcome back</p>
-                      <h1 className="text-lg font-bold">Hello, {userName.split(' ')[0]}!</h1>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950 pb-24">
+          {/* Modern Header with Gradient */}
+          <div className="relative overflow-hidden">
+              {/* Background Gradient Decorations */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+              <div className="absolute top-20 left-0 w-48 h-48 bg-gradient-to-br from-indigo-400/20 to-pink-500/20 rounded-full blur-3xl"></div>
+              
+              <div className="relative p-6">
+                  <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center gap-4">
+                          <motion.div 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/30"
+                          >
+                              {userName.charAt(0)}
+                          </motion.div>
+                          <div>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                                  {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                              </p>
+                              <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-0.5">
+                                  Hello, {userName.split(' ')[0]}!
+                              </h1>
+                          </div>
+                      </div>
+                      <motion.button 
+                          whileTap={{ scale: 0.95 }}
+                          className="relative w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200 dark:border-slate-700"
+                      >
+                          <Activity size={20} className="text-slate-700 dark:text-slate-300" />
+                          <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-gradient-to-br from-red-500 to-pink-500 rounded-full shadow-lg shadow-red-500/50"></div>
+                      </motion.button>
                   </div>
               </div>
-              <button className="relative w-10 h-10 bg-[#2A2A25] rounded-full flex items-center justify-center">
-                  <Activity size={20} />
-                  <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
-              </button>
           </div>
 
-          {/* HAPPENING NOW Section */}
+          {/* Warning Banner (if low attendance) */}
+          <AnimatePresence>
+              {lowAttendanceCourses.length > 0 && !isWarningDismissed && (
+                  <motion.div 
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="mx-4 mb-4 bg-gradient-to-r from-red-500 to-rose-500 rounded-2xl p-4 flex items-center gap-3 shadow-lg shadow-red-500/30"
+                  >
+                      <div className="bg-white/20 backdrop-blur-sm p-2.5 rounded-xl">
+                          <AlertCircle size={20} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                          <p className="text-sm font-bold text-white">Attendance Alert</p>
+                          <p className="text-xs text-white/90 mt-0.5">
+                              Below 75% in {lowAttendanceCourses.length} course{lowAttendanceCourses.length > 1 ? 's' : ''}
+                          </p>
+                      </div>
+                      <motion.button
+                          whileTap={{ scale: 0.9 }}
+                          onClick={handleDismissWarning}
+                          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                      >
+                          <X size={18} className="text-white" />
+                      </motion.button>
+                  </motion.div>
+              )}
+          </AnimatePresence>
+
+          {/* Quick Actions - Prominent CTAs */}
+          <div className="px-4 mb-6">
+              <div className="grid grid-cols-2 gap-3">
+                  <motion.button 
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setIsAttendanceModalOpen(true)}
+                      className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-5 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all"
+                  >
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                      <div className="relative">
+                          <div className="bg-white/20 backdrop-blur-sm w-12 h-12 rounded-xl flex items-center justify-center mb-3">
+                              <QrCode size={24} />
+                          </div>
+                          <h3 className="font-bold text-lg mb-1">Scan QR</h3>
+                          <p className="text-xs text-white/80">Mark attendance</p>
+                      </div>
+                  </motion.button>
+                  
+                  <motion.button 
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setIsRegistrationOpen(true)}
+                      className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-5 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all"
+                  >
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                      <div className="relative">
+                          <div className="bg-white/20 backdrop-blur-sm w-12 h-12 rounded-xl flex items-center justify-center mb-3">
+                              <Plus size={24} />
+                          </div>
+                          <h3 className="font-bold text-lg mb-1">Register</h3>
+                          <p className="text-xs text-white/80">Add courses</p>
+                      </div>
+                  </motion.button>
+              </div>
+          </div>
+
+          {/* Next Class Card - Only if exists */}
           {nextClass && (
-              <div className="px-4 mb-6">
+              <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-4 mb-6"
+              >
                   <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xs font-bold uppercase tracking-wider">Happening Now</span>
-                      <div className="flex items-center gap-1 text-red-500">
-                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                          <span className="text-xs font-bold uppercase">Live</span>
+                      <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 bg-gradient-to-br from-red-500 to-pink-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
+                          <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Happening Now</span>
                       </div>
                   </div>
                   
-                  <div className="bg-[#4A5C4A] rounded-2xl p-4 relative overflow-hidden">
-                      <div className="absolute top-2 right-2 px-2 py-1 bg-[#2A2A25] rounded-lg text-xs font-medium">
-                          <span className="text-red-500">REM</span>
-                      </div>
-                      <div className="absolute top-2 right-20 text-2xl font-bold">
-                          {/* Calculate remaining time if available */}
-                          {nextClass.end_time ? 
-                              Math.max(0, Math.floor((new Date(nextClass.end_time).getTime() - Date.now()) / 60000)) + 'm' 
-                              : 'Live'}
-                      </div>
+                  <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700">
+                      {/* Gradient Background */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-400/10 to-emerald-500/10 rounded-full blur-3xl"></div>
                       
-                      <div className="mb-3">
-                          <span className="px-2 py-1 bg-[#FFD700] text-black text-xs font-bold rounded">
-                              {nextClass.venue || 'Lecture Hall'}
-                          </span>
+                      <div className="relative p-6">
+                          <div className="flex items-start justify-between mb-4">
+                              <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-amber-400 text-slate-900 text-xs font-bold rounded-xl shadow-lg shadow-yellow-400/30">
+                                  {nextClass.venue || 'Lecture Hall'}
+                              </span>
+                              {nextClass.end_time && (
+                                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
+                                      <Clock size={14} className="text-slate-600 dark:text-slate-400" />
+                                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                          {/* Note: Timer updates via dashboard auto-refresh (every 60s) */}
+                                          {Math.max(0, Math.floor((new Date(nextClass.end_time).getTime() - Date.now()) / 60000))}m left
+                                      </span>
+                                  </div>
+                              )}
+                          </div>
+                          
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{nextClass.name}</h3>
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-5 flex items-center gap-2">
+                              <User size={14} />
+                              {nextClass.lecturer || 'Lecturer TBA'}
+                              <span className="text-slate-400 dark:text-slate-500">•</span>
+                              <Clock size={14} />
+                              {nextClass.time || 'Time TBA'}
+                          </p>
+                          
+                          <motion.button 
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => setIsAttendanceModalOpen(true)}
+                              className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all"
+                          >
+                              <QrCode size={20} />
+                              Mark Attendance Now
+                          </motion.button>
                       </div>
-                      
-                      <h3 className="text-xl font-bold mb-1">{nextClass.name}</h3>
-                      <p className="text-sm text-gray-300 mb-4">
-                          {nextClass.lecturer || 'Lecturer TBA'} • {nextClass.time || 'Time TBA'}
-                      </p>
-                      
-                      <button 
-                          onClick={() => setIsAttendanceModalOpen(true)}
-                          className="w-full bg-[#FFD700] text-black py-3 rounded-xl font-bold flex items-center justify-center gap-2"
-                      >
-                          <QrCode size={20} />
-                          Mark Attendance
-                      </button>
                   </div>
-              </div>
+              </motion.div>
           )}
 
-          {/* Attendance Summary */}
+          {/* Stats Overview - Enhanced Cards */}
           <div className="px-4 mb-6">
-              <h2 className="text-xl font-bold mb-4">Attendance Summary</h2>
-              <div className="bg-[#2A2A25] rounded-xl p-6">
-                  {/* Circular Chart */}
-                  <div className="flex justify-center mb-6">
-                      <div className="relative w-40 h-40">
-                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
-                              {/* Background circle */}
-                              <circle
-                                  cx="80"
-                                  cy="80"
-                                  r="70"
-                                  fill="none"
-                                  stroke="#4A4A3F"
-                                  strokeWidth="16"
-                              />
-                              {/* Progress circle */}
-                              <circle
-                                  cx="80"
-                                  cy="80"
-                                  r="70"
-                                  fill="none"
-                                  stroke="#FFD700"
-                                  strokeWidth="16"
-                                  strokeDasharray={`${(avgAttendance / 100) * 440} 440`}
-                                  strokeLinecap="round"
-                              />
-                          </svg>
-                          <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <div className="text-4xl font-bold">{avgAttendance.toFixed(1)}%</div>
-                              <div className="text-xs text-gray-400 uppercase">Overall</div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Your Stats</h2>
+              
+              {/* Main Attendance Card */}
+              <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-6 mb-4 shadow-xl shadow-indigo-500/30 relative overflow-hidden"
+              >
+                  {/* Decorative Elements */}
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-2xl"></div>
+                  
+                  <div className="relative">
+                      <div className="flex items-center justify-between mb-6">
+                          <div>
+                              <p className="text-white/80 text-sm font-medium mb-1">Overall Attendance</p>
+                              <h3 className="text-5xl font-black text-white">{avgAttendance.toFixed(1)}%</h3>
+                          </div>
+                          <div className="relative w-20 h-20">
+                              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
+                                  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="6"/>
+                                  <circle 
+                                      cx="40" cy="40" r="32" fill="none" stroke="white" strokeWidth="6"
+                                      strokeDasharray={`${(avgAttendance / 100) * (2 * Math.PI * 32)} ${2 * Math.PI * 32}`}
+                                      strokeLinecap="round"
+                                  />
+                              </svg>
+                          </div>
+                      </div>
+                      
+                      {/* Detailed Stats Grid */}
+                      <div className="grid grid-cols-3 gap-3">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center">
+                              <p className="text-3xl font-bold text-white mb-1">{dashboardData?.attendance_stats?.total_sessions || 0}</p>
+                              <p className="text-xs text-white/80 font-medium">Total Classes</p>
+                          </div>
+                          <div className="bg-green-500/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-green-400/30">
+                              <p className="text-3xl font-bold text-white mb-1">{dashboardData?.attendance_stats?.total_present || 0}</p>
+                              <p className="text-xs text-white/90 font-medium">Present</p>
+                          </div>
+                          <div className="bg-red-500/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-red-400/30">
+                              <p className="text-3xl font-bold text-white mb-1">{dashboardData?.attendance_stats?.total_absent || 0}</p>
+                              <p className="text-xs text-white/90 font-medium">Missed</p>
                           </div>
                       </div>
                   </div>
-                  
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-3 gap-3">
-                      <div className="text-center p-3 bg-[#3A3A30] rounded-xl">
-                          <div className="text-2xl font-bold mb-1">{dashboardData?.attendance_stats?.total_sessions || 0}</div>
-                          <div className="text-xs text-gray-400">Classes</div>
+              </motion.div>
+              
+              {/* Secondary Stats - Course Count */}
+              <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-lg border border-slate-200 dark:border-slate-700"
+              >
+                  <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl flex items-center justify-center">
+                              <BookOpen size={24} className="text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div>
+                              <p className="text-3xl font-bold text-slate-900 dark:text-white">{enrolledCourses.length}</p>
+                              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Enrolled Courses</p>
+                          </div>
                       </div>
-                      <div className="text-center p-3 bg-[#2A4A2A] rounded-xl">
-                          <div className="text-2xl font-bold text-[#4CAF50] mb-1">{dashboardData?.attendance_stats?.total_present || 0}</div>
-                          <div className="text-xs text-[#4CAF50]">Attended</div>
-                      </div>
-                      <div className="text-center p-3 bg-[#4A2A2A] rounded-xl">
-                          <div className="text-2xl font-bold text-[#F44336] mb-1">{dashboardData?.attendance_stats?.total_absent || 0}</div>
-                          <div className="text-xs text-[#F44336]">Missed</div>
-                      </div>
+                      <ChevronRight size={24} className="text-slate-400" />
                   </div>
-              </div>
+              </motion.div>
           </div>
 
-          {/* Recent Activity */}
+          {/* Recent Activity - Redesigned */}
           <div className="px-4 mb-6">
               <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">Recent Activity</h2>
-                  <button className="text-[#FFD700] text-sm font-medium">View All</button>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Recent Activity</h2>
+                  <button className="text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                      View All
+                      <ChevronRight size={16} />
+                  </button>
               </div>
               
               <div className="space-y-3">
-                  {recentActivity.slice(0, 3).map((activity, index) => {
-                      const isPresent = activity.status === 'PRESENT';
-                      const iconBg = isPresent ? 'bg-[#2A4A2A]' : 'bg-[#4A2A2A]';
-                      
-                      return (
-                          <div key={activity.id} className="bg-[#2A2A25] rounded-xl p-4 flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 ${iconBg} rounded-lg flex items-center justify-center`}>
-                                      {isPresent ? <CheckCircle2 size={20} className="text-[#4CAF50]" /> : <X size={20} className="text-[#F44336]" />}
-                                  </div>
-                                  <div>
-                                      <p className="font-bold text-sm">{activity.course_code} - {activity.course_name?.split(' ').slice(0, 2).join(' ')}</p>
-                                      <p className="text-xs text-gray-400">{new Date(activity.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(activity.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</p>
-                                  </div>
-                              </div>
-                              <span className={`text-xs font-bold px-2 py-1 rounded ${
-                                  isPresent ? 'bg-[#2A4A2A] text-[#4CAF50]' : 'bg-[#4A2A2A] text-[#F44336]'
-                              }`}>
-                                  {isPresent ? 'Present' : 'Missed'}
-                              </span>
+                  {recentActivity.length === 0 ? (
+                      <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 text-center border border-slate-200 dark:border-slate-700">
+                          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                              <Activity size={24} className="text-slate-400" />
                           </div>
-                      );
-                  })}
+                          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">No recent activity</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Your attendance records will appear here</p>
+                      </div>
+                  ) : (
+                      recentActivity.slice(0, MAX_RECENT_ACTIVITY_MOBILE).map((activity, index) => {
+                          const isPresent = activity.status === 'PRESENT';
+                          const isLate = activity.status === 'LATE';
+                          const statusColor = isPresent 
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : isLate
+                              ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                              : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                          const iconBg = isPresent
+                              ? 'bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30'
+                              : isLate
+                              ? 'bg-gradient-to-br from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30'
+                              : 'bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30';
+                          const statusLabel = activity.status === 'PRESENT' ? 'Present' 
+                              : activity.status === 'LATE' ? 'Late'
+                              : activity.status === 'EXCUSED' ? 'Excused'
+                              : 'Absent';
+                          
+                          return (
+                              <motion.div 
+                                  key={activity.id}
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: index * 0.05 }}
+                                  className="bg-white dark:bg-slate-800 rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
+                              >
+                                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${iconBg}`}>
+                                      {isPresent ? (
+                                          <CheckCircle2 size={22} className="text-green-600 dark:text-green-400" />
+                                      ) : isLate ? (
+                                          <Clock size={22} className="text-yellow-600 dark:text-yellow-400" />
+                                      ) : (
+                                          <X size={22} className="text-red-600 dark:text-red-400" />
+                                      )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                      <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                                          {activity.course_code}
+                                      </p>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                          {new Date(activity.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(activity.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                                      </p>
+                                  </div>
+                                  <span className={`text-xs font-bold px-3 py-1.5 rounded-xl whitespace-nowrap ${statusColor}`}>
+                                      {statusLabel}
+                                  </span>
+                              </motion.div>
+                          );
+                      })
+                  )}
               </div>
           </div>
 

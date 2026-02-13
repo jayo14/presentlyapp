@@ -533,7 +533,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Subject</label>
-                        <select className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-zinc-900 dark:text-white text-sm focus:ring-primary focus:border-primary outline-none">
+                        <select className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full px-4 p-2.5 text-zinc-900 dark:text-white text-sm focus:ring-primary focus:border-primary outline-none">
                             <option>Bug Report</option>
                             <option>Feature Request</option>
                             <option>Other</option>
@@ -544,7 +544,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                         <textarea 
                             rows={4} 
                             placeholder="Please describe the issue in detail..."
-                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 text-zinc-900 dark:text-white text-sm focus:ring-primary focus:border-primary resize-none placeholder-zinc-500"
+                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-3 text-zinc-900 dark:text-white text-sm focus:ring-primary focus:border-primary resize-none placeholder-zinc-500"
                         ></textarea>
                     </div>
                     <div className="flex gap-3 pt-2">
