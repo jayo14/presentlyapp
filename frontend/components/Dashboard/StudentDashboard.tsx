@@ -755,6 +755,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                   ) : (
                       recentActivity.slice(0, MAX_RECENT_ACTIVITY_MOBILE).map((activity, index) => {
                           const isPresent = activity.status === 'PRESENT';
+                          const isLate = activity.status === 'LATE';
+                          const statusColor = isPresent 
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : isLate
+                              ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                              : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                          const iconBg = isPresent
+                              ? 'bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30'
+                              : isLate
+                              ? 'bg-gradient-to-br from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30'
+                              : 'bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30';
+                          const statusLabel = activity.status === 'PRESENT' ? 'Present' 
+                              : activity.status === 'LATE' ? 'Late'
+                              : activity.status === 'EXCUSED' ? 'Excused'
+                              : 'Absent';
                           
                           return (
                               <motion.div 
@@ -764,13 +779,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                   transition={{ delay: index * 0.05 }}
                                   className="bg-white dark:bg-slate-800 rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
                               >
-                                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                                      isPresent 
-                                          ? 'bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30' 
-                                          : 'bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30'
-                                  }`}>
+                                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${iconBg}`}>
                                       {isPresent ? (
                                           <CheckCircle2 size={22} className="text-green-600 dark:text-green-400" />
+                                      ) : isLate ? (
+                                          <Clock size={22} className="text-yellow-600 dark:text-yellow-400" />
                                       ) : (
                                           <X size={22} className="text-red-600 dark:text-red-400" />
                                       )}
@@ -783,12 +796,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                           {new Date(activity.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(activity.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                                       </p>
                                   </div>
-                                  <span className={`text-xs font-bold px-3 py-1.5 rounded-xl whitespace-nowrap ${
-                                      isPresent 
-                                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                          : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                  }`}>
-                                      {isPresent ? 'Present' : 'Absent'}
+                                  <span className={`text-xs font-bold px-3 py-1.5 rounded-xl whitespace-nowrap ${statusColor}`}>
+                                      {statusLabel}
                                   </span>
                               </motion.div>
                           );
