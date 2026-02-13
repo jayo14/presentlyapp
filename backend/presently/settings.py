@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
+    # Removed: 'django.contrib.gis' - no longer needed (using lat/long fields instead)
     # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'fcm_django',
-    'location_field.apps.DefaultConfig',
+    # Removed: 'location_field.apps.DefaultConfig' - no longer needed
     # Presently apps
     'institutions',
     'attendance',
@@ -122,7 +122,7 @@ DATABASES = {
 # Override with PostgreSQL if DATABASE_URL is set (production)
 if 'DATABASE_URL' in os.environ:
     db_url = os.environ.get('DATABASE_URL')
-    is_postgres = db_url.startswith('postgres') or db_url.startswith('submit')
+    is_postgres = db_url.startswith('postgres') or db_url.startswith('postgresql')
     
     DATABASES['default'] = dj_database_url.config(
         default=db_url,
@@ -130,8 +130,9 @@ if 'DATABASE_URL' in os.environ:
         conn_health_checks=True,
         ssl_require=is_postgres
     )
+    # Use regular PostgreSQL backend (no PostGIS/GDAL required)
     if is_postgres:
-        DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+        DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
 
 
 # Password validation
@@ -186,12 +187,7 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# GIS Library Paths (for GeoDjango)
-# These are often needed on platforms like Heroku, Render, or Koyeb
-if os.environ.get('GDAL_LIBRARY_PATH'):
-    GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
-if os.environ.get('GEOS_LIBRARY_PATH'):
-    GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
+# GIS Library settings removed - no longer using PostGIS/GeoDjango
 
 # Custom User Model
 AUTH_USER_MODEL = 'institutions.User'

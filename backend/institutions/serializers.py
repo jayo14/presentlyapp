@@ -77,19 +77,15 @@ class InstitutionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if instance.location:
-            ret['latitude'] = instance.location.y
-            ret['longitude'] = instance.location.x
+        # Latitude and longitude are now direct fields, no conversion needed
         return ret
 
     def validate(self, attrs):
-        from django.contrib.gis.geos import Point
-        latitude = attrs.pop('latitude', None)
-        longitude = attrs.pop('longitude', None)
+        # No GIS conversion needed - lat/long are regular decimal fields
+        latitude = attrs.get('latitude')
+        longitude = attrs.get('longitude')
         
-        if latitude is not None and longitude is not None:
-            attrs['location'] = Point(longitude, latitude)
-        elif latitude is not None or longitude is not None:
+        if (latitude is not None and longitude is None) or (latitude is None and longitude is not None):
             raise serializers.ValidationError("Both latitude and longitude must be provided together.")
             
         return attrs
@@ -141,26 +137,26 @@ class VenueSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if instance.location:
-            ret['latitude'] = instance.location.y
-            ret['longitude'] = instance.location.x
+            ret['latitude'] = instance.latitude
+            ret['longitude'] = instance.longitude
         if instance.boundary:
-            # Transform from [[lng, lat], ...] (exterior ring) to [[lat, lng], ...]
-            ret['boundary_coordinates'] = [[c[1], c[0]] for c in instance.boundary.coords[0]]
+            # Boundary is now stored as JSON, return it directly
+            ret['boundary_coordinates'] = instance.boundary
         return ret
 
     def validate(self, attrs):
-        from django.contrib.gis.geos import Point, Polygon
-        latitude = attrs.pop('latitude', None)
-        longitude = attrs.pop('longitude', None)
-        boundary_coords = attrs.pop('boundary_coordinates', None)
+        # No GIS conversion needed
+        latitude = attrs.get('latitude')
+        longitude = attrs.get('longitude')
+        boundary_coords = attrs.get('boundary_coordinates')
         
-        if latitude is not None and longitude is not None:
-            # Point(x, y) where x is longitude, y is latitude
-            attrs['location'] = Point(longitude, latitude)
-        elif latitude is not None or longitude is not None:
+        if (latitude is not None and longitude is None) or (latitude is None and longitude is not None):
             raise serializers.ValidationError({"latitude": "Both latitude and longitude must be provided together."})
             
         if boundary_coords is not None:
+            if not isinstance(boundary_coords, list):
+                raise serializers.ValidationError({"boundary_coordinates": "Boundary must be an array of coordinate pairs."})
+            
             if len(boundary_coords) < 3:
                 raise serializers.ValidationError({"boundary_coordinates": "Boundary must have at least 3 coordinate pairs."})
             
@@ -168,10 +164,8 @@ class VenueSerializer(serializers.ModelSerializer):
             if boundary_coords[0] != boundary_coords[-1]:
                 boundary_coords.append(boundary_coords[0])
             
-            # GeoDjango Polygon expects [lng, lat] pairs
-            # Frontend sends [lat, lng]
-            geo_coords = [(float(c[1]), float(c[0])) for c in boundary_coords]
-            attrs['boundary'] = Polygon(geo_coords)
+            # Store as JSON array
+            attrs['boundary'] = boundary_coords
             
         return attrs
     
