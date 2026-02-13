@@ -633,6 +633,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
                                       <Clock size={14} className="text-slate-600 dark:text-slate-400" />
                                       <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                          {/* Note: Timer updates via dashboard auto-refresh (every 60s) */}
                                           {Math.max(0, Math.floor((new Date(nextClass.end_time).getTime() - Date.now()) / 60000))}m left
                                       </span>
                                   </div>
@@ -686,7 +687,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                   <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="6"/>
                                   <circle 
                                       cx="40" cy="40" r="32" fill="none" stroke="white" strokeWidth="6"
-                                      strokeDasharray={`${(avgAttendance / 100) * 201} 201`}
+                                      strokeDasharray={`${(avgAttendance / 100) * (2 * Math.PI * 32)} ${2 * Math.PI * 32}`}
                                       strokeLinecap="round"
                                   />
                               </svg>
