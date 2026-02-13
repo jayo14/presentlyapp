@@ -199,7 +199,7 @@ export const DepartmentFormPage: React.FC = () => {
                 onChange={(e) => handleChange('description', e.target.value)}
                 placeholder="Brief description of the department"
                 rows={3}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-3xl text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div>
@@ -217,7 +217,7 @@ export const DepartmentFormPage: React.FC = () => {
               <select
                 value={formData.accreditation_status || ''}
                 onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                className="w-full h-12 px-4 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-zinc-950 border border-zinc-800 rounded-full text-foreground focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="ACCREDITED">Fully Accredited</option>
                 <option value="PROVISIONAL">Provisional</option>
