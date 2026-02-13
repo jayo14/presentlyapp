@@ -163,7 +163,7 @@ export const ForgotPassword: React.FC = () => {
             <Lock size={48} color="#09090b" strokeWidth={2.5} />
           </Box>
           
-          <Heading as="h2" size="2xl" color="white" mb={2}>
+          <Heading as="h2" size="3xl" fontWeight="bold" color="white" mb={2}>
             Reset Password
           </Heading>
           <Text color="gray.400" textAlign="center">
@@ -176,13 +176,13 @@ export const ForgotPassword: React.FC = () => {
           bg="#18181b"
           borderWidth={1}
           borderColor="#27272a"
-          p={8}
+          p={6}
           borderRadius="2xl"
           shadow="lg"
         >
           {pageState === 'form' && (
             <form onSubmit={handleSubmit}>
-              <VStack gap={4} align="stretch">
+              <VStack gap={5} align="stretch">
                 {/* Email Input */}
                 <Box>
                   <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
@@ -192,12 +192,13 @@ export const ForgotPassword: React.FC = () => {
                     <Mail 
                       style={{ 
                         position: 'absolute', 
-                        left: '12px', 
+                        left: '16px', 
                         top: '50%', 
                         transform: 'translateY(-50%)',
-                        color: '#6B7280'
+                        color: '#6B7280',
+                        zIndex: 10
                       }} 
-                      size={18} 
+                      size={20} 
                     />
                     <Input
                       type="email"
@@ -206,15 +207,15 @@ export const ForgotPassword: React.FC = () => {
                       value={email}
                       onChange={handleEmailChange}
                       disabled={requestPasswordResetMutation.isPending}
-                      pl={10}
+                      pl={12}
                       pr={email ? 12 : 4}
-                      py={3}
+                      h={14}
                       bg="#27272a"
                       borderColor={emailError ? "#ef4444" : "#3f3f46"}
-                      borderRadius="full"
+                      borderRadius="2xl"
                       color="white"
                       _placeholder={{ color: "gray.500" }}
-                      _focus={{ borderColor: emailError ? "#ef4444" : "#FFD700", outline: "none" }}
+                      _focus={{ borderColor: emailError ? "#ef4444" : "#FFD700", outline: "none", ring: 1, ringColor: emailError ? "#ef4444" : "#FFD700" }}
                     />
                     {email && !requestPasswordResetMutation.isPending && (
                       <Box
@@ -222,14 +223,15 @@ export const ForgotPassword: React.FC = () => {
                         type="button"
                         onClick={clearEmail}
                         position="absolute"
-                        right={4}
+                        right="16px"
                         top="50%"
                         transform="translateY(-50%)"
                         color="gray.400"
                         _hover={{ color: "white" }}
                         transition="colors 0.2s"
+                        zIndex={10}
                       >
-                        <X size={18} />
+                        <X size={20} />
                       </Box>
                     )}
                   </Box>
@@ -246,15 +248,16 @@ export const ForgotPassword: React.FC = () => {
                   type="submit"
                   disabled={requestPasswordResetMutation.isPending || !email || !!emailError || cooldownRemaining > 0}
                   w="full"
-                  size="lg"
+                  h={14}
                   bg="#FFD700"
                   color="#09090b"
-                  borderRadius="full"
+                  borderRadius="2xl"
                   fontWeight="bold"
-                  _hover={{ bg: "#FFE44D" }}
+                  fontSize="lg"
+                  _hover={{ bg: "#FFE44D", transform: "translateY(-1px)" }}
+                  _active={{ transform: "translateY(0)" }}
                   transition="all 0.2s"
                   _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
-                  mt={4}
                 >
                   {requestPasswordResetMutation.isPending ? (
                     <HStack>

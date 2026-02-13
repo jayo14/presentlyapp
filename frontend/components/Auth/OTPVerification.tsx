@@ -4,8 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SEO } from '../SEO';
 import { useVerifyEmailOTP, useResendEmailVerification } from '../../hooks/useAuth';
 import { Haptics } from '@capacitor/haptics';
-import { Box, Input, VStack, HStack, Text, Heading, Spinner } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
+import { Box, Input, VStack, HStack, Text, Heading, Spinner, Button } from '@chakra-ui/react';
 
 export const OTPVerification: React.FC = () => {
   const navigate = useNavigate();
@@ -153,7 +152,7 @@ export const OTPVerification: React.FC = () => {
       <Box w="full" maxW="md">
         {/* Header */}
         <VStack mb={12} textAlign="center">
-          <Heading as="h1" size="2xl" color="white" mb={4}>
+          <Heading as="h1" size="3xl" fontWeight="bold" color="white" mb={4}>
             Verify your {email ? 'email' : 'phone number'}
           </Heading>
           <Text color="gray.400" mb={2}>
@@ -239,12 +238,14 @@ export const OTPVerification: React.FC = () => {
           onClick={handleVerify}
           disabled={!isOtpComplete || verifyMutation.isPending}
           w="full"
-          size="lg"
+          h={14}
           bg="#FFD700"
           color="#09090b"
-          borderRadius="full"
+          borderRadius="2xl"
           fontWeight="bold"
-          _hover={{ bg: "#FFE44D" }}
+          fontSize="lg"
+          _hover={{ bg: "#FFE44D", transform: "translateY(-1px)" }}
+          _active={{ transform: "translateY(0)" }}
           transition="all 0.2s"
           _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
           mb={6}

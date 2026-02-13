@@ -6,8 +6,7 @@ import { SEO } from '../SEO';
 import { ConfettiAnimation } from '../ConfettiAnimation';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { Box, Input, VStack, HStack, Text, Heading, Spinner, Progress } from '@chakra-ui/react';
-import { Button } from '@/components/ui/button';
+import { Box, Input, VStack, HStack, Text, Heading, Spinner, Progress, Button } from '@chakra-ui/react';
 
 type PageState = 'form' | 'success' | 'error' | 'loading' | 'invalid-link';
 
@@ -192,7 +191,7 @@ export const ResetPassword: React.FC = () => {
       <Box w="full" maxW="md">
         {/* Heading */}
         <VStack mb={8} textAlign="center">
-          <Heading as="h2" size="2xl" color="white" mb={2}>
+          <Heading as="h2" size="3xl" fontWeight="bold" color="white" mb={2}>
             Create new password
           </Heading>
           <Text color="gray.400">
@@ -205,12 +204,12 @@ export const ResetPassword: React.FC = () => {
           bg="#18181b"
           borderWidth={1}
           borderColor="#27272a"
-          p={8}
+          p={6}
           borderRadius="2xl"
           shadow="lg"
         >
           <form onSubmit={handleSubmit}>
-            <VStack gap={4} align="stretch">
+            <VStack gap={5} align="stretch">
               {/* New Password */}
               <Box>
                 <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
@@ -223,15 +222,15 @@ export const ResetPassword: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
                     autoComplete="new-password"
-                    px={4}
+                    pl={4}
                     pr={12}
-                    py={3}
+                    h={14}
                     bg="#27272a"
                     borderColor="#3f3f46"
-                    borderRadius="full"
+                    borderRadius="2xl"
                     color="white"
                     _placeholder={{ color: "gray.500" }}
-                    _focus={{ borderColor: "#FFD700", outline: "none" }}
+                    _focus={{ borderColor: "#FFD700", outline: "none", ring: 1, ringColor: "#FFD700" }}
                   />
                   <Box
                     as="button"
@@ -244,6 +243,7 @@ export const ResetPassword: React.FC = () => {
                     color="gray.400"
                     _hover={{ color: "white" }}
                     transition="colors 0.2s"
+                    zIndex={10}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </Box>
@@ -295,15 +295,15 @@ export const ResetPassword: React.FC = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    px={4}
+                    pl={4}
                     pr={12}
-                    py={3}
+                    h={14}
                     bg="#27272a"
                     borderColor="#3f3f46"
-                    borderRadius="full"
+                    borderRadius="2xl"
                     color="white"
                     _placeholder={{ color: "gray.500" }}
-                    _focus={{ borderColor: "#FFD700", outline: "none" }}
+                    _focus={{ borderColor: "#FFD700", outline: "none", ring: 1, ringColor: "#FFD700" }}
                   />
                   <Box
                     as="button"
@@ -316,6 +316,7 @@ export const ResetPassword: React.FC = () => {
                     color="gray.400"
                     _hover={{ color: "white" }}
                     transition="colors 0.2s"
+                    zIndex={10}
                   >
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </Box>
@@ -334,26 +335,22 @@ export const ResetPassword: React.FC = () => {
               {/* Submit Button */}
               <Button
                 type="submit"
+                isLoading={resetPasswordMutation.isPending}
                 disabled={!isPasswordValid || resetPasswordMutation.isPending}
                 w="full"
-                size="lg"
+                h={14}
                 bg="#FFD700"
                 color="#09090b"
-                borderRadius="full"
+                borderRadius="2xl"
                 fontWeight="bold"
-                _hover={{ bg: "#FFE44D" }}
+                fontSize="lg"
+                _hover={{ bg: "#FFE44D", transform: "translateY(-1px)" }}
+                _active={{ transform: "translateY(0)" }}
                 transition="all 0.2s"
                 _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
-                mt={6}
+                mt={4}
               >
-                {resetPasswordMutation.isPending ? (
-                  <HStack>
-                    <Spinner size="sm" color="#09090b" />
-                    <Text>Updating Password...</Text>
-                  </HStack>
-                ) : (
-                  'Update Password'
-                )}
+                Update Password
               </Button>
 
               {/* Cancel Link */}
@@ -470,7 +467,7 @@ const PasswordResetSuccess: React.FC<{ onBackToLogin: () => void }> = ({ onBackT
         </motion.div>
 
         {/* Title */}
-        <Heading as="h1" size="2xl" color="white" mb={4}>
+        <Heading as="h1" size="3xl" fontWeight="bold" color="white" mb={4}>
           Password Changed!
         </Heading>
 
