@@ -316,7 +316,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         
         // Extract actual course info from API response
         setAttendanceData({
-          courseCode: attendanceResponse.course_code || codeToVerify.substring(0, 6).toUpperCase(),
+          courseCode: attendanceResponse.course_code || (codeToVerify.length >= 6 ? codeToVerify.substring(0, 6).toUpperCase() : codeToVerify.toUpperCase()),
           courseName: attendanceResponse.course_name || 'Course Session',
           location: attendanceResponse.venue_name || `Location (±${location.accuracy?.toFixed(0)}m)`,
           sessionCode: codeToVerify
