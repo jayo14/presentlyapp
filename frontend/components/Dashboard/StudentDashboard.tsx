@@ -110,6 +110,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const avgAttendance = dashboardData?.attendance_stats?.average_attendance || 0;
   const nextClass = dashboardData?.next_class;
   const recentActivity = dashboardData?.recent_activity || [];
+  
+  // UI Constants
+  const MAX_RECENT_ACTIVITY_MOBILE = 5; // Show up to 5 recent activities on mobile dashboard
 
   // Handler to dismiss warning
   const handleDismissWarning = () => {
@@ -676,13 +679,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       <div className="flex items-center justify-between mb-6">
                           <div>
                               <p className="text-white/80 text-sm font-medium mb-1">Overall Attendance</p>
-                              <div className="flex items-baseline gap-2">
-                                  <h3 className="text-5xl font-black text-white">{avgAttendance.toFixed(1)}%</h3>
-                                  <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-lg">
-                                      <TrendingUp size={12} className="text-white" />
-                                      <span className="text-xs font-bold text-white">+2%</span>
-                                  </div>
-                              </div>
+                              <h3 className="text-5xl font-black text-white">{avgAttendance.toFixed(1)}%</h3>
                           </div>
                           <div className="relative w-20 h-20">
                               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
@@ -756,7 +753,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                           <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Your attendance records will appear here</p>
                       </div>
                   ) : (
-                      recentActivity.slice(0, 5).map((activity, index) => {
+                      recentActivity.slice(0, MAX_RECENT_ACTIVITY_MOBILE).map((activity, index) => {
                           const isPresent = activity.status === 'PRESENT';
                           
                           return (
