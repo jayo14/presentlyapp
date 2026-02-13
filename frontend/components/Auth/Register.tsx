@@ -122,7 +122,7 @@ export const Register: React.FC = () => {
       >
         <VStack gap={4}>
           <Spinner size="xl" color="yellow.400" thickness="4px" />
-          <Text color="gray.400">Loading...</Text>
+          <Text color="gray.400">Loading</Text>
         </VStack>
       </Box>
     );

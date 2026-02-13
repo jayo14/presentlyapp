@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Calendar, QrCode, Clock, ArrowUpDown, Trash2, X, Search, Camera, CheckCircle2, FileText, Download, BookOpen, MoreVertical, Share2, Copy, Edit2, AlertCircle, TrendingUp, TrendingDown, Filter, ChevronDown, BarChart3, Timer, AlertOctagon } from 'lucide-react';
+import { Plus, Users, Calendar, QrCode, Clock, ArrowUpDown, Trash2, X, Search, Camera, CheckCircle2, FileText, Download, BookOpen, MoreVertical, Share2, Copy, Edit2, AlertCircle, TrendingUp, TrendingDown, Filter, ChevronDown, BarChart3, Timer, AlertOctagon, Loader2 } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Session } from '../../types';
@@ -170,7 +170,12 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   }
   
   if (view === 'timetable') {
-       return <div className="p-8 text-center text-zinc-500">Timetable Module Loading...</div>;
+       return (
+         <div className="p-8 text-center text-zinc-500 flex flex-col items-center gap-4">
+           <Loader2 className="w-8 h-8 animate-spin" />
+           <span>Timetable Module Loading</span>
+         </div>
+       );
   }
   
   if (view === 'analytics') {
