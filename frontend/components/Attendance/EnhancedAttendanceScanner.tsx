@@ -11,7 +11,7 @@ import { AttendanceSuccessPage } from './AttendanceSuccessPage';
 interface EnhancedAttendanceScannerProps {
   isOpen: boolean;
   onClose: () => void;
-  onVerify: (code: string, location: any) => Promise<boolean>;
+  onVerify: (code: string, location: any) => Promise<any>; // Changed to return attendance data
 }
 
 type ScanMode = 'scan' | 'input';
@@ -300,9 +300,9 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setLocationInfo('Verifying session and location...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const success = await onVerify(codeToVerify, location);
+      const attendanceResponse = await onVerify(codeToVerify, location);
 
-      if (success) {
+      if (attendanceResponse) {
         setStatus('success');
         
         // Capture time of check-in
@@ -314,12 +314,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         });
         setCheckInTime(timeStr);
         
-        // Set attendance data for success screen
-        // TODO: Extract actual course info from API response once available
+        // Extract actual course info from API response
         setAttendanceData({
-          courseCode: codeToVerify.substring(0, 6).toUpperCase(),
-          courseName: 'Course Session',
-          location: `Location (±${location.accuracy?.toFixed(0)}m)`,
+          courseCode: attendanceResponse.course_code || codeToVerify.substring(0, 6).toUpperCase(),
+          courseName: attendanceResponse.course_name || 'Course Session',
+          location: attendanceResponse.venue_name || `Location (±${location.accuracy?.toFixed(0)}m)`,
           sessionCode: codeToVerify
         });
         

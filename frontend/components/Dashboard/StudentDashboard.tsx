@@ -141,11 +141,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     { name: 'Absent', value: dashboardData.attendance_stats.total_absent, color: 'rgb(239, 68, 68)' },
   ] : [];
 
-  const handleAttendanceCheckIn = async (code: string, location: any): Promise<boolean> => {
+  const handleAttendanceCheckIn = async (code: string, location: any): Promise<any> => {
       try {
-          await sessionApi.checkInByCode(code, location);
+          const attendanceData = await sessionApi.checkInByCode(code, location);
           await loadDashboardData();
-          return true;
+          return attendanceData; // Return the full attendance object
       } catch (err: any) {
           console.error("Check-in failed:", err);
           throw new Error(err.response?.data?.error || err.message || "Failed to check in");
