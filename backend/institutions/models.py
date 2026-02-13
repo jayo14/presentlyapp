@@ -1,4 +1,5 @@
-from django.contrib.gis.db import models as gis_models
+# Removed GIS dependency - using regular lat/long fields instead
+# from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone as django_timezone
@@ -45,7 +46,9 @@ class Institution(models.Model):
     state_province = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     address = models.TextField()
-    location = gis_models.PointField(blank=True, null=True)
+    # Location fields (replacing GIS PointField)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True, help_text="Latitude coordinate")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True, help_text="Longitude coordinate")
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     
     # Institution details
@@ -443,8 +446,9 @@ class Venue(models.Model):
     has_whiteboard = models.BooleanField(default=False)
     has_microphone = models.BooleanField(default=False)
     
-    # Geolocation with elevation
-    location = gis_models.PointField(blank=True, null=True, help_text="Venue center location")
+    # Geolocation with elevation (replacing GIS PointField)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True, help_text="Latitude coordinate")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True, help_text="Longitude coordinate")
     elevation = models.DecimalField(
         max_digits=8, 
         decimal_places=2, 
@@ -453,11 +457,11 @@ class Venue(models.Model):
         help_text="Elevation in meters above sea level"
     )
     
-    # Boundary/polygon for precise location mapping
-    boundary = gis_models.PolygonField(
+    # Boundary polygon as JSON (replacing GIS PolygonField)
+    boundary = models.JSONField(
         blank=True, 
         null=True,
-        help_text="Polygon boundary of the venue"
+        help_text="Polygon boundary of the venue as GeoJSON coordinates array"
     )
     
     # Location verification settings
