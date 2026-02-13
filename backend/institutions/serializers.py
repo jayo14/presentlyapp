@@ -136,7 +136,8 @@ class VenueSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if instance.location:
+        # Latitude and longitude are now direct fields
+        if instance.latitude is not None and instance.longitude is not None:
             ret['latitude'] = instance.latitude
             ret['longitude'] = instance.longitude
         if instance.boundary:
