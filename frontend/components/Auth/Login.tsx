@@ -168,7 +168,7 @@ export const Login: React.FC = () => {
         <VStack gap={4}>
           <Spinner size="xl" color="yellow.400" thickness="4px" />
           <Text color={textSecondary}>
-            {isRedirecting ? 'Redirecting to dashboard...' : 'Loading...'}
+            {isRedirecting ? 'Redirecting to dashboard' : 'Loading'}
           </Text>
         </VStack>
       </Box>
