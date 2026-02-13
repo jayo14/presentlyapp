@@ -5,4 +5,4 @@ try:
     __all__ = ('celery_app',)
 except ImportError:
     # Celery is not installed, which is fine for basic Django operations
-    pass
+    __all__ = ()
