@@ -315,7 +315,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         setCheckInTime(timeStr);
         
         // Set attendance data for success screen
-        // In a real app, this data would come from the API response
+        // TODO: Extract actual course info from API response once available
         setAttendanceData({
           courseCode: codeToVerify.substring(0, 6).toUpperCase(),
           courseName: 'Course Session',
