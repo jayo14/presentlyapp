@@ -7,6 +7,7 @@ import { useCurrentUser, useLogout } from './hooks/useAuth';
 import { Toaster } from 'sonner';
 import { offlineSyncManager } from './src/utils/offlineSync';
 import { OfflineIndicator } from './src/components/OfflineIndicator';
+import { Loader2 } from 'lucide-react';
 
 // Eager load critical components for initial page
 import { LandingPage } from './components/LandingPage';
@@ -52,8 +53,8 @@ const DepartmentManagement = lazy(() => import('./components/Admin/DepartmentMan
 const LoadingFallback: React.FC = () => (
   <div className="min-h-screen bg-background flex items-center justify-center" role="status" aria-live="polite" aria-label="Loading content">
     <div className="text-center">
-      <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" aria-hidden="true"></div>
-      <p className="text-zinc-400">Loading...</p>
+      <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto mb-4" aria-hidden="true" />
+      <p className="text-zinc-400">Loading</p>
     </div>
   </div>
 );
