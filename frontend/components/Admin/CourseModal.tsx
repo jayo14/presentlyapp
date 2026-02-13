@@ -238,7 +238,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                 <select
                   value={selectedInstitution || ''}
                   onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full text-foreground focus:outline-none focus:border-primary"
                   required
                 >
                   <option value="">Select Institution</option>
@@ -256,7 +256,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                   value={selectedCollege || ''}
                   onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
                   disabled={!selectedInstitution}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select College/Faculty (Optional)</option>
                   {colleges.map(college => (
@@ -374,7 +374,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                 <select
                   value={formData.level || ''}
                   onChange={(e) => handleChange('level', e.target.value)}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full text-foreground focus:outline-none focus:border-primary"
                 >
                   <option value="">Select Level</option>
                   <option value="100">100 Level</option>
@@ -393,7 +393,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                 <select
                   value={formData.semester || ''}
                   onChange={(e) => handleChange('semester', e.target.value)}
-                  className="w-full h-12 px-4 bg-zinc-800 border border-zinc-700 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
+                  className="w-full h-12 px-4 bg-zinc-800 border border-zinc-700 rounded-full text-foreground focus:outline-none focus:border-primary transition-colors"
                 >
                   <option value="">Select Semester</option>
                   <option value="FIRST">First Semester</option>
@@ -410,7 +410,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
                 placeholder="Brief description of the course"
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary min-h-[100px]"
+                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-3xl text-foreground focus:outline-none focus:border-primary min-h-[100px]"
               />
             </div>
           </div>

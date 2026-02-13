@@ -231,7 +231,7 @@ export const CourseManagement: React.FC = () => {
             <select
               value={selectedInstitution || ''}
               onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full text-foreground focus:outline-none focus:border-primary"
             >
               <option value="">All Institutions</option>
               {institutions.map(inst => (
@@ -248,7 +248,7 @@ export const CourseManagement: React.FC = () => {
               value={selectedCollege || ''}
               onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedInstitution}
-              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Colleges</option>
               {colleges.map(college => (
@@ -265,7 +265,7 @@ export const CourseManagement: React.FC = () => {
               value={selectedDepartment || ''}
               onChange={(e) => setSelectedDepartment(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedCollege}
-              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Departments</option>
               {departments.map(dept => (
