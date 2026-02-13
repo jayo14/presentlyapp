@@ -196,5 +196,5 @@ The application also supports deployment to:
 This software is proprietary and confidential. Unauthorized copying, distribution, modification, or use of this software is strictly prohibited. See the [LICENSE](LICENSE) file for full details.
 
 <div align="center">
-  <p>Made with ❤️ for modern education</p>
+  <p>Made with ❤️ for modern education.</p>
 </div>
