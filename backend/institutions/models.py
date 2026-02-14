@@ -535,16 +535,16 @@ class AttendanceSession(models.Model):
         """Get location coordinates, preferring venue over legacy fields"""
         if self.venue:
             coords = {
-                'latitude': float(self.venue.latitude) if self.venue.latitude else None,
-                'longitude': float(self.venue.longitude) if self.venue.longitude else None,
-                'elevation': float(self.venue.elevation) if self.venue.elevation else None,
+                'latitude': float(self.venue.latitude) if self.venue.latitude is not None else None,
+                'longitude': float(self.venue.longitude) if self.venue.longitude is not None else None,
+                'elevation': float(self.venue.elevation) if self.venue.elevation is not None else None,
                 'boundary': self.venue.boundary if self.venue.boundary else None,
                 'radius': self.venue.verification_radius
             }
             return coords
         return {
-            'latitude': float(self.latitude) if self.latitude else None,
-            'longitude': float(self.longitude) if self.longitude else None,
+            'latitude': float(self.latitude) if self.latitude is not None else None,
+            'longitude': float(self.longitude) if self.longitude is not None else None,
             'elevation': None,
             'boundary': None,
             'radius': self.location_radius
