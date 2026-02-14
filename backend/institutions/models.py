@@ -571,7 +571,7 @@ class AttendanceSession(models.Model):
         
         # Use venue location if not specified
         if self.venue and not self.latitude and not self.longitude:
-            if self.venue.latitude and self.venue.longitude:
+            if self.venue.latitude is not None and self.venue.longitude is not None:
                 self.latitude = self.venue.latitude
                 self.longitude = self.venue.longitude
             if not self.location_radius and self.venue.gps_radius:
