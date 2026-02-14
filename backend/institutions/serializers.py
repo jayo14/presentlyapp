@@ -69,11 +69,11 @@ class InstitutionSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'full_name', 'short_name', 'abbreviation', 'description', 'website_url',
             'contact_email', 'contact_phone', 'country', 'state_province', 'city',
-            'address', 'latitude', 'longitude', 'location', 'postal_code', 'established_year',
+            'address', 'latitude', 'longitude', 'postal_code', 'established_year',
             'institution_type', 'accreditation_status', 'logo_url', 'cover_image_url',
             'is_active', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['created_at', 'updated_at', 'location']
+        read_only_fields = ['created_at', 'updated_at']
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -129,10 +129,10 @@ class VenueSerializer(serializers.ModelSerializer):
             'id', 'institution', 'institution_name', 'college', 'name', 'code', 'description',
             'building', 'building_name', 'floor_number', 'room_number', 'capacity',
             'venue_type', 'has_projector', 'has_computers', 'has_whiteboard', 'has_microphone',
-            'latitude', 'longitude', 'location', 'elevation', 'boundary_coordinates', 'boundary',
+            'latitude', 'longitude', 'elevation', 'boundary_coordinates', 'boundary',
             'gps_radius', 'verification_radius', 'is_active', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['created_at', 'updated_at', 'location', 'boundary']
+        read_only_fields = ['created_at', 'updated_at', 'boundary']
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
