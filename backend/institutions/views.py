@@ -18,9 +18,8 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
-from django.conf import settings
-from presently.firebase_config import initialize_firebase
 from user_agents import parse
+from presently.firebase_config import initialize_firebase
 
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
@@ -429,6 +428,9 @@ def login_view(request):
         
         # Security: Device Tracking
         try:
+            # Constants
+            UNKNOWN = "Unknown"
+            
             user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown Device')
             # Handle proxy headers for IP
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -445,8 +447,8 @@ def login_view(request):
             browser_version = parsed_ua.browser.version_string
             os_name = parsed_ua.os.family
             os_version = parsed_ua.os.version_string
-            device_brand = parsed_ua.device.brand or "Unknown"
-            device_model = parsed_ua.device.model or "Unknown"
+            device_brand = parsed_ua.device.brand or UNKNOWN
+            device_model = parsed_ua.device.model or UNKNOWN
             
             # Determine device category
             if parsed_ua.is_bot:
@@ -462,7 +464,7 @@ def login_view(request):
             
             # Create a more descriptive device name
             if parsed_ua.is_mobile or parsed_ua.is_tablet:
-                if device_brand != "Unknown" and device_model != "Unknown":
+                if device_brand != UNKNOWN and device_model != UNKNOWN:
                     device_name = f"{device_brand} {device_model}"
                 else:
                     device_name = f"{device_category} ({os_name})"
