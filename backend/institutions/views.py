@@ -20,6 +20,7 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 from django.conf import settings
 from presently.firebase_config import initialize_firebase
+from user_agents import parse
 
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
@@ -436,18 +437,37 @@ def login_view(request):
             else:
                 ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
             
-            # Simple device fingerprinting (user agent + IP)
-            # In production, use a library like 'user-agents' to parse the UA string for a better name
-            import re
-            device_name = "Unknown Device"
-            if 'Mobile' in user_agent:
-                device_name = "Mobile Device"
-            elif 'Windows' in user_agent:
-                device_name = "Windows PC"
-            elif 'Macintosh' in user_agent:
-                device_name = "Mac"
-            elif 'Linux' in user_agent:
-                device_name = "Linux Machine"
+            # Parse user agent for detailed information
+            parsed_ua = parse(user_agent)
+            
+            # Extract detailed device information
+            browser_name = parsed_ua.browser.family
+            browser_version = parsed_ua.browser.version_string
+            os_name = parsed_ua.os.family
+            os_version = parsed_ua.os.version_string
+            device_brand = parsed_ua.device.brand or "Unknown"
+            device_model = parsed_ua.device.model or "Unknown"
+            
+            # Determine device category
+            if parsed_ua.is_mobile:
+                device_category = "Mobile Device"
+            elif parsed_ua.is_tablet:
+                device_category = "Tablet"
+            elif parsed_ua.is_pc:
+                device_category = "Desktop/Laptop"
+            elif parsed_ua.is_bot:
+                device_category = "Bot"
+            else:
+                device_category = "Unknown Device"
+            
+            # Create a more descriptive device name
+            if parsed_ua.is_mobile or parsed_ua.is_tablet:
+                if device_brand != "Unknown" and device_model != "Unknown":
+                    device_name = f"{device_brand} {device_model}"
+                else:
+                    device_name = f"{device_category} ({os_name})"
+            else:
+                device_name = f"{device_category} ({os_name})"
                 
             # Check if device exists
             device, created = UserDevice.objects.get_or_create(
@@ -465,31 +485,67 @@ def login_view(request):
                 # New device detected - Send security alert
                 subject = 'New Login Detected - Presently'
                 
+                # Get approximate location based on IP (optional - for future enhancement)
+                location_info = "Unknown Location"
+                
                 html_message = f"""
                 <!DOCTYPE html>
                 <html>
                 <body style="font-family: Arial, sans-serif; color: #333;">
                     <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                        <h2 style="color: #c0392b;">New Login Detected</h2>
-                        <p>Hello {user.full_name},</p>
+                        <h2 style="color: #c0392b;">🔒 New Login Detected</h2>
+                        <p>Hello <strong>{user.full_name}</strong>,</p>
                         <p>We detected a login to your Presently account from a new device.</p>
                         
                         <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                            <p><strong>Device:</strong> {device_name}</p>
-                            <p><strong>IP Address:</strong> {ip_address}</p>
-                            <p><strong>Time:</strong> {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
+                            <h3 style="margin-top: 0; color: #2c3e50;">Device Information</h3>
+                            <p style="margin: 8px 0;"><strong>Device Type:</strong> {device_category}</p>
+                            <p style="margin: 8px 0;"><strong>Device Name:</strong> {device_name}</p>
+                            <p style="margin: 8px 0;"><strong>Operating System:</strong> {os_name} {os_version}</p>
+                            <p style="margin: 8px 0;"><strong>Browser:</strong> {browser_name} {browser_version}</p>
+                            <p style="margin: 8px 0;"><strong>IP Address:</strong> {ip_address}</p>
+                            <p style="margin: 8px 0;"><strong>Location:</strong> {location_info}</p>
+                            <p style="margin: 8px 0;"><strong>Time:</strong> {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
                         </div>
                         
                         <p>If this was you, you can ignore this email.</p>
-                        <p style="font-weight: bold;">If you did not log in, please secure your account immediately by changing your password.</p>
+                        <p style="color: #c0392b; font-weight: bold;">⚠️ If you did not log in, please secure your account immediately by changing your password.</p>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: #ecf0f1; border-radius: 5px;">
+                            <p style="margin: 0; font-size: 12px; color: #7f8c8d;">
+                                <strong>Security Tip:</strong> Always use a strong, unique password and enable two-factor authentication when available.
+                            </p>
+                        </div>
                     </div>
                 </body>
                 </html>
                 """
                 
+                plain_message = f"""
+New Login Detected - Presently
+
+Hello {user.full_name},
+
+We detected a login to your Presently account from a new device.
+
+Device Information:
+- Device Type: {device_category}
+- Device Name: {device_name}
+- Operating System: {os_name} {os_version}
+- Browser: {browser_name} {browser_version}
+- IP Address: {ip_address}
+- Location: {location_info}
+- Time: {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+If this was you, you can ignore this email.
+If you did not log in, please secure your account immediately by changing your password.
+
+Security Tip: Always use a strong, unique password and enable two-factor authentication when available.
+                """
+                
                 send_mail(
                     subject,
-                    f"New login detected from {device_name} ({ip_address})",
+                    plain_message,
                     settings.DEFAULT_FROM_EMAIL,
                     [user.email],
                     html_message=html_message,
