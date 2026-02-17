@@ -14,7 +14,7 @@ export const PublicCheckInPage: React.FC = () => {
   const { data: user, isLoading: authLoading } = useCurrentUser();
 
   // Normalize API URL (remove trailing slash)
-  const API_URL = (import.meta.env.VITE_API_URL || 'https://presently.koyeb.app/api').replace(/\/$/, '');
+  const API_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
 
   // State
   const [session, setSession] = useState<any>(null);
