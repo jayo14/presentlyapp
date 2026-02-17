@@ -1,5 +1,0 @@
-# This file is required for Koyeb to detect this as a Python project
-# The actual dependencies are in backend/requirements.txt
-# This file references the backend requirements for installation
-
--r backend/requirements.txt
