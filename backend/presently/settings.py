@@ -212,7 +212,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_TYPES': ('Bearer', 'JWT'),
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
 }
@@ -316,10 +316,10 @@ UNFOLD = {
     "ENVIRONMENT": "presently.utils.environment_callback",
     "DASHBOARD_CALLBACK": "presently.utils.dashboard_callback",
     "STYLES": [
-        lambda request: f"/static/css/styles.css",
+        # lambda request: f"/static/css/styles.css",
     ],
     "SCRIPTS": [
-        lambda request: f"/static/js/scripts.js",
+        # lambda request: f"/static/js/scripts.js",
     ],
     "COLORS": {
         "primary": {
