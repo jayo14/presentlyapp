@@ -121,6 +121,8 @@ def google_auth_view(request):
         tokens = get_tokens_for_user(user)
         
         return Response({
+            'access': tokens['access'],
+            'refresh': tokens['refresh'],
             'success': True,
             'message': 'Google authentication successful',
             'user': {
@@ -398,6 +400,8 @@ def verify_email_otp_view(request):
         tokens = get_tokens_for_user(user)
         
         return Response({
+            'access': tokens['access'],
+            'refresh': tokens['refresh'],
             'success': True,
             'message': 'Email verified successfully',
             'user': {
@@ -557,6 +561,8 @@ Security Tip: Always use a strong, unique password and enable two-factor authent
             
         tokens = get_tokens_for_user(user)
         return Response({
+            'access': tokens['access'],
+            'refresh': tokens['refresh'],
             'success': True,
             'message': 'Login successful',
             'user': {
