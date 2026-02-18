@@ -2,6 +2,40 @@
 
 from django.db import migrations, models
 
+def convert_gis_to_regular(apps, schema_editor):
+    if schema_editor.connection.vendor != 'postgresql':
+        return
+
+    with schema_editor.connection.cursor() as cursor:
+        # Drop GIS indexes first
+        cursor.execute('DROP INDEX IF EXISTS venues_boundary_ab88e3c5_id;')
+        cursor.execute('DROP INDEX IF EXISTS institutions_location_id;')
+        cursor.execute('DROP INDEX IF EXISTS venues_location_id;')
+
+        # Drop GIS location from institutions
+        cursor.execute('ALTER TABLE institutions DROP COLUMN IF EXISTS location;')
+
+        # Add latitude/longitude to institutions if not exists
+        try:
+            cursor.execute('ALTER TABLE institutions ADD COLUMN latitude NUMERIC(9, 6);')
+        except:
+            pass
+        try:
+            cursor.execute('ALTER TABLE institutions ADD COLUMN longitude NUMERIC(9, 6);')
+        except:
+            pass
+
+        # Drop GIS location from venues
+        cursor.execute('ALTER TABLE venues DROP COLUMN IF EXISTS location;')
+
+        # Convert GIS boundary to jsonb
+        try:
+            cursor.execute('ALTER TABLE venues ALTER COLUMN boundary TYPE jsonb USING boundary::text::jsonb;')
+        except:
+            pass
+
+def reverse_convert(apps, schema_editor):
+    pass
 
 class Migration(migrations.Migration):
 
@@ -10,28 +44,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Use raw SQL to drop GIS fields and add regular fields
-        migrations.RunSQL(
-            sql=[
-                # Drop GIS indexes first
-                'DROP INDEX IF EXISTS venues_boundary_ab88e3c5_id;',
-                'DROP INDEX IF EXISTS institutions_location_id;',
-                'DROP INDEX IF EXISTS venues_location_id;',
-                # Drop GIS location from institutions
-                'ALTER TABLE institutions DROP COLUMN IF EXISTS location;',
-                # Add latitude/longitude to institutions
-                'ALTER TABLE institutions ADD COLUMN IF NOT EXISTS latitude NUMERIC(9, 6);',
-                'ALTER TABLE institutions ADD COLUMN IF NOT EXISTS longitude NUMERIC(9, 6);',
-                # Drop GIS location from venues
-                'ALTER TABLE venues DROP COLUMN IF EXISTS location;',
-                # Venues already have latitude/longitude from migration 0005
-                # Convert GIS boundary to jsonb
-                'ALTER TABLE venues ALTER COLUMN boundary TYPE jsonb USING boundary::text::jsonb;',
-            ],
-            reverse_sql=[
-                # Reverse operations (if needed)
-                'ALTER TABLE institutions DROP COLUMN IF EXISTS latitude;',
-                'ALTER TABLE institutions DROP COLUMN IF EXISTS longitude;',
-            ]
-        ),
+        migrations.RunPython(convert_gis_to_regular, reverse_convert),
     ]
