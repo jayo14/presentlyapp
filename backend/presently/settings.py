@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Removed: 'django.contrib.gis' - no longer needed (using lat/long fields instead)
+
     # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'fcm_django',
-    # Removed: 'location_field.apps.DefaultConfig' - no longer needed
+
     # Presently apps
     'institutions',
     'attendance',

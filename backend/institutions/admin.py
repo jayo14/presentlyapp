@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from unfold.admin import ModelAdmin
-from location_field.forms.plain import PlainLocationField
+
 from .models import User, Institution, College, Department, Venue, Course, AttendanceSession, Attendance, EmailVerificationOTP
 
 
@@ -72,9 +72,7 @@ class VenueAdmin(ModelAdmin):
     ordering = ['institution', 'name']
     readonly_fields = ['created_at', 'updated_at']
     
-    formfield_overrides = {
-        PlainLocationField: {'widget': PlainLocationField},
-    }
+
     
     fieldsets = (
         ('Basic Information', {
@@ -84,8 +82,8 @@ class VenueAdmin(ModelAdmin):
             'fields': ('building_name', 'floor_number', 'room_number', 'capacity')
         }),
         ('Geolocation', {
-            'fields': ('location', 'elevation', 'boundary', 'verification_radius'),
-            'description': 'Use the map widget to set location coordinates. You can also manually enter coordinates.'
+            'fields': ('latitude', 'longitude', 'elevation', 'boundary', 'verification_radius'),
+            'description': 'Enter coordinates manually.'
         }),
         ('Status', {
             'fields': ('is_active', 'created_at', 'updated_at')
