@@ -293,6 +293,8 @@ class CourseSerializer(serializers.ModelSerializer):
     lecturer_name = serializers.CharField(source='lecturer.full_name', read_only=True)
     enrolled_students_count = serializers.SerializerMethodField()
     applicable_levels = serializers.SerializerMethodField()
+    name = serializers.CharField(source='title', read_only=True)
+    instructor = serializers.CharField(source='lecturer.full_name', read_only=True)
     
     class Meta:
         model = Course
