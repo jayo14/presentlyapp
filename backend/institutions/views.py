@@ -204,9 +204,24 @@ def register_view(request):
                 'error': 'Failed to send verification email. Please request a new code.'
             }, status=status.HTTP_201_CREATED)
             
+    # Consistent error format
+    error_message = 'Register failed'
+    if serializer.errors:
+        if 'non_field_errors' in serializer.errors:
+            error_message = serializer.errors['non_field_errors'][0]
+        else:
+            field = next(iter(serializer.errors))
+            error_detail = serializer.errors[field]
+            if isinstance(error_detail, list):
+                error_detail = error_detail[0]
+            error_message = f"{field}: {error_detail}"
+
     return Response({
         'success': False,
-        'errors': serializer.errors
+        'error': error_message,
+        'errors': serializer.errors,
+        'code': 'REGISTRATION_FAILED',
+        'message': error_message
     }, status=status.HTTP_400_BAD_REQUEST)
 
 # Add these views to institutions/views.py after the register_view
@@ -576,9 +591,24 @@ Security Tip: Always use a strong, unique password and enable two-factor authent
             'tokens': tokens,
             'requires_onboarding': not user.onboarding_complete
         }, status=status.HTTP_200_OK)
+    # Consistent error format
+    error_message = 'Login failed'
+    if serializer.errors:
+        if 'non_field_errors' in serializer.errors:
+            error_message = serializer.errors['non_field_errors'][0]
+        else:
+            field = next(iter(serializer.errors))
+            error_detail = serializer.errors[field]
+            if isinstance(error_detail, list):
+                error_detail = error_detail[0]
+            error_message = f"{field}: {error_detail}"
+
     return Response({
         'success': False,
-        'errors': serializer.errors
+        'error': error_message,
+        'errors': serializer.errors,
+        'code': 'LOGIN_FAILED',
+        'message': error_message
     }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -589,19 +619,23 @@ def logout_view(request):
     try:
         refresh_token = request.data.get('refresh_token')
         if refresh_token:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except Exception:
+                # If token is already blacklisted or invalid, we still want to log out locally
+                pass
         return Response({
             'success': True,
             'message': 'Logout successful'
         }, status=status.HTTP_200_OK)
     except Exception as e:
+        auth_logger.error(f"Logout error: {str(e)}")
         return Response({
-            'success': False,
+            'success': True,
+            'message': 'Logout completed with errors',
             'error': str(e)
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-
+        }, status=status.HTTP_200_OK)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def current_user_view(request):
