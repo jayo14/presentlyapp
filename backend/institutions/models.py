@@ -1,5 +1,4 @@
 # Removed GIS dependency - using regular lat/long fields instead
-# from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone as django_timezone

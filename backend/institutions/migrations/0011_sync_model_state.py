@@ -10,41 +10,33 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # This migration only updates Django's migration state to match the actual database
-        # The database changes were already made by migration 0010 using raw SQL
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.RemoveField(
-                    model_name='venue',
-                    name='boundary_coordinates',
-                ),
-                migrations.AlterField(
-                    model_name='venue',
-                    name='boundary',
-                    field=models.JSONField(blank=True, help_text='Polygon boundary of the venue as GeoJSON coordinates array', null=True),
-                ),
-                migrations.AlterField(
-                    model_name='institution',
-                    name='latitude',
-                    field=models.DecimalField(blank=True, decimal_places=6, help_text='Latitude coordinate', max_digits=9, null=True),
-                ),
-                migrations.AlterField(
-                    model_name='institution',
-                    name='longitude',
-                    field=models.DecimalField(blank=True, decimal_places=6, help_text='Longitude coordinate', max_digits=9, null=True),
-                ),
-                migrations.AlterField(
-                    model_name='venue',
-                    name='latitude',
-                    field=models.DecimalField(blank=True, decimal_places=6, help_text='Latitude coordinate', max_digits=9, null=True),
-                ),
-                migrations.AlterField(
-                    model_name='venue',
-                    name='longitude',
-                    field=models.DecimalField(blank=True, decimal_places=6, help_text='Longitude coordinate', max_digits=9, null=True),
-                ),
-            ],
-            # No database operations - schema was already updated by migration 0010
-            database_operations=[],
+        migrations.RemoveField(
+            model_name='venue',
+            name='boundary_coordinates',
+        ),
+        migrations.AddField(
+            model_name='venue',
+            name='boundary',
+            field=models.JSONField(blank=True, help_text='Polygon boundary of the venue as GeoJSON coordinates array', null=True),
+        ),
+        migrations.AlterField(
+            model_name='institution',
+            name='latitude',
+            field=models.DecimalField(blank=True, decimal_places=6, help_text='Latitude coordinate', max_digits=9, null=True),
+        ),
+        migrations.AlterField(
+            model_name='institution',
+            name='longitude',
+            field=models.DecimalField(blank=True, decimal_places=6, help_text='Longitude coordinate', max_digits=9, null=True),
+        ),
+        migrations.AlterField(
+            model_name='venue',
+            name='latitude',
+            field=models.DecimalField(blank=True, decimal_places=6, help_text='Latitude coordinate', max_digits=9, null=True),
+        ),
+        migrations.AlterField(
+            model_name='venue',
+            name='longitude',
+            field=models.DecimalField(blank=True, decimal_places=6, help_text='Longitude coordinate', max_digits=9, null=True),
         ),
     ]
