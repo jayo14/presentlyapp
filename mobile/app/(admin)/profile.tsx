@@ -1,130 +1,203 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, LogOut, Settings, ShieldCheck, Database, FileText } from 'lucide-react-native';
-import { useState } from 'react';
-import { CustomModal } from '@/components/CustomModal';
+import { ChevronLeft, Settings, ShieldCheck, Shield, TrendingUp, User, Lock, FileText, Database, LogOut, ChevronRight, Clock } from 'lucide-react-native';
 
-export default function AdminProfileScreen() {
+export default function AdminProfile() {
   const router = useRouter();
-  const { colors } = useTheme();
-  const { user, signOut } = useAuth();
-  const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const { colors, isDark } = useTheme();
+  const { user, logout } = useAuth();
 
-  const handleSignOut = () => setShowSignOutModal(true);
-
-  const confirmSignOut = async () => {
-    setShowSignOutModal(false);
-    await signOut();
-    router.replace('/auth/sign-in');
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout from Terminal',
+      'Are you sure you want to end your administrative session?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Logout', style: 'destructive', onPress: logout }
+      ]
+    );
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <CustomModal
-        visible={showSignOutModal}
-        title="Sign Out"
-        message="Are you sure you want to sign out from the Admin Portal?"
-        type="confirmation"
-        onConfirm={confirmSignOut}
-        onCancel={() => setShowSignOutModal(false)}
-        confirmText="Sign Out"
-      />
-      
-      <View style={styles.headerBar}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Admin Profile</Text>
-        <ShieldCheck size={24} color={colors.primary} />
+      {/* Header Navigation */}
+      <View style={[styles.header, { borderBottomColor: colors.primary + '1A', borderBottomWidth: 1 }]}>
+        <TouchableOpacity style={styles.headerButton} onPress={() => router.back()}>
+          <ChevronLeft size={24} color={colors.primary} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Administrator Profile</Text>
+        <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/(admin)/settings')}>
+          <Settings size={24} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={[styles.profileHeader, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-            <Text style={[styles.avatarText, { color: colors.background }]}>AD</Text>
+        {/* Profile Identity Section */}
+        <View style={styles.profileSection}>
+          <View style={styles.avatarWrapper}>
+            <View style={[styles.avatarGlow, { backgroundColor: colors.primary }]} />
+            <View style={[styles.avatarContainer, { borderColor: colors.primary + '33' }]}>
+              <Image
+                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLRwwSjE9kCnMtNMEqOqQ5388pHIcCashg_tceg_guF0WII5s-7Y3Yw_00vl8O5EwOIlzIkn0PXlnf9fzrmK5RlbtEKkrveYLKTB4QWt6oB204XGs9nJu9yjzZPgZa2UhuqcRjrWef1f6PFczUK8MhGckkfxdviQnknJWivE5cfu1i7xo_zwMHfgvvoXfMhqO5gtWJWWEbjUWruW6U_Biiag6h3_Z5cgRWE2z7tcozqjDVwtKBK4j-lQVsE9gqdjEqoGSnlddTDM_' }}
+                style={styles.avatarImage}
+              />
+            </View>
+            <View style={[styles.verifiedBadge, { backgroundColor: colors.primary, borderColor: colors.background }]}>
+              <ShieldCheck size={14} color="#000" strokeWidth={3} />
+            </View>
           </View>
-          <Text style={[styles.name, { color: colors.text }]}>{user?.fullName || 'Administrator'}</Text>
-          <View style={[styles.adminBadge, { backgroundColor: colors.primary + '15' }]}>
-            <Text style={[styles.adminBadgeText, { color: colors.primary }]}>SUPER ADMIN</Text>
-          </View>
-          <Text style={[styles.email, { color: colors.textSecondary }]}>{user?.email}</Text>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>SYSTEM MANAGEMENT</Text>
-          <View style={[styles.card, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-            <ProfileRow icon={Database} label="System Logs" subLabel="View all activity trails" color={colors.text} />
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            <ProfileRow icon={FileText} label="Generate Reports" subLabel="Export system data" color={colors.text} />
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>ACCOUNT</Text>
-          <View style={[styles.card, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
-            <View style={styles.infoRow}>
-              <Mail size={20} color={colors.textSecondary} />
-              <View>
-                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Admin Email</Text>
-                <Text style={[styles.infoValue, { color: colors.text }]}>{user?.email}</Text>
-              </View>
+          <View style={styles.profileTextContainer}>
+            <Text style={[styles.profileName, { color: colors.text }]}>{user?.fullName || 'Alexander Pierce'}</Text>
+            <View style={[styles.roleBadge, { backgroundColor: colors.primary + '1A', borderColor: colors.primary + '33' }]}>
+              <Text style={[styles.roleText, { color: colors.primary }]}>SYSTEM ADMINISTRATOR</Text>
+            </View>
+            <View style={styles.lastLoginContainer}>
+              <Clock size={14} color={colors.primary + '99'} />
+              <Text style={[styles.lastLoginText, { color: colors.textSecondary }]}>
+                Last login: Oct 24, 10:45 AM
+              </Text>
             </View>
           </View>
         </View>
 
-        <TouchableOpacity
-          style={[styles.signOutButton, { backgroundColor: colors.error + '15', borderColor: colors.error }]}
-          onPress={handleSignOut}
-        >
-          <LogOut size={20} color={colors.error} />
-          <Text style={[styles.signOutText, { color: colors.error }]}>Log Out of Portal</Text>
-        </TouchableOpacity>
+        {/* Quick Stats Grid */}
+        <View style={styles.statsGrid}>
+          <View style={[styles.statCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#fff' }]}>
+            <View style={styles.statCardHeader}>
+              <View style={[styles.statIconBox, { backgroundColor: colors.primary + '33' }]}>
+                <Shield size={20} color={colors.primary} />
+              </View>
+              <Text style={styles.statBadgeText}>SECURE</Text>
+            </View>
+            <View>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>SECURITY LEVEL</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>High</Text>
+            </View>
+          </View>
 
-        <Text style={[styles.version, { color: colors.textSecondary }]}>Admin Portal v1.0.0</Text>
+          <View style={[styles.statCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#fff' }]}>
+            <View style={styles.statCardHeader}>
+              <View style={[styles.statIconBox, { backgroundColor: colors.primary + '33' }]}>
+                <TrendingUp size={20} color={colors.primary} />
+              </View>
+              <View style={styles.trendRow}>
+                <TrendingUp size={12} color="#10B981" />
+                <Text style={styles.trendText}>5%</Text>
+              </View>
+            </View>
+            <View>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>ADMIN ACTIONS TODAY</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>14</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Administrative Navigation */}
+        <View style={styles.navSection}>
+          <Text style={[styles.navSectionTitle, { color: colors.primary + '99' }]}>MANAGEMENT CONSOLE</Text>
+          <View style={styles.navItemsContainer}>
+            <ProfileNavItem
+              icon={<User size={22} color={colors.primary} />}
+              title="Personal Info"
+              subtitle="Manage your administrative profile"
+              colors={colors}
+              isDark={isDark}
+            />
+            <ProfileNavItem
+              icon={<Lock size={22} color={colors.primary} />}
+              title="Security Status"
+              subtitle="MFA & Authentication protocols"
+              colors={colors}
+              isDark={isDark}
+            />
+            <ProfileNavItem
+              icon={<FileText size={22} color={colors.primary} />}
+              title="Activity History"
+              subtitle="Audit logs & recent transactions"
+              colors={colors}
+              isDark={isDark}
+              onPress={() => router.push('/(admin)/logs')}
+            />
+            <ProfileNavItem
+              icon={<Database size={22} color={colors.primary} />}
+              title="System Health"
+              subtitle="Infrastructure performance"
+              colors={colors}
+              isDark={isDark}
+            />
+          </View>
+        </View>
+
+        {/* Danger Zone Footer */}
+        <TouchableOpacity
+          style={[styles.logoutButton, { borderColor: '#EF444433' }]}
+          onPress={handleLogout}
+        >
+          <LogOut size={20} color="#EF4444" />
+          <Text style={styles.logoutButtonText}>Logout from Terminal</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function ProfileRow({ icon: Icon, label, subLabel, color }: any) {
+function ProfileNavItem({ icon, title, subtitle, colors, isDark, onPress }: any) {
   return (
-    <TouchableOpacity style={styles.rowItem}>
-      <View style={[styles.rowIcon, { backgroundColor: 'rgba(0,0,0,0.03)' }]}>
-        <Icon size={20} color={color} />
+    <TouchableOpacity
+      style={[styles.navItem, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#fff' }]}
+      onPress={onPress}
+    >
+      <View style={[styles.navIconBox, { backgroundColor: colors.primary + '1A' }]}>
+        {icon}
       </View>
-      <View style={{ flex: 1 }}>
-        <Text style={[styles.rowLabel, { color }]}>{label}</Text>
-        <Text style={styles.rowSubLabel}>{subLabel}</Text>
+      <View style={styles.navContent}>
+        <Text style={[styles.navTitle, { color: colors.text }]}>{title}</Text>
+        <Text style={[styles.navSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
       </View>
-      <ShieldCheck size={16} color="rgba(0,0,0,0.1)" />
+      <ChevronRight size={20} color={colors.primary + '66'} />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  headerBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 },
-  headerTitle: { fontSize: 18, fontWeight: '700' },
-  scrollContent: { padding: 20, gap: 24, paddingBottom: 40 },
-  profileHeader: { alignItems: 'center', padding: 32, borderRadius: 24, borderWidth: 1, gap: 8 },
-  avatar: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  avatarText: { fontSize: 32, fontWeight: '800' },
-  name: { fontSize: 22, fontWeight: '700' },
-  adminBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
-  adminBadgeText: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  email: { fontSize: 14, marginTop: 4 },
-  section: { gap: 12 },
-  sectionTitle: { fontSize: 12, fontWeight: '700', letterSpacing: 1, marginLeft: 4 },
-  card: { borderRadius: 20, borderWidth: 1, overflow: 'hidden' },
-  infoRow: { flexDirection: 'row', padding: 16, gap: 12, alignItems: 'center' },
-  infoLabel: { fontSize: 12, fontWeight: '600' },
-  infoValue: { fontSize: 15, fontWeight: '600' },
-  rowItem: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 },
-  rowIcon: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  rowLabel: { fontSize: 15, fontWeight: '600' },
-  rowSubLabel: { fontSize: 12, color: '#888', marginTop: 2 },
-  divider: { height: 1, marginLeft: 68 },
-  signOutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 16, borderRadius: 16, borderWidth: 2, marginTop: 12 },
-  signOutText: { fontSize: 16, fontWeight: '700' },
-  version: { fontSize: 13, textAlign: 'center', marginTop: 12 }
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
+  headerButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 16, fontWeight: '700' },
+  scrollContent: { padding: 16, paddingBottom: 100 },
+  profileSection: { alignItems: 'center', marginTop: 24, marginBottom: 40 },
+  avatarWrapper: { position: 'relative' },
+  avatarGlow: { position: 'absolute', top: -4, left: -4, right: -4, bottom: -4, borderRadius: 68, opacity: 0.2 },
+  avatarContainer: { width: 128, height: 128, borderRadius: 64, borderWidth: 4, overflow: 'hidden' },
+  avatarImage: { width: '100%', height: '100%' },
+  verifiedBadge: { position: 'absolute', bottom: 4, right: 4, width: 28, height: 28, borderRadius: 14, borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
+  profileTextContainer: { alignItems: 'center', marginTop: 20 },
+  profileName: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
+  roleBadge: { marginTop: 8, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
+  roleText: { fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  lastLoginContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
+  lastLoginText: { fontSize: 13, fontWeight: '500' },
+  statsGrid: { flexDirection: 'row', gap: 16, marginBottom: 40 },
+  statCard: { flex: 1, padding: 20, borderRadius: 16, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  statCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  statIconBox: { width: 40, height: 40, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  statBadgeText: { fontSize: 10, fontWeight: '800', color: '#10B981' },
+  trendRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  trendText: { fontSize: 10, fontWeight: '800', color: '#10B981' },
+  statLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  statValue: { fontSize: 24, fontWeight: '700', marginTop: 2 },
+  navSection: { marginBottom: 32 },
+  navSectionTitle: { fontSize: 11, fontWeight: '800', letterSpacing: 2, paddingHorizontal: 8, marginBottom: 16 },
+  navItemsContainer: { gap: 8 },
+  navItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  navIconBox: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  navContent: { flex: 1, marginLeft: 16 },
+  navTitle: { fontSize: 16, fontWeight: '700' },
+  navSubtitle: { fontSize: 12, marginTop: 2 },
+  logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 16, borderRadius: 16, borderWidth: 1, marginTop: 8 },
+  logoutButtonText: { color: '#EF4444', fontSize: 15, fontWeight: '700' }
 });

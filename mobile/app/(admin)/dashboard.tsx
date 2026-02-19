@@ -1,32 +1,31 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Image } from 'react-native';
 import { useState, useCallback } from 'react';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { useAuth } from '@/contexts/AuthContext';
-import { storage } from '@/utils/storage';
-import { Users, MapPin, School, Plus, ShieldCheck } from 'lucide-react-native';
-import { User, Venue, School as SchoolType } from '@/types';
+import { api } from '@/services/api';
+import { Users, MapPin, Clock, AlertTriangle, Bell, DoorOpen, RefreshCcw, Building, Info, UserPlus } from 'lucide-react-native';
+import Svg, { Path, Defs, LinearGradient, Stop, Circle } from 'react-native-svg';
+import * as Animatable from 'react-native-animatable';
 
 export default function AdminDashboard() {
-  const router = useRouter();
-  const { colors } = useTheme();
-  const { user } = useAuth();
+  const { colors, isDark } = useTheme();
   
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [venues, setVenues] = useState<Venue[]>([]);
-  const [schools, setSchools] = useState<SchoolType[]>([]);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [activityFeed, setActivityFeed] = useState<any[]>([]);
 
   const loadData = async () => {
-    const [loadedUsers, loadedVenues, loadedSchools] = await Promise.all([
-      storage.getAllUsers(),
-      storage.getVenues(),
-      storage.getSchools()
-    ]);
-    setAllUsers(loadedUsers);
-    setVenues(loadedVenues);
-    setSchools(loadedSchools);
+    try {
+      const [stats, activity] = await Promise.all([
+        api.analytics.getAdminDashboard(),
+        api.system.getActivity()
+      ]);
+      setDashboardData(stats);
+      setActivityFeed(activity as any[]);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    }
   };
 
   useFocusEffect(
@@ -54,96 +53,136 @@ export default function AdminDashboard() {
           />
         }
       >
+        {/* Header Section */}
         <View style={styles.header}>
-          <View style={styles.titleRow}>
-            <View style={[styles.adminBadge, { backgroundColor: colors.primary + '20' }]}>
-              <ShieldCheck size={16} color={colors.primary} />
-              <Text style={[styles.adminBadgeText, { color: colors.primary }]}>Admin Portal</Text>
+          <View style={styles.headerLeft}>
+            <View style={[styles.profileContainer, { borderColor: colors.primary + '4D' }]}>
+              <Image
+                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4oHMrGpdpUKPkdqcYU0Um4Sid7SG4R9yDnU5KoAgyKBnhfW3YQfZ8tz3pz_Ng9mF0X2bSdfrUCmUNm-akFvqTPGyFTYS6nmFj5mC83nvC-jvXdv4W1D-KjSPYZO2DKnUmHFppd9wXaX24liPdr9x87mIsUxdyaKspw_veUaJDsMfIQfSaeGuJFdvSHbFnZJwEfks8qRaNhAUjPBmY7CVnL8Gs5-3-v5LitdAjofzQe7rw9-4rR2Q_wHG26ClKZ3Vgq4G8wyOe4bbY' }}
+                style={styles.profileImage}
+              />
+              <View style={[styles.statusDot, { backgroundColor: '#10B981', borderColor: colors.background }]} />
             </View>
-          </View>
-          <Text style={[styles.userName, { color: colors.text }]}>
-            {user?.fullName || 'Administrator'}
-          </Text>
-        </View>
-
-        <View style={styles.statsGrid}>
-          <TouchableOpacity 
-            style={[styles.statCard, { backgroundColor: colors.primary }]}
-            onPress={() => router.push('/(admin)/users')}
-          >
-            <Users size={24} color={colors.background} />
             <View>
-              <Text style={[styles.statValue, { color: colors.background }]}>{allUsers.length}</Text>
-              <Text style={[styles.statLabel, { color: colors.background }]}>Total Users</Text>
+              <Text style={[styles.welcomeText, { color: colors.primary }]}>PRESENTLY ADMIN</Text>
+              <Text style={[styles.userName, { color: colors.text }]}>Good Morning, Admin</Text>
             </View>
+          </View>
+          <TouchableOpacity style={[styles.notificationButton, { backgroundColor: isDark ? '#1a1608' : '#f0f0f0', borderColor: colors.border }]}>
+            <Bell size={20} color={colors.primary} />
+            <View style={styles.notificationBadge} />
           </TouchableOpacity>
+        </View>
 
-          <View style={styles.statsColumn}>
-            <TouchableOpacity 
-              style={[styles.smallStatCard, { backgroundColor: colors.cardBg }]}
-              onPress={() => router.push('/(admin)/venues')}
-            >
-              <MapPin size={20} color={colors.primary} />
-              <View>
-                <Text style={[styles.smallStatValue, { color: colors.text }]}>{venues.length}</Text>
-                <Text style={[styles.smallStatLabel, { color: colors.textSecondary }]}>Venues</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.smallStatCard, { backgroundColor: colors.cardBg }]}
-              onPress={() => router.push('/(admin)/institutions')}
-            >
-              <School size={20} color={colors.primary} />
-              <View>
-                <Text style={[styles.smallStatValue, { color: colors.text }]}>{schools.length}</Text>
-                <Text style={[styles.smallStatLabel, { color: colors.textSecondary }]}>Schools</Text>
-              </View>
-            </TouchableOpacity>
+        {/* KPI Grid */}
+        <View style={styles.kpiGrid}>
+          <View style={styles.kpiRow}>
+            <StatCard
+              icon={<Users size={20} color={colors.primary} />}
+              label="Users"
+              value={dashboardData?.total_users || '0'}
+              trend={dashboardData?.user_trend || '+0%'}
+              trendColor="#10B981"
+              colors={colors}
+            />
+            <StatCard
+              icon={<MapPin size={20} color={colors.primary} />}
+              label="Venues"
+              value={dashboardData?.total_venues || '0'}
+              colors={colors}
+            />
+          </View>
+          <View style={styles.kpiRow}>
+            <StatCard
+              icon={<Clock size={20} color={colors.primary} />}
+              label="Sessions"
+              value={dashboardData?.total_sessions || '0'}
+              colors={colors}
+            />
+            <StatCard
+              icon={<AlertTriangle size={20} color={colors.primary} />}
+              label="Alerts"
+              value={dashboardData?.active_alerts || '0'}
+              colors={colors}
+              isAlert={!!dashboardData?.active_alerts}
+            />
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
-          <View style={styles.actionsGrid}>
-            <TouchableOpacity 
-              style={[styles.actionItem, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
-              onPress={() => router.push('/(admin)/users')}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: colors.primary + '15' }]}>
-                <Plus size={24} color={colors.primary} />
-              </View>
-              <Text style={[styles.actionText, { color: colors.text }]}>New User</Text>
-            </TouchableOpacity>
+        {/* Chart Section */}
+        <View style={[styles.chartCard, { backgroundColor: isDark ? '#1a1608' : '#fff', borderColor: colors.border }]}>
+          <View style={styles.chartHeader}>
+            <View>
+              <Text style={[styles.chartTitle, { color: colors.text }]}>Weekly System Activity</Text>
+              <Text style={[styles.chartSubtitle, { color: colors.primary }]}>Activity Peak</Text>
+            </View>
+            <Text style={[styles.chartPeriod, { color: colors.textSecondary }]}>Last 7 Days</Text>
+          </View>
 
-            <TouchableOpacity 
-              style={[styles.actionItem, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
-              onPress={() => router.push('/(admin)/venues')}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: colors.primary + '15' }]}>
-                <Plus size={24} color={colors.primary} />
-              </View>
-              <Text style={[styles.actionText, { color: colors.text }]}>New Venue</Text>
-            </TouchableOpacity>
+          <View style={styles.chartContainer}>
+            <Svg width="100%" height="150" viewBox="0 0 400 150">
+              <Defs>
+                <LinearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0%" stopColor={colors.primary} stopOpacity="0.3" />
+                  <Stop offset="100%" stopColor={colors.primary} stopOpacity="0" />
+                </LinearGradient>
+              </Defs>
+              <Path
+                d="M0,120 Q50,110 80,40 T160,80 T240,20 T320,100 T400,30 V150 H0 Z"
+                fill="url(#chartGradient)"
+              />
+              <Path
+                d="M0,120 Q50,110 80,40 T160,80 T240,20 T320,100 T400,30"
+                fill="none"
+                stroke={colors.primary}
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              <Circle cx="240" cy="20" r="4" fill={colors.primary} />
+              <Circle cx="240" cy="20" r="10" fill={colors.primary} opacity="0.2" />
+            </Svg>
+          </View>
 
-            <TouchableOpacity 
-              style={[styles.actionItem, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
-              onPress={() => router.push('/(admin)/institutions')}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: colors.primary + '15' }]}>
-                <Plus size={24} color={colors.primary} />
-              </View>
-              <Text style={[styles.actionText, { color: colors.text }]}>New School</Text>
-            </TouchableOpacity>
+          <View style={styles.chartDays}>
+            {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, idx) => (
+              <Text key={day} style={[styles.dayText, { color: day === 'FRI' ? colors.primary : colors.textSecondary }]}>
+                {day}
+              </Text>
+            ))}
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Role Distribution</Text>
-          <View style={[styles.distributionCard, { backgroundColor: colors.cardBg }]}>
-            <RoleRow label="Students" count={allUsers.filter(u => u.role === 'student').length} total={allUsers.length} color={colors.primary} />
-            <RoleRow label="Lecturers" count={allUsers.filter(u => u.role === 'lecturer').length} total={allUsers.length} color="#FFCA0D" />
-            <RoleRow label="Admins" count={allUsers.filter(u => u.role === 'admin').length} total={allUsers.length} color={colors.textSecondary} />
+        {/* Live Activity Feed */}
+        <View style={styles.feedSection}>
+          <View style={styles.feedHeader}>
+            <Text style={[styles.feedTitle, { color: colors.text }]}>Live Activity Feed</Text>
+            <View style={styles.liveIndicator}>
+              <Animatable.View
+                animation="pulse"
+                easing="ease-out"
+                iterationCount="infinite"
+                style={[styles.liveDot, { backgroundColor: colors.primary }]}
+              />
+              <Text style={[styles.liveText, { color: colors.primary }]}>LIVE</Text>
+            </View>
+          </View>
+
+          <View style={styles.feedList}>
+            {activityFeed.length > 0 ? activityFeed.map((item, index) => (
+              <FeedItem
+                key={index}
+                icon={getActivityIcon(item.type, colors)}
+                title={item.title}
+                time={item.time}
+                subtitle={item.description}
+                colors={colors}
+                isDark={isDark}
+              />
+            )) : (
+              <View style={styles.emptyFeed}>
+                <Text style={{ color: colors.textSecondary }}>No recent activity</Text>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -151,16 +190,55 @@ export default function AdminDashboard() {
   );
 }
 
-function RoleRow({ label, count, total, color }: { label: string, count: number, total: number, color: string }) {
-  const percentage = total > 0 ? (count / total) * 100 : 0;
+function StatCard({ icon, label, value, trend, trendColor, colors, isAlert }: any) {
   return (
-    <View style={styles.roleRow}>
-      <View style={styles.roleInfo}>
-        <Text style={styles.roleLabel}>{label}</Text>
-        <Text style={styles.roleCount}>{count}</Text>
+    <View style={[styles.kpiCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+      <View style={styles.kpiHeader}>
+        <View style={[styles.kpiIconBox, { backgroundColor: colors.primary + '1A' }]}>
+          {icon}
+        </View>
+        {trend && (
+          <View style={[styles.trendBadge, { backgroundColor: trendColor + '1A' }]}>
+            <Text style={[styles.trendText, { color: trendColor }]}>{trend}</Text>
+          </View>
+        )}
+        {isAlert && (
+          <Animatable.View
+            animation="pulse"
+            iterationCount="infinite"
+            style={[styles.alertDot, { backgroundColor: colors.primary }]}
+          />
+        )}
       </View>
-      <View style={styles.progressBg}>
-        <View style={[styles.progressFill, { width: `${percentage}%`, backgroundColor: color }]} />
+      <Text style={[styles.kpiLabel, { color: colors.textSecondary }]}>{label}</Text>
+      <Text style={[styles.kpiValue, { color: colors.text }]}>{value}</Text>
+    </View>
+  );
+}
+
+function getActivityIcon(type: string, colors: any) {
+  switch (type) {
+    case 'session': return <DoorOpen size={20} color={colors.primary} />;
+    case 'sync': return <RefreshCcw size={20} color={colors.primary} />;
+    case 'venue': return <Building size={20} color={colors.primary} />;
+    case 'user': return <UserPlus size={20} color={colors.primary} />;
+    case 'alert': return <AlertTriangle size={20} color={colors.primary} />;
+    default: return <Info size={20} color={colors.primary} />;
+  }
+}
+
+function FeedItem({ icon, title, time, subtitle, colors, isDark }: any) {
+  return (
+    <View style={[styles.feedItem, { backgroundColor: isDark ? 'rgba(26, 22, 8, 0.5)' : '#f9f9f9', borderColor: colors.border + '4D' }]}>
+      <View style={[styles.feedIconBox, { backgroundColor: colors.primary + '1A' }]}>
+        {icon}
+      </View>
+      <View style={styles.feedContent}>
+        <View style={styles.feedTopLine}>
+          <Text style={[styles.feedItemTitle, { color: colors.text }]}>{title}</Text>
+          <Text style={[styles.feedTime, { color: colors.textSecondary }]}>{time}</Text>
+        </View>
+        <Text style={[styles.feedSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
       </View>
     </View>
   );
@@ -168,31 +246,46 @@ function RoleRow({ label, count, total, color }: { label: string, count: number,
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { padding: 20, gap: 24 },
-  header: { marginBottom: 8 },
-  titleRow: { flexDirection: 'row', marginBottom: 8 },
-  adminBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
-  adminBadgeText: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase' },
-  userName: { fontSize: 28, fontWeight: '700' },
-  statsGrid: { flexDirection: 'row', gap: 16, height: 160 },
-  statCard: { flex: 1.2, borderRadius: 24, padding: 20, justifyContent: 'space-between' },
-  statValue: { fontSize: 40, fontWeight: '800' },
-  statLabel: { fontSize: 14, fontWeight: '600', opacity: 0.9 },
-  statsColumn: { flex: 1, gap: 12 },
-  smallStatCard: { flex: 1, borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  smallStatValue: { fontSize: 20, fontWeight: '700' },
-  smallStatLabel: { fontSize: 12, fontWeight: '500' },
-  section: { gap: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '700' },
-  actionsGrid: { flexDirection: 'row', gap: 12 },
-  actionItem: { flex: 1, padding: 16, borderRadius: 20, alignItems: 'center', gap: 8, borderWidth: 1 },
-  actionIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  actionText: { fontSize: 12, fontWeight: '600' },
-  distributionCard: { padding: 20, borderRadius: 24, gap: 16 },
-  roleRow: { gap: 8 },
-  roleInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  roleLabel: { fontSize: 14, fontWeight: '600' },
-  roleCount: { fontSize: 14, fontWeight: '700' },
-  progressBg: { height: 6, backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 3, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 3 }
+  scrollContent: { padding: 24, paddingBottom: 100 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  profileContainer: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, padding: 2, position: 'relative' },
+  profileImage: { width: '100%', height: '100%', borderRadius: 22 },
+  statusDot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2, position: 'absolute', bottom: 0, right: 0 },
+  welcomeText: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2 },
+  userName: { fontSize: 20, fontWeight: '700' },
+  notificationButton: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  notificationBadge: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444', position: 'absolute', top: 10, right: 10 },
+  kpiGrid: { gap: 16, marginBottom: 24 },
+  kpiRow: { flexDirection: 'row', gap: 16, marginBottom: 16 },
+  kpiCard: { flex: 1, padding: 20, borderRadius: 16, borderWidth: 1, gap: 4 },
+  kpiHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
+  kpiIconBox: { padding: 8, borderRadius: 8 },
+  trendBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  trendText: { fontSize: 10, fontWeight: '700' },
+  alertDot: { width: 8, height: 8, borderRadius: 4 },
+  kpiLabel: { fontSize: 14, fontWeight: '500' },
+  kpiValue: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
+  chartCard: { padding: 24, borderRadius: 16, borderWidth: 1, marginBottom: 24 },
+  chartHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 },
+  chartTitle: { fontSize: 16, fontWeight: '600' },
+  chartSubtitle: { fontSize: 24, fontWeight: '700', marginTop: 4 },
+  chartPeriod: { fontSize: 12, fontWeight: '500' },
+  chartContainer: { height: 150, width: '100%', marginBottom: 16 },
+  chartDays: { flexDirection: 'row', justifyContent: 'space-between' },
+  dayText: { fontSize: 11, fontWeight: '700' },
+  feedSection: { gap: 16 },
+  feedHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  feedTitle: { fontSize: 18, fontWeight: '700' },
+  liveIndicator: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  liveDot: { width: 6, height: 6, borderRadius: 3 },
+  liveText: { fontSize: 12, fontWeight: '700' },
+  feedList: { gap: 12 },
+  feedItem: { flexDirection: 'row', padding: 16, borderRadius: 12, borderWidth: 1, gap: 16 },
+  feedIconBox: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  feedContent: { flex: 1 },
+  feedTopLine: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  feedItemTitle: { fontSize: 14, fontWeight: '600' },
+  feedTime: { fontSize: 10, fontWeight: '500' },
+  feedSubtitle: { fontSize: 12, marginTop: 2 }
 });
