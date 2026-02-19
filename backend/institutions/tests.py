@@ -1,10 +1,9 @@
 from django.test import TestCase
 from django.utils import timezone
-from django.contrib.gis.geos import Point
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework import status
 from .views import AttendanceSessionViewSet, public_check_in_view
-from .models import User, AttendanceSession, Course, Venue, Institution, College, Department, Attendance, UserRole
+from .models import User, AttendanceSession, Course, Venue, Institution, College, Department, Attendance, UserRole, CourseEnrollment
 from unittest.mock import patch, MagicMock
 import datetime
 
@@ -33,11 +32,12 @@ class CheckInTests(TestCase):
         self.course = Course.objects.create(
             code="CS101", title="Test Course", lecturer=self.lecturer
         )
+        CourseEnrollment.objects.create(student=self.student, course=self.course, is_active=True)
         self.course.department.add(self.department)
         
         self.venue = Venue.objects.create(
             institution=self.institution, name="Test Venue", 
-            location=Point(10.0, 10.0), gps_radius=50
+            latitude=10.0, longitude=10.0, gps_radius=50
         )
         
         # Active session
@@ -55,12 +55,13 @@ class CheckInTests(TestCase):
         mock_verify.return_value = (True, 10.0)
         
         view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
-        data = {'latitude': 10.0, 'longitude': 10.0}
+        data = {'latitude': 10.0, 'longitude': 10.0, 'code': self.session.session_code}
         request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/', data)
         force_authenticate(request, user=self.student)
         
         response = view(request, pk=self.session.id)
         
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.count(), 1)
         self.assertEqual(Attendance.objects.first().status, 'PRESENT')
@@ -74,12 +75,13 @@ class CheckInTests(TestCase):
         self.session.save()
         
         view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
-        data = {'latitude': 10.0, 'longitude': 10.0}
+        data = {'latitude': 10.0, 'longitude': 10.0, 'code': self.session.session_code}
         request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/', data)
         force_authenticate(request, user=self.student)
         
         response = view(request, pk=self.session.id)
         
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.first().status, 'LATE')
 
@@ -89,7 +91,7 @@ class CheckInTests(TestCase):
         mock_verify.return_value = (False, 100.0)
         
         view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
-        data = {'latitude': 11.0, 'longitude': 11.0}
+        data = {'latitude': 11.0, 'longitude': 11.0, 'code': self.session.session_code}
         request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/', data)
         force_authenticate(request, user=self.student)
         
@@ -104,7 +106,7 @@ class CheckInTests(TestCase):
         Attendance.objects.create(session=self.session, student=self.student)
         
         view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
-        request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/')
+        request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/', {'code': self.session.session_code})
         force_authenticate(request, user=self.student)
         
         response = view(request, pk=self.session.id)
@@ -122,5 +124,6 @@ class CheckInTests(TestCase):
         
         response = public_check_in_view(request, session_code=self.session.session_code)
         
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.count(), 1)

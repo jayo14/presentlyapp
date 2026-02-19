@@ -997,7 +997,7 @@ class VenueViewSet(viewsets.ModelViewSet):
             
         return queryset
 
-    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['get'])
     def sessions(self, request, pk=None):
         """Get all sessions for this venue"""
         venue = self.get_object()
@@ -1047,7 +1047,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
     
-    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['get'])
     def enrolled_students(self, request, pk=None):
         """Get list of students enrolled in this course"""
         course = self.get_object()
@@ -1085,7 +1085,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             'students': students
         })
     
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'])
     def available(self, request):
         """Get available courses for student enrollment based on their department"""
         if request.user.role != UserRole.STUDENT:
@@ -1180,7 +1180,7 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
     
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['post'])
     def enroll(self, request):
         """Student enrolls in a course"""
         if request.user.role != UserRole.STUDENT:
@@ -1243,7 +1243,7 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
             'enrollment': serializer.data
         }, status=status.HTTP_201_CREATED)
     
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post'])
     def drop(self, request, pk=None):
         """Student drops a course"""
         enrollment = self.get_object()
@@ -1271,7 +1271,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     serializer_class = AttendanceSessionSerializer
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'check_in']:
             return [IsAuthenticated()]
         return [IsLecturerOrAdmin()]
     
@@ -1344,7 +1344,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         
         return queryset
     
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post'])
     def end(self, request, pk=None):
         """Lecturer manually ends a session"""
         session = self.get_object()
@@ -1366,9 +1366,11 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
             'end_time': session.end_time
         })
 
-    @ratelimit(key='user', rate='5/m', block=True)
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post'])
     def check_in(self, request, pk=None):
+        from django_ratelimit.core import is_ratelimited
+        if is_ratelimited(request, key='user', rate='5/m', group='check_in', increment=True):
+            return Response({'error': 'Rate limit exceeded'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         """Student check-in to a session with GPS verification"""
         with transaction.atomic():
             # Use select_for_update to prevent race conditions during high volume
@@ -1630,9 +1632,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 
-@ratelimit(key='user', rate='5/m', block=True)
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
+@ratelimit(key='user', rate='5/m', block=True)
 def public_check_in_view(request, session_code):
     """
     Public check-in endpoint for QR code URLs
