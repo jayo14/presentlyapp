@@ -133,13 +133,7 @@ export default function AdminProfile() {
         </View>
 
         {/* Danger Zone Footer */}
-        <TouchableOpacity
-          style={[styles.logoutButton, { borderColor: '#EF444433' }]}
-          onPress={handleLogout}
-        >
-          <LogOut size={20} color="#EF4444" />
-          <Text style={styles.logoutButtonText}>Logout from Terminal</Text>
-        </TouchableOpacity>
+        {/* Sign Out button moved to settings screen */}
       </ScrollView>
     </SafeAreaView>
   );
