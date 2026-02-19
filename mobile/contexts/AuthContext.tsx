@@ -20,27 +20,7 @@ const normalizeRole = (role?: string): User['role'] => {
   return 'student';
 };
 
-const extractErrorMessage = (error: any): string => {
-  if (error.response?.data?.errors) {
-    const errors = error.response.data.errors;
-    const firstKey = Object.keys(errors)[0];
-    const firstError = errors[firstKey];
-    if (Array.isArray(firstError)) {
-      return ;
-    }
-    return ;
-  }
-  if (error.response?.data?.detail) {
-    return error.response.data.detail;
-  }
-  if (error.response?.data?.message) {
-      return error.response.data.message;
-  }
-  if (error.response?.data?.error) {
-    return error.response.data.error;
-  }
-  return error.message || 'An unexpected error occurred';
-};
+// ...existing code...
 
 
 const mapApiUser = (data: any, fallbackEmail: string): User => {

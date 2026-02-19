@@ -28,7 +28,8 @@ const getApiUrl = () => {
   if (process.env.EXPO_PUBLIC_API_BASE_URL) {
     return ensureApiPath(process.env.EXPO_PUBLIC_API_BASE_URL);
   }
-  return 'https://presently.koyeb.app/api';
+  // return 'https://presently.koyeb.app/api';
+  return 'http://localhost:8000/api';
 };
 
 export const ENV = {
