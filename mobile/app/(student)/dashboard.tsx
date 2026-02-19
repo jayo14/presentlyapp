@@ -29,6 +29,14 @@ export default function StudentDashboard() {
 
   const firstName = user?.fullName?.split(' ')[0] || 'Alex';
 
+  if (isLoading && !refreshing) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Top App Bar */}
@@ -60,6 +68,7 @@ export default function StudentDashboard() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
         {/* Happening Now Section */}
+        {activeSession ? (
         <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
                 <Text style={[styles.sectionSubtitle, { color: isDark ? '#ccbf8e' : '#666666' }]}>HAPPENING NOW</Text>
@@ -78,16 +87,16 @@ export default function StudentDashboard() {
                     <View style={styles.liveCardTop}>
                         <View style={styles.liveCardInfo}>
                             <View style={[styles.locationBadge, { backgroundColor: colors.primary + '33' }]}>
-                                <Text style={[styles.locationText, { color: isDark ? '#fbbf24' : '#B45309' }]}>Lecture Hall B</Text>
+                                <Text style={[styles.locationText, { color: isDark ? '#fbbf24' : '#B45309' }]}>{activeSession.venueName || 'Main Hall'}</Text>
                             </View>
-                            <Text style={[styles.courseName, { color: colors.text }]}>CS101 - Algorithm Design</Text>
+                            <Text style={[styles.courseName, { color: colors.text }]}>{activeSession.courseCode} - {activeSession.courseName}</Text>
                             <Text style={[styles.instructorName, { color: isDark ? '#ccbf8e' : '#666666' }]}>
-                                Prof. Sarah Jenkins • 10:00 AM - 11:30 AM
+                                {activeSession.lecturerName} • {new Date(activeSession.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(activeSession.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </Text>
                         </View>
                         <View style={[styles.remBox, { backgroundColor: isDark ? 'rgba(74,65,33,0.3)' : 'rgba(0,0,0,0.05)' }]}>
                             <Text style={[styles.remLabel, { color: colors.text, opacity: 0.7 }]}>REM</Text>
-                            <Text style={[styles.remValue, { color: colors.text }]}>15m</Text>
+                            <Text style={[styles.remValue, { color: colors.text }]}>{Math.max(0, Math.round((new Date(activeSession.endTime).getTime() - new Date().getTime()) / 60000))}m</Text>
                         </View>
                     </View>
 
@@ -102,6 +111,15 @@ export default function StudentDashboard() {
                 </View>
             </ImageBackground>
         </View>
+        ) : (
+          <View style={styles.section}>
+            <View style={[styles.liveCard, { backgroundColor: isDark ? '#231e0f' : '#F9FAFB', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0', padding: 32, alignItems: 'center' }]}>
+              <BookOpen size={48} color={colors.textSecondary} opacity={0.5} />
+              <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 16, marginBottom: 4, textAlign: 'center' }]}>No Active Sessions</Text>
+              <Text style={{ color: colors.textSecondary, textAlign: 'center' }}>{`You don't have any ongoing lectures at the moment.`}</Text>
+            </View>
+          </View>
+        )}
 
         {/* Attendance Summary */}
         <View style={styles.section}>

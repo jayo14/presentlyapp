@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from 'expo-router';
-import { Home, Users, MapPin, School, UserCircle } from 'lucide-react-native';
+import { Home, Users, School, BookOpen, MoreHorizontal } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Platform } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -58,27 +58,38 @@ export default function AdminLayout() {
         }}
       />
       <Tabs.Screen
-        name="venues"
+        name="institutions/index"
         options={{
-          title: 'Venues',
-          tabBarIcon: ({ color, size }) => <MapPin size={size} color={color} strokeWidth={2} />,
-        }}
-      />
-      <Tabs.Screen
-        name="institutions"
-        options={{
-          title: 'Schools',
+          title: 'Institutions',
           tabBarIcon: ({ color, size }) => <School size={size} color={color} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="courses"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => <UserCircle size={size} color={color} strokeWidth={2} />,
+          title: 'Courses',
+          tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} strokeWidth={2} />,
+        }}
+      />
+      <Tabs.Screen
+        name="more"
+        options={{
+          title: 'More',
+          tabBarIcon: ({ color, size }) => <MoreHorizontal size={size} color={color} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen name="index" options={{ href: null }} />
+      <Tabs.Screen name="venues" options={{ href: null }} />
+      <Tabs.Screen name="profile" options={{ href: null }} />
+      <Tabs.Screen name="logs" options={{ href: null }} />
+      <Tabs.Screen name="settings" options={{ href: null }} />
+      <Tabs.Screen name="institutions/new" options={{ href: null }} />
+      <Tabs.Screen name="institutions/[id]/index" options={{ href: null }} />
+      <Tabs.Screen name="institutions/[id]/faculties" options={{ href: null }} />
+      <Tabs.Screen name="institutions/[id]/departments" options={{ href: null }} />
+      <Tabs.Screen name="institutions/[id]/admins" options={{ href: null }} />
+      <Tabs.Screen name="institutions/[id]/analytics" options={{ href: null }} />
+      <Tabs.Screen name="institutions/[id]/settings" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -1,17 +1,17 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal, ScrollView, Alert, Image } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { storage } from '@/utils/storage';
+import { api } from '@/services/api';
 import { User } from '@/types';
-import { Search, Plus, UserCircle, Trash2, Edit2, X, Filter } from 'lucide-react-native';
+import { Search, X, MoreVertical, UserPlus } from 'lucide-react-native';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { CustomModal } from '@/components/CustomModal';
 
 export default function ManageUsersScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const [users, setUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<'all' | 'student' | 'lecturer' | 'admin'>('all');
@@ -32,8 +32,12 @@ export default function ManageUsersScreen() {
   const [confirmModal, setConfirmModal] = useState<{ visible: boolean, userId: string }>({ visible: false, userId: '' });
 
   const loadUsers = async () => {
-    const loadedUsers = await storage.getAllUsers();
-    setUsers(loadedUsers);
+    try {
+      const response: any = await api.users.list();
+      setUsers(response.results || response);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
   };
 
   useFocusEffect(
@@ -69,8 +73,17 @@ export default function ManageUsersScreen() {
       onboardingCompleted: true
     };
 
-    await storage.saveUser(userToSave);
-    await loadUsers();
+    try {
+      if (editingUser) {
+        await api.users.update(editingUser.id, userToSave);
+      } else {
+        await api.users.create(userToSave);
+      }
+      await loadUsers();
+    } catch (error) {
+      console.error('Error saving user:', error);
+      Alert.alert('Error', 'Failed to save user');
+    }
     setLoading(false);
     setModalVisible(false);
     setEditingUser(null);
@@ -78,8 +91,13 @@ export default function ManageUsersScreen() {
   };
 
   const deleteUser = async (id: string) => {
-    await storage.deleteUser(id);
-    await loadUsers();
+    try {
+      await api.users.delete(id);
+      await loadUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      Alert.alert('Error', 'Failed to delete user');
+    }
     setConfirmModal({ visible: false, userId: '' });
   };
 
@@ -117,51 +135,52 @@ export default function ManageUsersScreen() {
         onCancel={() => setConfirmModal({ visible: false, userId: '' })}
       />
 
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Users</Text>
-        <TouchableOpacity 
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={() => { setEditingUser(null); resetForm(); setModalVisible(true); }}
-        >
-          <Plus size={24} color={colors.background} />
-        </TouchableOpacity>
-      </View>
+        <View style={styles.headerTop}>
+          <Text style={[styles.title, { color: colors.text }]}>Users</Text>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f0f0f0' }]}
+            onPress={() => { setEditingUser(null); resetForm(); setModalVisible(true); }}
+          >
+            <UserPlus size={20} color={colors.text} />
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.searchSection}>
-        <View style={[styles.searchBar, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+        {/* Search Bar */}
+        <View style={[styles.searchBar, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f0f0f0' }]}>
           <Search size={20} color={colors.textSecondary} />
           <TextInput 
             style={[styles.searchInput, { color: colors.text }]}
-            placeholder="Search users..."
+            placeholder="Search by name, ID, or institution..."
             placeholderTextColor={colors.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
         </View>
-      </View>
 
-      <View style={styles.filterSection}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-          {(['all', 'student', 'lecturer', 'admin'] as const).map(role => (
-            <TouchableOpacity 
-              key={role}
-              style={[
-                styles.filterBadge, 
-                { backgroundColor: colors.cardBg, borderColor: colors.border },
-                selectedRole === role && { backgroundColor: colors.primary, borderColor: colors.primary }
-              ]}
-              onPress={() => setSelectedRole(role)}
-            >
-              <Text style={[
-                styles.filterText, 
-                { color: colors.textSecondary },
-                selectedRole === role && { color: colors.background }
-              ]}>
-                {role.charAt(0).toUpperCase() + role.slice(1)}s
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        {/* Role Filters */}
+        <View style={styles.filterSection}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+            {(['all', 'student', 'lecturer', 'admin'] as const).map(role => (
+              <TouchableOpacity
+                key={role}
+                style={[
+                  styles.filterBadge,
+                  selectedRole === role ? { backgroundColor: colors.primary } : { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f0f0f0' }
+                ]}
+                onPress={() => setSelectedRole(role)}
+              >
+                <Text style={[
+                  styles.filterText,
+                  selectedRole === role ? { color: '#000' } : { color: colors.textSecondary }
+                ]}>
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </View>
 
       <FlatList 
@@ -171,24 +190,32 @@ export default function ManageUsersScreen() {
         renderItem={({ item }) => (
           <View style={[styles.userCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
             <View style={styles.userMain}>
-              <View style={[styles.avatar, { backgroundColor: colors.primary + '15' }]}>
-                <UserCircle size={24} color={colors.primary} />
+              <View style={[styles.avatarContainer, { borderColor: colors.border }]}>
+                {item.avatar ? (
+                  <Image source={{ uri: item.avatar }} style={styles.avatar} />
+                ) : (
+                  <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary + '20' }]}>
+                    <Text style={[styles.avatarText, { color: colors.primary }]}>
+                      {item.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
               </View>
               <View style={styles.userInfo}>
-                <Text style={[styles.userName, { color: colors.text }]}>{item.fullName}</Text>
-                <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{item.email}</Text>
-                <View style={[styles.roleBadge, { backgroundColor: colors.border + '50' }]}>
-                  <Text style={[styles.roleLabel, { color: colors.textSecondary }]}>{item.role?.toUpperCase()}</Text>
+                <View style={styles.nameRow}>
+                  <Text style={[styles.userName, { color: colors.text }]}>{item.fullName}</Text>
+                  <View style={[styles.statusDot, { backgroundColor: colors.primary, shadowColor: colors.primary, shadowOpacity: 0.6, shadowRadius: 4, shadowOffset: { width: 0, height: 0 } }]} />
+                </View>
+                <Text style={[styles.userMeta, { color: colors.textSecondary }]}>
+                  ID: {item.matricNumber || 'N/A'} • {item.department || 'System'}
+                </Text>
+                <View style={[styles.roleBadge, { backgroundColor: getRoleColor(item.role) + '1A' }]}>
+                  <Text style={[styles.roleLabel, { color: getRoleColor(item.role) }]}>{item.role?.toUpperCase()}</Text>
                 </View>
               </View>
-              <View style={styles.userActions}>
-                <TouchableOpacity onPress={() => openEdit(item)} style={styles.actionBtn}>
-                  <Edit2 size={18} color={colors.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setConfirmModal({ visible: true, userId: item.id })} style={styles.actionBtn}>
-                  <Trash2 size={18} color={colors.error} />
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity onPress={() => openEdit(item)} style={styles.moreButton}>
+                <MoreVertical size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -246,29 +273,43 @@ export default function ManageUsersScreen() {
   );
 }
 
+function getRoleColor(role: any) {
+  switch (role) {
+    case 'student': return '#f2b90d';
+    case 'lecturer': return '#3B82F6';
+    case 'admin': return '#A855F7';
+    case 'suspended': return '#EF4444';
+    default: return '#f2b90d';
+  }
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 },
-  title: { fontSize: 28, fontWeight: '700' },
-  addButton: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  searchSection: { paddingHorizontal: 20, marginBottom: 12 },
-  searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 48, borderRadius: 14, borderWidth: 1, gap: 8 },
-  searchInput: { flex: 1, fontSize: 15 },
-  filterSection: { marginBottom: 16 },
-  filterScroll: { paddingHorizontal: 20, gap: 10 },
-  filterBadge: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
-  filterText: { fontSize: 13, fontWeight: '600' },
-  listContent: { paddingHorizontal: 20, gap: 12, paddingBottom: 40 },
-  userCard: { padding: 16, borderRadius: 20, borderWidth: 1 },
+  header: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8, gap: 16 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
+  headerButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 48, borderRadius: 12, gap: 8 },
+  searchInput: { flex: 1, fontSize: 14 },
+  filterSection: { marginHorizontal: -16 },
+  filterScroll: { paddingHorizontal: 16, gap: 8 },
+  filterBadge: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20 },
+  filterText: { fontSize: 12, fontWeight: '600' },
+  listContent: { padding: 16, gap: 12, paddingBottom: 100 },
+  userCard: { padding: 12, borderRadius: 16, borderWidth: 1 },
   userMain: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-  avatar: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  avatarContainer: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, overflow: 'hidden' },
+  avatar: { width: '100%', height: '100%' },
+  avatarPlaceholder: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: 16, fontWeight: '700' },
   userInfo: { flex: 1, gap: 2 },
-  userName: { fontSize: 16, fontWeight: '700' },
-  userEmail: { fontSize: 13 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  userName: { fontSize: 14, fontWeight: '700' },
+  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  userMeta: { fontSize: 10, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
   roleBadge: { alignSelf: 'flex-start', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginTop: 4 },
   roleLabel: { fontSize: 10, fontWeight: '800' },
-  userActions: { flexDirection: 'row', gap: 8 },
-  actionBtn: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.03)' },
+  moreButton: { padding: 4 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, height: '85%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
