@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
-from django.contrib.gis.geos import Point
+# from django.contrib.gis.geos import Point
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework import status
 from .views import AttendanceSessionViewSet, public_check_in_view
@@ -37,7 +37,7 @@ class CheckInTests(TestCase):
         
         self.venue = Venue.objects.create(
             institution=self.institution, name="Test Venue", 
-            location=Point(10.0, 10.0), gps_radius=50
+            latitude=10.0, longitude=10.0, gps_radius=50
         )
         
         # Active session
