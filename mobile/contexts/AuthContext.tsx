@@ -20,7 +20,31 @@ const normalizeRole = (role?: string): User['role'] => {
   return 'student';
 };
 
-const mapApiUser = (userData: any, fallbackEmail: string): User => {
+const extractErrorMessage = (error: any): string => {
+  if (error.response?.data?.errors) {
+    const errors = error.response.data.errors;
+    const firstKey = Object.keys(errors)[0];
+    const firstError = errors[firstKey];
+    if (Array.isArray(firstError)) {
+      return ;
+    }
+    return ;
+  }
+  if (error.response?.data?.detail) {
+    return error.response.data.detail;
+  }
+  if (error.response?.data?.message) {
+      return error.response.data.message;
+  }
+  if (error.response?.data?.error) {
+    return error.response.data.error;
+  }
+  return error.message || 'An unexpected error occurred';
+};
+
+
+const mapApiUser = (data: any, fallbackEmail: string): User => {
+  const userData = data?.user ?? data;
   return {
     id: String(userData?.id ?? userData?._id ?? userData?.uuid ?? 'user-1'),
     fullName: userData?.full_name ?? userData?.fullName ?? userData?.name ?? 'User',
@@ -174,7 +198,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
         return { success: false, error: response?.detail || response?.message || 'Invalid credentials' };
       } catch (apiError: any) {
-        return { success: false, error: apiError?.response?.data?.detail || apiError?.message || 'Invalid credentials' };
+        return { success: false, error: extractErrorMessage(apiError) };
       }
     } catch (error) {
       console.error('Sign in error:', error);
@@ -207,7 +231,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         }
         return { success: false, error: response.detail || 'Failed to create account' };
       } catch (apiError: any) {
-        return { success: false, error: apiError?.response?.data?.detail || apiError?.message || 'Failed to create account' };
+        return { success: false, error: extractErrorMessage(apiError) };
       }
     } catch (error) {
       return { success: false, error: 'Failed to create account' };

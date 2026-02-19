@@ -18,6 +18,7 @@ export default function SignUpScreen() {
     fullName: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -46,6 +47,10 @@ export default function SignUpScreen() {
       newErrors.password = passwordValidation.error || 'Invalid password';
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
@@ -54,9 +59,10 @@ export default function SignUpScreen() {
 
     setLoading(true);
     const result = await signUp({
-      fullName: formData.fullName,
+      full_name: formData.fullName,
       email: formData.email,
       password: formData.password,
+      password2: formData.confirmPassword,
     });
     setLoading(false);
 
@@ -129,6 +135,15 @@ export default function SignUpScreen() {
               placeholder="Min 8 characters"
               secureTextEntry
               error={errors.password}
+            />
+
+            <Input
+              label="Confirm Password"
+              value={formData.confirmPassword}
+              onChangeText={(text) => handleInputChange('confirmPassword', text)}
+              placeholder="Repeat your password"
+              secureTextEntry
+              error={errors.confirmPassword}
             />
 
             <Button
