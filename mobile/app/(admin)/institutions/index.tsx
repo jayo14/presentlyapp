@@ -11,7 +11,7 @@ import { Input } from '@/components/Input';
 import { CustomModal } from '@/components/CustomModal';
 
 export default function ManageInstitutionsScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const [schools, setSchools] = useState<School[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);

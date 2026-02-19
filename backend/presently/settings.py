@@ -219,13 +219,10 @@ SIMPLE_JWT = {
 
 # CORS Configuration for frontend
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:8081',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:8081',
-    'https://presentlyapp.vercel.app',
+    "http://localhost:8081",
+    "http://127.0.0.1:8081",
+    "https://studious-space-broccoli-4j79w564rjxp27p5j-8081.app.github.dev",
+    "https://studious-space-broccoli-4j79w564rjxp27p5j-8000.app.github.dev",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
