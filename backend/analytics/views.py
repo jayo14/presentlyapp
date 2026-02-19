@@ -385,7 +385,35 @@ class SessionAnalyticsView(APIView):
 class LiveSessionAnalyticsView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        return Response({'live_sessions': []})
+        from institutions.models import AttendanceSession, CourseEnrollment
+        from institutions.serializers import AttendanceSessionSerializer
+        from django.utils import timezone
+
+        user = request.user
+        now = timezone.now()
+
+        # Get active sessions for courses student is enrolled in
+        if user.role == 'STUDENT':
+            enrollments = CourseEnrollment.objects.filter(student=user, is_active=True)
+            courses = [e.course for e in enrollments]
+
+            live_sessions = AttendanceSession.objects.filter(
+                course__in=courses,
+                start_time__lte=now,
+                end_time__gte=now,
+                is_active=True
+            ).select_related('course', 'venue', 'course__lecturer')
+        else:
+            # For lecturers, get their own active sessions
+            live_sessions = AttendanceSession.objects.filter(
+                course__lecturer=user,
+                start_time__lte=now,
+                end_time__gte=now,
+                is_active=True
+            ).select_related('course', 'venue', 'course__lecturer')
+
+        serializer = AttendanceSessionSerializer(live_sessions, many=True, context={'request': request})
+        return Response({'live_sessions': serializer.data})
 
 
 class AtRiskStudentsView(APIView):
