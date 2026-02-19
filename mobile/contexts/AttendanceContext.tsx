@@ -8,15 +8,24 @@ import { useAuth } from './AuthContext';
 
 const mapApiAttendance = (item: any): AttendanceRecord => ({
   id: String(item.id),
-  sessionId: String(item.session),
-  studentId: String(item.student),
-  studentName: item.student_name,
-  studentMatric: item.student_matric,
-  courseCode: item.course_code,
-  courseName: item.course_name || item.course_code,
-  timestamp: item.checked_in_at || new Date().toISOString(),
+  sessionId: String(item.session || ""),
+  studentId: String(item.student || ""),
+  studentName: item.student_name || "",
+  studentMatric: item.student_matric || "",
+  courseCode: item.course_code || "",
+  courseName: item.course_name || item.course_code || "",
+  timestamp: item.timestamp || item.checked_in_at || new Date().toISOString(),
   method: (item.method || "qr").toLowerCase() as any,
   status: item.status || "PRESENT",
+});
+
+const mapApiCourse = (item: any): Course => ({
+  id: String(item.id),
+  code: item.course_code,
+  name: item.course_name,
+  totalSessions: item.total_sessions || 0,
+  attendedSessions: item.sessions_attended || 0,
+  percentage: item.attendance_percentage || 0,
 });
 
 const mapApiSession = (item: any): Session => ({
@@ -67,19 +76,19 @@ export const [AttendanceProvider, useAttendance] = createContextHook(() => {
       if (user.role === "student") {
           const response: any = await api.analytics.getStudentDashboard();
           if (response) {
+              const attendanceStats = response.attendance_stats || {};
               setStats({
-                  totalSessions: response.total_sessions || 0,
-                  attended: response.attended_sessions || 0,
-                  percentage: response.attendance_percentage || 0,
-                  status: response.eligibility_status || "eligible",
+                  totalSessions: attendanceStats.total_sessions || 0,
+                  attended: (attendanceStats.total_present || 0) + (attendanceStats.total_late || 0),
+                  percentage: attendanceStats.average_attendance || 0,
+                  status: (attendanceStats.average_attendance || 0) >= 75 ? 'eligible' : 'at-risk',
               });
-              setCourses(response.courses || []);
+              setCourses((response.enrolled_courses || []).map(mapApiCourse));
               setHistory((response.recent_activity || []).map(mapApiAttendance));
           }
           const liveResponse: any = await api.analytics.getLiveSessions();
-          if (liveResponse && liveResponse.results) {
-              setSessions(liveResponse.results.map(mapApiSession));
-          }
+          const liveSessions = liveResponse?.live_sessions || liveResponse?.results || [];
+          setSessions(liveSessions.map(mapApiSession));
       } else if (user.role === "lecturer") {
           const response: any = await api.analytics.getLecturerDashboard();
           if (response) {

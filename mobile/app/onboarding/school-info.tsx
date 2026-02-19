@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, FlatList, KeyboardAvoidingView, Platform, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, FlatList, KeyboardAvoidingView, Platform, Modal, ActivityIndicator, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +12,7 @@ import Fonts from '@/constants/fonts';
 export default function SchoolInfoScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { user, checkAuth } = useAuth();
+  const { user, onboarding, checkAuth } = useAuth();
   
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<College | null>(null);
@@ -45,24 +45,36 @@ export default function SchoolInfoScreen() {
     }
   }, [idNumber]);
 
+
   const handleComplete = async () => {
     if (!user || !selectedSchool || !selectedCollege || !selectedDepartment || !idNumber) return;
 
     setLoading(true);
-    const updatedUser = {
-      ...user,
-      school: selectedSchool.name,
-      college: selectedCollege.name,
-      department: selectedDepartment,
-      matricNumber: user.role === 'lecturer' ? '' : idNumber,
-      staffId: user.role === 'lecturer' ? idNumber : '',
-      onboardingCompleted: true,
-    };
-    await storage.setUser(updatedUser);
-    await checkAuth();
-    setLoading(false);
+    try {
+      const onboardingData = {
+        institution: selectedSchool.name,
+        college: selectedCollege.name,
+        department: selectedDepartment,
+        matric_number: user.role === 'lecturer' ? '' : idNumber,
+        staff_id: user.role === 'lecturer' ? idNumber : '',
+        role: user.role,
+        phone_number: user.phoneNumber || '',
+        onboarding_complete: true,
+      };
 
-    router.replace('/onboarding/success');
+      const result = await onboarding(onboardingData);
+
+      if (result.success) {
+        await checkAuth();
+        router.replace('/onboarding/success');
+      } else {
+        Alert.alert('Error', result.error || 'Failed to save onboarding data');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred during onboarding');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isFormComplete = selectedSchool && selectedCollege && selectedDepartment && idNumber.length >= 8 && isVerified;
