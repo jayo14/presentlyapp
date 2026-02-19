@@ -59,8 +59,9 @@ const mapApiUser = (data: any, fallbackEmail: string): User => {
     createdAt: userData?.created_at ?? userData?.createdAt ?? new Date().toISOString(),
     phoneNumber: userData?.phone_number ?? userData?.phoneNumber,
     profilePicture: userData?.profile_picture ?? userData?.profilePicture,
-    school: userData?.school ?? userData?.institution,
-    college: userData?.college,
+    school: userData?.institution_name ?? userData?.institution ?? userData?.school,
+    college: userData?.college_name ?? userData?.college,
+    profilePicture: userData?.avatar_url ?? userData?.profile_picture ?? userData?.profilePicture,
   };
 };
 
@@ -74,7 +75,27 @@ const getRefreshToken = (response: any): string | undefined => {
 
 const isAuthFailure = (error: any): boolean => {
   const status = error?.response?.status;
-  return status === 401 || status === 403;
+  return status === 401;
+};
+
+const extractErrorMessage = (error: any): string => {
+  if (typeof error === 'string') return error;
+
+  const responseData = error?.response?.data;
+  if (!responseData) return error?.message || 'An unexpected error occurred';
+
+  if (responseData.error && typeof responseData.error === 'string') return responseData.error;
+  if (responseData.detail && typeof responseData.detail === 'string') return responseData.detail;
+  if (responseData.message && typeof responseData.message === 'string') return responseData.message;
+
+  if (responseData.errors && typeof responseData.errors === 'object') {
+    const firstKey = Object.keys(responseData.errors)[0];
+    const firstError = responseData.errors[firstKey];
+    if (Array.isArray(firstError)) return `${firstKey}: ${firstError[0]}`;
+    if (typeof firstError === 'string') return `${firstKey}: ${firstError}`;
+  }
+
+  return 'An unexpected error occurred';
 };
 
 export const [AuthProvider, useAuth] = createContextHook(() => {
@@ -90,7 +111,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     if (!isAuthenticated) return;
     const intervalId = setInterval(() => {
       refreshUser();
-    }, 60000);
+    }, 300000); // 5 minutes
 
     return () => clearInterval(intervalId);
   }, [isAuthenticated]);
@@ -155,7 +176,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         await signOut();
         return { success: false, error: 'Session expired' };
       }
-      return { success: false, error: error?.response?.data?.detail || 'Failed to refresh user' };
+      return { success: false, error: extractErrorMessage(error) };
     }
   };
 
@@ -196,7 +217,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
           return { success: true, requiresVerification: !isVerified, user: userToLog };
         }
 
-        return { success: false, error: response?.detail || response?.message || 'Invalid credentials' };
+        return { success: false, error: extractErrorMessage(response) };
       } catch (apiError: any) {
         return { success: false, error: extractErrorMessage(apiError) };
       }
@@ -229,7 +250,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
           setIsAuthenticated(isVerified);
           return { success: true, requiresVerification: !isVerified, user: newUser };
         }
-        return { success: false, error: response.detail || 'Failed to create account' };
+        return { success: false, error: extractErrorMessage(response) };
       } catch (apiError: any) {
         return { success: false, error: extractErrorMessage(apiError) };
       }
@@ -257,7 +278,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         setIsAuthenticated(true);
         return { success: true };
       }
-      return { success: false, error: response.detail || 'Invalid code' };
+      return { success: false, error: extractErrorMessage(response) };
     } catch (error) {
       return { success: false, error: 'Invalid verification code' };
     }
@@ -333,7 +354,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         return { success: true, requiresVerification: !isVerified, user: userToLog };
       }
 
-      return { success: false, error: response?.detail || 'Google auth failed' };
+      return { success: false, error: extractErrorMessage(response) };
     } catch (error) {
       return { success: false, error: 'Google auth failed' };
     }
@@ -396,12 +417,18 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const signOut = async () => {
     try {
-      await api.auth.logout().catch(() => {});
+      const refreshToken = await storage.getRefreshToken();
+      if (refreshToken) {
+        await api.auth.logout({ refresh_token: refreshToken }).catch(() => {});
+      }
       await storage.clearAll();
       setUser(null);
       setIsAuthenticated(false);
     } catch (error) {
       console.error('Sign out error:', error);
+      await storage.clearAll();
+      setUser(null);
+      setIsAuthenticated(false);
     }
   };
 
