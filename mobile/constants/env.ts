@@ -29,7 +29,7 @@ const getApiUrl = () => {
     return ensureApiPath(process.env.EXPO_PUBLIC_API_BASE_URL);
   }
   // return 'https://presently.koyeb.app/api';
-  return 'http://localhost:8000/api';
+  return 'https://studious-space-broccoli-4j79w564rjxp27p5j-8000.app.github.dev/api';
 };
 
 export const ENV = {
