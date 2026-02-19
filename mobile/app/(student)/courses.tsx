@@ -81,8 +81,8 @@ export default function StudentCoursesScreen() {
                     key={course.id}
                     title={course.name}
                     code={course.code}
-                    instructor={course.instructor}
-                    percentage={course.attendance || 0}
+                    instructor={course.instructor || course.lecturer_name}
+                    percentage={course.percentage || 0}
                     status={course.status || (course.attendance >= 80 ? 'Active' : (course.attendance >= 60 ? 'Warning' : 'Low'))}
                     image={course.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAj31ikpQevVxSA6PeFETfug4QbDzNaS0614HFHBTD4ReuZoZ-hVoH84N2GI1XWKBQfCcJsNLaW23zcYBJwSmereyts0fJCyPIYu9DmwkybTWa9XR7NYe2BsMUpsuT8k31ImBUzfBCT2wCMDhpYAy8uJeiWcg74RByycS1GG_k0FooYWghVGoa7shzapkrRF49W-E3GK2aKWDJ67bazSMOmIWY4bA6E4BbLRqmIROtCgdiI65tlpjOjU4EKM-rbZrtiyK9Nw1U5ZAf5"}
                     colors={colors}
