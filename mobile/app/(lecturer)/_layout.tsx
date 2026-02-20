@@ -1,14 +1,29 @@
 import { Redirect, Tabs } from 'expo-router';
-import { Home, BookOpen, Calendar, User, BarChart3, Plus } from 'lucide-react-native';
+import { Home, BookOpen, Calendar, User, BarChart3 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { Platform, View, StyleSheet } from 'react-native';
+import { Platform, ActivityIndicator, View } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LecturerLayout() {
   const { colors, isDark } = useTheme();
   const { user, isLoading } = useAuth();
 
-  if (!isLoading && user && user.role !== 'lecturer') {
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#231e0f' : '#FFFFFF' }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  // Redirect to sign-in if not authenticated
+  if (!user) {
+    return <Redirect href="/auth/sign-in" />;
+  }
+
+  // Redirect if not a lecturer
+  if (user.role !== 'lecturer') {
     const destination = user.role === 'admin' ? '/(admin)' : '/(student)';
     return <Redirect href={destination} />;
   }
@@ -39,35 +54,35 @@ export default function LecturerLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <Home size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color }) => <Home size={22} color={color} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="sessions"
         options={{
           title: 'Sessions',
-          tabBarIcon: ({ color, size }) => <Calendar size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color }) => <Calendar size={22} color={color} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="courses"
         options={{
           title: 'Courses',
-          tabBarIcon: ({ color, size }) => <BookOpen size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color }) => <BookOpen size={22} color={color} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="analytics"
         options={{
           title: 'Records',
-          tabBarIcon: ({ color, size }) => <BarChart3 size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color }) => <BarChart3 size={22} color={color} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => <User size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color }) => <User size={22} color={color} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen name="dashboard" options={{ href: null }} />
@@ -80,7 +95,3 @@ export default function LecturerLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  // No FAB needed for lecturer as per the redesign designs provided
-});
