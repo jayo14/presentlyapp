@@ -42,6 +42,7 @@ export default function ManageInstitutionsScreen() {
   );
 
   const filteredSchools = schools.filter(s =>
+    s && typeof s.name === 'string' &&
     s.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
