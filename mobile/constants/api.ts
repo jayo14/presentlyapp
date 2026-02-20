@@ -168,6 +168,21 @@ export const API_ENDPOINTS = {
     GENERATE: (type: string) => `/reports/generate/${type}/`,
     EXPORT: (type: string) => `/reports/export/${type}/`,
     DOWNLOAD: (id: string) => `/reports/${id}/download/`,
+    DELETE: (id: string) => `/reports/${id}/delete/`,
     SCHEDULED: '/reports/scheduled/',
+    CREATE_SCHEDULED: '/reports/scheduled/create/',
+    TOGGLE_SCHEDULED: (id: string) => `/reports/scheduled/${id}/toggle/`,
+  },
+  // Exam Clearance
+  EXAM_CLEARANCE: {
+    LIST: '/exam-clearance/',
+    CALCULATE_ALL: '/exam-clearance/calculate-all/',
+    GENERATE: '/exam-clearance/generate/',
+    GET: (id: string) => `/exam-clearance/${id}/`,
+    APPROVE: (id: string) => `/exam-clearance/${id}/approve/`,
+    REJECT: (id: string) => `/exam-clearance/${id}/reject/`,
+    REPORT: '/exam-clearance/report/',
+    CERTIFICATE: (id: string) => `/exam-clearance/${id}/certificate/`,
+    COURSE: (courseId: string) => `/exam-clearance/course/${courseId}/`,
   },
 };

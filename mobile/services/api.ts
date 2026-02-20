@@ -138,6 +138,8 @@ import { studentsService } from './students';
 import { institutionsService, collegesService, departmentsService } from './institutions';
 import { timetablesService } from './timetables';
 import { checkInService } from './checkin';
+import { adminService } from './admin';
+import { usersService } from './users';
 
 // Re-export services under a single api object for compatibility
 export const api = {
@@ -156,11 +158,13 @@ export const api = {
   colleges: collegesService,
   departments: departmentsService,
   timetables: timetablesService,
+  admin: adminService,
+  users: usersService,
   checkIn: checkInService,
   // Backward compatibility mappings
   attendance: analyticsService,
   system: lecturerService,
-  users: authService,
+  // users: authService,
 };
 
 export default api;
