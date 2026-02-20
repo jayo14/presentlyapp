@@ -14,4 +14,16 @@ export const reportsService = {
   download: async (id: string) => {
     return apiClient.get(API_ENDPOINTS.REPORTS.DOWNLOAD(id));
   },
+  delete: async (id: string) => {
+    return apiClient.delete(API_ENDPOINTS.REPORTS.DELETE(id));
+  },
+  listScheduled: async () => {
+    return apiClient.get(API_ENDPOINTS.REPORTS.SCHEDULED);
+  },
+  createScheduled: async (data: any) => {
+    return apiClient.post(API_ENDPOINTS.REPORTS.CREATE_SCHEDULED, data);
+  },
+  toggleScheduled: async (id: string) => {
+    return apiClient.post(API_ENDPOINTS.REPORTS.TOGGLE_SCHEDULED(id));
+  },
 };
