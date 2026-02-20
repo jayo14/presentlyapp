@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 load_dotenv()
 
@@ -90,7 +91,7 @@ WSGI_APPLICATION = 'presently.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-import dj_database_url
+
 
 # Redis Cache Configuration
 if os.environ.get('REDIS_URL'):
@@ -218,12 +219,14 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration for frontend
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8081",
-    "http://127.0.0.1:8081",
-    "https://studious-space-broccoli-4j79w564rjxp27p5j-8081.app.github.dev",
-    "https://studious-space-broccoli-4j79w564rjxp27p5j-8000.app.github.dev",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8081",
+#     "http://127.0.0.1:8081",
+#     "https://studious-space-broccoli-4j79w564rjxp27p5j-8081.app.github.dev",
+#     "https://studious-space-broccoli-4j79w564rjxp27p5j-8000.app.github.dev",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
 
 CORS_ALLOW_CREDENTIALS = True
 
