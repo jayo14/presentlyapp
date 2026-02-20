@@ -1,44 +1,45 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Image } from 'react-native';
-import { useState, useCallback } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
+import { useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { api } from '@/services/api';
 import { Users, MapPin, Clock, AlertTriangle, Bell, DoorOpen, RefreshCcw, Building, Info, UserPlus } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient, Stop, Circle } from 'react-native-svg';
 import * as Animatable from 'react-native-animatable';
+import { useAdminDashboardStats, useSystemActivity } from '@/hooks/useAdminDashboard';
 
 export default function AdminDashboard() {
   const { colors, isDark } = useTheme();
   
-  const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [dashboardData, setDashboardData] = useState<any>(null);
-  const [activityFeed, setActivityFeed] = useState<any[]>([]);
+  const {
+    data: dashboardData,
+    isLoading: isLoadingStats,
+    refetch: refetchStats,
+    isRefetching: isRefetchingStats
+  } = useAdminDashboardStats();
 
-  const loadData = async () => {
-    try {
-      const [stats, activity] = await Promise.all([
-        api.analytics.getAdminDashboard(),
-        api.system.getActivity()
-      ]);
-      setDashboardData(stats);
-      setActivityFeed(activity as any[]);
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-    }
-  };
+  const {
+    data: activityFeedData,
+    isLoading: isLoadingActivity,
+    refetch: refetchActivity,
+    isRefetching: isRefetchingActivity
+  } = useSystemActivity();
 
-  useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [])
-  );
+  const activityFeed = (activityFeedData as any[]) || [];
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadData();
-    setRefreshing(false);
-  };
+  const onRefresh = useCallback(async () => {
+    await Promise.all([refetchStats(), refetchActivity()]);
+  }, [refetchStats, refetchActivity]);
+
+  const isLoading = isLoadingStats || isLoadingActivity;
+  const refreshing = isRefetchingStats || isRefetchingActivity;
+
+  if (isLoading && !refreshing) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -50,22 +51,21 @@ export default function AdminDashboard() {
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
       >
-        {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <View style={[styles.profileContainer, { borderColor: colors.primary + '4D' }]}>
-              <Image
-                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4oHMrGpdpUKPkdqcYU0Um4Sid7SG4R9yDnU5KoAgyKBnhfW3YQfZ8tz3pz_Ng9mF0X2bSdfrUCmUNm-akFvqTPGyFTYS6nmFj5mC83nvC-jvXdv4W1D-KjSPYZO2DKnUmHFppd9wXaX24liPdr9x87mIsUxdyaKspw_veUaJDsMfIQfSaeGuJFdvSHbFnZJwEfks8qRaNhAUjPBmY7CVnL8Gs5-3-v5LitdAjofzQe7rw9-4rR2Q_wHG26ClKZ3Vgq4G8wyOe4bbY' }}
-                style={styles.profileImage}
-              />
+            <View style={[styles.profileContainer, { borderColor: colors.primary }]}>
+              <View style={[styles.profileImage, { backgroundColor: colors.primary + '20', justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={{ color: colors.primary, fontWeight: 'bold' }}>AD</Text>
+              </View>
               <View style={[styles.statusDot, { backgroundColor: '#10B981', borderColor: colors.background }]} />
             </View>
             <View>
-              <Text style={[styles.welcomeText, { color: colors.primary }]}>PRESENTLY ADMIN</Text>
-              <Text style={[styles.userName, { color: colors.text }]}>Good Morning, Admin</Text>
+              <Text style={[styles.welcomeText, { color: colors.primary }]}>SYSTEM OVERVIEW</Text>
+              <Text style={[styles.userName, { color: colors.text }]}>Admin Panel</Text>
             </View>
           </View>
           <TouchableOpacity style={[styles.notificationButton, { backgroundColor: isDark ? '#1a1608' : '#f0f0f0', borderColor: colors.border }]}>
@@ -79,16 +79,16 @@ export default function AdminDashboard() {
           <View style={styles.kpiRow}>
             <StatCard
               icon={<Users size={20} color={colors.primary} />}
-              label="Users"
-              value={dashboardData?.total_users || '0'}
-              trend={dashboardData?.user_trend || '+0%'}
+              label="Institutions"
+              value={dashboardData?.total_institutions || '0'}
+              trend={dashboardData?.institution_trend}
               trendColor="#10B981"
               colors={colors}
             />
             <StatCard
-              icon={<MapPin size={20} color={colors.primary} />}
-              label="Venues"
-              value={dashboardData?.total_venues || '0'}
+              icon={<Building size={20} color={colors.primary} />}
+              label="Colleges"
+              value={dashboardData?.total_colleges || '0'}
               colors={colors}
             />
           </View>
@@ -96,15 +96,15 @@ export default function AdminDashboard() {
             <StatCard
               icon={<Clock size={20} color={colors.primary} />}
               label="Sessions"
-              value={dashboardData?.total_sessions || '0'}
+              value={dashboardData?.active_sessions || '0'}
               colors={colors}
             />
             <StatCard
               icon={<AlertTriangle size={20} color={colors.primary} />}
-              label="Alerts"
-              value={dashboardData?.active_alerts || '0'}
+              label="Attendance"
+              value={dashboardData?.attendance_rate ? `${dashboardData.attendance_rate}%` : '0%'}
               colors={colors}
-              isAlert={!!dashboardData?.active_alerts}
+              isAlert={dashboardData?.attendance_rate < 50}
             />
           </View>
         </View>
@@ -173,14 +173,14 @@ export default function AdminDashboard() {
                 key={index}
                 icon={getActivityIcon(item.type, colors)}
                 title={item.title}
-                time={item.time}
+                time={item.timestamp || item.time}
                 subtitle={item.description}
                 colors={colors}
                 isDark={isDark}
               />
             )) : (
               <View style={styles.emptyFeed}>
-                <Text style={{ color: colors.textSecondary }}>No recent activity</Text>
+                <Text style={{ color: colors.textSecondary, textAlign: 'center', marginTop: 20 }}>No recent activity</Text>
               </View>
             )}
           </View>
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   profileContainer: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, padding: 2, position: 'relative' },
-  profileImage: { width: '100%', height: '100%', borderRadius: 22 },
+  profileImage: { width: '100%', height: '100%', borderRadius: 22, overflow: 'hidden' },
   statusDot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2, position: 'absolute', bottom: 0, right: 0 },
   welcomeText: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2 },
   userName: { fontSize: 20, fontWeight: '700' },
@@ -287,5 +287,6 @@ const styles = StyleSheet.create({
   feedTopLine: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   feedItemTitle: { fontSize: 14, fontWeight: '600' },
   feedTime: { fontSize: 10, fontWeight: '500' },
-  feedSubtitle: { fontSize: 12, marginTop: 2 }
+  feedSubtitle: { fontSize: 12, marginTop: 2 },
+  emptyFeed: { padding: 40, alignItems: 'center' }
 });
