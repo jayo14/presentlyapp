@@ -1,5 +1,8 @@
 // ...existing code...
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Switch } from 'react-native';
+import { useRouter } from 'expo-router';
+import { LogOut } from 'lucide-react-native';
+import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
@@ -9,6 +12,8 @@ import * as Animatable from 'react-native-animatable';
 // ...existing code...
 
 export default function MoreScreen() {
+  const router = useRouter();
+  const { signOut } = useAuth();
   const { colors, isDark, toggleTheme } = useTheme();
   const [isGoldTheme, setIsGoldTheme] = useState(isDark);
   const [stats, setStats] = useState<any>(null);
@@ -52,6 +57,17 @@ export default function MoreScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {/* Sign Out Button */}
+                <TouchableOpacity
+                  style={[styles.toolButton, { backgroundColor: colors.primary, marginBottom: 16 }]}
+                  onPress={async () => {
+                    await signOut();
+                    router.replace('/login');
+                  }}
+                >
+                  <LogOut size={20} color="#000" />
+                  <Text style={styles.toolButtonText}>Sign Out</Text>
+                </TouchableOpacity>
         {/* Profile & Theme Toggle */}
         <View style={[styles.profileCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#fff', borderColor: 'rgba(255,255,255,0.08)' }]}>
           <View style={styles.adminInfo}>
