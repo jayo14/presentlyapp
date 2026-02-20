@@ -50,6 +50,12 @@ export const analyticsService = {
   getStudentPerformance: async () => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.PERFORMANCE);
   },
+  getCollegeAnalytics: async (id: string) => {
+    return apiClient.get(API_ENDPOINTS.ANALYTICS.COLLEGE(id));
+  },
+  getDepartmentAnalytics: async (id: string) => {
+    return apiClient.get(API_ENDPOINTS.ANALYTICS.DEPARTMENT(id));
+  },
   // Attendance methods (legacy useApi support)
   mark: async (data: any) => {
     return apiClient.post(API_ENDPOINTS.ATTENDANCES.CREATE, data);

@@ -5,11 +5,14 @@ export const examClearanceService = {
   list: async () => {
     return apiClient.get(API_ENDPOINTS.EXAM_CLEARANCE.LIST);
   },
-  getByCourse: async (courseId: string) => {
-    return apiClient.get(API_ENDPOINTS.EXAM_CLEARANCE.COURSE(courseId));
+  calculateAll: async () => {
+    return apiClient.post(API_ENDPOINTS.EXAM_CLEARANCE.CALCULATE_ALL);
   },
   generate: async (data: any) => {
     return apiClient.post(API_ENDPOINTS.EXAM_CLEARANCE.GENERATE, data);
+  },
+  get: async (id: string) => {
+    return apiClient.get(API_ENDPOINTS.EXAM_CLEARANCE.GET(id));
   },
   approve: async (id: string) => {
     return apiClient.post(API_ENDPOINTS.EXAM_CLEARANCE.APPROVE(id));
@@ -17,7 +20,13 @@ export const examClearanceService = {
   reject: async (id: string) => {
     return apiClient.post(API_ENDPOINTS.EXAM_CLEARANCE.REJECT(id));
   },
+  getReport: async () => {
+    return apiClient.get(API_ENDPOINTS.EXAM_CLEARANCE.REPORT);
+  },
   getCertificate: async (id: string) => {
     return apiClient.get(API_ENDPOINTS.EXAM_CLEARANCE.CERTIFICATE(id));
+  },
+  getByCourse: async (courseId: string) => {
+    return apiClient.get(API_ENDPOINTS.EXAM_CLEARANCE.COURSE(courseId));
   },
 };
