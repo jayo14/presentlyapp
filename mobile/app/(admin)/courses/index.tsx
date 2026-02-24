@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
 import { useState, useCallback } from 'react';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { LayoutGrid, Bell, Search, Calendar, Landmark, Grid, Filter, School, User, MoreVertical, Plus } from 'lucide-react-native';
+import { LayoutGrid, Bell, Search, Calendar, Landmark, Grid, School, User, MoreVertical, Plus } from 'lucide-react-native';
 import { useCourses } from '@/hooks/useCourses';
 
 export default function CourseDirectoryScreen() {
+  const router = useRouter();
   const { colors, isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -106,7 +108,10 @@ export default function CourseDirectoryScreen() {
         )}
       />
 
-      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary }]}>
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => router.push('/(admin)/courses/create')}
+      >
         <Plus size={32} color="#000" />
       </TouchableOpacity>
     </SafeAreaView>
