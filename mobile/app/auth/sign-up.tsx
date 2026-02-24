@@ -8,6 +8,9 @@ import { validation } from '@/utils/validation';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { ChevronLeft, Apple, Chrome } from 'lucide-react-native';
+import { SvgXml } from 'react-native-svg';
+import googleLogo from '../../assets/images/google-logo';
+import appleLogo from '../../assets/images/apple-logo';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -164,14 +167,14 @@ export default function SignUpScreen() {
                 onPress={handleGoogleSignUp}
                 activeOpacity={0.7}
               >
-                <Chrome size={24} color={colors.text} />
+                <SvgXml xml={googleLogo} width={24} height={24} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.socialButton, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
                 onPress={handleAppleSignUp}
                 activeOpacity={0.7}
               >
-                <Apple size={24} color={colors.text} />
+                <SvgXml xml={appleLogo} width={24} height={24} />
               </TouchableOpacity>
             </View>
           </View>
