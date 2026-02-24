@@ -113,7 +113,7 @@ export const ResetPassword: React.FC = () => {
       >
         <SEO title="Verifying Reset Link | Presently" />
         <VStack gap={4}>
-          <Spinner size="xl" color="yellow.400" thickness="4px" />
+          <Spinner size="xl" color="yellow.400"  />
           <Text color="gray.400">Verifying reset link...</Text>
         </VStack>
       </Box>
@@ -234,7 +234,7 @@ export const ResetPassword: React.FC = () => {
                   />
                   <Box
                     as="button"
-                    type="button"
+
                     onClick={() => setShowPassword(!showPassword)}
                     position="absolute"
                     right={4}
@@ -307,7 +307,7 @@ export const ResetPassword: React.FC = () => {
                   />
                   <Box
                     as="button"
-                    type="button"
+
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     position="absolute"
                     right={4}
@@ -357,7 +357,7 @@ export const ResetPassword: React.FC = () => {
               <Text textAlign="center" mt={2}>
                 <Box
                   as="button"
-                  type="button"
+
                   onClick={handleBackToLogin}
                   color="gray.400"
                   _hover={{ textDecoration: "underline" }}

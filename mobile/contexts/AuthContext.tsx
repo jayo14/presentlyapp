@@ -38,7 +38,6 @@ const mapApiUser = (data: any, fallbackEmail: string): User => {
     deviceId: userData?.device_id ?? userData?.deviceId ?? '',
     createdAt: userData?.created_at ?? userData?.createdAt ?? new Date().toISOString(),
     phoneNumber: userData?.phone_number ?? userData?.phoneNumber,
-    profilePicture: userData?.profile_picture ?? userData?.profilePicture,
     school: userData?.institution_name ?? userData?.institution ?? userData?.school,
     college: userData?.college_name ?? userData?.college,
     profilePicture: userData?.avatar_url ?? userData?.profile_picture ?? userData?.profilePicture,

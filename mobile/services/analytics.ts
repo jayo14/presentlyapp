@@ -1,75 +1,78 @@
 import { API_ENDPOINTS } from '@/constants/api';
-import { apiClient } from './api';
+import { apiClient } from './client';
 
 export const analyticsService = {
-  getDashboard: async () => {
+  getDashboard: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.DASHBOARD);
   },
-  getStudentDashboard: async () => {
+  getStudentDashboard: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.STUDENT_DASHBOARD);
   },
-  getLecturerDashboard: async () => {
+  getLecturerDashboard: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.LECTURER_DASHBOARD);
   },
-  getAdminDashboard: async () => {
+  getAdminDashboard: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.ADMIN_DASHBOARD);
   },
-  getCourseAttendance: async (courseId: string) => {
+  getCourseAttendance: async (courseId: string): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.COURSE(courseId));
   },
-  getStudentAttendance: async (studentId: string) => {
+  getStudentAttendance: async (studentId: string): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.STUDENT(studentId));
   },
-  getAttendanceTrends: async () => {
+  getAttendanceTrends: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.TRENDS);
   },
-  getAttendanceOverview: async () => {
+  getAttendanceOverview: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.OVERVIEW);
   },
-  getSessionAnalytics: async (sessionId: string) => {
+  getOverview: async (): Promise<any> => {
+    return apiClient.get(API_ENDPOINTS.ANALYTICS.OVERVIEW);
+  },
+  getSessionAnalytics: async (sessionId: string): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.SESSION(sessionId));
   },
-  getAttendancePredictions: async () => {
+  getAttendancePredictions: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.PREDICTIONS_ATTENDANCE);
   },
-  getDropoutPredictions: async () => {
+  getDropoutPredictions: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.PREDICTIONS_DROPOUTS);
   },
-  getLiveSessions: async () => {
+  getLiveSessions: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.LIVE_SESSIONS);
   },
-  getSessionStatistics: async () => {
+  getSessionStatistics: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.SESSIONS_STATS);
   },
-  getAtRiskStudents: async () => {
+  getAtRiskStudents: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.AT_RISK_STUDENTS);
   },
-  getStudentEngagement: async () => {
+  getStudentEngagement: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.ENGAGEMENT);
   },
-  getStudentPerformance: async () => {
+  getStudentPerformance: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.PERFORMANCE);
   },
-  getCollegeAnalytics: async (id: string) => {
+  getCollegeAnalytics: async (id: string): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.COLLEGE(id));
   },
-  getDepartmentAnalytics: async (id: string) => {
+  getDepartmentAnalytics: async (id: string): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.DEPARTMENT(id));
   },
   // Attendance methods (legacy useApi support)
-  mark: async (data: any) => {
+  mark: async (data: any): Promise<any> => {
     return apiClient.post(API_ENDPOINTS.ATTENDANCES.CREATE, data);
   },
-  getHistory: async (params?: any) => {
+  getHistory: async (params?: any): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ATTENDANCES.LIST, params);
   },
-  getStats: async () => {
+  getStats: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.STATISTICS);
   },
-  getSessionAttendance: async (sessionId: string) => {
+  getSessionAttendance: async (sessionId: string): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.SESSION(sessionId));
   },
-  getComparison: async () => {
+  getComparison: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.COMPARISON);
   },
 };

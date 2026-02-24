@@ -60,7 +60,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
     try {
       setLoading(true);
       const data = await institutionsApi.getCollegesByInstitution(institution.id);
-      const results = data.results || data;
+      const results = (data as any).results || data;
       const collegesArray = Array.isArray(results) ? results : [];
 
       const collegesWithStats = await Promise.all(
@@ -319,7 +319,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
 
       {/* College Modal */}
       {showCollegeModal && (
-        <CollegeModal
+        <CollegeModal institution={institution}
           college={editingCollege || undefined}
           onSave={handleSaveCollege}
           onClose={() => setShowCollegeModal(false)}
