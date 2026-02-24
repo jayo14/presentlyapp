@@ -13,7 +13,7 @@ export default function StudentDashboard() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user } = useAuth();
-  const { stats, history, getActiveSession, refreshData, isLoading } = useAttendance();
+  const { stats, history, courses, getActiveSession, refreshData, isLoading } = useAttendance();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -158,10 +158,13 @@ export default function StudentDashboard() {
 
                     {/* Stats Grid */}
                     <View style={styles.statsContainer}>
-                        <View style={[styles.statBox, { backgroundColor: isDark ? '#231e0f' : '#F9FAFB', borderColor: isDark ? '#4a4121' : '#E2E8F0' }]}>
-                            <Text style={[styles.statValue, { color: colors.text }]}>{stats.totalSessions}</Text>
+                        <TouchableOpacity
+                            style={[styles.statBox, { backgroundColor: isDark ? '#231e0f' : '#F9FAFB', borderColor: isDark ? '#4a4121' : '#E2E8F0' }]}
+                            onPress={() => router.push('/(student)/courses')}
+                        >
+                            <Text style={[styles.statValue, { color: colors.text }]}>{courses.length}</Text>
                             <Text style={[styles.statLabel, { color: isDark ? '#ccbf8e' : '#666666' }]}>Classes</Text>
-                        </View>
+                        </TouchableOpacity>
                         <View style={[styles.statBox, { backgroundColor: isDark ? 'rgba(16,185,129,0.1)' : '#F0FDF4', borderColor: isDark ? 'rgba(16,185,129,0.2)' : '#DCFCE7' }]}>
                             <Text style={[styles.statValue, { color: '#10B981' }]}>{stats.attended}</Text>
                             <Text style={[styles.statLabel, { color: isDark ? 'rgba(16,185,129,0.7)' : '#166534' }]}>Attended</Text>

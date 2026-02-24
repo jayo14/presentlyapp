@@ -25,8 +25,8 @@ export default function StudentCoursesScreen() {
           return;
         }
 
-        const data: any = await api.courses.list();
-        setCourses(data.courses || []);
+        const data: any = await api.courses.getMyCourses();
+        setCourses(data.courses || data.results || (Array.isArray(data) ? data : []));
     } catch (e) {
         const status = (e as any)?.response?.status;
         if (status === 401 && allowRetry) {

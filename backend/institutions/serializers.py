@@ -295,12 +295,39 @@ class CourseSerializer(serializers.ModelSerializer):
     applicable_levels = serializers.SerializerMethodField()
     name = serializers.CharField(source='title', read_only=True)
     instructor = serializers.CharField(source='lecturer.full_name', read_only=True)
+    attendance_percentage = serializers.SerializerMethodField()
+    sessions_attended = serializers.SerializerMethodField()
+    total_sessions = serializers.SerializerMethodField()
+    percentage = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
     
+
+    def get_attendance_percentage(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user or request.user.role != 'STUDENT':
+            return 0
+        total = AttendanceSession.objects.filter(course=obj).count()
+        if total == 0:
+            return 0
+        attended = Attendance.objects.filter(student=request.user, session__course=obj).count()
+        return round((attended / total) * 100)
+
+    def get_percentage(self, obj):
+        return self.get_attendance_percentage(obj)
+
+    def get_sessions_attended(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user or request.user.role != 'STUDENT':
+            return 0
+        return Attendance.objects.filter(student=request.user, session__course=obj).count()
+
+    def get_total_sessions(self, obj):
+        return AttendanceSession.objects.filter(course=obj).count()
+
     def get_department_name(self, obj):
         """Return a comma-separated list of department names"""
         return ", ".join([d.name for d in obj.department.all()])
