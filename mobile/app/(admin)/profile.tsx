@@ -8,7 +8,7 @@ import { ChevronLeft, Settings, ShieldCheck, Shield, TrendingUp, User, Lock, Fil
 export default function AdminProfile() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
 
   const handleLogout = () => {
     Alert.alert(
@@ -16,7 +16,7 @@ export default function AdminProfile() {
       'Are you sure you want to end your administrative session?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: logout }
+        { text: 'Logout', style: 'destructive', onPress: signOut }
       ]
     );
   };
@@ -192,6 +192,6 @@ const styles = StyleSheet.create({
   navContent: { flex: 1, marginLeft: 16 },
   navTitle: { fontSize: 16, fontWeight: '700' },
   navSubtitle: { fontSize: 12, marginTop: 2 },
-  logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 16, borderRadius: 16, borderWidth: 1, marginTop: 8 },
-  logoutButtonText: { color: '#EF4444', fontSize: 15, fontWeight: '700' }
+  signOutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 16, borderRadius: 16, borderWidth: 1, marginTop: 8 },
+  signOutButtonText: { color: '#EF4444', fontSize: 15, fontWeight: '700' }
 });

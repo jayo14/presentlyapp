@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Bell, Plus, Functions, Atom, Network } from 'lucide-react-native';
+import { BookOpen, Bell, Plus,  Atom, Network } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
@@ -78,7 +78,7 @@ export default function LecturerCoursesScreen() {
                         key={course.id}
                         title={course.name}
                         code={course.code}
-                        students={`${course.enrolledStudents || 124} Students`}
+                        students={`${course.enrolled_students_count || 124} Students`}
                         attendance={course.attendance || 85}
                         index={index}
                         colors={colors}

@@ -13,7 +13,7 @@ export default function RoleSelectionScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<'student' | 'lecturer' | null>(user?.role || 'student');
+  const [selectedRole, setSelectedRole] = useState<'student' | 'lecturer' | 'admin' | null>((user?.role as any) || 'student');
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleContinue = async () => {

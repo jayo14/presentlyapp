@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { ChevronLeft, MapPin, Group, School, BookOpen, DoorOpen, Landmark, Hub, Settings, ChevronRight, TrendingUp, TrendingDown, Monitor } from 'lucide-react-native';
+import { ChevronLeft, MapPin, Group, School, BookOpen, DoorOpen, Landmark, LayoutDashboard, Settings, ChevronRight, TrendingUp, TrendingDown, Monitor } from 'lucide-react-native';
 import { storage } from '@/utils/storage';
 import { useState, useEffect } from 'react';
 import { School as SchoolType } from '@/types';
@@ -98,11 +98,11 @@ export default function InstitutionCommandCenter() {
           />
         </View>
 
-        {/* Management Hub */}
+        {/* Management LayoutDashboard */}
         <View style={styles.hubSection}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>MANAGEMENT HUB</Text>
           <View style={styles.hubGrid}>
-            <HubCard
+            <LayoutDashboardCard
               icon={<Landmark size={20} color={colors.primary} />}
               title="Colleges & Faculties"
               subtitle="8 Managed Entities"
@@ -110,15 +110,15 @@ export default function InstitutionCommandCenter() {
               isDark={isDark}
               onPress={() => router.push(`/(admin)/institutions/${id}/faculties`)}
             />
-            <HubCard
-              icon={<Hub size={20} color={colors.primary} />}
+            <LayoutDashboardCard
+              icon={<LayoutDashboard size={20} color={colors.primary} />}
               title="Departments"
               subtitle="24 Academic Units"
               colors={colors}
               isDark={isDark}
               onPress={() => router.push(`/(admin)/institutions/${id}/departments`)}
             />
-            <HubCard
+            <LayoutDashboardCard
               icon={<MapPin size={20} color={colors.primary} />}
               title="Venue Management"
               subtitle="Labs, Auditoriums & Halls"
@@ -126,7 +126,7 @@ export default function InstitutionCommandCenter() {
               isDark={isDark}
               onPress={() => router.push(`/(admin)/venues`)}
             />
-            <HubCard
+            <LayoutDashboardCard
               icon={<Settings size={20} color={colors.primary} />}
               title="Admins & Access"
               subtitle="12 Security Protocols"
@@ -190,7 +190,7 @@ function StatCard({ icon, value, label, trend, trendUp, status, colors, isDark }
   );
 }
 
-function HubCard({ icon, title, subtitle, colors, isDark, onPress }: any) {
+function LayoutDashboardCard({ icon, title, subtitle, colors, isDark, onPress }: any) {
   return (
     <TouchableOpacity style={[styles.hubCard, { backgroundColor: isDark ? '#1e1b0f' : '#fff', borderColor: colors.border + '1A' }]} onPress={onPress}>
       <View style={styles.hubCardLeft}>

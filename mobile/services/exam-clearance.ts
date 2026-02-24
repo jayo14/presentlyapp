@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '@/constants/api';
-import { apiClient } from './api';
+import { apiClient } from './client';
 
 export const examClearanceService = {
   list: async () => {
