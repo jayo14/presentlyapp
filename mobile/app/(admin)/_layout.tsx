@@ -83,6 +83,7 @@ export default function AdminLayout() {
       <Tabs.Screen name="profile" options={{ href: null }} />
       <Tabs.Screen name="logs" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
+      <Tabs.Screen name="courses/create" options={{ href: null }} />
       <Tabs.Screen name="institutions/new" options={{ href: null }} />
       <Tabs.Screen name="institutions/[id]/index" options={{ href: null }} />
       <Tabs.Screen name="institutions/[id]/faculties" options={{ href: null }} />
