@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: Fonts.lexend.extraBold || Fonts.lexend.bold,
+    fontFamily: Fonts.lexend.bold || Fonts.lexend.bold,
     marginBottom: 8,
   },
   subtitle: {

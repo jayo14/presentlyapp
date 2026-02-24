@@ -4,9 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { Search, UserPlus, MoreVertical, X, Mail, Shield, User as UserIcon } from 'lucide-react-native';
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from '@/hooks/useUsers';
-import Button from '@/components/Button';
-import Input from '@/components/Input';
-import CustomModal from '@/components/CustomModal';
+import { Button } from '@/components/Button';
+import { Input } from '@/components/Input';
+import { CustomModal } from '@/components/CustomModal';
 
 export default function UserManagement() {
   const { colors, isDark } = useTheme();
@@ -226,9 +226,9 @@ export default function UserManagement() {
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.form}>
-              <Input label="Full Name" placeholder="John Doe" value={formData.fullName} onChangeText={t => setFormData({...formData, fullName: t})} />
+              <Input label="Full Name" placeholder="John Doe" value={formData.fullName} onChangeText={(t: string) => setFormData({...formData, fullName: t})} />
               {!editingUser && (
-                <Input label="Email" placeholder="email@university.edu" value={formData.email} onChangeText={t => setFormData({...formData, email: t})} />
+                <Input label="Email" placeholder="email@university.edu" value={formData.email} onChangeText={(t: string) => setFormData({...formData, email: t})} />
               )}
               
               <Text style={[styles.label, { color: colors.text }]}>Role</Text>

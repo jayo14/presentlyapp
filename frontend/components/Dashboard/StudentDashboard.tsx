@@ -182,7 +182,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                                 <Clock size={16} />
                                             </div>
                                             <div>
-                                                <p className="text-zinc-900 dark:text-white font-medium">{t.course_code} - {t.course_name}</p>
+                                                <p className="text-zinc-900 dark:text-white font-medium">{t.course.course_code} - {t.course_name}</p>
                                                 <p className="text-sm text-zinc-500">{t.start_time} - {t.end_time}</p>
                                                 {t.venue_name && <p className="text-xs text-zinc-400">{t.venue_name}</p>}
                                             </div>
@@ -319,16 +319,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       
                       const getIcon = () => {
                           const iconClass = "w-6 h-6";
-                          if (course.course_code.includes('CALC')) return <div className={`${iconClass} bg-[#FFD700] rounded-lg flex items-center justify-center text-black text-xs font-bold`}>∫</div>;
-                          if (course.course_code.includes('PHYS')) return <div className={`${iconClass} bg-[#4A90E2] rounded-lg`} />;
-                          if (course.course_code.includes('ART')) return <div className={`${iconClass} bg-[#9B59B6] rounded-lg`} />;
-                          if (course.course_code.includes('CS')) return <div className={`${iconClass} bg-[#E91E63] rounded-lg`} />;
+                          if (course.course.course_code.includes('CALC')) return <div className={`${iconClass} bg-[#FFD700] rounded-lg flex items-center justify-center text-black text-xs font-bold`}>∫</div>;
+                          if (course.course.course_code.includes('PHYS')) return <div className={`${iconClass} bg-[#4A90E2] rounded-lg`} />;
+                          if (course.course.course_code.includes('ART')) return <div className={`${iconClass} bg-[#9B59B6] rounded-lg`} />;
+                          if (course.course.course_code.includes('CS')) return <div className={`${iconClass} bg-[#E91E63] rounded-lg`} />;
                           return <BookOpen className={iconClass} />;
                       };
                       
                       return (
                           <div 
-                              key={course.course_code}
+                              key={course.course.course_code}
                               className="bg-[#2A2A25] rounded-xl p-4 flex items-center gap-3"
                           >
                               {getIcon()}
@@ -463,10 +463,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                   </div>
                   <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
                       {analyticsData?.course_performance?.map((course) => (
-                          <div key={course.course_code} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
+                          <div key={course.course.course_code} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
                               <div className="flex-1">
                                   <div className="flex justify-between mb-2">
-                                      <span className="font-bold text-zinc-900 dark:text-white text-sm">{course.course_code}</span>
+                                      <span className="font-bold text-zinc-900 dark:text-white text-sm">{course.course.course_code}</span>
                                       <span className={`text-sm font-bold ${course.attendance_percentage >= 75 ? 'text-green-500' : 'text-red-500'}`}>{course.attendance_percentage}%</span>
                                   </div>
                                   <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
@@ -627,7 +627,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       <div className="relative p-6">
                           <div className="flex items-start justify-between mb-4">
                               <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-amber-400 text-slate-900 text-xs font-bold rounded-xl shadow-lg shadow-yellow-400/30">
-                                  {nextClass.venue || 'Lecture Hall'}
+                                  {nextClass.venue_name || 'Lecture Hall'}
                               </span>
                               {nextClass.end_time && (
                                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
@@ -640,13 +640,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                               )}
                           </div>
                           
-                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{nextClass.name}</h3>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{nextClass.course_name}</h3>
                           <p className="text-sm text-slate-600 dark:text-slate-400 mb-5 flex items-center gap-2">
                               <User size={14} />
-                              {nextClass.lecturer || 'Lecturer TBA'}
+                              {nextClass.lecturer_name || 'Lecturer TBA'}
                               <span className="text-slate-400 dark:text-slate-500">•</span>
                               <Clock size={14} />
-                              {nextClass.time || 'Time TBA'}
+                              {nextClass.start_time || 'Time TBA'}
                           </p>
                           
                           <motion.button 
@@ -791,7 +791,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                   </div>
                                   <div className="flex-1 min-w-0">
                                       <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                                          {activity.course_code}
+                                          {activity.course.course_code}
                                       </p>
                                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                           {new Date(activity.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(activity.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
@@ -894,13 +894,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                    <p className="text-zinc-400 text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
                        <Clock size={14} className="text-primary"/> Up Next
                    </p>
-                   <h3 className="text-2xl font-bold mb-1">{nextClass.name}</h3>
+                   <h3 className="text-2xl font-bold mb-1">{nextClass.course_name}</h3>
                    <div className="flex items-center gap-4 mt-4">
                        <div className="bg-zinc-800 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
-                           <Clock size={14} className="text-zinc-400"/> {nextClass.time}
+                           <Clock size={14} className="text-zinc-400"/> {nextClass.start_time}
                        </div>
                        <div className="bg-zinc-800 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
-                           <MapPin size={14} className="text-zinc-400"/> {nextClass.venue}
+                           <MapPin size={14} className="text-zinc-400"/> {nextClass.venue_name}
                        </div>
                    </div>
                </div>
@@ -974,10 +974,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                        <div key={activity.id} className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
                            <div className="flex items-center gap-4">
                                <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 text-sm">
-                                   {activity.course_code?.substring(0,2) || 'AT'}
+                                   {activity.course.course_code?.substring(0,2) || 'AT'}
                                </div>
                                <div>
-                                   <p className="font-bold text-zinc-900 dark:text-white text-sm">{activity.course_code} {activity.type === 'attendance' ? 'Class' : ''}</p>
+                                   <p className="font-bold text-zinc-900 dark:text-white text-sm">{activity.course.course_code} {activity.type === 'attendance' ? 'Class' : ''}</p>
                                    <p className="text-xs text-zinc-500">{new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                </div>
                            </div>

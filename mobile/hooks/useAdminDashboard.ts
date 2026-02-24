@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/services/api';
+import { AdminDashboardStats, SystemActivity } from '@/services/admin';
 
 export const useAdminDashboardStats = () => {
-  return useQuery({
+  return useQuery<AdminDashboardStats>({
     queryKey: ['admin', 'dashboard-stats'],
     queryFn: () => api.admin.getDashboardStats(),
   });
@@ -16,7 +17,7 @@ export const useSystemStats = () => {
 };
 
 export const useSystemActivity = () => {
-  return useQuery({
+  return useQuery<SystemActivity[]>({
     queryKey: ['admin', 'activity'],
     queryFn: () => api.admin.getActivity(),
   });

@@ -41,8 +41,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                          course.lecturer_name?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = filterStatus === 'all' || 
-                         (filterStatus === 'active' && !course.is_completed) ||
-                         (filterStatus === 'completed' && course.is_completed);
+                         (filterStatus === 'active' && !course.is_active === false) ||
+                         (filterStatus === 'completed' && course.is_active === false);
     
     return matchesSearch && matchesFilter;
   });
@@ -218,7 +218,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       </div>
 
       {/* Course Registration Dialog */}
-      <CourseRegistrationDialog
+      <CourseRegistrationDialog onSuccess={() => loadCourses()}
         isOpen={isRegistrationOpen}
         onClose={() => {
           setIsRegistrationOpen(false);
@@ -317,7 +317,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                       {course.course_code}
                     </p>
                   </div>
-                  {course.is_completed && (
+                  {course.is_active === false && (
                     <div className="flex-shrink-0 ml-2">
                       <CheckCircle2 className="text-success dark:text-success-light" size={24} />
                     </div>
@@ -351,7 +351,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                     />
                   </div>
                   <div className="flex justify-between mt-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
-                    <span>{course.attended_sessions} attended</span>
+                    <span>{course.sessions_attended} attended</span>
                     <span>{course.total_sessions} total</span>
                   </div>
                 </div>
@@ -360,16 +360,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2 text-light-text-secondary dark:text-dark-text-secondary">
                     <Clock size={16} />
-                    <span>{course.credit_hours || 0} credit hours</span>
+                    <span>{course.credit_units || 0} credit hours</span>
                   </div>
-                  {course.next_session && (
-                    <div className="flex items-center gap-2 text-light-text-secondary dark:text-dark-text-secondary">
-                      <Calendar size={16} />
-                      <span className="line-clamp-1">
-                        Next: {new Date(course.next_session).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Performance Indicator */}
@@ -387,7 +379,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         )}
 
         {/* Course Registration Dialog */}
-        <CourseRegistrationDialog
+        <CourseRegistrationDialog onSuccess={() => loadCourses()}
           isOpen={isRegistrationOpen}
           onClose={() => {
             setIsRegistrationOpen(false);

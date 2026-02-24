@@ -104,7 +104,7 @@ export default function AdminDashboard() {
               label="Attendance"
               value={dashboardData?.attendance_rate ? `${dashboardData.attendance_rate}%` : '0%'}
               colors={colors}
-              isAlert={dashboardData?.attendance_rate < 50}
+              isAlert={(dashboardData?.attendance_rate || 0) < 50}
             />
           </View>
         </View>
