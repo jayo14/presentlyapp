@@ -85,7 +85,7 @@ export default function LecturerCoursesScreen() {
                         isDark={isDark}
                         onPress={() => router.push({
                             pathname: '/(lecturer)/students',
-                            params: { courseId: course.id, courseName: course.name }
+                            params: { courseId: course.id, courseName: course.name, courseCode: course.code }
                         })}
                     />
                 ))
