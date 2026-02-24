@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
@@ -134,6 +135,7 @@ def google_auth_view(request):
                 'avatar_url': user.avatar_url
             },
             'tokens': tokens,
+            'requires_email_verification': not user.email_verified,
             'requires_onboarding': not user.onboarding_complete
         }, status=status.HTTP_200_OK)
         
@@ -149,6 +151,8 @@ def google_auth_view(request):
             'success': False,
             'error': 'An unexpected error occurred during authentication.'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 @api_view(['POST'])
@@ -229,60 +233,16 @@ def register_view(request):
 def send_verification_email(user, otp_code):
     """Send OTP verification email"""
     try:
-        subject = 'Verify Your Email - Presently'
+        subject = "Welcome to Presently - Verify Your Email"
         
-        html_message = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
-        .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
-        .otp-box {{ background: white; border: 2px dashed #667eea; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }}
-        .otp-code {{ font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px; }}
-        .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎓 Presently</h1>
-            <p>Verify Your Email Address</p>
-        </div>
-        <div class="content">
-            <h2>Hello {user.full_name},</h2>
-            <p>Thank you for signing up for Presently! To complete your registration, please verify your email address using the OTP code below:</p>
-            
-            <div class="otp-box">
-                <p style="margin: 0; color: #666;">Your Verification Code</p>
-                <div class="otp-code">{otp_code}</div>
-                <p style="margin: 10px 0 0 0; color: #999; font-size: 14px;">This code will expire in 15 minutes</p>
-            </div>
-            
-            <p>If you didn't create an account with Presently, please ignore this email.</p>
-        </div>
-        <div class="footer">
-            <p>© 2026 Presently. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html>
-        """
+        context = {
+            "user": user,
+            "otp_code": otp_code,
+        }
         
-        plain_message = f"""
-Hello {user.full_name},
+        html_message = render_to_string("emails/welcome_otp.html", context)
 
-Thank you for signing up for Presently!
-
-Your email verification code is: {otp_code}
-
-This code will expire in 15 minutes.
-
-Best regards,
-The Presently Team
-        """
+        plain_message = f"Hello {user.full_name},\n\nThank you for signing up for Presently!\n\nYour email verification code is: {otp_code}\n\nThis code will expire in 15 minutes.\n\nBest regards,\nThe Presently Team"
         
         from django.core.mail import EmailMultiAlternatives
         
@@ -340,6 +300,8 @@ def send_verification_otp_view(request):
                 'error': 'Failed to send verification email',
                 'details': str(e) if settings.DEBUG else None
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
         
         logger.info(f"OTP sent to {email}")
         
@@ -359,6 +321,8 @@ def send_verification_otp_view(request):
             'success': False,
             'error': 'Failed to send verification email'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 @api_view(['POST'])
@@ -428,6 +392,7 @@ def verify_email_otp_view(request):
                 'onboarding_complete': user.onboarding_complete
             },
             'tokens': tokens,
+            'requires_email_verification': not user.email_verified,
             'requires_onboarding': not user.onboarding_complete
         }, status=status.HTTP_200_OK)
         
@@ -506,67 +471,39 @@ def login_view(request):
                 else:
                     # New device detected - Send security alert
                     subject = 'New Login Detected - Presently'
-                
-                    html_message = f"""
-<!DOCTYPE html>
-<html>
-<body style="font-family: Arial, sans-serif; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-        <h2 style="color: #c0392b;">🔒 New Login Detected</h2>
-        <p>Hello <strong>{user.full_name}</strong>,</p>
-        <p>We detected a login to your Presently account from a new device.</p>
-        
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #2c3e50;">Device Information</h3>
-            <p style="margin: 8px 0;"><strong>Device Type:</strong> {device_category}</p>
-            <p style="margin: 8px 0;"><strong>Device Name:</strong> {device_name}</p>
-            <p style="margin: 8px 0;"><strong>Operating System:</strong> {os_name} {os_version}</p>
-            <p style="margin: 8px 0;"><strong>Browser:</strong> {browser_name} {browser_version}</p>
-            <p style="margin: 8px 0;"><strong>IP Address:</strong> {ip_address}</p>
-            <p style="margin: 8px 0;"><strong>Time:</strong> {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
-        </div>
-        
-        <p>If this was you, you can ignore this email.</p>
-        <p style="color: #c0392b; font-weight: bold;">⚠️ If you did not log in, please secure your account immediately by changing your password.</p>
-        
-        <div style="margin-top: 20px; padding: 15px; background: #ecf0f1; border-radius: 5px;">
-            <p style="margin: 0; font-size: 12px; color: #7f8c8d;">
-                <strong>Security Tip:</strong> Always use a strong, unique password and enable two-factor authentication when available.
-            </p>
-        </div>
-    </div>
-</body>
-</html>
-"""
-                    
-                    plain_message = f"""New Login Detected - Presently
+                    context = {
+                        'user': user,
+                        'device_category': device_category,
+                        'device_name': device_name,
+                        'os_name': os_name,
+                        'os_version': os_version,
+                        'browser': f"{browser_name} {browser_version}",
+                        'location': ip_address,
+                        'time': timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC'),
+                        'confirm_url': f"{settings.FRONTEND_URL}/auth/confirm-device",
+                        'secure_url': f"{settings.FRONTEND_URL}/auth/reset-password",
+                    }
 
-Hello {user.full_name},
+                    html_message = render_to_string('emails/new_device_alert.html', context)
+                    plain_message = (
+                        f"New Login Detected - Presently\n\n"
+                        f"Hello {user.full_name},\n"
+                        f"We detected a login to your Presently account from a new device.\n"
+                        f"Device: {device_name}\n"
+                        f"Location: {ip_address}\n"
+                        f"Time: {context['time']}\n"
+                        f"If this was not you, please secure your account.\n"
+                    )
 
-We detected a login to your Presently account from a new device.
-
-Device Information:
-- Device Type: {device_category}
-- Device Name: {device_name}
-- Operating System: {os_name} {os_version}
-- Browser: {browser_name} {browser_version}
-- IP Address: {ip_address}
-- Time: {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
-
-If this was you, you can ignore this email.
-If you did not log in, please secure your account immediately by changing your password.
-
-Security Tip: Always use a strong, unique password and enable two-factor authentication when available.
-"""
-                    
-                    send_mail(
+                    from django.core.mail import EmailMultiAlternatives
+                    msg = EmailMultiAlternatives(
                         subject,
                         plain_message,
                         settings.DEFAULT_FROM_EMAIL,
-                        [user.email],
-                        html_message=html_message,
-                        fail_silently=True,
+                        [user.email]
                     )
+                    msg.attach_alternative(html_message, 'text/html')
+                    msg.send(fail_silently=True)
             else:
                 # Log bot access but don't track or send alerts
                 auth_logger.info(f"Bot user agent detected for user {user.email}: {user_agent}")
@@ -589,6 +526,7 @@ Security Tip: Always use a strong, unique password and enable two-factor authent
                 'avatar_url': user.avatar_url
             },
             'tokens': tokens,
+            'requires_email_verification': not user.email_verified,
             'requires_onboarding': not user.onboarding_complete
         }, status=status.HTTP_200_OK)
     # Consistent error format
@@ -707,50 +645,12 @@ def request_password_reset_view(request):
         # Send email with HTML template
         subject = 'Password Reset Request - Presently'
         
-        html_message = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
-        .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
-        .button {{ display: inline-block; background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }}
-        .button:hover {{ background: #5568d3; }}
-        .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
-        .warning {{ background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎓 Presently</h1>
-            <p>Password Reset Request</p>
-        </div>
-        <div class="content">
-            <h2>Hello {user.full_name},</h2>
-            <p>You requested to reset your password for your Presently account.</p>
-            
-            <p style="text-align: center;">
-                <a href="{reset_link}" class="button">Reset Password</a>
-            </p>
-            
-            <p style="color: #666; font-size: 14px;">Or copy and paste this link into your browser:</p>
-            <p style="background: #fff; padding: 10px; border-radius: 5px; word-break: break-all; font-size: 12px;">{reset_link}</p>
-            
-            <div class="warning">
-                <strong>⚠️ Security Notice:</strong><br>
-                This link will expire in 24 hours. If you did not request this password reset, please ignore this email and your password will remain unchanged.
-            </div>
-        </div>
-        <div class="footer">
-            <p>© 2026 Presently. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html>
-        """
+        context = {
+            'user': user,
+            'reset_link': reset_link,
+        }
+
+        html_message = render_to_string('emails/password_reset.html', context)
         
         plain_message = f"""
 Hello {user.full_name},
@@ -785,7 +685,6 @@ The Presently Team
             'success': True,
             'message': 'Password reset email sent successfully'
         }, status=status.HTTP_200_OK)
-        
     except User.DoesNotExist:
         # Don't reveal if user exists or not for security
         logger.warning(f"Password reset requested for non-existent email: {email}")
@@ -1059,6 +958,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         queryset = Course.objects.all().order_by('code')
         department_id = self.request.query_params.get('department', None)
         lecturer_id = self.request.query_params.get('lecturer', None)
+        enrolled_param = self.request.query_params.get('enrolled', 'false').lower() == 'true'
         
         if department_id:
             queryset = queryset.filter(department__id=department_id)
@@ -1068,8 +968,18 @@ class CourseViewSet(viewsets.ModelViewSet):
         # Lecturers can see their own courses (including inactive ones)
         if self.request.user.role == UserRole.LECTURER:
             queryset = queryset.filter(lecturer=self.request.user)
+        elif self.request.user.role == UserRole.STUDENT:
+            # For students, filter by enrollment if requested OR if listing "my courses" (no other filters)
+            if enrolled_param or (not department_id and not lecturer_id):
+                enrolled_course_ids = CourseEnrollment.objects.filter(
+                    student=self.request.user,
+                    is_active=True
+                ).values_list('course_id', flat=True)
+                queryset = queryset.filter(id__in=enrolled_course_ids)
+
+            queryset = queryset.filter(is_active=True)
         else:
-            # Non-lecturers (students) only see active courses
+            # Non-lecturers (admins) only see active courses
             queryset = queryset.filter(is_active=True)
             
         return queryset
