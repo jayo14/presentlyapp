@@ -28,7 +28,7 @@ export default function SessionScreen() {
         if (id) {
             const [sessionData, analyticsData] = await Promise.all([
                 api.sessions.get(id as string),
-                api.analytics.session(id as string)
+                api.analytics.getSessionAnalytics(id as string)
             ]);
             setSession(sessionData);
             setAnalytics(analyticsData);
