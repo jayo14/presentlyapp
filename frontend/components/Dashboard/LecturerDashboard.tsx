@@ -32,7 +32,7 @@ interface LecturerDashboardProps {
 export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, userProfile, view = 'dashboard' }) => {
   const navigate = useNavigate();
   // State
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [venues, setVenues] = useState<VenueType[]>([]);
   

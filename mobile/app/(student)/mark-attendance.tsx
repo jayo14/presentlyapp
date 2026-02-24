@@ -251,7 +251,7 @@ export default function MarkAttendanceScreen() {
                   {sessionCode.slice(0, 4).map((digit, i) => (
                     <TextInput
                       key={i}
-                      ref={el => inputs.current[i] = el!}
+                      ref={el => { if (el) inputs.current[i] = el; }}
                       style={[styles.digitInput, { color: colors.text, borderBottomColor: digit ? colors.primary : colors.primary + '66' }]}
                       maxLength={1}
                       value={digit}
@@ -265,7 +265,7 @@ export default function MarkAttendanceScreen() {
                   {sessionCode.slice(4, 8).map((digit, i) => (
                     <TextInput
                       key={i + 4}
-                      ref={el => inputs.current[i + 4] = el!}
+                      ref={el => { if (el) inputs.current[i + 4] = el; }}
                       style={[styles.digitInput, { color: colors.text, borderBottomColor: digit ? colors.primary : colors.primary + '66' }]}
                       maxLength={1}
                       value={digit}

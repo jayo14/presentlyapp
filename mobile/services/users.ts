@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '@/constants/api';
-import { apiClient } from './api';
+import { apiClient } from './client';
 
 export const usersService = {
   list: async (params?: any) => {
@@ -12,6 +12,9 @@ export const usersService = {
     return apiClient.post(API_ENDPOINTS.USERS.CREATE, data);
   },
   update: async (id: string, data: any) => {
+    return apiClient.put(API_ENDPOINTS.USERS.UPDATE(id), data);
+  },
+  partialUpdate: async (id: string, data: any) => {
     return apiClient.patch(API_ENDPOINTS.USERS.UPDATE(id), data);
   },
   delete: async (id: string) => {

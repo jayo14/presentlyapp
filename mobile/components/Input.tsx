@@ -1,4 +1,4 @@
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { useState } from 'react';
 import { useTheme } from '@/hooks/useTheme';
 import { Eye, EyeOff } from 'lucide-react-native';
@@ -15,6 +15,7 @@ interface InputProps {
   error?: string;
   editable?: boolean;
   icon?: React.ReactNode;
+  containerStyle?: ViewStyle;
 }
 
 export function Input({
@@ -24,93 +25,107 @@ export function Input({
   placeholder,
   secureTextEntry = false,
   keyboardType = 'default',
-  autoCapitalize = 'sentences',
+  autoCapitalize = 'none',
   error,
   editable = true,
   icon,
+  containerStyle,
 }: InputProps) {
-  const { colors } = useTheme();
-  const [isSecure, setIsSecure] = useState<boolean>(secureTextEntry);
+  const { colors, isDark } = useTheme();
+  const [showPassword, setShowPassword] = useState(!secureTextEntry);
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <View style={styles.container}>
-      {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
-      <View style={styles.inputWrapper}>
-        {icon && <View style={styles.leftIcon}>{icon}</View>}
+    <View style={[styles.container, containerStyle]}>
+      {label && (
+        <Text style={[styles.label, { color: isDark ? '#ccbf8e' : '#666666' }]}>
+          {label}
+        </Text>
+      )}
+      <View
+        style={[
+          styles.inputContainer,
+          {
+            backgroundColor: isDark ? '#2d281a' : '#FFFFFF',
+            borderColor: error
+              ? '#EF4444'
+              : isFocused
+              ? colors.primary
+              : isDark
+              ? 'rgba(255,255,255,0.05)'
+              : '#E2E8F0',
+          },
+        ]}
+      >
+        {icon && <View style={styles.iconContainer}>{icon}</View>}
         <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: colors.input,
-              color: colors.text,
-              borderColor: error ? colors.error : isFocused ? colors.primary : colors.border,
-              paddingLeft: icon ? 48 : 16,
-              paddingRight: secureTextEntry ? 48 : 16,
-            },
-          ]}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={colors.textSecondary}
-          secureTextEntry={isSecure}
+          placeholderTextColor={isDark ? '#4a4225' : '#94A3B8'}
+          secureTextEntry={secureTextEntry && !showPassword}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           editable={editable}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          style={[
+            styles.input,
+            { color: colors.text, fontFamily: Fonts.lexend.regular },
+          ]}
         />
         {secureTextEntry && (
           <TouchableOpacity
-            style={styles.eyeButton}
-            onPress={() => setIsSecure(!isSecure)}
-            activeOpacity={0.7}
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIcon}
           >
-            {isSecure ? (
-              <EyeOff size={20} color={colors.textSecondary} />
+            {showPassword ? (
+              <EyeOff size={20} color={isDark ? '#4a4225' : '#94A3B8'} />
             ) : (
-              <Eye size={20} color={colors.textSecondary} />
+              <Eye size={20} color={isDark ? '#4a4225' : '#94A3B8'} />
             )}
           </TouchableOpacity>
         )}
       </View>
-      {error && <Text style={[styles.error, { color: colors.error }]}>{error}</Text>}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    gap: 8,
+    width: '100%',
+    marginBottom: 16,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
+    marginBottom: 8,
     fontFamily: Fonts.lexend.medium,
-    marginBottom: 2,
   },
-  inputWrapper: {
-    position: 'relative',
-    justifyContent: 'center',
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 16,
   },
-  leftIcon: {
-    position: 'absolute',
-    left: 16,
-    zIndex: 1,
+  iconContainer: {
+    marginRight: 12,
   },
   input: {
-    height: 56,
-    borderRadius: 12,
-    fontSize: 16,
-    fontFamily: Fonts.lexend.regular,
-    borderWidth: 1,
+    flex: 1,
+    height: '100%',
+    fontSize: 15,
   },
-  eyeButton: {
-    position: 'absolute',
-    right: 16,
+  eyeIcon: {
+    padding: 4,
   },
-  error: {
-    fontSize: 13,
-    fontFamily: Fonts.lexend.regular,
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
     marginTop: 4,
+    marginLeft: 4,
+    fontFamily: Fonts.lexend.regular,
   },
 });

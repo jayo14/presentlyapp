@@ -5,9 +5,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { Search, Plus, School as SchoolIcon, ChevronRight, X, Bell } from 'lucide-react-native';
 import { useInstitutions, useCreateInstitution, useDeleteInstitution, useUpdateInstitution } from '@/hooks/useInstitutions';
-import Button from '@/components/Button';
-import Input from '@/components/Input';
-import CustomModal from '@/components/CustomModal';
+import { Button } from '@/components/Button';
+import { Input } from '@/components/Input';
+import { CustomModal } from '@/components/CustomModal';
 
 export default function InstitutionManagement() {
   const { colors, isDark } = useTheme();
@@ -183,8 +183,8 @@ export default function InstitutionManagement() {
               </TouchableOpacity>
             </View>
             <View style={styles.form}>
-              <Input label="School Name" placeholder="University of Excellence" value={formData.name} onChangeText={t => setFormData({...formData, name: t})} />
-              <Input label="Address" placeholder="123 Education St" value={formData.address} onChangeText={t => setFormData({...formData, address: t})} />
+              <Input label="School Name" placeholder="University of Excellence" value={formData.name} onChangeText={(t: string) => setFormData({...formData, name: t})} />
+              <Input label="Address" placeholder="123 Education St" value={formData.address} onChangeText={(t: string) => setFormData({...formData, address: t})} />
 
               <Button
                 title={editingSchool ? "Update Institution" : "Create Institution"}

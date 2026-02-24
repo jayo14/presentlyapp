@@ -1,17 +1,20 @@
 import { API_ENDPOINTS } from '@/constants/api';
-import { apiClient } from './api';
+import { apiClient } from './client';
 
 export const lecturerService = {
-  getDashboard: async () => {
+  getDashboard: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.LECTURER_DASHBOARD);
   },
-  getActivity: async () => {
+  getActivity: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.SYSTEM.ACTIVITY);
   },
-  getStats: async () => {
+  getStats: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.SYSTEM.STATS);
   },
-  getAlerts: async () => {
+  getAlerts: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.SYSTEM.ALERTS);
+  },
+  getLogs: async (): Promise<any> => {
+    return apiClient.get(API_ENDPOINTS.SYSTEM.LOGS);
   },
 };

@@ -60,23 +60,8 @@ export const InstitutionManagement: React.FC = () => {
       const results = (data as any)?.results || data;
       const institutionsArray = Array.isArray(results) ? results : [];
       
-      const institutionsWithStats = await Promise.all(
-        institutionsArray.map(async (inst: Institution) => {
-          if (!inst || !inst.id) return { ...inst, collegeCount: 0 };
-          try {
-            const colleges = await institutionsApi.getCollegesByInstitution(inst.id);
-            const collegeResults = (colleges as any)?.results || colleges;
-            return {
-              ...inst,
-              collegeCount: Array.isArray(collegeResults) ? collegeResults.length : 0
-            };
-          } catch (e) {
-            return { ...inst, collegeCount: 0 };
-          }
-        })
-      );
-      
-      setInstitutions(institutionsWithStats as InstitutionWithStats[]);
+      // Removed N+1 queries for collegeCount to prevent loading failures
+      setInstitutions(institutionsArray as InstitutionWithStats[]);
       setError(null);
     } catch (err) {
       setError('Failed to load institutions');
@@ -148,10 +133,12 @@ export const InstitutionManagement: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Building2 className="w-8 h-8 text-primary" />
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <Building2 className="w-5 h-5" />
+          </div>
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Institution Management</h2>
-            <p className="text-sm text-zinc-400">Manage educational institutions and their colleges</p>
+            <h2 className="text-2xl font-bold text-foreground">Institutions</h2>
+            <p className="text-zinc-500 text-sm">Manage educational organizations and their hierarchy</p>
           </div>
         </div>
         <Button onClick={handleCreateInstitution} className="gap-2">
