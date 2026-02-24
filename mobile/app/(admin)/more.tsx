@@ -62,7 +62,7 @@ export default function MoreScreen() {
                   style={[styles.toolButton, { backgroundColor: colors.primary, marginBottom: 16 }]}
                   onPress={async () => {
                     await signOut();
-                    router.replace('/login');
+                    router.replace('/auth/sign-in');
                   }}
                 >
                   <LogOut size={20} color="#000" />

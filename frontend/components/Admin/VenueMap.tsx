@@ -10,7 +10,7 @@ import { Button } from '../Button';
 // Fix for default marker icons in Leaflet with Webpack/Vite
 // @ts-ignore
 if (typeof window !== 'undefined' && L.Icon.Default) {
-    delete L.Icon.Default.prototype._getIconUrl;
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -46,7 +46,6 @@ export const VenueMap: React.FC<VenueMapProps> = ({
   const handleRefresh = () => {
     if (mapRef.current) {
       mapRef.current.invalidateSize();
-      // If no venues, reset to default view
       if (venues.length === 0) {
         mapRef.current.setView([7.3775, 3.8936], 13);
       }
@@ -58,7 +57,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     if (!containerRef.current || mapRef.current) return;
 
     const map = L.map(containerRef.current, {
-        center: [7.3775, 3.8936], // Nigeria (Ibadan/Lagos area)
+        center: [7.3775, 3.8936],
         zoom: 13,
         zoomControl: false,
         fadeAnimation: true,
@@ -67,24 +66,17 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // Define Base Layers
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
-    });
-
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles © Esri'
     });
 
     osm.addTo(map);
     mapRef.current = map;
 
-    // Trigger resize after a short delay to ensure container is fully rendered
-    setTimeout(() => {
-      map.invalidateSize();
+    const resizeTimer = setTimeout(() => {
+      if (mapRef.current) mapRef.current.invalidateSize();
     }, 250);
 
-    // --- GEOMAN SETUP ---
     map.pm.addControls({
       position: 'topleft',
       drawCircle: false,
@@ -98,48 +90,49 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     });
 
     map.pm.setPathOptions({
-      color: 'rgb(184, 134, 11)', // primary color
+      color: 'rgb(184, 134, 11)',
       fillColor: 'rgb(184, 134, 11)',
       fillOpacity: 0.2,
     });
 
-    // Handle Creation
     map.on('pm:create', (e: any) => {
       const layer = e.layer;
       if (e.shape === 'Polygon') {
-        const coords = layer.getLatLngs()[0].map((latlng: L.LatLng) => [latlng.lat, latlng.lng]);
-        
-        // Add click handler to the newly drawn polygon
-        layer.on('click', (clickEvent: L.LeafletMouseEvent) => {
-          L.DomEvent.stopPropagation(clickEvent);
-          // Calculate center of polygon for venue marker
-          const center = layer.getBounds().getCenter();
-          onMapClick?.(center.lat, center.lng);
-        });
-        
-        // Style the temporary polygon
-        layer.setStyle({
-          color: 'rgb(184, 134, 11)', // primary color
-          fillColor: 'rgb(184, 134, 11)',
-          fillOpacity: 0.2,
-          weight: 2
-        });
-        
-        // Callback with coordinates
-        onBoundaryComplete?.(coords);
+        const latlngs = layer.getLatLngs();
+        if (latlngs && latlngs.length > 0) {
+            const coords = latlngs[0].map((latlng: L.LatLng) => [latlng.lat, latlng.lng]);
+
+            layer.on('click', (clickEvent: L.LeafletMouseEvent) => {
+              L.DomEvent.stopPropagation(clickEvent);
+              const center = layer.getBounds().getCenter();
+              onMapClick?.(center.lat, center.lng);
+            });
+
+            layer.setStyle({
+              color: 'rgb(184, 134, 11)',
+              fillColor: 'rgb(184, 134, 11)',
+              fillOpacity: 0.2,
+              weight: 2
+            });
+
+            onBoundaryComplete?.(coords);
+        }
       }
     });
 
-    // Map Click for adding new venue markers
     map.on('click', (e: L.LeafletMouseEvent) => {
-        if (!map.pm.globalDrawModeEnabled()) {
+        if (mapRef.current && !mapRef.current.pm.globalDrawModeEnabled()) {
             onMapClick?.(e.latlng.lat, e.latlng.lng);
         }
     });
 
     return () => {
-      map.remove();
-      mapRef.current = null;
+      clearTimeout(resizeTimer);
+      if (mapRef.current) {
+        mapRef.current.off();
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
   }, []);
 
@@ -165,18 +158,27 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     if (!mapRef.current) return;
     const map = mapRef.current;
 
-    // Clear existing markers and boundaries
-    Object.values(markersRef.current).forEach(m => map.removeLayer(m));
-    Object.values(layersRef.current).forEach(l => map.removeLayer(l));
+    // Clear existing markers and boundaries safely
+    Object.values(markersRef.current).forEach(m => {
+      if (m && map.hasLayer(m)) map.removeLayer(m);
+    });
+    Object.values(layersRef.current).forEach(l => {
+      if (l) {
+        // @ts-ignore
+        if (l.pm && l.pm.enabled()) l.pm.disable();
+        if (map.hasLayer(l)) map.removeLayer(l);
+      }
+    });
     markersRef.current = {};
     layersRef.current = {};
 
     venues.forEach(venue => {
+      if (venue.latitude === undefined || venue.longitude === undefined || venue.latitude === null || venue.longitude === null) return;
+
       const isActive = activeSessions.has(venue.id);
       const isSelected = selectedVenue?.id === venue.id;
 
       // 1. Render Marker
-      // Use semantic colors: red for active sessions, primary for selected, blue for default
       const markerColor = isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(59, 130, 246)');
       
       const customIcon = L.divIcon({
@@ -198,78 +200,83 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         iconAnchor: [16, 32]
       });
 
-      const marker = L.marker([venue.latitude, venue.longitude], { icon: customIcon })
-        .addTo(map)
-        .on('click', (e) => {
-            L.DomEvent.stopPropagation(e);
-            onVenueClick?.(venue);
-        });
-      
-      marker.bindTooltip(`<b>${venue.name}</b><br/>${venue.code}`, { direction: 'top', offset: [0, -32] });
+      const marker = L.marker([Number(venue.latitude), Number(venue.longitude)], {
+        icon: customIcon,
+        title: venue.name,
+        zIndexOffset: isSelected ? 1000 : 0
+      }).addTo(map);
+
+      marker.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
+        onVenueClick?.(venue);
+      });
+
       markersRef.current[venue.id] = marker;
 
       // 2. Render Boundary Polygon
-      if (venue.boundary_coordinates && venue.boundary_coordinates.length >= 3) {
-        const polygon = L.polygon(venue.boundary_coordinates as L.LatLngExpression[], {
-          color: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
-          fillColor: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
-          fillOpacity: isSelected ? 0.2 : 0.1,
-          weight: isSelected ? 3 : 2,
-          className: 'venue-polygon'
-        }).addTo(map);
+      if (venue.boundary_coordinates && Array.isArray(venue.boundary_coordinates) && venue.boundary_coordinates.length >= 3) {
+        try {
+            const polygon = L.polygon(venue.boundary_coordinates as any, {
+              color: isSelected ? 'rgb(184, 134, 11)' : (isActive ? 'rgb(239, 68, 68)' : 'rgb(99, 102, 241)'),
+              fillColor: isSelected ? 'rgb(184, 134, 11)' : (isActive ? 'rgb(239, 68, 68)' : 'rgb(99, 102, 241)'),
+              fillOpacity: isSelected ? 0.2 : 0.1,
+              weight: isSelected ? 3 : 2,
+              className: 'venue-polygon'
+            }).addTo(map);
 
-        // Add hover effect
-        polygon.on('mouseover', function() {
-          this.setStyle({ fillOpacity: 0.3, weight: 3 });
-        });
-        polygon.on('mouseout', function() {
-          this.setStyle({ 
-            fillOpacity: isSelected ? 0.2 : 0.1,
-            weight: isSelected ? 3 : 2
-          });
-        });
+            polygon.on('mouseover', function() {
+              this.setStyle({ fillOpacity: 0.3, weight: 3 });
+            });
+            polygon.on('mouseout', function() {
+              this.setStyle({
+                fillOpacity: isSelected ? 0.2 : 0.1,
+                weight: isSelected ? 3 : 2
+              });
+            });
 
-        // Add click handler to polygon
-        polygon.on('click', (e) => {
-          L.DomEvent.stopPropagation(e);
-          onVenueClick?.(venue);
-        });
+            polygon.on('click', (e) => {
+              L.DomEvent.stopPropagation(e);
+              onVenueClick?.(venue);
+            });
 
-        // Enable editing for the selected venue's boundary
-        if (isSelected) {
-            polygon.pm.enable({
-                allowSelfIntersection: false,
-            });
-            
-            // Update boundary when edited
-            polygon.on('pm:edit', (e: any) => {
-                const updatedCoords = polygon.getLatLngs()[0].map((latlng: any) => [latlng.lat, latlng.lng]);
-                onBoundaryComplete?.(updatedCoords);
-            });
-            
-            // Show tooltip indicating editability
-            polygon.bindTooltip('Click and drag vertices to edit boundary', { 
-              sticky: true,
-              className: 'custom-tooltip'
-            });
+            if (isSelected) {
+                // @ts-ignore
+                polygon.pm.enable({
+                    allowSelfIntersection: false,
+                });
+
+                polygon.on('pm:edit', (e: any) => {
+                    const latlngs = polygon.getLatLngs();
+                    if (latlngs && latlngs.length > 0) {
+                        const updatedCoords = (latlngs[0] as any).map((latlng: any) => [latlng.lat, latlng.lng]);
+                        onBoundaryComplete?.(updatedCoords);
+                    }
+                });
+
+                polygon.bindTooltip('Click and drag vertices to edit boundary', {
+                  sticky: true,
+                  className: 'custom-tooltip'
+                });
+            }
+
+            layersRef.current[venue.id] = polygon;
+        } catch (err) {
+            console.error('Error rendering boundary for venue', venue.id, err);
         }
-
-        layersRef.current[venue.id] = polygon;
       }
       
-      // 3. Render Radius Circle (if radius is defined and no boundary polygon)
-      if (venue.radius && venue.radius > 0 && (!venue.boundary_coordinates || venue.boundary_coordinates.length < 3)) {
-        const circle = L.circle([venue.latitude, venue.longitude], {
-          radius: venue.radius, // radius in meters
+      // 3. Render Radius Circle
+      if (venue.verification_radius && venue.verification_radius > 0 && (!venue.boundary_coordinates || venue.boundary_coordinates.length < 3)) {
+        const circle = L.circle([Number(venue.latitude), Number(venue.longitude)], {
+          radius: Number(venue.verification_radius),
           color: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
           fillColor: isActive ? 'rgb(239, 68, 68)' : (isSelected ? 'rgb(184, 134, 11)' : 'rgb(99, 102, 241)'),
           fillOpacity: isSelected ? 0.15 : 0.08,
           weight: isSelected ? 2.5 : 1.5,
-          dashArray: '5, 5', // dashed circle for radius
+          dashArray: '5, 5',
           className: 'venue-radius-circle'
         }).addTo(map);
 
-        // Add hover effect
         circle.on('mouseover', function() {
           this.setStyle({ fillOpacity: 0.25, weight: 2.5 });
         });
@@ -280,16 +287,14 @@ export const VenueMap: React.FC<VenueMapProps> = ({
           });
         });
 
-        // Add click handler to circle
         circle.on('click', (e) => {
           L.DomEvent.stopPropagation(e);
           onVenueClick?.(venue);
         });
 
-        // Add radius label tooltip
-        const radiusText = venue.radius >= 1000 
-          ? `${(venue.radius / 1000).toFixed(1)}km radius`
-          : `${venue.radius}m radius`;
+        const radiusText = venue.verification_radius >= 1000
+          ? `${(venue.verification_radius / 1000).toFixed(1)}km radius`
+          : `${venue.verification_radius}m radius`;
         circle.bindTooltip(radiusText, { 
           permanent: isSelected,
           direction: 'center',
@@ -300,54 +305,56 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       }
     });
 
-    // Fit bounds whenever venues list changes (filtering)
     const currentMarkers = Object.values(markersRef.current);
     if (venues.length > 0 && currentMarkers.length > 0) {
-        const group = L.featureGroup(currentMarkers);
-        const bounds = group.getBounds();
-        
-        if (bounds.isValid()) {
-            // If only one venue, zoom in closer
-            if (venues.length === 1) {
-                map.setView([venues[0].latitude, venues[0].longitude], 16, { animate: true });
-            } else {
-                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16, animate: true });
+        try {
+            const points = currentMarkers.map(m => m.getLatLng());
+            const bounds = L.latLngBounds(points);
+
+            if (bounds.isValid()) {
+                if (venues.length === 1) {
+                    map.setView([Number(venues[0].latitude), Number(venues[0].longitude)], 16, { animate: false });
+                } else {
+                    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16, animate: false });
+                }
             }
+        } catch (err) {
+            console.error('Error fitting bounds', err);
         }
     } else if (map.getZoom() <= 6) {
-        // Reset to default view if no venues and we are zoomed out
         map.setView([7.3775, 3.8936], 13);
     }
 
   }, [venues, selectedVenue, activeSessions]);
 
-  // Center on selected venue
   useEffect(() => {
     if (!mapRef.current || !selectedVenue) return;
-    mapRef.current.setView([selectedVenue.latitude, selectedVenue.longitude], 16, { animate: true });
+    if (selectedVenue.latitude && selectedVenue.longitude) {
+        mapRef.current.setView([Number(selectedVenue.latitude), Number(selectedVenue.longitude)], 16, { animate: true });
+    }
   }, [selectedVenue]);
 
-  // Handle Drawing Mode
   useEffect(() => {
     if (!mapRef.current) return;
     const map = mapRef.current;
 
     if (drawingMode) {
+      // @ts-ignore
       map.pm.enableDraw('Polygon', {
         snappable: true,
         snapDistance: 20,
         allowSelfIntersection: false,
       });
     } else {
+      // @ts-ignore
       map.pm.disableDraw();
     }
   }, [drawingMode]);
 
-  // Handle Resize
   useEffect(() => {
     if (mapRef.current) {
       const timer = setTimeout(() => {
-        mapRef.current?.invalidateSize();
+        if (mapRef.current) mapRef.current.invalidateSize();
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -357,7 +364,6 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     <div className="relative w-full h-full group">
       <div ref={containerRef} className="w-full h-full z-0" />
       
-      {/* Map Controls */}
       <div className="absolute top-4 right-12 z-[1000] flex flex-col gap-2">
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl p-1 flex flex-col overflow-hidden">
             <button 
@@ -385,7 +391,6 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         </div>
       </div>
 
-      {/* Legend */}
       <div className="absolute bottom-6 left-6 z-[1000] bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-4 min-w-[160px]">
         <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3">Map Legend</h4>
         <div className="space-y-3">

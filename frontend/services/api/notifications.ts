@@ -88,6 +88,7 @@ export const notificationsApi = {
   },
 
   // Mark all notifications as read
+  // Clear all notifications\n  clearAll: async (): Promise<void> => {\n    try {\n      await apiClient.post("/notifications/mark-all-read/");\n    } catch (error) {\n      console.warn("Clear all endpoint not available");\n    }\n  },
   markAllAsRead: async (): Promise<void> => {
     try {
       await apiClient.post('/notifications/mark-all-read/');

@@ -222,10 +222,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                             ) : logs.map(log => (
                                 <tr key={log.id} className="border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
                                     <td className="p-4">
-                                        {log.level === 'info' && <Info size={18} className="text-blue-500" title="Info" />}
-                                        {log.level === 'warning' && <AlertTriangle size={18} className="text-yellow-500" title="Warning" />}
-                                        {log.level === 'error' && <XCircle size={18} className="text-red-500" title="Error" />}
-                                        {log.level === 'success' && <CheckCircle size={18} className="text-green-500" title="Success" />}
+                                        {log.level === 'info' && <Info size={18} className="text-blue-500"  />}
+                                        {log.level === 'warning' && <AlertTriangle size={18} className="text-yellow-500"  />}
+                                        {log.level === 'error' && <XCircle size={18} className="text-red-500"  />}
+                                        {log.level === 'success' && <CheckCircle size={18} className="text-green-500"  />}
                                     </td>
                                     <td className="p-4 text-zinc-900 dark:text-white font-medium">{log.action}</td>
                                     <td className="p-4">{log.user_name || log.ip_address || 'System'}</td>
