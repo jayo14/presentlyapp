@@ -21,7 +21,7 @@ export default function MarkAttendanceScreen() {
   const [activeTab, setActiveTab] = useState<'qr' | 'code'>(tab === 'code' ? 'code' : 'qr');
   const [permission, requestPermission] = useCameraPermissions();
   
-  const [sessionCode, setSessionCode] = useState<string[]>(new Array(6).fill(''));
+    const [sessionCode, setSessionCode] = useState<string[]>(new Array(8).fill(''));
   const [processing, setProcessing] = useState<boolean>(false);
   const inputs = useRef<TextInput[]>([]);
 
@@ -57,9 +57,9 @@ export default function MarkAttendanceScreen() {
     newCode[index] = text.toUpperCase();
     setSessionCode(newCode);
 
-    if (text && index < 5) {
-      inputs.current[index + 1]?.focus();
-    }
+        if (text && index < 7) {
+            inputs.current[index + 1]?.focus();
+        }
   };
 
   const handleKeyPress = (e: any, index: number) => {
@@ -134,7 +134,7 @@ export default function MarkAttendanceScreen() {
   };
 
   const fullCode = sessionCode.join('');
-  const isValidCode = fullCode.length === 6;
+    const isValidCode = fullCode.length === 8;
 
   if (activeTab === 'qr') {
     return (
@@ -253,7 +253,7 @@ export default function MarkAttendanceScreen() {
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-            <Text style={[styles.headline, { color: colors.text }]}>Enter 6-Digit Code</Text>
+            <Text style={[styles.headline, { color: colors.text }]}>Enter 8-Digit Code</Text>
             <Text style={[styles.subtext, { color: isDark ? 'rgba(255,255,255,0.6)' : '#666' }]}>
                 Ask your lecturer for the unique code to confirm your attendance manually.
             </Text>
