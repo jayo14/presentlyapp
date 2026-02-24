@@ -100,7 +100,7 @@ export default function LecturerCoursesScreen() {
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.primary }]}
         activeOpacity={0.8}
-        onPress={() => router.push('/(lecturer)/sessions')}
+        onPress={() => router.push('/(lecturer)/create-course')}
       >
         <Plus size={32} color="#231e0f" strokeWidth={2.5} />
       </TouchableOpacity>
