@@ -5,76 +5,57 @@ import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { Bell, Clock, MapPin, BookOpen, Calendar, TrendingUp, CheckCircle, AlertCircle, Mail, ChevronRight } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
-import { useState, useEffect } from 'react';
-import { api } from '@/services/api';
-import { Session } from '@/types';
+import { useState, useCallback } from 'react';
+import { useLecturerDashboard, useUpcomingSessions } from '@/hooks/useLecturerDashboard';
 
 export default function LecturerDashboard() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { user, isAuthenticated, isLoading: authLoading, refreshSession } = useAuth();
-  const [stats, setStats] = useState<any>(null);
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const { user } = useAuth();
 
-  const loadData = async (allowRetry = true) => {
-    try {
-        if (!isAuthenticated) {
-          setStats(null);
-          setSessions([]);
-          return;
-        }
+  const {
+    data: dashboardData,
+    isLoading: statsLoading,
+    refetch: refetchStats,
+    isRefetching: isRefetchingStats
+  } = useLecturerDashboard();
 
-        const dashboardData: any = await api.analytics.getLecturerDashboard();
-        setStats(dashboardData.stats);
-        setSessions(dashboardData.recentSessions || []);
-    } catch (e: any) {
-        console.error('Failed to load lecturer dashboard', e);
-        // Silent fail for now
-    } finally {
-        setLoading(false);
-    }
-  };
+  const {
+    data: upcomingSessionsData,
+    isLoading: upcomingLoading,
+    refetch: refetchUpcoming
+  } = useUpcomingSessions();
 
-  useEffect(() => {
-    if (authLoading) return;
-    loadData();
-  }, [authLoading, isAuthenticated]);
+  const onRefresh = useCallback(async () => {
+    await Promise.all([refetchStats(), refetchUpcoming()]);
+  }, [refetchStats, refetchUpcoming]);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadData();
-    setRefreshing(false);
-  };
-
-  if (loading && !refreshing) {
-      return (
-          <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
-              <ActivityIndicator size="large" color={colors.primary} />
-          </View>
-      );
-  }
+  const nextSession = upcomingSessionsData?.[0] || upcomingSessionsData?.results?.[0];
+  const refreshing = isRefetchingStats;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Top App Bar */}
+      {/* Top Header */}
       <View style={styles.header}>
         <View style={styles.profileRow}>
-          <TouchableOpacity onPress={() => router.push('/(lecturer)/profile')}>
-            <View style={[styles.avatarContainer, { borderColor: colors.primary }]}>
+            <TouchableOpacity
+                style={[styles.avatarContainer, { borderColor: colors.primary + '4D' }]}
+                onPress={() => router.push('/(lecturer)/profile')}
+            >
                 <Image
-                source={{ uri: user?.profilePicture || "https://lh3.googleusercontent.com/aida-public/AB6AXuCuzsNLYOMOCIRZNX04glx11isgZH3YUQ1gvGK6_sE1cz0kKPPVfxqrlQxHeBSQQ3t13Idb0sadCUB0ZZK3UDvT9szriQu4J37GBR5WmWTc5GYw8HSrQFdq4FGQ1OR-zcY40CljQhQU2LcNvTZx85rCPYnNafAN40Xjy732BVWusDuYCVjTt3dLjZLo-sGB84-UePHKSzj3l7tSq1GlCNLJbktIHgdlg6MNmiuEMarDYoh7Q5AsVfHQTje6rT49diyUa-I32Im1COVR" }}
-                style={styles.avatar}
+                    source={{ uri: user?.profilePicture || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" }}
+                    style={styles.avatar}
                 />
+            </TouchableOpacity>
+            <View>
+                <Text style={[styles.welcomeSub, { color: isDark ? '#ccbf8e' : '#666666' }]}>GOOD MORNING,</Text>
+                <Text style={[styles.userName, { color: colors.text }]}>Prof. {user?.fullName?.split(' ')[0] || 'Lecturer'}</Text>
             </View>
-          </TouchableOpacity>
-          <View>
-            <Text style={[styles.welcomeSub, { color: isDark ? '#ccbf8e' : '#666666' }]}>Welcome back,</Text>
-            <Text style={[styles.userName, { color: colors.text }]}>Professor</Text>
-          </View>
         </View>
-        <TouchableOpacity style={[styles.iconBtn, { backgroundColor: isDark ? '#352e18' : '#F1F5F9' }]} onPress={() => router.push('/(lecturer)/notifications')}>
+        <TouchableOpacity
+            style={[styles.iconBtn, { backgroundColor: isDark ? '#2d281a' : '#F9FAFB' }]}
+            onPress={() => router.push('/(lecturer)/notifications')}
+        >
           <Bell size={22} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -86,46 +67,82 @@ export default function LecturerDashboard() {
       >
         {/* Next Class Card Section */}
         <View style={styles.section}>
-            <View style={[styles.nextClassCard, { backgroundColor: isDark ? '#352e18' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
-                <Image
-                    source={{ uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBlxoJsKgpZimzuMN9_wIy2nQKrP6xfFobHPPC15rReLLYJ7PMTH4lJGYUO7gawKCDatFSRKvtW3W5Q_pYm2C1qvmULm56p9l0uPqnFWg0RbId2dgvNPpL2N93K5OuqLrvC1m-mZ08yHo9ElAVoWDhR0_NEg28ZQZ1WI4xj2Q2tqy3yIy-dzGAUIN7RPK0MxOEKZ3aAT-dQ8cSviIs7HhgdE1QOlj-IPnLnzsjZ4S7JpE5qis-MOWdsTrM2UcvFzShcXtqjTlLZT_Nh" }}
-                    style={styles.nextClassImage}
-                />
-                <View style={styles.nextClassContent}>
-                    <View style={styles.nextClassHeader}>
-                        <View style={styles.liveIndicator}>
-                            <View style={styles.liveDot} />
-                            <Text style={styles.liveText}>NEXT CLASS</Text>
+            {nextSession ? (
+                <View style={[styles.nextClassCard, { backgroundColor: isDark ? '#352e18' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
+                    <Image
+                        source={{ uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBlxoJsKgpZimzuMN9_wIy2nQKrP6xfFobHPPC15rReLLYJ7PMTH4lJGYUO7gawKCDatFSRKvtW3W5Q_pYm2C1qvmULm56p9l0uPqnFWg0RbId2dgvNPpL2N93K5OuqLrvC1m-mZ08yHo9ElAVoWDhR0_NEg28ZQZ1WI4xj2Q2tqy3yIy-dzGAUIN7RPK0MxOEKZ3aAT-dQ8cSviIs7HhgdE1QOlj-IPnLnzsjZ4S7JpE5qis-MOWdsTrM2UcvFzShcXtqjTlLZT_Nh" }}
+                        style={styles.nextClassImage}
+                    />
+                    <View style={styles.nextClassContent}>
+                        <View style={styles.nextClassHeader}>
+                            <View style={styles.liveIndicator}>
+                                <View style={styles.liveDot} />
+                                <Text style={styles.liveText}>NEXT CLASS</Text>
+                            </View>
                         </View>
-                    </View>
-                    <Text style={[styles.nextClassName, { color: colors.text }]}>CS401 - AI Ethics</Text>
+                        <Text style={[styles.nextClassName, { color: colors.text }]}>{nextSession.course_code} - {nextSession.course_name}</Text>
 
-                    <View style={styles.nextClassFooter}>
-                        <View style={styles.nextClassDetails}>
-                            <View style={styles.detailRow}>
-                                <Clock size={14} color={isDark ? '#ccbf8e' : '#666666'} />
-                                <Text style={[styles.detailText, { color: isDark ? '#ccbf8e' : '#666666' }]}>10:00 AM - 12:00 PM</Text>
+                        <View style={styles.nextClassFooter}>
+                            <View style={styles.nextClassDetails}>
+                                <View style={styles.detailRow}>
+                                    <Clock size={14} color={isDark ? '#ccbf8e' : '#666666'} />
+                                    <Text style={[styles.detailText, { color: isDark ? '#ccbf8e' : '#666666' }]}>
+                                        {new Date(nextSession.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(nextSession.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <MapPin size={14} color={isDark ? '#ccbf8e' : '#666666'} />
+                                    <Text style={[styles.detailText, { color: isDark ? '#ccbf8e' : '#666666' }]}>{nextSession.venue_name || 'Hall A'}</Text>
+                                </View>
                             </View>
-                            <View style={styles.detailRow}>
-                                <MapPin size={14} color={isDark ? '#ccbf8e' : '#666666'} />
-                                <Text style={[styles.detailText, { color: isDark ? '#ccbf8e' : '#666666' }]}>Hall A</Text>
-                            </View>
+                            <TouchableOpacity
+                                style={[styles.startSessionBtn, { backgroundColor: colors.primary }]}
+                                onPress={() => router.push({ pathname: '/(lecturer)/sessions', params: { sessionId: nextSession.id }})}
+                            >
+                                <Text style={styles.startSessionText}>Start Session</Text>
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={[styles.startSessionBtn, { backgroundColor: colors.primary }]}>
-                            <Text style={styles.startSessionText}>Start Session</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            ) : !statsLoading && (
+                <View style={[styles.noSessionCard, { backgroundColor: isDark ? '#352e18' : '#F9FAFB', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
+                    <Calendar size={32} color={colors.primary} />
+                    <Text style={[styles.noSessionText, { color: colors.text }]}>No upcoming classes scheduled</Text>
+                    <TouchableOpacity
+                        style={[styles.createBtn, { backgroundColor: colors.primary }]}
+                        onPress={() => router.push('/(lecturer)/sessions')}
+                    >
+                        <Text style={styles.startSessionText}>Create Session</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
 
         {/* Quick Stats Section */}
         <View style={styles.statsSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Stats</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statsScroll}>
-                <StatCard icon={<BookOpen size={18} color={colors.primary} />} label="Courses" value="6" colors={colors} isDark={isDark} />
-                <StatCard icon={<Calendar size={18} color={colors.primary} />} label="Today" value="2" colors={colors} isDark={isDark} />
-                <StatCard icon={<TrendingUp size={18} color={colors.primary} />} label="Attendance" value="88%" colors={colors} isDark={isDark} />
+                <StatCard
+                    icon={<BookOpen size={18} color={colors.primary} />}
+                    label="Courses"
+                    value={dashboardData?.total_courses?.toString() || "0"}
+                    colors={colors}
+                    isDark={isDark}
+                />
+                <StatCard
+                    icon={<Calendar size={18} color={colors.primary} />}
+                    label="Today"
+                    value={dashboardData?.active_sessions_count?.toString() || "0"}
+                    colors={colors}
+                    isDark={isDark}
+                />
+                <StatCard
+                    icon={<TrendingUp size={18} color={colors.primary} />}
+                    label="Attendance"
+                    value={`${dashboardData?.avg_attendance_percentage || 0}%`}
+                    colors={colors}
+                    isDark={isDark}
+                />
             </ScrollView>
         </View>
 
@@ -133,30 +150,19 @@ export default function LecturerDashboard() {
         <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
             <View style={styles.activityList}>
-                <ActivityItem
-                    icon={<CheckCircle size={20} color="#10B981" />}
-                    title="Attendance Completed"
-                    subtitle="CS302 - Data Structures • 2h ago"
-                    badge="92% mark"
-                    colors={colors}
-                    isDark={isDark}
-                />
-                <ActivityItem
-                    icon={<AlertCircle size={20} color={colors.primary} />}
-                    title="New Leave Request"
-                    subtitle="John Doe • CS401 • 4h ago"
-                    action="Review"
-                    colors={colors}
-                    isDark={isDark}
-                />
-                <ActivityItem
-                    icon={<Mail size={20} color="#3B82F6" />}
-                    title="Weekly Report Ready"
-                    subtitle="Academic Office • Yesterday"
-                    chevron
-                    colors={colors}
-                    isDark={isDark}
-                />
+                {dashboardData?.weekly_overview?.slice(0, 3).map((item, idx) => (
+                    <ActivityItem
+                        key={idx}
+                        icon={<CheckCircle size={20} color="#10B981" />}
+                        title="Attendance Recorded"
+                        subtitle={`${item.name} Session • ${item.attendees} Students`}
+                        badge={`${item.attendees} mark`}
+                        colors={colors}
+                        isDark={isDark}
+                    />
+                )) || (
+                    <Text style={{ textAlign: 'center', color: colors.textSecondary, marginTop: 10 }}>No recent activity</Text>
+                )}
             </View>
         </View>
         <View style={{ height: 100 }} />
@@ -230,8 +236,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   welcomeSub: {
-    fontSize: 12,
-    fontFamily: Fonts.lexend.medium,
+    fontSize: 10,
+    fontFamily: Fonts.lexend.bold,
+    letterSpacing: 1,
   },
   userName: {
     fontSize: 18,
@@ -319,6 +326,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.lexend.bold,
     color: '#231e0f',
+  },
+  noSessionCard: {
+    borderRadius: 20,
+    padding: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    gap: 12
+  },
+  noSessionText: {
+    fontSize: 14,
+    fontFamily: Fonts.lexend.medium,
+    textAlign: 'center',
+    opacity: 0.7
+  },
+  createBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 8
   },
   statsSection: {
     marginTop: 24,
