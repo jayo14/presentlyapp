@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { api } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Clock, MapPin, Calendar, X, ChevronDown, BookOpen, QrCode, Hash, Navigation, ArrowRight, CheckCircle, Sensors, ShieldCheck, Edit, ChevronLeft } from 'lucide-react-native';
+import { Plus, Clock, MapPin, Calendar, X, ChevronDown, BookOpen, QrCode, Hash, Navigation, ArrowRight, CheckCircle, Radio, ShieldCheck, Edit, ChevronLeft } from 'lucide-react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Fonts from '@/constants/fonts';
 import Slider from '@react-native-community/slider';
@@ -171,7 +171,7 @@ export default function LecturerSessionsScreen() {
 
         <View style={[styles.reminderBox, { backgroundColor: isDark ? '#1A1A1A' : '#f8f8f5' }]}>
             <View style={[styles.reminderIcon, { backgroundColor: colors.primary + '33' }]}>
-                <Sensors size={20} color={colors.primary} />
+                <Radio size={20} color={colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
                 <Text style={[styles.reminderTitle, { color: colors.text }]}>Auto-Attendance</Text>
@@ -373,7 +373,7 @@ export default function LecturerSessionsScreen() {
             >
                 {loading ? <ActivityIndicator color="#0A0A0A" /> : (
                     <>
-                        <Sensors size={22} color="#0A0A0A" />
+                        <Radio size={22} color="#0A0A0A" />
                         <Text style={styles.launchBtnText}>Start & Broadcast</Text>
                     </>
                 )}

@@ -97,6 +97,7 @@ export default function StudentLayout() {
       <Tabs.Screen name="courses/drop-confirmation" options={{ href: null }} />
       <Tabs.Screen name="courses/drop-success" options={{ href: null }} />
       <Tabs.Screen name="courses/department/[id]" options={{ href: null }} />
+      <Tabs.Screen name="courses/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
