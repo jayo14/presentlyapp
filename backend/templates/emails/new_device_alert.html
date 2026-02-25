@@ -1,128 +1,143 @@
-<!-- Email: New Device Sign-in -->
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f2c10d",
-                        "danger": "#ef4444",
-                        "background-light": "#f8f8f5",
-                        "background-dark": "#1a1811",
-                    },
-                    fontFamily: {
-                        "display": ["Lexend", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-<title>Presently - New Device Sign-in</title>
-<style>
-        body {
-            min-height: 100dvh;
-        }
-    </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="bg-background-light dark:bg-background-dark font-display antialiased">
-<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
-<div class="flex items-center justify-center p-8">
-<div class="flex flex-col items-center gap-2">
-<div class="size-12 rounded-xl bg-primary flex items-center justify-center text-slate-900 shadow-lg shadow-primary/20">
-<span class="material-symbols-outlined text-3xl font-bold">school</span>
-</div>
-<h1 class="text-slate-900 dark:text-slate-100 text-2xl font-bold tracking-tight uppercase tracking-widest text-[14px]">Presently</h1>
-</div>
-</div>
-<div class="px-6 pb-12 max-w-md mx-auto w-full">
-<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/50 dark:border-slate-800 p-8">
-<div class="flex flex-col items-center mb-8">
-<div class="mb-4 size-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-<span class="material-symbols-outlined text-danger text-4xl">warning</span>
-</div>
-<h2 class="text-slate-900 dark:text-slate-100 text-2xl font-bold text-center">New Device Sign-in</h2>
-</div>
-<p class="text-slate-600 dark:text-slate-400 text-center text-base leading-relaxed mb-8">
-                    We noticed a login from a new device. Please review the details below to ensure your account remains secure.
-                </p>
-<div class="grid grid-cols-1 gap-4 mb-10 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-slate-400 dark:text-slate-500">laptop_mac</span>
-<div>
-<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Device</p>
-<p class="text-slate-900 dark:text-slate-100 font-medium">{{ device_name|default:"Unknown Device" }}</p>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-slate-400 dark:text-slate-500">public</span>
-<div>
-<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Browser</p>
-<p class="text-slate-900 dark:text-slate-100 font-medium">{{ browser|default:"Unknown Browser" }}</p>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-slate-400 dark:text-slate-500">location_on</span>
-<div>
-<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Location</p>
-<p class="text-slate-900 dark:text-slate-100 font-medium">{{ location|default:"Unknown Location" }}</p>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-slate-400 dark:text-slate-500">schedule</span>
-<div>
-<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Time</p>
-<p class="text-slate-900 dark:text-slate-100 font-medium">{{ time|default:"Just now" }}</p>
-</div>
-</div>
-</div>
-<div class="flex flex-col gap-3">
-<a href="{{ confirm_url }}" style="background-color: #f2c10d; color: #0f172a; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: bold; text-align: center;">
-<span>Yes, it was me</span>
-</a>
-<a href="{{ secure_url }}" style="background-color: transparent; border: 2px solid #ef4444; color: #ef4444; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: bold; text-align: center;">
-<span>No, Secure Account</span>
-</a>
-</div>
-</div>
-<div class="mt-8 text-center px-4">
-<p class="text-slate-500 dark:text-slate-400 text-sm">
-                    If this wasn't you, please secure your account immediately by clicking the button above.
-                </p>
-</div>
-</div>
-<div class="mt-auto p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
-<p class="text-slate-400 dark:text-slate-500 text-sm font-medium mb-1">Presently Support Team</p>
-<p class="text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-[0.2em] font-semibold">
-                University Attendance Management
-            </p>
-<div class="flex justify-center gap-6 mt-6 opacity-30">
-<span class="material-symbols-outlined">security</span>
-<span class="material-symbols-outlined">verified_user</span>
-<span class="material-symbols-outlined">help</span>
-</div>
-<p class="mt-8 text-slate-300 dark:text-slate-600 text-[10px] uppercase tracking-widest">
-                © 2024 Presently. Sent to you for account security.
-            </p>
-</div>
-<div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-danger to-primary"></div>
-</div>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Presently - New Device Sign-in</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f8f8f5; font-family: Arial, Helvetica, sans-serif;">
 
-</body></html>
+  <!-- Top Gradient Bar -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td style="height:4px; background: linear-gradient(to right, #f2c10d, #ef4444, #f2c10d);"></td>
+    </tr>
+  </table>
+
+  <!-- Wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="padding:40px 20px;">
+    <tr>
+      <td align="center">
+
+        <!-- Card -->
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px; background-color:#ffffff; border-radius:16px; border:1px solid #e5e7eb;">
+          
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding:40px 20px 20px 20px;">
+              <div style="width:60px; height:60px; background-color:#f2c10d; border-radius:12px; display:inline-block; line-height:60px; font-size:28px; font-weight:bold; color:#0f172a;">
+                🎓
+              </div>
+              <p style="margin:15px 0 0 0; font-size:14px; font-weight:bold; letter-spacing:3px; text-transform:uppercase; color:#111827;">
+                Presently
+              </p>
+            </td>
+          </tr>
+
+          <!-- Title -->
+          <tr>
+            <td align="center" style="padding:10px 30px;">
+              <div style="width:60px; height:60px; background-color:#f3f4f6; border-radius:50%; line-height:60px; font-size:28px;">
+                ⚠️
+              </div>
+              <h2 style="margin:20px 0 10px 0; font-size:22px; color:#111827;">
+                New Device Sign-in
+              </h2>
+              <p style="margin:0; font-size:15px; color:#6b7280; line-height:1.6;">
+                We noticed a login from a new device. Please review the details below to ensure your account remains secure.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Device Info Box -->
+          <tr>
+            <td style="padding:30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f9fafb; border-radius:12px; padding:20px;">
+                
+                <tr>
+                  <td style="padding:10px 0;">
+                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">DEVICE</strong><br>
+                    <span style="font-size:15px; color:#111827;">{{ device_name|default:"Unknown Device" }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:10px 0;">
+                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">BROWSER</strong><br>
+                    <span style="font-size:15px; color:#111827;">{{ browser|default:"Unknown Browser" }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:10px 0;">
+                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">LOCATION</strong><br>
+                    <span style="font-size:15px; color:#111827;">{{ location|default:"Unknown Location" }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:10px 0;">
+                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">TIME</strong><br>
+                    <span style="font-size:15px; color:#111827;">{{ time|default:"Just now" }}</span>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Buttons -->
+          <tr>
+            <td align="center" style="padding:10px 30px 40px 30px;">
+
+              <!-- Confirm Button -->
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td align="center" bgcolor="#f2c10d" style="border-radius:10px;">
+                    <a href="{{ confirm_url }}"
+                       style="display:inline-block; padding:14px 28px; font-size:15px; font-weight:bold; color:#0f172a; text-decoration:none;">
+                      Yes, it was me
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="height:15px;"></div>
+
+              <!-- Secure Button -->
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td align="center" style="border:2px solid #ef4444; border-radius:10px;">
+                    <a href="{{ secure_url }}"
+                       style="display:inline-block; padding:14px 28px; font-size:15px; font-weight:bold; color:#ef4444; text-decoration:none;">
+                      No, Secure Account
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Footer -->
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px; margin-top:30px;">
+          <tr>
+            <td align="center" style="font-size:12px; color:#9ca3af;">
+              <p style="margin:0;">Presently Support Team</p>
+              <p style="margin:5px 0 0 0; font-size:10px; letter-spacing:2px; text-transform:uppercase;">
+                University Attendance Management
+              </p>
+              <p style="margin:20px 0 0 0; font-size:10px; color:#d1d5db;">
+                © 2024 Presently. Sent to you for account security.
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
