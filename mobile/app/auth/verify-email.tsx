@@ -82,12 +82,13 @@ export default function VerifyEmailScreen() {
 
     if (result.success) {
       const role = user?.role ?? 'student';
-      const destination =
+      const destination = "/onboarding"; // Always go to onboarding after verification
+      /*
         role === 'admin'
           ? '/(admin)'
           : role === 'lecturer'
             ? '/(lecturer)'
-            : '/(student)';
+            : '/(student)'; */
 
       router.replace(destination);
     } else {
