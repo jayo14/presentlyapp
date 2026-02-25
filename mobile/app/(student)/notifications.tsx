@@ -81,7 +81,7 @@ export default function StudentNotificationsScreen() {
                 <Text style={[styles.sectionTitle, { color: isDark ? '#ccbf8e' : '#666666' }]}>{title.toUpperCase()}</Text>
             </View>
             {data.map(item => (
-                <NotificationItem key={item.id} item={item} colors={colors} isDark={isDark} />
+                <NotificationItem key={item.id} item={item} colors={colors} isDark={isDark} onRead={handleRead} />
             ))}
         </View>
     );
