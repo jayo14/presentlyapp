@@ -738,3 +738,26 @@ class Timetable(models.Model):
     
     def __str__(self):
         return f"{self.course.code} - {self.get_day_of_week_display()} {self.start_time}"
+
+class AuditLog(models.Model):
+    """Audit logs for tracking system activities"""
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='audit_logs')
+    action = models.CharField(max_length=100)  # e.g., "COURSE_ENROLLMENT", "COURSE_DROP"
+    resource_type = models.CharField(max_length=100)  # e.g., "COURSE", "ENROLLMENT"
+    resource_id = models.CharField(max_length=255, blank=True, null=True)
+    details = models.JSONField(blank=True, null=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'audit_logs'
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['action']),
+            models.Index(fields=['resource_type']),
+            models.Index(fields=['timestamp']),
+        ]
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user.email if self.user else 'System'} - {self.action} - {self.timestamp}"

@@ -1,79 +1,79 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { ChevronLeft, MoreHorizontal, CheckCircle, Clock, AlertTriangle, FileText, Calendar, Circle } from 'lucide-react-native';
+import { ChevronLeft, MoreHorizontal, CheckCircle, Clock, AlertTriangle, FileText, Calendar, Circle, CheckCircle2 } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
-import { useState } from 'react';
-
-type Notification = {
-  id: string;
-  type: 'success' | 'info' | 'warning' | 'assignment' | 'event';
-  title: string;
-  subtitle: string;
-  time: string;
-  isUnread: boolean;
-  category: 'Today' | 'Yesterday' | 'Last Week';
-};
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'success',
-    title: 'Attendance marked successfully',
-    subtitle: 'Mathematics 101',
-    time: '10:30 AM',
-    isUnread: true,
-    category: 'Today'
-  },
-  {
-    id: '2',
-    type: 'info',
-    title: 'Session ending soon',
-    subtitle: 'CS Lab',
-    time: '09:45 AM',
-    isUnread: true,
-    category: 'Today'
-  },
-  {
-    id: '3',
-    type: 'warning',
-    title: 'Attendance Warning',
-    subtitle: 'Physics - Attendance below 75%',
-    time: 'Yesterday',
-    isUnread: false,
-    category: 'Yesterday'
-  },
-  {
-    id: '4',
-    type: 'assignment',
-    title: 'New Assignment Posted',
-    subtitle: 'World History',
-    time: 'Yesterday',
-    isUnread: false,
-    category: 'Yesterday'
-  },
-  {
-    id: '5',
-    type: 'event',
-    title: 'Holiday Announcement',
-    subtitle: 'Oct 12th is a University Holiday',
-    time: 'Oct 12',
-    isUnread: false,
-    category: 'Last Week'
-  }
-];
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '@/services/api';
+import { format, isToday, isYesterday, parseISO } from 'date-fns';
 
 export default function StudentNotificationsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<'All' | 'Unread'>('All');
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadNotifications = useCallback(async () => {
+    try {
+        const data = await api.notifications.list();
+        setNotifications(data.results || data);
+    } catch (e) {
+        console.error('Failed to load notifications', e);
+    } finally {
+        setLoading(false);
+        setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadNotifications();
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+        await api.notifications.markAllRead();
+        loadNotifications();
+    } catch (e) {
+        console.error('Failed to mark all read', e);
+    }
+  };
+
+  const handleRead = async (id: string) => {
+    try {
+        await api.notifications.read(id);
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    } catch (e) {
+        console.error('Failed to mark read', e);
+    }
+  };
 
   const filteredNotifications = activeTab === 'All'
-    ? MOCK_NOTIFICATIONS
-    : MOCK_NOTIFICATIONS.filter(n => n.isUnread);
+    ? notifications
+    : notifications.filter(n => !n.is_read);
 
-  const renderSection = (title: string, data: Notification[]) => {
+  const getCategory = (dateStr: string) => {
+    const date = parseISO(dateStr);
+    if (isToday(date)) return 'Today';
+    if (isYesterday(date)) return 'Yesterday';
+    return 'Older';
+  };
+
+  const groupedNotifications = filteredNotifications.reduce((acc: any, n: any) => {
+    const cat = getCategory(n.created_at);
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(n);
+    return acc;
+  }, {});
+
+  const renderSection = (title: string, data: any[]) => {
     if (data.length === 0) return null;
     return (
         <View key={title}>
@@ -87,7 +87,7 @@ export default function StudentNotificationsScreen() {
     );
   };
 
-  const sections = ['Today', 'Yesterday', 'Last Week'] as const;
+  const sections = ['Today', 'Yesterday', 'Older'];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -97,8 +97,8 @@ export default function StudentNotificationsScreen() {
           <ChevronLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Notifications</Text>
-        <TouchableOpacity style={styles.moreButton}>
-          <MoreHorizontal size={24} color={colors.text} />
+        <TouchableOpacity style={styles.moreButton} onPress={handleMarkAllRead}>
+          <CheckCircle2 size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -118,40 +118,53 @@ export default function StudentNotificationsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {sections.map(section => renderSection(section, filteredNotifications.filter(n => n.category === section)))}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+      >
+        {loading && !refreshing ? (
+             <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
+        ) : (
+            sections.map(section => groupedNotifications[section] ? renderSection(section, groupedNotifications[section]) : null)
+        )}
+        {!loading && notifications.length === 0 && (
+            <View style={styles.emptyContainer}>
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No notifications yet</Text>
+            </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function NotificationItem({ item, colors, isDark }: { item: Notification, colors: any, isDark: boolean }) {
+function NotificationItem({ item, colors, isDark, onRead }: any) {
     const getIcon = () => {
-        switch(item.type) {
-            case 'success': return <CheckCircle size={24} color={colors.primary} fill={isDark ? colors.primary + '00' : colors.primary + '00'} />;
-            case 'info': return <Clock size={24} color={colors.primary} />;
-            case 'warning': return <AlertTriangle size={24} color={colors.primary} />;
-            case 'assignment': return <FileText size={24} color={colors.primary} />;
-            case 'event': return <Calendar size={24} color={isDark ? '#6a5d2f' : '#94A3B8'} />;
-            default: return <Circle size={24} color={colors.primary} />;
-        }
+        const type = item.notification_type;
+        if (type === 'SESSION_STARTED' || type === 'ATTENDANCE_SUMMARY') return <CheckCircle size={24} color={colors.primary} />;
+        if (type === 'SESSION_ENDING' || type === 'ATTENDANCE_REMINDER') return <Clock size={24} color={colors.primary} />;
+        if (type === 'ABSENCE_ALERT' || type === 'EXAM_CLEARANCE') return <AlertTriangle size={24} color={colors.primary} />;
+        return <Circle size={24} color={colors.primary} />;
     };
+
+    const timeStr = format(parseISO(item.created_at), 'h:mm a');
 
     return (
         <TouchableOpacity
             style={[styles.notificationItem, { backgroundColor: colors.background }]}
             activeOpacity={0.7}
+            onPress={() => onRead(item.id)}
         >
             <View style={styles.itemLeft}>
-                <View style={[styles.iconContainer, { backgroundColor: item.type === 'event' ? (isDark ? '#322d1a' : '#F1F5F9') : (isDark ? '#4a4121' : colors.primary + '1A') }]}>
+                <View style={[styles.iconContainer, { backgroundColor: isDark ? '#4a4121' : colors.primary + '1A' }]}>
                     {getIcon()}
                 </View>
                 <View style={styles.itemTextContent}>
-                    <Text style={[styles.itemTitle, { color: item.type === 'event' ? (isDark ? '#ccbf8e' : '#94A3B8') : colors.text }]} numberOfLines={1}>{item.title}</Text>
-                    <Text style={[styles.itemSubtitle, { color: isDark ? '#ccbf8e' : '#666666' }]} numberOfLines={1}>{item.subtitle} • {item.time}</Text>
+                    <Text style={[styles.itemTitle, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
+                    <Text style={[styles.itemSubtitle, { color: isDark ? '#ccbf8e' : '#666666' }]} numberOfLines={1}>{item.message} • {timeStr}</Text>
                 </View>
             </View>
-            {item.isUnread && (
+            {!item.is_read && (
                 <View style={styles.unreadDotContainer}>
                     <Circle size={8} color={colors.primary} fill={colors.primary} />
                 </View>
@@ -253,5 +266,13 @@ const styles = StyleSheet.create({
   },
   unreadDotContainer: {
     marginLeft: 8,
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontFamily: Fonts.lexend.medium,
   }
 });
