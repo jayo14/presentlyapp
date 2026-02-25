@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
-    register_view, login_view, google_auth_view, logout_view, current_user_view,
+    register_view, login_view, google_auth_view, google_callback_view, logout_view, current_user_view,
     complete_onboarding_view, change_password_view,
     send_verification_otp_view, verify_email_otp_view,
     request_password_reset_view, reset_password_view, verify_reset_token_view, public_check_in_view,
@@ -30,6 +30,7 @@ urlpatterns = [
     path('auth/register/', register_view, name='register'),
     path('auth/login/', login_view, name='login'),
     path('auth/google-auth/', google_auth_view, name='google-auth'),
+    path('auth/google-callback/', google_callback_view, name='google-callback'),
     path('auth/logout/', logout_view, name='logout'),
     path('auth/me/', current_user_view, name='current-user'),
     path('auth/onboarding/', complete_onboarding_view, name='complete-onboarding'),

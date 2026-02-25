@@ -123,27 +123,20 @@ export const Login: React.FC = () => {
     });
   };
 
-  const handleGoogleLogin = async () => {
-    const auth = getFirebaseAuth();
-    if (!auth) {
+  const handleGoogleLogin = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
       toast.error('Google Auth Error', {
-        description: 'Firebase is not configured properly.'
+        description: 'Google Client ID is not configured.'
       });
       return;
     }
 
-    try {
-      const provider = new GoogleAuthProvider();
-      // Use redirect instead of popup for more consistent cross-device experience
-      await signInWithRedirect(auth, provider);
-    } catch (error: any) {
-      if (error.code !== 'auth/popup-closed-by-user') {
-        console.error('Google Auth Popup Error:', error);
-        toast.error('Google Auth Error', {
-          description: error.message || 'Failed to open Google login popup.'
-        });
-      }
-    }
+    const redirectUri = `${window.location.origin}/auth/callback`;
+    const scope = 'email profile';
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
+
+    window.location.href = authUrl;
   };
 
   const handleAppleLogin = () => {
