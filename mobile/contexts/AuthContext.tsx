@@ -41,6 +41,7 @@ const mapApiUser = (data: any, fallbackEmail: string): User => {
     school: userData?.institution_name ?? userData?.institution ?? userData?.school,
     college: userData?.college_name ?? userData?.college,
     profilePicture: userData?.avatar_url ?? userData?.profile_picture ?? userData?.profilePicture,
+    institutionId: userData?.institution_id ?? userData?.institution?.id ?? userData?.institution,
   };
 };
 
