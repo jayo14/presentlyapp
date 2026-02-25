@@ -118,6 +118,18 @@ export const authApi = {
     return result;
   },
 
+  // Google OAuth2 Callback
+  googleCallback: async (code: string, redirectUri: string, rememberMe: boolean = true): Promise<AuthResponse> => {
+    const response = await apiClient.post('/auth/google-callback/', { code, redirect_uri: redirectUri });
+    const result = response.data;
+
+    if (result.success && result.tokens) {
+      tokenManager.setTokens(result.tokens.access, result.tokens.refresh, rememberMe);
+    }
+
+    return result;
+  },
+
   // Logout
   logout: async (): Promise<void> => {
     const refreshToken = tokenManager.getRefreshToken();

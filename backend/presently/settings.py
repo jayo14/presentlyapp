@@ -242,16 +242,20 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# Email Configuration (Gmail SMTP)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+# Email Configuration (Gmail SMTP or Gmail API)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+GMAIL_API_REFRESH_TOKEN = os.environ.get('GMAIL_API_REFRESH_TOKEN', '')
 
-# Fallback to console in development if Gmail is not configured
-if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+# Choose backend based on available credentials
+if os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
+    EMAIL_BACKEND = 'presently.email_backend.GmailApiEmailBackend'
+elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '')
