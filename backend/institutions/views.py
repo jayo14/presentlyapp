@@ -25,7 +25,7 @@ from presently.firebase_config import initialize_firebase
 
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
-    Attendance, Venue, UserRole, EmailVerificationOTP
+    Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog
 )
 from accounts.models import UserDevice
 from .serializers import (
@@ -943,6 +943,27 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
     
+    @action(detail=True, methods=['get'])
+    def courses(self, request, pk=None):
+        """Get courses for this department"""
+        department = self.get_object()
+        courses = Course.objects.filter(department=department, is_active=True)
+
+        # Filter by level/semester if provided
+        level = request.query_params.get('level')
+        semester = request.query_params.get('semester')
+        if level:
+            courses = courses.filter(level=level)
+        if semester:
+            courses = courses.filter(semester=semester)
+
+        serializer = CourseSerializer(courses, many=True, context={'request': request})
+        return Response({
+            'success': True,
+            'department': department.name,
+            'courses': serializer.data
+        })
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
@@ -1038,7 +1059,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'available', 'enrolled_students']:
+        if self.action in ['list', 'retrieve', 'available', 'enrolled_students', 'search', 'register', 'drop']:
             return [IsAuthenticated()]
         return [IsLecturerOrAdmin()]
     
@@ -1060,7 +1081,8 @@ class CourseViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(lecturer=self.request.user)
         elif self.request.user.role == UserRole.STUDENT:
             # For students, filter by enrollment if requested OR if listing "my courses" (no other filters)
-            if enrolled_param or (not department_id and not lecturer_id):
+            # Only apply this if it's a list action
+            if self.action == 'list' and (enrolled_param or (not department_id and not lecturer_id)):
                 enrolled_course_ids = CourseEnrollment.objects.filter(
                     student=self.request.user,
                     is_active=True
@@ -1119,6 +1141,119 @@ class CourseViewSet(viewsets.ModelViewSet):
             'students': students
         })
     
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        """Search for courses by course code"""
+        code = request.query_params.get('code')
+        if not code:
+            return Response({
+                'success': False,
+                'error': 'Course code is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate that the course belongs to the student's institution
+        queryset = Course.objects.filter(code__icontains=code, is_active=True)
+
+        if request.user.role == UserRole.STUDENT and request.user.institution:
+            queryset = queryset.filter(department__institution=request.user.institution).distinct()
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'success': True,
+            'results': serializer.data
+        })
+
+    @action(detail=True, methods=['post'])
+    def register(self, request, pk=None):
+        """Register for a course"""
+        if request.user.role != UserRole.STUDENT:
+            return Response({
+                'success': False,
+                'error': 'Only students can register for courses'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        course = self.get_object()
+
+        # Validate student belongs to the institution of the course
+        course_institution = course.institution
+        if course_institution and request.user.institution and course_institution != request.user.institution:
+             return Response({
+                'success': False,
+                'error': 'You can only register for courses in your institution'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Prevent duplicate enrollments
+        enrollment, created = CourseEnrollment.objects.get_or_create(
+            student=request.user,
+            course=course,
+            defaults={'status': 'ENROLLED', 'is_active': True}
+        )
+
+        if not created:
+            if enrollment.is_active:
+                return Response({
+                    'success': False,
+                    'error': 'Already enrolled in this course'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                enrollment.is_active = True
+                enrollment.status = 'ENROLLED'
+                enrollment.save()
+
+        # Log activity
+        AuditLog.objects.create(
+            user=request.user,
+            action='COURSE_REGISTRATION',
+            resource_type='COURSE',
+            resource_id=str(course.id),
+            details={'course_code': course.code, 'course_title': course.title},
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+
+        return Response({
+            'success': True,
+            'message': f'Successfully registered for {course.code}',
+            'is_enrolled': True
+        })
+
+    @action(detail=True, methods=['post'])
+    def drop(self, request, pk=None):
+        """Drop a course"""
+        if request.user.role != UserRole.STUDENT:
+            return Response({
+                'success': False,
+                'error': 'Only students can drop courses'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        course = self.get_object()
+        enrollment = CourseEnrollment.objects.filter(student=request.user, course=course, is_active=True).first()
+
+        if not enrollment:
+            return Response({
+                'success': False,
+                'error': 'You are not enrolled in this course'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        enrollment.is_active = False
+        enrollment.status = 'DROPPED'
+        enrollment.save()
+
+        # Log activity
+        AuditLog.objects.create(
+            user=request.user,
+            action='COURSE_DROP',
+            resource_type='COURSE',
+            resource_id=str(course.id),
+            details={'course_code': course.code, 'course_title': course.title},
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+
+        return Response({
+            'success': True,
+            'message': f'Successfully dropped {course.code}',
+            'is_enrolled': False
+        })
+
     @action(detail=False, methods=['get'])
     def available(self, request):
         """Get available courses for student enrollment based on their department"""
@@ -1308,7 +1443,6 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve', 'check_in']:
             return [IsAuthenticated()]
         return [IsLecturerOrAdmin()]
-    
     def perform_create(self, serializer):
         """Create session and notify enrolled students"""
         session = serializer.save()

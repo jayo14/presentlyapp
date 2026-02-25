@@ -1,75 +1,54 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { ChevronLeft, Settings, PlayCircle, FileText, AlertTriangle, PenTool, RefreshCw, ChevronRight, CheckCircle, Info } from 'lucide-react-native';
+import { ChevronLeft, Settings, PlayCircle, FileText, AlertTriangle, PenTool, RefreshCw, ChevronRight, CheckCircle, Info, Circle } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
-import { useState } from 'react';
-
-type Notification = {
-  id: string;
-  type: 'session' | 'export' | 'warning' | 'reminder' | 'update';
-  title: string;
-  subtitle: string;
-  time: string;
-  isUnread: boolean;
-  isImportant?: boolean;
-  summary?: string;
-};
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'session',
-    title: 'Session Started: CS101',
-    subtitle: '10 minutes ago',
-    time: '10:30 AM',
-    isUnread: true,
-  },
-  {
-    id: '2',
-    type: 'export',
-    title: 'Export Completed: Semester A Reports',
-    subtitle: '1 hour ago',
-    time: '09:45 AM',
-    isUnread: false,
-  },
-  {
-    id: '3',
-    type: 'warning',
-    title: 'Low Attendance Warning: CS402 (62%)',
-    subtitle: '2 hours ago',
-    time: 'Yesterday',
-    isUnread: true,
-    isImportant: true,
-    summary: 'Attendance dropped below 70% threshold for the current semester.'
-  },
-  {
-    id: '4',
-    type: 'reminder',
-    title: 'Grading Deadline: Intro to AI',
-    subtitle: '4 hours ago',
-    time: 'Yesterday',
-    isUnread: false,
-  },
-  {
-    id: '5',
-    type: 'update',
-    title: 'System Update Scheduled',
-    subtitle: 'Today, 11:00 PM',
-    time: 'Oct 12',
-    isUnread: false,
-  }
-];
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '@/services/api';
+import { format, parseISO } from 'date-fns';
 
 export default function LecturerNotificationsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<'All' | 'Unread' | 'Important'>('All');
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const filteredNotifications = MOCK_NOTIFICATIONS.filter(n => {
-      if (activeTab === 'Unread') return n.isUnread;
-      if (activeTab === 'Important') return n.isImportant;
+  const loadNotifications = useCallback(async () => {
+    try {
+        const data = await api.notifications.list();
+        setNotifications(data.results || data);
+    } catch (e) {
+        console.error('Failed to load notifications', e);
+    } finally {
+        setLoading(false);
+        setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadNotifications();
+  };
+
+  const handleRead = async (id: string) => {
+    try {
+        await api.notifications.read(id);
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    } catch (e) {
+        console.error('Failed to mark read', e);
+    }
+  };
+
+  const filteredNotifications = notifications.filter(n => {
+      if (activeTab === 'Unread') return !n.is_read;
+      if (activeTab === 'Important') return n.notification_type === 'ABSENCE_ALERT';
       return true;
   });
 
@@ -93,10 +72,23 @@ export default function LecturerNotificationsScreen() {
         <TabItem label="Important" active={activeTab === 'Important'} onPress={() => setActiveTab('Important')} colors={colors} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {filteredNotifications.map(item => (
-            <NotificationItem key={item.id} item={item} colors={colors} isDark={isDark} />
-        ))}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+      >
+        {loading && !refreshing ? (
+             <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
+        ) : (
+            filteredNotifications.map(item => (
+                <NotificationItem key={item.id} item={item} colors={colors} isDark={isDark} onRead={handleRead} />
+            ))
+        )}
+        {!loading && filteredNotifications.length === 0 && (
+            <View style={styles.emptyContainer}>
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No notifications found</Text>
+            </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -115,52 +107,42 @@ function TabItem({ label, active, onPress, colors }: any) {
     );
 }
 
-function NotificationItem({ item, colors, isDark }: { item: Notification, colors: any, isDark: boolean }) {
+function NotificationItem({ item, colors, isDark, onRead }: any) {
     const getIcon = () => {
-        switch(item.type) {
-            case 'session': return <PlayCircle size={24} color={colors.primary} />;
-            case 'export': return <FileText size={24} color={colors.primary} />;
-            case 'warning': return <AlertTriangle size={24} color="#EF4444" />;
-            case 'reminder': return <PenTool size={24} color={colors.primary} />;
-            case 'update': return <RefreshCw size={24} color={colors.primary} />;
-            default: return <Info size={24} color={colors.primary} />;
-        }
+        const type = item.notification_type;
+        if (type === 'SESSION_STARTED') return <PlayCircle size={24} color={colors.primary} />;
+        if (type === 'SYSTEM') return <RefreshCw size={24} color={colors.primary} />;
+        if (type === 'ABSENCE_ALERT') return <AlertTriangle size={24} color="#EF4444" />;
+        return <Info size={24} color={colors.primary} />;
     };
+
+    const timeStr = format(parseISO(item.created_at), 'h:mm a');
 
     return (
         <TouchableOpacity
             style={[styles.notificationItem, { borderBottomColor: isDark ? '#332c15' : '#F1F5F9' }]}
             activeOpacity={0.7}
+            onPress={() => onRead(item.id)}
         >
             <View style={styles.itemRow}>
-                <View style={[styles.iconContainer, { backgroundColor: item.type === 'warning' ? 'rgba(239,68,68,0.1)' : (isDark ? '#4a4121' : colors.primary + '1A') }]}>
+                <View style={[styles.iconContainer, { backgroundColor: item.notification_type === 'ABSENCE_ALERT' ? 'rgba(239,68,68,0.1)' : (isDark ? '#4a4121' : colors.primary + '1A') }]}>
                     {getIcon()}
                 </View>
 
                 <View style={styles.contentContainer}>
                     <View style={styles.titleRow}>
                         <Text style={[styles.itemTitle, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
-                        {item.type === 'warning' && <View style={[styles.unreadDotMini, { backgroundColor: colors.primary }]} />}
+                        {!item.is_read && <View style={[styles.unreadDotMini, { backgroundColor: colors.primary }]} />}
                     </View>
-                    {item.summary && (
-                        <Text style={[styles.itemSummary, { color: isDark ? '#ccbf8e' : '#666666' }]}>{item.summary}</Text>
-                    )}
-                    <Text style={[styles.itemTime, { color: isDark ? '#ccbf8e' : '#94A3B8' }]}>{item.subtitle}</Text>
+                    <Text style={[styles.itemSummary, { color: isDark ? '#ccbf8e' : '#666666' }]}>{item.message}</Text>
+                    <Text style={[styles.itemTime, { color: isDark ? '#ccbf8e' : '#94A3B8' }]}>{timeStr}</Text>
                 </View>
 
                 <View style={styles.itemRight}>
-                    {item.isUnread && item.type !== 'warning' && (
+                    {!item.is_read && (
                         <View style={[styles.unreadPulse, { backgroundColor: colors.primary }]} />
                     )}
-                    {item.type === 'export' && !item.isUnread && (
-                        <CheckCircle size={18} color={isDark ? '#4a4121' : '#E2E8F0'} />
-                    )}
-                    {(item.type === 'reminder' || item.type === 'warning') && (
-                        <ChevronRight size={20} color={isDark ? '#ccbf8e' : '#94A3B8'} />
-                    )}
-                    {item.type === 'update' && (
-                        <Info size={20} color={isDark ? '#ccbf8e' : '#94A3B8'} />
-                    )}
+                    <ChevronRight size={20} color={isDark ? '#ccbf8e' : '#94A3B8'} />
                 </View>
             </View>
         </TouchableOpacity>
@@ -279,5 +261,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 4,
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontFamily: Fonts.lexend.medium,
   }
 });

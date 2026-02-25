@@ -83,10 +83,23 @@ class RegisterFCMDeviceView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        serializer = FCMDeviceSerializer(data=request.data)
+        registration_token = request.data.get('registration_token')
+        if not registration_token:
+            return Response({'registration_token': ['This field is required.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        device, created = FCMDevice.objects.get_or_create(
+            registration_token=registration_token,
+            defaults={'user': request.user}
+        )
+
+        if not created:
+            device.user = request.user
+            device.is_active = True
+
+        serializer = FCMDeviceSerializer(device, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

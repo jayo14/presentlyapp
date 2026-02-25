@@ -273,7 +273,7 @@ FCM_DJANGO_SETTINGS = {
 
 # Firebase Admin SDK Configuration (for FCM)
 # Path to Firebase service account JSON file
-FIREBASE_SERVICE_ACCOUNT_KEY = os.environ.get('FIREBASE_SERVICE_ACCOUNT_KEY', '')
+FIREBASE_SERVICE_ACCOUNT_PATH = os.environ.get('FIREBASE_SERVICE_ACCOUNT_PATH', 'serviceAccountKey.json')
 
 # Google OAuth 2.0 Configuration
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
