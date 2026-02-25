@@ -6,11 +6,13 @@ import { ChevronLeft, Settings, PlayCircle, FileText, AlertTriangle, PenTool, Re
 import Fonts from '@/constants/fonts';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { format, parseISO } from 'date-fns';
 
 export default function LecturerNotificationsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
+  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'All' | 'Unread' | 'Important'>('All');
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,12 +31,16 @@ export default function LecturerNotificationsScreen() {
   }, []);
 
   useEffect(() => {
-    loadNotifications();
-  }, [loadNotifications]);
+    if (isAuthenticated && user) {
+        loadNotifications();
+    }
+  }, [loadNotifications, isAuthenticated, user]);
 
   const onRefresh = () => {
-    setRefreshing(true);
-    loadNotifications();
+    if (isAuthenticated && user) {
+        setRefreshing(true);
+        loadNotifications();
+    }
   };
 
   const handleRead = async (id: string) => {

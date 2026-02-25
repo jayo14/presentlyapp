@@ -93,6 +93,8 @@ export default function LecturerLayout() {
       <Tabs.Screen name="session/attendance/[id]" options={{ href: null }} />
       <Tabs.Screen name="session/override/[id]" options={{ href: null }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
+      <Tabs.Screen name="create-course" options={{ href: null }} />
+      <Tabs.Screen name="courses/create-success" options={{ href: null }} />
     </Tabs>
   );
 }

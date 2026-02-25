@@ -1,13 +1,45 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Animated, Slider } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Animated, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { X, ArrowRight, ArrowLeft, Minus, Plus, UnfoldVertical, Landmark, Hub, GraduationCap, Layers, User, Lock, Search, Info, CheckCircle2 } from 'lucide-react-native';
+import { X, ArrowRight, ArrowLeft, Minus, Plus, UnfoldVertical, Landmark, Building2, GraduationCap, Layers, User, Lock, Search, Info, CheckCircle2 } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useRef, useEffect } from 'react';
 import { api } from '@/services/api';
 
 const { width } = Dimensions.get('window');
+
+function SelectionModal({ visible, title, data, onSelect, onClose, isDark }: any) {
+    return (
+        <Modal transparent visible={visible} animationType="slide">
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' }}>
+                <View style={{ backgroundColor: isDark ? '#1A1A1A' : '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '70%', padding: 24 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                        <Text style={{ fontSize: 20, fontFamily: Fonts.lexend.bold, color: isDark ? '#FFFFFF' : '#000000' }}>{title}</Text>
+                        <TouchableOpacity onPress={onClose}>
+                            <X size={24} color={isDark ? '#FFFFFF' : '#000000'} />
+                        </TouchableOpacity>
+                    </View>
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        {data.length === 0 ? (
+                            <Text style={{ textAlign: 'center', marginTop: 40, color: 'rgba(255,255,255,0.4)', fontFamily: Fonts.lexend.medium }}>No items found</Text>
+                        ) : (
+                            data.map((item: any) => (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={{ paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}
+                                    onPress={() => { onSelect(item); onClose(); }}
+                                >
+                                    <Text style={{ fontSize: 16, fontFamily: Fonts.lexend.medium, color: isDark ? '#FFFFFF' : '#000000' }}>{item.name}</Text>
+                                </TouchableOpacity>
+                            ))
+                        )}
+                    </ScrollView>
+                </View>
+            </View>
+        </Modal>
+    );
+}
 
 export default function CreateCourseScreen() {
   const router = useRouter();
@@ -19,16 +51,62 @@ export default function CreateCourseScreen() {
       level: '100',
       credits: 3,
       semester: 'FIRST',
-      faculty: 'Sciences',
-      department: 'Computer Science',
+      faculty: 'Select Faculty',
+      department: 'Select Department',
       coLecturer: '',
       threshold: 75,
       colorTag: '#FFCA0D',
   });
 
+  const [colleges, setColleges] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [selectedFaculty, setSelectedFaculty] = useState<any>(null);
+  const [selectedDept, setSelectedDept] = useState<any>(null);
+  const [isFacultyModalVisible, setIsFacultyModalVisible] = useState(false);
+  const [isDeptModalVisible, setIsDeptModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const bgColor = isDark ? '#0A0A0A' : colors.background;
 
+  useEffect(() => {
+    loadColleges();
+  }, []);
+
+  const loadColleges = async () => {
+    try {
+        const data = await api.colleges.list();
+        setColleges(data.results || data);
+    } catch (e) {
+        console.error('Failed to load colleges', e);
+    }
+  };
+
+  const loadDepartments = async (collegeId: string) => {
+    try {
+        const data = await api.departments.list({ college: collegeId });
+        setDepartments(data.results || data);
+    } catch (e) {
+        console.error('Failed to load departments', e);
+    }
+  };
+
+  const handleSelectFaculty = (faculty: any) => {
+    setSelectedFaculty(faculty);
+    setFormData({ ...formData, faculty: faculty.name, department: 'Select Department' });
+    setSelectedDept(null);
+    loadDepartments(faculty.id);
+  };
+
+  const handleSelectDept = (dept: any) => {
+    setSelectedDept(dept);
+    setFormData({ ...formData, department: dept.name });
+  };
+
   const handleNext = () => {
+    if (step === 1 && (!formData.title || !formData.code)) {
+        alert('Please fill in course title and code');
+        return;
+    }
     if (step < 3) {
         setStep(step + 1);
     } else {
@@ -45,19 +123,15 @@ export default function CreateCourseScreen() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
-        // In a real scenario, we'd have the department objects with IDs.
-        // For this implementation, we'll try to find a matching department or use a fallback.
-        const depts = await api.departments.list();
-        const matchingDept = depts.results?.find((d: any) => d.name === formData.department) || depts[0];
-
         const payload = {
             title: formData.title,
             code: formData.code,
             level: formData.level,
             credit_units: formData.credits,
             semester: formData.semester,
-            department: matchingDept ? [matchingDept.id] : [],
+            department: selectedDept ? [selectedDept.id] : [],
         };
 
         const res = await api.courses.create(payload);
@@ -67,6 +141,8 @@ export default function CreateCourseScreen() {
         });
     } catch (e) {
         console.error('Failed to create course', e);
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -86,11 +162,7 @@ export default function CreateCourseScreen() {
                     <View style={[styles.dot, step >= 3 ? styles.activeDot : styles.inactiveDot]} />
                 </View>
             </View>
-            {step === 1 ? <View style={{ width: 40 }} /> : (
-                 <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
-                    <X size={20} color="#FFFFFF" />
-                </TouchableOpacity>
-            )}
+            <View style={{ width: 40 }} />
         </View>
 
         <View style={styles.headerTitleContainer}>
@@ -98,32 +170,65 @@ export default function CreateCourseScreen() {
                 {step === 1 ? 'Basic Info' : step === 2 ? 'Institutional Hierarchy' : 'Assignment & Rules'}
             </Text>
             <Text style={styles.subtitle}>
-                {step === 1 ? 'Start by defining the core course identity.' : step === 2 ? 'Define where this course sits within the organization.' : 'Finalize course instructors and management rules.'}
+                {step === 1 ? 'Course identifiers and credit values' : step === 2 ? 'Mapping to your institution' : 'Configure thresholds and co-instructors'}
             </Text>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {step === 1 && <Step1 formData={formData} setFormData={setFormData} />}
+        {step === 1 && (
+            <Step1
+                formData={formData}
+                setFormData={setFormData}
+                onOpenFaculty={() => setIsFacultyModalVisible(true)}
+                onOpenDept={() => setIsDeptModalVisible(true)}
+            />
+        )}
         {step === 2 && <Step2 formData={formData} setFormData={setFormData} />}
         {step === 3 && <Step3 formData={formData} setFormData={setFormData} />}
-        <View style={{ height: 120 }} />
+        <View style={{ height: 160 }} />
       </ScrollView>
+
+      {/* Selection Modals */}
+      <SelectionModal
+        visible={isFacultyModalVisible}
+        title="Select Faculty"
+        data={colleges}
+        onSelect={handleSelectFaculty}
+        onClose={() => setIsFacultyModalVisible(false)}
+        isDark={isDark}
+      />
+      <SelectionModal
+        visible={isDeptModalVisible}
+        title="Select Department"
+        data={departments}
+        onSelect={handleSelectDept}
+        onClose={() => setIsDeptModalVisible(false)}
+        isDark={isDark}
+      />
 
       {/* Footer */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-            <Text style={styles.nextBtnText}>
-                {step === 1 ? 'Continue to Course Details' : step === 2 ? 'Continue to Schedule' : 'Finalize & Create Course'}
-            </Text>
-            {step < 3 ? <ArrowRight size={20} color="#0A0A0A" strokeWidth={3} /> : <CheckCircle2 size={20} color="#0A0A0A" strokeWidth={3} />}
+        <TouchableOpacity
+            style={[styles.nextBtn, { opacity: loading ? 0.7 : 1 }]}
+            onPress={handleNext}
+            disabled={loading}
+        >
+            {loading ? (
+                <ActivityIndicator color="#0A0A0A" />
+            ) : (
+                <>
+                    <Text style={styles.nextBtnText}>{step === 3 ? 'Create Course' : 'Continue'}</Text>
+                    <ArrowRight size={20} color="#0A0A0A" />
+                </>
+            )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
-function Step1({ formData, setFormData }: any) {
+function Step1({ formData, setFormData, onOpenFaculty, onOpenDept }: any) {
     const levels = ['100', '200', '300', '400', '500'];
     return (
         <View style={styles.stepContainer}>
@@ -141,8 +246,8 @@ function Step1({ formData, setFormData }: any) {
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>COURSE CODE</Text>
                 <TextInput
-                    style={[styles.input, { textTransform: 'uppercase' }]}
-                    placeholder="CSC 401"
+                    style={styles.input}
+                    placeholder="e.g. CSC 401"
                     placeholderTextColor="rgba(255,255,255,0.2)"
                     value={formData.code}
                     onChangeText={(v) => setFormData({ ...formData, code: v })}
@@ -164,33 +269,40 @@ function Step1({ formData, setFormData }: any) {
                 </View>
             </View>
 
-            <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
+            <View style={[styles.row, { gap: 16 }]}>
+                <View style={[styles.inputGroup, { flex: 1.2 }]}>
                     <Text style={styles.label}>CREDIT UNITS</Text>
                     <View style={styles.counter}>
-                        <TouchableOpacity style={styles.counterBtn} onPress={() => setFormData({ ...formData, credits: Math.max(1, formData.credits - 1) })}>
-                            <Minus size={20} color="rgba(255,255,255,0.6)" />
+                        <TouchableOpacity
+                            style={styles.counterBtn}
+                            onPress={() => setFormData({ ...formData, credits: Math.max(1, formData.credits - 1) })}
+                        >
+                            <Minus size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                         <Text style={styles.counterValue}>{formData.credits}</Text>
-                        <TouchableOpacity style={[styles.counterBtn, { backgroundColor: 'rgba(255, 202, 13, 0.1)' }]} onPress={() => setFormData({ ...formData, credits: formData.credits + 1 })}>
-                            <Plus size={20} color="#FFCA0D" />
+                        <TouchableOpacity
+                            style={styles.counterBtn}
+                            onPress={() => setFormData({ ...formData, credits: Math.min(6, formData.credits + 1) })}
+                        >
+                            <Plus size={20} color="#FFFFFF" />
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={[styles.inputGroup, { flex: 1, marginLeft: 10 }]}>
+
+                <View style={[styles.inputGroup, { flex: 1.8 }]}>
                     <Text style={styles.label}>SEMESTER</Text>
                     <View style={styles.semesterRow}>
                         <TouchableOpacity
                             style={[styles.semesterBtn, formData.semester === 'FIRST' && styles.activeSemesterBtn]}
                             onPress={() => setFormData({ ...formData, semester: 'FIRST' })}
                         >
-                            <Text style={[styles.semesterBtnText, formData.semester === 'FIRST' && styles.activeSemesterBtnText]}>1ST</Text>
+                            <Text style={[styles.semesterBtnText, formData.semester === 'FIRST' && styles.activeSemesterBtnText]}>FIRST</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.semesterBtn, formData.semester === 'SECOND' && styles.activeSemesterBtn]}
                             onPress={() => setFormData({ ...formData, semester: 'SECOND' })}
                         >
-                            <Text style={[styles.semesterBtnText, formData.semester === 'SECOND' && styles.activeSemesterBtnText]}>2ND</Text>
+                            <Text style={[styles.semesterBtnText, formData.semester === 'SECOND' && styles.activeSemesterBtnText]}>SECOND</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -198,7 +310,7 @@ function Step1({ formData, setFormData }: any) {
 
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>FACULTY / COLLEGE</Text>
-                <TouchableOpacity style={styles.selectInput}>
+                <TouchableOpacity style={styles.selectInput} onPress={onOpenFaculty}>
                     <Text style={styles.selectText}>{formData.faculty}</Text>
                     <UnfoldVertical size={20} color="#FFCA0D" />
                 </TouchableOpacity>
@@ -206,7 +318,7 @@ function Step1({ formData, setFormData }: any) {
 
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>DEPARTMENT</Text>
-                <TouchableOpacity style={styles.selectInput}>
+                <TouchableOpacity style={styles.selectInput} onPress={onOpenDept}>
                     <Text style={styles.selectText}>{formData.department}</Text>
                     <UnfoldVertical size={20} color="#FFCA0D" />
                 </TouchableOpacity>
@@ -222,7 +334,7 @@ function Step2({ formData, setFormData }: any) {
                 <Text style={styles.label}>UNIVERSITY / CAMPUS</Text>
                 <View style={styles.selectInputWithIcon}>
                     <Landmark size={20} color="rgba(255,255,255,0.3)" style={{ marginRight: 12 }} />
-                    <Text style={styles.selectText}>Main Campus - City Center</Text>
+                    <Text style={styles.selectText}>Institutional Main Campus</Text>
                     <UnfoldVertical size={20} color="rgba(255,255,255,0.4)" style={{ marginLeft: 'auto' }} />
                 </View>
             </View>
@@ -230,27 +342,29 @@ function Step2({ formData, setFormData }: any) {
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>DEPARTMENT</Text>
                 <View style={styles.inputWithIcons}>
-                    <Hub size={20} color="rgba(255,255,255,0.3)" style={{ marginRight: 12 }} />
+                    <Building2 size={20} color="rgba(255,255,255,0.3)" style={{ marginRight: 12 }} />
                     <TextInput
                         style={[styles.transparentInput, { flex: 1 }]}
                         value={formData.department}
-                        onChangeText={(v) => setFormData({ ...formData, department: v })}
+                        editable={false}
                     />
                     <Search size={18} color="rgba(255,255,255,0.4)" />
                 </View>
-                <View style={styles.matchBadge}>
-                    <Text style={styles.matchBadgeText}>MATCH FOUND</Text>
-                </View>
+                {formData.department !== 'Select Department' && (
+                    <View style={styles.matchBadge}>
+                        <Text style={styles.matchBadgeText}>MAPPED SUCCESSFULLY</Text>
+                    </View>
+                )}
             </View>
 
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>FACULTY / COLLEGE</Text>
                 <View style={[styles.inputWithIcons, { backgroundColor: 'rgba(26, 26, 26, 0.5)', borderColor: '#FFCA0D' }]}>
                     <GraduationCap size={20} color="rgba(255, 202, 13, 0.6)" style={{ marginRight: 12 }} />
-                    <Text style={[styles.selectText, { color: '#FFFFFF' }]}>Faculty of Computing & IT</Text>
+                    <Text style={[styles.selectText, { color: '#FFFFFF' }]}>{formData.faculty}</Text>
                     <Info size={18} color="#FFCA0D" style={{ marginLeft: 'auto' }} />
                 </View>
-                <Text style={styles.infoSubtitle}>Automatically mapped based on department</Text>
+                <Text style={styles.infoSubtitle}>Automatically mapped based on selection</Text>
             </View>
 
             <View style={styles.hierarchyCard}>
@@ -266,7 +380,7 @@ function Step2({ formData, setFormData }: any) {
                 <View style={styles.hierarchyDivider} />
                 <View style={styles.hierarchyBottom}>
                     <Text style={styles.reportingLabel}>Reporting to:</Text>
-                    <Text style={styles.reportingValue}>Academic Board - Region A</Text>
+                    <Text style={styles.reportingValue}>Academic Board - Institution</Text>
                 </View>
             </View>
         </View>
@@ -283,7 +397,7 @@ function Step3({ formData, setFormData }: any) {
                     <View style={styles.lecturerAvatar}>
                         <User size={14} color="#FFCA0D" />
                     </View>
-                    <Text style={styles.lecturerName}>Dr. Sarah Jenkins (You)</Text>
+                    <Text style={styles.lecturerName}>You</Text>
                     <Lock size={12} color="rgba(255,255,255,0.4)" style={{ marginLeft: 'auto' }} />
                 </View>
             </View>
@@ -304,13 +418,9 @@ function Step3({ formData, setFormData }: any) {
 
             <View style={styles.inputGroup}>
                 <View style={styles.thresholdHeader}>
-                    <View>
-                        <Text style={[styles.label, { fontSize: 14, textTransform: 'none', color: 'rgba(255,255,255,0.7)', marginBottom: 0 }]}>Attendance Threshold</Text>
-                        <Text style={styles.infoSubtitle}>Minimum required to sit for exams</Text>
-                    </View>
+                    <Text style={styles.label}>ATTENDANCE THRESHOLD</Text>
                     <Text style={styles.thresholdValue}>{formData.threshold}%</Text>
                 </View>
-                {/* Slider - simple workaround as standard Slider is deprecated and community one might not be installed */}
                 <View style={styles.sliderMock}>
                     <View style={styles.sliderTrack}>
                         <View style={[styles.sliderFill, { width: `${formData.threshold}%` }]} />
@@ -318,14 +428,14 @@ function Step3({ formData, setFormData }: any) {
                     </View>
                 </View>
                 <View style={styles.sliderLabels}>
-                    <Text style={styles.sliderLabel}>0%</Text>
-                    <Text style={styles.sliderLabel}>50%</Text>
-                    <Text style={styles.sliderLabel}>100%</Text>
+                    <Text style={styles.sliderLabel}>MIN 0%</Text>
+                    <Text style={styles.sliderLabel}>DEFAULT 75%</Text>
+                    <Text style={styles.sliderLabel}>MAX 100%</Text>
                 </View>
             </View>
 
             <View style={styles.inputGroup}>
-                <Text style={[styles.label, { fontSize: 14, textTransform: 'none', color: 'rgba(255,255,255,0.7)' }]}>Course Color Tag</Text>
+                <Text style={styles.label}>COURSE COLOR TAG</Text>
                 <View style={styles.colorSelector}>
                     <View style={styles.colorsRow}>
                         {colorsArr.map(c => (
