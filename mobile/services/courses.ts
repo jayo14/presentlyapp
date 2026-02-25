@@ -29,4 +29,13 @@ export const coursesService = {
   getMyCourses: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.COURSES.LIST, { enrolled: true });
   },
+  search: async (code: string): Promise<any> => {
+    return apiClient.get(API_ENDPOINTS.COURSES.SEARCH, { code });
+  },
+  register: async (courseId: string): Promise<any> => {
+    return apiClient.post(API_ENDPOINTS.COURSES.REGISTER(courseId));
+  },
+  drop: async (courseId: string): Promise<any> => {
+    return apiClient.post(API_ENDPOINTS.COURSES.DROP(courseId));
+  },
 };
