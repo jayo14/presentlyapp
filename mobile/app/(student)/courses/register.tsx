@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimens
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { Search, Bell, Star, Terminal, Engineering, Palette, CircleDollarSign, ChevronRight, PlusCircle, Brain, Bitcoin, Leaf } from 'lucide-react-native';
+import { ArrowLeft, Search, Bell, Star, Terminal, Engineering, Palette, CircleDollarSign, ChevronRight, PlusCircle, Brain, Bitcoin, Leaf } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
@@ -85,6 +85,9 @@ export default function RegistrationHubScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <ArrowLeft size={24} color={isDark ? "#FFFFFF" : colors.text} />
+            </TouchableOpacity>
             <View>
                 <Text style={[styles.headerTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>Courses</Text>
                 <Text style={[styles.headerSubtitle, { color: 'rgba(249, 196, 6, 0.7)' }]}>Academic Year 2023/24</Text>
@@ -183,6 +186,10 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: 20,
+  },
+  backButton: {
+    marginRight: 16,
+    padding: 4,
   },
   header: {
     flexDirection: 'row',
