@@ -1,68 +1,66 @@
-import resend
+import os
+import base64
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 from django.core.mail.backends.base import BaseEmailBackend
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+import logging
 
-class ResendEmailBackend(BaseEmailBackend):
+logger = logging.getLogger(__name__)
+
+class GmailApiEmailBackend(BaseEmailBackend):
+    """
+    Django email backend that uses the Gmail API.
+    Requires GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GMAIL_API_REFRESH_TOKEN in settings.
+    """
     def __init__(self, fail_silently=False, **kwargs):
-        super().__init__(fail_silently=fail_silently)
-        self.api_key = getattr(settings, 'RESEND_API_KEY', None)
-        if self.api_key:
-            resend.api_key = self.api_key
+        super().__init__(fail_silently=fail_silently, **kwargs)
+        self.credentials = self._get_credentials()
+
+    def _get_credentials(self):
+        refresh_token = getattr(settings, 'GMAIL_API_REFRESH_TOKEN', os.environ.get('GMAIL_API_REFRESH_TOKEN'))
+        client_id = getattr(settings, 'GOOGLE_CLIENT_ID', None)
+        client_secret = getattr(settings, 'GOOGLE_CLIENT_SECRET', None)
+
+        if not all([refresh_token, client_id, client_secret]):
+            logger.warning("Gmail API credentials not fully configured. Email sending might fail.")
+            return None
+
+        return Credentials(
+            None,
+            refresh_token=refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=client_id,
+            client_secret=client_secret,
+        )
 
     def send_messages(self, email_messages):
         if not email_messages:
             return 0
-            
-        if not self.api_key:
-            if self.fail_silently:
-                return 0
-            raise ImproperlyConfigured('RESEND_API_KEY is not set in settings.')
 
-        count = 0
-        for message in email_messages:
-            sent = self._send(message)
-            if sent:
-                count += 1
-        return count
+        if not self.credentials:
+            if not self.fail_silently:
+                # Fallback or error
+                logger.error("Gmail API credentials not configured. Cannot send email.")
+            return 0
 
-    def _send(self, message):
+        import os # Added import inside or move to top
+
         try:
-            # Extract HTML content if available (from EmailMultiAlternatives)
-            html_content = None
-            if hasattr(message, 'alternatives'):
-                for content, mimetype in message.alternatives:
-                    if mimetype == 'text/html':
-                        html_content = content
-                        break
+            service = build('gmail', 'v1', credentials=self.credentials)
+            sent_count = 0
             
-            # Also check if the primary body is HTML (though rare for send_mail unless misused)
-            if message.content_subtype == 'html':
-                html_content = message.body
-            
-            params = {
-                "from": message.from_email,
-                "to": message.to,
-                "subject": message.subject,
-                "text": message.body,
-            }
-            
-            if html_content:
-                params["html"] = html_content
-            
-            # Extract Reply-To if present
-            if message.reply_to:
-                params["reply_to"] = message.reply_to
+            for message in email_messages:
+                # Use Django's built-in message conversion to MIME
+                mime_msg = message.message()
+                raw_msg = base64.urlsafe_b64encode(mime_msg.as_bytes()).decode()
                 
-            # Send via Resend
-            r = resend.Emails.send(params)
-            
-            # Check for success (resend returns a dict with 'id' on success)
-            if r and 'id' in r:
-                return True
-            return False
-            
+                service.users().messages().send(userId='me', body={'raw': raw_msg}).execute()
+                sent_count += 1
+
+            return sent_count
         except Exception as e:
+            logger.error(f"Error sending email via Gmail API: {str(e)}")
             if not self.fail_silently:
                 raise e
-            return False
+            return 0
