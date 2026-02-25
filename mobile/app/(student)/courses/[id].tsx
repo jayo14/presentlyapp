@@ -34,6 +34,7 @@ export default function CourseDetailsScreen() {
   };
 
   const handleEnroll = async () => {
+    if (!course) return;
     setEnrolling(true);
     try {
         await api.courses.register(id as string);
@@ -54,6 +55,25 @@ export default function CourseDetailsScreen() {
               <ActivityIndicator color="#f9c406" style={{ flex: 1 }} />
           </SafeAreaView>
       );
+  }
+
+  if (!course) {
+    return (
+        <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <ArrowLeft size={24} color={isDark ? '#FFFFFF' : '#111418'} />
+                </TouchableOpacity>
+                <Text style={[styles.headerTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>NOT FOUND</Text>
+                <View style={{ width: 40 }} />
+            </View>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+                <Text style={{ color: colors.text, fontFamily: Fonts.lexend.bold, fontSize: 18, textAlign: 'center' }}>
+                    Course not found or has been removed.
+                </Text>
+            </View>
+        </SafeAreaView>
+    );
   }
 
   return (
