@@ -13,6 +13,7 @@ export interface User {
   profilePicture?: string;
   school?: string;
   college?: string;
+  institutionId?: string;
   onboardingCompleted?: boolean;
 }
 

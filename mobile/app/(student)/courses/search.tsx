@@ -2,37 +2,59 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Activi
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { ArrowLeft, Search, SlidersHorizontal, Bookmark, User, PlusCircle, AlertCircle } from 'lucide-react-native';
+import { ArrowLeft, Search, SlidersHorizontal, Bookmark, User, PlusCircle, AlertCircle, Building2, GraduationCap, ChevronRight } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function SearchResultsScreen() {
   const router = useRouter();
   const { q, code } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState((q as string) || (code as string) || '');
-  const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [colleges, setColleges] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const bgColor = isDark ? '#1a1608' : colors.background;
   const cardColor = isDark ? '#2c2614' : '#FFFFFF';
 
-  useEffect(() => {
-    performSearch();
-  }, [q, code]);
-
-  const performSearch = async () => {
+  const performSearch = useCallback(async () => {
+    if (!searchQuery.trim()) return;
     setLoading(true);
+    setHasSearched(true);
     try {
-        const data = await api.courses.search(searchQuery);
-        setResults(data.results || []);
+        const institutionId = user?.institutionId;
+
+        // Parallel search
+        const [courseData, deptData, collegeData] = await Promise.all([
+            api.courses.list({ search: searchQuery, institution: institutionId }).catch(() => ({ results: [] })),
+            api.departments.list({ search: searchQuery, institution: institutionId }).catch(() => ({ results: [] })),
+            api.colleges.list({ search: searchQuery, institution: institutionId }).catch(() => ({ results: [] }))
+        ]);
+
+        setCourses(courseData.results || courseData || []);
+        setDepartments(deptData.results || deptData || []);
+        setColleges(collegeData.results || collegeData || []);
+
     } catch (e) {
         console.error('Search failed', e);
     } finally {
         setLoading(false);
     }
-  };
+  }, [searchQuery, user]);
+
+  useEffect(() => {
+    if (q || code) {
+        performSearch();
+    }
+  }, [q, code]);
+
+  const totalResults = courses.length + departments.length + colleges.length;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} edges={['top']}>
@@ -48,75 +70,124 @@ export default function SearchResultsScreen() {
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onSubmitEditing={performSearch}
-                placeholder="Search courses..."
+                placeholder="Search courses, depts, faculties..."
                 placeholderTextColor="#94A3B8"
+                autoFocus={!q && !code}
             />
         </View>
-        <TouchableOpacity style={styles.filterButton}>
-            <SlidersHorizontal size={24} color={isDark ? '#FFFFFF' : '#111418'} />
-        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.resultsHeader}>
-            <Text style={styles.resultsCount}>SEARCH RESULTS ({results.length})</Text>
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Text style={styles.clearAll}>Clear all</Text>
-            </TouchableOpacity>
-        </View>
-
         {loading ? (
-            <ActivityIndicator color="#f9c406" style={{ marginTop: 40 }} />
+            <View style={styles.centerContainer}>
+                <ActivityIndicator color="#f9c406" size="large" />
+                <Text style={[styles.loadingText, { color: isDark ? '#ccbf8e' : '#666666' }]}>Searching institution database...</Text>
+            </View>
+        ) : !hasSearched ? (
+            <View style={styles.emptyState}>
+                <View style={styles.emptyIconBg}>
+                    <Search size={64} color="#f9c406" opacity={0.5} />
+                </View>
+                <Text style={[styles.emptyTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>Discover Your Courses</Text>
+                <Text style={[styles.emptyDesc, { color: isDark ? '#ccbf8e' : '#666666' }]}>Enter a course code, department name, or faculty to explore available offerings.</Text>
+            </View>
+        ) : totalResults === 0 ? (
+            <View style={styles.emptyState}>
+                <View style={[styles.emptyIconBg, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
+                    <AlertCircle size={64} color="#EF4444" opacity={0.5} />
+                </View>
+                <Text style={[styles.emptyTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>No Results Found</Text>
+                <Text style={[styles.emptyDesc, { color: isDark ? '#ccbf8e' : '#666666' }]}>We couldn't find anything matching "{searchQuery}" in your institution.</Text>
+                <TouchableOpacity style={styles.clearBtn} onPress={() => { setSearchQuery(''); setHasSearched(false); }}>
+                    <Text style={styles.clearBtnText}>Clear Search</Text>
+                </TouchableOpacity>
+            </View>
         ) : (
-            <View style={styles.resultsList}>
-                {results.map((course) => (
-                    <View key={course.id} style={[styles.courseCard, { backgroundColor: cardColor, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
-                        <View style={styles.cardHeader}>
-                            <View>
-                                <Text style={styles.deptName}>{course.department_name?.split(',')[0].toUpperCase() || 'GENERAL'}</Text>
-                                <View style={styles.titleRow}>
-                                    <Text style={[styles.courseCode, { backgroundColor: 'rgba(249, 196, 6, 0.2)' }]}>
-                                        {course.code.substring(0, 4)}
-                                    </Text>
-                                    <Text style={[styles.courseTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>
-                                        {course.code.substring(4)}: {course.title}
-                                    </Text>
+            <>
+                <View style={styles.resultsHeader}>
+                    <Text style={styles.resultsCount}>FOUND {totalResults} RESULTS</Text>
+                </View>
+
+                {colleges.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>FACULTIES / COLLEGES</Text>
+                        {colleges.map(college => (
+                            <TouchableOpacity key={college.id} style={[styles.itemCard, { backgroundColor: cardColor }]}>
+                                <View style={styles.iconBox}>
+                                    <GraduationCap size={20} color="#f9c406" />
                                 </View>
-                            </View>
-                            <TouchableOpacity style={[styles.bookmarkBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC' }]}>
-                                <Bookmark size={20} color="#94A3B8" />
+                                <View style={styles.itemInfo}>
+                                    <Text style={[styles.itemTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>{college.name}</Text>
+                                    <Text style={styles.itemSubtitle}>{college.code || 'FACULTY'}</Text>
+                                </View>
+                                <ChevronRight size={18} color="rgba(255,255,255,0.2)" />
                             </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.instructorRow}>
-                            <View style={[styles.avatar, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]}>
-                                <User size={20} color="#94A3B8" />
-                            </View>
-                            <Text style={styles.instructorName}>{course.lecturer_name || 'Dr. Alexander Wright'}</Text>
-                        </View>
-
-                        <TouchableOpacity
-                            style={styles.enrollBtn}
-                            onPress={() => router.push(`/(student)/courses/${course.id}`)}
-                        >
-                            <Text style={styles.enrollBtnText}>Enroll Now</Text>
-                            <PlusCircle size={18} color="#1a1608" />
-                        </TouchableOpacity>
+                        ))}
                     </View>
-                ))}
+                )}
 
-                {searchQuery.toLowerCase() === 'cs40' && (
-                     <View style={styles.errorBanner}>
-                        <View style={styles.errorIconContainer}>
-                            <AlertCircle size={20} color="#EF4444" />
-                        </View>
-                        <View style={styles.errorTextContainer}>
-                            <Text style={styles.errorTitle}>Invalid course code</Text>
-                            <Text style={styles.errorDesc}>The code "CS40" is not a direct entry code. Please select a specific section from the results above or check your code again.</Text>
+                {departments.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>DEPARTMENTS</Text>
+                        {departments.map(dept => (
+                            <TouchableOpacity
+                                key={dept.id}
+                                style={[styles.itemCard, { backgroundColor: cardColor }]}
+                                onPress={() => router.push(`/(student)/courses/department/${dept.id}`)}
+                            >
+                                <View style={styles.iconBox}>
+                                    <Building2 size={20} color="#f9c406" />
+                                </View>
+                                <View style={styles.itemInfo}>
+                                    <Text style={[styles.itemTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>{dept.name}</Text>
+                                    <Text style={styles.itemSubtitle}>{dept.code || 'DEPT'}</Text>
+                                </View>
+                                <ChevronRight size={18} color="rgba(255,255,255,0.2)" />
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
+
+                {courses.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>COURSES</Text>
+                        <View style={styles.resultsList}>
+                            {courses.map((course) => (
+                                <View key={course.id} style={[styles.courseCard, { backgroundColor: cardColor, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                                    <View style={styles.cardHeader}>
+                                        <View>
+                                            <Text style={styles.deptName}>{course.department_name?.split(',')[0].toUpperCase() || 'GENERAL'}</Text>
+                                            <View style={styles.titleRow}>
+                                                <Text style={[styles.courseCode, { backgroundColor: 'rgba(249, 196, 6, 0.2)' }]}>
+                                                    {course.code}
+                                                </Text>
+                                                <Text style={[styles.courseTitle, { color: isDark ? '#FFFFFF' : colors.text }]} numberOfLines={1}>
+                                                    : {course.title}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.instructorRow}>
+                                        <View style={[styles.avatar, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }]}>
+                                            <User size={20} color="#94A3B8" />
+                                        </View>
+                                        <Text style={styles.instructorName}>{course.lecturer_name || 'Departmental Lecturer'}</Text>
+                                    </View>
+
+                                    <TouchableOpacity
+                                        style={styles.enrollBtn}
+                                        onPress={() => router.push(`/(student)/courses/${course.id}`)}
+                                    >
+                                        <Text style={styles.enrollBtnText}>Enroll Now</Text>
+                                        <PlusCircle size={18} color="#1a1608" />
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
                         </View>
                     </View>
                 )}
-            </View>
+            </>
         )}
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -162,21 +233,63 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.lexend.medium,
   },
-  filterButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-  },
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 24,
   },
-  resultsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  centerContainer: {
+    marginTop: 100,
     alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 14,
+    fontFamily: Fonts.lexend.medium,
+  },
+  emptyState: {
+    marginTop: 80,
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyIconBg: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(249, 196, 6, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontFamily: Fonts.lexend.bold,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  emptyState: {
+    marginTop: 80,
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyDesc: {
+    fontSize: 14,
+    fontFamily: Fonts.lexend.regular,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  clearBtn: {
+    marginTop: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(249, 196, 6, 0.1)',
+  },
+  clearBtnText: {
+    color: '#f9c406',
+    fontFamily: Fonts.lexend.bold,
+    fontSize: 14,
+  },
+  resultsHeader: {
     marginBottom: 24,
   },
   resultsCount: {
@@ -185,10 +298,46 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     letterSpacing: 1.5,
   },
-  clearAll: {
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
     fontSize: 11,
-    fontFamily: Fonts.lexend.medium,
+    fontFamily: Fonts.lexend.bold,
     color: '#f9c406',
+    letterSpacing: 1,
+    marginBottom: 16,
+  },
+  itemCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  iconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: 'rgba(249, 196, 6, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  itemInfo: {
+    flex: 1,
+  },
+  itemTitle: {
+    fontSize: 15,
+    fontFamily: Fonts.lexend.bold,
+  },
+  itemSubtitle: {
+    fontSize: 12,
+    fontFamily: Fonts.lexend.medium,
+    color: '#94A3B8',
+    marginTop: 2,
   },
   resultsList: {
     gap: 20,
@@ -231,13 +380,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: Fonts.lexend.bold,
     marginLeft: 2,
-  },
-  bookmarkBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
   },
   instructorRow: {
     flexDirection: 'row',
@@ -271,39 +414,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.lexend.bold,
     color: '#1a1608',
-  },
-  errorBanner: {
-    marginTop: 16,
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.2)',
-    flexDirection: 'row',
-    gap: 16,
-  },
-  errorIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  errorTextContainer: {
-    flex: 1,
-  },
-  errorTitle: {
-    fontSize: 15,
-    fontFamily: Fonts.lexend.bold,
-    color: '#EF4444',
-    marginBottom: 2,
-  },
-  errorDesc: {
-    fontSize: 12,
-    fontFamily: Fonts.lexend.regular,
-    color: 'rgba(239, 68, 68, 0.8)',
-    lineHeight: 18,
   }
 });
