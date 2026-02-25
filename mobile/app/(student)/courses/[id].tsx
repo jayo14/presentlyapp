@@ -93,7 +93,7 @@ export default function CourseDetailsScreen() {
         <View style={styles.content}>
             <View style={styles.badgeRow}>
                 <View style={[styles.badge, { backgroundColor: 'rgba(249, 196, 6, 0.2)' }]}>
-                    <Text style={[styles.badgeText, { color: '#f9c406' }]}>{course.department_name?.split(',')[0] || 'GENERAL'}</Text>
+                    <Text style={[styles.badgeText, { color: '#f9c406' }]}>{(course.department_name ? course.department_name.split(',')[0] : 'GENERAL')}</Text>
                 </View>
                 <View style={[styles.badge, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]}>
                     <Text style={[styles.badgeText, { color: isDark ? '#94A3B8' : '#666666' }]}>CORE MODULE</Text>
