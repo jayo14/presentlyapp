@@ -62,4 +62,7 @@ export const departmentsService = {
   delete: async (id: string) => {
     return apiClient.delete(API_ENDPOINTS.DEPARTMENTS.DELETE(id));
   },
+  getCourses: async (id: string, params?: any) => {
+    return apiClient.get(API_ENDPOINTS.DEPARTMENTS.COURSES(id), params);
+  },
 };

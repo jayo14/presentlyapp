@@ -79,6 +79,7 @@ export const API_ENDPOINTS = {
     CREATE: '/departments/',
     UPDATE: (id: string) => `/departments/${id}/`,
     DELETE: (id: string) => `/departments/${id}/`,
+    COURSES: (id: string) => `/departments/${id}/courses/`,
   },
   // Courses
   COURSES: {
@@ -89,6 +90,9 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/courses/${id}/`,
     AVAILABLE: '/courses/available/',
     ENROLLED_STUDENTS: (id: string) => `/courses/${id}/enrolled_students/`,
+    SEARCH: '/courses/search/',
+    REGISTER: (id: string) => `/courses/${id}/register/`,
+    DROP: (id: string) => `/courses/${id}/drop/`,
   },
   // Course Enrollments
   ENROLLMENTS: {
