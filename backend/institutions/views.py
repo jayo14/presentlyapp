@@ -1,3 +1,4 @@
+import requests
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
@@ -94,8 +95,6 @@ def google_auth_view(request):
                 )
             except Exception as e:
                 auth_logger.error(f"Secondary Google Token validation failed: {str(e)}")
-                # Depending on strictness, we might choose to fail here
-                # return Response({'error': 'Token validation failed'}, status=401)
             
         # Get or create user
         user, created = User.objects.get_or_create(
@@ -105,7 +104,8 @@ def google_auth_view(request):
                 'is_active': True,
                 'email_verified': True, 
                 'email_verified_at': timezone.now(),
-                'avatar_url': picture
+                'avatar_url': picture,
+                'signup_method': 'google'
             }
         )
         
@@ -113,9 +113,15 @@ def google_auth_view(request):
             auth_logger.info(f"New user created via Google Auth: {email}")
         else:
             auth_logger.info(f"User logged in via Google Auth: {email}")
+            needs_save = False
             if not user.email_verified:
                 user.email_verified = True
                 user.email_verified_at = timezone.now()
+                needs_save = True
+            if user.signup_method != 'google':
+                user.signup_method = 'google'
+                needs_save = True
+            if needs_save:
                 user.save()
             
         # Generate tokens
@@ -151,6 +157,90 @@ def google_auth_view(request):
             'success': False,
             'error': 'An unexpected error occurred during authentication.'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def google_callback_view(request):
+    """
+    Handle Google OAuth2 callback.
+    Exchange code for tokens and user info.
+    """
+    code = request.data.get('code')
+    if not code:
+        return Response({'error': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Exchange code for access token
+    token_url = "https://oauth2.googleapis.com/token"
+    # Use redirect_uri from request or fallback to settings
+    redirect_uri = request.data.get('redirect_uri', settings.GOOGLE_AUTH_CALLBACK_URL)
+
+    data = {
+        'code': code,
+        'client_id': settings.GOOGLE_CLIENT_ID,
+        'client_secret': settings.GOOGLE_CLIENT_SECRET,
+        'redirect_uri': redirect_uri,
+        'grant_type': 'authorization_code',
+    }
+
+    response = requests.post(token_url, data=data)
+    token_data = response.json()
+
+    if 'error' in token_data:
+        return Response({'error': token_data.get('error_description', 'Failed to exchange code')}, status=status.HTTP_400_BAD_REQUEST)
+
+    access_token = token_data.get('access_token')
+
+    # Get user info
+    user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+    user_info_response = requests.get(user_info_url, params={'access_token': access_token})
+    user_info = user_info_response.json()
+
+    email = user_info.get('email')
+    name = user_info.get('name', '')
+    picture = user_info.get('picture', '')
+
+    if not email:
+        return Response({'error': 'Email not provided by Google'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Get or create user
+    user, created = User.objects.get_or_create(
+        email=email,
+        defaults={
+            'full_name': name,
+            'avatar_url': picture,
+            'is_active': True,
+            'email_verified': True,
+            'signup_method': 'google'
+        }
+    )
+
+    if not created:
+        needs_save = False
+        if not user.email_verified:
+            user.email_verified = True
+            needs_save = True
+        if user.signup_method != 'google':
+            user.signup_method = 'google'
+            needs_save = True
+        if needs_save:
+            user.save()
+
+    # Generate tokens
+    tokens = get_tokens_for_user(user)
+
+    return Response({
+        'success': True,
+        'tokens': tokens,
+        'user': {
+            'id': str(user.id),
+            'email': user.email,
+            'full_name': user.full_name,
+            'role': user.role,
+            'onboarding_complete': user.onboarding_complete,
+            'avatar_url': user.avatar_url
+        },
+        'requires_onboarding': not user.onboarding_complete
+    })
 
 
 

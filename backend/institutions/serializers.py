@@ -29,7 +29,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             full_name=validated_data['full_name'],
             role=UserRole.STUDENT,  # Default role
-            onboarding_complete=False
+            onboarding_complete=False,
+            signup_method='email'
         )
         return user
 
@@ -207,7 +208,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'full_name', 'name', 'role', 'avatar_url', 'onboarding_complete',
+            'id', 'email', 'full_name', 'name', 'role', 'avatar_url', 'onboarding_complete', 'signup_method',
             'institution', 'institution_name', 'college', 'college_name',
             'phone_number', 'matric_number', 'department', 'level',
             'staff_id', 'courses', 'assigned_lecturer',
