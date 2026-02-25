@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Plus, QrCode } from 'lucide-react-native';
+import { ArrowLeft, Plus, QrCode, Search, Terminal, Palette, CircleDollarSign, ChevronRight } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
@@ -15,7 +15,9 @@ export default function StudentCoursesScreen() {
   const { colors, isDark } = useTheme();
   const { isAuthenticated, isLoading: authLoading, refreshSession } = useAuth();
   const [courses, setCourses] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deptsLoading, setDeptsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadCourses = async (allowRetry = true) => {
@@ -44,16 +46,37 @@ export default function StudentCoursesScreen() {
     }
   };
 
+  const loadDepartments = async () => {
+    try {
+        const data = await api.departments.list();
+        const depts = data.results || data;
+        setDepartments(Array.isArray(depts) ? depts.slice(0, 5) : []);
+    } catch (e) {
+        console.error('Failed to load departments', e);
+    } finally {
+        setDeptsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (authLoading) return;
     loadCourses();
+    loadDepartments();
   }, [authLoading, isAuthenticated]);
 
   const onRefresh = async () => {
     if (authLoading) return;
     setRefreshing(true);
-    await loadCourses();
+    await Promise.all([loadCourses(), loadDepartments()]);
     setRefreshing(false);
+  };
+
+  const getDeptIcon = (name: string) => {
+    const n = (name || '').toLowerCase();
+    if (n.includes('computer')) return <Terminal size={24} color="#f9c406" />;
+    if (n.includes('art') || n.includes('design')) return <Palette size={24} color="#f9c406" />;
+    if (n.includes('business')) return <CircleDollarSign size={24} color="#f9c406" />;
+    return <Terminal size={24} color="#f9c406" />;
   };
 
   return (
@@ -72,22 +95,68 @@ export default function StudentCoursesScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
+        {/* Search Bar */}
+        <TouchableOpacity
+            style={styles.searchContainer}
+            activeOpacity={0.9}
+            onPress={() => router.push('/(student)/courses/search')}
+        >
+            <Search size={22} color="#f9c406" style={styles.searchIcon} />
+            <View style={[styles.searchInputStub, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
+                <Text style={styles.searchPlaceholder}>Search by code or title</Text>
+            </View>
+        </TouchableOpacity>
+
+        {/* Departments Section */}
+        <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Departments</Text>
+                <TouchableOpacity onPress={() => router.push('/(student)/courses/register')}>
+                    <Text style={styles.viewAllText}>VIEW ALL</Text>
+                </TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.deptScroll}>
+                {deptsLoading ? (
+                    <ActivityIndicator color={colors.primary} style={{ marginHorizontal: 20 }} />
+                ) : (
+                    departments.map((dept) => (
+                        <TouchableOpacity
+                            key={dept.id}
+                            style={[styles.deptCard, { backgroundColor: isDark ? '#2d281a' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}
+                            onPress={() => router.push(`/(student)/courses/department/${dept.id}`)}
+                        >
+                            <View style={styles.deptIconContainer}>
+                                {getDeptIcon(dept.name)}
+                            </View>
+                            <Text style={[styles.deptName, { color: colors.text }]} numberOfLines={1}>{dept.name}</Text>
+                        </TouchableOpacity>
+                    ))
+                )}
+            </ScrollView>
+        </View>
+
         <View style={styles.courseList}>
+          <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 12 }]}>Enrolled Courses</Text>
           {loading && !refreshing ? (
               <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
           ) : (
               courses.map((course) => (
-                <CourseItem
+                <TouchableOpacity
                     key={course.id}
-                    title={course.name}
-                    code={course.code}
-                    instructor={course.instructor || course.lecturer_name}
-                    percentage={course.percentage || 0}
-                    status={course.status || (course.attendance >= 80 ? 'Active' : (course.attendance >= 60 ? 'Warning' : 'Low'))}
-                    image={course.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAj31ikpQevVxSA6PeFETfug4QbDzNaS0614HFHBTD4ReuZoZ-hVoH84N2GI1XWKBQfCcJsNLaW23zcYBJwSmereyts0fJCyPIYu9DmwkybTWa9XR7NYe2BsMUpsuT8k31ImBUzfBCT2wCMDhpYAy8uJeiWcg74RByycS1GG_k0FooYWghVGoa7shzapkrRF49W-E3GK2aKWDJ67bazSMOmIWY4bA6E4BbLRqmIROtCgdiI65tlpjOjU4EKM-rbZrtiyK9Nw1U5ZAf5"}
-                    colors={colors}
-                    isDark={isDark}
-                />
+                    onPress={() => router.push(`/(student)/courses/${course.id}`)}
+                    activeOpacity={0.8}
+                >
+                    <CourseItem
+                        title={course.name || course.title}
+                        code={course.code}
+                        instructor={course.instructor || course.lecturer_name}
+                        percentage={course.percentage || 0}
+                        status={course.status || (course.attendance >= 80 ? 'Active' : (course.attendance >= 60 ? 'Warning' : 'Low'))}
+                        image={course.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAj31ikpQevVxSA6PeFETfug4QbDzNaS0614HFHBTD4ReuZoZ-hVoH84N2GI1XWKBQfCcJsNLaW23zcYBJwSmereyts0fJCyPIYu9DmwkybTWa9XR7NYe2BsMUpsuT8k31ImBUzfBCT2wCMDhpYAy8uJeiWcg74RByycS1GG_k0FooYWghVGoa7shzapkrRF49W-E3GK2aKWDJ67bazSMOmIWY4bA6E4BbLRqmIROtCgdiI65tlpjOjU4EKM-rbZrtiyK9Nw1U5ZAf5"}
+                        colors={colors}
+                        isDark={isDark}
+                    />
+                </TouchableOpacity>
               ))
           )}
           {!loading && courses.length === 0 && (
@@ -109,7 +178,7 @@ export default function StudentCoursesScreen() {
 }
 
 function CourseItem({ title, code, instructor, percentage, status, image, colors, isDark }: any) {
-    const statusType = status.toLowerCase();
+    const statusType = (status || 'Active').toLowerCase();
 
     const getStatusColors = () => {
         switch(statusType) {
@@ -180,6 +249,73 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 100,
+  },
+  searchContainer: {
+    position: 'relative',
+    marginBottom: 24,
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 16,
+    top: 16,
+    zIndex: 1,
+  },
+  searchInputStub: {
+    height: 56,
+    borderRadius: 16,
+    paddingLeft: 52,
+    paddingRight: 20,
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(249, 196, 6, 0.2)',
+  },
+  searchPlaceholder: {
+    fontSize: 16,
+    fontFamily: Fonts.lexend.regular,
+    color: 'rgba(255,255,255,0.4)',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.lexend.bold,
+  },
+  viewAllText: {
+    color: '#f9c406',
+    fontSize: 12,
+    fontFamily: Fonts.lexend.bold,
+    letterSpacing: 1,
+  },
+  deptScroll: {
+    gap: 12,
+  },
+  deptCard: {
+    width: 120,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  deptIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: 'rgba(249, 196, 6, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  deptName: {
+    fontSize: 12,
+    fontFamily: Fonts.lexend.bold,
+    textAlign: 'center',
   },
   courseList: {
     gap: 12,
