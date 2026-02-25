@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
-    Attendance, UserRole, Venue, Timetable
+    Attendance, UserRole, Venue, Timetable, AuditLog
 )
 
 
@@ -300,6 +300,7 @@ class CourseSerializer(serializers.ModelSerializer):
     sessions_attended = serializers.SerializerMethodField()
     total_sessions = serializers.SerializerMethodField()
     percentage = serializers.SerializerMethodField()
+    is_enrolled = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
@@ -351,6 +352,16 @@ class CourseSerializer(serializers.ModelSerializer):
     def get_applicable_levels(self, obj):
         """Get list of applicable levels for this course based on duration"""
         return obj.get_applicable_levels()
+
+    def get_is_enrolled(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            return False
+        return CourseEnrollment.objects.filter(
+            student=request.user,
+            course=obj,
+            is_active=True
+        ).exists()
 
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
@@ -494,3 +505,11 @@ class PasswordChangeSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+class AuditLogSerializer(serializers.ModelSerializer):
+    """Serializer for AuditLog model"""
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+
+    class Meta:
+        model = AuditLog
+        fields = '__all__'
+        read_only_fields = ['timestamp']
