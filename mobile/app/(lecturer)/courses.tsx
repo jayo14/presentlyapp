@@ -1,44 +1,39 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Bell, Plus,  Atom, Network } from 'lucide-react-native';
+import { Search, Plus, MoreVertical } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
 
-const { width } = Dimensions.get('window');
-
-export default function LecturerCoursesScreen() {
+export default function LecturerCourseHubScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { isAuthenticated, isLoading: authLoading, refreshSession } = useAuth();
+  const { user } = useAuth();
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const loadCourses = async (allowRetry = true) => {
+  const bgColor = isDark ? '#0A0A0A' : colors.background;
+  const surfaceColor = isDark ? '#1A1A1A' : '#FFFFFF';
+
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  const loadCourses = async () => {
     try {
-        if (!isAuthenticated) {
-          setCourses([]);
-          return;
-        }
-
-        const data: any = await api.courses.list();
-        setCourses(data.courses || []);
+        const data = await api.courses.list();
+        setCourses(data.courses || data.results || data || []);
     } catch (e) {
         console.error('Failed to load courses', e);
-        setCourses([]);
     } finally {
         setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (authLoading) return;
-    loadCourses();
-  }, [authLoading, isAuthenticated]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -46,109 +41,107 @@ export default function LecturerCoursesScreen() {
     setRefreshing(false);
   };
 
+  const filteredCourses = courses.filter(c =>
+    c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Top App Bar */}
-      <View style={[styles.header, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
-        <View style={styles.headerLeft}>
-            <BookOpen size={28} color={colors.primary} />
-            <Text style={[styles.headerTitle, { color: colors.text }]}>My Classes</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} edges={['top']}>
+      <View style={[styles.header, { backgroundColor: isDark ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
+        <View style={styles.headerTop}>
+            <View>
+                <Text style={[styles.headerTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>Course Hub</Text>
+                <Text style={styles.headerSubtitle}>Manage your current academic load</Text>
+            </View>
+            <View style={[styles.profileImgContainer, { borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0' }]}>
+                <Image source={{ uri: user?.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAg5o8203WNZIxONqSkXaJpEAfQRk2t_URQ3DFROkMLFnshERoqKII5kHs8sVynK5l8m4qqfcDj0rJiHO76kYgkA0GzTVG5bCOXyH1w4pbg4gyFgWubJuGbBfPnLlY1fbnKiYIna24ZrG_1aZLm6tANg2009WPMNT0v40G6dBOyp23-vWkEZa5tuFrLbEO4g4Fuk8zQH4jaLLtWRskxKdF8U7R-AgnZuItTTd6GjmcvaB-sDf32UCcT0M4vFtKm9GCt4-lwcDYj-3uw' }} style={styles.profileImg} />
+            </View>
         </View>
-        <TouchableOpacity style={styles.notificationBtn} onPress={() => router.push('/(lecturer)/notifications')}>
-          <Bell size={24} color={isDark ? '#ccbf8e' : colors.textSecondary} />
-        </TouchableOpacity>
+
+        <View style={styles.searchContainer}>
+            <Search size={20} color="#FFCA0D" style={styles.searchIcon} />
+            <TextInput
+                style={[styles.searchInput, { backgroundColor: isDark ? 'rgba(26, 26, 26, 0.5)' : '#F1F5F9', color: isDark ? '#FFFFFF' : '#000000', borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0' }]}
+                placeholder="Search courses..."
+                placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+            />
+        </View>
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFCA0D" />}
       >
-        <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Ongoing Courses</Text>
-            <Text style={[styles.sectionSubtitle, { color: isDark ? '#ccbf8e' : colors.textSecondary }]}>Manage your active lecture series</Text>
-        </View>
-
-        <View style={styles.courseList}>
-            {loading && !refreshing ? (
-                <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
-            ) : (
-                courses.map((course, index) => (
-                    <CourseCard
+        {loading && !refreshing ? (
+            <ActivityIndicator color="#FFCA0D" style={{ marginTop: 40 }} />
+        ) : (
+            <View style={styles.courseList}>
+                {filteredCourses.map((course) => (
+                    <TouchableOpacity
                         key={course.id}
-                        title={course.name}
-                        code={course.code}
-                        students={`${course.enrolled_students_count || 124} Students`}
-                        attendance={course.attendance || 85}
-                        index={index}
-                        colors={colors}
-                        isDark={isDark}
+                        style={[styles.courseCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0' }]}
+                        activeOpacity={0.9}
                         onPress={() => router.push({
                             pathname: '/(lecturer)/students',
-                            params: { courseId: course.id, courseName: course.name, courseCode: course.code }
+                            params: { courseId: course.id, courseName: course.title, courseCode: course.code }
                         })}
-                    />
-                ))
-            )}
-            {!loading && courses.length === 0 && (
-                <Text style={{ textAlign: 'center', marginTop: 40, color: colors.textSecondary, fontFamily: Fonts.lexend.medium }}>No classes found</Text>
-            )}
-        </View>
+                    >
+                        <View style={styles.cardHeader}>
+                            <View>
+                                <View style={styles.codeTag}>
+                                    <Text style={styles.codeTagText}>{course.code}</Text>
+                                </View>
+                                <Text style={[styles.courseTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>{course.title}</Text>
+                            </View>
+                            <TouchableOpacity>
+                                <MoreVertical size={20} color="rgba(255, 255, 255, 0.3)" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.attendanceSection}>
+                            <View style={styles.attendanceHeader}>
+                                <Text style={styles.attendanceLabel}>ATTENDANCE RATE</Text>
+                                <Text style={styles.attendanceValue}>{course.attendance_percentage || 88}%</Text>
+                            </View>
+                            <View style={[styles.progressBg, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F1F5F9' }]}>
+                                <View
+                                    style={[
+                                        styles.progressFill,
+                                        { width: `${course.attendance_percentage || 88}%`, backgroundColor: '#FFCA0D' }
+                                    ]}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={styles.cardFooter}>
+                            <View style={[styles.studentBadge, { backgroundColor: surfaceColor, borderColor: bgColor }]}>
+                                <Text style={styles.studentBadgeText}>{course.enrolled_count || 128} Students</Text>
+                            </View>
+                            <Text style={styles.footerLabel}>Registered</Text>
+                        </View>
+                    </TouchableOpacity>
+                ))}
+                {!loading && filteredCourses.length === 0 && (
+                    <Text style={styles.emptyText}>No courses found</Text>
+                )}
+            </View>
+        )}
+        <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Floating Action Button */}
+      {/* FAB */}
       <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.primary }]}
-        activeOpacity={0.8}
+        style={styles.fab}
         onPress={() => router.push('/(lecturer)/create-course')}
       >
-        <Plus size={32} color="#231e0f" strokeWidth={2.5} />
+        <Plus size={32} color="#0A0A0A" strokeWidth={2.5} />
       </TouchableOpacity>
     </SafeAreaView>
   );
-}
-
-function CourseCard({ title, code, students, attendance, index, colors, isDark, onPress }: any) {
-    const getIcon = () => {
-        if (index % 3 === 0) return <Text style={{ fontSize: 24, color: colors.primary }}>ƒ</Text>; // Functions
-        if (index % 3 === 1) return <Atom size={24} color={colors.primary} />;
-        return <Network size={24} color={colors.primary} />;
-    };
-
-    return (
-        <View style={[styles.card, { backgroundColor: isDark ? '#352e18' : '#FFFFFF', borderColor: isDark ? 'transparent' : '#E2E8F0' }]}>
-            <View style={styles.cardTop}>
-                <View style={styles.cardInfo}>
-                    <Text style={[styles.cardTitle, { color: colors.text }]}>{title}</Text>
-                    <View style={styles.metaRow}>
-                        <Text style={[styles.cardCode, { color: colors.primary }]}>{code}</Text>
-                        <Text style={[styles.metaDot, { color: isDark ? '#ccbf8e' : colors.textSecondary }]}>•</Text>
-                        <Text style={[styles.cardStudents, { color: isDark ? '#ccbf8e' : colors.textSecondary }]}>{students}</Text>
-                    </View>
-                </View>
-                <View style={[styles.iconBox, { backgroundColor: colors.primary + '1A' }]}>
-                    {getIcon()}
-                </View>
-            </View>
-
-            <View style={styles.attendanceSection}>
-                <View style={styles.attendanceHeader}>
-                    <Text style={[styles.attendanceLabel, { color: isDark ? '#ccbf8e' : colors.textSecondary }]}>AVG. ATTENDANCE</Text>
-                    <Text style={[styles.attendanceValue, { color: colors.text }]}>{attendance}%</Text>
-                </View>
-                <View style={[styles.progressBg, { backgroundColor: isDark ? '#4a4121' : '#F1F5F9' }]}>
-                    <View style={[styles.progressFill, { width: `${attendance}%`, backgroundColor: colors.primary }]} />
-                </View>
-            </View>
-
-            <TouchableOpacity
-                style={[styles.detailsBtn, { backgroundColor: isDark ? '#4a4121' : '#F1F5F9' }]}
-                onPress={onPress}
-            >
-                <Text style={[styles.detailsBtnText, { color: colors.text }]}>View Class Details</Text>
-            </TouchableOpacity>
-        </View>
-    );
 }
 
 const styles = StyleSheet.create({
@@ -156,147 +149,165 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 24,
+    zIndex: 10,
   },
-  headerLeft: {
+  headerTop: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 12,
+    marginBottom: 24,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 28,
     fontFamily: Fonts.lexend.bold,
+    letterSpacing: -0.5,
   },
-  notificationBtn: {
+  headerSubtitle: {
+    fontSize: 12,
+    fontFamily: Fonts.lexend.regular,
+    color: 'rgba(255, 255, 255, 0.5)',
+    marginTop: 4,
+  },
+  profileImgContainer: {
     width: 44,
     height: 44,
-    alignItems: 'center',
+    borderRadius: 22,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  profileImg: {
+    width: '100%',
+    height: '100%',
+  },
+  searchContainer: {
+    position: 'relative',
     justifyContent: 'center',
   },
-  scrollContent: {
-    paddingTop: 24,
-    paddingBottom: 100,
+  searchIcon: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 1,
   },
-  sectionHeader: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontFamily: Fonts.lexend.bold,
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
+  searchInput: {
+    height: 52,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingLeft: 52,
+    paddingRight: 20,
     fontSize: 14,
-    fontFamily: Fonts.lexend.regular,
+    fontFamily: Fonts.lexend.medium,
+  },
+  scrollContent: {
+    paddingTop: 8,
   },
   courseList: {
-    paddingHorizontal: 16,
-    gap: 16,
+    paddingHorizontal: 24,
+    gap: 20,
   },
-  card: {
-    borderRadius: 20,
-    padding: 20,
+  courseCard: {
+    borderRadius: 32,
+    padding: 24,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
   },
-  cardTop: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  cardInfo: {
-    flex: 1,
+  codeTag: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255, 202, 13, 0.1)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginBottom: 8,
   },
-  cardTitle: {
-    fontSize: 18,
+  codeTagText: {
+    fontSize: 10,
     fontFamily: Fonts.lexend.bold,
-    marginBottom: 4,
+    color: '#FFCA0D',
+    letterSpacing: 1.5,
   },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  cardCode: {
-    fontSize: 12,
+  courseTitle: {
+    fontSize: 20,
     fontFamily: Fonts.lexend.bold,
-    letterSpacing: 1,
-  },
-  metaDot: {
-    fontSize: 12,
-  },
-  cardStudents: {
-    fontSize: 13,
-    fontFamily: Fonts.lexend.medium,
-  },
-  iconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    lineHeight: 24,
+    maxWidth: '90%',
   },
   attendanceSection: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   attendanceHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   attendanceLabel: {
     fontSize: 10,
     fontFamily: Fonts.lexend.bold,
+    color: 'rgba(255, 255, 255, 0.5)',
     letterSpacing: 1,
   },
   attendanceValue: {
     fontSize: 14,
     fontFamily: Fonts.lexend.bold,
+    color: '#FFCA0D',
   },
   progressBg: {
-    height: 8,
-    width: '100%',
-    borderRadius: 4,
+    height: 6,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: 4,
+    borderRadius: 3,
   },
-  detailsBtn: {
-    height: 40,
-    borderRadius: 10,
+  cardFooter: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 12,
   },
-  detailsBtnText: {
-    fontSize: 14,
+  studentBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 2,
+  },
+  studentBadgeText: {
+    fontSize: 9,
     fontFamily: Fonts.lexend.bold,
+    color: '#FFFFFF',
+  },
+  footerLabel: {
+    fontSize: 10,
+    fontFamily: Fonts.lexend.medium,
+    color: 'rgba(255, 255, 255, 0.4)',
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: 'rgba(255, 255, 255, 0.4)',
+    fontFamily: Fonts.lexend.medium,
   },
   fab: {
     position: 'absolute',
-    bottom: 24,
+    bottom: 100,
     right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 60,
+    height: 60,
+    borderRadius: 20,
+    backgroundColor: '#FFCA0D',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowColor: '#FFCA0D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 8,
   }
 });

@@ -6,12 +6,14 @@ from firebase_admin import credentials
 
 logger = logging.getLogger(__name__)
 
+from django.conf import settings
+
 def initialize_firebase():
     """Initialize Firebase Admin SDK if not already initialized."""
     if not firebase_admin._apps:
         try:
             # Try to load from file path
-            service_account_path = os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH')
+            service_account_path = getattr(settings, 'FIREBASE_SERVICE_ACCOUNT_PATH', os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH'))
             
             if service_account_path and os.path.exists(service_account_path):
                 cred = credentials.Certificate(service_account_path)
