@@ -49,7 +49,7 @@ class CheckInTests(TestCase):
             latitude=10.0, longitude=10.0, location_radius=50
         )
 
-    @patch('institutions.views.verify_location')
+    @patch('institutions.attendance_logic.verify_location')
     def test_check_in_success(self, mock_verify):
         # Mock verification to return True
         mock_verify.return_value = (True, 10.0)
@@ -61,12 +61,11 @@ class CheckInTests(TestCase):
         
         response = view(request, pk=self.session.id)
         
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.count(), 1)
         self.assertEqual(Attendance.objects.first().status, 'PRESENT')
 
-    @patch('institutions.views.verify_location')
+    @patch('institutions.attendance_logic.verify_location')
     def test_check_in_late(self, mock_verify):
         mock_verify.return_value = (True, 10.0)
         
@@ -81,11 +80,10 @@ class CheckInTests(TestCase):
         
         response = view(request, pk=self.session.id)
         
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.first().status, 'LATE')
 
-    @patch('institutions.views.verify_location')
+    @patch('institutions.attendance_logic.verify_location')
     def test_check_in_location_fail(self, mock_verify):
         # Mock verification to return False (too far)
         mock_verify.return_value = (False, 100.0)
@@ -101,12 +99,22 @@ class CheckInTests(TestCase):
         self.assertIn('too far', response.data['error'])
         self.assertEqual(Attendance.objects.count(), 0)
 
-    def test_duplicate_check_in(self):
+    @patch('institutions.attendance_logic.verify_location')
+    def test_duplicate_check_in(self, mock_verify):
+        mock_verify.return_value = (True, 10.0)
         # Create existing attendance
-        Attendance.objects.create(session=self.session, student=self.student)
+        Attendance.objects.create(
+            session=self.session,
+            student=self.student,
+            latitude=10.0,
+            longitude=10.0,
+            accuracy=10.0,
+            location_verified=True
+        )
         
         view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
-        request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/', {'code': self.session.session_code})
+        data = {'latitude': 10.0, 'longitude': 10.0, 'code': self.session.session_code}
+        request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/', data)
         force_authenticate(request, user=self.student)
         
         response = view(request, pk=self.session.id)
@@ -114,7 +122,7 @@ class CheckInTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('already checked in', response.data['error'])
 
-    @patch('institutions.views.verify_location')
+    @patch('institutions.attendance_logic.verify_location')
     def test_public_check_in_view(self, mock_verify):
         mock_verify.return_value = (True, 10.0)
         
@@ -124,6 +132,5 @@ class CheckInTests(TestCase):
         
         response = public_check_in_view(request, session_code=self.session.session_code)
         
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.count(), 1)
