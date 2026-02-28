@@ -18,17 +18,6 @@ def calculate_distance(
     """
     Calculate distance between two points using haversine formula.
     If elevations are provided, calculates 3D distance including vertical component.
-    
-    Args:
-        lat1: Latitude of first point
-        lon1: Longitude of first point
-        lat2: Latitude of second point
-        lon2: Longitude of second point
-        elevation1: Elevation of first point in meters (optional)
-        elevation2: Elevation of second point in meters (optional)
-    
-    Returns:
-        Distance in meters
     """
     # Calculate horizontal distance
     horizontal_distance = haversine(
@@ -52,7 +41,7 @@ def point_in_polygon(point: Tuple[float, float], polygon: List[List[float]]) -> 
     
     Args:
         point: Tuple of (latitude, longitude)
-        polygon: List of [latitude, longitude] coordinate pairs defining the polygon
+        polygon: List of [longitude, latitude] coordinate pairs defining the polygon
     
     Returns:
         True if point is inside polygon, False otherwise
@@ -64,23 +53,26 @@ def point_in_polygon(point: Tuple[float, float], polygon: List[List[float]]) -> 
     inside = False
     
     n = len(polygon)
-    p1_lat, p1_lon = polygon[0]
+
+    # polygon is [[lng, lat], [lng, lat], ...]
+    p1_lon, p1_lat = polygon[0]
     
     for i in range(1, n + 1):
-        p2_lat, p2_lon = polygon[i % n]
+        p2_lon, p2_lat = polygon[i % n]
         
-        # Check if point's longitude is between the two vertices' longitudes
-        if min(p1_lon, p2_lon) < lon <= max(p1_lon, p2_lon):
-            # Calculate the x-coordinate of polygon edge at point's longitude
-            if p2_lon != p1_lon:  # Avoid division by zero
+        # Check if point's latitude is between the two vertices' latitudes
+        if min(p1_lat, p2_lat) < lat <= max(p1_lat, p2_lat):
+            # Calculate the longitude of polygon edge at point's latitude
+            if p2_lat != p1_lat:  # Avoid division by zero
                 # Calculate where the horizontal ray at 'lat' intersects the edge
-                x_intersection = p1_lat + (lon - p1_lon) * (p2_lat - p1_lat) / (p2_lon - p1_lon)
+                # (lon - p1_lon) / (p2_lon - p1_lon) = (lat - p1_lat) / (p2_lat - p1_lat)
+                lon_intersection = p1_lon + (lat - p1_lat) * (p2_lon - p1_lon) / (p2_lat - p1_lat)
                 
-                # If point is to the left of the intersection, toggle inside/outside
-                if lat <= x_intersection:
+                # If point's longitude is to the left of the intersection, toggle inside/outside
+                if lon <= lon_intersection:
                     inside = not inside
         
-        p1_lat, p1_lon = p2_lat, p2_lon
+        p1_lon, p1_lat = p2_lon, p2_lat
     
     return inside
 
@@ -98,19 +90,6 @@ def verify_location(
     """
     Verify if student's location is within acceptable range of venue.
     Uses polygon boundary if available, otherwise uses radius-based verification.
-    
-    Args:
-        student_lat: Student's latitude
-        student_lon: Student's longitude
-        student_elevation: Student's elevation in meters (optional)
-        venue_lat: Venue center latitude
-        venue_lon: Venue center longitude
-        venue_elevation: Venue elevation in meters (optional)
-        boundary_coords: Polygon boundary coordinates [[lat, lng], ...] (optional)
-        radius: Verification radius in meters (used if no boundary)
-    
-    Returns:
-        Tuple of (is_verified: bool, distance_from_center: float)
     """
     # Calculate distance from venue center
     distance = calculate_distance(
@@ -139,26 +118,3 @@ def verify_location(
         # Use radius-based verification
         is_verified = distance <= radius
         return (is_verified, distance)
-
-
-def get_elevation_tolerance(venue_elevation: Optional[float]) -> float:
-    """
-    Get acceptable elevation tolerance based on venue elevation.
-    Buildings at higher elevations may need more tolerance.
-    
-    Args:
-        venue_elevation: Venue elevation in meters
-    
-    Returns:
-        Tolerance in meters
-    """
-    if venue_elevation is None:
-        return 10.0  # Default 10 meters tolerance
-    
-    # Increase tolerance slightly at higher elevations
-    if venue_elevation > 1000:
-        return 15.0
-    elif venue_elevation > 500:
-        return 12.0
-    else:
-        return 10.0

@@ -4,7 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAttendance } from '@/contexts/AttendanceContext';
-import { ChevronLeft, CheckCircle, Keyboard, QrCode as QrIcon, Camera, X } from 'lucide-react-native';
+import { ChevronLeft, CheckCircle, Keyboard, QrCode as QrIcon, Camera, X, Navigation } from 'lucide-react-native';
 import { CustomModal } from '@/components/CustomModal';
 import Fonts from '@/constants/fonts';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -12,6 +12,13 @@ import { api } from '@/services/api';
 import * as Location from 'expo-location';
 
 const { width, height } = Dimensions.get('window');
+
+interface LocationSample {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    timestamp: number;
+}
 
 export default function MarkAttendanceScreen() {
   const router = useRouter();
@@ -21,8 +28,11 @@ export default function MarkAttendanceScreen() {
   const [activeTab, setActiveTab] = useState<'qr' | 'code'>(tab === 'code' ? 'code' : 'qr');
   const [permission, requestPermission] = useCameraPermissions();
   
-    const [sessionCode, setSessionCode] = useState<string[]>(new Array(8).fill(''));
+  const [sessionCode, setSessionCode] = useState<string[]>(new Array(8).fill(''));
   const [processing, setProcessing] = useState<boolean>(false);
+  const [samplingProgress, setSamplingProgress] = useState<number>(0);
+  const [samplingStatus, setSamplingStatus] = useState<string>('');
+
   const inputs = useRef<TextInput[]>([]);
 
   const [scannedSession, setScannedSession] = useState<any>(null);
@@ -95,25 +105,52 @@ export default function MarkAttendanceScreen() {
 
     try {
         setProcessing(true);
+        setSamplingProgress(0);
 
-        let locationData = undefined;
-        if (scannedSession.require_gps) {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                showAlert('Permission Denied', 'Location access is required for this session', 'error');
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            showAlert('Permission Denied', 'Location access is required for this session', 'error');
+            setProcessing(false);
+            return;
+        }
+
+        const samples: LocationSample[] = [];
+        setSamplingStatus('Stabilizing GPS...');
+
+        for (let i = 0; i < 4; i++) {
+            setSamplingStatus(`Collecting samples (${i + 1}/4)...`);
+
+            const loc = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.High,
+            });
+
+            if (loc.coords.accuracy && loc.coords.accuracy > 30) {
+                showAlert('Low Accuracy', `GPS accuracy too low (${Math.round(loc.coords.accuracy)}m). Please move near a window or outdoors.`, 'error');
                 setProcessing(false);
                 return;
             }
-            const loc = await Location.getCurrentPositionAsync({});
-            locationData = {
+
+            samples.push({
                 latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude
-            };
+                longitude: loc.coords.longitude,
+                accuracy: loc.coords.accuracy || 0,
+                timestamp: loc.timestamp
+            });
+
+            setSamplingProgress((i + 1) / 4);
+
+            if (i < 3) {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+            }
         }
 
-        const response = await api.checkIn.mark(scannedSession.code, { location: locationData });
+        setSamplingStatus('Verifying on server...');
+        const response = await api.checkIn.mark(scannedSession.code, {
+            samples,
+            course_id: scannedSession.course_id
+        });
 
-        if (response.success || response.id) {
+        if (response.success || response.id || response.status === 'success') {
             refreshData();
             router.push({
               pathname: '/(student)/attendance-success',
@@ -127,14 +164,17 @@ export default function MarkAttendanceScreen() {
         }
     } catch (e: any) {
         console.error(e);
-        showAlert('Verification Failed', e.response?.data?.detail || 'Could not verify your presence. Please ensure you are within the venue.', 'error');
+        const errorMsg = e.response?.data?.reason || e.response?.data?.error || 'Could not verify your presence. Please ensure you are within the venue.';
+        showAlert('Verification Failed', errorMsg, 'error');
     } finally {
         setProcessing(false);
+        setSamplingStatus('');
+        setSamplingProgress(0);
     }
   };
 
   const fullCode = sessionCode.join('');
-    const isValidCode = fullCode.length === 8;
+  const isValidCode = fullCode.length === 8;
 
   if (activeTab === 'qr') {
     return (
@@ -193,37 +233,51 @@ export default function MarkAttendanceScreen() {
                 </View>
             </SafeAreaView>
 
-            <Modal visible={showConfirmModal} transparent animationType="fade">
+            <Modal visible={showConfirmModal || (processing && samplingProgress > 0)} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
                     <View style={[styles.confirmCard, { backgroundColor: isDark ? '#2d281a' : '#FFF' }]}>
-                        <View style={styles.confirmHeader}>
-                            <View style={[styles.iconWrap, { backgroundColor: colors.primary + '1A' }]}>
-                                <CheckCircle size={32} color={colors.primary} />
-                            </View>
-                            <TouchableOpacity onPress={() => setShowConfirmModal(false)}>
-                                <X size={24} color="#999" />
-                            </TouchableOpacity>
-                        </View>
+                        {processing && samplingProgress > 0 ? (
+                             <View style={styles.samplingContainer}>
+                                <ActivityIndicator size="large" color={colors.primary} />
+                                <Text style={[styles.confirmTitle, { color: colors.text, textAlign: 'center' }]}>Security Check</Text>
+                                <Text style={[styles.detailValue, { color: colors.text, textAlign: 'center' }]}>{samplingStatus}</Text>
+                                <View style={styles.progressBarContainer}>
+                                    <View style={[styles.progressBar, { width: `${samplingProgress * 100}%`, backgroundColor: colors.primary }]} />
+                                </View>
+                                <Text style={styles.qrHint}>Hold still while we verify your location stability</Text>
+                             </View>
+                        ) : (
+                            <>
+                                <View style={styles.confirmHeader}>
+                                    <View style={[styles.iconWrap, { backgroundColor: colors.primary + '1A' }]}>
+                                        <CheckCircle size={32} color={colors.primary} />
+                                    </View>
+                                    <TouchableOpacity onPress={() => setShowConfirmModal(false)}>
+                                        <X size={24} color="#999" />
+                                    </TouchableOpacity>
+                                </View>
 
-                        <Text style={[styles.confirmTitle, { color: colors.text }]}>Confirm Attendance</Text>
-                        <View style={styles.sessionDetails}>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Course</Text>
-                                <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.course_code} - {scannedSession?.course_name}</Text>
-                            </View>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Venue</Text>
-                                <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.venue_name || 'Main Campus'}</Text>
-                            </View>
-                        </View>
+                                <Text style={[styles.confirmTitle, { color: colors.text }]}>Confirm Attendance</Text>
+                                <View style={styles.sessionDetails}>
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailLabel}>Course</Text>
+                                        <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.course_code} - {scannedSession?.course_name}</Text>
+                                    </View>
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailLabel}>Venue</Text>
+                                        <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.venue_name || 'Main Campus'}</Text>
+                                    </View>
+                                </View>
 
-                        <TouchableOpacity
-                            style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
-                            onPress={handleFinalCheckIn}
-                            disabled={processing}
-                        >
-                            {processing ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.confirmBtnText}>Confirm Presence</Text>}
-                        </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
+                                    onPress={handleFinalCheckIn}
+                                    disabled={processing}
+                                >
+                                    {processing ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.confirmBtnText}>Confirm Presence</Text>}
+                                </TouchableOpacity>
+                            </>
+                        )}
                     </View>
                 </View>
             </Modal>
@@ -289,37 +343,51 @@ export default function MarkAttendanceScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <Modal visible={showConfirmModal} transparent animationType="fade">
+      <Modal visible={showConfirmModal || (processing && samplingProgress > 0)} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
                     <View style={[styles.confirmCard, { backgroundColor: isDark ? '#2d281a' : '#FFF' }]}>
-                        <View style={styles.confirmHeader}>
-                            <View style={[styles.iconWrap, { backgroundColor: colors.primary + '1A' }]}>
-                                <CheckCircle size={32} color={colors.primary} />
-                            </View>
-                            <TouchableOpacity onPress={() => setShowConfirmModal(false)}>
-                                <X size={24} color="#999" />
-                            </TouchableOpacity>
-                        </View>
+                        {processing && samplingProgress > 0 ? (
+                             <View style={styles.samplingContainer}>
+                                <ActivityIndicator size="large" color={colors.primary} />
+                                <Text style={[styles.confirmTitle, { color: colors.text, textAlign: 'center' }]}>Security Check</Text>
+                                <Text style={[styles.detailValue, { color: colors.text, textAlign: 'center', marginVertical: 10 }]}>{samplingStatus}</Text>
+                                <View style={styles.progressBarContainer}>
+                                    <View style={[styles.progressBar, { width: `${samplingProgress * 100}%`, backgroundColor: colors.primary }]} />
+                                </View>
+                                <Text style={[styles.qrHint, { color: isDark ? '#999' : '#666' }]}>Hold still while we verify your location stability</Text>
+                             </View>
+                        ) : (
+                            <>
+                                <View style={styles.confirmHeader}>
+                                    <View style={[styles.iconWrap, { backgroundColor: colors.primary + '1A' }]}>
+                                        <CheckCircle size={32} color={colors.primary} />
+                                    </View>
+                                    <TouchableOpacity onPress={() => setShowConfirmModal(false)}>
+                                        <X size={24} color="#999" />
+                                    </TouchableOpacity>
+                                </View>
 
-                        <Text style={[styles.confirmTitle, { color: colors.text }]}>Confirm Attendance</Text>
-                        <View style={styles.sessionDetails}>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Course</Text>
-                                <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.course_code} - {scannedSession?.course_name}</Text>
-                            </View>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Venue</Text>
-                                <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.venue_name || 'Main Campus'}</Text>
-                            </View>
-                        </View>
+                                <Text style={[styles.confirmTitle, { color: colors.text }]}>Confirm Attendance</Text>
+                                <View style={styles.sessionDetails}>
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailLabel}>Course</Text>
+                                        <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.course_code} - {scannedSession?.course_name}</Text>
+                                    </View>
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailLabel}>Venue</Text>
+                                        <Text style={[styles.detailValue, { color: colors.text }]}>{scannedSession?.venue_name || 'Main Campus'}</Text>
+                                    </View>
+                                </View>
 
-                        <TouchableOpacity
-                            style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
-                            onPress={handleFinalCheckIn}
-                            disabled={processing}
-                        >
-                            {processing ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.confirmBtnText}>Confirm Presence</Text>}
-                        </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
+                                    onPress={handleFinalCheckIn}
+                                    disabled={processing}
+                                >
+                                    {processing ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.confirmBtnText}>Confirm Presence</Text>}
+                                </TouchableOpacity>
+                            </>
+                        )}
                     </View>
                 </View>
             </Modal>
@@ -372,5 +440,8 @@ const styles = StyleSheet.create({
   detailLabel: { fontSize: 10, fontFamily: Fonts.lexend.bold, color: '#999', textTransform: 'uppercase' },
   detailValue: { fontSize: 16, fontFamily: Fonts.lexend.medium },
   confirmBtn: { height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 12 },
-  confirmBtnText: { fontSize: 16, fontFamily: Fonts.lexend.bold, color: '#0A0A0A' }
+  confirmBtnText: { fontSize: 16, fontFamily: Fonts.lexend.bold, color: '#0A0A0A' },
+  samplingContainer: { alignItems: 'center', padding: 10 },
+  progressBarContainer: { width: '100%', height: 6, backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 3, marginVertical: 20, overflow: 'hidden' },
+  progressBar: { height: '100%', borderRadius: 3 }
 });

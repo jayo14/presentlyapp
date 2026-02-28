@@ -80,7 +80,7 @@ export const AttendanceDashboard: React.FC = () => {
     setSessionInfo(prev => ({
       ...prev,
       code: newCode,
-      qrData: \`https://presentlyapp.vercel.app/check-in/\${newCode}\`
+      qrData: `https://presentlyapp.vercel.app/check-in/${newCode}`
     }));
   };
 
@@ -100,7 +100,7 @@ export const AttendanceDashboard: React.FC = () => {
   const handleEndSession = () => {
     if (confirm('Are you sure you want to end this session?')) {
       setSessionInfo(prev => ({ ...prev, status: 'ended' }));
-      setTimeout(() => navigate(\`/dashboard/sessions/\${sessionId}/report\`), 2000);
+      setTimeout(() => navigate(`/dashboard/sessions/${sessionId}/report`), 2000);
     }
   };
 
@@ -148,19 +148,19 @@ export const AttendanceDashboard: React.FC = () => {
               <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
                 {sessionInfo.courseCode} - Live Session
               </h1>
-              <span className={\`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 \${
+              <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${
                 sessionInfo.status === 'active' ? 'bg-green-500/10 text-green-600' :
                 sessionInfo.status === 'paused' ? 'bg-yellow-500/10 text-yellow-600' :
                 'bg-red-500/10 text-red-600'
-              }\`}>
-                <Circle size={8} className={\`fill-current \${sessionInfo.status === 'active' ? 'animate-pulse' : ''}\`} />
+              }`}>
+                <Circle size={8} className={`fill-current ${sessionInfo.status === 'active' ? 'animate-pulse' : ''}`} />
                 {sessionInfo.status === 'active' ? 'Active' : sessionInfo.status === 'paused' ? 'Paused' : 'Ended'}
               </span>
             </div>
             <p className="text-text-secondary text-sm">{sessionInfo.courseName}</p>
           </div>
           <Button onClick={handleRefreshData} variant="secondary" size="sm" disabled={refreshing} className="hidden md:flex">
-            <RefreshCw size={16} className={\`mr-2 \${refreshing ? 'animate-spin' : ''}\`} />
+            <RefreshCw size={16} className={`mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -215,14 +215,14 @@ export const AttendanceDashboard: React.FC = () => {
                 <button
                   key={status}
                   onClick={() => setFilterStatus(status as any)}
-                  className={\`px-3 py-1.5 rounded-lg text-sm font-medium capitalize \${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize ${
                     filterStatus === status
                       ? 'bg-primary text-white'
                       : 'bg-zinc-100 dark:bg-zinc-800 text-text-secondary'
-                  }\`}
+                  }`}
                 >
                   {status}
-                  {status !== 'all' && \`(\${status === 'present' ? presentCount : status === 'absent' ? absentCount : pendingCount})\`}
+                  {status !== 'all' && `(${status === 'present' ? presentCount : status === 'absent' ? absentCount : pendingCount})`}
                 </button>
               ))}
             </div>
@@ -237,7 +237,7 @@ export const AttendanceDashboard: React.FC = () => {
             {filteredStudents.map(student => (
               <div key={student.id} className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
-                  <div className={\`p-2 rounded-lg \${getStatusColor(student.status)}\`}>
+                  <div className={`p-2 rounded-lg ${getStatusColor(student.status)}`}>
                     {getStatusIcon(student.status)}
                   </div>
                   <div className="flex-1 min-w-0">
