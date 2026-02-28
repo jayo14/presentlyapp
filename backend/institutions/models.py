@@ -36,7 +36,7 @@ class Institution(models.Model):
     short_name = models.TextField(unique=True)  # e.g., "OAU", "UNILAG"
     abbreviation = models.TextField(unique=True)
     description = models.TextField(blank=True, null=True)
-    website_url = models.URLField(blank=True, null=True)
+    website_url = models.URLField(max_length=500, blank=True, null=True)
     contact_email = models.EmailField(blank=True, null=True)
     contact_phone = models.CharField(max_length=20, blank=True, null=True)
     
@@ -54,8 +54,8 @@ class Institution(models.Model):
     established_year = models.IntegerField(blank=True, null=True)
     institution_type = models.CharField(max_length=20, choices=INSTITUTION_TYPES, blank=True, null=True)
     accreditation_status = models.CharField(max_length=20, choices=ACCREDITATION_STATUS, blank=True, null=True)
-    logo_url = models.URLField(blank=True, null=True)
-    cover_image_url = models.URLField(blank=True, null=True)
+    logo_url = models.URLField(max_length=500, blank=True, null=True)
+    cover_image_url = models.URLField(max_length=500, blank=True, null=True)
     
     # Metadata
     is_active = models.BooleanField(default=True)
@@ -88,7 +88,7 @@ class College(models.Model):
     dean_email = models.EmailField(blank=True, null=True)
     contact_email = models.EmailField(blank=True, null=True)
     contact_phone = models.CharField(max_length=20, blank=True, null=True)
-    website_url = models.URLField(blank=True, null=True)
+    website_url = models.URLField(max_length=500, blank=True, null=True)
     
     # Location within institution
     building_block = models.CharField(max_length=100, blank=True, null=True)
@@ -96,7 +96,7 @@ class College(models.Model):
     
     # Metadata
     established_year = models.IntegerField(blank=True, null=True)
-    logo_url = models.URLField(blank=True, null=True)
+    logo_url = models.URLField(max_length=500, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -136,14 +136,14 @@ class Department(models.Model):
     contact_email = models.EmailField(blank=True, null=True)
     contact_phone = models.CharField(max_length=20, blank=True, null=True)
     office_location = models.CharField(max_length=200, blank=True, null=True)
-    website_url = models.URLField(blank=True, null=True)
+    website_url = models.URLField(max_length=500, blank=True, null=True)
     
     # Academic details
     established_year = models.IntegerField(blank=True, null=True)
     accreditation_status = models.CharField(max_length=20, choices=ACCREDITATION_STATUS, blank=True, null=True)
     
     # Metadata
-    logo_url = models.URLField(blank=True, null=True)
+    logo_url = models.URLField(max_length=500, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -197,14 +197,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, validators=[EmailValidator()])
     full_name = models.CharField(max_length=200)
     role = models.CharField(max_length=20, choices=UserRole.choices, default=UserRole.STUDENT)
-    avatar_url = models.URLField(blank=True, null=True)
+    avatar_url = models.URLField(max_length=500, blank=True, null=True)
     signup_method = models.CharField(
         max_length=20,
         choices=[('email', 'Email'), ('google', 'Google')],
         default='email'
     )
-    profile_image = models.URLField(blank=True, null=True, help_text="User's profile picture URL")
-    cover_image = models.URLField(blank=True, null=True, help_text="User's cover/banner image URL")
+    profile_image = models.URLField(max_length=500, blank=True, null=True, help_text="User's profile picture URL")
+    cover_image = models.URLField(max_length=500, blank=True, null=True, help_text="User's cover/banner image URL")
     onboarding_complete = models.BooleanField(default=False)
     
     # Email verification
@@ -517,7 +517,7 @@ class AttendanceSession(models.Model):
     expiry_time = models.DateTimeField(blank=True, null=True, help_text="Time when the session code expires")
     
     # QR code data (will store URL for external access)
-    qr_code_url = models.URLField(blank=True, null=True, help_text="URL that the QR code points to")
+    qr_code_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL that the QR code points to")
     
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
