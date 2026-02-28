@@ -506,6 +506,7 @@ class AttendanceSession(models.Model):
     # Location for geo-fencing (can override venue location)
     latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True)
+    accuracy = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="GPS accuracy in meters")
     location_radius = models.IntegerField(default=100, help_text="Radius in meters for geo-fencing")
     
     # Session metadata
@@ -614,6 +615,7 @@ class Attendance(models.Model):
     # Location verification with elevation support
     latitude = models.DecimalField(max_digits=10, decimal_places=8, blank=True, null=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, blank=True, null=True)
+    accuracy = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="GPS accuracy in meters")
     elevation = models.DecimalField(
         max_digits=8, 
         decimal_places=2, 
