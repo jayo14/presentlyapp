@@ -17,6 +17,8 @@ import { Login } from './components/Auth/Login';
 import { Register } from './components/Auth/Register';
 import { Layout } from './components/Layout';
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
+import { DocumentationPage } from './components/DocumentationPage';
+import { VolunteersPage } from './components/VolunteersPage';
 
 // Lazy load less critical components
 const Onboarding = lazy(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
@@ -184,6 +186,8 @@ const AppContent: React.FC = () => {
       <main id="main-content">
         <Routes>
           <Route path="/" element={<LandingPage onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />} />
+          <Route path="/documentation" element={<DocumentationPage />} />
+          <Route path="/volunteers" element={<VolunteersPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
