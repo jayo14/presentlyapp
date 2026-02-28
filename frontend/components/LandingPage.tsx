@@ -80,6 +80,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
             <button onClick={() => scrollToSection('solutions')} className="hover:text-white transition-colors">Solutions</button>
             <button onClick={() => scrollToSection('security')} className="hover:text-white transition-colors">System Metrics</button>
             <button onClick={() => scrollToSection('pricing')} className="hover:text-white transition-colors">Pricing</button>
+            <button onClick={() => navigate('/documentation')} className="hover:text-white transition-colors">Documentation</button>
+            <button onClick={() => navigate('/volunteers')} className="hover:text-white transition-colors">Volunteers</button>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
@@ -122,6 +124,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
               <button onClick={() => scrollToSection('solutions')} className="block w-full text-left py-2 text-zinc-400">Solutions</button>
               <button onClick={() => scrollToSection('security')} className="block w-full text-left py-2 text-zinc-400">System Metrics</button>
               <button onClick={() => scrollToSection('pricing')} className="block w-full text-left py-2 text-zinc-400">Pricing</button>
+              <button onClick={() => navigate('/documentation')} className="block w-full text-left py-2 text-zinc-400">Documentation</button>
+              <button onClick={() => navigate('/volunteers')} className="block w-full text-left py-2 text-zinc-400">Volunteers</button>
               <div className="pt-4 border-t border-zinc-800 flex flex-col gap-3">
                 {user ? (
                   <Button onClick={handleDashboardClick} className="w-full justify-center">
@@ -181,7 +185,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
               <Button size="lg" onClick={onGetStarted} className="h-14 px-8 text-lg rounded-full w-full sm:w-auto">
                 Request Demo
               </Button>
-              <Button variant="secondary" size="lg" className="h-14 px-8 text-lg rounded-full w-full sm:w-auto gap-2 bg-transparent border-white/20 text-white hover:bg-white/5">
+              <Button variant="secondary" size="lg" onClick={() => navigate('/documentation')} className="h-14 px-8 text-lg rounded-full w-full sm:w-auto gap-2 bg-transparent border-white/20 text-white hover:bg-white/5">
                 View Documentation
               </Button>
             </motion.div>
