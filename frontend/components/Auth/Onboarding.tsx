@@ -1,11 +1,13 @@
 import React, { useReducer, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
 import { UserRole, Course, Institution, College, Department } from '../../types';
 import { useCompleteOnboarding, useCurrentUser } from '../../hooks/useAuth';
 import { coursesApi } from '../../services/api';
+import { authApi } from '../../services/api/auth';
 import { institutionsApi } from '../../services/api/institutions';
 import { 
   User, Bell, MapPin, Check, Upload, 
@@ -225,6 +227,14 @@ export const Onboarding: React.FC = () => {
   const [state, dispatch] = useReducer(onboardingReducer, initialState);
   const { data: user } = useCurrentUser();
   const completeOnboardingMutation = useCompleteOnboarding();
+  const navigate = useNavigate();
+
+  // Redirect users who have already completed onboarding
+  useEffect(() => {
+    if (user?.onboarding_complete) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   // Cache utilities
   const getFromCache = <T,>(key: string): T | null => {
@@ -470,7 +480,23 @@ export const Onboarding: React.FC = () => {
       // Complete onboarding
       if (state.selectedRole) {
         dispatch({ type: 'SET_ERROR', payload: '' });
-        
+
+        // If the profile image is a base64 data-URI, upload it to Cloudinary first
+        let avatarUrl: string | undefined;
+        if (state.profileImage) {
+          if (state.profileImage.startsWith('data:')) {
+            try {
+              avatarUrl = await authApi.uploadAvatar(state.profileImage);
+            } catch (err: any) {
+              dispatch({ type: 'SET_ERROR', payload: err.message || 'Failed to upload profile photo. Please try again.' });
+              return;
+            }
+          } else {
+            // Already a remote URL (e.g. Google avatar)
+            avatarUrl = state.profileImage;
+          }
+        }
+
         // Prepare onboarding data
         const onboardingData = {
           role: state.selectedRole,
@@ -483,7 +509,7 @@ export const Onboarding: React.FC = () => {
           assigned_lecturer: state.formData.assignedLecturer || undefined,
           institution: state.selectedInstitution || undefined,
           college: state.selectedCollege || undefined,
-          avatar_url: state.profileImage || undefined,
+          avatar_url: avatarUrl,
           notifications_enabled: state.permissions.notifications,
           location_enabled: state.permissions.location,
           dark_mode: state.permissions.darkMode,

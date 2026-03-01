@@ -295,6 +295,11 @@ REPORTS_DIR.mkdir(exist_ok=True)
 # Exam Clearance Settings
 EXAM_CLEARANCE_THRESHOLD = 75  # Minimum attendance percentage for exam clearance
 
+# Cloudinary Configuration (for avatar/image uploads)
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
+
 # Django Location Field Configuration
 LOCATION_FIELD = {
     'provider.google.api': '//maps.google.com/maps/api/js?sensor=false',
