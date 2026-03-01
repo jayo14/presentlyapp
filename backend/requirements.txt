@@ -7,6 +7,7 @@ CacheControl==0.14.4
 cachetools==6.2.4
 celery==5.4.0
 certifi==2025.11.12
+cloudinary==1.42.1
 cffi==2.0.0
 chardet==5.2.0
 charset-normalizer==3.4.4
