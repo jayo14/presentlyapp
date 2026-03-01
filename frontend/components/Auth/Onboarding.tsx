@@ -637,8 +637,8 @@ export const Onboarding: React.FC = () => {
       <div className="space-y-6">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-zinc-900 mb-2">How will you use Presently?</h2>
-          <p className="text-zinc-600">Select your role to get started</p>
-          <p className="text-xs text-zinc-500 mt-2">Step 1 of {totalSteps}</p>
+          <p className="text-zinc-700">Select your role to get started</p>
+          <p className="text-xs text-zinc-600 mt-2">Step 1 of {totalSteps}</p>
         </div>
         
         <div className="grid gap-4">
@@ -649,20 +649,20 @@ export const Onboarding: React.FC = () => {
               className={`flex flex-col p-5 rounded-xl border-2 transition-all w-full text-left group hover:shadow-md
                 ${state.selectedRole === role.id 
                   ? 'border-primary bg-primary/10 shadow-md' 
-                  : 'border-zinc-200 bg-white hover:border-primary/30'
+                  : 'border-zinc-300 bg-zinc-50 hover:border-primary/30'
                 }`}
             >
               <div className="flex items-start gap-4 mb-3">
-                <div className={`p-3 rounded-xl transition-colors ${state.selectedRole === role.id ? 'bg-primary text-white' : 'bg-zinc-100 text-zinc-600 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                <div className={`p-3 rounded-xl transition-colors ${state.selectedRole === role.id ? 'bg-primary text-white' : 'bg-zinc-200 text-zinc-700 group-hover:bg-primary/10 group-hover:text-primary'}`}>
                   <role.icon size={28} />
                 </div>
                 <div className="flex-1">
                   <p className={`text-lg font-bold transition-colors mb-1 ${state.selectedRole === role.id ? 'text-primary' : 'text-zinc-900'}`}>
                     {role.label}
                   </p>
-                  <p className="text-sm text-zinc-600 leading-relaxed">{role.desc}</p>
+                  <p className="text-sm text-zinc-700 leading-relaxed">{role.desc}</p>
                 </div>
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-300'}`}>
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-400'}`}>
                    {state.selectedRole === role.id && <Check size={16} className="text-white" />}
                 </div>
               </div>
@@ -672,7 +672,7 @@ export const Onboarding: React.FC = () => {
                 {role.features.map((feature, idx) => (
                   <span 
                     key={idx}
-                    className={`text-xs px-2 py-1 rounded-full ${state.selectedRole === role.id ? 'bg-primary/20 text-primary' : 'bg-zinc-100 text-zinc-600'}`}
+                    className={`text-xs px-2 py-1 rounded-full ${state.selectedRole === role.id ? 'bg-primary/20 text-primary' : 'bg-zinc-200 text-zinc-700'}`}
                   >
                     {feature}
                   </span>
@@ -689,18 +689,18 @@ export const Onboarding: React.FC = () => {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-zinc-900 mb-2">Personal Details</h2>
-        <p className="text-zinc-600">Let's set up your profile.</p>
+        <p className="text-zinc-700">Let's set up your profile.</p>
       </div>
 
       <div className="flex flex-col items-center mb-8 gap-4">
         <div className="relative group cursor-pointer">
-           <div className="w-28 h-28 rounded-full bg-zinc-100 overflow-hidden border-4 border-zinc-200 ring-2 ring-zinc-100 group-hover:ring-primary transition-all">
+           <div className="w-28 h-28 rounded-full bg-zinc-200 overflow-hidden border-4 border-zinc-300 ring-2 ring-zinc-200 group-hover:ring-primary transition-all">
               {state.pendingImage ? (
                   <img src={state.pendingImage} alt="Preview" className="w-full h-full object-cover opacity-80" />
               ) : state.profileImage ? (
                   <img src={state.profileImage} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                  <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                  <div className="w-full h-full flex items-center justify-center text-zinc-500">
                       <User size={40} />
                   </div>
               )}
@@ -769,7 +769,7 @@ export const Onboarding: React.FC = () => {
         <h3 className="text-3xl md:text-4xl font-black text-text-primary dark:text-dark-text-primary mb-3">
           Link your Institution
         </h3>
-        <p className="text-sm text-[#8B7355] dark:text-dark-text-secondary">
+        <p className="text-sm text-zinc-600 dark:text-dark-text-secondary">
           Almost there! Select your specific academic location to finalize your profile.
         </p>
       </div>
@@ -918,9 +918,9 @@ export const Onboarding: React.FC = () => {
         {state.selectedRole === UserRole.STUDENT && (
              <div className="w-full">
                  <label className="block text-sm font-medium text-zinc-700 mb-1.5">Digital Signature <span className="text-zinc-500 font-normal">(Optional)</span></label>
-                 <div className="border border-dashed border-zinc-300 bg-zinc-50 rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-100 hover:border-primary/50 cursor-pointer transition-colors group">
-                    <Upload className="h-6 w-6 text-zinc-400 group-hover:text-primary mb-2 transition-colors" />
-                    <p className="text-xs text-zinc-500 group-hover:text-zinc-700">Upload signature image</p>
+                 <div className="border border-dashed border-zinc-400 bg-zinc-100 rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-200 hover:border-primary/50 cursor-pointer transition-colors group">
+                    <Upload className="h-6 w-6 text-zinc-500 group-hover:text-primary mb-2 transition-colors" />
+                    <p className="text-xs text-zinc-600 group-hover:text-zinc-800">Upload signature image</p>
                  </div>
             </div>
         )}
@@ -966,7 +966,7 @@ export const Onboarding: React.FC = () => {
     <div className="space-y-6 h-full flex flex-col">
       <div className="text-center mb-4">
         <h2 className="text-2xl font-bold text-zinc-900 mb-2">Register Courses</h2>
-        <p className="text-zinc-600">Select courses to add to your dashboard.</p>
+        <p className="text-zinc-700">Select courses to add to your dashboard.</p>
       </div>
 
       {state.coursesLoading ? (
@@ -1000,32 +1000,32 @@ export const Onboarding: React.FC = () => {
                         className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
                             isSelected 
                                 ? 'bg-primary/10 border-primary shadow-md' 
-                                : 'bg-white border-zinc-300 hover:border-zinc-400 hover:shadow-sm'
+                                : 'bg-zinc-50 border-zinc-300 hover:border-zinc-400 hover:shadow-sm'
                         }`}
                     >
                         <div className="text-left">
                             <div className="flex items-center gap-2">
                                  <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-zinc-900'}`}>{course.code}</span>
                                  {course.level && (
-                                   <span className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded">{course.level}L</span>
+                                   <span className="text-[10px] bg-zinc-200 text-zinc-700 px-1.5 py-0.5 rounded">{course.level}L</span>
                                  )}
                             </div>
-                            <p className="text-xs text-zinc-600 mt-1">{course.title}</p>
+                            <p className="text-xs text-zinc-700 mt-1">{course.title}</p>
                             {course.lecturer_name && (
-                              <p className="text-[10px] text-zinc-500 mt-0.5">{course.lecturer_name}</p>
+                              <p className="text-[10px] text-zinc-600 mt-0.5">{course.lecturer_name}</p>
                             )}
                         </div>
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
-                            isSelected ? 'bg-primary border-primary text-white' : 'border-zinc-300 bg-transparent'
+                            isSelected ? 'bg-primary border-primary text-white' : 'border-zinc-400 bg-transparent'
                         }`}>
-                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-400" />}
+                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-500" />}
                         </div>
                     </button>
                 );
             })}
           </div>
           
-          <div className="text-center text-xs text-zinc-500 pt-2">
+          <div className="text-center text-xs text-zinc-600 pt-2">
             You selected {state.selectedCourses.length} courses.
           </div>
         </>
@@ -1037,7 +1037,7 @@ export const Onboarding: React.FC = () => {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-zinc-900 mb-2">Permissions</h2>
-        <p className="text-zinc-600">Customize your app experience.</p>
+        <p className="text-zinc-700">Customize your app experience.</p>
       </div>
 
       <div className="space-y-3">
@@ -1070,19 +1070,19 @@ export const Onboarding: React.FC = () => {
                 className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all
                     ${item.state 
                         ? 'bg-white border-primary/30 shadow-sm' 
-                        : 'bg-zinc-50 border-zinc-200 hover:bg-white'
+                        : 'bg-zinc-100 border-zinc-300 hover:bg-white'
                     }`}
             >
                 <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-white' : 'bg-zinc-200 text-zinc-600'}`}>
+                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-white' : 'bg-zinc-300 text-zinc-700'}`}>
                         <item.icon size={20} />
                     </div>
                     <div className="text-left">
-                        <p className={`font-medium transition-colors ${item.state ? 'text-zinc-900' : 'text-zinc-600'}`}>{item.label}</p>
-                        <p className="text-xs text-zinc-500">{item.desc}</p>
+                        <p className={`font-medium transition-colors ${item.state ? 'text-zinc-900' : 'text-zinc-800'}`}>{item.label}</p>
+                        <p className="text-xs text-zinc-600">{item.desc}</p>
                     </div>
                 </div>
-                <div className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-300 justify-start'}`}>
+                <div className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-400 justify-start'}`}>
                     <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
                 </div>
             </div>
@@ -1146,7 +1146,7 @@ export const Onboarding: React.FC = () => {
                     {state.step > 1 && (
                         <button 
                           onClick={handleBack} 
-                          className="px-4 py-3 bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light rounded-full hover:bg-[#F5F5F0] dark:hover:bg-dark-background-primary transition-colors"
+                          className="px-4 py-3 bg-white dark:bg-dark-background-tertiary border border-zinc-300 dark:border-dark-border-light text-zinc-700 dark:text-dark-text-primary rounded-full hover:bg-[#F5F5F0] dark:hover:bg-dark-background-primary transition-colors"
                         >
                             <ChevronLeft size={20} />
                         </button>
@@ -1175,7 +1175,7 @@ export const Onboarding: React.FC = () => {
             </div>
         </div>
         
-        <p className="text-center text-zinc-500 text-xs mt-6">
+        <p className="text-center text-zinc-600 text-xs mt-6">
             Step {state.step} of {totalSteps}
         </p>
       </div>
