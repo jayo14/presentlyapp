@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     register_view, login_view, google_auth_view, google_callback_view, logout_view, current_user_view,
-    complete_onboarding_view, change_password_view,
+    complete_onboarding_view, upload_avatar_view, change_password_view,
     send_verification_otp_view, verify_email_otp_view,
     request_password_reset_view, reset_password_view, verify_reset_token_view, public_check_in_view,
     InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
@@ -34,6 +34,7 @@ urlpatterns = [
     path('auth/logout/', logout_view, name='logout'),
     path('auth/me/', current_user_view, name='current-user'),
     path('auth/onboarding/', complete_onboarding_view, name='complete-onboarding'),
+    path('auth/upload-avatar/', upload_avatar_view, name='upload-avatar'),
     path('auth/change-password/', change_password_view, name='change-password'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     
