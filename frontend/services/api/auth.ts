@@ -154,6 +154,15 @@ export const authApi = {
     return response.data.user;
   },
 
+  // Upload avatar image to Cloudinary via backend, returns the hosted URL
+  uploadAvatar: async (base64DataUri: string): Promise<string> => {
+    const response = await apiClient.post('/auth/upload-avatar/', { avatar_base64: base64DataUri });
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Avatar upload failed');
+    }
+    return response.data.avatar_url as string;
+  },
+
   // Change password
   changePassword: async (oldPassword: string, newPassword: string): Promise<void> => {
     await apiClient.post('/auth/change-password/', {
