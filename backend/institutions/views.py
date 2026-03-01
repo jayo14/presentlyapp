@@ -16,6 +16,8 @@ from django.db import transaction
 from django_ratelimit.decorators import ratelimit
 import secrets
 import logging
+import cloudinary
+import cloudinary.uploader
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from google.oauth2 import id_token as google_id_token
@@ -40,6 +42,21 @@ from .geolocation_utils import verify_location, calculate_distance
 # Configure logging
 auth_logger = logging.getLogger('auth_events')
 logger = logging.getLogger(__name__)
+
+# Configure Cloudinary once at module load using settings
+_cloudinary_configured = False
+
+def _ensure_cloudinary_configured():
+    """Configure the Cloudinary SDK from Django settings (runs only once)."""
+    global _cloudinary_configured
+    if not _cloudinary_configured:
+        cloudinary.config(
+            cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+            api_key=settings.CLOUDINARY_API_KEY,
+            api_secret=settings.CLOUDINARY_API_SECRET,
+            secure=True,
+        )
+        _cloudinary_configured = True
 
 # Helper function to generate tokens
 def get_tokens_for_user(user):
@@ -692,6 +709,60 @@ def complete_onboarding_view(request):
         'success': False,
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_avatar_view(request):
+    """Upload a user avatar image to Cloudinary and return the hosted URL.
+
+    Accepts either:
+    - A multipart file upload with field name ``avatar`` (``request.FILES``).
+    - A JSON body with field ``avatar_base64`` containing a data-URI string
+      (``data:image/...;base64,...``).
+
+    Returns JSON: ``{ "success": true, "avatar_url": "<cloudinary-url>" }``
+    """
+    if not (settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET):
+        return Response(
+            {'success': False, 'error': 'Image upload service is not configured.'},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    _ensure_cloudinary_configured()
+
+    upload_data = None
+
+    # Prefer a real file upload
+    if 'avatar' in request.FILES:
+        upload_data = request.FILES['avatar']
+    elif 'avatar_base64' in request.data:
+        upload_data = request.data['avatar_base64']
+    else:
+        return Response(
+            {'success': False, 'error': 'No image provided. Send "avatar" as a file or "avatar_base64" as a data-URI.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        result = cloudinary.uploader.upload(
+            upload_data,
+            folder='presently/avatars',
+            public_id=f'user_{request.user.id}',
+            overwrite=True,
+            resource_type='image',
+            transformation=[
+                {'width': 512, 'height': 512, 'crop': 'fill', 'gravity': 'face'},
+                {'quality': 'auto', 'fetch_format': 'auto'},
+            ],
+        )
+        return Response({'success': True, 'avatar_url': result['secure_url']}, status=status.HTTP_200_OK)
+    except Exception as exc:
+        logger.error('Cloudinary upload failed for user %s: %s', request.user.id, exc)
+        return Response(
+            {'success': False, 'error': 'Failed to upload image. Please try again.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 @api_view(['POST'])
