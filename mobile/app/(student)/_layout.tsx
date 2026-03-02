@@ -90,12 +90,12 @@ export default function StudentLayout() {
       <Tabs.Screen name="history" options={{ href: null }} />
       <Tabs.Screen name="attendance-success" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
-      {/* <Tabs.Screen name="courses/register" options={{ href: null }} /> */}
       <Tabs.Screen name="notifications" options={{ href: null }} />
+      <Tabs.Screen name="courses/register" options={{ href: null }} />
       <Tabs.Screen name="courses/search" options={{ href: null }} />
-      {/* <Tabs.Screen name="courses/success" options={{ href: null }} /> */}
-      {/* <Tabs.Screen name="courses/drop-confirmation" options={{ href: null }} /> */}
-      {/* <Tabs.Screen name="courses/drop-success" options={{ href: null }} /> */}
+      <Tabs.Screen name="courses/success" options={{ href: null }} />
+      <Tabs.Screen name="courses/drop-confirmation" options={{ href: null }} />
+      <Tabs.Screen name="courses/drop-success" options={{ href: null }} />
       <Tabs.Screen name="courses/department/[id]" options={{ href: null }} />
       <Tabs.Screen name="courses/[id]" options={{ href: null }} />
     </Tabs>
