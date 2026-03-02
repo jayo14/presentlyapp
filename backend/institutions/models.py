@@ -474,7 +474,22 @@ class Venue(models.Model):
         default=100, 
         help_text="Radius in meters for location verification (if no boundary is set)"
     )
-    
+
+    # Visual display settings (used by the admin map UI)
+    venue_color = models.CharField(
+        max_length=20,
+        default='#6366f1',
+        help_text="Hex colour used when rendering this venue on the map"
+    )
+    venue_opacity = models.FloatField(
+        default=0.15,
+        help_text="Fill opacity for the venue polygon (0.0 – 1.0)"
+    )
+    border_width = models.IntegerField(
+        default=2,
+        help_text="Stroke width (px) for the venue polygon outline"
+    )
+
     # Metadata
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

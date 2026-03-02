@@ -18,6 +18,7 @@ class AttendanceAttemptLog(models.Model):
     latitude = models.DecimalField(max_digits=10, decimal_places=8, null=True, blank=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
     accuracy = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    drift_avg = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     inside_polygon = models.BooleanField(default=False)
     rejected_reason = models.CharField(max_length=255, null=True, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
