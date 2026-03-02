@@ -133,11 +133,18 @@ export interface Venue {
   longitude: number;
   elevation?: number;
   
-  // Boundary/polygon for precise location mapping
-  boundary_coordinates?: number[][];  // Array of [lat, lng] pairs
-  
+  // Boundary/polygon for precise location mapping.
+  // Coordinates are stored as **[latitude, longitude]** pairs (Python/backend convention).
+  // MapLibre requires [longitude, latitude] — convert when rendering.
+  boundary_coordinates?: number[][];
+
   // Location verification settings
   verification_radius: number;
+
+  // Visual display settings (configurable per-venue)
+  venue_color?: string;    // hex colour, e.g. "#6366f1"
+  venue_opacity?: number;  // 0.0 – 1.0
+  border_width?: number;   // stroke width in px
   
   // Metadata
   is_active: boolean;
