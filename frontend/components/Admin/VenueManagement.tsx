@@ -88,11 +88,13 @@ export const VenueManagement: React.FC = () => {
   };
 
   const handleMapClick = (lat: number, lng: number) => {
-    // When clicking on map, prepare to create venue at that location
-    setNewVenueLocation({ lat, lng });
-    setNewVenueBoundary(null);
-    setEditingVenue(null);
-    setShowModal(true);
+    // When clicking on map in non-drawing mode, create venue at that location (point mode)
+    if (!isDrawing) {
+      setNewVenueLocation({ lat, lng });
+      setNewVenueBoundary(null);
+      setEditingVenue(null);
+      setShowModal(true);
+    }
   };
 
   const handleBoundaryComplete = (coords: number[][]) => {
@@ -214,7 +216,7 @@ export const VenueManagement: React.FC = () => {
           </div>
           <Button 
             variant="secondary" 
-            size="icon" 
+            size="sm"
             onClick={() => {
                 loadData();
                 loadVenues(selectedInstitution || undefined);
@@ -456,6 +458,7 @@ export const VenueManagement: React.FC = () => {
           }}
           initialLocation={newVenueLocation}
           initialBoundary={newVenueBoundary}
+          drawMode={newVenueBoundary ? 'polygon' : 'point'}
         />
       )}
     </div>
