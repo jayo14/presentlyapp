@@ -155,7 +155,7 @@ class VenueSerializer(serializers.ModelSerializer):
         if (latitude is not None and longitude is None) or (latitude is None and longitude is not None):
             raise serializers.ValidationError({"latitude": "Both latitude and longitude must be provided together."})
             
-        if boundary_coords is not None:
+        if boundary_coords is not None and len(boundary_coords) > 0:
             if not isinstance(boundary_coords, list):
                 raise serializers.ValidationError({"boundary_coordinates": "Boundary must be an array of coordinate pairs."})
             
@@ -166,7 +166,7 @@ class VenueSerializer(serializers.ModelSerializer):
             if boundary_coords[0] != boundary_coords[-1]:
                 boundary_coords.append(boundary_coords[0])
             
-            # Store as JSON array
+            # Store as JSON array (boundary takes priority over radius-based verification)
             attrs['boundary'] = boundary_coords
             
         return attrs

@@ -19,7 +19,7 @@ interface VenueMapProps {
 const DEFAULT_CENTER: [number, number] = [3.8936, 7.3775]; // [lng, lat]
 const DEFAULT_ZOOM = 13;
 
-const ROAD_STYLE = 'https://demotiles.maplibre.org/style.json';
+const ROAD_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
 
 const SATELLITE_STYLE: maplibregl.StyleSpecification = {
   version: 8,

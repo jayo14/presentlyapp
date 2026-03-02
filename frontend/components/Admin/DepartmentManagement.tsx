@@ -6,6 +6,7 @@ import { Input } from '../Input';
 import { Department, College, Institution } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
 import DepartmentModal from './DepartmentModal';
+import { SEO } from '../SEO';
 
 interface DepartmentManagementProps {
   institution?: Institution;
@@ -174,6 +175,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      <SEO title="Departments | Admin | Presently" description="Manage academic departments across institutions and colleges." />
       {/* Header Section */}
       <div className="flex flex-col gap-4">
         {onBack && (

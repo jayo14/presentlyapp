@@ -6,6 +6,7 @@ import { Course, Department, College, Institution } from '../../types';
 import { coursesApi } from '../../services/api/courses';
 import { institutionsApi } from '../../services/api/institutions';
 import CourseModal from './CourseModal';
+import { SEO } from '../SEO';
 
 export const CourseManagement: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -183,6 +184,7 @@ export const CourseManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <SEO title="Courses | Admin | Presently" description="Manage courses offered across departments and institutions." />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
