@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, AlertCircle, MapPin, Map as MapIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, AlertCircle, MapPin } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
@@ -11,9 +11,15 @@ interface VenueModalProps {
   institutions: Institution[];
   onSave: (data: Partial<Venue>) => Promise<void>;
   onClose: () => void;
-  initialLocation?: {lat: number; lng: number} | null;
+  initialLocation?: { lat: number; lng: number } | null;
   initialBoundary?: number[][] | null;
+  drawMode?: 'point' | 'polygon';
 }
+
+const PRESET_COLORS = [
+  '#6366f1', '#3b82f6', '#10b981', '#f59e0b',
+  '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6',
+];
 
 export const VenueModal: React.FC<VenueModalProps> = ({
   venue,
@@ -21,16 +27,19 @@ export const VenueModal: React.FC<VenueModalProps> = ({
   onSave,
   onClose,
   initialLocation,
-  initialBoundary
+  initialBoundary,
+  drawMode,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showMapHelper, setShowMapHelper] = useState(false);
-  
+
   const { modalRef, modalProps } = useModalAccessibility(true, onClose);
-  
+
   const [formData, setFormData] = useState<Partial<Venue>>({
-    institution: venue?.institution || venue?.institution_id || (institutions.length > 0 ? institutions[0].id : undefined),
+    institution:
+      venue?.institution ||
+      venue?.institution_id ||
+      (institutions.length > 0 ? institutions[0].id : undefined),
     name: venue?.name || '',
     code: venue?.code || '',
     description: venue?.description || '',
@@ -38,20 +47,16 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     floor_number: venue?.floor_number || '',
     room_number: venue?.room_number || '',
     capacity: venue?.capacity || undefined,
-    latitude: initialLocation?.lat || venue?.latitude || 0,
-    longitude: initialLocation?.lng || venue?.longitude || 0,
+    latitude: initialLocation?.lat ?? venue?.latitude ?? 0,
+    longitude: initialLocation?.lng ?? venue?.longitude ?? 0,
     elevation: venue?.elevation || undefined,
     boundary_coordinates: initialBoundary || venue?.boundary_coordinates || [],
     verification_radius: venue?.verification_radius || 100,
+    venue_color: venue?.venue_color || '#6366f1',
+    venue_opacity: venue?.venue_opacity ?? 0.15,
+    border_width: venue?.border_width ?? 2,
     is_active: venue?.is_active !== false,
   });
-
-  // Handle click outside
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose();
-    }
-  };
 
   const [boundaryInput, setBoundaryInput] = useState('');
 
@@ -63,11 +68,14 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     }
   }, [venue, initialBoundary]);
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+  };
+
   const handleChange = (field: keyof Venue, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleBoundaryChange = (value: string) => {
@@ -76,13 +84,13 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       if (value.trim()) {
         const parsed = JSON.parse(value);
         if (Array.isArray(parsed)) {
-          setFormData(prev => ({ ...prev, boundary_coordinates: parsed }));
+          setFormData((prev) => ({ ...prev, boundary_coordinates: parsed }));
         }
       } else {
-        setFormData(prev => ({ ...prev, boundary_coordinates: [] }));
+        setFormData((prev) => ({ ...prev, boundary_coordinates: [] }));
       }
-    } catch (e) {
-      // Invalid JSON, don't update
+    } catch {
+      // Invalid JSON, ignore
     }
   };
 
@@ -93,9 +101,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       const position = await geolocationService.getCurrentPosition();
       handleChange('latitude', position.latitude);
       handleChange('longitude', position.longitude);
-      if (position.altitude) {
-        handleChange('elevation', position.altitude);
-      }
+      if (position.altitude) handleChange('elevation', position.altitude);
     } catch (err: any) {
       setError('Failed to get current location: ' + (err.message || 'Unknown error'));
     } finally {
@@ -105,8 +111,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validation
+
     if (!formData.name?.trim()) {
       setError('Venue name is required');
       return;
@@ -116,7 +121,9 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       return;
     }
     if (!formData.institution) {
-      setError('Please select an institution. If none exist, please create one first in the Institutions tab.');
+      setError(
+        'Please select an institution. If none exist, please create one first in the Institutions tab.',
+      );
       return;
     }
     if (formData.latitude == null || formData.longitude == null) {
@@ -127,7 +134,6 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     try {
       setLoading(true);
       setError(null);
-      // Only include boundary_coordinates if non-empty; omit to avoid backend validation error
       const payload: Partial<Venue> = { ...formData };
       if (!payload.boundary_coordinates?.length) {
         delete payload.boundary_coordinates;
@@ -140,21 +146,35 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     }
   };
 
+  const hasBoundary = !!(
+    formData.boundary_coordinates && formData.boundary_coordinates.length >= 3
+  );
+
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
       onClick={handleOverlayClick}
     >
-      <div 
+      <div
         {...modalProps}
-        aria-labelledby="modal-title"
-        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto outline-none"
+        aria-labelledby="venue-modal-title"
+        className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-3xl w-full max-h-[92vh] overflow-y-auto outline-none"
       >
         {/* Header */}
-        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900">
-          <h2 id="modal-title" className="text-xl font-bold text-foreground">
-            {venue ? 'Edit Venue' : 'Create Venue'}
-          </h2>
+        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900 z-10">
+          <div>
+            <h2 id="venue-modal-title" className="text-xl font-bold text-foreground">
+              {venue ? 'Edit Venue' : 'Create Venue'}
+            </h2>
+            {drawMode && (
+              <p className="text-xs text-zinc-400 mt-0.5">
+                Mode:{' '}
+                <span className="text-primary font-medium">
+                  {drawMode === 'polygon' ? 'Polygon (drawn on map)' : 'Point + radius'}
+                </span>
+              </p>
+            )}
+          </div>
           <button
             onClick={onClose}
             className="text-zinc-400 hover:text-foreground transition-colors"
@@ -164,7 +184,6 @@ export const VenueModal: React.FC<VenueModalProps> = ({
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
             <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3">
@@ -173,8 +192,8 @@ export const VenueModal: React.FC<VenueModalProps> = ({
             </div>
           )}
 
-          {/* Basic Information */}
-          <div>
+          {/* ── Basic Information ─────────────────────────────────── */}
+          <section>
             <h3 className="text-lg font-semibold text-foreground mb-4">Basic Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -187,8 +206,10 @@ export const VenueModal: React.FC<VenueModalProps> = ({
                   className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
                   required
                 >
-                  {institutions.map(inst => (
-                    <option key={inst.id} value={inst.id}>{inst.short_name}</option>
+                  {institutions.map((inst) => (
+                    <option key={inst.id} value={inst.id}>
+                      {inst.short_name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -262,7 +283,12 @@ export const VenueModal: React.FC<VenueModalProps> = ({
                 <Input
                   type="number"
                   value={formData.capacity || ''}
-                  onChange={(e) => handleChange('capacity', e.target.value ? Number(e.target.value) : undefined)}
+                  onChange={(e) =>
+                    handleChange(
+                      'capacity',
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
+                  }
                   placeholder="Maximum capacity"
                   min="1"
                 />
@@ -270,9 +296,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Description
-              </label>
+              <label className="block text-sm font-medium text-zinc-400 mb-2">Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
@@ -280,10 +304,10 @@ export const VenueModal: React.FC<VenueModalProps> = ({
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary min-h-[80px]"
               />
             </div>
-          </div>
+          </section>
 
-          {/* Geolocation */}
-          <div>
+          {/* ── Geolocation ──────────────────────────────────────── */}
+          <section>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-foreground">Geolocation Data *</h3>
               <Button
@@ -296,7 +320,7 @@ export const VenueModal: React.FC<VenueModalProps> = ({
                 Use Current Location
               </Button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-2">
@@ -328,103 +352,181 @@ export const VenueModal: React.FC<VenueModalProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  Elevation (meters)
+                  Elevation (m)
                 </label>
                 <Input
                   type="number"
                   step="0.01"
                   value={formData.elevation || ''}
-                  onChange={(e) => handleChange('elevation', e.target.value ? Number(e.target.value) : undefined)}
+                  onChange={(e) =>
+                    handleChange(
+                      'elevation',
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
+                  }
                   placeholder="Height above sea level"
                 />
               </div>
             </div>
 
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Verification Radius (meters)
-              </label>
-              <Input
-                type="number"
-                value={formData.verification_radius}
-                onChange={(e) => handleChange('verification_radius', Number(e.target.value))}
-                placeholder="100"
-                min="1"
-              />
-              <p className="text-xs text-zinc-500 mt-1">
-                Used if no boundary polygon is defined
-              </p>
-            </div>
-          </div>
-
-          {/* Boundary Coordinates */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-foreground">Boundary Polygon (Optional)</h3>
-              <button
-                type="button"
-                onClick={() => setShowMapHelper(!showMapHelper)}
-                className="text-primary text-sm hover:underline"
-              >
-                {showMapHelper ? 'Hide' : 'Show'} Helper
-              </button>
-            </div>
-
-            {showMapHelper && (
-              <div className="p-4 bg-zinc-800 border border-zinc-700 rounded-lg mb-4 text-sm text-zinc-400">
-                <p className="font-semibold text-foreground mb-2">How to define boundary:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Use online tools like geojson.io or Google Maps</li>
-                  <li>Draw a polygon around your venue</li>
-                  <li>Copy coordinates as array of [latitude, longitude] pairs</li>
-                  <li>Paste JSON below (must have at least 3 coordinate pairs)</li>
-                </ul>
-                <p className="mt-2">
-                  Example: [[7.5629, 4.5200], [7.5630, 4.5201], [7.5631, 4.5199]]
+            {/* Radius – show when no polygon drawn */}
+            {!hasBoundary && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                  Verification Radius (metres)
+                </label>
+                <Input
+                  type="number"
+                  value={formData.verification_radius}
+                  onChange={(e) =>
+                    handleChange('verification_radius', Number(e.target.value))
+                  }
+                  placeholder="100"
+                  min="1"
+                />
+                <p className="text-xs text-zinc-500 mt-1">
+                  Used when no boundary polygon is defined. Draw a polygon on the map to use
+                  polygon-based verification instead.
                 </p>
               </div>
             )}
+          </section>
+
+          {/* ── Boundary Polygon ─────────────────────────────────── */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-foreground">
+                Boundary Polygon{' '}
+                <span className="text-sm font-normal text-zinc-400">(Optional)</span>
+              </h3>
+              {hasBoundary && (
+                <span className="text-xs bg-green-500/10 text-green-400 px-2 py-1 rounded-full">
+                  ✓ {formData.boundary_coordinates!.length} points
+                </span>
+              )}
+            </div>
 
             <textarea
               value={boundaryInput}
               onChange={(e) => handleBoundaryChange(e.target.value)}
               placeholder='[[7.5629, 4.5200], [7.5630, 4.5201], [7.5631, 4.5199], [7.5629, 4.5200]]'
-              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary min-h-[120px] font-mono text-sm"
+              className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary min-h-[100px] font-mono text-sm"
             />
             <p className="text-xs text-zinc-500 mt-1">
-              JSON array of coordinate pairs defining the venue boundary. First and last points should match to close the polygon.
+              JSON array of [latitude, longitude] pairs. The polygon is closed automatically.
+              You can also draw directly on the map using the "Draw Boundary" button.
             </p>
-          </div>
+          </section>
 
-          {/* Status */}
+          {/* ── Display Settings ─────────────────────────────────── */}
+          <section>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Display Settings</h3>
+
+            {/* Colour picker */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-zinc-400 mb-2">
+                Venue Colour
+              </label>
+              <div className="flex items-center gap-3 flex-wrap">
+                {PRESET_COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => handleChange('venue_color', c)}
+                    className={`w-7 h-7 rounded-full border-2 transition-transform ${
+                      formData.venue_color === c
+                        ? 'border-white scale-110'
+                        : 'border-transparent hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: c }}
+                    aria-label={`Select colour ${c}`}
+                  />
+                ))}
+                {/* Free-form hex input */}
+                <input
+                  type="color"
+                  value={formData.venue_color || '#6366f1'}
+                  onChange={(e) => handleChange('venue_color', e.target.value)}
+                  className="w-9 h-9 rounded cursor-pointer bg-transparent border border-zinc-700"
+                  title="Custom colour"
+                />
+                <span className="text-sm text-zinc-400 font-mono">
+                  {formData.venue_color}
+                </span>
+              </div>
+            </div>
+
+            {/* Opacity slider */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-zinc-400 mb-2">
+                Fill Opacity –{' '}
+                <span className="text-foreground font-mono">
+                  {Math.round((formData.venue_opacity ?? 0.15) * 100)}%
+                </span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={formData.venue_opacity ?? 0.15}
+                onChange={(e) => handleChange('venue_opacity', Number(e.target.value))}
+                className="w-full accent-primary"
+              />
+            </div>
+
+            {/* Border thickness */}
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-2">
+                Border Width –{' '}
+                <span className="text-foreground font-mono">{formData.border_width ?? 2}px</span>
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="8"
+                step="1"
+                value={formData.border_width ?? 2}
+                onChange={(e) => handleChange('border_width', Number(e.target.value))}
+                className="w-full accent-primary"
+              />
+            </div>
+
+            {/* Live preview */}
+            <div className="mt-4 flex items-center gap-3">
+              <div
+                className="w-24 h-12 rounded border-2 transition-all"
+                style={{
+                  backgroundColor: formData.venue_color || '#6366f1',
+                  opacity: formData.venue_opacity ?? 0.15,
+                  borderColor: formData.venue_color || '#6366f1',
+                  borderWidth: `${formData.border_width ?? 2}px`,
+                }}
+              />
+              <span className="text-xs text-zinc-400">Polygon preview</span>
+            </div>
+          </section>
+
+          {/* ── Status ───────────────────────────────────────────── */}
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
-              id="is_active"
+              id="venue-is-active"
               checked={formData.is_active}
               onChange={(e) => handleChange('is_active', e.target.checked)}
               className="w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-primary focus:ring-primary"
             />
-            <label htmlFor="is_active" className="text-sm text-zinc-400">
+            <label htmlFor="venue-is-active" className="text-sm text-zinc-400">
               Venue is active and available for use
             </label>
           </div>
 
-          {/* Actions */}
+          {/* ── Actions ──────────────────────────────────────────── */}
           <div className="flex items-center gap-3 pt-4 border-t border-zinc-800">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading ? 'Saving...' : venue ? 'Update Venue' : 'Create Venue'}
+            <Button type="submit" disabled={loading} className="flex-1">
+              {loading ? 'Saving…' : venue ? 'Update Venue' : 'Create Venue'}
             </Button>
-            <Button
-              type="button"
-              onClick={onClose}
-              variant="secondary"
-              className="flex-1"
-            >
+            <Button type="button" onClick={onClose} variant="secondary" className="flex-1">
               Cancel
             </Button>
           </div>

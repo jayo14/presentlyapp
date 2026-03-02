@@ -131,7 +131,9 @@ class VenueSerializer(serializers.ModelSerializer):
             'building', 'building_name', 'floor_number', 'room_number', 'capacity',
             'venue_type', 'has_projector', 'has_computers', 'has_whiteboard', 'has_microphone',
             'latitude', 'longitude', 'elevation', 'boundary_coordinates', 'boundary',
-            'gps_radius', 'verification_radius', 'is_active', 'created_at', 'updated_at'
+            'gps_radius', 'verification_radius',
+            'venue_color', 'venue_opacity', 'border_width',
+            'is_active', 'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at', 'boundary']
 

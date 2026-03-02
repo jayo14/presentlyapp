@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Clock, MapPin, User, Users, Calendar, AlertCircle, Plus, Search, Filter, GraduationCap, TrendingUp, CheckCircle2, QrCode } from 'lucide-react';
+import { BookOpen, Clock, MapPin, User, Users, Calendar, AlertCircle, Plus, Search, Filter, GraduationCap, TrendingUp, CheckCircle2, QrCode, Trash2 } from 'lucide-react';
 import { Button } from '../Button';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
 import CourseRegistrationDialog from './CourseRegistrationDialog';
@@ -15,6 +15,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed'>('all');
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [droppingId, setDroppingId] = useState<number | null>(null);
 
   useEffect(() => {
     loadCourses();
@@ -32,6 +33,24 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDropCourse = async (course: EnrolledCourse) => {
+    if (!window.confirm(`Drop ${course.course_code} – ${course.course_name}? This will remove your enrollment.`)) {
+      return;
+    }
+    try {
+      setDroppingId(course.id);
+      await studentApi.dropCourse(course.id);
+      toast.success('Course dropped', { description: `${course.course_code} has been removed from your schedule.` });
+      await loadCourses();
+    } catch (err: any) {
+      toast.error('Failed to drop course', {
+        description: err.response?.data?.error || 'Please try again later',
+      });
+    } finally {
+      setDroppingId(null);
     }
   };
 
@@ -175,6 +194,16 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                       style={{ width: `${attendance}%` }}
                     />
                   </div>
+
+                  {/* Drop button */}
+                  <button
+                    onClick={() => handleDropCourse(course)}
+                    disabled={droppingId === course.id}
+                    className="mt-3 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-error dark:text-error-light border border-error/30 dark:border-error-light/30 hover:bg-error/5 dark:hover:bg-error-light/5 transition-colors disabled:opacity-50"
+                  >
+                    <Trash2 size={13} />
+                    {droppingId === course.id ? 'Dropping…' : 'Drop Course'}
+                  </button>
                 </div>
               </div>
             );
@@ -373,6 +402,18 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                     </div>
                   </div>
                 )}
+
+                {/* Drop Course */}
+                <div className="mt-4 pt-4 border-t border-light-border dark:border-dark-border">
+                  <button
+                    onClick={() => handleDropCourse(course)}
+                    disabled={droppingId === course.id}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-error dark:text-error-light hover:underline disabled:opacity-50 transition-opacity"
+                  >
+                    <Trash2 size={13} />
+                    {droppingId === course.id ? 'Dropping…' : 'Drop Course'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

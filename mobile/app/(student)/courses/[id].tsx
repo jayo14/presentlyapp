@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIn
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { ArrowLeft, Share2, Mail, Star, Calendar, Users, CheckCircle, ArrowRight, ShieldCheck } from 'lucide-react-native';
+import { ArrowLeft, Share2, Mail, Star, Calendar, Users, CheckCircle, ArrowRight, ShieldCheck, Trash2 } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
@@ -47,6 +47,13 @@ export default function CourseDetailsScreen() {
     } finally {
         setEnrolling(false);
     }
+  };
+
+  const handleDrop = () => {
+    router.push({
+        pathname: '/(student)/courses/drop-confirmation',
+        params: { id: id as string, code: course?.code, title: course?.title },
+    });
   };
 
   if (loading) {
@@ -159,20 +166,36 @@ export default function CourseDetailsScreen() {
 
       {/* Bottom Button */}
       <View style={styles.footer}>
-        <TouchableOpacity
-            style={[styles.confirmBtn, { opacity: enrolling ? 0.7 : 1 }]}
-            onPress={handleEnroll}
-            disabled={enrolling || course.is_enrolled}
-        >
-            {enrolling ? (
-                <ActivityIndicator color="#1a160b" />
-            ) : (
-                <>
-                    <Text style={styles.confirmBtnText}>{course.is_enrolled ? 'Already Enrolled' : 'Confirm Enrollment'}</Text>
-                    {!course.is_enrolled && <ArrowRight size={22} color="#1a160b" strokeWidth={3} />}
-                </>
-            )}
-        </TouchableOpacity>
+        {course.is_enrolled ? (
+          <>
+            <View style={styles.enrolledBadge}>
+              <CheckCircle size={18} color="#10B981" />
+              <Text style={styles.enrolledBadgeText}>You are enrolled</Text>
+            </View>
+            <TouchableOpacity
+                style={styles.dropBtn}
+                onPress={handleDrop}
+            >
+                <Trash2 size={18} color="#F43F5E" />
+                <Text style={styles.dropBtnText}>Drop Course</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity
+              style={[styles.confirmBtn, { opacity: enrolling ? 0.7 : 1 }]}
+              onPress={handleEnroll}
+              disabled={enrolling}
+          >
+              {enrolling ? (
+                  <ActivityIndicator color="#1a160b" />
+              ) : (
+                  <>
+                      <Text style={styles.confirmBtnText}>Confirm Enrollment</Text>
+                      <ArrowRight size={22} color="#1a160b" strokeWidth={3} />
+                  </>
+              )}
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -368,5 +391,33 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: Fonts.lexend.bold,
     color: '#1a160b',
-  }
+  },
+  enrolledBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    marginBottom: 12,
+  },
+  enrolledBadgeText: {
+    fontSize: 16,
+    fontFamily: Fonts.lexend.semibold,
+    color: '#10B981',
+  },
+  dropBtn: {
+    height: 52,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#F43F5E',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  dropBtnText: {
+    fontSize: 16,
+    fontFamily: Fonts.lexend.semibold,
+    color: '#F43F5E',
+  },
 });
