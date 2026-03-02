@@ -7,6 +7,7 @@ import { venueApi } from '../../services/api/venues';
 import { institutionsApi } from '../../services/api/institutions';
 import VenueModal from './VenueModal';
 import VenueMap from './VenueMap';
+import { SEO } from '../SEO';
 
 export const VenueManagement: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -173,6 +174,7 @@ export const VenueManagement: React.FC = () => {
 
   return (
     <div className="space-y-6 h-full flex flex-col">
+      <SEO title="Venues | Admin | Presently" description="Manage campus venues with geolocation and polygon boundary mapping." />
       {/* Header */}
       <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">

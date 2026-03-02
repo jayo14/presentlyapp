@@ -127,7 +127,12 @@ export const VenueModal: React.FC<VenueModalProps> = ({
     try {
       setLoading(true);
       setError(null);
-      await onSave(formData);
+      // Only include boundary_coordinates if non-empty; omit to avoid backend validation error
+      const payload: Partial<Venue> = { ...formData };
+      if (!payload.boundary_coordinates?.length) {
+        delete payload.boundary_coordinates;
+      }
+      await onSave(payload);
     } catch (err: any) {
       setError(err.message || 'Failed to save venue');
     } finally {

@@ -7,6 +7,7 @@ import apiClient from '../../services/api/client';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { Box, Button as ChakraButton, HStack, Text } from '@chakra-ui/react';
+import { SEO } from '../SEO';
 
 export const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -179,6 +180,7 @@ export const UserManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <SEO title="Users | Admin | Presently" description="Manage system users and their roles and permissions." />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
