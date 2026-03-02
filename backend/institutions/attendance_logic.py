@@ -5,11 +5,72 @@ from rest_framework.response import Response
 from .models import Attendance, AttendanceSession, UserRole
 from attendance.models import AttendanceAttemptLog
 from .serializers import AttendanceSerializer
-from .geolocation_utils import verify_location
+from .geolocation_utils import verify_location, calculate_distance
+
+# Anti-spoofing thresholds (must match frontend constants)
+_MAX_ACCURACY_METERS = 30
+_MAX_JUMP_METERS = 50
+_MAX_DRIFT_METERS = 15
+_MAX_SPEED_MPS = 2.5  # ~9 km/h
+
+
+def _validate_sample_stability(samples):
+    """
+    Validate that the sample window is stable (no spoofing indicators).
+
+    Returns (is_stable: bool, rejected_reason: str | None, drift_avg: float).
+    """
+    if len(samples) < 2:
+        return True, None, 0.0
+
+    first = samples[0]
+    prev = None
+    drift_values = []
+
+    for sample in samples:
+        lat = float(sample.get('latitude', 0))
+        lng = float(sample.get('longitude', 0))
+
+        if prev is not None:
+            prev_lat = float(prev.get('latitude', 0))
+            prev_lng = float(prev.get('longitude', 0))
+            jump = calculate_distance(prev_lat, prev_lng, lat, lng)
+
+            # Detect teleport jump (checked before drift to give clearer error)
+            if jump > _MAX_JUMP_METERS:
+                drift_values.append(jump)
+                return False, f"Suspicious location jump detected ({jump:.1f}m)", sum(drift_values) / len(drift_values)
+
+            # Detect unrealistic speed using timestamps (milliseconds → seconds)
+            prev_ts = prev.get('timestamp')
+            cur_ts = sample.get('timestamp')
+            if prev_ts is not None and cur_ts is not None:
+                time_diff = (float(cur_ts) - float(prev_ts)) / 1000.0
+                if time_diff > 0:
+                    speed = jump / time_diff
+                    if speed > _MAX_SPEED_MPS:
+                        drift_values.append(jump)
+                        return False, f"Unrealistic movement speed ({speed:.1f} m/s)", sum(drift_values) / len(drift_values)
+
+        # Drift from the start of the stable window
+        drift = calculate_distance(
+            float(first.get('latitude', 0)), float(first.get('longitude', 0)),
+            lat, lng
+        )
+        drift_values.append(drift)
+
+        if drift > _MAX_DRIFT_METERS:
+            return False, f"Excessive movement drift ({drift:.1f}m)", sum(drift_values) / len(drift_values)
+
+        prev = sample
+
+    drift_avg = sum(drift_values) / len(drift_values) if drift_values else 0.0
+    return True, None, drift_avg
+
 
 def perform_attendance_check_in(request, session):
     """
-    Standardized attendance check-in logic with multi-sample verification.
+    Standardized attendance check-in logic with passive pre-validated sample verification.
     """
     samples = request.data.get('samples', [])
     # Fallback for old mobile clients or tests sending single sample
@@ -68,6 +129,7 @@ def perform_attendance_check_in(request, session):
 
     all_verified = True
     rejected_reason = None
+    drift_avg = 0.0
     last_sample = samples[-1]
 
     for sample in samples:
@@ -76,7 +138,7 @@ def perform_attendance_check_in(request, session):
         acc = float(sample.get('accuracy', 0))
 
         # Security: Validate accuracy
-        if acc > 30:
+        if acc > _MAX_ACCURACY_METERS:
             all_verified = False
             rejected_reason = f"Accuracy too low ({acc}m)"
             break
@@ -98,6 +160,13 @@ def perform_attendance_check_in(request, session):
                 rejected_reason = f"You are too far from the session location ({dist:.1f}m). You must be within {location_data['radius']} meters."
             break
 
+    # Validate stability across the sample window (anti-spoofing)
+    if all_verified and len(samples) >= 2:
+        is_stable, stability_reason, drift_avg = _validate_sample_stability(samples)
+        if not is_stable:
+            all_verified = False
+            rejected_reason = stability_reason
+
     # Use atomic transaction for logging and marking
     with transaction.atomic():
         # Log the attempt
@@ -107,6 +176,7 @@ def perform_attendance_check_in(request, session):
             latitude=last_sample.get('latitude'),
             longitude=last_sample.get('longitude'),
             accuracy=last_sample.get('accuracy'),
+            drift_avg=round(drift_avg, 2),
             inside_polygon=all_verified,
             rejected_reason=rejected_reason,
             ip_address=ip_address,

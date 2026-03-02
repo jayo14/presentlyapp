@@ -134,3 +134,86 @@ class CheckInTests(TestCase):
         
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.count(), 1)
+
+    @patch('institutions.attendance_logic.verify_location')
+    def test_check_in_multi_sample_stable(self, mock_verify):
+        """Multi-sample stable window should succeed."""
+        mock_verify.return_value = (True, 10.0)
+        base_ts = 1700000000000
+        samples = [
+            {'latitude': 10.0, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts + i * 1000}
+            for i in range(8)
+        ]
+        view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
+        request = self.factory.post(
+            f'/api/sessions/{self.session.id}/check_in/',
+            data={'samples': samples, 'code': self.session.session_code},
+            format='json'
+        )
+        force_authenticate(request, user=self.student)
+        response = view(request, pk=self.session.id)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    @patch('institutions.attendance_logic.verify_location')
+    def test_check_in_rejects_location_jump(self, mock_verify):
+        """A sudden jump > 50m between samples should be rejected."""
+        mock_verify.return_value = (True, 10.0)
+        base_ts = 1700000000000
+        # Second sample is ~0.001° lat ≈ ~111m jump
+        samples = [
+            {'latitude': 10.0, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts},
+            {'latitude': 10.001, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts + 1000},
+        ]
+        view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
+        request = self.factory.post(
+            f'/api/sessions/{self.session.id}/check_in/',
+            data={'samples': samples, 'code': self.session.session_code},
+            format='json'
+        )
+        force_authenticate(request, user=self.student)
+        response = view(request, pk=self.session.id)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('jump', response.data['error'].lower())
+
+    @patch('institutions.attendance_logic.verify_location')
+    def test_check_in_rejects_excessive_drift(self, mock_verify):
+        """Cumulative drift > 15m from the window start should be rejected."""
+        mock_verify.return_value = (True, 10.0)
+        base_ts = 1700000000000
+        # Drift of ~0.0002° lat per step ≈ 22m total drift after 2 steps
+        samples = [
+            {'latitude': 10.0, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts},
+            {'latitude': 10.0001, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts + 5000},
+            {'latitude': 10.0002, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts + 10000},
+        ]
+        view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
+        request = self.factory.post(
+            f'/api/sessions/{self.session.id}/check_in/',
+            data={'samples': samples, 'code': self.session.session_code},
+            format='json'
+        )
+        force_authenticate(request, user=self.student)
+        response = view(request, pk=self.session.id)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('drift', response.data['error'].lower())
+
+    @patch('institutions.attendance_logic.verify_location')
+    def test_check_in_rejects_high_speed(self, mock_verify):
+        """Movement at > 2.5 m/s between samples should be rejected."""
+        mock_verify.return_value = (True, 10.0)
+        base_ts = 1700000000000
+        # 0.00005° lat ≈ 5.5m in 1 second → ~5.5 m/s (exceeds 2.5 m/s)
+        samples = [
+            {'latitude': 10.0, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts},
+            {'latitude': 10.00005, 'longitude': 10.0, 'accuracy': 10, 'timestamp': base_ts + 1000},
+        ]
+        view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
+        request = self.factory.post(
+            f'/api/sessions/{self.session.id}/check_in/',
+            data={'samples': samples, 'code': self.session.session_code},
+            format='json'
+        )
+        force_authenticate(request, user=self.student)
+        response = view(request, pk=self.session.id)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('speed', response.data['error'].lower())
