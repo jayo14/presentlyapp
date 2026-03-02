@@ -10,6 +10,7 @@ import CourseManagement from '../Admin/CourseManagement';
 import Map from '../Map';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '../../services/api/system';
+import { SEO } from '../SEO';
 
 interface AdminDashboardProps {
   userName: string;
@@ -124,33 +125,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
 
   // 1. Institution Management View
   if (view === 'institutions') {
-    return <InstitutionManagement />;
+    return (
+      <React.Fragment>
+        <SEO title="Institutions | Admin | Presently" description="Manage educational institutions on Presently." />
+        <InstitutionManagement />
+      </React.Fragment>
+    );
   }
 
   // 2. User Management View
   if (view === 'users') {
-    return <UserManagement />;
+    return (
+      <React.Fragment>
+        <SEO title="Users | Admin | Presently" description="Manage users and roles on Presently." />
+        <UserManagement />
+      </React.Fragment>
+    );
   }
 
   // 3. Venue Management View
   if (view === 'venues') {
-    return <VenueManagement />;
+    return (
+      <React.Fragment>
+        <SEO title="Venues | Admin | Presently" description="Manage and map campus venues on Presently." />
+        <VenueManagement />
+      </React.Fragment>
+    );
   }
 
   // 4. Department Management View
   if (view === 'departments') {
-    return <DepartmentManagement />;
+    return (
+      <React.Fragment>
+        <SEO title="Departments | Admin | Presently" description="Manage academic departments on Presently." />
+        <DepartmentManagement />
+      </React.Fragment>
+    );
   }
 
   // 5. Course Management View
   if (view === 'courses') {
-    return <CourseManagement />;
+    return (
+      <React.Fragment>
+        <SEO title="Courses | Admin | Presently" description="Manage courses offered on Presently." />
+        <CourseManagement />
+      </React.Fragment>
+    );
   }
 
   // 6. Audit Logs View
   if (view === 'logs') {
       return (
           <div className="space-y-6 animate-in fade-in">
+              <SEO title="System Logs | Admin | Presently" description="View and audit system activity logs on Presently." />
               <div className="flex justify-between items-center">
                   <div>
                     <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">System Logs</h2>
@@ -276,6 +303,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   // 6. Default Admin Dashboard Overview
   return (
     <div className="space-y-8 animate-in fade-in">
+        <SEO title="Admin Dashboard | Presently" description="System overview and health check for Presently administrators." />
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Admin Dashboard</h1>
