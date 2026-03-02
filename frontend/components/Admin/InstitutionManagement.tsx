@@ -6,6 +6,7 @@ import { Input } from '../Input';
 import { Institution } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
 import CollegeManagement from './CollegeManagement';
+import { SEO } from '../SEO';
 
 interface InstitutionWithStats extends Institution {
   collegeCount?: number;
@@ -130,6 +131,7 @@ export const InstitutionManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <SEO title="Institutions | Admin | Presently" description="Manage educational institutions and their colleges and departments." />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
