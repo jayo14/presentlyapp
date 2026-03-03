@@ -270,6 +270,30 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         },
       });
     }
+
+    // Add venue labels layer
+    if (!map.getLayer('venue-labels')) {
+      map.addLayer({
+        id: 'venue-labels',
+        type: 'symbol',
+        source: 'venue-polygons',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+          'text-anchor': 'center',
+          'text-offset': [0, 0],
+          'text-allow-overlap': false,
+          'text-ignore-placement': false,
+        },
+        paint: {
+          'text-color': '#ffffff',
+          'text-halo-color': '#000000',
+          'text-halo-width': 2,
+          'text-halo-blur': 1,
+        },
+      });
+    }
   }, []);
 
   // Initialise map once
@@ -400,7 +424,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       if (!drawRef.current) {
         const draw = new MapboxDraw({
           displayControlsDefault: false,
-          controls: { polygon: true, trash: true },
+          controls: {
+            polygon: true,
+            trash: true,
+            line_string: false,
+            point: false,
+            combine_features: false,
+            uncombine_features: false,
+          },
           defaultMode: 'draw_polygon',
           styles: [
             // Polygon fill (active drawing)
@@ -476,7 +507,12 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         // Start drawing mode automatically
         setTimeout(() => {
           if (drawRef.current) {
-            drawRef.current.changeMode('draw_polygon');
+            try {
+              drawRef.current.changeMode('draw_polygon');
+              console.log('Drawing mode activated - click to add vertices');
+            } catch (error) {
+              console.error('Failed to activate drawing mode:', error);
+            }
           }
         }, 100);
 
@@ -499,6 +535,20 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
         drawCreateHandlerRef.current = handleCreate;
         map.on('draw.create', handleCreate as any);
+
+        // Add ESC key handler to cancel drawing
+        const handleEscape = (e: KeyboardEvent) => {
+          if (e.key === 'Escape' && drawRef.current) {
+            drawRef.current.deleteAll();
+            console.log('Drawing cancelled');
+          }
+        };
+        window.addEventListener('keydown', handleEscape);
+
+        // Cleanup function for escape handler
+        return () => {
+          window.removeEventListener('keydown', handleEscape);
+        };
       } else {
         // If draw control already exists, just change mode
         drawRef.current.deleteAll();
@@ -632,9 +682,15 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
       {/* Drawing mode badge */}
       {drawingMode && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
-          <span className="bg-primary text-black text-xs font-semibold px-3 py-1.5 rounded-full shadow animate-pulse">
-            Draw polygon on map — click to add vertices, double-click to finish
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
+          <span className="bg-primary text-black text-xs font-semibold px-4 py-2 rounded-full shadow-lg animate-pulse flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            Draw Mode Active
+          </span>
+          <span className="bg-zinc-900 text-zinc-300 text-xs px-3 py-1.5 rounded-lg border border-zinc-700 shadow">
+            Click to add vertices • Double-click to finish • ESC to cancel
           </span>
         </div>
       )}
