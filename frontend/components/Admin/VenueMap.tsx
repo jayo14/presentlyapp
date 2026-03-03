@@ -417,6 +417,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     const map = mapRef.current;
     if (!map || !mapReady) return;
 
+    let escapeHandler: ((e: KeyboardEvent) => void) | null = null;
+
     if (drawingMode) {
       // Set crosshair cursor to indicate drawing is active
       map.getCanvas().style.cursor = 'crosshair';
@@ -537,18 +539,13 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         map.on('draw.create', handleCreate as any);
 
         // Add ESC key handler to cancel drawing
-        const handleEscape = (e: KeyboardEvent) => {
+        escapeHandler = (e: KeyboardEvent) => {
           if (e.key === 'Escape' && drawRef.current) {
             drawRef.current.deleteAll();
             console.log('Drawing cancelled');
           }
         };
-        window.addEventListener('keydown', handleEscape);
-
-        // Cleanup function for escape handler
-        return () => {
-          window.removeEventListener('keydown', handleEscape);
-        };
+        window.addEventListener('keydown', escapeHandler);
       } else {
         // If draw control already exists, just change mode
         drawRef.current.deleteAll();
@@ -575,6 +572,13 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         drawRef.current = null;
       }
     }
+
+    // Cleanup function
+    return () => {
+      if (escapeHandler) {
+        window.removeEventListener('keydown', escapeHandler);
+      }
+    };
   }, [drawingMode, mapReady]);
 
   // Style switch
