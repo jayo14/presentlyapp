@@ -123,7 +123,10 @@ export const VenueMap: React.FC<VenueMapProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const drawRef = useRef<MapboxDraw | null>(null);
+  const drawCreateHandlerRef = useRef<((e: { features: GeoJSON.Feature[] }) => void) | null>(null);
+  const venueMarkersRef = useRef<maplibregl.Marker[]>([]);
   const tooltipRef = useRef<maplibregl.Popup | null>(null);
+  const drawingModeRef = useRef(drawingMode);
   const [mapType, setMapType] = useState<'road' | 'satellite'>('road');
   const [mapReady, setMapReady] = useState(false);
 
@@ -144,6 +147,51 @@ export const VenueMap: React.FC<VenueMapProps> = ({
   useEffect(() => { onVenueClickRef.current = onVenueClick; }, [onVenueClick]);
   useEffect(() => { onMapClickRef.current = onMapClick; }, [onMapClick]);
   useEffect(() => { onBoundaryCompleteRef.current = onBoundaryComplete; }, [onBoundaryComplete]);
+  useEffect(() => { drawingModeRef.current = drawingMode; }, [drawingMode]);
+
+  const clearVenueMarkers = useCallback(() => {
+    venueMarkersRef.current.forEach((marker) => marker.remove());
+    venueMarkersRef.current = [];
+  }, []);
+
+  const renderVenueMarkers = useCallback((map: maplibregl.Map) => {
+    clearVenueMarkers();
+
+    venuesRef.current
+      .filter((venue) => venue.latitude && venue.longitude)
+      .forEach((venue) => {
+        const isSelected = selectedVenueRef.current?.id === venue.id;
+        const isActive = activeSessRef.current.has(venue.id);
+        const color = isSelected
+          ? '#f9c406'
+          : isActive
+          ? '#ef4444'
+          : venue.venue_color || '#3b82f6';
+
+        const pin = document.createElement('button');
+        pin.type = 'button';
+        pin.className = 'focus:outline-none';
+        pin.title = venue.name;
+        pin.style.width = isSelected ? '22px' : '18px';
+        pin.style.height = isSelected ? '22px' : '18px';
+        pin.style.borderRadius = '9999px';
+        pin.style.backgroundColor = color;
+        pin.style.border = '2px solid #ffffff';
+        pin.style.boxShadow = isSelected ? '0 0 0 2px rgba(249, 196, 6, 0.45)' : '0 1px 3px rgba(0,0,0,0.45)';
+        pin.style.cursor = 'pointer';
+
+        pin.addEventListener('click', (event) => {
+          event.stopPropagation();
+          onVenueClickRef.current?.(venue);
+        });
+
+        const marker = new maplibregl.Marker({ element: pin, anchor: 'bottom' })
+          .setLngLat([Number(venue.longitude), Number(venue.latitude)])
+          .addTo(map);
+
+        venueMarkersRef.current.push(marker);
+      });
+  }, [clearVenueMarkers]);
 
   // Update search results when term changes
   useEffect(() => {
@@ -215,9 +263,9 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         type: 'circle',
         source: 'venue-points',
         paint: {
-          'circle-radius': 10,
+          'circle-radius': 0,
           'circle-color': ['get', 'color'],
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 0,
           'circle-stroke-color': '#ffffff',
         },
       });
@@ -248,6 +296,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
     map.on('load', () => {
       addSourcesAndLayers(map);
+      renderVenueMarkers(map);
       setMapReady(true);
     });
 
@@ -263,24 +312,18 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         bSrc.setData(
           buildBoundaryGeoJSON(venuesRef.current, activeSessRef.current, selectedVenueRef.current?.id),
         );
+      renderVenueMarkers(map);
     });
 
     // Click on empty area → create venue
     map.on('click', (e) => {
+      if (drawingModeRef.current) return;
       const features = map.queryRenderedFeatures(e.point, {
-        layers: ['venue-points-layer', 'venue-polygon-fill'],
+        layers: ['venue-polygon-fill'],
       });
       if (features.length === 0) {
         onMapClickRef.current?.(e.lngLat.lat, e.lngLat.lng);
       }
-    });
-
-    // Click on venue point
-    map.on('click', 'venue-points-layer', (e) => {
-      if (!e.features?.length) return;
-      const venueId = e.features[0].properties?.id as number;
-      const venue = venuesRef.current.find((v) => v.id === venueId);
-      if (venue) onVenueClickRef.current?.(venue);
     });
 
     // Click on venue polygon
@@ -289,23 +332,6 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       const venueId = e.features[0].properties?.id as number;
       const venue = venuesRef.current.find((v) => v.id === venueId);
       if (venue) onVenueClickRef.current?.(venue);
-    });
-
-    // Hover tooltip – point layer
-    map.on('mouseenter', 'venue-points-layer', (e) => {
-      map.getCanvas().style.cursor = 'pointer';
-      if (!e.features?.length) return;
-      const name = e.features[0].properties?.name as string;
-      tooltip
-        .setLngLat(e.lngLat)
-        .setHTML(
-          `<div class="font-semibold text-sm">${name}</div>`,
-        )
-        .addTo(map);
-    });
-    map.on('mouseleave', 'venue-points-layer', () => {
-      map.getCanvas().style.cursor = '';
-      tooltip.remove();
     });
 
     // Hover tooltip – polygon layer
@@ -327,11 +353,12 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
     return () => {
       tooltip.remove();
+      clearVenueMarkers();
       map.remove();
       mapRef.current = null;
       setMapReady(false);
     };
-  }, [addSourcesAndLayers]);
+  }, [addSourcesAndLayers, clearVenueMarkers, renderVenueMarkers]);
 
   // Sync venue data to map
   useEffect(() => {
@@ -343,6 +370,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
     if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions, selectedVenue?.id));
     if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions, selectedVenue?.id));
+    renderVenueMarkers(map);
 
     // Fly to selected venue; otherwise fit bounds
     if (selectedVenue?.latitude && selectedVenue?.longitude) {
@@ -358,7 +386,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       });
       if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 60, maxZoom: 16 });
     }
-  }, [venues, activeSessions, selectedVenue, mapReady]);
+  }, [venues, activeSessions, selectedVenue, mapReady, renderVenueMarkers]);
 
   // Drawing mode
   useEffect(() => {
@@ -416,14 +444,22 @@ export const VenueMap: React.FC<VenueMapProps> = ({
           draw.deleteAll();
         };
 
+        drawCreateHandlerRef.current = handleCreate;
         map.on('draw.create', handleCreate as any);
       }
+
+      drawRef.current.deleteAll();
+      drawRef.current.changeMode('draw_polygon');
     } else {
       // Restore default cursor
       map.getCanvas().style.cursor = '';
 
       if (drawRef.current) {
         try {
+          if (drawCreateHandlerRef.current) {
+            map.off('draw.create', drawCreateHandlerRef.current as any);
+            drawCreateHandlerRef.current = null;
+          }
           map.removeControl(drawRef.current as any);
         } catch {
           // ignore

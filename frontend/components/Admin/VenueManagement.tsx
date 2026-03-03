@@ -100,12 +100,18 @@ export const VenueManagement: React.FC = () => {
   const handleBoundaryComplete = (coords: number[][]) => {
     if (coords.length > 0) {
         if (isDrawing) {
-            // New venue via drawing
-            setNewVenueLocation({ lat: coords[0][0], lng: coords[0][1] });
-            setNewVenueBoundary(coords);
-            setEditingVenue(null);
-            setIsDrawing(false);
-            setShowModal(true);
+            if (selectedVenue) {
+              // Update selected venue boundary directly from drawing mode
+              setIsDrawing(false);
+              handleSaveVenue({ ...selectedVenue, boundary_coordinates: coords });
+            } else {
+              // New venue via drawing
+              setNewVenueLocation({ lat: coords[0][0], lng: coords[0][1] });
+              setNewVenueBoundary(coords);
+              setEditingVenue(null);
+              setIsDrawing(false);
+              setShowModal(true);
+            }
         } else if (selectedVenue) {
             // Updating existing venue boundary directly on map
             handleSaveVenue({ ...selectedVenue, boundary_coordinates: coords });

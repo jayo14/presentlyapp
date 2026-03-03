@@ -110,6 +110,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const avgAttendance = dashboardData?.attendance_stats?.average_attendance || 0;
   const nextClass = dashboardData?.next_class;
   const recentActivity = dashboardData?.recent_activity || [];
+    const getActivityCourseCode = (activity: StudentDashboardData['recent_activity'][number]) => {
+        return activity.course_code || 'ACT';
+    };
   
   // UI Constants
   const MAX_RECENT_ACTIVITY_MOBILE = 5; // Show up to 5 recent activities on mobile dashboard
@@ -791,7 +794,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                   </div>
                                   <div className="flex-1 min-w-0">
                                       <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                                          {activity.course.course_code}
+                                          {getActivityCourseCode(activity)}
                                       </p>
                                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                           {new Date(activity.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, {new Date(activity.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
@@ -974,10 +977,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                        <div key={activity.id} className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
                            <div className="flex items-center gap-4">
                                <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 text-sm">
-                                   {activity.course.course_code?.substring(0,2) || 'AT'}
+                                   {getActivityCourseCode(activity).substring(0,2)}
                                </div>
                                <div>
-                                   <p className="font-bold text-zinc-900 dark:text-white text-sm">{activity.course.course_code} {activity.type === 'attendance' ? 'Class' : ''}</p>
+                                   <p className="font-bold text-zinc-900 dark:text-white text-sm">{getActivityCourseCode(activity)} {activity.type === 'attendance' ? 'Class' : ''}</p>
                                    <p className="text-xs text-zinc-500">{new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                </div>
                            </div>
