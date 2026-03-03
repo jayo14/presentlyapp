@@ -11,12 +11,14 @@ import { FindMyLocation } from '../Location/FindMyLocation';
 import EnhancedAttendanceScanner from '../Attendance/EnhancedAttendanceScanner';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import { useCurrentUser } from '../../hooks/useAuth';
 
 interface StudentDashboardProps {
   userName: string;
   view?: string;
 }
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, view = 'dashboard' }) => {
+    const { data: currentUser } = useCurrentUser();
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [isWarningDismissed, setIsWarningDismissed] = useState(() => {
@@ -116,6 +118,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   
   // UI Constants
   const MAX_RECENT_ACTIVITY_MOBILE = 5; // Show up to 5 recent activities on mobile dashboard
+    const displayAvatar = currentUser?.avatar_url;
+    const displayInitials = userName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() || '')
+        .join('') || 'U';
 
   // Handler to dismiss warning
   const handleDismissWarning = () => {
@@ -521,9 +530,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                           <motion.div 
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
-                              className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/30"
+                                                            className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/30"
                           >
-                              {userName.charAt(0)}
+                                                            {displayAvatar ? (
+                                                                <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                displayInitials
+                                                            )}
                           </motion.div>
                           <div>
                               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
@@ -834,9 +847,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
             <p className="text-zinc-500 text-sm font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
             <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mt-1">Hello, {userName.split(' ')[0]}</h1>
           </div>
-          <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-400">
-              {userName.charAt(0)}
-          </div>
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-400">
+                            {displayAvatar ? (
+                                <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                displayInitials
+                            )}
+                    </div>
        </div>
 
        {/* PROMINENT MARK ATTENDANCE HERO */}
