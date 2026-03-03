@@ -72,6 +72,7 @@ export const VenueManagement: React.FC = () => {
   };
 
   const filteredVenues = Array.isArray(venues) ? venues.filter(venue => {
+    if (!venue) return false;
     const search = searchTerm.toLowerCase();
     const nameMatch = venue.name?.toLowerCase().includes(search) ?? false;
     const codeMatch = venue.code?.toLowerCase().includes(search) ?? false;
@@ -139,10 +140,19 @@ export const VenueManagement: React.FC = () => {
       // Use formData.id if present (e.g. from map update), otherwise check editingVenue
       const idToUpdate = formData.id || editingVenue?.id;
 
+      // Ensure all required fields are present and properly formatted
+      const cleanedData: Partial<Venue> = {
+        ...formData,
+        name: formData.name?.trim() || '',
+        code: formData.code?.trim() || '',
+        latitude: formData.latitude !== undefined ? Number(formData.latitude) : 0,
+        longitude: formData.longitude !== undefined ? Number(formData.longitude) : 0,
+      };
+
       if (idToUpdate) {
-        savedVenue = await venueApi.update(idToUpdate, formData);
+        savedVenue = await venueApi.update(idToUpdate, cleanedData);
       } else {
-        savedVenue = await venueApi.create(formData);
+        savedVenue = await venueApi.create(cleanedData);
       }
       await loadVenues(selectedInstitution || undefined);
       setSelectedVenue(savedVenue);
@@ -385,8 +395,14 @@ export const VenueManagement: React.FC = () => {
               <div className="flex items-center gap-2 text-zinc-400">
                 <MapIcon className="w-4 h-4" />
                 <span>
-                  {Number(venue.latitude).toFixed(6)}, {Number(venue.longitude).toFixed(6)}
-                  {venue.elevation && ` @ ${venue.elevation}m`}
+                  {venue.latitude && venue.longitude ? (
+                    <>
+                      {Number(venue.latitude).toFixed(6)}, {Number(venue.longitude).toFixed(6)}
+                      {venue.elevation && ` @ ${venue.elevation}m`}
+                    </>
+                  ) : (
+                    'No coordinates set'
+                  )}
                 </span>
               </div>
 
