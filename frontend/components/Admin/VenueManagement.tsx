@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map as MapIcon, List, Grid, X as CloseIcon, RefreshCw } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
 import { venueApi } from '../../services/api/venues';
 import { institutionsApi } from '../../services/api/institutions';
-import VenueModal from './VenueModal';
-import VenueMap from './VenueMap';
 import { SEO } from '../SEO';
+
+// Lazy load heavy components
+const VenueModal = lazy(() => import('./VenueModal'));
+const VenueMap = lazy(() => import('./VenueMap'));
 
 export const VenueManagement: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -332,14 +334,20 @@ export const VenueManagement: React.FC = () => {
       {/* Map or Grid View */}
       {viewMode === 'map' ? (
         <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden relative">
-          <VenueMap
-            venues={filteredVenues}
-            onVenueClick={handleVenueClick}
-            onMapClick={handleMapClick}
-            selectedVenue={selectedVenue}
-            drawingMode={isDrawing}
-            onBoundaryComplete={handleBoundaryComplete}
-          />
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-full">
+              <Loader className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          }>
+            <VenueMap
+              venues={filteredVenues}
+              onVenueClick={handleVenueClick}
+              onMapClick={handleMapClick}
+              selectedVenue={selectedVenue}
+              drawingMode={isDrawing}
+              onBoundaryComplete={handleBoundaryComplete}
+            />
+          </Suspense>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
@@ -469,19 +477,25 @@ export const VenueManagement: React.FC = () => {
 
       {/* Venue Modal */}
       {showModal && (
-        <VenueModal
-          venue={editingVenue || undefined}
-          institutions={institutions}
-          onSave={handleSaveVenue}
-          onClose={() => {
-            setShowModal(false);
-            setNewVenueLocation(null);
-            setNewVenueBoundary(null);
-          }}
-          initialLocation={newVenueLocation}
-          initialBoundary={newVenueBoundary}
-          drawMode={newVenueBoundary ? 'polygon' : 'point'}
-        />
+        <Suspense fallback={
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Loader className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        }>
+          <VenueModal
+            venue={editingVenue || undefined}
+            institutions={institutions}
+            onSave={handleSaveVenue}
+            onClose={() => {
+              setShowModal(false);
+              setNewVenueLocation(null);
+              setNewVenueBoundary(null);
+            }}
+            initialLocation={newVenueLocation}
+            initialBoundary={newVenueBoundary}
+            drawMode={newVenueBoundary ? 'polygon' : 'point'}
+          />
+        </Suspense>
       )}
     </div>
   );
