@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChevronLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight } from 'lucide-react-native';
+import { ChevronLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight, Camera } from 'lucide-react-native';
 import { useState } from 'react';
 import { CustomModal } from '@/components/CustomModal';
 import Fonts from '@/constants/fonts';
@@ -48,12 +48,19 @@ export default function LecturerProfileScreen() {
       >
         {/* Profile Header */}
         <View style={styles.profileHeader}>
-            <View style={[styles.avatarContainer, { borderColor: colors.primary + '33' }]}>
+            <TouchableOpacity
+              style={[styles.avatarContainer, { borderColor: colors.primary + '33' }]}
+              onPress={() => router.push('/(lecturer)/edit-photo')}
+              activeOpacity={0.8}
+            >
                 <Image
                 source={{ uri: user?.profilePicture || "https://lh3.googleusercontent.com/aida-public/AB6AXuArYVEE3JQ7abCyj84g5FZspghkA41SrRaPQ7yjLcPLAs35Tx23959JDeeGF4RJPsarjkaUB4Xr27ApgEIb8ygs7Bn02p_ReRH2oRCAQjLZgZ9qTqFGMZphgtq0toT7GeIDjs9gLSrIUU4PXmrusKrZR6us9L2itoMp_EXhQVblnNBYdRWwsadjtLI_Txq4aiykNPV5kv1bla9U4QZyyF2QmDFnvZXxAR4H_UqKyMVyvpo-XnTRGRB9iVTz9uzrh8hIZ9fSytIk3u0h" }}
                 style={styles.avatar}
                 />
-            </View>
+                <View style={[styles.editPhotoBadge, { backgroundColor: colors.primary }]}>
+                  <Camera size={13} color="#000" />
+                </View>
+            </TouchableOpacity>
             <Text style={[styles.userName, { color: colors.text }]}>{user?.fullName || 'Dr. Sarah Smith'}</Text>
             <Text style={[styles.userTitle, { color: isDark ? '#ccbf8e' : '#666666' }]}>
                 Senior Lecturer - Computer Science
@@ -177,6 +184,17 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     padding: 4,
     marginBottom: 16,
+    position: 'relative',
+  },
+  editPhotoBadge: {
+    position: 'absolute',
+    bottom: 6,
+    right: 6,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
     width: '100%',
