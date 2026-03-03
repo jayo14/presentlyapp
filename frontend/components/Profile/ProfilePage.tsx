@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ArrowLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight, Loader,
-  BookOpen, Calendar, PlusCircle, Edit, User
+  BookOpen, Calendar, PlusCircle, Edit, User, Mail, Phone, MapPin, Award, TrendingUp,
+  Clock, CheckCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
 import { Button } from '../Button';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
+import { SEO } from '../SEO';
 
 interface ProfilePageProps {
   userRole?: UserRole;
@@ -23,9 +25,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const navigate = useNavigate();
   const { data: user, isLoading } = useCurrentUser();
   const logoutMutation = useLogout();
+  const [showShareMenu, setShowShareMenu] = useState(false);
   
   const userName = user?.full_name || propUserName || 'Dr. Sarah Smith';
   const userAvatar = user?.avatar_url;
+  const userEmail = user?.email || 'user@presently.app';
   const userInitials = userName
     .split(' ')
     .filter(Boolean)
@@ -36,12 +40,32 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const userRoleDisplay = userRole === UserRole.LECTURER 
     ? 'Senior Lecturer - Computer Science' 
     : user?.department || 'Computer Science';
+  
+  // Mock stats - in real app, these would come from API
+  const stats = {
+    activeCourses: user?.active_courses_count || 6,
+    totalSessions: user?.total_sessions_count || 124,
+    attendanceRate: user?.attendance_rate || 94,
+    completedCourses: user?.completed_courses_count || 12
+  };
 
   const handleLogout = () => {
     if (propOnLogout) {
       propOnLogout();
     } else {
       logoutMutation.mutate();
+    }
+  };
+
+  const handleShare = () => {
+    setShowShareMenu(!showShareMenu);
+    // In a real app, implement share functionality
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Presently Profile',
+        text: `Check out ${userName}'s profile on Presently`,
+        url: window.location.href,
+      }).catch(() => {});
     }
   };
 
@@ -65,7 +89,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           <ArrowLeft size={24} className="text-white" />
         </button>
         <h1 className="text-xl font-bold text-white">Profile</h1>
-        <button className="p-2 hover:bg-zinc-800 rounded-full transition-colors">
+        <button 
+          onClick={handleShare}
+          className="p-2 hover:bg-zinc-800 rounded-full transition-colors"
+        >
           <Share2 size={24} className="text-zinc-400" />
         </button>
       </div>
@@ -96,15 +123,81 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 px-4 mb-8">
-        <div className="bg-zinc-900 border border-primary/30 rounded-2xl p-5 text-center">
-          <span className="text-white text-3xl font-bold block mb-1">6</span>
-          <span className="text-zinc-400 text-sm">Active Courses</span>
+      {/* Stats Grid - Enhanced with more details */}
+      <div className="grid grid-cols-2 gap-3 px-4 mb-8">
+        <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/80 border border-primary/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-primary/20 rounded-lg">
+              <BookOpen size={18} className="text-primary" />
+            </div>
+          </div>
+          <span className="text-white text-3xl font-bold block mb-1">{stats.activeCourses}</span>
+          <span className="text-zinc-400 text-xs">Active Courses</span>
         </div>
-        <div className="bg-zinc-900 border border-primary/30 rounded-2xl p-5 text-center">
-          <span className="text-white text-3xl font-bold block mb-1">124</span>
-          <span className="text-zinc-400 text-sm">Total Sessions</span>
+        <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/80 border border-blue-500/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-blue-500/20 rounded-lg">
+              <Calendar size={18} className="text-blue-400" />
+            </div>
+          </div>
+          <span className="text-white text-3xl font-bold block mb-1">{stats.totalSessions}</span>
+          <span className="text-zinc-400 text-xs">Total Sessions</span>
+        </div>
+        <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/80 border border-green-500/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-green-500/20 rounded-lg">
+              <TrendingUp size={18} className="text-green-400" />
+            </div>
+          </div>
+          <span className="text-white text-3xl font-bold block mb-1">{stats.attendanceRate}%</span>
+          <span className="text-zinc-400 text-xs">Attendance Rate</span>
+        </div>
+        <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/80 border border-purple-500/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-purple-500/20 rounded-lg">
+              <Award size={18} className="text-purple-400" />
+            </div>
+          </div>
+          <span className="text-white text-3xl font-bold block mb-1">{stats.completedCourses}</span>
+          <span className="text-zinc-400 text-xs">Completed</span>
+        </div>
+      </div>
+
+      {/* User Details Section */}
+      <div className="px-4 mb-8">
+        <h3 className="text-white text-lg font-semibold mb-4">Contact Information</h3>
+        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Mail size={18} className="text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-zinc-500">Email</p>
+              <p className="text-sm text-white font-medium">{userEmail}</p>
+            </div>
+          </div>
+          {user?.phone && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Phone size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-zinc-500">Phone</p>
+                <p className="text-sm text-white font-medium">{user.phone}</p>
+              </div>
+            </div>
+          )}
+          {user?.department && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <MapPin size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-zinc-500">Department</p>
+                <p className="text-sm text-white font-medium">{user.department}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -185,7 +278,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           <ArrowLeft size={24} className="text-text-primary" />
         </button>
         <h1 className="text-xl font-bold text-text-primary">Profile</h1>
-        <button className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-full transition-colors">
+        <button 
+          onClick={handleShare}
+          className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-full transition-colors"
+        >
           <Share2 size={24} className="text-text-primary" />
         </button>
       </div>
@@ -231,22 +327,76 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
       </div>
 
-      {/* Stats Cards - Two equal-width cards with subtle elevation */}
+      {/* Stats Grid - Enhanced 2x2 layout */}
       <div className="grid grid-cols-2 gap-4 mb-8 px-4 md:px-6">
-        <div className="bg-surface dark:bg-zinc-900 border border-primary/30 dark:border-primary/20 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-shadow">
+        <div className="bg-surface dark:bg-zinc-900 border border-primary/30 dark:border-primary/20 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-all hover:scale-105">
           <div className="bg-primary/10 dark:bg-primary/20 p-2 rounded-lg mb-2">
             <BookOpen size={20} className="text-primary" />
           </div>
-          <span className="text-text-primary text-3xl font-bold mb-1">6</span>
+          <span className="text-text-primary text-3xl font-bold mb-1">{stats.activeCourses}</span>
           <span className="text-text-secondary text-sm text-center">Active Courses</span>
         </div>
 
-        <div className="bg-surface dark:bg-zinc-900 border border-primary/30 dark:border-primary/20 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-shadow">
-          <div className="bg-primary/10 dark:bg-primary/20 p-2 rounded-lg mb-2">
-            <Calendar size={20} className="text-primary" />
+        <div className="bg-surface dark:bg-zinc-900 border border-blue-500/30 dark:border-blue-500/20 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-all hover:scale-105">
+          <div className="bg-blue-500/10 dark:bg-blue-500/20 p-2 rounded-lg mb-2">
+            <Calendar size={20} className="text-blue-500" />
           </div>
-          <span className="text-text-primary text-3xl font-bold mb-1">124</span>
+          <span className="text-text-primary text-3xl font-bold mb-1">{stats.totalSessions}</span>
           <span className="text-text-secondary text-sm text-center">Total Sessions</span>
+        </div>
+
+        <div className="bg-surface dark:bg-zinc-900 border border-green-500/30 dark:border-green-500/20 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-all hover:scale-105">
+          <div className="bg-green-500/10 dark:bg-green-500/20 p-2 rounded-lg mb-2">
+            <TrendingUp size={20} className="text-green-500" />
+          </div>
+          <span className="text-text-primary text-3xl font-bold mb-1">{stats.attendanceRate}%</span>
+          <span className="text-text-secondary text-sm text-center">Attendance</span>
+        </div>
+
+        <div className="bg-surface dark:bg-zinc-900 border border-purple-500/30 dark:border-purple-500/20 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-all hover:scale-105">
+          <div className="bg-purple-500/10 dark:bg-purple-500/20 p-2 rounded-lg mb-2">
+            <Award size={20} className="text-purple-500" />
+          </div>
+          <span className="text-text-primary text-3xl font-bold mb-1">{stats.completedCourses}</span>
+          <span className="text-text-secondary text-sm text-center">Completed</span>
+        </div>
+      </div>
+
+      {/* Contact Information Section */}
+      <div className="px-4 md:px-6 mb-8">
+        <h3 className="text-text-primary text-lg font-semibold mb-4">Contact Information</h3>
+        <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+              <Mail size={18} className="text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-text-secondary">Email</p>
+              <p className="text-sm text-text-primary font-medium">{userEmail}</p>
+            </div>
+          </div>
+          {user?.phone && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                <Phone size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-text-secondary">Phone</p>
+                <p className="text-sm text-text-primary font-medium">{user.phone}</p>
+              </div>
+            </div>
+          )}
+          {user?.department && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                <MapPin size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-text-secondary">Department</p>
+                <p className="text-sm text-text-primary font-medium">{user.department}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -345,10 +495,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   );
 
   return (
-    <ResponsiveContainer
-      mobileChildren={mobileLayout}
-    >
-      {desktopLayout}
-    </ResponsiveContainer>
+    <>
+      <SEO 
+        title={`${userName} | Profile | Presently`}
+        description={`View ${userName}'s profile, courses, and attendance statistics on Presently`}
+      />
+      <ResponsiveContainer
+        mobileChildren={mobileLayout}
+      >
+        {desktopLayout}
+      </ResponsiveContainer>
+    </>
   );
 };
