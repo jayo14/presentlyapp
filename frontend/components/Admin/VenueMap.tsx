@@ -361,11 +361,11 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
       if (pSrc)
         pSrc.setData(
-          buildPointGeoJSON(venuesRef.current, activeSessRef.current, selectedVenueRef.current?.id),
+          buildPointGeoJSON(venuesRef.current, activeSessRef.current as Set<number>, selectedVenueRef.current?.id),
         );
       if (bSrc)
         bSrc.setData(
-          buildBoundaryGeoJSON(venuesRef.current, activeSessRef.current, selectedVenueRef.current?.id),
+          buildBoundaryGeoJSON(venuesRef.current, activeSessRef.current as Set<number>, selectedVenueRef.current?.id),
         );
       renderVenueMarkers(map);
     });
@@ -446,8 +446,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     const pSrc = map.getSource('venue-points') as maplibregl.GeoJSONSource | undefined;
     const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
 
-    if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions, selectedVenue?.id));
-    if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions, selectedVenue?.id));
+    if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
+    if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
     renderVenueMarkers(map);
 
     // Fly to selected venue; otherwise fit bounds
