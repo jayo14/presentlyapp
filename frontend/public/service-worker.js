@@ -1,4 +1,4 @@
-const CACHE_NAME = 'presently-v5';
+const CACHE_NAME = 'presently-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -70,11 +70,13 @@ self.addEventListener('fetch', (event) => {
           if (response && response.status === 200) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', responseToCache));
+            return response;
           }
-          return response;
+          // Non-200 response (e.g. 404 from server before SPA rewrite): fall back to index.html
+          return caches.match('/index.html').then((cached) => cached ? cached : caches.match('/offline.html'));
         })
         .catch(() => {
-          return caches.match('/index.html') || caches.match('/offline.html');
+          return caches.match('/index.html').then((cached) => cached ? cached : caches.match('/offline.html'));
         })
     );
     return;
