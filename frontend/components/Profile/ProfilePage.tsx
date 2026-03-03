@@ -350,7 +350,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       <div className="relative mb-8 px-4 md:px-6">
         <div className="flex flex-col items-center">
           {/* Avatar with gold border - Larger per spec (120px) */}
-          <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary mb-4 shadow-lg">
+          <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary mb-4 shadow-lg group">
+            {uploadingAvatar && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+                <Loader className="w-8 h-8 animate-spin text-white" />
+              </div>
+            )}
             {userAvatar ? (
               <img 
                 src={userAvatar}
@@ -362,6 +367,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 {userInitials}
               </div>
             )}
+            {/* Camera button overlay - bottom right */}
+            <button
+              onClick={handleAvatarUpdate}
+              disabled={uploadingAvatar}
+              className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Update profile picture"
+            >
+              <Camera size={16} />
+            </button>
           </div>
 
           {/* Edit button floating top-right of avatar */}
