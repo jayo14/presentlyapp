@@ -41,4 +41,9 @@ export const authService = {
   refreshToken: async (refresh: string): Promise<any> => {
     return apiClient.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN, { refresh });
   },
+  uploadAvatar: async (formData: FormData): Promise<any> => {
+    return apiClient.post(API_ENDPOINTS.AUTH.UPLOAD_AVATAR, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };

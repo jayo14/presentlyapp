@@ -395,6 +395,13 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     }
   };
 
+  const updateProfilePicture = async (avatarUrl: string) => {
+    if (!user) return;
+    const updatedUser = { ...user, profilePicture: avatarUrl };
+    setUser(updatedUser);
+    await storage.setUser(updatedUser);
+  };
+
   const signOut = async () => {
     try {
       const refreshToken = await storage.getRefreshToken();
@@ -430,5 +437,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     refreshUser,
     signOut,
     checkAuth,
+    updateProfilePicture,
   };
 });
