@@ -19,6 +19,7 @@ export const Login: React.FC = () => {
   const googleAuthMutation = useGoogleAuth();
   const { data: user, isLoading } = useCurrentUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [hasHandledRedirect, setHasHandledRedirect] = useState(false);
 
   // Theme-aware colors (dark mode optimized)
   const bgColor = '#09090b';
@@ -40,7 +41,10 @@ export const Login: React.FC = () => {
     }
   }, [message]);
 
+  // Handle Google OAuth redirect - only once
   useEffect(() => {
+    if (hasHandledRedirect) return;
+    
     const handleRedirect = async () => {
       const auth = getFirebaseAuth();
       if (!auth) return;
@@ -48,6 +52,7 @@ export const Login: React.FC = () => {
       try {
         const result = await getRedirectResult(auth);
         if (result) {
+          setHasHandledRedirect(true);
           const idToken = await result.user.getIdToken();
           setIsRedirecting(true);
           // Use the rememberMe state to respect user's checkbox preference
@@ -67,25 +72,25 @@ export const Login: React.FC = () => {
     };
 
     handleRedirect();
-  }, [googleAuthMutation, rememberMe]);
+  }, [hasHandledRedirect, googleAuthMutation, rememberMe]);
 
-  // Auto-redirect if user is already logged in
+  // Auto-redirect if user is already logged in - optimized to only run once
   useEffect(() => {
-    if (user && !isLoading) {
-      setIsRedirecting(true);
-      const pendingCheckIn = localStorage.getItem('pending_checkin');
-      const explicitRedirect = searchParams.get('redirect_to');
+    if (!user || isLoading || isRedirecting) return;
 
-      if (!user.onboarding_complete) {
-        navigate('/onboarding', { replace: true });
-      } else if (explicitRedirect) {
-        navigate(explicitRedirect, { replace: true });
-      } else if (pendingCheckIn) {
-        localStorage.removeItem('pending_checkin');
-        navigate(`/check-in/${pendingCheckIn}`, { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
+    setIsRedirecting(true);
+    const pendingCheckIn = localStorage.getItem('pending_checkin');
+    const explicitRedirect = searchParams.get('redirect_to');
+
+    if (!user.onboarding_complete) {
+      navigate('/onboarding', { replace: true });
+    } else if (explicitRedirect) {
+      navigate(explicitRedirect, { replace: true });
+    } else if (pendingCheckIn) {
+      localStorage.removeItem('pending_checkin');
+      navigate(`/check-in/${pendingCheckIn}`, { replace: true });
+    } else {
+      navigate('/dashboard', { replace: true });
     }
   }, [user, isLoading, navigate, searchParams]);
 
@@ -148,8 +153,11 @@ export const Login: React.FC = () => {
   const onBack = () => navigate(-1);
   const onRegisterClick = () => navigate('/register');
 
-  // Show loading state while checking auth or redirecting
-  if (isLoading || isRedirecting) {
+  // Only show loading if we're redirecting OR if we have a user and are still loading
+  const shouldShowLoading = isRedirecting || (user && isLoading);
+
+  // Show loading state only when redirecting
+  if (shouldShowLoading) {
     return (
       <Box 
         minH="100vh" 
@@ -161,7 +169,7 @@ export const Login: React.FC = () => {
         <VStack gap={4}>
           <Spinner size="xl" color="yellow.400" thickness="4px" />
           <Text color={textSecondary}>
-            {isRedirecting ? 'Redirecting to dashboard' : 'Loading'}
+            Redirecting to dashboard
           </Text>
         </VStack>
       </Box>
