@@ -366,6 +366,9 @@ export const VenueMap: React.FC<VenueMapProps> = ({
     if (!map || !mapReady) return;
 
     if (drawingMode) {
+      // Set crosshair cursor to indicate drawing is active
+      map.getCanvas().style.cursor = 'crosshair';
+
       if (!drawRef.current) {
         const draw = new MapboxDraw({
           displayControlsDefault: false,
@@ -401,19 +404,24 @@ export const VenueMap: React.FC<VenueMapProps> = ({
           const polygon = e.features[0].geometry as GeoJSON.Polygon;
           if (polygon.type !== 'Polygon') return;
           const ring = polygon.coordinates[0];
-          // Close if needed, store as [[lng, lat]] (GeoJSON)
+          // Close the ring if needed (GeoJSON ring is [lng, lat])
           const closed =
             ring.length > 0 &&
             (ring[0][0] !== ring[ring.length - 1][0] || ring[0][1] !== ring[ring.length - 1][1])
               ? [...ring, ring[0]]
               : ring;
-          onBoundaryCompleteRef.current?.(closed);
+          // Convert from GeoJSON [lng, lat] to backend [lat, lng] convention
+          const latlng = closed.map(([lng, lat]) => [lat, lng] as [number, number]);
+          onBoundaryCompleteRef.current?.(latlng);
           draw.deleteAll();
         };
 
         map.on('draw.create', handleCreate as any);
       }
     } else {
+      // Restore default cursor
+      map.getCanvas().style.cursor = '';
+
       if (drawRef.current) {
         try {
           map.removeControl(drawRef.current as any);
