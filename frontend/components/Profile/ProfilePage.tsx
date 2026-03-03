@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ArrowLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight, Loader,
   BookOpen, Calendar, PlusCircle, Edit, User, Mail, Phone, MapPin, Award, TrendingUp,
-  Clock, CheckCircle
+  Clock, CheckCircle, Camera
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth';
@@ -10,6 +10,10 @@ import { UserRole } from '../../types';
 import { Button } from '../Button';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { SEO } from '../SEO';
+import { authApi } from '../../services/api/auth';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '../../hooks/useAuth';
 
 interface ProfilePageProps {
   userRole?: UserRole;
@@ -25,7 +29,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const navigate = useNavigate();
   const { data: user, isLoading } = useCurrentUser();
   const logoutMutation = useLogout();
+  const queryClient = useQueryClient();
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   
   const userName = user?.full_name || propUserName || 'Dr. Sarah Smith';
   const userAvatar = user?.avatar_url;
@@ -47,6 +53,46 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     totalSessions: user?.total_sessions_count || 124,
     attendanceRate: user?.attendance_rate || 94,
     completedCourses: user?.completed_courses_count || 12
+  };
+
+  const handleAvatarUpdate = async () => {
+    try {
+      setUploadingAvatar(true);
+      
+      // Import CameraService dynamically
+      const { CameraService } = await import('../../services/camera');
+      
+      // Get photo from user
+      const photoData = await CameraService.promptForPhoto({
+        quality: 80,
+        allowEditing: true,
+        width: 512,
+        height: 512,
+      });
+
+      if (!photoData) {
+        toast.error('No image selected');
+        return;
+      }
+
+      // Upload to backend
+      const avatarUrl = await authApi.uploadAvatar(photoData);
+      
+      // Update local user data
+      if (user) {
+        const updatedUser = { ...user, avatar_url: avatarUrl };
+        queryClient.setQueryData(queryKeys.currentUser, updatedUser);
+      }
+
+      toast.success('Profile picture updated successfully');
+    } catch (error: any) {
+      console.error('Avatar upload error:', error);
+      toast.error('Failed to update profile picture', {
+        description: error.message || 'Please try again'
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const handleLogout = () => {
@@ -99,8 +145,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
       {/* Profile Section */}
       <div className="flex flex-col items-center pt-8 pb-6 px-4">
-        {/* Avatar with gold border */}
-        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary mb-4 shadow-lg">
+        {/* Avatar with gold border and camera button */}
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary mb-4 shadow-lg group">
+          {uploadingAvatar && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+              <Loader className="w-8 h-8 animate-spin text-white" />
+            </div>
+          )}
           {userAvatar ? (
             <img 
               src={userAvatar}
@@ -112,6 +163,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               {userInitials}
             </div>
           )}
+          {/* Camera button overlay */}
+          <button
+            onClick={handleAvatarUpdate}
+            disabled={uploadingAvatar}
+            className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Update profile picture"
+          >
+            <Camera size={16} />
+          </button>
         </div>
 
         {/* User Info */}

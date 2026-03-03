@@ -72,9 +72,14 @@ export default defineConfig(({ mode }) => {
           'react-router-dom', 
           '@tanstack/react-query',
           'axios',
-          'lucide-react'
+          'lucide-react',
+          'maplibre-gl',
+          '@mapbox/mapbox-gl-draw'
         ],
         exclude: ['@google/genai'],
+        esbuildOptions: {
+          target: 'es2020'
+        }
       },
     };
 });
