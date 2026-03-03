@@ -389,6 +389,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       if (venue) onVenueClickRef.current?.(venue);
     });
 
+    // Click on venue points (for venues without boundaries)
+    map.on('click', 'venue-points-layer', (e) => {
+      if (!e.features?.length) return;
+      const venueId = e.features[0].properties?.id as number;
+      const venue = venuesRef.current.find((v) => v.id === venueId);
+      if (venue) onVenueClickRef.current?.(venue);
+    });
+
     // Hover tooltip – polygon layer
     map.on('mousemove', 'venue-polygon-fill', (e) => {
       map.getCanvas().style.cursor = 'pointer';
@@ -400,6 +408,21 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         .addTo(map);
     });
     map.on('mouseleave', 'venue-polygon-fill', () => {
+      map.getCanvas().style.cursor = '';
+      tooltip.remove();
+    });
+
+    // Hover tooltip – point layer
+    map.on('mousemove', 'venue-points-layer', (e) => {
+      map.getCanvas().style.cursor = 'pointer';
+      if (!e.features?.length) return;
+      const name = e.features[0].properties?.name as string;
+      tooltip
+        .setLngLat(e.lngLat)
+        .setHTML(`<div class="font-semibold text-sm">${name}</div>`)
+        .addTo(map);
+    });
+    map.on('mouseleave', 'venue-points-layer', () => {
       map.getCanvas().style.cursor = '';
       tooltip.remove();
     });
