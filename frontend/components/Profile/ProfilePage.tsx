@@ -24,8 +24,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const { data: user, isLoading } = useCurrentUser();
   const logoutMutation = useLogout();
   
-  const userAvatar = user?.avatar_url || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400';
   const userName = user?.full_name || propUserName || 'Dr. Sarah Smith';
+  const userAvatar = user?.avatar_url;
+  const userInitials = userName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || '')
+    .join('') || 'U';
   const userRole = user?.role || propUserRole || UserRole.STUDENT;
   const userRoleDisplay = userRole === UserRole.LECTURER 
     ? 'Senior Lecturer - Computer Science' 
@@ -68,11 +74,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       <div className="flex flex-col items-center pt-8 pb-6 px-4">
         {/* Avatar with gold border */}
         <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary mb-4 shadow-lg">
-          <img 
-            src={userAvatar}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
+          {userAvatar ? (
+            <img 
+              src={userAvatar}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-white text-3xl font-bold">
+              {userInitials}
+            </div>
+          )}
         </div>
 
         {/* User Info */}
@@ -183,11 +195,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div className="flex flex-col items-center">
           {/* Avatar with gold border - Larger per spec (120px) */}
           <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary mb-4 shadow-lg">
-            <img 
-              src={userAvatar}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
+            {userAvatar ? (
+              <img 
+                src={userAvatar}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-white text-3xl font-bold">
+                {userInitials}
+              </div>
+            )}
           </div>
 
           {/* Edit button floating top-right of avatar */}

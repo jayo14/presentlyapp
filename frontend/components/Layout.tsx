@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Logo } from './Logo';
 import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap, Building2, Building, Timer, Menu, X } from 'lucide-react';
 import { UserRole } from '../types';
+import { useCurrentUser } from '../hooks/useAuth';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -45,6 +46,7 @@ if (typeof window !== 'undefined') {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
+  const { data: currentUser } = useCurrentUser();
   const [isDark, setIsDark] = useState(() => {
     // Initialize from localStorage or default to false
     const savedTheme = localStorage.getItem('theme');
@@ -192,6 +194,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   };
 
   const navItems = getNavItems();
+  const displayAvatar = currentUser?.avatar_url;
+  const displayInitials = userName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || '')
+    .join('') || 'U';
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row transition-colors duration-300">
@@ -291,8 +300,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
           {!sidebarCollapsed && (
             <div className="flex items-center gap-3 px-4 py-3">
-              <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
-                 {userRole === UserRole.STUDENT ? 'S' : (userRole === UserRole.LECTURER ? 'L' : (userRole === UserRole.ADMIN ? 'A' : 'CR'))}
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
+                {displayAvatar ? (
+                  <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                    {displayInitials}
+                  </div>
+                )}
               </div>
               <div className="flex-1 overflow-hidden">
                   <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">{userName}</p>
@@ -302,8 +317,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           )}
           {sidebarCollapsed && (
             <div className="flex items-center justify-center px-4 py-3">
-              <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
-                 {userRole === UserRole.STUDENT ? 'S' : (userRole === UserRole.LECTURER ? 'L' : (userRole === UserRole.ADMIN ? 'A' : 'CR'))}
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
+                {displayAvatar ? (
+                  <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                    {displayInitials}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -361,8 +382,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
           <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
               <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
-                     {userName.charAt(0)}
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
+                    {displayAvatar ? (
+                      <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-sm font-bold text-primary">
+                        {displayInitials}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 overflow-hidden">
                       <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{userName}</p>
