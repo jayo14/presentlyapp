@@ -243,6 +243,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         paint: {
           'fill-color': ['get', 'fillColor'],
           'fill-opacity': ['get', 'fillOpacity'],
+          'fill-antialias': true,
         },
       });
     }
@@ -254,6 +255,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         paint: {
           'line-color': ['get', 'strokeColor'],
           'line-width': ['get', 'strokeWidth'],
+          'line-opacity': 1,
         },
       });
     }
@@ -263,9 +265,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         type: 'circle',
         source: 'venue-points',
         paint: {
-          'circle-radius': 0,
+          'circle-radius': 6,
           'circle-color': ['get', 'color'],
-          'circle-stroke-width': 0,
+          'circle-stroke-width': 3,
           'circle-stroke-color': '#ffffff',
         },
       });
@@ -279,18 +281,47 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         source: 'venue-polygons',
         layout: {
           'text-field': ['get', 'name'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
+          'text-font': ['Arial Unicode MS', 'Open Sans Regular'],
+          'text-size': 14,
           'text-anchor': 'center',
           'text-offset': [0, 0],
-          'text-allow-overlap': false,
+          'text-allow-overlap': true,
           'text-ignore-placement': false,
+          'text-optional': true,
+          'text-max-width': 8,
+        },
+        paint: {
+          'text-color': '#ffffff',
+          'text-halo-color': '#000000',
+          'text-halo-width': 3,
+          'text-halo-blur': 2,
+          'text-opacity': 1,
+        },
+      });
+    }
+
+    // Add venue point labels (for venues with points only)
+    if (!map.getLayer('venue-point-labels')) {
+      map.addLayer({
+        id: 'venue-point-labels',
+        type: 'symbol',
+        source: 'venue-points',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Arial Unicode MS', 'Open Sans Regular'],
+          'text-size': 12,
+          'text-anchor': 'top',
+          'text-offset': [0, 1],
+          'text-allow-overlap': true,
+          'text-ignore-placement': false,
+          'text-max-width': 8,
         },
         paint: {
           'text-color': '#ffffff',
           'text-halo-color': '#000000',
           'text-halo-width': 2,
           'text-halo-blur': 1,
+          'text-opacity': 1,
         },
       });
     }
