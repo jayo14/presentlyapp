@@ -24,7 +24,14 @@ export default defineConfig(({ mode }) => {
         // Enable code splitting
         rollupOptions: {
           output: {
-            // manualChunks removed to let Vite optimize chunks automatically and avoid circular dependencies
+            manualChunks: {
+              // Vendor chunks for better caching
+              'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+              'query-vendor': ['@tanstack/react-query'],
+              'map-vendor': ['maplibre-gl', '@mapbox/mapbox-gl-draw'],
+              'ui-vendor': ['lucide-react', 'recharts'],
+              'utils': ['axios'],
+            },
           },
         },
         // Optimize chunk size
@@ -59,7 +66,14 @@ export default defineConfig(({ mode }) => {
       },
       // Performance optimizations
       optimizeDeps: {
-        include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
+        include: [
+          'react', 
+          'react-dom', 
+          'react-router-dom', 
+          '@tanstack/react-query',
+          'axios',
+          'lucide-react'
+        ],
         exclude: ['@google/genai'],
       },
     };
