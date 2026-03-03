@@ -322,6 +322,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               <div className="px-4 space-y-3">
                   {enrolledCourses.slice(0, 4).map((course) => {
                       const attendance = course.attendance_percentage || 0;
+                      const courseCode = course.course_code || 'COURSE';
                       const getStatusColor = () => {
                           if (attendance >= 90) return 'bg-[#FFD700]';
                           if (attendance >= 75) return 'bg-[#4CAF50]';
@@ -331,16 +332,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       
                       const getIcon = () => {
                           const iconClass = "w-6 h-6";
-                          if (course.course.course_code.includes('CALC')) return <div className={`${iconClass} bg-[#FFD700] rounded-lg flex items-center justify-center text-black text-xs font-bold`}>∫</div>;
-                          if (course.course.course_code.includes('PHYS')) return <div className={`${iconClass} bg-[#4A90E2] rounded-lg`} />;
-                          if (course.course.course_code.includes('ART')) return <div className={`${iconClass} bg-[#9B59B6] rounded-lg`} />;
-                          if (course.course.course_code.includes('CS')) return <div className={`${iconClass} bg-[#E91E63] rounded-lg`} />;
+                          if (courseCode.includes('CALC')) return <div className={`${iconClass} bg-[#FFD700] rounded-lg flex items-center justify-center text-black text-xs font-bold`}>∫</div>;
+                          if (courseCode.includes('PHYS')) return <div className={`${iconClass} bg-[#4A90E2] rounded-lg`} />;
+                          if (courseCode.includes('ART')) return <div className={`${iconClass} bg-[#9B59B6] rounded-lg`} />;
+                          if (courseCode.includes('CS')) return <div className={`${iconClass} bg-[#E91E63] rounded-lg`} />;
                           return <BookOpen className={iconClass} />;
                       };
                       
                       return (
                           <div 
-                              key={course.course.course_code}
+                              key={course.id || courseCode}
                               className="bg-[#2A2A25] rounded-xl p-4 flex items-center gap-3"
                           >
                               {getIcon()}
@@ -475,10 +476,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                   </div>
                   <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
                       {analyticsData?.course_performance?.map((course) => (
-                          <div key={course.course.course_code} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
+                          <div key={course.course_code} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
                               <div className="flex-1">
                                   <div className="flex justify-between mb-2">
-                                      <span className="font-bold text-zinc-900 dark:text-white text-sm">{course.course.course_code}</span>
+                                      <span className="font-bold text-zinc-900 dark:text-white text-sm">{course.course_code}</span>
                                       <span className={`text-sm font-bold ${course.attendance_percentage >= 75 ? 'text-green-500' : 'text-red-500'}`}>{course.attendance_percentage}%</span>
                                   </div>
                                   <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
