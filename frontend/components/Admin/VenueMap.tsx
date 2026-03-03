@@ -403,20 +403,65 @@ export const VenueMap: React.FC<VenueMapProps> = ({
           controls: { polygon: true, trash: true },
           defaultMode: 'draw_polygon',
           styles: [
+            // Polygon fill (active drawing)
             {
-              id: 'gl-draw-polygon-fill',
+              id: 'gl-draw-polygon-fill-inactive',
               type: 'fill',
-              filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-              paint: { 'fill-color': '#f9c406', 'fill-opacity': 0.3 },
+              filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+              paint: { 'fill-color': '#f9c406', 'fill-opacity': 0.2 },
             },
             {
-              id: 'gl-draw-polygon-stroke',
+              id: 'gl-draw-polygon-fill-active',
+              type: 'fill',
+              filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+              paint: { 'fill-color': '#f9c406', 'fill-opacity': 0.3 },
+            },
+            // Polygon outline
+            {
+              id: 'gl-draw-polygon-stroke-inactive',
               type: 'line',
-              filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+              filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+              layout: { 'line-cap': 'round', 'line-join': 'round' },
               paint: { 'line-color': '#f9c406', 'line-width': 2 },
             },
             {
-              id: 'gl-draw-polygon-vertex',
+              id: 'gl-draw-polygon-stroke-active',
+              type: 'line',
+              filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+              layout: { 'line-cap': 'round', 'line-join': 'round' },
+              paint: { 'line-color': '#f9c406', 'line-width': 3 },
+            },
+            // Line string (while drawing)
+            {
+              id: 'gl-draw-line',
+              type: 'line',
+              filter: ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+              layout: { 'line-cap': 'round', 'line-join': 'round' },
+              paint: { 'line-color': '#f9c406', 'line-dasharray': [0.2, 2], 'line-width': 2 },
+            },
+            // Polygon midpoints
+            {
+              id: 'gl-draw-polygon-midpoint',
+              type: 'circle',
+              filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'midpoint']],
+              paint: { 'circle-radius': 4, 'circle-color': '#f9c406', 'circle-opacity': 0.7 },
+            },
+            // Vertices
+            {
+              id: 'gl-draw-polygon-and-line-vertex-stroke-inactive',
+              type: 'circle',
+              filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
+              paint: { 'circle-radius': 6, 'circle-color': '#ffffff' },
+            },
+            {
+              id: 'gl-draw-polygon-and-line-vertex-inactive',
+              type: 'circle',
+              filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
+              paint: { 'circle-radius': 4, 'circle-color': '#f9c406' },
+            },
+            // Active vertex
+            {
+              id: 'gl-draw-polygon-and-line-vertex-active',
               type: 'circle',
               filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
               paint: { 'circle-radius': 5, 'circle-color': '#f9c406' },
@@ -424,7 +469,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
           ],
         });
 
-        map.addControl(draw as any);
+        map.addControl(draw as any, 'top-right');
         drawRef.current = draw;
 
         const handleCreate = (e: { features: GeoJSON.Feature[] }) => {
@@ -446,10 +491,11 @@ export const VenueMap: React.FC<VenueMapProps> = ({
 
         drawCreateHandlerRef.current = handleCreate;
         map.on('draw.create', handleCreate as any);
+      } else {
+        // If draw control already exists, just change mode
+        drawRef.current.deleteAll();
+        drawRef.current.changeMode('draw_polygon');
       }
-
-      drawRef.current.deleteAll();
-      drawRef.current.changeMode('draw_polygon');
     } else {
       // Restore default cursor
       map.getCanvas().style.cursor = '';
