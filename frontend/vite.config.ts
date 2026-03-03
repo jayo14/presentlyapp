@@ -78,8 +78,18 @@ export default defineConfig(({ mode }) => {
         ],
         exclude: ['@google/genai'],
         esbuildOptions: {
-          target: 'es2020'
+          target: 'es2020',
+          // Fix for __publicField errors with class fields
+          define: {
+            __publicField: 'void'
+          }
         }
+      },
+      // Additional esbuild options
+      esbuild: {
+        // Handle class fields properly
+        target: 'es2020',
+        keepNames: true,
       },
     };
 });

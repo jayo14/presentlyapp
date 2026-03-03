@@ -135,3 +135,61 @@
     border-radius: 4px;
   }
 }
+/* MapLibre and Mapbox Draw Styles */
+.maplibregl-canvas-container.maplibregl-interactive,
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass {
+  cursor: inherit;
+}
+
+.maplibregl-popup-content {
+  @apply bg-zinc-900 text-white border border-zinc-700 rounded-lg shadow-xl;
+  padding: 8px 12px;
+}
+
+.maplibregl-popup-tip {
+  @apply border-zinc-900;
+}
+
+/* Mapbox Draw Control Styles */
+.mapbox-gl-draw_ctrl-draw-btn {
+  @apply bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white;
+  border: 1px solid #e4e4e7 !important;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+.mapbox-gl-draw_ctrl-draw-btn:hover {
+  @apply bg-zinc-100 dark:bg-zinc-800;
+}
+
+.mapbox-gl-draw_ctrl-draw-btn.active {
+  @apply bg-primary text-zinc-900;
+  border-color: #FFD700 !important;
+}
+
+.mapboxgl-ctrl-group,
+.maplibregl-ctrl-group {
+  @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl;
+  overflow: hidden;
+}
+
+.mapboxgl-ctrl-group button,
+.maplibregl-ctrl-group button {
+  @apply text-zinc-700 dark:text-zinc-300;
+  background-color: transparent !important;
+}
+
+.mapboxgl-ctrl-group button:hover,
+.maplibregl-ctrl-group button:hover {
+  @apply bg-zinc-100 dark:bg-zinc-800;
+}
+
+/* Enhance map canvas cursor for drawing mode */
+.maplibregl-canvas-container.maplibregl-interactive[style*="cursor: crosshair"] {
+  cursor: crosshair !important;
+}
+
+/* Venue label styles */
+.maplibregl-map .maplibregl-canvas-container canvas {
+  outline: none;
+}
