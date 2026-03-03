@@ -21,7 +21,7 @@ const PRESET_COLORS = [
   '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6',
 ];
 
-export const VenueModal: React.FC<VenueModalProps> = ({
+export const VenueModal: React.FC<VenueModalProps> = React.memo(({
   venue,
   institutions,
   onSave,
@@ -534,6 +534,8 @@ export const VenueModal: React.FC<VenueModalProps> = ({
       </div>
     </div>
   );
-};
+});
+
+VenueModal.displayName = 'VenueModal';
 
 export default VenueModal;
