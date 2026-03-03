@@ -111,7 +111,7 @@ function buildBoundaryGeoJSON(
   };
 }
 
-export const VenueMap: React.FC<VenueMapProps> = ({
+export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   venues,
   activeSessions = new Set(),
   onVenueClick,
@@ -628,6 +628,8 @@ export const VenueMap: React.FC<VenueMapProps> = ({
       )}
     </div>
   );
-};
+});
+
+VenueMap.displayName = 'VenueMap';
 
 export default VenueMap;
