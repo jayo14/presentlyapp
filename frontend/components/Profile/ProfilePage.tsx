@@ -13,7 +13,7 @@ import { SEO } from '../SEO';
 import { authApi } from '../../services/api/auth';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../../hooks/useAuth';
+import { queryKeys } from '../../services/api/queryClient';
 
 interface ProfilePageProps {
   userRole?: UserRole;
