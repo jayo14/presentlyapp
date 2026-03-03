@@ -1,46 +1,73 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAttendance } from '@/contexts/AttendanceContext';
-import { ChevronLeft, ChevronDown, TrendingUp, Calculator, BookOpen } from 'lucide-react-native';
+import { ChevronLeft, TrendingUp, BookOpen, TrendingDown } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import Svg, { Circle } from 'react-native-svg';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { api } from '@/services/api';
 
 export default function StudentAnalyticsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { stats } = useAttendance();
-  const [courseBreakdown, setCourseBreakdown] = useState<any[]>([]);
+  const { stats, courses, refreshData } = useAttendance();
+  const [weeklyTrends, setWeeklyTrends] = useState<any[]>([]);
+  const [trendInfo, setTrendInfo] = useState<{ label: string; positive: boolean } | null>(null);
   const [fetching, setFetching] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const percentage = stats.percentage || 0;
   const circumference = 2 * Math.PI * 80;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
-  const loadBreakdown = async () => {
+  const loadAnalytics = useCallback(async () => {
     try {
-        setFetching(true);
-        // This is a placeholder since we don't have a specific breakdown API yet in ApiService
-        // But we can simulate or fetch from a general endpoint if it existed
-        // For now we'll use the stats and history to build a mock-ish but slightly more dynamic list
-        setCourseBreakdown([
-            { id: '1', name: 'Advanced Calculus', percentage: 95, icon: <Calculator size={20} color={colors.primary} /> },
-            { id: '2', name: 'Physics II', percentage: 88, icon: <BookOpen size={20} color="#42A5F5" /> },
-            { id: '3', name: 'History of Art', percentage: 65, icon: <BookOpen size={20} color="#9E9E9E" />, low: true },
-            { id: '4', name: 'Comp Sci 101', percentage: 98, icon: <BookOpen size={20} color="#AB47BC" /> },
-        ]);
+      setFetching(true);
+      const response: any = await api.analytics.getStudentDashboard();
+
+      if (response?.weekly_trends && Array.isArray(response.weekly_trends)) {
+        const trends = response.weekly_trends.slice(-4);
+        setWeeklyTrends(trends);
+      } else if (response?.attendance_stats?.weekly_breakdown) {
+        setWeeklyTrends(response.attendance_stats.weekly_breakdown.slice(-4));
+      }
+
+      if (response?.attendance_stats) {
+        const stats = response.attendance_stats;
+        const change = stats.trend_vs_last_month ?? stats.change_percentage;
+        if (change !== undefined) {
+          setTrendInfo({
+            label: `${Math.abs(change) >= 0 ? '+' : ''}${Number(change).toFixed(1)}% vs last month`,
+            positive: Number(change) >= 0,
+          });
+        }
+      }
     } catch (e) {
-        console.error(e);
+      console.error('Analytics load error', e);
     } finally {
-        setFetching(false);
+      setFetching(false);
     }
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([refreshData(), loadAnalytics()]);
+    setRefreshing(false);
   };
 
   useEffect(() => {
-    loadBreakdown();
+    loadAnalytics();
   }, []);
+
+  // Build course breakdown from the AttendanceContext courses (already loaded from backend)
+  const courseBreakdown = courses.map(c => ({
+    id: c.id,
+    name: c.name,
+    percentage: c.percentage,
+    low: c.percentage < 75,
+  }));
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
@@ -55,19 +82,11 @@ export default function StudentAnalyticsScreen() {
         <View style={{ width: 44 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Filters */}
-        <View style={styles.filtersContainer}>
-          <TouchableOpacity style={[styles.filterBtn, { backgroundColor: isDark ? '#4a4121' : '#F1F5F9' }]}>
-            <Text style={[styles.filterText, { color: colors.text }]}>Semester 1</Text>
-            <ChevronDown size={18} color={colors.text} />
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.filterBtn, { backgroundColor: isDark ? '#4a4121' : '#F1F5F9' }]}>
-            <Text style={[styles.filterText, { color: colors.text }]}>All Courses</Text>
-            <ChevronDown size={18} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+      >
         {/* Hero Circular Chart */}
         <View style={styles.heroSection}>
           <View style={styles.chartContainer}>
@@ -94,57 +113,95 @@ export default function StudentAnalyticsScreen() {
               />
             </Svg>
             <View style={styles.chartTextContainer}>
-              <Text style={[styles.chartValue, { color: colors.text }]}>{percentage}%</Text>
+              <Text style={[styles.chartValue, { color: colors.text }]}>{percentage.toFixed(1)}%</Text>
               <Text style={[styles.chartLabel, { color: colors.textSecondary }]}>Overall Attendance</Text>
             </View>
           </View>
 
-          <View style={[styles.trendBadge, { backgroundColor: '#66BB6A1A' }]}>
-            <TrendingUp size={16} color="#10B981" />
-            <Text style={[styles.trendText, { color: '#10B981' }]}>+2% vs last month</Text>
+          {trendInfo && (
+            <View style={[styles.trendBadge, { backgroundColor: trendInfo.positive ? '#66BB6A1A' : 'rgba(239,68,68,0.1)' }]}>
+              {trendInfo.positive ? (
+                <TrendingUp size={16} color="#10B981" />
+              ) : (
+                <TrendingDown size={16} color="#EF4444" />
+              )}
+              <Text style={[styles.trendText, { color: trendInfo.positive ? '#10B981' : '#EF4444' }]}>
+                {trendInfo.label}
+              </Text>
+            </View>
+          )}
+
+          {/* Summary Stats */}
+          <View style={styles.summaryRow}>
+            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
+              <Text style={[styles.summaryVal, { color: '#10B981' }]}>{stats.attended}</Text>
+              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Attended</Text>
+            </View>
+            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
+              <Text style={[styles.summaryVal, { color: '#EF4444' }]}>{Math.max(0, stats.totalSessions - stats.attended)}</Text>
+              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Missed</Text>
+            </View>
+            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
+              <Text style={[styles.summaryVal, { color: colors.text }]}>{stats.totalSessions}</Text>
+              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Total</Text>
+            </View>
           </View>
         </View>
 
         {/* Weekly Trends Bar Chart */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Weekly Trends</Text>
-          <View style={[styles.card, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
-            <View style={styles.cardHeader}>
-                <View>
-                    <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>AVERAGE</Text>
-                    <Text style={[styles.cardValue, { color: colors.text }]}>18.5 hrs</Text>
-                </View>
-                <View style={[styles.periodBadge, { backgroundColor: colors.primary + '33' }]}>
-                    <Text style={[styles.periodText, { color: colors.primary }]}>Last 4 Weeks</Text>
-                </View>
-            </View>
+        {weeklyTrends.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Weekly Trends</Text>
+            <View style={[styles.card, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
+              <View style={styles.cardHeader}>
+                  <View>
+                      <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>LAST 4 WEEKS</Text>
+                      <Text style={[styles.cardValue, { color: colors.text }]}>Attendance Rate</Text>
+                  </View>
+                  <View style={[styles.periodBadge, { backgroundColor: colors.primary + '33' }]}>
+                      <Text style={[styles.periodText, { color: colors.primary }]}>Weekly</Text>
+                  </View>
+              </View>
 
-            <View style={styles.barChart}>
-                <BarItem label="W1" height="65%" active={false} colors={colors} isDark={isDark} />
-                <BarItem label="W2" height="85%" active={false} colors={colors} isDark={isDark} />
-                <BarItem label="W3" height="45%" active={false} colors={colors} isDark={isDark} />
-                <BarItem label="W4" height="92%" active={true} colors={colors} isDark={isDark} />
+              <View style={styles.barChart}>
+                  {weeklyTrends.map((week, idx) => {
+                    const pct = typeof week === 'number' ? week : (week?.percentage ?? week?.rate ?? 0);
+                    const heightPct = `${Math.max(5, pct)}%`;
+                    return (
+                      <BarItem
+                        key={idx}
+                        label={week?.label || `W${idx + 1}`}
+                        height={heightPct}
+                        active={idx === weeklyTrends.length - 1}
+                        colors={colors}
+                        isDark={isDark}
+                        value={`${Math.round(pct)}%`}
+                      />
+                    );
+                  })}
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         {/* Course Breakdown */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Course Breakdown</Text>
-            <TouchableOpacity>
-                <Text style={[styles.seeAllText, { color: colors.primary }]}>See All</Text>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.courseList}>
-            {fetching ? (
+            {fetching && courseBreakdown.length === 0 ? (
                 <ActivityIndicator color={colors.primary} />
+            ) : courseBreakdown.length === 0 ? (
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                  No courses enrolled yet.
+                </Text>
             ) : (
                 courseBreakdown.map((item) => (
                     <CourseStatItem
                         key={item.id}
-                        icon={item.icon}
+                        icon={<BookOpen size={20} color={item.low ? '#9E9E9E' : colors.primary} />}
                         name={item.name}
                         percentage={item.percentage}
                         colors={colors}
@@ -159,17 +216,6 @@ export default function StudentAnalyticsScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-function BarItem({ label, height, active, colors, isDark }: any) {
-    return (
-        <View style={styles.barContainer}>
-            <View style={[styles.barBackground, { backgroundColor: isDark ? '#4a4121' : '#F1F5F9' }]}>
-                <View style={[styles.barFill, { height, backgroundColor: active ? colors.primary : (isDark ? colors.primary + '99' : colors.primary + '66') }]} />
-            </View>
-            <Text style={[styles.barLabel, { color: active ? colors.primary : colors.textSecondary, fontFamily: active ? Fonts.lexend.bold : Fonts.lexend.medium }]}>{label}</Text>
-        </View>
-    );
 }
 
 function CourseStatItem({ icon, name, percentage, colors, isDark, low }: any) {
