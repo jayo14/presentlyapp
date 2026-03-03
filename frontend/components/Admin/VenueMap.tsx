@@ -469,8 +469,16 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           ],
         });
 
+        // Add the control to the map
         map.addControl(draw as any, 'top-right');
         drawRef.current = draw;
+
+        // Start drawing mode automatically
+        setTimeout(() => {
+          if (drawRef.current) {
+            drawRef.current.changeMode('draw_polygon');
+          }
+        }, 100);
 
         const handleCreate = (e: { features: GeoJSON.Feature[] }) => {
           if (!e.features?.length) return;
@@ -494,7 +502,11 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       } else {
         // If draw control already exists, just change mode
         drawRef.current.deleteAll();
-        drawRef.current.changeMode('draw_polygon');
+        setTimeout(() => {
+          if (drawRef.current) {
+            drawRef.current.changeMode('draw_polygon');
+          }
+        }, 50);
       }
     } else {
       // Restore default cursor
