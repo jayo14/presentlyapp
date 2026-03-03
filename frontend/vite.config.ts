@@ -79,10 +79,6 @@ export default defineConfig(({ mode }) => {
         exclude: ['@google/genai'],
         esbuildOptions: {
           target: 'es2020',
-          // Fix for __publicField errors with class fields
-          define: {
-            __publicField: 'void'
-          }
         }
       },
       // Additional esbuild options
