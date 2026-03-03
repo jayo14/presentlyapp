@@ -170,7 +170,9 @@ class VenueSerializer(serializers.ModelSerializer):
             
             # Store as JSON array (boundary takes priority over radius-based verification)
             attrs['boundary'] = boundary_coords
-            
+
+        # Remove boundary_coordinates since it is not a Venue model field
+        attrs.pop('boundary_coordinates', None)
         return attrs
     
     def validate_boundary_coordinates(self, value):
