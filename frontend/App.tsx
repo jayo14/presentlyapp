@@ -21,6 +21,7 @@ import { DocumentationPage } from './components/DocumentationPage';
 import { VolunteersPage } from './components/VolunteersPage';
 
 // Lazy load less critical components
+import { LoadingScreen } from './components/LoadingScreen';
 const Onboarding = lazy(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
 const EmailVerificationSent = lazy(() => import('./components/Auth/EmailVerificationSent').then(module => ({ default: module.EmailVerificationSent })));
 const VerifyEmail = lazy(() => import('./components/Auth/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
@@ -54,14 +55,7 @@ const VenueManagement = lazy(() => import('./components/Admin/VenueManagement').
 const DepartmentManagement = lazy(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
 
 // Loading fallback component
-const LoadingFallback: React.FC = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center" role="status" aria-live="polite" aria-label="Loading content">
-    <div className="text-center">
-      <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto mb-4" aria-hidden="true" />
-      <p className="text-zinc-400">Loading</p>
-    </div>
-  </div>
-);
+const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." />;
 
 // Wrapper for Layout to handle props from context/hooks
 const DashboardLayout: React.FC = () => {
