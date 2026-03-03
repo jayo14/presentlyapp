@@ -189,7 +189,182 @@ The application also supports deployment to:
 
 ---
 
-## 📝 License
+## 🧪 Testing
+
+Presently has a multi-layer test suite covering the backend API (Django unit tests) and frontend (Vitest unit tests + Playwright E2E tests).
+
+### Quick-start: run all tests
+
+```bash
+# Backend (from the repo root)
+cd backend && python manage.py test
+
+# Frontend unit tests (from the repo root)
+cd frontend && npm test
+
+# Frontend E2E tests (requires a running dev server)
+cd frontend && npm run test:e2e
+```
+
+---
+
+### Backend Tests (Django)
+
+The backend tests live alongside each Django app and use the built-in `unittest` runner.
+
+#### Prerequisites
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+#### Running the tests
+
+```bash
+# Run the full backend test suite
+python manage.py test
+
+# Run tests for a specific app
+python manage.py test institutions
+python manage.py test analytics
+python manage.py test notifications
+
+# Run a single test module
+python manage.py test institutions.test_comprehensive
+python manage.py test institutions.test_onboarding
+python manage.py test institutions.tests           # check-in, venue, geolocation tests
+python manage.py test institutions.tests_onboarding # OnboardingSerializer tests
+
+# Run with verbose output
+python manage.py test --verbosity=2
+```
+
+#### What's covered
+
+| Module | Tests | Description |
+|---|---|---|
+| `institutions/tests.py` | 15 | Check-in flow, venue display fields, geolocation utilities |
+| `institutions/tests_onboarding.py` | 1 | OnboardingSerializer long avatar URL |
+| `institutions/test_comprehensive.py` | 39 | Auth (register/login/logout/me), student dashboard & enrollment, lecturer session management, admin CRUD, full attendance flow, RBAC |
+| `institutions/test_onboarding.py` | 20 | Student / Lecturer / Admin onboarding endpoint, preferences, course enrollment |
+| `analytics/tests.py` | 2 | Student dashboard analytics view |
+| `notifications/tests.py` | — | Notification service |
+| `exam_clearance/tests.py` | — | Exam clearance logic |
+| `reports/tests.py` | — | Report generation |
+| `system/tests.py` | — | System stats |
+
+---
+
+### Frontend Unit Tests (Vitest + React Testing Library)
+
+Unit tests live in `frontend/src/test/` and use [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+
+#### Prerequisites
+
+```bash
+cd frontend
+npm install
+```
+
+#### Running the tests
+
+```bash
+# Run all unit tests once
+npm test
+
+# Run in watch mode (re-runs on file changes)
+npm run test:watch
+
+# Run with coverage report
+npm run test:coverage
+```
+
+#### What's covered
+
+| File | Tests | Description |
+|---|---|---|
+| `src/test/services.tokenManager.test.ts` | 12 | `tokenManager` – localStorage / sessionStorage split, `rememberMe`, `clearTokens` |
+| `src/test/services.authApi.test.ts` | 9 | `authApi` – login, register, logout, `getCurrentUser`, `isAuthenticated` |
+| `src/test/services.attendanceApi.test.ts` | 10 | `sessionApi`, `attendanceApi`, `courseApi` – CRUD, check-in, check-in-by-code |
+| `src/test/hooks.useAuth.test.tsx` | 8 | `useCurrentUser`, `useLogin`, `useLogout`, `useRegister` hooks |
+| `src/test/hooks.useCompleteOnboarding.test.tsx` | 5 | `useCompleteOnboarding` hook – all roles, error state, cache update |
+| `src/test/components.ProtectedRoute.test.tsx` | 5 | `ProtectedRoute` – loading spinner, unauthenticated redirect, role guard |
+
+---
+
+### Frontend E2E Tests (Playwright)
+
+End-to-end tests live in `frontend/e2e/` and use [Playwright](https://playwright.dev/). All backend API calls are mocked via `page.route()` interception — **no live backend is required**.
+
+#### Prerequisites
+
+```bash
+cd frontend
+npm install
+
+# Install Playwright browsers (first time only)
+npx playwright install chromium
+```
+
+#### Running the E2E tests
+
+```bash
+# Run all E2E tests (auto-starts the Vite dev server)
+npm run test:e2e
+
+# Run with the interactive Playwright UI
+npm run test:e2e:ui
+
+# Run a single spec file
+npx playwright test e2e/student.spec.ts
+npx playwright test e2e/lecturer.spec.ts
+npx playwright test e2e/admin.spec.ts
+npx playwright test e2e/attendance.spec.ts
+npx playwright test e2e/onboarding.spec.ts
+
+# Run against an already-running dev server
+PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test
+```
+
+#### What's covered
+
+| Spec | Description |
+|---|---|
+| `e2e/student.spec.ts` | Student login → `/dashboard` redirect, stats render, course display, navigation |
+| `e2e/lecturer.spec.ts` | Lecturer login, dashboard, sessions page, create-session access, student blocked from lecturer routes |
+| `e2e/admin.spec.ts` | Admin login, management pages (users, institutions, venues), student/lecturer blocked from admin routes |
+| `e2e/attendance.spec.ts` | **Full attendance flow**: lecturer creates session → student visits `/check-in/<code>` → marks attendance → PRESENT confirmation; unauthenticated user redirected to `/login`; full two-context browser scenario |
+| `e2e/onboarding.spec.ts` | New user redirected to `/onboarding`; student/lecturer/admin role selection; onboarding API called on submit; navigation to `/dashboard` after completion |
+
+#### Shared helpers (`e2e/helpers.ts`)
+
+All E2E specs share:
+- **Fixture data** – `STUDENT_USER`, `LECTURER_USER`, `ADMIN_USER`, `MOCK_COURSE`, `MOCK_SESSION`, `MOCK_ATTENDANCE`
+- **`loginAs(page, user)`** – injects access token + mocks all API routes for the given user
+- **`mockApiForUser(page, user)`** – sets up route interceptions for every API endpoint the app calls
+
+---
+
+### Continuous Integration
+
+The test commands map to the following CI steps:
+
+```yaml
+# Backend
+- run: cd backend && python manage.py test --verbosity=2
+
+# Frontend unit tests
+- run: cd frontend && npm ci && npm test
+
+# E2E tests (with pre-built frontend)
+- run: cd frontend && npm ci && npx playwright install --with-deps chromium
+- run: cd frontend && npm run build && npm run test:e2e
+```
+
+---
 
 **Proprietary Software - All Rights Reserved**
 
