@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChevronLeft, Settings, ShieldCheck, Shield, TrendingUp, User, Lock, FileText, Database, LogOut, ChevronRight, Clock } from 'lucide-react-native';
+import { ChevronLeft, Settings, ShieldCheck, Shield, TrendingUp, User, Lock, FileText, Database, LogOut, ChevronRight, Clock, Camera } from 'lucide-react-native';
 
 export default function AdminProfile() {
   const router = useRouter();
@@ -39,15 +39,25 @@ export default function AdminProfile() {
         <View style={styles.profileSection}>
           <View style={styles.avatarWrapper}>
             <View style={[styles.avatarGlow, { backgroundColor: colors.primary }]} />
-            <View style={[styles.avatarContainer, { borderColor: colors.primary + '33' }]}>
+            <TouchableOpacity
+              style={[styles.avatarContainer, { borderColor: colors.primary + '33' }]}
+              onPress={() => router.push('/(admin)/edit-photo')}
+              activeOpacity={0.8}
+            >
               <Image
-                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLRwwSjE9kCnMtNMEqOqQ5388pHIcCashg_tceg_guF0WII5s-7Y3Yw_00vl8O5EwOIlzIkn0PXlnf9fzrmK5RlbtEKkrveYLKTB4QWt6oB204XGs9nJu9yjzZPgZa2UhuqcRjrWef1f6PFczUK8MhGckkfxdviQnknJWivE5cfu1i7xo_zwMHfgvvoXfMhqO5gtWJWWEbjUWruW6U_Biiag6h3_Z5cgRWE2z7tcozqjDVwtKBK4j-lQVsE9gqdjEqoGSnlddTDM_' }}
+                source={{ uri: user?.profilePicture || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBLRwwSjE9kCnMtNMEqOqQ5388pHIcCashg_tceg_guF0WII5s-7Y3Yw_00vl8O5EwOIlzIkn0PXlnf9fzrmK5RlbtEKkrveYLKTB4QWt6oB204XGs9nJu9yjzZPgZa2UhuqcRjrWef1f6PFczUK8MhGckkfxdviQnknJWivE5cfu1i7xo_zwMHfgvvoXfMhqO5gtWJWWEbjUWruW6U_Biiag6h3_Z5cgRWE2z7tcozqjDVwtKBK4j-lQVsE9gqdjEqoGSnlddTDM_' }}
                 style={styles.avatarImage}
               />
-            </View>
+            </TouchableOpacity>
             <View style={[styles.verifiedBadge, { backgroundColor: colors.primary, borderColor: colors.background }]}>
               <ShieldCheck size={14} color="#000" strokeWidth={3} />
             </View>
+            <TouchableOpacity
+              style={[styles.editPhotoBadge, { backgroundColor: colors.primary, borderColor: colors.background }]}
+              onPress={() => router.push('/(admin)/edit-photo')}
+            >
+              <Camera size={13} color="#000" />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.profileTextContainer}>
@@ -169,6 +179,7 @@ const styles = StyleSheet.create({
   avatarContainer: { width: 128, height: 128, borderRadius: 64, borderWidth: 4, overflow: 'hidden' },
   avatarImage: { width: '100%', height: '100%' },
   verifiedBadge: { position: 'absolute', bottom: 4, right: 4, width: 28, height: 28, borderRadius: 14, borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
+  editPhotoBadge: { position: 'absolute', bottom: 4, left: 4, width: 26, height: 26, borderRadius: 13, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   profileTextContainer: { alignItems: 'center', marginTop: 20 },
   profileName: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
   roleBadge: { marginTop: 8, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },

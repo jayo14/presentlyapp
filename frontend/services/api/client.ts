@@ -3,8 +3,8 @@ import { toast } from 'sonner';
 
 // API Base URL - Django backend
 // Ensure /api suffix is present to avoid 404 errors
-const rawApiUrl = import.meta.env.VITE_API_URL;
-let API_BASE_URL = rawApiUrl;
+const rawApiUrl: string = (import.meta as any).env?.VITE_API_URL ?? '';
+let API_BASE_URL: string = rawApiUrl;
 
 // Normalize the URL: remove trailing slash and ensure /api suffix
 if (!API_BASE_URL.endsWith('/api')) {
