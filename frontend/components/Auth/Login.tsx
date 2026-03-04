@@ -8,6 +8,7 @@ import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase
 import { Box, Input, Text, Heading, VStack, HStack, Button } from '@chakra-ui/react';
 import { LoadingScreen } from '../LoadingScreen';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { LoadingScreen } from '../LoadingScreen';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();

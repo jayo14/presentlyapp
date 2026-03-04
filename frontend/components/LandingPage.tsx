@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
 import { Button } from './Button';
 import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   CheckCircle2, ShieldCheck, MapPin, 
   Server, Globe, Database, 
@@ -12,6 +14,8 @@ import {
 } from 'lucide-react';
 import { useCurrentUser } from '../hooks/useAuth';
 import { SEO } from './SEO';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -24,6 +28,123 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [currency, setCurrency] = useState<'USD' | 'NGN'>('USD');
+  
+  const infrastructureRef = useRef<HTMLDivElement>(null);
+  const solutionsRef = useRef<HTMLDivElement>(null);
+  const securityRef = useRef<HTMLDivElement>(null);
+  const pricingRef = useRef<HTMLDivElement>(null);
+  const faqRef = useRef<HTMLDivElement>(null);
+
+  // Setup GSAP scroll animations on mount
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Infrastructure cards stagger animation
+      if (infrastructureRef.current) {
+        const cards = infrastructureRef.current.querySelectorAll('.infrastructure-card');
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 30, rotationX: 10 },
+          {
+            opacity: 1,
+            y: 0,
+            rotationX: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            scrollTrigger: {
+              trigger: infrastructureRef.current,
+              start: 'top 80%',
+              end: 'top 20%',
+              scrub: 1,
+              markers: false
+            }
+          }
+        );
+      }
+
+      // Solutions section animation
+      if (solutionsRef.current) {
+        const sectionTitle = solutionsRef.current.querySelector('h2');
+        if (sectionTitle) {
+          gsap.fromTo(
+            sectionTitle,
+            { opacity: 0, x: -50 },
+            {
+              opacity: 1,
+              x: 0,
+              duration: 0.8,
+              scrollTrigger: {
+                trigger: solutionsRef.current,
+                start: 'top 85%',
+                toggleActions: 'play none none none'
+              }
+            }
+          );
+        }
+      }
+
+      // Security metrics animation
+      if (securityRef.current) {
+        const metrics = securityRef.current.querySelectorAll('.metric-box');
+        gsap.fromTo(
+          metrics,
+          { opacity: 0, scale: 0.8 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            scrollTrigger: {
+              trigger: securityRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none none'
+            }
+          }
+        );
+      }
+
+      // Pricing cards animation
+      if (pricingRef.current) {
+        const pricingCards = pricingRef.current.querySelectorAll('.pricing-card');
+        gsap.fromTo(
+          pricingCards,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            scrollTrigger: {
+              trigger: pricingRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none none'
+            }
+          }
+        );
+      }
+
+      // FAQ items animation
+      if (faqRef.current) {
+        const faqItems = faqRef.current.querySelectorAll('.faq-item');
+        gsap.fromTo(
+          faqItems,
+          { opacity: 0, x: 30 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            scrollTrigger: {
+              trigger: faqRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none none'
+            }
+          }
+        );
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
@@ -365,7 +486,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       </section>
 
       {/* --- Infrastructure & Architecture --- */}
-      <section id="infrastructure" className="py-24 px-6 relative bg-black">
+      <section id="infrastructure" ref={infrastructureRef} className="py-24 px-6 relative bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="mb-20">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 max-w-2xl">
@@ -378,7 +499,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+            <div className="infrastructure-card bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <MapPin className="text-primary" />
                </div>
@@ -388,7 +509,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                </p>
             </div>
 
-            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+            <div className="infrastructure-card bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Fingerprint className="text-primary" />
                </div>
@@ -398,7 +519,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                </p>
             </div>
 
-            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+            <div className="infrastructure-card bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Database className="text-primary" />
                </div>
@@ -408,7 +529,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                </p>
             </div>
 
-            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+            <div className="infrastructure-card bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Network className="text-primary" />
                </div>
@@ -418,7 +539,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                </p>
             </div>
 
-            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+            <div className="infrastructure-card bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Server className="text-primary" />
                </div>
@@ -428,7 +549,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
                </p>
             </div>
 
-            <div className="bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
+            <div className="infrastructure-card bg-zinc-900/20 border border-zinc-800 p-8 rounded-2xl">
                <div className="bg-zinc-900 w-12 h-12 rounded-lg flex items-center justify-center mb-6 border border-zinc-800">
                   <Globe className="text-primary" />
                </div>
@@ -442,7 +563,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       </section>
 
       {/* --- Solutions by Role --- */}
-      <section id="solutions" className="py-24 px-6 bg-zinc-950 border-t border-white/5">
+      <section id="solutions" ref={solutionsRef} className="py-24 px-6 bg-zinc-950 border-t border-white/5">
          <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl font-bold text-white mb-16 text-center">Built for Every Level of Academic Administration</h2>
             
@@ -532,7 +653,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       </section>
 
       {/* --- Why Choose Presently (Stats/Proof) --- */}
-      <section id="security" className="py-24 px-6 relative overflow-hidden">
+      <section id="security" ref={securityRef} className="py-24 px-6 relative overflow-hidden">
          <div className="absolute inset-0 bg-primary/5 -skew-y-2 scale-110 -z-10"></div>
          <div className="max-w-7xl mx-auto text-center">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-16">System Integrity & Operational Metrics</h2>
@@ -558,7 +679,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
       </section>
 
       {/* --- Enterprise Pricing --- */}
-      <section id="pricing" className="py-24 px-6 bg-black">
+      <section id="pricing" ref={pricingRef} className="py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Deployment Models</h2>
@@ -586,7 +707,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
 
           <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
              {/* Individual Practitioner */}
-             <div className="bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
+             <div className="pricing-card bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
                 <div className="mb-8">
                    <h3 className="text-xl font-bold text-white mb-2">Lecturer License</h3>
                    <p className="text-zinc-500 text-sm">For individual lecturers requiring classroom-level attendance management with location verification and digital record generation.</p>
@@ -646,7 +767,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin 
              </div>
 
              {/* Institutional Infrastructure */}
-             <div className="bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
+             <div className="pricing-card bg-zinc-900/50 border border-zinc-800 p-10 rounded-3xl flex flex-col">
                 <div className="mb-8">
                    <h3 className="text-xl font-bold text-white mb-2">Institutional License</h3>
                    <p className="text-zinc-500 text-sm">Campus-wide attendance infrastructure for universities requiring unified system of record, deep technical integration, and total institutional visibility.</p>
