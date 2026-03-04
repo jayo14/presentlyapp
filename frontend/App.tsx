@@ -51,7 +51,7 @@ const CollegeFormPage = lazy(() => import('./components/Admin/CollegeFormPage').
 const DepartmentFormPage = lazy(() => import('./components/Admin/DepartmentFormPage').then(module => ({ default: module.DepartmentFormPage })));
 const UserManagement = lazy(() => import('./components/Admin/UserManagement').then(module => ({ default: module.UserManagement })));
 const CourseManagement = lazy(() => import('./components/Admin/CourseManagement').then(module => ({ default: module.CourseManagement })));
-const VenueManagement = lazy(() => import('./components/Admin/VenueManagement').then(module => ({ default: module.VenueManagement })));
+const VenueManagement = lazy(() => import('./components/Admin/VenueManagement'));
 const DepartmentManagement = lazy(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
 
 // Loading fallback component
