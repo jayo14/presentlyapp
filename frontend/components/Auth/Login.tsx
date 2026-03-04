@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
-import { Box, Input, Text, Heading, VStack, HStack, Spinner, Button } from '@chakra-ui/react';
+import { Box, Input, Text, Heading, VStack, HStack, Button } from '@chakra-ui/react';
+import { LoadingScreen } from '../LoadingScreen';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -158,22 +159,7 @@ export const Login: React.FC = () => {
 
   // Show loading state only when redirecting
   if (shouldShowLoading) {
-    return (
-      <Box 
-        minH="100vh" 
-        display="flex" 
-        alignItems="center" 
-        justifyContent="center"
-        bg={bgColor}
-      >
-        <VStack gap={4}>
-          <Spinner size="xl" color="yellow.400" thickness="4px" />
-          <Text color={textSecondary}>
-            Redirecting to dashboard
-          </Text>
-        </VStack>
-      </Box>
-    );
+    return <LoadingScreen message="Redirecting to dashboard" />;
   }
 
   return (
