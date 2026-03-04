@@ -7,7 +7,6 @@ import UserManagement from '../Admin/UserManagement';
 import VenueManagement from '../Admin/VenueManagement';
 import DepartmentManagement from '../Admin/DepartmentManagement';
 import CourseManagement from '../Admin/CourseManagement';
-import Map from '../Map';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '../../services/api/system';
 import { SEO } from '../SEO';
@@ -362,7 +361,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                     </ResponsiveContainer>
                 </div>
             </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00420cd (updates)
         </div>
     </div>
   );
