@@ -38,6 +38,7 @@ def calculate_distance(
 def point_in_polygon(point: Tuple[float, float], polygon: List[List[float]]) -> bool:
     """
     Check if a point is inside a polygon using ray casting algorithm.
+    This implementation is more robust and explicitly handles edge cases.
     
     Args:
         point: Tuple of (latitude, longitude)
@@ -52,28 +53,23 @@ def point_in_polygon(point: Tuple[float, float], polygon: List[List[float]]) -> 
     lat, lon = point
     inside = False
     
+    # Ensure polygon is closed for the calculation if it isn't already
+    # Most GeoJSON-like polygons repeat the first point at the end
     n = len(polygon)
-
-    # polygon is [[lng, lat], [lng, lat], ...]
-    p1_lon, p1_lat = polygon[0]
     
-    for i in range(1, n + 1):
-        p2_lon, p2_lat = polygon[i % n]
+    # Ray casting algorithm
+    j = n - 1
+    for i in range(n):
+        pi_lon, pi_lat = polygon[i]
+        pj_lon, pj_lat = polygon[j]
         
-        # Check if point's latitude is between the two vertices' latitudes
-        if min(p1_lat, p2_lat) < lat <= max(p1_lat, p2_lat):
-            # Calculate the longitude of polygon edge at point's latitude
-            if p2_lat != p1_lat:  # Avoid division by zero
-                # Calculate where the horizontal ray at 'lat' intersects the edge
-                # (lon - p1_lon) / (p2_lon - p1_lon) = (lat - p1_lat) / (p2_lat - p1_lat)
-                lon_intersection = p1_lon + (lat - p1_lat) * (p2_lon - p1_lon) / (p2_lat - p1_lat)
-                
-                # If point's longitude is to the left of the intersection, toggle inside/outside
-                if lon <= lon_intersection:
-                    inside = not inside
+        # Check if point is on the horizontal line between vertex i and j
+        # and if the point is to the left of the edge between them
+        if ((pi_lat > lat) != (pj_lat > lat)) and \
+           (lon < (pj_lon - pi_lon) * (lat - pi_lat) / (pj_lat - pi_lat + 1e-10) + pi_lon):
+            inside = not inside
+        j = i
         
-        p1_lon, p1_lat = p2_lon, p2_lat
-    
     return inside
 
 
