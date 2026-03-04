@@ -15,8 +15,6 @@ import {
 } from 'lucide-react';
 import { UserRole } from '../../types';
 
-import { LoadingScreen } from '../LoadingScreen';
-
 // Constants
 const AUTO_REDIRECT_SECONDS = 10; // Auto-redirect countdown duration
 
