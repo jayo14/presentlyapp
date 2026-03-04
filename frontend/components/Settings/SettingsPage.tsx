@@ -567,16 +567,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
 
   return (
     <>
-    <SEO
-      title="Settings | Dashboard"
-      description="Manage your account settings, notification preferences and privacy options on Presently."
-      noIndex
-    />
-    <ResponsiveContainer
-      mobileChildren={mobileLayout}
-    >
-      {desktopLayout}
-    </ResponsiveContainer>
+      <SEO
+        title="Settings | Dashboard"
+        description="Manage your account settings, notification preferences and privacy options on Presently."
+        noIndex
+      />
+      <ResponsiveContainer
+        mobileChildren={mobileLayout}
+      >
+        {desktopLayout}
+      </ResponsiveContainer>
     </>
   );
 };

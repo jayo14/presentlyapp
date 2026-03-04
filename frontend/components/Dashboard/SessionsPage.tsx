@@ -58,12 +58,12 @@ export const SessionsPage: React.FC = () => {
 
   return (
     <>
-    <SEO
-      title="Sessions | Dashboard"
-      description="View and manage all your attendance sessions on Presently."
-      noIndex
-    />
-    <div className="space-y-6 animate-in fade-in duration-500 pb-12">
+      <SEO
+        title="Sessions | Dashboard"
+        description="View and manage all your attendance sessions on Presently."
+        noIndex
+      />
+      <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
