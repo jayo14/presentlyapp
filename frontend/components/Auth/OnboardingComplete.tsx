@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '../Logo';
+import { LoadingScreen } from '../LoadingScreen';
 import { Button } from '../Button';
 import { ConfettiAnimation } from '../ConfettiAnimation';
 import { 
@@ -35,7 +36,9 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else if (autoRedirect && countdown === 0) {
-      navigate('/dashboard');
+      // Small delay to show the loading screen before navigating
+      const timer = setTimeout(() => navigate('/dashboard'), 2000);
+      return () => clearTimeout(timer);
     }
   }, [countdown, autoRedirect, navigate]);
 
@@ -82,6 +85,10 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
       action: 'tour'
     }
   ];
+
+  if (autoRedirect && countdown === 0) {
+    return <LoadingScreen message="Finalizing your profile..." />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
