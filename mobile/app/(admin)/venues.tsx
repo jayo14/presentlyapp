@@ -1,38 +1,40 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Switch, TextInput } from 'react-native';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { api } from '@/services/api';
 import { Venue } from '@/types';
-import { Map, Filter, Plus, Minus, Crosshair, DoorOpen, Signal, X, Search } from 'lucide-react-native';
+import { Map, Filter, Plus, DoorOpen, Signal, X, Search, Edit, Trash2 } from 'lucide-react-native';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { CustomModal } from '@/components/CustomModal';
-import Svg, { Circle, Path, Rect, G } from 'react-native-svg';
-import Slider from '@react-native-community/slider';
+import MapView, { Marker, Circle } from 'react-native-maps';
+import { venuesService } from '@/services/venues';
 
 export default function ManageVenuesScreen() {
   const { colors, isDark } = useTheme();
-  const [venues, setVenues] = useState<Venue[]>([]);
+  const [venues, setVenues] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [geofenceEnabled, setGeofenceEnabled] = useState(true);
-  const [radius, setRadius] = useState(250);
-  
+  const [selectedVenue, setSelectedVenue] = useState<any>(null);
+  const mapRef = useRef<MapView>(null);
+
   // Create/Edit Modal
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingVenue] = useState<Venue | null>(null);
+  const [editingVenue, setEditingVenue] = useState<any | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    code: '',
     latitude: '',
     longitude: '',
+    location_radius: '',
+    description: '',
   });
 
   const [confirmModal, setConfirmModal] = useState<{ visible: boolean, venueId: string }>({ visible: false, venueId: '' });
 
   const loadVenues = async () => {
     try {
-      const response: any = await api.venues.list();
+      const response: any = await venuesService.list();
       setVenues(response.results || response);
     } catch (error) {
       console.error('Error loading venues:', error);
@@ -45,15 +47,91 @@ export default function ManageVenuesScreen() {
     }, [])
   );
 
+  const openCreateModal = () => {
+    setEditingVenue(null);
+    setFormData({ name: '', code: '', latitude: '', longitude: '', location_radius: '', description: '' });
+    setModalVisible(true);
+  };
+
+  const openEditModal = (venue: any) => {
+    setEditingVenue(venue);
+    setFormData({
+      name: venue.name || '',
+      code: venue.code || '',
+      latitude: String(venue.latitude || ''),
+      longitude: String(venue.longitude || ''),
+      location_radius: String(venue.location_radius || ''),
+      description: venue.description || '',
+    });
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setEditingVenue(null);
+    setFormData({ name: '', code: '', latitude: '', longitude: '', location_radius: '', description: '' });
+  };
+
+  const handleFormSubmit = async () => {
+    try {
+      const payload = {
+        name: formData.name,
+        code: formData.code,
+        latitude: parseFloat(formData.latitude) || 0,
+        longitude: parseFloat(formData.longitude) || 0,
+        location_radius: parseInt(formData.location_radius) || 100,
+        description: formData.description,
+      };
+      if (editingVenue) {
+        await venuesService.update(editingVenue.id, payload);
+      } else {
+        await venuesService.create(payload);
+      }
+      await loadVenues();
+      closeModal();
+    } catch (error) {
+      console.error('Error saving venue:', error);
+    }
+  };
+
   const deleteVenue = async (id: string) => {
     try {
-      await api.venues.delete(id);
+      await venuesService.delete(id);
       await loadVenues();
+      if (selectedVenue?.id === id) setSelectedVenue(null);
     } catch (error) {
       console.error('Error deleting venue:', error);
     }
     setConfirmModal({ visible: false, venueId: '' });
   };
+
+  const handleVenueSelect = (venue: any) => {
+    setSelectedVenue(venue);
+    const lat = parseFloat(String(venue.latitude));
+    const lon = parseFloat(String(venue.longitude));
+    if (lat && lon) {
+      mapRef.current?.animateToRegion({
+        latitude: lat,
+        longitude: lon,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }, 500);
+    }
+  };
+
+  const searchLower = searchQuery.toLowerCase();
+  const filteredVenues = venues.filter(v => v.name.toLowerCase().includes(searchLower));
+  const hasValidCoords = (v: any) => parseFloat(String(v.latitude)) && parseFloat(String(v.longitude));
+
+  const firstVenueWithCoords = venues.find(hasValidCoords);
+  const defaultRegion = firstVenueWithCoords
+    ? {
+        latitude: parseFloat(String(firstVenueWithCoords.latitude)),
+        longitude: parseFloat(String(firstVenueWithCoords.longitude)),
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      }
+    : { latitude: 0, longitude: 0, latitudeDelta: 50, longitudeDelta: 50 };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -91,98 +169,57 @@ export default function ManageVenuesScreen() {
         </View>
       </View>
 
-      <ScrollView stickyHeaderIndices={[1]} showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Map View */}
-        <View style={[styles.mapContainer, { backgroundColor: isDark ? '#1a170d' : '#f0f0f0' }]}>
-          {/* Mock Map with SVG */}
-          <Svg height="100%" width="100%" viewBox="0 0 400 300">
-            <Rect x="0" y="0" width="400" height="300" fill={isDark ? "#12110a" : "#e0e0e0"} />
-            <Path d="M50 50 L350 50 L350 250 L50 250 Z" fill={isDark ? "#1a1910" : "#d0d0d0"} />
-            <Path d="M100 0 L100 300 M200 0 L200 300 M300 0 L300 300" stroke={isDark ? "#2a281a" : "#c0c0c0"} strokeWidth="1" />
-            <Path d="M0 100 L400 100 M0 200 L400 200" stroke={isDark ? "#2a281a" : "#c0c0c0"} strokeWidth="1" />
-
-            {/* Pins */}
-            <G transform="translate(130, 80)">
-              <Circle r="6" fill={colors.primary} />
-              <Circle r="12" fill={colors.primary} opacity="0.2" />
-            </G>
-            <G transform="translate(260, 150)">
-              <Circle r="6" fill={colors.primary} />
-            </G>
-            <G transform="translate(200, 220)">
-              <Circle r="24" fill={colors.primary} opacity="0.1" stroke={colors.primary} strokeWidth="1" />
-              <Circle r="3" fill={colors.primary} />
-            </G>
-          </Svg>
-
-          {/* Labels */}
-          <View style={[styles.mapLabel, { top: 40, left: 110 }]}>
-            <Text style={styles.mapLabelText}>Hall 7</Text>
-          </View>
-          <View style={[styles.mapLabel, { top: 110, left: 230 }]}>
-            <Text style={styles.mapLabelText}>Auditorium 2</Text>
-          </View>
-
-          {/* Map Controls */}
-          <View style={styles.mapControls}>
-            <TouchableOpacity style={[styles.mapButton, { backgroundColor: isDark ? 'rgba(0,0,0,0.8)' : '#fff' }]}>
-              <Plus size={20} color={colors.text} />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.mapButton, { backgroundColor: isDark ? 'rgba(0,0,0,0.8)' : '#fff' }]}>
-              <Minus size={20} color={colors.text} />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.mapButton, { backgroundColor: colors.primary }]}>
-              <Crosshair size={20} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Geofence Controls */}
-        <View style={[styles.geofenceBar, { backgroundColor: colors.background, borderBottomColor: colors.primary + '1A', borderBottomWidth: 1 }]}>
-          <View style={[styles.geofenceBox, { backgroundColor: colors.primary + '0D', borderColor: colors.primary + '33' }]}>
-            <View>
-              <Text style={[styles.geofenceTitle, { color: colors.primary }]}>Geofence Parameters</Text>
-              <Text style={[styles.geofenceSubtitle, { color: colors.textSecondary }]}>Adjust perimeter tracking sensitivity</Text>
-            </View>
-            <Switch
-              value={geofenceEnabled}
-              onValueChange={setGeofenceEnabled}
-              trackColor={{ false: '#333', true: colors.primary }}
-              thumbColor="#fff"
-            />
-          </View>
-          <View style={styles.sliderContainer}>
-            <View style={styles.sliderHeader}>
-              <Text style={[styles.sliderLabel, { color: colors.textSecondary }]}>Radius Sensitivity</Text>
-              <Text style={[styles.sliderValue, { color: colors.primary }]}>{radius}m</Text>
-            </View>
-            <Slider
-              style={{ width: '100%', height: 40 }}
-              minimumValue={50}
-              maximumValue={1000}
-              value={radius}
-              onValueChange={setRadius}
-              minimumTrackTintColor={colors.primary}
-              maximumTrackTintColor={isDark ? '#333' : '#ddd'}
-              thumbTintColor={colors.primary}
-            />
-          </View>
+        <View style={styles.mapContainer}>
+          <MapView
+            ref={mapRef}
+            style={StyleSheet.absoluteFill}
+            initialRegion={defaultRegion}
+          >
+            {venues.filter(hasValidCoords).map(venue => {
+              const lat = parseFloat(String(venue.latitude));
+              const lon = parseFloat(String(venue.longitude));
+              return (
+                <Marker
+                  key={venue.id}
+                  coordinate={{ latitude: lat, longitude: lon }}
+                  title={venue.name}
+                  pinColor={colors.primary}
+                  onPress={() => handleVenueSelect(venue)}
+                />
+              );
+            })}
+            {selectedVenue && hasValidCoords(selectedVenue) && (
+              <Circle
+                center={{
+                  latitude: parseFloat(String(selectedVenue.latitude)),
+                  longitude: parseFloat(String(selectedVenue.longitude)),
+                }}
+                radius={selectedVenue.location_radius || 100}
+                strokeColor={colors.primary}
+                fillColor={colors.primary + '22'}
+              />
+            )}
+          </MapView>
         </View>
 
         {/* Venue List */}
         <View style={styles.venueListContainer}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>LIVE VENUE STATUS</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>VENUE LIST</Text>
           <View style={styles.venueList}>
-            {venues.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).map((venue) => (
+            {filteredVenues.map((venue) => (
               <VenueItem
                 key={venue.id}
                 icon={<DoorOpen size={24} color={colors.primary} />}
                 name={venue.name}
-                status="GPS: Active"
-                sessionStatus="IDLE"
-                time="Starts 09:00 AM"
+                code={venue.code}
                 colors={colors}
                 isDark={isDark}
+                selected={selectedVenue?.id === venue.id}
+                onPress={() => handleVenueSelect(venue)}
+                onEdit={() => openEditModal(venue)}
+                onDelete={() => setConfirmModal({ visible: true, venueId: venue.id })}
               />
             ))}
             {venues.length === 0 && (
@@ -197,7 +234,7 @@ export default function ManageVenuesScreen() {
       {/* FAB */}
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.primary }]}
-        onPress={() => setModalVisible(true)}
+        onPress={openCreateModal}
       >
         <Plus size={32} color="#000" />
       </TouchableOpacity>
@@ -209,15 +246,18 @@ export default function ManageVenuesScreen() {
               <Text style={[styles.modalTitle, { color: colors.text }]}>
                 {editingVenue ? 'Edit Venue' : 'New Venue'}
               </Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <TouchableOpacity onPress={closeModal}>
                 <X size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
-              <Input label="Venue Name" placeholder="Main Auditorium" value={formData.name} onChangeText={t => setFormData({...formData, name: t})} />
+              <Input label="Venue Name *" placeholder="Main Auditorium" value={formData.name} onChangeText={t => setFormData({...formData, name: t})} />
+              <Input label="Venue Code" placeholder="HALL-01" value={formData.code} onChangeText={t => setFormData({...formData, code: t})} />
               <Input label="Latitude" placeholder="0.0000" value={formData.latitude} onChangeText={t => setFormData({...formData, latitude: t})} keyboardType="numeric" />
               <Input label="Longitude" placeholder="0.0000" value={formData.longitude} onChangeText={t => setFormData({...formData, longitude: t})} keyboardType="numeric" />
-              <Button title={editingVenue ? "Update Venue" : "Create Venue"} onPress={() => setModalVisible(false)} style={{ marginTop: 24, marginBottom: 40 }} />
+              <Input label="Location Radius (metres)" placeholder="100" value={formData.location_radius} onChangeText={t => setFormData({...formData, location_radius: t})} keyboardType="numeric" />
+              <Input label="Description" placeholder="Optional description" value={formData.description} onChangeText={t => setFormData({...formData, description: t})} />
+              <Button title={editingVenue ? "Update Venue" : "Create Venue"} onPress={handleFormSubmit} style={{ marginTop: 24, marginBottom: 40 }} />
             </ScrollView>
           </View>
         </View>
@@ -226,29 +266,36 @@ export default function ManageVenuesScreen() {
   );
 }
 
-function VenueItem({ icon, name, status, sessionStatus, time, colors, isDark, inactive, opacity }: any) {
-  const active = sessionStatus === 'ACTIVE SESSION';
+function VenueItem({ icon, name, code, colors, isDark, selected, onPress, onEdit, onDelete }: any) {
   return (
-    <View style={[styles.venueItem, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#fff', borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#eee' }, opacity ? { opacity } : {}]}>
+    <TouchableOpacity
+      style={[styles.venueItem, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#fff', borderColor: selected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#eee') }]}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
       <View style={styles.venueItemLeft}>
-        <View style={[styles.venueIconBox, { backgroundColor: active ? colors.primary + '1A' : (isDark ? '#2a2a2a' : '#f0f0f0') }]}>
+        <View style={[styles.venueIconBox, { backgroundColor: selected ? colors.primary + '1A' : (isDark ? '#2a2a2a' : '#f0f0f0') }]}>
           {icon}
         </View>
         <View>
           <Text style={[styles.venueName, { color: colors.text }]}>{name}</Text>
-          <View style={styles.statusRow}>
-            <Signal size={12} color={active ? '#10B981' : colors.primary} />
-            <Text style={[styles.statusText, { color: colors.textSecondary }]}>{status}</Text>
-          </View>
+          {code ? (
+            <View style={styles.statusRow}>
+              <Signal size={12} color={colors.primary} />
+              <Text style={[styles.statusText, { color: colors.textSecondary }]}>{code}</Text>
+            </View>
+          ) : null}
         </View>
       </View>
-      <View style={styles.venueItemRight}>
-        <View style={[styles.sessionBadge, { backgroundColor: active ? colors.primary : (isDark ? '#333' : '#eee') }]}>
-          <Text style={[styles.sessionBadgeText, { color: active ? '#000' : colors.textSecondary }]}>{sessionStatus}</Text>
-        </View>
-        <Text style={[styles.venueTime, { color: colors.textSecondary }]}>{time}</Text>
+      <View style={styles.venueActions}>
+        <TouchableOpacity onPress={onEdit} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Edit size={16} color={colors.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onDelete} style={styles.actionBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Trash2 size={16} color="#EF4444" />
+        </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -261,32 +308,18 @@ const styles = StyleSheet.create({
   searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 48, borderRadius: 12, gap: 10 },
   searchInput: { flex: 1, fontSize: 14 },
   headerIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  mapContainer: { height: 300, width: '100%', position: 'relative' },
-  mapLabel: { position: 'absolute', backgroundColor: '#f2b90d', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  mapLabelText: { color: '#000', fontSize: 10, fontWeight: '700' },
-  mapControls: { position: 'absolute', bottom: 16, right: 16, gap: 8 },
-  mapButton: { width: 40, height: 40, borderRadius: 8, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 4 },
-  geofenceBar: { padding: 16, gap: 16 },
-  geofenceBox: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderRadius: 12, borderWidth: 1 },
-  geofenceTitle: { fontSize: 14, fontWeight: '700' },
-  geofenceSubtitle: { fontSize: 12, marginTop: 2 },
-  sliderContainer: { paddingHorizontal: 8 },
-  sliderHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  sliderLabel: { fontSize: 12, fontWeight: '500' },
-  sliderValue: { fontSize: 12, fontWeight: '700' },
+  mapContainer: { height: 300, width: '100%' },
   venueListContainer: { padding: 16 },
   sectionTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 1.5, marginBottom: 16 },
   venueList: { gap: 12, paddingBottom: 100 },
   venueItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderRadius: 16, borderWidth: 1 },
-  venueItemLeft: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  venueItemLeft: { flexDirection: 'row', alignItems: 'center', gap: 16, flex: 1 },
   venueIconBox: { width: 48, height: 48, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   venueName: { fontSize: 16, fontWeight: '700' },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   statusText: { fontSize: 10, fontWeight: '600' },
-  venueItemRight: { alignItems: 'flex-end', gap: 6 },
-  sessionBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 20 },
-  sessionBadgeText: { fontSize: 10, fontWeight: '800' },
-  venueTime: { fontSize: 10, fontWeight: '500' },
+  venueActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  actionBtn: { padding: 4 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, height: '90%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },

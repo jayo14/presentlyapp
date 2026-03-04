@@ -7,7 +7,16 @@ import { useAttendance } from '@/contexts/AttendanceContext';
 import { Bell, QrCode, Check, X, BookOpen } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import Svg, { Circle } from 'react-native-svg';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import * as Location from 'expo-location';
+
+const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+};
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -15,6 +24,38 @@ export default function StudentDashboard() {
   const { user } = useAuth();
   const { stats, history, courses, getActiveSession, refreshData, isLoading } = useAttendance();
   const [refreshing, setRefreshing] = useState(false);
+  const [rangeStatus, setRangeStatus] = useState<'in_range' | 'out_of_range' | 'unknown'>('unknown');
+  const locationWatchRef = useRef<Location.LocationSubscription | null>(null);
+
+  const activeSession = getActiveSession();
+
+  useEffect(() => {
+    const loc = activeSession?.location;
+    if (!loc?.latitude || !loc?.longitude) {
+      setRangeStatus('unknown');
+      return;
+    }
+    const { latitude: vLat, longitude: vLon, radius } = loc;
+    const radiusKm = (radius || 100) / 1000;
+    let cancelled = false;
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (cancelled || status !== 'granted') { setRangeStatus('unknown'); return; }
+      locationWatchRef.current = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.Balanced, timeInterval: 10000, distanceInterval: 10 },
+        (position) => {
+          const distKm = haversineKm(position.coords.latitude, position.coords.longitude, vLat, vLon);
+          setRangeStatus(distKm <= radiusKm ? 'in_range' : 'out_of_range');
+        }
+      );
+    })();
+    return () => {
+      cancelled = true;
+      locationWatchRef.current?.remove();
+      locationWatchRef.current = null;
+      setRangeStatus('unknown');
+    };
+  }, [activeSession?.id]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -22,7 +63,6 @@ export default function StudentDashboard() {
     setRefreshing(false);
   };
 
-  const activeSession = getActiveSession();
   const attendancePercentage = stats.percentage || 90.5;
   const circumference = 2 * Math.PI * 40;
   const strokeDashoffset = circumference - (attendancePercentage / 100) * circumference;
@@ -83,6 +123,11 @@ export default function StudentDashboard() {
                 style={[styles.liveCard, { backgroundColor: isDark ? '#352e18' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}
                 imageStyle={styles.cardBgImage}
             >
+                {rangeStatus !== 'unknown' && (
+                  <View style={[styles.rangeBadge, { backgroundColor: rangeStatus === 'in_range' ? '#10B981' : '#F59E0B' }]}>
+                    <Text style={styles.rangeBadgeText}>{rangeStatus === 'in_range' ? '✓ In Range' : '⚠ Out of Range'}</Text>
+                  </View>
+                )}
                 <View style={styles.liveCardContent}>
                     <View style={styles.liveCardTop}>
                         <View style={styles.liveCardInfo}>
@@ -489,5 +534,19 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 10,
     fontFamily: Fonts.lexend.bold,
-  }
+  },
+  rangeBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    zIndex: 10,
+  },
+  rangeBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontFamily: Fonts.lexend.bold,
+  },
 });
