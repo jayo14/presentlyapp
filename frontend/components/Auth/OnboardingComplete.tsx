@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { UserRole } from '../../types';
 
+import { LoadingScreen } from '../LoadingScreen';
+
 // Constants
 const AUTO_REDIRECT_SECONDS = 10; // Auto-redirect countdown duration
 
@@ -41,6 +43,10 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
       return () => clearTimeout(timer);
     }
   }, [countdown, autoRedirect, navigate]);
+
+  if (autoRedirect && countdown === 0) {
+    return <LoadingScreen message="Redirecting to dashboard" />;
+  }
 
   const handleSkipToDashboard = () => {
     navigate('/dashboard');
@@ -186,12 +192,12 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
           {/* Auto-redirect Countdown */}
           {autoRedirect && countdown > 0 && (
             <div className="mt-6 text-text-secondary text-sm">
-              <p>Redirecting to dashboard in {countdown} seconds...</p>
+              <p>Entering dashboard in {countdown}s...</p>
               <button 
                 onClick={handleCancelRedirect}
                 className="text-primary hover:underline mt-1 font-medium"
               >
-                Cancel redirect
+                Cancel auto-entry
               </button>
             </div>
           )}

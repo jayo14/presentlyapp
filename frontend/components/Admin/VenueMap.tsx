@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import { Venue } from '../../types';
-import { MapIcon, Satellite, RefreshCw, Search, X as CloseIcon } from 'lucide-react';
+import { MapIcon, Satellite, RefreshCw, Search, X as CloseIcon, Navigation, Loader2 } from 'lucide-react';
 
 interface VenueMapProps {
   venues: Venue[];
@@ -125,10 +125,80 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   const drawRef = useRef<MapboxDraw | null>(null);
   const drawCreateHandlerRef = useRef<((e: { features: GeoJSON.Feature[] }) => void) | null>(null);
   const venueMarkersRef = useRef<maplibregl.Marker[]>([]);
+  const userMarkerRef = useRef<maplibregl.Marker | null>(null);
   const tooltipRef = useRef<maplibregl.Popup | null>(null);
   const drawingModeRef = useRef(drawingMode);
   const [mapType, setMapType] = useState<'road' | 'satellite'>('road');
   const [mapReady, setMapReady] = useState(false);
+  const [showUserLocation, setShowUserLocation] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+
+  // Real-time user location tracking
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady || !showUserLocation) {
+        if (userMarkerRef.current) {
+            userMarkerRef.current.remove();
+            userMarkerRef.current = null;
+        }
+        setIsLocating(false);
+        return;
+    }
+
+    setIsLocating(true);
+    let watchId: number;
+
+    const onSuccess = (position: GeolocationPosition) => {
+        setIsLocating(false);
+        const { latitude, longitude } = position.coords;
+        
+        if (!userMarkerRef.current) {
+            const el = document.createElement('div');
+            el.className = 'user-location-marker';
+            el.innerHTML = `
+                <div class="user-location-container">
+                    <div class="user-location-label">You</div>
+                    <div class="marker-pulse"></div>
+                    <div class="marker-dot"></div>
+                </div>
+            `;
+            
+            userMarkerRef.current = new maplibregl.Marker({ element: el })
+                .setLngLat([longitude, latitude])
+                .addTo(map);
+            
+            // First time finding location, fly to it
+            map.flyTo({
+                center: [longitude, latitude],
+                zoom: 16,
+                speed: 1.2
+            });
+        } else {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+        }
+    };
+
+    const onError = (error: GeolocationPositionError) => {
+        setIsLocating(false);
+        console.error('Geolocation error:', error);
+        setShowUserLocation(false);
+        alert(`Failed to get location: ${error.message}`);
+    };
+
+    watchId = navigator.geolocation.watchPosition(onSuccess, onError, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+    });
+
+    return () => {
+        if (watchId) navigator.geolocation.clearWatch(watchId);
+        if (userMarkerRef.current) {
+            userMarkerRef.current.remove();
+            userMarkerRef.current = null;
+        }
+    };
+  }, [showUserLocation, mapReady]);
 
   // Search state
   const [searchTerm, setSearchTerm] = useState('');
@@ -201,6 +271,22 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         pin.addEventListener('click', (event) => {
           event.stopPropagation();
           onVenueClickRef.current?.(venue);
+        });
+
+        // Add hover listener for marker tooltip
+        pin.addEventListener('mouseenter', () => {
+          if (tooltipRef.current) {
+            tooltipRef.current
+              .setLngLat([Number(venue.longitude), Number(venue.latitude)])
+              .setHTML(`<div class="px-2 py-1 font-semibold text-sm">${venue.name}</div>`)
+              .addTo(map);
+          }
+        });
+
+        pin.addEventListener('mouseleave', () => {
+          if (tooltipRef.current) {
+            tooltipRef.current.remove();
+          }
         });
 
         const marker = new maplibregl.Marker({ element: pin, anchor: 'bottom' })
@@ -736,34 +822,45 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
       {/* Map-style / reset controls (top-right) */}
       <div className="absolute top-4 right-12 z-10 flex flex-col gap-2">
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl p-1 flex flex-col overflow-hidden">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl flex flex-col overflow-hidden">
           <button
             onClick={() => setMapType('road')}
-            className={`p-2 rounded-lg transition-colors ${
+            className={`p-2 transition-colors flex items-center justify-center ${
               mapType === 'road'
                 ? 'bg-primary text-black'
-                : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
-            title="Road map"
+            title="Road Map"
           >
             <MapIcon size={20} />
           </button>
           <button
             onClick={() => setMapType('satellite')}
-            className={`p-2 rounded-lg transition-colors ${
+            className={`p-2 transition-colors flex items-center justify-center ${
               mapType === 'satellite'
                 ? 'bg-primary text-black'
-                : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
-            title="Satellite"
+            title="Satellite View"
           >
             <Satellite size={20} />
           </button>
-          <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1 mx-2" />
+          <button
+            onClick={() => setShowUserLocation(!showUserLocation)}
+            className={`p-2 transition-colors flex items-center justify-center ${
+              showUserLocation
+                ? 'bg-blue-500 text-white'
+                : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+            title={showUserLocation ? "Stop Tracking Location" : "Find My Location"}
+          >
+            {isLocating ? <Loader2 size={20} className="animate-spin" /> : <Navigation size={20} />}
+          </button>
+          <div className="h-px bg-zinc-200 dark:bg-zinc-800" />
           <button
             onClick={handleReset}
-            className="p-2 rounded-lg text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-            title="Reset view"
+            className="p-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center"
+            title="Reset View"
           >
             <RefreshCw size={20} />
           </button>
@@ -784,6 +881,73 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           </span>
         </div>
       )}
+
+      <style>{`
+        .venue-tooltip .maplibregl-popup-content {
+          background-color: #18181b;
+          color: white;
+          border: 1px solid #27272a;
+          border-radius: 8px;
+          padding: 0;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .venue-tooltip .maplibregl-popup-tip {
+          border-top-color: #18181b;
+        }
+
+        .user-location-marker {
+          position: relative;
+        }
+        .user-location-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+        }
+        .user-location-label {
+          background-color: #a855f7;
+          color: white;
+          font-size: 10px;
+          font-weight: bold;
+          padding: 2px 6px;
+          border-radius: 4px;
+          margin-bottom: 4px;
+          white-space: nowrap;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.2);
+          z-index: 3;
+        }
+        .marker-dot {
+          width: 14px;
+          height: 14px;
+          background-color: #a855f7;
+          border: 2px solid white;
+          border-radius: 2px;
+          transform: rotate(45deg);
+          box-shadow: 0 0 4px rgba(0,0,0,0.3);
+          z-index: 2;
+        }
+        .marker-pulse {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          background-color: rgba(168, 85, 247, 0.4);
+          border-radius: 50%;
+          z-index: 1;
+          bottom: -3px;
+          animation: pulse-marker 2s ease-out infinite;
+        }
+        @keyframes pulse-marker {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(3.5);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 });
