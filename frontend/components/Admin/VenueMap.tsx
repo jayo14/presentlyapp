@@ -483,75 +483,89 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           controls: {
             polygon: true,
             trash: true,
-            line_string: false,
-            point: false,
-            combine_features: false,
-            uncombine_features: false,
           },
           defaultMode: 'draw_polygon',
           styles: [
-            // Polygon fill (active drawing)
+            // Polygon fill (while drawing and completed)
             {
               id: 'gl-draw-polygon-fill-inactive',
               type: 'fill',
               filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-              paint: { 'fill-color': '#f9c406', 'fill-opacity': 0.2 },
+              paint: { 'fill-color': '#f9c406', 'fill-opacity': 0.25 },
             },
             {
               id: 'gl-draw-polygon-fill-active',
               type: 'fill',
               filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
-              paint: { 'fill-color': '#f9c406', 'fill-opacity': 0.3 },
+              paint: { 'fill-color': '#f9c406', 'fill-opacity': 0.35 },
             },
-            // Polygon outline
+            // Polygon outline (border)
             {
               id: 'gl-draw-polygon-stroke-inactive',
               type: 'line',
               filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
               layout: { 'line-cap': 'round', 'line-join': 'round' },
-              paint: { 'line-color': '#f9c406', 'line-width': 2 },
+              paint: { 'line-color': '#f9c406', 'line-width': 3 },
             },
             {
               id: 'gl-draw-polygon-stroke-active',
               type: 'line',
               filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
               layout: { 'line-cap': 'round', 'line-join': 'round' },
+              paint: { 'line-color': '#f9c406', 'line-width': 4 },
+            },
+            // Line string (the active drawing line connecting vertices)
+            {
+              id: 'gl-draw-line-inactive',
+              type: 'line',
+              filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+              layout: { 'line-cap': 'round', 'line-join': 'round' },
               paint: { 'line-color': '#f9c406', 'line-width': 3 },
             },
-            // Line string (while drawing)
             {
-              id: 'gl-draw-line',
+              id: 'gl-draw-line-active',
               type: 'line',
-              filter: ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+              filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'LineString']],
               layout: { 'line-cap': 'round', 'line-join': 'round' },
-              paint: { 'line-color': '#f9c406', 'line-dasharray': [0.2, 2], 'line-width': 2 },
+              paint: { 'line-color': '#f9c406', 'line-width': 3 },
             },
-            // Polygon midpoints
+            // Midpoints (points between vertices for adding new points)
             {
               id: 'gl-draw-polygon-midpoint',
               type: 'circle',
               filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'midpoint']],
-              paint: { 'circle-radius': 4, 'circle-color': '#f9c406', 'circle-opacity': 0.7 },
+              paint: { 
+                'circle-radius': 5, 
+                'circle-color': '#ffffff',
+                'circle-stroke-color': '#f9c406',
+                'circle-stroke-width': 2,
+              },
             },
-            // Vertices
+            // Vertices (the actual points you click)
             {
               id: 'gl-draw-polygon-and-line-vertex-stroke-inactive',
               type: 'circle',
               filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
-              paint: { 'circle-radius': 6, 'circle-color': '#ffffff' },
+              paint: { 'circle-radius': 7, 'circle-color': '#ffffff' },
             },
             {
               id: 'gl-draw-polygon-and-line-vertex-inactive',
               type: 'circle',
               filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
-              paint: { 'circle-radius': 4, 'circle-color': '#f9c406' },
-            },
-            // Active vertex
-            {
-              id: 'gl-draw-polygon-and-line-vertex-active',
-              type: 'circle',
-              filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
               paint: { 'circle-radius': 5, 'circle-color': '#f9c406' },
+            },
+            // Active vertex (the one being dragged or last placed)
+            {
+              id: 'gl-draw-point-stroke-active',
+              type: 'circle',
+              filter: ['all', ['==', '$type', 'Point'], ['==', 'active', 'true'], ['!=', 'meta', 'midpoint']],
+              paint: { 'circle-radius': 8, 'circle-color': '#ffffff' },
+            },
+            {
+              id: 'gl-draw-point-active',
+              type: 'circle',
+              filter: ['all', ['==', '$type', 'Point'], ['==', 'active', 'true'], ['!=', 'meta', 'midpoint']],
+              paint: { 'circle-radius': 6, 'circle-color': '#f9c406' },
             },
           ],
         });

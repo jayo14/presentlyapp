@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
         // Source maps for debugging (disable in production for performance)
         sourcemap: mode !== 'production',
         // Target modern browsers for smaller bundle size
-        target: 'es2020',
+        target: 'es2022',
         // Enable CSS code splitting and minification
         cssCodeSplit: true,
         cssMinify: true,
@@ -73,18 +73,17 @@ export default defineConfig(({ mode }) => {
           '@tanstack/react-query',
           'axios',
           'lucide-react',
-          'maplibre-gl',
-          '@mapbox/mapbox-gl-draw'
+          'maplibre-gl'
         ],
-        exclude: ['@google/genai'],
+        exclude: ['@google/genai', '@mapbox/mapbox-gl-draw'],
         esbuildOptions: {
-          target: 'es2020',
+          target: 'es2022',
         }
       },
       // Additional esbuild options
       esbuild: {
-        // Handle class fields properly
-        target: 'es2020',
+        // Handle class fields properly - use es2022 for native class field support
+        target: 'es2022',
         keepNames: true,
       },
     };
