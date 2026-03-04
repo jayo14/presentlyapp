@@ -8,7 +8,7 @@ from .serializers import AttendanceSerializer
 from .geolocation_utils import verify_location, calculate_distance
 
 # Anti-spoofing thresholds (must match frontend constants)
-_MAX_ACCURACY_METERS = 30
+_MAX_ACCURACY_METERS = 100
 _MAX_JUMP_METERS = 50
 _MAX_DRIFT_METERS = 15
 _MAX_SPEED_MPS = 2.5  # ~9 km/h
@@ -77,7 +77,7 @@ def perform_attendance_check_in(request, session):
     if not samples:
         lat = request.data.get('latitude')
         lng = request.data.get('longitude')
-        acc = request.data.get('accuracy', 30) # Default to 30 if missing
+        acc = request.data.get('accuracy', 100) # Default to 30 if missing
         if lat and lng:
             samples = [{'latitude': lat, 'longitude': lng, 'accuracy': acc}]
 
