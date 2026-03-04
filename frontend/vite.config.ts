@@ -104,10 +104,6 @@ export default defineConfig(({ mode }) => {
         exclude: ['@google/genai'],
         esbuildOptions: {
           target: 'es2022',
-          supported: {
-            'class-fields': true,
-            'class-static-fields': true,
-          },
           define: {
             global: 'globalThis',
           },
@@ -118,13 +114,6 @@ export default defineConfig(({ mode }) => {
         // Handle class fields properly - use es2022 for native class field support
         target: 'es2022',
         keepNames: true,
-        supported: {
-          'class-fields': true,
-          'class-static-fields': true,
-        },
-        minify: mode === 'production' ? 'terser' : false,
-        jsxFactory: 'React.createElement',
-        jsxFragment: 'React.Fragment',
       },
     };
 });
