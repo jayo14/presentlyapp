@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, Hash, Building2, GraduationCap, LogOut, Phone, School, Settings, ChevronRight, User, ShieldCheck } from 'lucide-react-native';
+import { Mail, Hash, Building2, GraduationCap, LogOut, Phone, School, Settings, ChevronRight, User, ShieldCheck, Camera } from 'lucide-react-native';
 import { useState } from 'react';
 import { CustomModal } from '@/components/CustomModal';
 import Fonts from '@/constants/fonts';
@@ -52,12 +52,19 @@ export default function ProfileScreen() {
         {/* Profile Card */}
         <View style={styles.profileSection}>
             <View style={[styles.profileCard, { backgroundColor: isDark ? '#2d2714' : '#FFFFFF', borderColor: isDark ? '#6a5d2f' : '#E5E7EB' }]}>
-                <View style={[styles.avatarWrap, { borderColor: colors.primary }]}>
+                <TouchableOpacity
+                  style={[styles.avatarWrap, { borderColor: colors.primary }]}
+                  onPress={() => router.push('/(student)/edit-photo')}
+                  activeOpacity={0.8}
+                >
                     <Image
                         source={{ uri: user?.profilePicture || "https://lh3.googleusercontent.com/aida-public/AB6AXuCb1eKfu-webFwjY0bTXYx8AQIXlQS1CjzC-egov9i3U-qHRmSeMk3U4ic0u5zhgOz6EZWHyJLpXvLf4hya-low0fHuH_ifWg4jTPQCOPuyvaUkX-3EweZpFBhmzfa1hhPxKdFVY9xwV3dC9YmLBSBX0mrESrhtSx0ifvXZhX2IxibbmIsVsg1UvSHLkMWvpi97rriSq3NDDqJN0lu2srg4aGcXWMJBu0ENImvXsAEKLVtuA2QW4Ze-KGmUkSHdRjWQKBnQUC3luKS1" }}
                         style={styles.avatar}
                     />
-                </View>
+                    <View style={[styles.editPhotoBadge, { backgroundColor: colors.primary }]}>
+                        <Camera size={14} color="#000" />
+                    </View>
+                </TouchableOpacity>
                 <View style={styles.profileInfo}>
                     <Text style={[styles.nameText, { color: colors.text }]}>{user?.fullName}</Text>
                     <View style={styles.roleBadge}>
@@ -180,11 +187,22 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     padding: 3,
     marginBottom: 16,
+    position: 'relative',
   },
   avatar: {
     width: '100%',
     height: '100%',
     borderRadius: 50,
+  },
+  editPhotoBadge: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileInfo: {
     alignItems: 'center',

@@ -27,6 +27,7 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout/',
     ME: '/auth/me/',
     REFRESH_TOKEN: '/auth/token/refresh/',
+    UPLOAD_AVATAR: '/auth/upload-avatar/',
   },
   // Check-in
   CHECK_IN: {

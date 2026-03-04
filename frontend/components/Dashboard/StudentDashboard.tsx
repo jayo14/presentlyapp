@@ -3,6 +3,7 @@ import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, X, Image as
 import { Button } from '../Button';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 import { AnimatePresence, motion } from 'framer-motion';
+import { SEO } from '../SEO';
 import { studentApi, StudentDashboardData, EnrolledCourse, TimetableEntry, StudentAnalytics } from '../../services/api/student';
 import { sessionApi } from '../../services/api/attendance';
 import { geolocationService } from '../../services/geolocation';
@@ -168,6 +169,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
   if (view === 'timetable') {
       return (
+          <>
+          <SEO
+            title="Class Timetable | Student Dashboard"
+            description="View your weekly class schedule and registered courses on Presently."
+            noIndex
+          />
           <div className="space-y-6 animate-in fade-in duration-500">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Class Timetable</h2>
@@ -209,6 +216,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                   })}
               </div>
           </div>
+          </>
       );
   }
 
@@ -501,6 +509,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
       return (
           <>
+              <SEO
+                title="Attendance Analytics | Student Dashboard"
+                description="View your attendance analytics, course performance and weekly trends on Presently."
+                noIndex
+              />
               {/* Mobile View */}
               <div className="md:hidden">
                   {mobileLayout}
@@ -1028,6 +1041,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
   return (
       <>
+          <SEO
+            title="Student Dashboard | Presently"
+            description="Track your attendance, enrolled courses, upcoming classes and academic performance on Presently."
+            noIndex
+          />
           {/* Mobile View */}
           <div className="md:hidden">
               {mobileDashboardLayout}

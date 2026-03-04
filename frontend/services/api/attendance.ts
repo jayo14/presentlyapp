@@ -59,7 +59,8 @@ export interface Attendance {
   elevation?: number;
   distance_from_venue?: number;
   location_verified: boolean;
-  status: 'PRESENT' | 'LATE' | 'EXCUSED';
+  status: 'PRESENT' | 'LATE' | 'EXCUSED' | 'ABSENT';
+  warning?: string;
 }
 
 export interface CheckInData {

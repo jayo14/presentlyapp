@@ -15,6 +15,7 @@ import { PushNotificationSettings } from '../PushNotifications/PushNotificationS
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '../SEO';
 
 interface SettingsPageProps {
   userRole?: UserRole;
@@ -565,11 +566,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
   );
 
   return (
-    <ResponsiveContainer
-      mobileChildren={mobileLayout}
-    >
-      {desktopLayout}
-    </ResponsiveContainer>
+    <>
+      <SEO
+        title="Settings | Dashboard"
+        description="Manage your account settings, notification preferences and privacy options on Presently."
+        noIndex
+      />
+      <ResponsiveContainer
+        mobileChildren={mobileLayout}
+      >
+        {desktopLayout}
+      </ResponsiveContainer>
+    </>
   );
 };
 

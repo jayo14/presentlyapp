@@ -8,6 +8,7 @@ import { notificationsApi, Notification as ApiNotification } from '../../service
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
+import { SEO } from '../SEO';
 
 type TabType = 'all' | 'unread' | 'important' | 'system';
 
@@ -447,10 +448,17 @@ export const NotificationsPage: React.FC = () => {
   );
 
   return (
-    <ResponsiveContainer
-      mobileChildren={mobileLayout}
-    >
-      {desktopLayout}
-    </ResponsiveContainer>
+    <>
+      <SEO
+        title="Notifications | Dashboard"
+        description="View all your Presently notifications, attendance alerts and system messages."
+        noIndex
+      />
+      <ResponsiveContainer
+        mobileChildren={mobileLayout}
+      >
+        {desktopLayout}
+      </ResponsiveContainer>
+    </>
   );
 };
