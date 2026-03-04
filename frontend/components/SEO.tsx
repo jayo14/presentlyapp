@@ -8,6 +8,8 @@ interface SEOProps {
   image?: string;
   url?: string;
   type?: 'website' | 'article';
+  /** Prevent search-engine indexing while still allowing social-preview crawlers to read OG tags */
+  noIndex?: boolean;
 }
 
 export const SEO: React.FC<SEOProps> = ({
@@ -17,6 +19,7 @@ export const SEO: React.FC<SEOProps> = ({
   image = 'https://presentlyapp.vercel.app/og-image.png',
   url = 'https://presentlyapp.vercel.app/',
   type = 'website',
+  noIndex = false,
 }) => {
   const fullTitle = title.includes('|') ? title : `${title} | Presently`;
 
@@ -51,6 +54,7 @@ export const SEO: React.FC<SEOProps> = ({
       <meta name="title" content={fullTitle} />
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
+      {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
