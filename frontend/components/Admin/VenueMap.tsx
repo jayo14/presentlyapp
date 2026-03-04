@@ -180,6 +180,24 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         pin.style.boxShadow = isSelected ? '0 0 0 2px rgba(249, 196, 6, 0.45)' : '0 1px 3px rgba(0,0,0,0.45)';
         pin.style.cursor = 'pointer';
 
+        // Create popup for hover
+        const popup = new maplibregl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          offset: [0, -20],
+          className: 'venue-tooltip'
+        }).setHTML(`<div class="px-2 py-1 text-xs font-bold bg-zinc-900 text-white rounded shadow-lg">${venue.name}</div>`);
+
+        pin.addEventListener('mouseenter', () => {
+          if (!drawingModeRef.current) {
+            popup.setLngLat([Number(venue.longitude), Number(venue.latitude)]).addTo(map);
+          }
+        });
+
+        pin.addEventListener('mouseleave', () => {
+          popup.remove();
+        });
+
         pin.addEventListener('click', (event) => {
           event.stopPropagation();
           onVenueClickRef.current?.(venue);
