@@ -155,11 +155,16 @@ export interface Venue {
 export interface User {
   id: string;
   name: string;
+  full_name?: string;
   email: string;
   role: UserRole;
   avatar?: string;
   onboarding_complete: boolean;
-  
+  is_active?: boolean;
+  matric_number?: string;
+  level?: string;
+  department?: string;
+
   // Institutional Affiliation
   institution?: number;
   institution_id?: number;
