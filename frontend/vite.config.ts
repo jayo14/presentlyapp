@@ -21,16 +21,32 @@ export default defineConfig(({ mode }) => {
         }
       },
       build: {
-        // Enable code splitting
+        // Enable code splitting with careful control over chunks
         rollupOptions: {
           output: {
-            manualChunks: {
-              // Vendor chunks for better caching
-              'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-              'query-vendor': ['@tanstack/react-query'],
-              'map-vendor': ['maplibre-gl', '@mapbox/mapbox-gl-draw'],
-              'ui-vendor': ['lucide-react', 'recharts'],
-              'utils': ['axios'],
+            manualChunks(id) {
+              // Ensure React and core vendors are in dedicated chunks
+              if (id.includes('node_modules/react/')) {
+                return 'react-core';
+              }
+              if (id.includes('node_modules/@emotion/')) {
+                return 'emotion-core';
+              }
+              if (id.includes('node_modules/@chakra-ui/')) {
+                return 'chakra-core';
+              }
+              if (id.includes('node_modules/maplibre-gl')) {
+                return 'maplibre';
+              }
+              if (id.includes('node_modules/@mapbox/')) {
+                return 'mapbox-draw';
+              }
+              if (id.includes('node_modules/react-router')) {
+                return 'react-router';
+              }
+              if (id.includes('node_modules/@tanstack/')) {
+                return 'query-core';
+              }
             },
           },
         },
@@ -69,15 +85,32 @@ export default defineConfig(({ mode }) => {
         include: [
           'react', 
           'react-dom', 
-          'react-router-dom', 
+          'react-router-dom',
+          'react-router',
           '@tanstack/react-query',
           'axios',
           'lucide-react',
-          'maplibre-gl'
+          'maplibre-gl',
+          '@mapbox/mapbox-gl-draw',
+          '@chakra-ui/react',
+          '@emotion/react',
+          '@emotion/styled',
+          '@emotion/cache',
+          'react-icons',
+          'framer-motion',
+          'next-themes',
+          'react-helmet-async',
         ],
-        exclude: ['@google/genai', '@mapbox/mapbox-gl-draw'],
+        exclude: ['@google/genai'],
         esbuildOptions: {
           target: 'es2022',
+          supported: {
+            'class-fields': true,
+            'class-static-fields': true,
+          },
+          define: {
+            global: 'globalThis',
+          },
         }
       },
       // Additional esbuild options
@@ -85,6 +118,13 @@ export default defineConfig(({ mode }) => {
         // Handle class fields properly - use es2022 for native class field support
         target: 'es2022',
         keepNames: true,
+        supported: {
+          'class-fields': true,
+          'class-static-fields': true,
+        },
+        minify: mode === 'production' ? 'terser' : false,
+        jsxFactory: 'React.createElement',
+        jsxFragment: 'React.Fragment',
       },
     };
 });

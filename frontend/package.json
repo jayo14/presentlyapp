@@ -78,6 +78,20 @@
     "vitest": "^4.0.18"
   },
   "overrides": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "@emotion/react": {
+      "react": "$react"
+    },
+    "@emotion/styled": {
+      "react": "$react"
+    },
+    "@chakra-ui/react": {
+      "react": "$react",
+      "react-dom": "$react-dom",
+      "@emotion/react": "$@emotion/react",
+      "@emotion/styled": "$@emotion/styled"
+    },
     "react-helmet-async": {
       "react": "$react",
       "react-dom": "$react-dom"
