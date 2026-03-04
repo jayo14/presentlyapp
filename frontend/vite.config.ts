@@ -30,15 +30,18 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           output: {
             manualChunks(id) {
-              // Ensure React and core vendors are in dedicated chunks
-              if (id.includes('node_modules/react/')) {
-                return 'react-core';
-              }
-              if (id.includes('node_modules/@emotion/')) {
-                return 'emotion-core';
-              }
-              if (id.includes('node_modules/@chakra-ui/')) {
-                return 'chakra-core';
+              // Group React, Emotion, and Chakra UI together to avoid circular chunk dependencies.
+              // These packages are tightly coupled and must be in the same chunk.
+              if (
+                id.includes('node_modules/react/') ||
+                id.includes('node_modules/react-dom/') ||
+                id.includes('node_modules/@emotion/') ||
+                id.includes('node_modules/@chakra-ui/') ||
+                id.includes('node_modules/@ark-ui/') ||
+                id.includes('node_modules/@zag-js/') ||
+                id.includes('node_modules/framer-motion/')
+              ) {
+                return 'vendor-react';
               }
               if (id.includes('node_modules/maplibre-gl')) {
                 return 'maplibre';
@@ -100,7 +103,6 @@ export default defineConfig(({ mode }) => {
           '@chakra-ui/react',
           '@emotion/react',
           '@emotion/styled',
-          '@emotion/cache',
           'react-icons',
           'framer-motion',
           'next-themes',
