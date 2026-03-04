@@ -449,16 +449,16 @@ export const NotificationsPage: React.FC = () => {
 
   return (
     <>
-    <SEO
-      title="Notifications | Dashboard"
-      description="View all your Presently notifications, attendance alerts and system messages."
-      noIndex
-    />
-    <ResponsiveContainer
-      mobileChildren={mobileLayout}
-    >
-      {desktopLayout}
-    </ResponsiveContainer>
+      <SEO
+        title="Notifications | Dashboard"
+        description="View all your Presently notifications, attendance alerts and system messages."
+        noIndex
+      />
+      <ResponsiveContainer
+        mobileChildren={mobileLayout}
+      >
+        {desktopLayout}
+      </ResponsiveContainer>
     </>
   );
 };
