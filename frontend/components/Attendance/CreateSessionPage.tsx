@@ -11,6 +11,7 @@ import { Institution, College, Department, Course, Venue, Session } from '../../
 import { toast } from 'sonner';
 import { SessionDetailDialog } from './SessionDetailDialog';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
+import { SEO } from '../SEO';
 
 export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
@@ -637,10 +638,17 @@ export const CreateSessionPage: React.FC = () => {
     );
 
     return (
+        <>
+        <SEO
+          title="Create Attendance Session | Lecturer Dashboard"
+          description="Create a new attendance session for your course. Students can check in via QR code or session code on Presently."
+          noIndex
+        />
         <ResponsiveContainer
             mobileChildren={mobileLayout}
         >
             {desktopLayout}
         </ResponsiveContainer>
+        </>
     );
 };

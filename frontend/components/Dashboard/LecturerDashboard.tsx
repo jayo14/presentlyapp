@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { SessionDetailDialog } from '../Attendance/SessionDetailDialog';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { AttendanceReport } from './AttendanceReport';
+import { SEO } from '../SEO';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -158,32 +159,70 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   // Render Views
   if (view === 'courses') {
       return (
+          <>
+          <SEO
+            title="My Courses | Lecturer Dashboard"
+            description="Manage your courses, enrolled students and course settings on Presently."
+            noIndex
+          />
           <CourseManagement 
             userInstitutionId={userProfile?.institution} 
             userCollegeId={userProfile?.college} 
           />
+          </>
       );
   }
 
   if (view === 'reports') {
-      return <AttendanceReport />;
+      return (
+          <>
+          <SEO
+            title="Attendance Reports | Lecturer Dashboard"
+            description="View and export detailed attendance reports for your courses on Presently."
+            noIndex
+          />
+          <AttendanceReport />
+          </>
+      );
   }
   
   if (view === 'timetable') {
        return (
+         <>
+         <SEO
+           title="Timetable | Lecturer Dashboard"
+           description="View your teaching schedule and class timetable on Presently."
+           noIndex
+         />
          <div className="p-8 text-center text-zinc-500 flex flex-col items-center gap-4">
            <Loader2 className="w-8 h-8 animate-spin" />
            <span>Timetable Module Loading</span>
          </div>
+         </>
        );
   }
   
   if (view === 'analytics') {
-       return <LecturerAnalytics />;
+       return (
+         <>
+         <SEO
+           title="Analytics | Lecturer Dashboard"
+           description="Review attendance analytics, course performance and student engagement data on Presently."
+           noIndex
+         />
+         <LecturerAnalytics />
+         </>
+       );
   }
 
   // Default Dashboard View
   return (
+    <>
+    <SEO
+      title="Lecturer Dashboard | Presently"
+      description="Manage your courses, attendance sessions and view real-time student engagement on Presently."
+      noIndex
+    />
     <div className="space-y-6 animate-in fade-in duration-500">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -374,5 +413,6 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         </div>
       )}
     </div>
+    </>
   );
 };

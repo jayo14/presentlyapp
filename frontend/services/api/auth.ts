@@ -39,11 +39,13 @@ export interface UserProfile {
   role: UserRole;
   avatar_url?: string;
   onboarding_complete: boolean;
+  is_verified?: boolean;
   institution?: number;
   institution_name?: string;
   college?: number;
   college_name?: string;
   phone_number?: string;
+  phone?: string;
   matric_number?: string;
   department?: string;
   level?: string;
@@ -56,6 +58,11 @@ export interface UserProfile {
   timezone: string;
   created_at: string;
   updated_at: string;
+  // Optional stats (populated by some endpoints)
+  active_courses_count?: number;
+  total_sessions_count?: number;
+  attendance_rate?: number;
+  completed_courses_count?: number;
 }
 
 export interface AuthResponse {

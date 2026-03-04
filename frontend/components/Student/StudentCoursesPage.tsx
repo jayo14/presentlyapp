@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
 import CourseRegistrationDialog from './CourseRegistrationDialog';
 import { toast } from 'sonner';
+import { SEO } from '../SEO';
 
 interface StudentCoursesPageProps {
   userName?: string;
@@ -433,6 +434,11 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
   return (
     <>
+      <SEO
+        title="My Courses | Student Dashboard"
+        description="View and manage your enrolled courses, attendance records and course details on Presently."
+        noIndex
+      />
       {/* Mobile View */}
       <div className="md:hidden">
         {mobileLayout}

@@ -6,6 +6,7 @@ import { useCurrentUser } from '../../hooks/useAuth';
 import { sessionApi, attendanceApi, courseApi } from '../../services/api/attendance';
 import { toast } from 'sonner';
 import { geolocationService } from '../../services/geolocation';
+import { SEO } from '../SEO';
 
 export const PublicCheckInPage: React.FC = () => {
   const { sessionCode } = useParams<{ sessionCode: string }>();
@@ -230,7 +231,22 @@ export const PublicCheckInPage: React.FC = () => {
     );
   }
 
+  const sessionTitle = session
+    ? `${session.course_code} – ${session.course_name} | Attendance Check-In`
+    : 'Attendance Check-In | Presently';
+  const sessionDescription = session
+    ? `Mark your attendance for ${session.course_name} (${session.course_code})${session.lecturer_name ? ` — ${session.lecturer_name}` : ''}${session.venue_name ? ` at ${session.venue_name}` : ''}. Powered by Presently.`
+    : 'Mark your attendance for this session. Powered by Presently.';
+  const sessionUrl = `https://presentlyapp.vercel.app/check-in/${sessionCode ?? ''}`;
+
   return (
+    <>
+      <SEO
+        title={sessionTitle}
+        description={sessionDescription}
+        url={sessionUrl}
+        noIndex
+      />
     <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
@@ -332,5 +348,6 @@ export const PublicCheckInPage: React.FC = () => {
         Powered by <span className="text-zinc-400">Presently Smart Attendance</span>
       </p>
     </div>
+    </>
   );
 };
