@@ -61,9 +61,21 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     try {
       const position = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 15000, // Increased from 10s to 15s for better lock
         maximumAge: 0
       });
+
+      // Log for debugging
+      console.log('Location acquired:', {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy: position.coords.accuracy
+      });
+
+      // Manually reject if accuracy is too low (e.g., > 100m)
+      if (position.coords.accuracy > 100) {
+        throw new Error(`Accuracy too low (${position.coords.accuracy.toFixed(1)}m). Please move to a clearer area or ensure your GPS is enabled.`);
+      }
 
       return {
         latitude: position.coords.latitude,
@@ -74,7 +86,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       };
     } catch (error: any) {
       console.error('Geolocation error:', error);
-      throw new Error('Unable to get your location. Please enable location services.');
+      if (error.message?.includes('Accuracy too low')) {
+        throw error;
+      }
+      throw new Error('Unable to get your location. Please enable location services and ensure you are in a clear area.');
     }
   };
 
