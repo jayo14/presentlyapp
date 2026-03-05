@@ -240,7 +240,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
         const pin = document.createElement('button');
         pin.type = 'button';
-        pin.className = 'focus:outline-none';
+        pin.className = `focus:outline-none ${isActive ? 'session-active-marker' : ''}`;
         pin.title = venue.name;
         pin.style.width = isSelected ? '22px' : '18px';
         pin.style.height = isSelected ? '22px' : '18px';
@@ -249,6 +249,13 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         pin.style.border = '2px solid #ffffff';
         pin.style.boxShadow = isSelected ? '0 0 0 2px rgba(249, 196, 6, 0.45)' : '0 1px 3px rgba(0,0,0,0.45)';
         pin.style.cursor = 'pointer';
+        pin.style.position = 'relative';
+
+        if (isActive) {
+          const pulse = document.createElement('div');
+          pulse.className = 'session-marker-pulse';
+          pin.appendChild(pulse);
+        }
 
         // Create popup for hover
         const popup = new maplibregl.Popup({
@@ -882,6 +889,33 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         </div>
       )}
 
+      {/* Map Legend */}
+      <div className="absolute bottom-4 right-4 z-10 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[140px]">
+        <h4 className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Map Legend</h4>
+        
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-[#ef4444] border border-white shadow-sm relative overflow-visible">
+            <div className="absolute inset-0 rounded-full bg-[#ef4444] animate-ping opacity-40"></div>
+          </div>
+          <span className="text-xs font-medium text-foreground">Active Session</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-[#f9c406] border border-white shadow-sm"></div>
+          <span className="text-xs font-medium text-foreground">Selected Venue</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-[#3b82f6] border border-white shadow-sm"></div>
+          <span className="text-xs font-medium text-foreground">Regular Venue</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-[#a855f7] border border-white shadow-sm transform rotate-45"></div>
+          <span className="text-xs font-medium text-foreground">Your Location</span>
+        </div>
+      </div>
+
       <style>{`
         .venue-tooltip .maplibregl-popup-content {
           background-color: #18181b;
@@ -893,6 +927,29 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         }
         .venue-tooltip .maplibregl-popup-tip {
           border-top-color: #18181b;
+        }
+
+        .session-marker-pulse {
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          border-radius: 9999px;
+          background-color: rgba(239, 68, 68, 0.4);
+          z-index: -1;
+          animation: session-pulse 2s infinite;
+        }
+
+        @keyframes session-pulse {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(3);
+            opacity: 0;
+          }
         }
 
         .user-location-marker {

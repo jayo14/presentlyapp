@@ -361,10 +361,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                     </ResponsiveContainer>
                 </div>
             </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> 00420cd (updates)
         </div>
     </div>
   );

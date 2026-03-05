@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon, RotateCcw, Edit3 } from 'lucide-react';
+import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon, RotateCcw, Clipboard } from 'lucide-react';
 import { Button } from '../Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -57,40 +57,71 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   };
 
   // Get precise location using Capacitor
-  const getPreciseLocation = async () => {
-    try {
-      const position = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 15000, // Increased from 10s to 15s for better lock
-        maximumAge: 0
-      });
+  const getPreciseLocation = async (retries = 2) => {
+    let lastError: any = null;
+    
+    for (let i = 0; i <= retries; i++) {
+      try {
+        if (i > 0) {
+          setLocationInfo(`Improving location accuracy (Attempt ${i + 1}/${retries + 1})...`);
+          // Brief delay before retry
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
 
-      // Log for debugging
-      console.log('Location acquired:', {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-        accuracy: position.coords.accuracy
-      });
+        const position = await Geolocation.getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout: 15000 + (i * 5000), // Increase timeout on retries
+          maximumAge: 0
+        });
 
-      // Manually reject if accuracy is too low (e.g., > 100m)
-      if (position.coords.accuracy > 100) {
-        throw new Error(`Accuracy too low (${position.coords.accuracy.toFixed(1)}m). Please move to a clearer area or ensure your GPS is enabled.`);
+        // Log for debugging
+        console.log(`Location acquired (Attempt ${i + 1}):`, {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        });
+
+        // Threshold for acceptable accuracy (meters)
+        // 250m is a reasonable compromise for indoor/urban environments
+        const ACCURACY_THRESHOLD = 250;
+
+        // Manually reject if accuracy is too low
+        if (position.coords.accuracy > ACCURACY_THRESHOLD) {
+          const error = new Error(`Accuracy too low (${position.coords.accuracy.toFixed(0)}m). Need < ${ACCURACY_THRESHOLD}m.`);
+          
+          // If we have retries left, continue to next attempt
+          if (i < retries) {
+            lastError = error;
+            continue;
+          }
+          throw error;
+        }
+
+        return {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          altitude: position.coords.altitude,
+          accuracy: position.coords.accuracy,
+          altitudeAccuracy: position.coords.altitudeAccuracy
+        };
+      } catch (error: any) {
+        console.error(`Geolocation error (Attempt ${i + 1}):`, error);
+        lastError = error;
+        
+        // Don't retry if it's a permission error
+        if (error.code === 1 || error.message?.toLowerCase().includes('permission')) {
+          throw new Error('Location permission denied. Please enable location services in your browser or device settings.');
+        }
+
+        if (i === retries) {
+          if (lastError?.message?.includes('Accuracy too low')) {
+             throw new Error(`Location accuracy is too low (${lastError.message.match(/\d+/)[0]}m). Please move near a window or outdoors to get a better GPS signal.`);
+          }
+          throw new Error('Unable to get your location. Please ensure GPS is enabled and you are in a clear area.');
+        }
       }
-
-      return {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        altitude: position.coords.altitude,
-        accuracy: position.coords.accuracy,
-        altitudeAccuracy: position.coords.altitudeAccuracy
-      };
-    } catch (error: any) {
-      console.error('Geolocation error:', error);
-      if (error.message?.includes('Accuracy too low')) {
-        throw error;
-      }
-      throw new Error('Unable to get your location. Please enable location services and ensure you are in a clear area.');
     }
+    throw lastError || new Error('Geolocation failed');
   };
 
   // Reset state on open
@@ -225,8 +256,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           if (qrData.includes('/check-in/')) {
             const match = qrData.match(/\/check-in\/([A-Z0-9]+)/i);
             if (match && match[1]) {
-              sessionCodeFromQR = match[1];
+              sessionCodeFromQR = match[1].toUpperCase();
             }
+          } else {
+            // If it's just a raw code, ensure it's uppercase
+            sessionCodeFromQR = qrData.toUpperCase();
           }
           
           // Stop scanning and process attendance
@@ -287,6 +321,21 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
     setSessionCode(val);
+  };
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const cleanText = text.toUpperCase().trim().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+      if (cleanText) {
+        setSessionCode(cleanText);
+        toast.success('Code pasted');
+        await triggerHaptic(ImpactStyle.Light);
+      }
+    } catch (err) {
+      console.error('Failed to paste:', err);
+      toast.error('Could not access clipboard');
+    }
   };
 
   const processAttendance = async (codeToVerify: string) => {
@@ -442,9 +491,12 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           className="absolute bottom-0 left-0 right-0 z-50 p-6 bg-gradient-to-t from-black via-black/95 to-transparent"
         >
           {status === 'idle' && (
-            <div className="flex gap-3 mb-4">
+            <div className="flex gap-3 mb-4" role="tablist" aria-label="Scanner modes">
               <button
                 onClick={() => handleModeSwitch('scan')}
+                role="tab"
+                aria-selected={mode === 'scan'}
+                aria-label="Scan QR code using camera"
                 className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${
                   mode === 'scan'
                     ? 'bg-primary text-black shadow-lg shadow-primary/50'
@@ -456,6 +508,9 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               </button>
               <button
                 onClick={() => handleModeSwitch('input')}
+                role="tab"
+                aria-selected={mode === 'input'}
+                aria-label="Enter session code manually"
                 className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${
                   mode === 'input'
                     ? 'bg-primary text-black shadow-lg shadow-primary/50'
@@ -662,20 +717,49 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 Type the 6-8 character code displayed on screen
               </p>
 
-              <input
-                type="text"
-                value={sessionCode}
-                onChange={handleCodeChange}
-                maxLength={8}
-                placeholder="XXXXXXXX"
-                autoFocus
-                className="w-full bg-white/10 backdrop-blur-lg border-2 border-white/20 rounded-2xl px-6 py-6 text-center text-4xl font-mono tracking-[0.3em] uppercase text-white placeholder-white/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all mb-6"
-              />
+              <div className="relative group">
+                <input
+                  type="text"
+                  value={sessionCode}
+                  onChange={handleCodeChange}
+                  maxLength={8}
+                  placeholder="XXXXXXXX"
+                  aria-label="Attendance Session Code"
+                  autoFocus
+                  className="w-full bg-white/10 backdrop-blur-lg border-2 border-white/20 rounded-2xl px-6 py-6 text-center text-4xl font-mono tracking-[0.3em] uppercase text-white placeholder-white/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all mb-6"
+                />
+                
+                {/* Paste Button for Accessibility */}
+                <div className="flex justify-center mb-8 gap-3">
+                  <Button
+                    onClick={handlePaste}
+                    variant="secondary"
+                    className="bg-white/10 hover:bg-white/20 border-white/10 text-white rounded-xl py-3 flex items-center gap-2"
+                    aria-label="Paste session code from clipboard"
+                  >
+                    <Clipboard className="w-4 h-4" />
+                    Paste Code
+                  </Button>
+                  
+                  {sessionCode && (
+                    <Button
+                      onClick={() => setSessionCode('')}
+                      variant="secondary"
+                      className="bg-white/10 hover:bg-white/20 border-white/10 text-white rounded-xl py-3 flex items-center gap-2"
+                      aria-label="Clear session code"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
 
               <Button
                 onClick={handleSubmit}
                 disabled={sessionCode.length < 6}
                 className="w-full h-16 text-lg font-bold rounded-2xl"
+                aria-label="Verify session code and mark attendance"
               >
                 Verify & Mark Attendance
               </Button>

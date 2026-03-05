@@ -45,4 +45,10 @@ export const venueApi = {
     // Handle both paginated and direct array responses
     return response.data.results || response.data.sessions || response.data;
   },
+
+  // Get venue IDs with active sessions right now
+  getActiveSessions: async (): Promise<number[]> => {
+    const response = await apiClient.get('/venues/active_sessions/');
+    return response.data.active_venue_ids || [];
+  },
 };
