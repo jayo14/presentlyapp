@@ -1113,6 +1113,22 @@ class VenueViewSet(viewsets.ModelViewSet):
             
         return queryset
 
+    @action(detail=False, methods=['get'])
+    def active_sessions(self, request):
+        """Get IDs of venues that have active sessions right now"""
+        now = timezone.now()
+        active_venue_ids = AttendanceSession.objects.filter(
+            is_active=True,
+            start_time__lte=now,
+            end_time__gte=now,
+            venue__isnull=False
+        ).values_list('venue_id', flat=True).distinct()
+        
+        return Response({
+            'success': True,
+            'active_venue_ids': list(active_venue_ids)
+        })
+
     @action(detail=True, methods=['get'])
     def sessions(self, request, pk=None):
         """Get all sessions for this venue"""
@@ -1748,6 +1764,8 @@ class UserViewSet(viewsets.ModelViewSet):
 def public_check_in_view(request, session_code):
     """Public check-in endpoint with multi-sample verification"""
     try:
+        # Normalize code to uppercase to avoid case-sensitivity issues
+        session_code = session_code.upper()
         session = AttendanceSession.objects.get(session_code=session_code)
     except AttendanceSession.DoesNotExist:
         return Response({

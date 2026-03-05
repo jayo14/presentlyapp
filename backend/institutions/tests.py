@@ -279,6 +279,33 @@ class VenueDisplayFieldTests(TestCase):
         self.assertAlmostEqual(float(response.data['venue_opacity']), 0.15, places=4)
         self.assertEqual(response.data['border_width'], 2)
 
+    def test_active_sessions_endpoint(self):
+        from .views import VenueViewSet
+        # Create venue and active session
+        venue = Venue.objects.create(
+            institution=self.institution, name="Active Venue", 
+            latitude=10.0, longitude=10.0
+        )
+        # We need a course for the session
+        lecturer = User.objects.create_user(
+            email="lecturer_active@test.com", password="password", full_name="Lecturer", role=UserRole.LECTURER
+        )
+        course = Course.objects.create(code="ACT101", title="Active Course", lecturer=lecturer)
+        AttendanceSession.objects.create(
+            course=course, venue=venue,
+            start_time=timezone.now() - datetime.timedelta(minutes=10),
+            end_time=timezone.now() + datetime.timedelta(minutes=50),
+            is_active=True
+        )
+
+        view = VenueViewSet.as_view({'get': 'active_sessions'})
+        request = self.factory.get('/api/venues/active_sessions/')
+        force_authenticate(request, user=self.admin)
+        response = view(request)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(venue.id, response.data['active_venue_ids'])
+
 
 # ---------------------------------------------------------------------------
 # Geolocation utility tests (point-in-polygon and radius validation)

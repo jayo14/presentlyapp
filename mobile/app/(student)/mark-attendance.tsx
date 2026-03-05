@@ -1,19 +1,21 @@
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput, KeyboardAvoidingView, Platform, ScrollView, Dimensions, Alert } from 'react-native';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAttendance } from '@/contexts/AttendanceContext';
-import { ChevronLeft, Keyboard, QrCode as QrIcon, Camera, X } from 'lucide-react-native';
+import { ChevronLeft, Keyboard, QrCode as QrIcon, Camera, X, Clipboard as ClipboardIcon } from 'lucide-react-native';
 import { CustomModal } from '@/components/CustomModal';
 import Fonts from '@/constants/fonts';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { api } from '@/services/api';
 import { enrollmentsService } from '@/services/enrollments';
 import * as Location from 'expo-location';
+import * as Clipboard from 'expo-clipboard';
 
 const { width, height } = Dimensions.get('window');
 
+const ACCURACY_THRESHOLD = 250; // meters
 const ACCURACY_UNAVAILABLE = 999;
 
 interface LocationSample {
@@ -31,10 +33,11 @@ export default function MarkAttendanceScreen() {
   const [activeTab, setActiveTab] = useState<'qr' | 'code'>(tab === 'code' ? 'code' : 'qr');
   const [permission, requestPermission] = useCameraPermissions();
 
-  const [sessionCode, setSessionCode] = useState<string[]>(new Array(8).fill(''));
+  const [sessionCode, setSessionCode] = useState<string>('');
   const [processing, setProcessing] = useState<boolean>(false);
+  const [locationStatus, setLocationStatus] = useState<string>('');
 
-  const inputs = useRef<TextInput[]>([]);
+  const inputRef = useRef<TextInput>(null);
 
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
@@ -60,66 +63,97 @@ export default function MarkAttendanceScreen() {
     });
   };
 
-  const handleCodeChange = (text: string, index: number) => {
-    const newCode = [...sessionCode];
-    newCode[index] = text.toUpperCase();
-    setSessionCode(newCode);
-
-    if (text && index < 7) {
-      inputs.current[index + 1]?.focus();
-    }
+  const handleCodeChange = (text: string) => {
+    const cleaned = text.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+    setSessionCode(cleaned);
   };
 
-  const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === 'Backspace' && !sessionCode[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
+  const handlePaste = async () => {
+    const text = await Clipboard.getStringAsync();
+    if (text) {
+      handleCodeChange(text);
     }
   };
 
   const handleBarcodeScanned = async ({ data }: { data?: string }) => {
     if (processing) return;
-    const code = (data || '').trim();
+    let code = (data || '').trim();
     if (!code) return;
 
+    // Handle full URL scanning
+    if (code.includes('/check-in/')) {
+        const parts = code.split('/check-in/');
+        if (parts.length > 1) {
+            code = parts[1].split(/[?#/]/)[0];
+        }
+    }
+
+    // Always normalize to uppercase
+    code = code.toUpperCase();
+
     await verifyAndPrepareCheckIn(code);
+  };
+
+  const getPreciseLocation = async (retries = 2): Promise<LocationSample[]> => {
+    setLocationStatus('Getting location...');
+    for (let i = 0; i <= retries; i++) {
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') return [];
+
+            const loc = await Location.getCurrentPositionAsync({ 
+                accuracy: Location.Accuracy.High,
+                timeout: 10000 
+            });
+
+            const accuracy = loc.coords.accuracy ?? ACCURACY_UNAVAILABLE;
+            
+            if (accuracy <= ACCURACY_THRESHOLD || i === retries) {
+                return [{
+                    latitude: loc.coords.latitude,
+                    longitude: loc.coords.longitude,
+                    accuracy: accuracy,
+                    timestamp: loc.timestamp,
+                }];
+            }
+            
+            setLocationStatus(`Improving accuracy... (${Math.round(accuracy)}m)`);
+            // Wait a bit before retry
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        } catch (e) {
+            if (i === retries) return [];
+        }
+    }
+    return [];
   };
 
   const verifyAndPrepareCheckIn = async (code: string) => {
     try {
       setProcessing(true);
-      const sessionInfo: any = await api.checkIn.get(code);
+      setErrorMsg('');
+      
+      // Step 1: Normalize and Get Session Info
+      const normalizedCode = code.toUpperCase().trim();
+      const sessionInfo: any = await api.checkIn.get(normalizedCode);
 
-      // Enrollment check
+      // Step 2: Enrollment check
       try {
         const enrollData = await enrollmentsService.list({ course: sessionInfo.course_id });
         const enrollments: any[] = enrollData.results ?? (Array.isArray(enrollData) ? enrollData : []);
         if (!enrollments.some((e: any) => e.is_active === true)) {
-          Alert.alert('Not Enrolled', 'You are not registered for this course. Please register first.');
+          showAlert('Not Enrolled', 'You are not registered for this course. Please register first.', 'error');
           return;
         }
       } catch {
         // Enrollment check failed — let server-side validation handle it
       }
 
-      // Collect a single GPS sample
-      let samples: LocationSample[] = [];
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-          samples = [{
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-            accuracy: loc.coords.accuracy ?? ACCURACY_UNAVAILABLE,
-            timestamp: loc.timestamp,
-          }];
-        }
-      } catch {
-        // Location unavailable; proceed without GPS
-      }
+      // Step 3: Collect GPS samples with retry logic
+      const samples = await getPreciseLocation();
+      setLocationStatus('');
 
-      // Submit attendance directly
-      const response: any = await api.checkIn.mark(code, {
+      // Step 4: Submit attendance directly
+      const response: any = await api.checkIn.mark(normalizedCode, {
         samples,
         course_id: sessionInfo.course_id,
       });
@@ -142,11 +176,13 @@ export default function MarkAttendanceScreen() {
       showAlert('Error', msg, 'error');
     } finally {
       setProcessing(false);
+      setLocationStatus('');
     }
   };
 
-  const fullCode = sessionCode.join('');
-  const isValidCode = fullCode.length === 8;
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const isValidCode = sessionCode.length >= 6;
 
   if (activeTab === 'qr') {
     return (
@@ -191,6 +227,13 @@ export default function MarkAttendanceScreen() {
             <View style={[styles.corner, styles.tr, { borderColor: colors.primary }]} />
             <View style={[styles.corner, styles.bl, { borderColor: colors.primary }]} />
             <View style={[styles.corner, styles.br, { borderColor: colors.primary }]} />
+            
+            {processing && (
+                <View style={styles.processingOverlay}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={styles.processingText}>{locationStatus || 'Verifying...'}</Text>
+                </View>
+            )}
           </View>
 
           <View style={styles.qrFooter}>
@@ -230,35 +273,83 @@ export default function MarkAttendanceScreen() {
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Text style={[styles.headline, { color: colors.text }]}>Enter 8-Digit Code</Text>
+          <Text style={[styles.headline, { color: colors.text }]}>Enter Session Code</Text>
           <Text style={[styles.subtext, { color: isDark ? 'rgba(255,255,255,0.6)' : '#666' }]}>
             Ask your lecturer for the unique code to confirm your attendance manually.
           </Text>
 
-          <View style={styles.codeInputContainer}>
+          <TouchableOpacity 
+            style={styles.codeInputContainer} 
+            onPress={() => inputRef.current?.focus()}
+            activeOpacity={1}
+            accessible={true}
+            accessibilityLabel={`Session code input. Current value: ${sessionCode || 'empty'}`}
+            accessibilityHint="Double tap to edit"
+          >
             <View style={styles.codeRow}>
-              {sessionCode.map((digit, i) => (
-                <TextInput
-                  key={i}
-                  ref={el => { if (el) inputs.current[i] = el; }}
-                  style={[styles.digitInput, { color: colors.text, borderBottomColor: digit ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB') }]}
-                  maxLength={1}
-                  value={digit}
-                  onChangeText={(text) => handleCodeChange(text, i)}
-                  onKeyPress={(e) => handleKeyPress(e, i)}
-                  autoCapitalize="characters"
-                />
+              {[...Array(8)].map((_, i) => (
+                <View 
+                  key={i} 
+                  style={[
+                    styles.digitBox, 
+                    { 
+                        borderBottomColor: sessionCode[i] ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'),
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'
+                    }
+                  ]}
+                >
+                  <Text style={[styles.digitText, { color: colors.text }]}>
+                    {sessionCode[i] || ''}
+                  </Text>
+                </View>
               ))}
             </View>
-          </View>
-
-          <TouchableOpacity
-            style={[styles.verifyBtn, { backgroundColor: colors.primary, opacity: isValidCode ? 1 : 0.6 }]}
-            onPress={() => verifyAndPrepareCheckIn(fullCode)}
-            disabled={!isValidCode || processing}
-          >
-            {processing ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.verifyBtnText}>Mark Attendance</Text>}
+            
+            {/* Hidden real input for accessibility and paste support */}
+            <TextInput
+              ref={inputRef}
+              style={styles.hiddenInput}
+              value={sessionCode}
+              onChangeText={handleCodeChange}
+              maxLength={8}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              autoComplete="off"
+              keyboardType="default"
+              textContentType="none"
+              caretHidden
+            />
           </TouchableOpacity>
+
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity 
+                style={[styles.pasteBtn, { borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB' }]} 
+                onPress={handlePaste}
+                accessibilityLabel="Paste code from clipboard"
+            >
+                <ClipboardIcon size={18} color={colors.text} />
+                <Text style={[styles.pasteBtnText, { color: colors.text }]}>Paste Code</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={[styles.verifyBtn, { backgroundColor: colors.primary, opacity: isValidCode ? 1 : 0.6 }]}
+                onPress={() => verifyAndPrepareCheckIn(sessionCode)}
+                disabled={!isValidCode || processing}
+                accessibilityLabel="Mark Attendance"
+                accessibilityRole="button"
+            >
+                {processing ? (
+                    <View style={styles.btnLoading}>
+                        <ActivityIndicator color="#0A0A0A" size="small" />
+                        <Text style={[styles.verifyBtnText, { marginLeft: 10 }]}>
+                            {locationStatus ? 'Locating...' : 'Processing...'}
+                        </Text>
+                    </View>
+                ) : (
+                    <Text style={styles.verifyBtnText}>Mark Attendance</Text>
+                )}
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity style={styles.switchTextBtn} onPress={() => setActiveTab('qr')}>
             <Text style={[styles.switchText, { color: colors.primary }]}>Switch to QR Scanner</Text>
@@ -279,12 +370,18 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: 24, alignItems: 'center', paddingTop: 60, paddingBottom: 40 },
   headline: { fontSize: 28, fontFamily: Fonts.lexend.bold, textAlign: 'center', marginBottom: 12 },
   subtext: { fontSize: 15, fontFamily: Fonts.lexend.regular, textAlign: 'center', lineHeight: 22, marginBottom: 48 },
-  codeInputContainer: { width: '100%', marginBottom: 40 },
+  codeInputContainer: { width: '100%', marginBottom: 24, position: 'relative' },
   codeRow: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
-  digitInput: { width: width * 0.12, height: 56, borderBottomWidth: 3, fontSize: 28, fontFamily: Fonts.lexend.bold, textAlign: 'center' },
+  digitBox: { width: width * 0.1, height: 56, borderBottomWidth: 3, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  digitText: { fontSize: 24, fontFamily: Fonts.lexend.bold, textAlign: 'center' },
+  hiddenInput: { position: 'absolute', opacity: 0, width: '100%', height: '100%' },
+  actionsContainer: { width: '100%', gap: 16, marginBottom: 40 },
+  pasteBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed' },
+  pasteBtnText: { fontSize: 14, fontFamily: Fonts.lexend.medium },
   verifyBtn: { width: '100%', height: 60, borderRadius: 16, alignItems: 'center', justifyContent: 'center', shadowColor: '#f9c406', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 12, elevation: 4 },
   verifyBtnText: { fontSize: 18, fontFamily: Fonts.lexend.bold, color: '#0A0A0A' },
-  switchTextBtn: { marginTop: 24 },
+  btnLoading: { flexDirection: 'row', alignItems: 'center' },
+  switchTextBtn: { marginTop: 8 },
   switchText: { fontSize: 14, fontFamily: Fonts.lexend.bold },
   permissionScreen: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
   permTitle: { fontSize: 20, fontFamily: Fonts.lexend.bold, color: '#FFF', marginTop: 24 },
@@ -295,6 +392,8 @@ const styles = StyleSheet.create({
   qrHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 10 },
   qrTitle: { color: '#FFF', fontSize: 18, fontFamily: Fonts.lexend.bold },
   scannerTarget: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  processingOverlay: { backgroundColor: 'rgba(0,0,0,0.7)', padding: 24, borderRadius: 20, alignItems: 'center', gap: 12 },
+  processingText: { color: '#FFF', fontFamily: Fonts.lexend.medium, fontSize: 14 },
   corner: { position: 'absolute', width: 40, height: 40, borderWidth: 4 },
   tl: { top: height * 0.3, left: width * 0.2, borderRightWidth: 0, borderBottomWidth: 0 },
   tr: { top: height * 0.3, right: width * 0.2, borderLeftWidth: 0, borderBottomWidth: 0 },
