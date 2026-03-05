@@ -140,6 +140,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/venues/${id}/`,
     DELETE: (id: string) => `/venues/${id}/`,
     SESSIONS: (id: string) => `/venues/${id}/sessions/`,
+    ACTIVE_SESSIONS: '/venues/active_sessions/',
   },
   // Notifications
   NOTIFICATIONS: {

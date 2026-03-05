@@ -14,6 +14,7 @@ import { venuesService } from '@/services/venues';
 export default function ManageVenuesScreen() {
   const { colors, isDark } = useTheme();
   const [venues, setVenues] = useState<any[]>([]);
+  const [activeVenueIds, setActiveVenueIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVenue, setSelectedVenue] = useState<any>(null);
   const mapRef = useRef<MapView>(null);
@@ -41,9 +42,22 @@ export default function ManageVenuesScreen() {
     }
   };
 
+  const loadActiveSessions = async () => {
+    try {
+      const response: any = await venuesService.getActiveSessions();
+      setActiveVenueIds(response.active_venue_ids || []);
+    } catch (error) {
+      console.error('Error loading active sessions:', error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       loadVenues();
+      loadActiveSessions();
+      
+      const interval = setInterval(loadActiveSessions, 60000);
+      return () => clearInterval(interval);
     }, [])
   );
 
@@ -180,12 +194,14 @@ export default function ManageVenuesScreen() {
             {venues.filter(hasValidCoords).map(venue => {
               const lat = parseFloat(String(venue.latitude));
               const lon = parseFloat(String(venue.longitude));
+              const isActive = activeVenueIds.includes(venue.id);
               return (
                 <Marker
                   key={venue.id}
                   coordinate={{ latitude: lat, longitude: lon }}
                   title={venue.name}
-                  pinColor={colors.primary}
+                  description={isActive ? "Active Session in Progress" : ""}
+                  pinColor={isActive ? "#EF4444" : colors.primary}
                   onPress={() => handleVenueSelect(venue)}
                 />
               );
@@ -230,6 +246,18 @@ export default function ManageVenuesScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Legend */}
+      <View style={[styles.legend, { backgroundColor: colors.background + 'E6', borderColor: colors.primary + '33' }]}>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+          <Text style={[styles.legendText, { color: colors.text }]}>Active Session</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
+          <Text style={[styles.legendText, { color: colors.text }]}>Venue</Text>
+        </View>
+      </View>
 
       {/* FAB */}
       <TouchableOpacity
@@ -320,6 +348,18 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 10, fontWeight: '600' },
   venueActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   actionBtn: { padding: 4 },
+  legend: { 
+    position: 'absolute', 
+    bottom: 100, 
+    right: 16, 
+    padding: 8, 
+    borderRadius: 8, 
+    borderWidth: 1,
+    gap: 4
+  },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendDot: { width: 10, height: 10, borderRadius: 5 },
+  legendText: { fontSize: 10, fontWeight: '600' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, height: '90%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
