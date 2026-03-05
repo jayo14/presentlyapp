@@ -22,7 +22,8 @@ const GRACEFUL_404_ENDPOINTS = [
   '/system/stats/',
   '/system/activity/',
   '/system/alerts/',
-  '/system/config/'
+  '/system/config/',
+  '/venues/active_sessions/'
 ];
 
 // Check if an endpoint gracefully handles 404

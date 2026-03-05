@@ -25,11 +25,26 @@ export const VenueManagement: React.FC = () => {
   const [newVenueLocation, setNewVenueLocation] = useState<{lat: number; lng: number} | null>(null);
   const [newVenueBoundary, setNewVenueBoundary] = useState<number[][] | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [activeVenueIds, setActiveVenueIds] = useState<Set<number>>(new Set());
 
   // Load initial data
   useEffect(() => {
     loadData();
+    fetchActiveSessions();
+    
+    // Refresh active sessions every minute
+    const interval = setInterval(fetchActiveSessions, 60000);
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchActiveSessions = async () => {
+    try {
+      const ids = await venueApi.getActiveSessions();
+      setActiveVenueIds(new Set(ids));
+    } catch (err) {
+      console.error('Failed to fetch active sessions:', err);
+    }
+  };
 
   // Filter-driven loading
   useEffect(() => {
@@ -341,6 +356,7 @@ export const VenueManagement: React.FC = () => {
           }>
             <VenueMap
               venues={filteredVenues}
+              activeSessions={activeVenueIds}
               onVenueClick={handleVenueClick}
               onMapClick={handleMapClick}
               selectedVenue={selectedVenue}
