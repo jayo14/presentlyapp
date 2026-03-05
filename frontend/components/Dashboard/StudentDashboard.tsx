@@ -804,7 +804,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                           
                           return (
                               <motion.div 
-                                  key={activity.id}
+                                  key={activity.id || `activity-${index}`}
                                   initial={{ opacity: 0, x: -20 }}
                                   animate={{ opacity: 1, x: 0 }}
                                   transition={{ delay: index * 0.05 }}
@@ -1004,8 +1004,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                {recentActivity.length === 0 ? (
                    <p className="text-sm text-zinc-500 italic px-1">No recent activity recorded.</p>
                ) : (
-                   recentActivity.map((activity) => (
-                       <div key={activity.id} className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
+                   recentActivity.map((activity, index) => (
+                       <div key={activity.id || `activity-desktop-${index}`} className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
                            <div className="flex items-center gap-4">
                                <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 text-sm">
                                    {getActivityCourseCode(activity).substring(0,2)}
