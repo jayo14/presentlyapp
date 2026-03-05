@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth';
+import { useAvatarUpload } from '../../hooks/useAvatarUpload';
 import { UserRole } from '../../types';
 import { Button } from '../Button';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
@@ -27,11 +28,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onLogout: propOnLogout
 }) => {
   const navigate = useNavigate();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { data: user, isLoading } = useCurrentUser();
   const logoutMutation = useLogout();
   const queryClient = useQueryClient();
+  const { uploadAvatar, isUploading: uploadingAvatar } = useAvatarUpload();
   const [showShareMenu, setShowShareMenu] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  // Removed local state, using hook instead
   
   const userName = user?.full_name || propUserName || 'Dr. Sarah Smith';
   const userAvatar = user?.avatar_url;
@@ -56,43 +59,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   };
 
   const handleAvatarUpdate = async () => {
-    try {
-      setUploadingAvatar(true);
-      
-      // Import CameraService dynamically
-      const { CameraService } = await import('../../services/camera');
-      
-      // Get photo from user
-      const photoData = await CameraService.promptForPhoto({
-        quality: 80,
-        allowEditing: true,
-        width: 512,
-        height: 512,
-      });
-
-      if (!photoData) {
-        toast.error('No image selected');
-        return;
-      }
-
-      // Upload to backend
-      const avatarUrl = await authApi.uploadAvatar(photoData);
-      
-      // Update local user data
-      if (user) {
-        const updatedUser = { ...user, avatar_url: avatarUrl };
-        queryClient.setQueryData(queryKeys.currentUser, updatedUser);
-      }
-
-      toast.success('Profile picture updated successfully');
-    } catch (error: any) {
-      console.error('Avatar upload error:', error);
-      toast.error('Failed to update profile picture', {
-        description: error.message || 'Please try again'
-      });
-    } finally {
-      setUploadingAvatar(false);
-    }
+    await uploadAvatar();
   };
 
   const handleLogout = () => {
