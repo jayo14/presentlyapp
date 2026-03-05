@@ -18,7 +18,15 @@ interface VenueMapProps {
 
 const DEFAULT_CENTER: [number, number] = [3.8936, 7.3775]; // [lng, lat]
 const DEFAULT_ZOOM = 13;
-const ROAD_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
+
+// Mapbox Token from environment
+const MAPBOX_TOKEN = (import.meta as any).env?.VITE_MAPBOX_TOKEN || '';
+
+// Use Mapbox Streets for the most up-to-date streets, roads and building names
+// Falling back to Carto Voyager if token is missing
+const ROAD_STYLE = MAPBOX_TOKEN 
+  ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`
+  : 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
 
 const SATELLITE_STYLE: maplibregl.StyleSpecification = {
   version: 8,
@@ -126,6 +134,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   const drawCreateHandlerRef = useRef<((e: { features: GeoJSON.Feature[] }) => void) | null>(null);
   const venueMarkersRef = useRef<maplibregl.Marker[]>([]);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const userAccuracyCircleRef = useRef<maplibregl.Marker | null>(null);
   const tooltipRef = useRef<maplibregl.Popup | null>(null);
   const drawingModeRef = useRef(drawingMode);
   const [mapType, setMapType] = useState<'road' | 'satellite'>('road');
@@ -141,6 +150,10 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             userMarkerRef.current.remove();
             userMarkerRef.current = null;
         }
+        if (userAccuracyCircleRef.current) {
+            userAccuracyCircleRef.current.remove();
+            userAccuracyCircleRef.current = null;
+        }
         setIsLocating(false);
         return;
     }
@@ -150,8 +163,12 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     const onSuccess = (position: GeolocationPosition) => {
         setIsLocating(false);
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
+        // Store accuracy for zoom-based updates
+        (map as any)._lastAccuracy = accuracy;
+        (map as any)._lastLat = latitude;
         
+        // Update marker
         if (!userMarkerRef.current) {
             const el = document.createElement('div');
             el.className = 'user-location-marker';
@@ -167,35 +184,75 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
                 .setLngLat([longitude, latitude])
                 .addTo(map);
             
-            // First time finding location, fly to it
+            // Accuracy circle (visual representation of precision)
+            const circleEl = document.createElement('div');
+            circleEl.className = 'user-accuracy-circle';
+            userAccuracyCircleRef.current = new maplibregl.Marker({ element: circleEl, pitchAlignment: 'map' })
+                .setLngLat([longitude, latitude])
+                .addTo(map);
+            
+            // First time finding location, fly to it with high precision
             map.flyTo({
                 center: [longitude, latitude],
-                zoom: 16,
+                zoom: 18, // High zoom for precision
                 speed: 1.2
             });
         } else {
             userMarkerRef.current.setLngLat([longitude, latitude]);
+            if (userAccuracyCircleRef.current) {
+                userAccuracyCircleRef.current.setLngLat([longitude, latitude]);
+                updateAccuracyCircle(map, latitude, accuracy);
+            }
         }
     };
+
+    const updateAccuracyCircle = (map: maplibregl.Map, lat: number, acc: number) => {
+        if (!userAccuracyCircleRef.current) return;
+        const metersPerPixel = (40075016.686 * Math.cos(lat * Math.PI / 180)) / Math.pow(2, map.getZoom() + 8);
+        const radiusPx = acc / metersPerPixel;
+        const circleEl = userAccuracyCircleRef.current.getElement();
+        circleEl.style.width = `${radiusPx * 2}px`;
+        circleEl.style.height = `${radiusPx * 2}px`;
+    };
+
+    const handleZoom = () => {
+        if (mapRef.current && (mapRef.current as any)._lastAccuracy !== undefined) {
+            updateAccuracyCircle(mapRef.current, (mapRef.current as any)._lastLat, (mapRef.current as any)._lastAccuracy);
+        }
+    };
+
+    map.on('zoom', handleZoom);
 
     const onError = (error: GeolocationPositionError) => {
         setIsLocating(false);
         console.error('Geolocation error:', error);
         setShowUserLocation(false);
-        alert(`Failed to get location: ${error.message}`);
+        // More descriptive errors for better UX
+        const errorMsg = error.code === 1 ? 'Location access denied. Please enable location permissions in your browser.' : 
+                        error.code === 2 ? 'Location unavailable. Ensure GPS is enabled.' : 
+                        'Location request timed out. Trying to get a better signal...';
+        alert(`Failed to get precise location: ${errorMsg}`);
     };
 
+    // Use watchPosition for continuous, high-precision updates
     watchId = navigator.geolocation.watchPosition(onSuccess, onError, {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+        timeout: 20000, // Longer timeout for better initial lock
+        maximumAge: 0 // No cache - get fresh data
     });
 
     return () => {
         if (watchId) navigator.geolocation.clearWatch(watchId);
+        if (mapRef.current) {
+            mapRef.current.off('zoom', handleZoom);
+        }
         if (userMarkerRef.current) {
             userMarkerRef.current.remove();
             userMarkerRef.current = null;
+        }
+        if (userAccuracyCircleRef.current) {
+            userAccuracyCircleRef.current.remove();
+            userAccuracyCircleRef.current = null;
         }
     };
   }, [showUserLocation, mapReady]);
@@ -954,6 +1011,15 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
         .user-location-marker {
           position: relative;
+        }
+        .user-accuracy-circle {
+          background-color: rgba(168, 85, 247, 0.15);
+          border: 1px solid rgba(168, 85, 247, 0.4);
+          border-radius: 50%;
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .user-location-container {
           display: flex;

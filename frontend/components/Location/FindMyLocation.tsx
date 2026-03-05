@@ -34,8 +34,23 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+    // Mapbox Token from environment
+    const MAPBOX_TOKEN = (import.meta as any).env?.VITE_MAPBOX_TOKEN || '';
+
+    // Use Mapbox Streets for the most up-to-date streets, roads and building names
+    // Falling back to Carto Voyager/OSM if token is missing
+    const tileUrl = MAPBOX_TOKEN 
+      ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    const attribution = MAPBOX_TOKEN
+      ? '© Mapbox © OpenStreetMap'
+      : '© OpenStreetMap © CARTO';
+
+    L.tileLayer(tileUrl, {
+      attribution: attribution,
+      tileSize: 512,
+      zoomOffset: -1
     }).addTo(map);
 
     mapRef.current = map;

@@ -23,4 +23,7 @@ export const venuesService = {
   getSessions: async (venueId: string) => {
     return apiClient.get(API_ENDPOINTS.VENUES.SESSIONS(venueId));
   },
+  getActiveSessions: async () => {
+    return apiClient.get(API_ENDPOINTS.VENUES.ACTIVE_SESSIONS);
+  },
 };
