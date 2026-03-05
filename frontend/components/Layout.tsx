@@ -489,6 +489,25 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto h-screen bg-zinc-50 dark:bg-black scroll-smooth transition-colors duration-300">
+        {/* Mobile Top Header */}
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-zinc-600 dark:text-zinc-400">
+            <Menu size={24} />
+          </button>
+          <Logo className="text-zinc-900 dark:text-white" />
+          <button
+            onClick={() => handleNavClick('profile')}
+            className="w-10 h-10 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-800"
+          >
+            {currentUser?.avatar_url ? (
+              <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                {userName.charAt(0)}
+              </div>
+            )}
+          </button>
+        </div>
         <div className="max-w-7xl mx-auto p-4 md:p-8 pb-24 md:pb-8 h-full flex flex-col">
             {children}
         </div>
