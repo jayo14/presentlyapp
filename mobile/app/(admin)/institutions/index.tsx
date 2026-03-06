@@ -29,7 +29,7 @@ export default function InstitutionManagement() {
   const updateMutation = useUpdateInstitution();
   const deleteMutation = useDeleteInstitution();
 
-  const institutions = (institutionsData as any[]) || [];
+  const institutions = ((institutionsData as any)?.results || institutionsData || []) as any[];
 
   const filteredSchools = useMemo(() => {
     return institutions.filter(school => {

@@ -13,7 +13,7 @@ export default function CourseDirectoryScreen() {
 
   const { data: coursesData, isLoading, refetch, isRefetching } = useCourses();
 
-  const courses = (coursesData as any[]) || [];
+  const courses = ((coursesData as any)?.results || coursesData || []) as any[];
 
   const filteredCourses = courses.filter(course =>
     course.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
