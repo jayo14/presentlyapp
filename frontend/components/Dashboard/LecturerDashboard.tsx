@@ -194,7 +194,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
            description="View your teaching schedule and class timetable on Presently."
            noIndex
          />
-         <div className="p-8 text-center text-zinc-500 flex flex-col items-center gap-4">
+         <div className="p-8 text-center text-zinc-400 flex flex-col items-center gap-4">
            <Loader2 className="w-8 h-8 animate-spin" />
            <span>Timetable Module Loading</span>
          </div>
@@ -227,7 +227,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Lecturer Dashboard</h2>
-              <p className="text-zinc-500">Manage your courses and attendance sessions.</p>
+              <p className="text-zinc-400">Manage your courses and attendance sessions.</p>
             </div>
             <div className="flex gap-2">
                 <Button onClick={() => navigate('/dashboard/sessions/new')}>
@@ -243,7 +243,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                     <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
                         <BookOpen size={20} />
                     </div>
-                    <h3 className="text-zinc-500 text-sm font-medium">My Courses</h3>
+                    <h3 className="text-zinc-400 text-sm font-medium">My Courses</h3>
                 </div>
                 <p className="text-3xl font-bold text-zinc-900 dark:text-white">{courses.length}</p>
             </div>
@@ -252,7 +252,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                     <div className="p-2 bg-green-50 text-green-500 rounded-lg">
                         <Clock size={20} />
                     </div>
-                    <h3 className="text-zinc-500 text-sm font-medium">Active Sessions</h3>
+                    <h3 className="text-zinc-400 text-sm font-medium">Active Sessions</h3>
                 </div>
                 <p className="text-3xl font-bold text-zinc-900 dark:text-white">{sessions.filter(s => s.is_active).length}</p>
             </div>
@@ -261,7 +261,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                     <div className="p-2 bg-purple-50 text-purple-500 rounded-lg">
                         <Users size={20} />
                     </div>
-                    <h3 className="text-zinc-500 text-sm font-medium">Total Students</h3>
+                    <h3 className="text-zinc-400 text-sm font-medium">Total Students</h3>
                 </div>
                 <p className="text-3xl font-bold text-zinc-900 dark:text-white">{dashboardAnalytics?.total_students || 0}</p>
             </div>
@@ -275,7 +275,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             </div>
             <div className="p-6">
                 {sessions.length === 0 ? (
-                    <div className="text-center py-16 text-zinc-500 bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
+                    <div className="text-center py-16 text-zinc-400 bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
                         <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Calendar className="text-zinc-400" size={32} />
                         </div>
@@ -299,12 +299,12 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                                     {/* Card Top: Course & Status */}
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-5">
-                                            <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-black text-lg text-zinc-500 group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-inner group-hover:scale-110 group-hover:rotate-3">
+                                            <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-black text-lg text-zinc-400 group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-inner group-hover:scale-110 group-hover:rotate-3">
                                                 {session.course_code?.substring(0,2) || 'CS'}
                                             </div>
                                             <div>
                                                 <h4 className="text-2xl font-black text-zinc-900 dark:text-white group-hover:text-primary transition-colors tracking-tight mb-1">{session.course_code}</h4>
-                                                <p className="text-sm text-zinc-500 font-medium truncate max-w-[200px]">{session.course_name || 'Class Session'}</p>
+                                                <p className="text-sm text-zinc-400 font-medium truncate max-w-[200px]">{session.course_name || 'Class Session'}</p>
                                             </div>
                                         </div>
                                         
@@ -314,7 +314,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                                             const statusStyles = {
                                                 'ACTIVE': 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-900/50',
                                                 'EXPIRED': 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
-                                                'ENDED': 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                                                'ENDED': 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
                                             };
                                             return (
                                                 <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.1em] border uppercase ${statusStyles[status]}`}>
@@ -341,7 +341,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Attendance</span>
                                             </div>
                                             <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
-                                                <span className="text-xl text-zinc-900 dark:text-white font-black">{session.attendee_count || 0}</span> <span className="text-zinc-500 font-medium">Present</span>
+                                                <span className="text-xl text-zinc-900 dark:text-white font-black">{session.attendee_count || 0}</span> <span className="text-zinc-400 font-medium">Present</span>
                                             </p>
                                         </div>
                                     </div>
@@ -403,7 +403,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             >
                 <div className="flex items-center gap-4 mb-4">
                     <div className="bg-red-500/10 p-3 rounded-full text-red-500"><Trash2 size={24} /></div>
-                    <div><h3 id="delete-title" className="text-lg font-bold text-zinc-900 dark:text-white">Delete Session?</h3><p className="text-sm text-zinc-500">This action cannot be undone.</p></div>
+                    <div><h3 id="delete-title" className="text-lg font-bold text-zinc-900 dark:text-white">Delete Session?</h3><p className="text-sm text-zinc-400">This action cannot be undone.</p></div>
                 </div>
                 <div className="flex gap-3 mt-6">
                     <Button variant="secondary" className="flex-1" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
