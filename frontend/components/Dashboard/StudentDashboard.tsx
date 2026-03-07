@@ -197,18 +197,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                   {dayClasses.length > 0 ? (
                                     dayClasses.map((t) => (
                                         <div key={t.id} className="flex items-center gap-4 p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                                            <div className="bg-zinc-100 dark:bg-zinc-900 p-2 rounded text-zinc-500 dark:text-zinc-400">
+                                            <div className="bg-zinc-100 dark:bg-zinc-900 p-2 rounded text-zinc-400 dark:text-zinc-400">
                                                 <Clock size={16} />
                                             </div>
                                             <div>
                                                 <p className="text-zinc-900 dark:text-white font-medium">{t.course.course_code} - {t.course_name}</p>
-                                                <p className="text-sm text-zinc-500">{t.start_time} - {t.end_time}</p>
+                                                <p className="text-sm text-zinc-400">{t.start_time} - {t.end_time}</p>
                                                 {t.venue_name && <p className="text-xs text-zinc-400">{t.venue_name}</p>}
                                             </div>
                                         </div>
                                     ))
                                   ) : (
-                                      <p className="text-sm text-zinc-500 italic">No classes scheduled.</p>
+                                      <p className="text-sm text-zinc-400 italic">No classes scheduled.</p>
                                   )}
                               </div>
                           </div>
@@ -376,7 +376,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
                       <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Performance Insights</h2>
-                      <p className="text-zinc-500">Track your attendance trends and statistics.</p>
+                      <p className="text-zinc-400">Track your attendance trends and statistics.</p>
                   </div>
               </div>
 
@@ -386,19 +386,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               {/* Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
-                      <p className="text-xs text-zinc-500 uppercase tracking-wide">Avg Attendance</p>
+                      <p className="text-xs text-zinc-400 uppercase tracking-wide">Avg Attendance</p>
                       <p className="text-2xl font-bold text-zinc-900 dark:text-white mt-1">{avgAttendance}%</p>
                   </div>
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
-                      <p className="text-xs text-zinc-500 uppercase tracking-wide">Present</p>
+                      <p className="text-xs text-zinc-400 uppercase tracking-wide">Present</p>
                       <p className="text-2xl font-bold text-green-500 mt-1">35</p>
                   </div>
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
-                      <p className="text-xs text-zinc-500 uppercase tracking-wide">Late</p>
+                      <p className="text-xs text-zinc-400 uppercase tracking-wide">Late</p>
                       <p className="text-2xl font-bold text-yellow-500 mt-1">5</p>
                   </div>
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
-                      <p className="text-xs text-zinc-500 uppercase tracking-wide">Absent</p>
+                      <p className="text-xs text-zinc-400 uppercase tracking-wide">Absent</p>
                       <p className="text-2xl font-bold text-red-500 mt-1">2</p>
                   </div>
               </div>
@@ -430,7 +430,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                      verticalAlign="bottom" 
                                      height={36} 
                                      iconType="circle"
-                                     formatter={(value) => <span className="text-zinc-500 text-sm ml-1">{value}</span>}
+                                     formatter={(value) => <span className="text-zinc-400 text-sm ml-1">{value}</span>}
                                   />
                               </PieChart>
                           </ResponsiveContainer>
@@ -438,7 +438,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
                                <div className="text-center">
                                    <p className="text-4xl font-bold text-zinc-900 dark:text-white">{avgAttendance}%</p>
-                                   <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Total</p>
+                                   <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Total</p>
                                </div>
                           </div>
                       </div>
@@ -498,7 +498,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                                   </div>
                               </div>
                               <div className="ml-6 text-right w-32">
-                                  <p className="text-xs text-zinc-500 truncate">{course.course_name}</p>
+                                  <p className="text-xs text-zinc-400 truncate">{course.course_name}</p>
                               </div>
                           </div>
                       )) || []}
@@ -858,10 +858,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
        {/* Greeting Header */}
        <div className="flex justify-between items-end mb-2">
           <div>
-            <p className="text-zinc-500 text-sm font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+            <p className="text-zinc-400 text-sm font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
             <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mt-1">Hello, {userName.split(' ')[0]}</h1>
           </div>
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-400">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-zinc-400 dark:text-zinc-400">
                             {displayAvatar ? (
                                 <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
                             ) : (
@@ -966,7 +966,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                        </div>
                        <div>
                            <p className="text-2xl font-bold text-zinc-900 dark:text-white">{avgAttendance}%</p>
-                           <p className="text-xs text-zinc-500">Avg. Attendance</p>
+                           <p className="text-xs text-zinc-400">Avg. Attendance</p>
                        </div>
                    </div>
                    <div className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-3xl flex flex-col justify-between">
@@ -975,7 +975,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                         </div>
                        <div>
                            <p className="text-2xl font-bold text-zinc-900 dark:text-white">{enrolledCourses.length}</p>
-                           <p className="text-xs text-zinc-500">Active Courses</p>
+                           <p className="text-xs text-zinc-400">Active Courses</p>
                        </div>
                    </div>
                </div>
@@ -985,11 +985,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                >
                    <div className="flex items-center gap-3">
                        <div className="bg-zinc-200 dark:bg-zinc-800 p-2 rounded-lg">
-                           <Plus size={18} className="text-zinc-600 dark:text-zinc-400"/>
+                           <Plus size={18} className="text-zinc-400 dark:text-zinc-400"/>
                        </div>
                        <div className="text-left">
                            <p className="font-bold text-zinc-900 dark:text-white text-sm">Register Courses</p>
-                           <p className="text-xs text-zinc-500">Manage your enrollment</p>
+                           <p className="text-xs text-zinc-400">Manage your enrollment</p>
                        </div>
                    </div>
                    <ChevronRight size={18} className="text-zinc-400" />
@@ -1002,17 +1002,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
            <h3 className="font-bold text-zinc-900 dark:text-white mb-4 px-1">Recent Activity</h3>
            <div className="space-y-3">
                {recentActivity.length === 0 ? (
-                   <p className="text-sm text-zinc-500 italic px-1">No recent activity recorded.</p>
+                   <p className="text-sm text-zinc-400 italic px-1">No recent activity recorded.</p>
                ) : (
                    recentActivity.map((activity, index) => (
                        <div key={activity.id || `activity-desktop-${index}`} className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
                            <div className="flex items-center gap-4">
-                               <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 text-sm">
+                               <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-400 text-sm">
                                    {getActivityCourseCode(activity).substring(0,2)}
                                </div>
                                <div>
                                    <p className="font-bold text-zinc-900 dark:text-white text-sm">{getActivityCourseCode(activity)} {activity.type === 'attendance' ? 'Class' : ''}</p>
-                                   <p className="text-xs text-zinc-500">{new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                                   <p className="text-xs text-zinc-400">{new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                </div>
                            </div>
                            <span className={`text-xs font-bold px-2 py-1 rounded-md ${activity.status === 'PRESENT' ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400'}`}>

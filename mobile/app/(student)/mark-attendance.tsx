@@ -149,7 +149,7 @@ export default function MarkAttendanceScreen() {
       }
 
       // Step 3: Collect GPS samples with retry logic
-      const samples = await getPreciseLocation();
+      const samples = await getMultipleSamples(4, 2000);
       setLocationStatus('');
 
       // Step 4: Submit attendance directly
