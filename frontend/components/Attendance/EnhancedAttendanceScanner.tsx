@@ -352,7 +352,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setLocationInfo('Getting your precise location...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const location = await getPreciseLocation();
+      const samples = await geolocationService.getMultipleSamples(4, 1500);
+      const location = samples[samples.length - 1];
       
       setLocationInfo(
         `Location acquired (±${location.accuracy?.toFixed(0)}m accuracy)` +
@@ -364,7 +365,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setLocationInfo('Verifying session and location...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const attendanceResponse = await onVerify(codeToVerify, location);
+      const attendanceResponse = await onVerify(codeToVerify, { ...location, samples });
 
       if (attendanceResponse) {
         setStatus('success');

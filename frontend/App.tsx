@@ -12,7 +12,7 @@ import { OfflineIndicator } from './src/components/OfflineIndicator';
 import { Loader2 } from 'lucide-react';
 
 // Eager load critical components for initial page
-import { LandingPage } from './components/LandingPage';
+import LandingPage from './components/EnhancedLandingPage';
 import { Login } from './components/Auth/Login';
 import { Register } from './components/Auth/Register';
 import { Layout } from './components/Layout';
