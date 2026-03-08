@@ -22,11 +22,8 @@ const DEFAULT_ZOOM = 13;
 // Mapbox Token from environment
 const MAPBOX_TOKEN = (import.meta as any).env?.VITE_MAPBOX_TOKEN || '';
 
-// Use Mapbox Streets for the most up-to-date streets, roads and building names
-// Falling back to Carto Positron if token is missing
-const ROAD_STYLE = MAPBOX_TOKEN 
-  ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`
-  : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+// Premium open-source map style (Google-like)
+const ROAD_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
 const SATELLITE_STYLE: maplibregl.StyleSpecification = {
   version: 8,

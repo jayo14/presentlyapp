@@ -77,9 +77,9 @@ export const getCurrentPosition = (
   } = {},
 ): Promise<GeolocationPosition> => {
   const {
-    timeout = 25000,
+    timeout = 30000,
     desiredAccuracy = 20, // metres
-    maxWait = 10000,
+    maxWait = 15000,
     requiredSamples = 5,
   } = options;
 
@@ -174,10 +174,10 @@ export const getCurrentPosition = (
               bestSinglePosition = currentPos;
             }
 
-            // FILTER: Reject bad GPS readings (IP fallback or weak signal)
+            // FILTER (Step 2): Reject bad GPS readings (IP fallback or weak signal)
             // Anything over 40m is likely not pure GPS or is too noisy for geofencing
             if (currentPos.accuracy > 40) {
-              console.log(`Ignoring low-accuracy signal: ${currentPos.accuracy.toFixed(1)}m`);
+              console.log(`Rejecting weak signal (Step 2): ${currentPos.accuracy.toFixed(1)}m`);
               return;
             }
 
