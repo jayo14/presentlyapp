@@ -23,9 +23,12 @@ export default function StudentLayout() {
           backgroundColor: isDark ? '#231e0f' : '#FFFFFF',
           borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0',
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 96 : 78,
-          paddingBottom: Platform.OS === 'ios' ? 30 : 18,
-          paddingTop: 12,
+          height: Platform.OS === 'ios' ? 104 : 92,
+          paddingBottom: Platform.OS === 'ios' ? 34 : 26,
+          paddingTop: 16,
+          marginBottom: Platform.OS === 'ios' ? 0 : 12,
+          marginHorizontal: Platform.OS === 'ios' ? 0 : 12,
+          borderRadius: Platform.OS === 'ios' ? 0 : 32,
           elevation: 0,
         },
         tabBarLabelStyle: {
@@ -98,6 +101,7 @@ export default function StudentLayout() {
       <Tabs.Screen name="courses/drop-success" options={{ href: null }} />
       <Tabs.Screen name="courses/department/[id]" options={{ href: null }} />
       <Tabs.Screen name="courses/[id]" options={{ href: null }} />
+      <Tabs.Screen name="edit-photo" options={{ href: null }} />
     </Tabs>
   );
 }
@@ -106,11 +110,11 @@ const styles = StyleSheet.create({
   fabContainer: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: 36,
     borderWidth: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -30,
+    marginTop: -42,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.14,
