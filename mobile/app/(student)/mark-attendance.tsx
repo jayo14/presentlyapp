@@ -110,18 +110,23 @@ export default function MarkAttendanceScreen() {
         // Enrollment check failed — let server-side validation handle it
       }
 
-      // Step 3: Collect GPS samples with retry logic
-      const sample = await locationService.getHighPrecisionLocation({
-        requiredSamples: 5,
-        onProgress: setLocationStatus
-      });
+      // Step 3: Collect GPS samples + Anti-Cheat signals (Fingerprint, Emulator check)
+      const [sample, antiCheat] = await Promise.all([
+        locationService.getHighPrecisionLocation({
+          requiredSamples: 5,
+          onProgress: setLocationStatus
+        }),
+        locationService.getAntiCheatSignals()
+      ]);
+      
       const samples = [sample]; // API expects array
       setLocationStatus('');
 
-      // Step 4: Submit attendance directly
+      // Step 4: Submit attendance
       const response: any = await api.checkIn.mark(normalizedCode, {
         samples,
         course_id: sessionInfo.course_id,
+        ...antiCheat
       });
 
       if (response.success || response.id || response.status === 'success') {

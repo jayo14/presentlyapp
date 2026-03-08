@@ -1,10 +1,21 @@
 import * as Location from 'expo-location';
+import * as Device from 'expo-device';
+import * as Application from 'expo-application';
+import { Platform } from 'react-native';
 
 export interface LocationSample {
   latitude: number;
   longitude: number;
   accuracy: number;
   timestamp: number;
+  isMock?: boolean;
+}
+
+export interface AntiCheatSignals {
+  visitorId?: string;
+  deviceId?: string;
+  webglRenderer?: string;
+  isEmulator?: boolean;
 }
 
 /**
@@ -94,12 +105,19 @@ export const getHighPrecisionLocation = async (
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
             accuracy: location.coords.accuracy ?? 999,
-            timestamp: location.timestamp
+            timestamp: location.timestamp,
+            isMock: (location as any).mocked || false
           };
 
           // Track best fallback
           if (!bestSingleSample || sample.accuracy < bestSingleSample.accuracy) {
             bestSingleSample = sample;
+          }
+
+          // Force rejection if mock detected
+          if (sample.isMock) {
+            onProgress?.(`Security Alert: Mock location detected`);
+            // We still collect it to let the backend decide, but we flag it
           }
 
           // FILTER: Reject bad signals
@@ -123,6 +141,30 @@ export const getHighPrecisionLocation = async (
   });
 };
 
+/**
+ * Collect anti-cheat signals for mobile devices.
+ */
+export const getAntiCheatSignals = async (): Promise<AntiCheatSignals> => {
+  const signals: AntiCheatSignals = {
+    isEmulator: !Device.isDevice,
+  };
+
+  try {
+    if (Platform.OS === 'android') {
+      signals.visitorId = Application.androidId || undefined;
+      signals.deviceId = Device.osInternalBuildId || undefined;
+    } else if (Platform.OS === 'ios') {
+      signals.visitorId = await Application.getIosIdForVendorAsync() || undefined;
+      signals.deviceId = Device.modelName || undefined;
+    }
+  } catch (e) {
+    console.warn('Error collecting mobile anti-cheat signals:', e);
+  }
+
+  return signals;
+};
+
 export const locationService = {
-  getHighPrecisionLocation
+  getHighPrecisionLocation,
+  getAntiCheatSignals
 };
