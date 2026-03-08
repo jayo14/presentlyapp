@@ -163,7 +163,8 @@ export const LandingPage: React.FC = () => {
           <a href="#problem" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">The Problem</a>
           <a href="#product" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Product</a>
           <a href="#pricing" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Pricing</a>
-          <a href="/documentation" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Docs</a>
+          <a href="/documentation" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Documentation</a>
+          <a href="/volunteers" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Volunteers</a>
         </div>
         <div className="flex items-center gap-6">
           <button onClick={() => navigate('/auth/login')} className="text-sm font-bold text-white hover:text-primary transition-colors">Sign In</button>
