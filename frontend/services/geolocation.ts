@@ -53,28 +53,39 @@ export const getMultipleSamples = async (
  * Uses Capacitor's high-accuracy mode and returns the best (lowest-accuracy)
  * fix observed within the allowed time budget.
  */
+/**
+ * Get current position with high accuracy, smoothing, and jitter rejection.
+ * 
+ * Collects multiple high-accuracy samples, filters out those with poor accuracy
+ * (threshold: 50m), and averages the best ones to provide a stable, "Google-like"
+ * location experience.
+ */
 export const getCurrentPosition = (
   options: {
     timeout?: number;
     desiredAccuracy?: number;
     maxWait?: number;
+    requiredSamples?: number;
   } = {},
 ): Promise<GeolocationPosition> => {
   const {
-    timeout = 20000,
-    // Target very tight accuracy by default; caller can relax if needed.
-    desiredAccuracy = 15, // metres
-    maxWait = 7000,
+    timeout = 25000,
+    desiredAccuracy = 20, // metres
+    maxWait = 10000,
+    requiredSamples = 5,
   } = options;
 
   return new Promise(async (resolve, reject) => {
-    let bestPosition: GeolocationPosition | null = null;
     let watchId: string | null = null;
     let timerId: any;
     let hasResolved = false;
+    const samples: GeolocationPosition[] = [];
+    let bestSinglePosition: GeolocationPosition | null = null;
 
     const cleanup = () => {
-      if (watchId) Geolocation.clearWatch({ id: watchId });
+      if (watchId) {
+        Geolocation.clearWatch({ id: watchId }).catch(err => console.error('Error clearing watch:', err));
+      }
       if (timerId) clearTimeout(timerId);
     };
 
@@ -86,43 +97,88 @@ export const getCurrentPosition = (
     };
 
     const handleError = (error: any) => {
-      if (bestPosition && !hasResolved) {
-        finish(bestPosition);
+      // If we have at least some samples or a best position, prefer that over an error
+      if (samples.length > 0 && !hasResolved) {
+        finish(calculateAveragePosition(samples));
         return;
+      }
+      if (bestSinglePosition && !hasResolved) {
+          finish(bestSinglePosition);
+          return;
       }
       if (hasResolved) return;
       hasResolved = true;
       cleanup();
-      reject(new Error(error?.message || 'Failed to get location'));
+      reject(new Error(error?.message || 'Failed to get precise location'));
     };
 
+    const calculateAveragePosition = (posSamples: GeolocationPosition[]): GeolocationPosition => {
+      if (posSamples.length === 0) throw new Error('No samples to average');
+      
+      const sumLat = posSamples.reduce((sum, p) => sum + p.latitude, 0);
+      const sumLng = posSamples.reduce((sum, p) => sum + p.longitude, 0);
+      const avgAccuracy = posSamples.reduce((sum, p) => sum + p.accuracy, 0) / posSamples.length;
+      
+      return {
+        ...posSamples[posSamples.length - 1], // Use metadata from last sample
+        latitude: sumLat / posSamples.length,
+        longitude: sumLng / posSamples.length,
+        accuracy: avgAccuracy,
+      };
+    };
+
+    // Overall timeout safeguard
     timerId = setTimeout(() => {
-      if (bestPosition) finish(bestPosition);
-      else handleError({ message: 'Location request timed out' });
+      if (samples.length > 0) {
+        finish(calculateAveragePosition(samples));
+      } else if (bestSinglePosition) {
+        finish(bestSinglePosition);
+      } else {
+        handleError({ message: 'GPS signal too weak or timed out. Please ensure you are outdoors or near a window.' });
+      }
     }, timeout);
 
     try {
       watchId = await Geolocation.watchPosition(
-        { enableHighAccuracy: true, timeout, maximumAge: 0 },
+        { 
+            enableHighAccuracy: true, 
+            timeout: 10000, 
+            maximumAge: 0 
+        },
         (position, err) => {
-          if (err) return;
+          if (err) {
+            console.warn('Geolocation watch error:', err);
+            return;
+          }
+          
           if (position) {
             const currentPos: GeolocationPosition = {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
               altitude: position.coords.altitude || undefined,
-              accuracy: Math.min(position.coords.accuracy || 90, 90), // Clamp accuracy to bypass strict 100m backend checks
+              accuracy: position.coords.accuracy,
               altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
               timestamp: position.timestamp,
             };
 
-            if (!bestPosition || currentPos.accuracy < bestPosition.accuracy) {
-              bestPosition = currentPos;
+            // Track the absolute best single position as fallback
+            if (!bestSinglePosition || currentPos.accuracy < bestSinglePosition.accuracy) {
+              bestSinglePosition = currentPos;
             }
 
-            // Resolve immediately once we hit the desired accuracy threshold.
-            if (currentPos.accuracy <= desiredAccuracy) {
-              finish(currentPos);
+            // FILTER: Reject bad GPS readings (IP fallback or weak signal)
+            // Anything over 50m is likely not pure GPS or is too noisy for geofencing
+            if (currentPos.accuracy > 50) {
+              console.log(`Ignoring low-accuracy signal: ${currentPos.accuracy.toFixed(1)}m`);
+              return;
+            }
+
+            // Collect good samples for SMOOTHING
+            samples.push(currentPos);
+
+            // Optimization: If we have enough good samples and the last one is very accurate, resolve
+            if (samples.length >= requiredSamples && currentPos.accuracy <= desiredAccuracy) {
+              finish(calculateAveragePosition(samples));
             }
           }
         },
@@ -131,8 +187,11 @@ export const getCurrentPosition = (
       handleError(err);
     }
 
+    // Secondary timer to resolve with partial samples if we're taking too long but have data
     setTimeout(() => {
-      if (!hasResolved && bestPosition) finish(bestPosition);
+      if (!hasResolved && samples.length >= 2) {
+        finish(calculateAveragePosition(samples));
+      }
     }, maxWait);
   });
 };
