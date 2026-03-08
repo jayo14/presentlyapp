@@ -2,16 +2,18 @@ from django.utils import timezone
 from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Attendance, AttendanceSession, UserRole
+from institutions.models import Attendance, AttendanceSession, UserRole
 from attendance.models import AttendanceAttemptLog
+from accounts.models import UserDevice
 from .serializers import AttendanceSerializer
 from .geolocation_utils import verify_location, calculate_distance
 
 # Anti-spoofing thresholds (must match frontend constants)
-_MAX_ACCURACY_METERS = 100.0
+_MAX_ACCURACY_METERS = 50.0
 _MAX_JUMP_METERS = 100.0
 _MAX_DRIFT_METERS = 40.0
-_MAX_SPEED_MPS = 10.0  # ~9 km/h
+_MAX_SPEED_MPS = 10.0  # ~36 km/h
+_TRUST_THRESHOLD = 70
 
 
 def _validate_sample_stability(samples):
@@ -72,13 +74,19 @@ def _validate_sample_stability(samples):
 
 def perform_attendance_check_in(request, session):
     """
-    Standardized attendance check-in logic with passive pre-validated sample verification.
+    Standardized attendance check-in logic with weighted confidence score system.
     """
-    samples = request.data.get('samples', [])
+    data = request.data
+    samples = data.get('samples', [])
+    visitor_id = data.get('visitorId') or data.get('visitor_id')
+    device_id = data.get('deviceId') or data.get('device_id')
+    webgl_renderer = data.get('webglRenderer')
+    is_mock_from_client = data.get('isMock') or data.get('is_mock') or False
+
     if not samples:
-        lat = request.data.get('latitude')
-        lng = request.data.get('longitude')
-        acc = request.data.get('accuracy', 100)
+        lat = data.get('latitude')
+        lng = data.get('longitude')
+        acc = data.get('accuracy', 100)
         if lat and lng:
             samples = [{'latitude': lat, 'longitude': lng, 'accuracy': acc}]
 
@@ -91,69 +99,87 @@ def perform_attendance_check_in(request, session):
         }, status=status.HTTP_400_BAD_REQUEST)
 
     if request.user.role != UserRole.STUDENT:
-        return Response({
-            'success': False,
-            'status': 'error',
-            'error': 'Only students can check in',
-            'reason': 'Only students can check in'
-        }, status=status.HTTP_403_FORBIDDEN)
+        return Response({'success': False, 'status': 'error', 'error': 'Only students can check in'}, status=status.HTTP_403_FORBIDDEN)
 
     if not session.is_active:
-        return Response({
-            'success': False,
-            'status': 'error',
-            'error': 'Session is not active',
-            'reason': 'Session is not active'
-        }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'success': False, 'status': 'error', 'error': 'Session is not active'}, status=status.HTTP_400_BAD_REQUEST)
 
     now = timezone.now()
     location_data = session.get_location_coords()
-
     ip_address = request.META.get('REMOTE_ADDR')
-    user_agent = request.META.get('HTTP_USER_AGENT')
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
 
-    all_verified = True
-    rejected_reason = None
-    drift_avg = 0.0
+    # --- Confidence Score System ---
+    score = 0
+    flags = []
+    
+    # 1. GPS Accuracy Signal (30 points)
     last_sample = samples[-1]
+    avg_acc = sum(float(s.get('accuracy', 999)) for s in samples) / len(samples)
+    if avg_acc <= 15: score += 30
+    elif avg_acc <= 30: score += 20
+    elif avg_acc <= 50: score += 10
+    else: flags.append(f"Low accuracy ({avg_acc:.1f}m)")
 
-    # Check for minimum number of samples for modern clients
-    # (Allow 1 sample for backward compatibility, but log it)
-    if len(samples) < 3 and ' samples' not in user_agent: # Simple check
-        pass
-
+    # 2. Geofence Signal (30 points)
+    is_inside_any = False
+    min_dist = 999999
     for sample in samples:
-        lat = float(sample.get('latitude', 0))
-        lng = float(sample.get('longitude', 0))
-        acc = float(sample.get('accuracy', 0))
-
-        if acc > _MAX_ACCURACY_METERS:
-            all_verified = False
-            rejected_reason = f"Accuracy too low ({acc}m). Min required: 100m."
-            break
-
         is_inside, dist = verify_location(
-            lat, lng, None,
-            location_data['latitude'],
-            location_data['longitude'],
-            None,
-            location_data['boundary'],
-            location_data['radius']
+            float(sample.get('latitude')), float(sample.get('longitude')), None,
+            location_data['latitude'], location_data['longitude'], None,
+            location_data['boundary'], location_data['radius']
         )
+        if is_inside: is_inside_any = True
+        min_dist = min(min_dist, dist)
+    
+    if is_inside_any: score += 30
+    else: flags.append(f"Outside area ({min_dist:.1f}m away)")
 
-        if not is_inside:
-            all_verified = False
-            if location_data['boundary']:
-                rejected_reason = f"Outside lecture hall boundary ({dist:.1f}m away)"
-            else:
-                rejected_reason = f"Too far from venue ({dist:.1f}m). Limit: {location_data['radius']}m."
-            break
+    # 3. Device/Integrity Signal (20 points)
+    if visitor_id:
+        device_exists = UserDevice.objects.filter(user=request.user, visitor_id=visitor_id).exists()
+        if device_exists:
+            score += 20
+        else:
+            # First time using this device, or new fingerprint
+            score += 10 
+            flags.append("New device fingerprint")
+    else:
+        flags.append("Missing device fingerprint")
 
-    if all_verified:
-        is_stable, stability_reason, drift_avg = _validate_sample_stability(samples)
-        if not is_stable:
-            all_verified = False
-            rejected_reason = stability_reason
+    # 4. Movement/Stability Signal (10 points)
+    is_stable, stability_reason, drift_avg = _validate_sample_stability(samples)
+    if is_stable and len(samples) >= 3:
+        # Check if movement is too "perfect" (zero drift is suspicious for real GPS)
+        if drift_avg > 0.01: 
+            score += 10
+        else:
+            flags.append("Static GPS signal (suspicious)")
+    elif not is_stable:
+        score -= 20 # Penalty for jumps/speed
+        flags.append(stability_reason)
+
+    # 5. Network/Environment (10 points)
+    # Simple IP check - same IP as previous successful attempts is good
+    last_success = AttendanceAttemptLog.objects.filter(student=request.user, rejected_reason__isnull=True).first()
+    if last_success and last_success.ip_address == ip_address:
+        score += 10
+    else:
+        score += 5 # New IP but not necessarily bad
+
+    # Hard Rejections (Overrides)
+    is_mocked = is_mock_from_client or stability_reason == "Mock location detected"
+    if is_mocked:
+        score = 0
+        flags.append("Mock location provider active")
+    
+    if webgl_renderer and ("SwiftShader" in webgl_renderer or "llvmpipe" in webgl_renderer):
+        score -= 50
+        flags.append("Emulator detected (hardware renderer)")
+
+    final_result = score >= _TRUST_THRESHOLD
+    rejected_reason = "; ".join(flags) if not final_result else None
 
     with transaction.atomic():
         AttendanceAttemptLog.objects.create(
@@ -163,27 +189,41 @@ def perform_attendance_check_in(request, session):
             longitude=last_sample.get('longitude'),
             accuracy=last_sample.get('accuracy'),
             drift_avg=round(drift_avg, 2),
-            inside_polygon=all_verified,
+            inside_polygon=is_inside_any,
+            is_mocked=is_mocked,
+            visitor_id=visitor_id,
+            device_id=device_id,
+            webgl_renderer=webgl_renderer,
+            trust_score=score,
             rejected_reason=rejected_reason,
             ip_address=ip_address,
             user_agent=user_agent
         )
 
-        if not all_verified:
+        if not final_result:
             return Response({
                 'success': False,
                 'status': 'error',
-                'error': rejected_reason,
-                'reason': rejected_reason
+                'error': f"Attendance flagged (Confidence: {score}%). {rejected_reason}",
+                'reason': rejected_reason,
+                'score': score
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Register device if first time or trusted enough
+        if visitor_id:
+            UserDevice.objects.update_or_create(
+                user=request.user,
+                visitor_id=visitor_id,
+                defaults={
+                    'device_name': user_agent[:250],
+                    'user_agent': user_agent,
+                    'ip_address': ip_address or '0.0.0.0',
+                    'is_trusted': True if score >= 90 else False
+                }
+            )
+
         if Attendance.objects.select_for_update().filter(session=session, student=request.user).exists():
-            return Response({
-                'success': False,
-                'status': 'error',
-                'error': 'Attendance already marked',
-                'reason': 'Attendance already marked'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'success': False, 'status': 'error', 'error': 'Attendance already marked'}, status=status.HTTP_400_BAD_REQUEST)
 
         grace_period = timezone.timedelta(minutes=15)
         status_value = 'PRESENT'
@@ -198,12 +238,13 @@ def perform_attendance_check_in(request, session):
             accuracy=last_sample.get('accuracy'),
             location_verified=True,
             status=status_value,
-            distance_from_venue=dist # From last verify_location call
+            distance_from_venue=min_dist
         )
 
         return Response({
             'success': True,
             'status': 'success',
             'message': 'Attendance marked successfully',
+            'score': score,
             'attendance': AttendanceSerializer(attendance).data
         }, status=status.HTTP_201_CREATED)
