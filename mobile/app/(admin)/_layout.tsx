@@ -1,7 +1,8 @@
 import { Redirect, Tabs } from 'expo-router';
 import { Home, Users, School, BookOpen, MoreHorizontal } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { Platform } from 'react-native';
+import { Platform, View, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminLayout() {
@@ -20,19 +21,31 @@ export default function AdminLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
-          borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 85 : 65,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 8,
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(25, 22, 12, 0.85)' : 'rgba(255, 255, 255, 0.85)'),
+          borderTopWidth: 0,
+          height: Platform.OS === 'ios' ? 92 : 76,
+          paddingBottom: Platform.OS === 'ios' ? 32 : 12,
           paddingTop: 12,
-          paddingHorizontal: 16,
-          elevation: 0,
-          shadowColor: colors.text,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: isDark ? 0.3 : 0.1,
-          shadowRadius: 8,
+          position: 'absolute',
+          bottom: Platform.OS === 'ios' ? 24 : 16,
+          left: 16,
+          right: 16,
+          borderRadius: 32,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 16,
+          borderWidth: 1,
+          borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
         },
+        tabBarBackground: () => (
+          Platform.OS === 'ios' ? (
+            <BlurView intensity={95} tint={isDark ? "dark" : "light"} style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, overflow: 'hidden' }} />
+          ) : (
+            <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, backgroundColor: isDark ? 'rgba(30, 27, 20, 0.85)' : 'rgba(255, 255, 255, 0.85)' }} />
+          )
+        ),
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '700',
@@ -91,6 +104,7 @@ export default function AdminLayout() {
       <Tabs.Screen name="institutions/[id]/admins" options={{ href: null }} />
       <Tabs.Screen name="institutions/[id]/analytics" options={{ href: null }} />
       <Tabs.Screen name="institutions/[id]/settings" options={{ href: null }} />
+      <Tabs.Screen name="edit-photo" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -94,37 +94,33 @@ export default function MarkAttendanceScreen() {
     await verifyAndPrepareCheckIn(code);
   };
 
-  const getPreciseLocation = async (retries = 2): Promise<LocationSample[]> => {
-    setLocationStatus('Getting location...');
-    for (let i = 0; i <= retries; i++) {
+  const getMultipleSamples = async (count: number, intervalMs: number): Promise<LocationSample[]> => {
+    const samples: LocationSample[] = [];
+    for (let i = 0; i < count; i++) {
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') return [];
+            if (status !== 'granted') break;
 
+            setLocationStatus(`Verifying location... (${i + 1}/${count})`);
             const loc = await Location.getCurrentPositionAsync({ 
                 accuracy: Location.Accuracy.High,
-                timeout: 10000 
             });
 
-            const accuracy = loc.coords.accuracy ?? ACCURACY_UNAVAILABLE;
+            samples.push({
+                latitude: loc.coords.latitude,
+                longitude: loc.coords.longitude,
+                accuracy: loc.coords.accuracy ?? ACCURACY_UNAVAILABLE,
+                timestamp: loc.timestamp,
+            });
             
-            if (accuracy <= ACCURACY_THRESHOLD || i === retries) {
-                return [{
-                    latitude: loc.coords.latitude,
-                    longitude: loc.coords.longitude,
-                    accuracy: accuracy,
-                    timestamp: loc.timestamp,
-                }];
+            if (i < count - 1) {
+                await new Promise(resolve => setTimeout(resolve, intervalMs));
             }
-            
-            setLocationStatus(`Improving accuracy... (${Math.round(accuracy)}m)`);
-            // Wait a bit before retry
-            await new Promise(resolve => setTimeout(resolve, 1500));
         } catch (e) {
-            if (i === retries) return [];
+            console.error('Location sample error', e);
         }
     }
-    return [];
+    return samples;
   };
 
   const verifyAndPrepareCheckIn = async (code: string) => {
