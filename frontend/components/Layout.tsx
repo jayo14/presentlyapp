@@ -4,6 +4,7 @@ import { Logo } from './Logo';
 import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap, Building2, Building, Timer, Menu, X } from 'lucide-react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
+import { Dock, DockItem } from '@/components/magicui/dock';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -407,84 +408,48 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           </div>
       </div>
 
-      {/* Mobile Bottom Navigation - Redesigned to match UI */}
+      {/* Mobile Bottom Navigation - MagicUI-style dock */}
       <div className="md:hidden fixed bottom-3 left-3 right-3 z-50 pointer-events-none">
-        <div className="pointer-events-auto bg-white dark:bg-dark-surface rounded-[2rem] shadow-2xl border border-light-border dark:border-dark-border px-3 py-2 flex items-center justify-around max-w-full">
-          {/* Home */}
-          <button
-            onClick={() => handleNavClick('dashboard')}
-            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
-          >
-            <Home 
-              size={24} 
-              className={currentPage === 'dashboard' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
-              strokeWidth={currentPage === 'dashboard' ? 2.5 : 2}
-            />
-            <span className={`text-[10px] font-medium ${currentPage === 'dashboard' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
-              Home
-            </span>
-          </button>
-
-          {/* Courses */}
-          <button
-            onClick={() => handleNavClick('courses')}
-            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
-          >
-            <GraduationCap 
-              size={24} 
-              className={currentPage === 'courses' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
-              strokeWidth={currentPage === 'courses' ? 2.5 : 2}
-            />
-            <span className={`text-[10px] font-medium ${currentPage === 'courses' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
-              Courses
-            </span>
-          </button>
-
-          {/* Records/Analytics */}
-          <button
-            onClick={() => handleNavClick('analytics')}
-            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
-          >
-            <BarChart3 
-              size={24} 
-              className={currentPage === 'analytics' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
-              strokeWidth={currentPage === 'analytics' ? 2.5 : 2}
-            />
-            <span className={`text-[10px] font-medium ${currentPage === 'analytics' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
-              Records
-            </span>
-          </button>
-
-          {/* Profile/Alerts - Shows Profile for lecturers, Alerts/Notifications for students */}
-          <button
-            onClick={() => handleNavClick(userRole === UserRole.STUDENT ? 'notifications' : 'profile')}
-            className="flex flex-col items-center justify-center gap-1 min-w-[56px] py-1"
-          >
-            {userRole === UserRole.STUDENT ? (
-              <>
-                <Bell 
-                  size={24} 
-                  className={(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
-                  strokeWidth={(currentPage === 'notifications' || currentPage === 'alerts') ? 2.5 : 2}
-                />
-                <span className={`text-[10px] font-medium ${(currentPage === 'notifications' || currentPage === 'alerts') ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
-                  Alerts
-                </span>
-              </>
-            ) : (
-              <>
-                <User 
-                  size={24} 
-                  className={currentPage === 'profile' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}
-                  strokeWidth={currentPage === 'profile' ? 2.5 : 2}
-                />
-                <span className={`text-[10px] font-medium ${currentPage === 'profile' ? 'text-primary dark:text-dark-primary' : 'text-light-text-tertiary dark:text-dark-text-tertiary'}`}>
-                  Profile
-                </span>
-              </>
-            )}
-          </button>
-        </div>
+        <Dock
+          items={[
+            {
+              id: 'dashboard',
+              label: 'Home',
+              active: currentPage === 'dashboard',
+              onClick: () => handleNavClick('dashboard'),
+              icon: <Home size={22} />,
+            },
+            {
+              id: 'courses',
+              label: 'Courses',
+              active: currentPage === 'courses',
+              onClick: () => handleNavClick('courses'),
+              icon: <GraduationCap size={22} />,
+            },
+            {
+              id: 'analytics',
+              label: 'Records',
+              active: currentPage === 'analytics',
+              onClick: () => handleNavClick('analytics'),
+              icon: <BarChart3 size={22} />,
+            },
+            userRole === UserRole.STUDENT
+              ? ({
+                  id: 'notifications',
+                  label: 'Alerts',
+                  active: currentPage === 'notifications' || currentPage === 'alerts',
+                  onClick: () => handleNavClick('notifications'),
+                  icon: <Bell size={22} />,
+                } as DockItem)
+              : ({
+                  id: 'profile',
+                  label: 'Profile',
+                  active: currentPage === 'profile',
+                  onClick: () => handleNavClick('profile'),
+                  icon: <User size={22} />,
+                } as DockItem),
+          ]}
+        />
       </div>
 
       {/* Main Content */}
