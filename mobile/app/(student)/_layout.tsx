@@ -21,27 +21,30 @@ export default function StudentLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: isDark ? '#ccbf8e' : '#94A3B8',
         tabBarStyle: {
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(35, 30, 15, 0.92)' : 'rgba(255, 255, 255, 0.92)'),
-          borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'transparent',
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(25, 22, 12, 0.85)' : 'rgba(255, 255, 255, 0.85)'),
           borderTopWidth: 0,
-          height: Platform.OS === 'ios' ? 98 : 88,
-          paddingBottom: Platform.OS === 'ios' ? 32 : 24,
+          height: Platform.OS === 'ios' ? 92 : 76,
+          paddingBottom: Platform.OS === 'ios' ? 32 : 12,
           paddingTop: 12,
           position: 'absolute',
-          bottom: Platform.OS === 'ios' ? 0 : 16,
-          left: Platform.OS === 'ios' ? 0 : 16,
-          right: Platform.OS === 'ios' ? 0 : 16,
-          borderRadius: Platform.OS === 'ios' ? 0 : 28,
-          elevation: 20,
+          bottom: Platform.OS === 'ios' ? 24 : 16,
+          left: 16,
+          right: 16,
+          borderRadius: 32,
+          elevation: 8,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 16,
+          borderWidth: 1,
+          borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
         },
         tabBarBackground: () => (
           Platform.OS === 'ios' ? (
-            <BlurView intensity={80} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
-          ) : null
+            <BlurView intensity={95} tint={isDark ? "dark" : "light"} style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, overflow: 'hidden' }} />
+          ) : (
+            <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, backgroundColor: isDark ? 'rgba(30, 27, 20, 0.85)' : 'rgba(255, 255, 255, 0.85)' }} />
+          )
         ),
         tabBarLabelStyle: {
           fontSize: 10,
