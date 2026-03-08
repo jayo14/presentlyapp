@@ -1,3 +1,4 @@
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Geolocation } from '@capacitor/geolocation';
 import {
   haversineDistance,
@@ -22,6 +23,11 @@ export interface GeolocationPosition {
   altitudeAccuracy?: number;
   timestamp: number;
   isMock?: boolean;
+}
+
+export interface AntiCheatSignals {
+  visitorId?: string;
+  webglRenderer?: string;
 }
 
 const DEFAULT_SAMPLE_COUNT = 4;
@@ -265,6 +271,51 @@ export const checkLocationPermission = async (): Promise<boolean> => {
   }
 };
 
+/**
+ * Get the WebGL renderer name to detect emulators.
+ */
+export const getWebGLRenderer = (): string | null => {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    if (gl) {
+      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      }
+    }
+  } catch (e) {
+    console.error('WebGL detection error:', e);
+  }
+  return null;
+};
+
+/**
+ * Get device fingerprint (visitorId).
+ */
+export const getVisitorId = async (): Promise<string | null> => {
+  try {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    return result.visitorId;
+  } catch (e) {
+    console.error('Fingerprint generation error:', e);
+    return null;
+  }
+};
+
+/**
+ * Collect all anti-cheat signals.
+ */
+export const getAntiCheatSignals = async (): Promise<AntiCheatSignals> => {
+  const [visitorId, webglRenderer] = await Promise.all([
+    getVisitorId(),
+    Promise.resolve(getWebGLRenderer()),
+  ]);
+
+  return { visitorId: visitorId || undefined, webglRenderer: webglRenderer || undefined };
+};
+
 export const geolocationService = {
   getCurrentPosition,
   getMultipleSamples,
@@ -273,4 +324,5 @@ export const geolocationService = {
   verifyVenueLocation,
   formatDistance,
   checkLocationPermission,
+  getAntiCheatSignals,
 };

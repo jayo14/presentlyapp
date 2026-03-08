@@ -361,12 +361,19 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         (location.altitude ? ` at ${location.altitude.toFixed(0)}m elevation` : '')
       );
 
-      // Step 2: Verify attendance
+      // Step 2: Get anti-cheat signals (Fingerprint + WebGL)
+      const antiCheat = await geolocationService.getAntiCheatSignals();
+
+      // Step 3: Verify attendance
       setStatus('verifying');
       setLocationInfo('Verifying session and location...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const attendanceResponse = await onVerify(codeToVerify, { ...location, samples });
+      const attendanceResponse = await onVerify(codeToVerify, { 
+        ...location, 
+        samples,
+        ...antiCheat
+      });
 
       if (attendanceResponse) {
         setStatus('success');
