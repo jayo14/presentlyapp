@@ -1,7 +1,8 @@
 import { Redirect, Tabs } from 'expo-router';
 import { Home, BookOpen, Calendar, User, BarChart3 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { Platform, ActivityIndicator, View } from 'react-native';
+import { Platform, ActivityIndicator, View, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LecturerLayout() {
@@ -35,14 +36,31 @@ export default function LecturerLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: isDark ? '#ccbf8e' : '#94A3B8',
         tabBarStyle: {
-          backgroundColor: isDark ? '#231e0f' : '#FFFFFF',
-          borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0',
-          borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 90 : 70,
-          paddingBottom: Platform.OS === 'ios' ? 25 : 12,
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(25, 22, 12, 0.85)' : 'rgba(255, 255, 255, 0.85)'),
+          borderTopWidth: 0,
+          height: Platform.OS === 'ios' ? 92 : 76,
+          paddingBottom: Platform.OS === 'ios' ? 32 : 12,
           paddingTop: 12,
-          elevation: 0,
+          position: 'absolute',
+          bottom: Platform.OS === 'ios' ? 24 : 16,
+          left: 16,
+          right: 16,
+          borderRadius: 32,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 16,
+          borderWidth: 1,
+          borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
         },
+        tabBarBackground: () => (
+          Platform.OS === 'ios' ? (
+            <BlurView intensity={95} tint={isDark ? "dark" : "light"} style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, overflow: 'hidden' }} />
+          ) : (
+            <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, backgroundColor: isDark ? 'rgba(30, 27, 20, 0.85)' : 'rgba(255, 255, 255, 0.85)' }} />
+          )
+        ),
         tabBarLabelStyle: {
           fontSize: 10,
           fontFamily: 'Lexend_700Bold',
@@ -95,6 +113,7 @@ export default function LecturerLayout() {
       <Tabs.Screen name="notifications" options={{ href: null }} />
       <Tabs.Screen name="create-course" options={{ href: null }} />
       <Tabs.Screen name="courses/create-success" options={{ href: null }} />
+      <Tabs.Screen name="edit-photo" options={{ href: null }} />
     </Tabs>
   );
 }
