@@ -9,7 +9,7 @@ from .serializers import AttendanceSerializer
 from .geolocation_utils import verify_location, calculate_distance
 
 # Anti-spoofing thresholds (must match frontend constants)
-_MAX_ACCURACY_METERS = 50.0
+_MAX_ACCURACY_METERS = 40.0
 _MAX_JUMP_METERS = 100.0
 _MAX_DRIFT_METERS = 40.0
 _MAX_SPEED_MPS = 10.0  # ~36 km/h
@@ -83,6 +83,8 @@ def perform_attendance_check_in(request, session):
     device_id = data.get('deviceId') or data.get('device_id')
     webgl_renderer = data.get('webglRenderer')
     is_mock_from_client = data.get('isMock') or data.get('is_mock') or False
+    motion_detected = data.get('motionDetected') or data.get('motion_detected') or False
+    ip_city = data.get('ipCity') or data.get('ip_city')
 
     if not samples:
         lat = data.get('latitude')
@@ -111,15 +113,15 @@ def perform_attendance_check_in(request, session):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
 
     # --- Confidence Score System ---
-    score = 0
-    flags = []
+    score: int = 0
+    flags: list[str] = []
     
-    # 1. GPS Accuracy Signal (30 points)
+    # 1. GPS Accuracy Signal (20 points)
     last_sample = samples[-1]
-    avg_acc = sum(float(s.get('accuracy', 999)) for s in samples) / len(samples)
-    if avg_acc <= 15: score += 30
-    elif avg_acc <= 30: score += 20
-    elif avg_acc <= 50: score += 10
+    avg_acc = float(sum(float(s.get('accuracy', 999)) for s in samples) / len(samples))
+    if avg_acc <= 10: score += 20
+    elif avg_acc <= 20: score += 15
+    elif avg_acc <= 40: score += 10
     else: flags.append(f"Low accuracy ({avg_acc:.1f}m)")
 
     # 2. Geofence Signal (30 points)
@@ -137,20 +139,26 @@ def perform_attendance_check_in(request, session):
     if is_inside_any: score += 30
     else: flags.append(f"Outside area ({min_dist:.1f}m away)")
 
-    # 3. Device/Integrity Signal (20 points)
+    # 3. Device/Integrity Signal (10 points)
     if visitor_id:
         device_exists = UserDevice.objects.filter(user=request.user, visitor_id=visitor_id).exists()
         if device_exists:
-            score += 20
+            score += 10
         else:
-            # First time using this device, or new fingerprint
-            score += 10 
+            # First time using this device
+            score += 5
             flags.append("New device fingerprint")
     else:
         flags.append("Missing device fingerprint")
 
-    # 4. Movement/Stability Signal (10 points)
+    # 4. Movement/Stability Signal (20 points)
     is_stable, stability_reason, drift_avg = _validate_sample_stability(samples)
+    # Give points if motion sensor detected physical movement during sampling
+    if motion_detected:
+        score += 10
+    else:
+        flags.append("No physical movement detected (static device)")
+
     if is_stable and len(samples) >= 3:
         # Check if movement is too "perfect" (zero drift is suspicious for real GPS)
         if drift_avg > 0.01: 
@@ -161,13 +169,20 @@ def perform_attendance_check_in(request, session):
         score -= 20 # Penalty for jumps/speed
         flags.append(stability_reason)
 
-    # 5. Network/Environment (10 points)
-    # Simple IP check - same IP as previous successful attempts is good
+    # 5. Network/Environment (20 points)
+    # A. IP Sanity Check (+10) - placeholder for actual city comparison if we had student's home city
+    # For now, we trust it if it's provided.
+    if ip_city:
+        score += 10
+    else:
+        flags.append("Could not verify IP city")
+
+    # B. Network Continuity (+10)
     last_success = AttendanceAttemptLog.objects.filter(student=request.user, rejected_reason__isnull=True).first()
     if last_success and last_success.ip_address == ip_address:
         score += 10
     else:
-        score += 5 # New IP but not necessarily bad
+        score += 5 # New IP
 
     # Hard Rejections (Overrides)
     is_mocked = is_mock_from_client or stability_reason == "Mock location detected"
@@ -189,9 +204,11 @@ def perform_attendance_check_in(request, session):
                 latitude=last_sample.get('latitude'),
                 longitude=last_sample.get('longitude'),
                 accuracy=last_sample.get('accuracy'),
-                drift_avg=round(drift_avg, 2),
+                drift_avg=round(float(drift_avg), 2),
                 inside_polygon=is_inside_any,
                 is_mocked=is_mocked,
+                motion_detected=motion_detected,
+                ip_city=ip_city,
                 visitor_id=visitor_id,
                 device_id=device_id,
                 webgl_renderer=webgl_renderer,
@@ -220,6 +237,8 @@ def perform_attendance_check_in(request, session):
             drift_avg=round(float(drift_avg), 2),
             inside_polygon=is_inside_any,
             is_mocked=is_mocked,
+            motion_detected=motion_detected,
+            ip_city=ip_city,
             visitor_id=visitor_id,
             device_id=device_id,
             webgl_renderer=webgl_renderer,
@@ -262,7 +281,9 @@ def perform_attendance_check_in(request, session):
             accuracy=last_sample.get('accuracy'),
             location_verified=True,
             status=status_value,
-            distance_from_venue=min_dist
+            distance_from_venue=min_dist,
+            trust_score=score,
+            verification_metadata={'flags': flags, 'is_mocked': is_mocked}
         )
 
         return Response({
