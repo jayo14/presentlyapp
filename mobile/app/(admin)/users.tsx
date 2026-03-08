@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   filterScroll: { paddingHorizontal: 16, gap: 8 },
   filterBadge: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20 },
   filterText: { fontSize: 12, fontWeight: '600' },
-  listContent: { padding: 16, gap: 12, paddingBottom: 100 },
+  listContent: { padding: 16, gap: 12, paddingBottom: 160 },
   userCard: { padding: 12, borderRadius: 16, borderWidth: 1 },
   userMain: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   avatarPlaceholder: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },

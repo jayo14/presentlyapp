@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 140,
   },
   section: {
     paddingHorizontal: 16,
