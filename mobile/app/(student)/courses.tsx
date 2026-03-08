@@ -48,7 +48,7 @@ export default function StudentCoursesScreen() {
 
   const loadDepartments = async () => {
     try {
-        const data = await api.departments.list();
+        const data: any = await api.departments.list();
         const depts = data.results || data;
         setDepartments(Array.isArray(depts) ? depts.slice(0, 5) : []);
     } catch (e) {
