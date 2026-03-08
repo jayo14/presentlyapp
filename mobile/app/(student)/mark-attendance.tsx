@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   tr: { top: height * 0.3, right: width * 0.2, borderLeftWidth: 0, borderBottomWidth: 0 },
   bl: { bottom: height * 0.3, left: width * 0.2, borderRightWidth: 0, borderTopWidth: 0 },
   br: { bottom: height * 0.3, right: width * 0.2, borderLeftWidth: 0, borderTopWidth: 0 },
-  qrFooter: { padding: 40, alignItems: 'center', gap: 24 },
+  qrFooter: { padding: 40, paddingBottom: Platform.OS === 'ios' ? 140 : 120, alignItems: 'center', gap: 24 },
   qrHint: { color: '#FFF', textAlign: 'center', opacity: 0.8, fontSize: 14, fontFamily: Fonts.lexend.medium },
   switchBtn: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 30, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
   switchBtnText: { color: '#FFF', fontFamily: Fonts.lexend.bold, fontSize: 14 },
