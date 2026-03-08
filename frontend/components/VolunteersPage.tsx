@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
 import { Logo } from './Logo';
 import { Input } from './Input';
+import { LandingHeader } from './LandingHeader';
 
 const roles = [
   { id: 'backend', title: 'Backend Developer', icon: Code, desc: 'Scaling our Python/Django infrastructure and API security.' },
@@ -59,21 +60,7 @@ export const VolunteersPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-primary selection:text-black overflow-x-hidden">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/80 backdrop-blur-xl h-20 flex items-center px-6">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <button
-              onClick={() => navigate('/')}
-              className="p-2 hover:bg-zinc-900 rounded-full transition-colors text-zinc-400 hover:text-white"
-            >
-              <ArrowLeft size={24} />
-            </button>
-            <Logo />
-          </div>
-          <Button onClick={() => navigate('/login')} variant="ghost">Sign In</Button>
-        </div>
-      </nav>
+      <LandingHeader />
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">
         {/* Left Side: Content */}
