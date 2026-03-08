@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.lexend.bold,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 140,
   },
   filtersContainer: {
     flexDirection: 'row',

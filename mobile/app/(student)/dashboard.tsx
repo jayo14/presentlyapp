@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 140,
   },
   section: {
     paddingHorizontal: 16,
