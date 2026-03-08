@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 100,
+    paddingBottom: 160,
   },
   searchContainer: {
     position: 'relative',
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 24,
+    bottom: 110,
     right: 24,
     width: 56,
     height: 56,
