@@ -55,7 +55,7 @@ export default function LecturerCourseHubScreen() {
                 <Text style={styles.headerSubtitle}>Manage your current academic load</Text>
             </View>
             <View style={[styles.profileImgContainer, { borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0' }]}>
-                <Image source={{ uri: user?.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAg5o8203WNZIxONqSkXaJpEAfQRk2t_URQ3DFROkMLFnshERoqKII5kHs8sVynK5l8m4qqfcDj0rJiHO76kYgkA0GzTVG5bCOXyH1w4pbg4gyFgWubJuGbBfPnLlY1fbnKiYIna24ZrG_1aZLm6tANg2009WPMNT0v40G6dBOyp23-vWkEZa5tuFrLbEO4g4Fuk8zQH4jaLLtWRskxKdF8U7R-AgnZuItTTd6GjmcvaB-sDf32UCcT0M4vFtKm9GCt4-lwcDYj-3uw' }} style={styles.profileImg} />
+                <Image source={{ uri: user?.profilePicture || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAg5o8203WNZIxONqSkXaJpEAfQRk2t_URQ3DFROkMLFnshERoqKII5kHs8sVynK5l8m4qqfcDj0rJiHO76kYgkA0GzTVG5bCOXyH1w4pbg4gyFgWubJuGbBfPnLlY1fbnKiYIna24ZrG_1aZLm6tANg2009WPMNT0v40G6dBOyp23-vWkEZa5tuFrLbEO4g4Fuk8zQH4jaLLtWRskxKdF8U7R-AgnZuItTTd6GjmcvaB-sDf32UCcT0M4vFtKm9GCt4-lwcDYj-3uw' }} style={styles.profileImg} />
             </View>
         </View>
 
@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: 8,
+    paddingBottom: 160,
   },
   courseList: {
     paddingHorizontal: 24,
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 100,
+    bottom: 120,
     right: 24,
     width: 60,
     height: 60,
