@@ -1,8 +1,17 @@
 import { Geolocation } from '@capacitor/geolocation';
+import {
+  haversineDistance,
+  pointInPolygon as turfPointInPolygon,
+  validateLocation,
+  type ValidationResult,
+} from './venueValidation';
 
 /**
  * Geolocation utilities for frontend attendance check-in
  * Enhanced with anti-spoofing and multi-sample precision.
+ *
+ * All distance and polygon checks are delegated to Turf.js via `venueValidation`
+ * to guarantee precise, well-tested geospatial maths across the app.
  */
 
 export interface GeolocationPosition {
@@ -23,15 +32,15 @@ const DEFAULT_SAMPLE_INTERVAL = 2000; // 2 seconds
  */
 export const getMultipleSamples = async (
   count: number = DEFAULT_SAMPLE_COUNT,
-  interval: number = DEFAULT_SAMPLE_INTERVAL
+  interval: number = DEFAULT_SAMPLE_INTERVAL,
 ): Promise<GeolocationPosition[]> => {
   const samples: GeolocationPosition[] = [];
 
   for (let i = 0; i < count; i++) {
-    const pos = await getCurrentPosition({ timeout: 10000 });
+    const pos = await getCurrentPosition({ timeout: 15000 });
     samples.push(pos);
     if (i < count - 1) {
-      await new Promise(resolve => setTimeout(resolve, interval));
+      await new Promise((resolve) => setTimeout(resolve, interval));
     }
   }
 
@@ -40,18 +49,22 @@ export const getMultipleSamples = async (
 
 /**
  * Get current position with high accuracy and stability.
+ *
+ * Uses Capacitor's high-accuracy mode and returns the best (lowest-accuracy)
+ * fix observed within the allowed time budget.
  */
 export const getCurrentPosition = (
-  options: { 
-    timeout?: number; 
-    desiredAccuracy?: number; 
-    maxWait?: number 
-  } = {}
+  options: {
+    timeout?: number;
+    desiredAccuracy?: number;
+    maxWait?: number;
+  } = {},
 ): Promise<GeolocationPosition> => {
-  const { 
-    timeout = 15000,
-    desiredAccuracy = 20, // meters
-    maxWait = 5000
+  const {
+    timeout = 20000,
+    // Target very tight accuracy by default; caller can relax if needed.
+    desiredAccuracy = 15, // metres
+    maxWait = 7000,
   } = options;
 
   return new Promise(async (resolve, reject) => {
@@ -107,53 +120,88 @@ export const getCurrentPosition = (
               bestPosition = currentPos;
             }
 
+            // Resolve immediately once we hit the desired accuracy threshold.
             if (currentPos.accuracy <= desiredAccuracy) {
               finish(currentPos);
             }
           }
-        }
+        },
       );
     } catch (err) {
       handleError(err);
     }
-    
+
     setTimeout(() => {
-        if (!hasResolved && bestPosition) finish(bestPosition);
+      if (!hasResolved && bestPosition) finish(bestPosition);
     }, maxWait);
   });
 };
 
+/**
+ * Distance between two points in metres.
+ * Delegates to Turf.js haversineDistance for maximum precision.
+ */
 export const calculateDistance = (
-  lat1: number, lon1: number, lat2: number, lon2: number
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
 ): number => {
-  const R = 6371e3;
-  const φ1 = (lat1 * Math.PI) / 180;
-  const φ2 = (lat2 * Math.PI) / 180;
-  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  return haversineDistance(lat1, lon1, lat2, lon2);
 };
 
-export const pointInPolygon = (point: [number, number], polygon: number[][]): boolean => {
+/**
+ * Point-in-polygon helper that supports both [lat,lng] and [lng,lat] polygon inputs.
+ * Uses Turf.js under the hood via venueValidation.pointInPolygon.
+ */
+export const pointInPolygon = (
+  point: [number, number],
+  polygon: number[][],
+): boolean => {
   if (!polygon || polygon.length < 3) return false;
-  const [lat, lon] = point;
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const [lat_i, lon_i] = polygon[i];
-    const [lat_j, lon_j] = polygon[j];
-    const intersect = ((lon_i > lon) !== (lon_j > lon)) && (lat < (lat_j - lat_i) * (lon - lon_i) / (lon_j - lon_i) + lat_i);
-    if (intersect) inside = !inside;
+
+  let coords = polygon;
+  const [a, b] = polygon[0];
+  const isLatLng = Math.abs(a) <= 90 && Math.abs(b) <= 180;
+  if (isLatLng) {
+    coords = polygon.map(([lat, lng]) => [lng, lat]);
   }
-  return inside;
+
+  return turfPointInPolygon(point, coords);
+};
+
+/**
+ * High-level venue-location verification using Turf.js.
+ * Accepts student + venue coordinates, optional boundary and radius.
+ */
+export const verifyVenueLocation = (
+  studentLat: number,
+  studentLng: number,
+  venueLat: number,
+  venueLng: number,
+  boundary: number[][] | null | undefined,
+  radius: number,
+): ValidationResult => {
+  return validateLocation(studentLat, studentLng, venueLat, venueLng, boundary, radius);
+};
+
+/**
+ * Human-friendly distance formatting while preserving metre-level precision.
+ */
+export const formatDistance = (distanceMetres: number): string => {
+  if (!Number.isFinite(distanceMetres)) return '–';
+  if (distanceMetres < 1000) {
+    return `${Math.round(distanceMetres)} m`;
+  }
+  const km = distanceMetres / 1000;
+  return `${km.toFixed(2)} km`;
 };
 
 export const checkLocationPermission = async (): Promise<boolean> => {
   try {
     const status = await Geolocation.checkPermissions();
     return status.location === 'granted';
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -163,5 +211,7 @@ export const geolocationService = {
   getMultipleSamples,
   calculateDistance,
   pointInPolygon,
+  verifyVenueLocation,
+  formatDistance,
   checkLocationPermission,
 };
