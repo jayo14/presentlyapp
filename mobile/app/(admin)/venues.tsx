@@ -8,16 +8,7 @@ import { Map, Filter, Plus, DoorOpen, Signal, X, Search, Edit, Trash2 } from 'lu
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { CustomModal } from '@/components/CustomModal';
-let MapView: any = View;
-let Marker: any = View;
-let Circle: any = View;
-
-if (Platform.OS !== 'web') {
-  const Maps = require('react-native-maps');
-  MapView = Maps.default;
-  Marker = Maps.Marker;
-  Circle = Maps.Circle;
-}
+import { MapView, Marker, Circle } from '@/components/NativeMaps';
 import { venuesService } from '@/services/venues';
 
 export default function ManageVenuesScreen() {
