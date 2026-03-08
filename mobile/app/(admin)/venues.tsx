@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Switch, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Switch, TextInput, Platform } from 'react-native';
 import { useState, useCallback, useRef } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,7 +8,16 @@ import { Map, Filter, Plus, DoorOpen, Signal, X, Search, Edit, Trash2 } from 'lu
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { CustomModal } from '@/components/CustomModal';
-import MapView, { Marker, Circle } from 'react-native-maps';
+let MapView: any = View;
+let Marker: any = View;
+let Circle: any = View;
+
+if (Platform.OS !== 'web') {
+  const Maps = require('react-native-maps');
+  MapView = Maps.default;
+  Marker = Maps.Marker;
+  Circle = Maps.Circle;
+}
 import { venuesService } from '@/services/venues';
 
 export default function ManageVenuesScreen() {
@@ -186,6 +195,13 @@ export default function ManageVenuesScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Map View */}
         <View style={styles.mapContainer}>
+          {Platform.OS === 'web' ? (
+            <View style={[styles.mapContainer, { justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
+              <Map size={48} color={colors.textSecondary} style={{ marginBottom: 12 }} />
+              <Text style={{ color: colors.textSecondary, fontSize: 16, fontWeight: '600' }}>Interactive Maps Unavailable</Text>
+              <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>Maps are only supported on the mobile app</Text>
+            </View>
+          ) : (
           <MapView
             ref={mapRef}
             style={StyleSheet.absoluteFill}
@@ -218,6 +234,7 @@ export default function ManageVenuesScreen() {
               />
             )}
           </MapView>
+          )}
         </View>
 
         {/* Venue List */}
