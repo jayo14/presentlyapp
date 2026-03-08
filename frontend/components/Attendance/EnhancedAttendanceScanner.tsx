@@ -7,6 +7,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
 import { AttendanceSuccessPage } from './AttendanceSuccessPage';
+import { geolocationService } from '../../services/geolocation';
 
 interface EnhancedAttendanceScannerProps {
   isOpen: boolean;
