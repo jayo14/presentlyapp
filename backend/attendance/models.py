@@ -24,6 +24,8 @@ class AttendanceAttemptLog(models.Model):
     visitor_id = models.CharField(max_length=255, null=True, blank=True, help_text="Unique hardware fingerprint (visitorId)")
     device_id = models.CharField(max_length=255, null=True, blank=True, help_text="Mobile device identifier")
     webgl_renderer = models.CharField(max_length=255, null=True, blank=True, help_text="WebGL Renderer (emulator detection)")
+    motion_detected = models.BooleanField(default=False, help_text="Did the device sensors detect physical movement?")
+    ip_city = models.CharField(max_length=255, null=True, blank=True, help_text="City inferred from IP address")
     trust_score = models.IntegerField(default=0, help_text="Calculated fraud confidence score (0-100)")
     
     rejected_reason = models.CharField(max_length=255, null=True, blank=True)
