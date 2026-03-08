@@ -73,19 +73,19 @@ export default function StudentLayout() {
           title: 'Mark',
           tabBarIcon: ({ color, focused }) => (
             <View style={[
-                styles.fabContainer,
-                {
-                    backgroundColor: colors.primary,
-                    borderColor: isDark ? colors.background : '#FFFFFF'
-                }
+              styles.fabContainer,
+              {
+                backgroundColor: colors.primary,
+                borderColor: isDark ? colors.background : '#FFFFFF'
+              }
             ]}>
-                <QrCode size={28} color="#231e0f" strokeWidth={2.5} />
+              <QrCode size={28} color="#231e0f" strokeWidth={2.5} />
             </View>
           ),
           tabBarLabelStyle: {
-              marginTop: 18,
-              fontSize: 10,
-              fontFamily: 'Lexend_700Bold',
+            marginTop: 18,
+            fontSize: 10,
+            fontFamily: 'Lexend_700Bold',
           }
         }}
       />
