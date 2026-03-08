@@ -5,8 +5,9 @@ import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, MoreVertical, Search } from 'lucide-react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Fonts from '@/constants/fonts';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { api } from '@/services/api';
+import { useCourse, useCourseEnrolledStudents, useCourseAttendance } from '@/hooks/useCourses';
 
 const { width } = Dimensions.get('window');
 
@@ -14,43 +15,29 @@ export default function LecturerStudentsScreen() {
   const router = useRouter();
   const { courseId, courseName, courseCode } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
-  const [students, setStudents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
-    try {
-        if (courseId) {
-            const data: any = await api.courses.getEnrolledStudents(courseId as string);
-            const studentList = Array.isArray(data) ? data : (data.students || []);
-            setStudents(studentList);
-        }
-    } catch (e) {
-        console.error('Failed to load students', e);
-    } finally {
-        setLoading(false);
-    }
-  };
+  const { data: courseData, isLoading: courseLoading } = useCourse(courseId as string);
+  const { data: studentsData, isLoading: studentsLoading, refetch: refetchStudents } = useCourseEnrolledStudents(courseId as string);
+  const { data: attendanceData, isLoading: attendanceLoading, refetch: refetchAttendance } = useCourseAttendance(courseId as string);
 
-  useEffect(() => {
-    loadData();
-  }, [courseId]);
+  const students = Array.isArray(studentsData) ? studentsData : (studentsData?.results || studentsData?.students || []);
+  const enrolledCount = courseData?.enrolled_students_count || students.length;
+  const avgAttendance = attendanceData?.average_attendance || courseData?.attendance_percentage || 0;
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadData();
-    setRefreshing(false);
-  };
-
-  const filteredStudents = students.filter(s =>
+  const filteredStudents = students.filter((s: any) =>
     (s.name || s.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
     (s.matric_number || s.matricNumber || '').toLowerCase().includes(search.toLowerCase())
   );
 
-  const avgAttendance = students.length > 0
-    ? Math.round(students.reduce((acc, s) => acc + (s.attendance_percentage || s.attendance || 0), 0) / students.length)
-    : 0;
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([refetchStudents(), refetchAttendance()]);
+    setRefreshing(false);
+  };
+
+  const loading = courseLoading || studentsLoading || attendanceLoading;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -59,7 +46,7 @@ export default function LecturerStudentsScreen() {
           <ChevronLeft size={24} color={colors.primary} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
-            {courseCode ? `${courseCode} - ` : ''}{courseName || 'Class Students'}
+            {courseData?.code || courseCode ? `${courseData?.code || courseCode} - ` : ''}{courseData?.title || courseName || 'Class Students'}
         </Text>
         <TouchableOpacity style={styles.moreBtn}>
           <MoreVertical size={24} color={isDark ? '#ccbf8e' : '#94A3B8'} />
@@ -74,7 +61,7 @@ export default function LecturerStudentsScreen() {
         <View style={styles.statsSection}>
             <View style={[styles.statBox, { backgroundColor: isDark ? '#2d2714' : '#FFFFFF', borderColor: isDark ? '#6a5d2f' : '#E2E8F0' }]}>
                 <Text style={[styles.statLabel, { color: isDark ? '#ccbf8e' : '#666666' }]}>Students Registered</Text>
-                <Text style={[styles.statValue, { color: colors.text }]}>{students.length}</Text>
+                <Text style={[styles.statValue, { color: colors.text }]}>{enrolledCount}</Text>
             </View>
             <View style={[styles.statBox, { backgroundColor: isDark ? '#2d2714' : '#FFFFFF', borderColor: isDark ? '#6a5d2f' : '#E2E8F0' }]}>
                 <Text style={[styles.statLabel, { color: isDark ? '#ccbf8e' : '#666666' }]}>Avg Attendance</Text>
@@ -104,7 +91,7 @@ export default function LecturerStudentsScreen() {
             {loading && !refreshing ? (
                 <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
             ) : (
-                filteredStudents.map((student, idx) => (
+                filteredStudents.map((student: any, idx: number) => (
                     <StudentItem key={student.id || idx} student={student} colors={colors} isDark={isDark} />
                 ))
             )}
