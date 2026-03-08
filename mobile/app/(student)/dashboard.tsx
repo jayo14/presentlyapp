@@ -42,8 +42,15 @@ export default function StudentDashboard() {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (cancelled || status !== 'granted') { setRangeStatus('unknown'); return; }
       locationWatchRef.current = await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.Balanced, timeInterval: 10000, distanceInterval: 10 },
+        { 
+          accuracy: Location.Accuracy.BestForNavigation, // Force High Accuracy GPS
+          timeInterval: 5000, 
+          distanceInterval: 5 
+        },
         (position) => {
+          // Filter bad readings (Step 2)
+          if (position.coords.accuracy && position.coords.accuracy > 50) return;
+          
           const distKm = haversineKm(position.coords.latitude, position.coords.longitude, vLat, vLon);
           setRangeStatus(distKm <= radiusKm ? 'in_range' : 'out_of_range');
         }
