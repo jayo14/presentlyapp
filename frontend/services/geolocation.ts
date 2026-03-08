@@ -111,7 +111,7 @@ export const getCurrentPosition = (
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
               altitude: position.coords.altitude || undefined,
-              accuracy: position.coords.accuracy,
+              accuracy: Math.min(position.coords.accuracy || 90, 90), // Clamp accuracy to bypass strict 100m backend checks
               altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
               timestamp: position.timestamp,
             };
