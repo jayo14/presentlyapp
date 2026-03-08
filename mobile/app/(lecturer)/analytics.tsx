@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   backButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 18, fontFamily: Fonts.lexend.bold },
   calendarBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  scrollContent: { paddingBottom: 40 },
+  scrollContent: { paddingBottom: 160 },
   avgSection: { alignItems: 'center', paddingVertical: 32, paddingHorizontal: 16 },
   progressContainer: { width: 180, height: 180, alignItems: 'center', justifyContent: 'center', marginBottom: 24, position: 'relative' },
   avgTextContainer: { position: 'absolute', alignItems: 'center' },

@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontFamily: Fonts.lexend.bold, letterSpacing: -0.5 },
   gaAvatar: { width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   gaText: { color: '#000', fontFamily: Fonts.lexend.bold, fontSize: 16 },
-  scrollContent: { padding: 20, gap: 24, paddingBottom: 100 },
+  scrollContent: { padding: 20, gap: 24, paddingBottom: 160 },
   profileCard: { padding: 20, borderRadius: 24, borderWidth: 1, gap: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.03, shadowRadius: 12, elevation: 2 },
   adminInfo: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   adminAvatar: { width: 64, height: 64, borderRadius: 22, borderWidth: 2, overflow: 'hidden', padding: 3 },

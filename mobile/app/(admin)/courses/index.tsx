@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   filterScroll: { paddingHorizontal: 16, gap: 8 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
   chipText: { fontSize: 12, fontWeight: '600' },
-  listContent: { padding: 16, gap: 16, paddingBottom: 100 },
+  listContent: { padding: 16, gap: 16, paddingBottom: 160 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, paddingHorizontal: 4 },
   sectionTitle: { fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   courseCard: { padding: 16, borderRadius: 16, borderWidth: 1, gap: 16 },
@@ -157,5 +157,5 @@ const styles = StyleSheet.create({
   metaGrid: { flexDirection: 'row', gap: 12 },
   metaItem: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   metaText: { fontSize: 12, fontWeight: '500' },
-  fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', elevation: 5 }
+  fab: { position: 'absolute', bottom: 120, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', elevation: 5 }
 });

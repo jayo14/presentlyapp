@@ -246,7 +246,7 @@ function FeedItem({ icon, title, time, subtitle, colors, isDark }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { padding: 24, paddingBottom: 100 },
+  scrollContent: { padding: 24, paddingBottom: 160 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   profileContainer: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, padding: 2, position: 'relative' },
