@@ -743,6 +743,12 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         setTimeout(() => {
           if (drawRef.current) {
             try {
+             // FILTER (Step 2): Reject bad GPS readings (IP fallback or weak signal)
+            // Anything over 40m is likely not pure GPS or is too noisy for geofencing
+            if (currentPos.accuracy > 40) {
+              console.log(`Ignoring low-accuracy signal: ${currentPos.accuracy.toFixed(1)}m`);
+              return;
+            }
               drawRef.current.changeMode('draw_polygon');
               console.log('Drawing mode activated - click to add vertices');
             } catch (error) {
