@@ -648,6 +648,8 @@ class Attendance(models.Model):
         null=True,
         help_text="Distance in meters from venue center"
     )
+    trust_score = models.IntegerField(default=0, help_text="Final confidence score (0-100)")
+    verification_metadata = models.JSONField(null=True, blank=True, help_text="Detailed audit flags and signals")
     
     # Status
     STATUS_CHOICES = [
