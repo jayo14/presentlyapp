@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon, RotateCcw, Clipboard } from 'lucide-react';
+import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon, RotateCcw, Clipboard, Edit3 } from 'lucide-react';
 import { Button } from '../Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -461,9 +461,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         }
       `}</style>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {/* Header Bar */}
         <motion.div
+          key="header-bar"
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -100, opacity: 0 }}
@@ -486,6 +487,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
         {/* Mode Switcher */}
         <motion.div
+          key="mode-switcher"
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
@@ -706,10 +708,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 flex items-center justify-center p-8"
+            className="absolute inset-0 flex flex-col pt-20 pb-32"
           >
-            <div className="w-full max-w-md">
-              <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+            <div className="flex-1 overflow-y-auto no-scrollbar w-full px-6 flex flex-col justify-center min-h-[400px]">
+              <div className="w-full max-w-md mx-auto py-8">
+                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse shrink-0">
                 <Keyboard className="w-12 h-12 text-primary" />
               </div>
 
@@ -771,10 +774,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         {/* Loading States */}
         {(status === 'locating' || status === 'verifying') && (
           <motion.div
+            key="loading-state"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 flex items-center justify-center bg-black/90 backdrop-blur-lg"
+            className="absolute inset-0 flex items-center justify-center bg-black/90 backdrop-blur-lg z-[60]"
           >
             <div className="text-center px-8">
               {status === 'locating' && (
@@ -801,10 +805,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         {/* Dedicated Error Screen */}
         {status === 'error' && (
           <motion.div
+            key="error-state"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute inset-0 flex items-center justify-center bg-black/95 backdrop-blur-lg p-6"
+            className="absolute inset-0 flex items-center justify-center bg-black/95 backdrop-blur-lg p-6 z-[60]"
           >
             <div className="w-full max-w-md text-center">
               {/* Error Icon */}
