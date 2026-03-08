@@ -2,6 +2,7 @@ import { Redirect, Tabs } from 'expo-router';
 import { Home, BarChart3, User, BookOpen, QrCode, Bell } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Platform, View, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function StudentLayout() {
@@ -20,17 +21,28 @@ export default function StudentLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: isDark ? '#ccbf8e' : '#94A3B8',
         tabBarStyle: {
-          backgroundColor: isDark ? '#231e0f' : '#FFFFFF',
-          borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0',
-          borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 104 : 92,
-          paddingBottom: Platform.OS === 'ios' ? 34 : 26,
-          paddingTop: 16,
-          marginBottom: Platform.OS === 'ios' ? 0 : 12,
-          marginHorizontal: Platform.OS === 'ios' ? 0 : 12,
-          borderRadius: Platform.OS === 'ios' ? 0 : 32,
-          elevation: 0,
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(35, 30, 15, 0.92)' : 'rgba(255, 255, 255, 0.92)'),
+          borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'transparent',
+          borderTopWidth: 0,
+          height: Platform.OS === 'ios' ? 98 : 88,
+          paddingBottom: Platform.OS === 'ios' ? 32 : 24,
+          paddingTop: 12,
+          position: 'absolute',
+          bottom: Platform.OS === 'ios' ? 0 : 16,
+          left: Platform.OS === 'ios' ? 0 : 16,
+          right: Platform.OS === 'ios' ? 0 : 16,
+          borderRadius: Platform.OS === 'ios' ? 0 : 28,
+          elevation: 20,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
         },
+        tabBarBackground: () => (
+          Platform.OS === 'ios' ? (
+            <BlurView intensity={80} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+          ) : null
+        ),
         tabBarLabelStyle: {
           fontSize: 10,
           fontFamily: 'Lexend_700Bold',
