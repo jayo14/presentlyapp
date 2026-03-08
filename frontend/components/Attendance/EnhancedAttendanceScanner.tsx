@@ -767,6 +767,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               >
                 Verify & Mark Attendance
               </Button>
+              </div>
             </div>
           </motion.div>
         )}
