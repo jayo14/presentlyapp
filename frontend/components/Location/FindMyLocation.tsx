@@ -9,14 +9,14 @@ interface FindMyLocationProps {
   className?: string;
 }
 
-export const FindMyLocation: React.FC<FindMyLocationProps> = ({ 
+export const FindMyLocation: React.FC<FindMyLocationProps> = ({
   onLocationFound,
-  className = '' 
+  className = ''
 }) => {
   const [isLocating, setIsLocating] = useState(false);
   const [location, setLocation] = useState<{ latitude: number; longitude: number; accuracy: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -90,10 +90,10 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
     }
 
     map.setView(latLng, 16);
-    
+
     // Invalidate size again to be sure
     setTimeout(() => {
-        map.invalidateSize();
+      map.invalidateSize();
     }, 100);
 
   }, [location]);
@@ -120,10 +120,10 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
 
   const handleRefreshMap = () => {
     if (mapRef.current) {
-        mapRef.current.invalidateSize();
-        if (location) {
-            mapRef.current.setView([location.latitude, location.longitude], 16);
-        }
+      mapRef.current.invalidateSize();
+      if (location) {
+        mapRef.current.setView([location.latitude, location.longitude], 16);
+      }
     }
   };
 
@@ -163,39 +163,39 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
       {/* Map Container */}
       <div className="relative flex-1 min-h-[300px] bg-zinc-950">
         <div ref={mapContainerRef} className="absolute inset-0 z-0" />
-        
+
         {!location && !isLocating && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/50 backdrop-blur-sm z-10 p-6 text-center">
-                <MapPin className="w-12 h-12 text-zinc-700 mb-4" />
-                <p className="text-zinc-400 text-sm mb-4">Map view is ready. Click 'Find Me' to see your current position.</p>
-                <Button variant="secondary" onClick={handleFindLocation} size="sm">
-                    Activate GPS
-                </Button>
-            </div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/50 backdrop-blur-sm z-10 p-6 text-center">
+            <MapPin className="w-12 h-12 text-zinc-700 mb-4" />
+            <p className="text-zinc-400 text-sm mb-4">Map view is ready. Click 'Find Me' to see your current position.</p>
+            <Button variant="secondary" onClick={handleFindLocation} size="sm">
+              Activate GPS
+            </Button>
+          </div>
         )}
 
         {isLocating && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/50 backdrop-blur-sm z-10">
-                <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
-                <p className="text-zinc-400 text-sm">Accessing GPS...</p>
-            </div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/50 backdrop-blur-sm z-10">
+            <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
+            <p className="text-zinc-400 text-sm">Accessing GPS...</p>
+          </div>
         )}
 
-        <button 
-            onClick={handleRefreshMap}
-            className="absolute bottom-4 right-4 z-[1000] p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg text-zinc-500 hover:text-primary transition-colors"
-            title="Fix Map Rendering"
+        <button
+          onClick={handleRefreshMap}
+          className="absolute bottom-4 right-4 z-[1000] p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg text-zinc-500 hover:text-primary transition-colors"
+          title="Fix Map Rendering"
         >
-            <RefreshCw size={18} />
+          <RefreshCw size={18} />
         </button>
       </div>
 
       {/* Footer Info */}
       {location && (
         <div className="p-4 bg-zinc-800/50 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-            <span>LAT: {location.latitude.toFixed(6)}</span>
-            <span>LNG: {location.longitude.toFixed(6)}</span>
-            <span>ACC: ±{Math.round(location.accuracy)}m</span>
+          <span>LAT: {location.latitude.toFixed(6)}</span>
+          <span>LNG: {location.longitude.toFixed(6)}</span>
+          <span>ACC: ±{Math.round(location.accuracy)}m</span>
         </div>
       )}
     </div>
