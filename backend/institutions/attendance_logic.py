@@ -13,7 +13,8 @@ _MAX_ACCURACY_METERS = 50.0
 _MAX_JUMP_METERS = 100.0
 _MAX_DRIFT_METERS = 40.0
 _MAX_SPEED_MPS = 10.0  # ~36 km/h
-_TRUST_THRESHOLD = 70
+_TRUST_THRESHOLD = 85
+_FLAG_THRESHOLD = 50
 
 
 def _validate_sample_stability(samples):
@@ -178,9 +179,37 @@ def perform_attendance_check_in(request, session):
         score -= 50
         flags.append("Emulator detected (hardware renderer)")
 
-    final_result = score >= _TRUST_THRESHOLD
-    rejected_reason = "; ".join(flags) if not final_result else None
+    # Rejection logic: Hard reject only if very low confidence
+    if score < _FLAG_THRESHOLD:
+        rejected_reason = "; ".join(flags) or "Low confidence score"
+        with transaction.atomic():
+            AttendanceAttemptLog.objects.create(
+                student=request.user,
+                session=session,
+                latitude=last_sample.get('latitude'),
+                longitude=last_sample.get('longitude'),
+                accuracy=last_sample.get('accuracy'),
+                drift_avg=round(drift_avg, 2),
+                inside_polygon=is_inside_any,
+                is_mocked=is_mocked,
+                visitor_id=visitor_id,
+                device_id=device_id,
+                webgl_renderer=webgl_renderer,
+                trust_score=score,
+                rejected_reason=rejected_reason,
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
 
+        return Response({
+            'success': False,
+            'status': 'error',
+            'error': f"Attendance rejected (Confidence: {score}%). {rejected_reason}",
+            'reason': rejected_reason,
+            'score': score
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Success/Flag logic: Allow but mark status
     with transaction.atomic():
         AttendanceAttemptLog.objects.create(
             student=request.user,
@@ -188,26 +217,17 @@ def perform_attendance_check_in(request, session):
             latitude=last_sample.get('latitude'),
             longitude=last_sample.get('longitude'),
             accuracy=last_sample.get('accuracy'),
-            drift_avg=round(drift_avg, 2),
+            drift_avg=round(float(drift_avg), 2),
             inside_polygon=is_inside_any,
             is_mocked=is_mocked,
             visitor_id=visitor_id,
             device_id=device_id,
             webgl_renderer=webgl_renderer,
             trust_score=score,
-            rejected_reason=rejected_reason,
+            rejected_reason=None if score >= _TRUST_THRESHOLD else "; ".join(flags),
             ip_address=ip_address,
             user_agent=user_agent
         )
-
-        if not final_result:
-            return Response({
-                'success': False,
-                'status': 'error',
-                'error': f"Attendance flagged (Confidence: {score}%). {rejected_reason}",
-                'reason': rejected_reason,
-                'score': score
-            }, status=status.HTTP_400_BAD_REQUEST)
 
         # Register device if first time or trusted enough
         if visitor_id:
@@ -225,9 +245,13 @@ def perform_attendance_check_in(request, session):
         if Attendance.objects.select_for_update().filter(session=session, student=request.user).exists():
             return Response({'success': False, 'status': 'error', 'error': 'Attendance already marked'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Determine Status: LATE, FLAGGED, or PRESENT
         grace_period = timezone.timedelta(minutes=15)
         status_value = 'PRESENT'
-        if now > session.start_time + grace_period:
+        
+        if score < _TRUST_THRESHOLD:
+            status_value = 'FLAGGED'
+        elif now > session.start_time + grace_period:
             status_value = 'LATE'
 
         attendance = Attendance.objects.create(

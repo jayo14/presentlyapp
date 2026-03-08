@@ -654,6 +654,7 @@ class Attendance(models.Model):
         ('PRESENT', 'Present'),
         ('LATE', 'Late'),
         ('EXCUSED', 'Excused'),
+        ('FLAGGED', 'Flagged'),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PRESENT')
     
