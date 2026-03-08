@@ -123,17 +123,18 @@ DATABASES = {
 # Override with PostgreSQL if DATABASE_URL is set (production)
 if 'DATABASE_URL' in os.environ:
     db_url = os.environ.get('DATABASE_URL')
-    is_postgres = db_url.startswith('postgresql') # Covers both 'postgres://' and 'postgresql://'
-    
-    DATABASES['default'] = dj_database_url.config(
-        default=db_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=is_postgres
-    )
-    # Use regular PostgreSQL backend (no PostGIS/GDAL required)
-    if is_postgres:
-        DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+    if db_url:
+        is_postgres = db_url.startswith('postgresql') # Covers both 'postgres://' and 'postgresql://'
+        
+        DATABASES['default'] = dj_database_url.config(
+            default=db_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=is_postgres
+        )
+        # Use regular PostgreSQL backend (no PostGIS/GDAL required)
+        if is_postgres:
+            DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
 
 
 # Password validation
@@ -253,12 +254,15 @@ GMAIL_API_REFRESH_TOKEN = os.environ.get('GMAIL_API_REFRESH_TOKEN', '')
 # Choose backend based on available credentials
 if os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
     EMAIL_BACKEND = 'presently.email_backend.GmailApiEmailBackend'
-elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    print("INFO: Using Gmail API email backend.")
+elif os.environ.get('EMAIL_HOST_USER') and os.environ.get('EMAIL_HOST_PASSWORD'):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    print(f"INFO: Using SMTP email backend ({EMAIL_HOST}).")
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    print("WARNING: Using console email backend. Emails will be printed to terminal instead of being sent.")
 
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') or os.environ.get('EMAIL_HOST_USER') or 'getpresently.io@gmail.com'
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links

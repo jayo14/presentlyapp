@@ -133,17 +133,23 @@ export default function StudentAnalyticsScreen() {
 
           {/* Summary Stats */}
           <View style={styles.summaryRow}>
-            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
-              <Text style={[styles.summaryVal, { color: '#10B981' }]}>{stats.attended}</Text>
-              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Attended</Text>
+            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF', borderColor: isDark ? '#4a4121' : '#E2E8F0' }]}>
+              <View style={[styles.summaryIcon, { backgroundColor: '#10B9811A' }]}>
+                <TrendingUp size={20} color="#10B981" />
+              </View>
+              <View>
+                <Text style={[styles.summaryVal, { color: colors.text }]}>{stats.attended}</Text>
+                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Attended</Text>
+              </View>
             </View>
-            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
-              <Text style={[styles.summaryVal, { color: '#EF4444' }]}>{Math.max(0, stats.totalSessions - stats.attended)}</Text>
-              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Missed</Text>
-            </View>
-            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF' }]}>
-              <Text style={[styles.summaryVal, { color: colors.text }]}>{stats.totalSessions}</Text>
-              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Total</Text>
+            <View style={[styles.summaryBox, { backgroundColor: isDark ? '#2e2918' : '#FFFFFF', borderColor: isDark ? '#4a4121' : '#E2E8F0' }]}>
+              <View style={[styles.summaryIcon, { backgroundColor: '#EF44441A' }]}>
+                <TrendingDown size={20} color="#EF4444" />
+              </View>
+              <View>
+                <Text style={[styles.summaryVal, { color: colors.text }]}>{Math.max(0, stats.totalSessions - stats.attended)}</Text>
+                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Missed</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -216,6 +222,18 @@ export default function StudentAnalyticsScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+function BarItem({ label, height, active, colors, isDark, value }: any) {
+    return (
+        <View style={styles.barContainer}>
+            <Text style={[styles.barValueText, { color: active ? colors.primary : colors.textSecondary }]}>{value}</Text>
+            <View style={[styles.barBackground, { backgroundColor: isDark ? '#4a4121' : '#F1F5F9' }]}>
+                <View style={[styles.barFill, { height, backgroundColor: active ? colors.primary : (isDark ? '#ccbf8e66' : '#94A3B866') }]} />
+            </View>
+            <Text style={[styles.barLabel, { color: active ? colors.text : colors.textSecondary, fontFamily: active ? Fonts.lexend.bold : Fonts.lexend.regular }]}>{label}</Text>
+        </View>
+    );
 }
 
 function CourseStatItem({ icon, name, percentage, colors, isDark, low }: any) {
@@ -317,6 +335,37 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.lexend.bold,
   },
+  summaryRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    gap: 16,
+    width: '100%',
+    marginTop: 32,
+  },
+  summaryBox: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: 12,
+  },
+  summaryIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryVal: {
+    fontSize: 18,
+    fontFamily: Fonts.lexend.bold,
+  },
+  summaryLabel: {
+    fontSize: 11,
+    fontFamily: Fonts.lexend.medium,
+  },
   section: {
     marginTop: 32,
     paddingHorizontal: 24,
@@ -328,23 +377,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: Fonts.lexend.bold,
-    marginBottom: 16,
   },
   card: {
-    borderRadius: 24,
+    borderRadius: 28,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     marginBottom: 32,
   },
   cardLabel: {
@@ -353,50 +398,53 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   cardValue: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: Fonts.lexend.bold,
     marginTop: 4,
   },
   periodBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 8,
   },
   periodText: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.lexend.bold,
   },
   barChart: {
     flexDirection: 'row',
-    height: 160,
+    height: 180,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
   },
   barContainer: {
     alignItems: 'center',
-    width: 48,
-    height: '100%',
-    justifyContent: 'flex-end',
+    width: 50,
+  },
+  barValueText: {
+    fontSize: 10,
+    fontFamily: Fonts.lexend.bold,
+    marginBottom: 8,
   },
   barBackground: {
-    width: '100%',
-    flex: 1,
-    borderRadius: 8,
+    width: 14,
+    height: 120,
+    borderRadius: 7,
     overflow: 'hidden',
     justifyContent: 'flex-end',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   barFill: {
     width: '100%',
-    borderRadius: 8,
+    borderRadius: 7,
   },
   barLabel: {
-    fontSize: 12,
+    fontSize: 11,
   },
-  seeAllText: {
+  emptyText: {
     fontSize: 14,
-    fontFamily: Fonts.lexend.bold,
+    textAlign: 'center',
+    marginTop: 20,
   },
   courseList: {
     gap: 12,
@@ -405,19 +453,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    borderRadius: 20,
+    borderRadius: 24,
     borderWidth: 1,
     gap: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 1,
   },
   courseIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -438,7 +481,6 @@ const styles = StyleSheet.create({
   coursePercentageText: {
     fontSize: 15,
     fontFamily: Fonts.lexend.bold,
-    marginLeft: 8,
   },
   progressBarBg: {
     height: 6,
