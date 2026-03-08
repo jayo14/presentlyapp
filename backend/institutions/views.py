@@ -1183,7 +1183,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         elif self.request.user.role == UserRole.STUDENT:
             # For students, filter by enrollment if requested OR if listing "my courses" (no other filters)
             # Only apply this if it's a list action
-            if self.action == 'list' and (enrolled_param or (not department_id and not lecturer_id)):
+            search_param = self.request.query_params.get('search', None)
+            
+            if self.action == 'list' and (enrolled_param or (not department_id and not lecturer_id and not search_param)):
                 enrolled_course_ids = CourseEnrollment.objects.filter(
                     student=self.request.user,
                     is_active=True

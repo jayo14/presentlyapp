@@ -15,8 +15,6 @@ export default function SearchResultsScreen() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState((q as string) || (code as string) || '');
   const [courses, setCourses] = useState<any[]>([]);
-  const [departments, setDepartments] = useState<any[]>([]);
-  const [colleges, setColleges] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -30,17 +28,10 @@ export default function SearchResultsScreen() {
     try {
         const institutionId = user?.institutionId;
 
-        // Parallel search
-        const [courseData, deptData, collegeData] = await Promise.all([
-            api.courses.list({ search: searchQuery, institution: institutionId }).catch(() => ({ results: [] })),
-            api.departments.list({ search: searchQuery, institution: institutionId }).catch(() => ({ results: [] })),
-            api.colleges.list({ search: searchQuery, institution: institutionId }).catch(() => ({ results: [] }))
-        ]);
+        // Search courses
+        const courseData = await api.courses.list({ search: searchQuery, institution: institutionId }).catch(() => ({ results: [] }));
 
         setCourses(courseData.results || courseData || []);
-        setDepartments(deptData.results || deptData || []);
-        setColleges(collegeData.results || collegeData || []);
-
     } catch (e) {
         console.error('Search failed', e);
     } finally {
@@ -54,7 +45,7 @@ export default function SearchResultsScreen() {
     }
   }, [q, code]);
 
-  const totalResults = courses.length + departments.length + colleges.length;
+  const totalResults = courses.length;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} edges={['top']}>
@@ -107,46 +98,6 @@ export default function SearchResultsScreen() {
                 <View style={styles.resultsHeader}>
                     <Text style={styles.resultsCount}>FOUND {totalResults} RESULTS</Text>
                 </View>
-
-                {colleges.length > 0 && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>FACULTIES / COLLEGES</Text>
-                        {colleges.map(college => (
-                            <TouchableOpacity key={college.id} style={[styles.itemCard, { backgroundColor: cardColor }]}>
-                                <View style={styles.iconBox}>
-                                    <GraduationCap size={20} color="#f9c406" />
-                                </View>
-                                <View style={styles.itemInfo}>
-                                    <Text style={[styles.itemTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>{college.name}</Text>
-                                    <Text style={styles.itemSubtitle}>{college.code || 'FACULTY'}</Text>
-                                </View>
-                                <ChevronRight size={18} color="rgba(255,255,255,0.2)" />
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                )}
-
-                {departments.length > 0 && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>DEPARTMENTS</Text>
-                        {departments.map(dept => (
-                            <TouchableOpacity
-                                key={dept.id}
-                                style={[styles.itemCard, { backgroundColor: cardColor }]}
-                                onPress={() => router.push(`/(student)/courses/department/${dept.id}`)}
-                            >
-                                <View style={styles.iconBox}>
-                                    <Building2 size={20} color="#f9c406" />
-                                </View>
-                                <View style={styles.itemInfo}>
-                                    <Text style={[styles.itemTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>{dept.name}</Text>
-                                    <Text style={styles.itemSubtitle}>{dept.code || 'DEPT'}</Text>
-                                </View>
-                                <ChevronRight size={18} color="rgba(255,255,255,0.2)" />
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                )}
 
                 {courses.length > 0 && (
                     <View style={styles.section}>
