@@ -95,9 +95,13 @@ export default function LecturerAnalyticsScreen() {
             </View>
             <View style={[styles.chartContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#FFF', borderColor: colors.border }]}>
                 <View style={styles.barChart}>
-                    {dashboardData?.weekly_overview?.map((item, idx) => (
-                        <Bar key={idx} day={item.name.toUpperCase()} height={Math.min(100, (item.attendees / 100) * 100)} colors={colors} />
-                    ))}
+                    {dashboardData?.weekly_overview?.map((item, idx) => {
+                        const maxAttendees = Math.max(...(dashboardData?.weekly_overview?.map(d => d.attendees) || [100]));
+                        const barHeight = maxAttendees > 0 ? (item.attendees / maxAttendees) * 100 : 0;
+                        return (
+                            <Bar key={idx} day={item.name.substring(0, 3).toUpperCase()} height={barHeight} colors={colors} />
+                        );
+                    })}
                 </View>
             </View>
         </View>
