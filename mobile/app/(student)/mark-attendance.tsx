@@ -12,18 +12,13 @@ import { api } from '@/services/api';
 import { enrollmentsService } from '@/services/enrollments';
 import * as Location from 'expo-location';
 import * as Clipboard from 'expo-clipboard';
+import { locationService, type LocationSample } from '../../services/location';
 
 const { width, height } = Dimensions.get('window');
 
 const ACCURACY_THRESHOLD = 250; // meters
 const ACCURACY_UNAVAILABLE = 999;
 
-interface LocationSample {
-    latitude: number;
-    longitude: number;
-    accuracy: number;
-    timestamp: number;
-}
 
 export default function MarkAttendanceScreen() {
   const router = useRouter();
@@ -94,35 +89,6 @@ export default function MarkAttendanceScreen() {
     await verifyAndPrepareCheckIn(code);
   };
 
-  const getMultipleSamples = async (count: number, intervalMs: number): Promise<LocationSample[]> => {
-    const samples: LocationSample[] = [];
-    for (let i = 0; i < count; i++) {
-        try {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') break;
-
-            setLocationStatus(`Verifying location... (${i + 1}/${count})`);
-            const loc = await Location.getCurrentPositionAsync({ 
-                accuracy: Location.Accuracy.High,
-            });
-
-            samples.push({
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude,
-                accuracy: loc.coords.accuracy ?? ACCURACY_UNAVAILABLE,
-                timestamp: loc.timestamp,
-            });
-            
-            if (i < count - 1) {
-                await new Promise(resolve => setTimeout(resolve, intervalMs));
-            }
-        } catch (e) {
-            console.error('Location sample error', e);
-        }
-    }
-    return samples;
-  };
-
   const verifyAndPrepareCheckIn = async (code: string) => {
     try {
       setProcessing(true);
@@ -145,7 +111,11 @@ export default function MarkAttendanceScreen() {
       }
 
       // Step 3: Collect GPS samples with retry logic
-      const samples = await getMultipleSamples(4, 2000);
+      const sample = await locationService.getHighPrecisionLocation({
+        requiredSamples: 5,
+        onProgress: setLocationStatus
+      });
+      const samples = [sample]; // API expects array
       setLocationStatus('');
 
       // Step 4: Submit attendance directly
