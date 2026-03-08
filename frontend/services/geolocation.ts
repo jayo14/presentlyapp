@@ -28,6 +28,8 @@ export interface GeolocationPosition {
 export interface AntiCheatSignals {
   visitorId?: string;
   webglRenderer?: string;
+  motionDetected?: boolean;
+  ipCity?: string;
 }
 
 const DEFAULT_SAMPLE_COUNT = 4;
@@ -173,8 +175,8 @@ export const getCurrentPosition = (
             }
 
             // FILTER: Reject bad GPS readings (IP fallback or weak signal)
-            // Anything over 50m is likely not pure GPS or is too noisy for geofencing
-            if (currentPos.accuracy > 50) {
+            // Anything over 40m is likely not pure GPS or is too noisy for geofencing
+            if (currentPos.accuracy > 40) {
               console.log(`Ignoring low-accuracy signal: ${currentPos.accuracy.toFixed(1)}m`);
               return;
             }
@@ -305,15 +307,57 @@ export const getVisitorId = async (): Promise<string | null> => {
 };
 
 /**
+ * Simple IP-based city lookup as a coarse sanity check.
+ */
+export const getIPCity = async (): Promise<string | null> => {
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    return data.city || null;
+  } catch (e) {
+    return null;
+  }
+};
+
+/**
+ * Detect device motion during the sampling window.
+ * Returns true if ANY acceleration (excluding gravity) was detected.
+ */
+export const detectMotion = async (durationMs: number = 5000): Promise<boolean> => {
+  return new Promise((resolve) => {
+    let moved = false;
+    const handleMotion = (event: DeviceMotionEvent) => {
+      const acc = event.acceleration;
+      if (acc && (Math.abs(acc.x || 0) > 0.1 || Math.abs(acc.y || 0) > 0.1 || Math.abs(acc.z || 0) > 0.1)) {
+        moved = true;
+      }
+    };
+
+    window.addEventListener('devicemotion', handleMotion);
+    setTimeout(() => {
+      window.removeEventListener('devicemotion', handleMotion);
+      resolve(moved);
+    }, durationMs);
+  });
+};
+
+/**
  * Collect all anti-cheat signals.
  */
 export const getAntiCheatSignals = async (): Promise<AntiCheatSignals> => {
-  const [visitorId, webglRenderer] = await Promise.all([
+  const [visitorId, webglRenderer, motionDetected, ipCity] = await Promise.all([
     getVisitorId(),
     Promise.resolve(getWebGLRenderer()),
+    detectMotion(3000), // Check for 3 seconds of micro-movement
+    getIPCity(),
   ]);
 
-  return { visitorId: visitorId || undefined, webglRenderer: webglRenderer || undefined };
+  return { 
+    visitorId: visitorId || undefined, 
+    webglRenderer: webglRenderer || undefined,
+    motionDetected,
+    ipCity: ipCity || undefined
+  };
 };
 
 export const geolocationService = {

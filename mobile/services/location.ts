@@ -1,6 +1,8 @@
 import * as Location from 'expo-location';
 import * as Device from 'expo-device';
 import * as Application from 'expo-application';
+import * as Network from 'expo-network';
+import { Accelerometer } from 'expo-sensors';
 import { Platform } from 'react-native';
 
 export interface LocationSample {
@@ -16,6 +18,8 @@ export interface AntiCheatSignals {
   deviceId?: string;
   webglRenderer?: string;
   isEmulator?: boolean;
+  motionDetected?: boolean;
+  ipAddress?: string;
 }
 
 /**
@@ -149,7 +153,31 @@ export const getAntiCheatSignals = async (): Promise<AntiCheatSignals> => {
     isEmulator: !Device.isDevice,
   };
 
+  // 1. Detect motion (check for 2 seconds)
+  const motionPromise = new Promise<boolean>((resolve) => {
+    let moved = false;
+    const subscription = Accelerometer.addListener(data => {
+      const totalAcc = Math.sqrt(data.x ** 2 + data.y ** 2 + data.z ** 2);
+      // If deviation from gravity (1.0) is > 0.1, we count it as movement
+      if (Math.abs(totalAcc - 1.0) > 0.1) {
+        moved = true;
+      }
+    });
+    setTimeout(() => {
+      subscription.remove();
+      resolve(moved);
+    }, 2000);
+  });
+
   try {
+    const [moved, ip] = await Promise.all([
+      motionPromise,
+      Network.getIpAddressAsync().catch(() => undefined)
+    ]);
+    
+    signals.motionDetected = moved;
+    signals.ipAddress = ip;
+
     if (Platform.OS === 'android') {
       signals.visitorId = Application.androidId || undefined;
       signals.deviceId = Device.osInternalBuildId || undefined;
