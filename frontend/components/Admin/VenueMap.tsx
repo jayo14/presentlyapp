@@ -189,7 +189,10 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             el.className = 'user-location-marker';
             el.innerHTML = `
                 <div class="user-location-container">
-                    <div class="user-location-label">You <span class="accuracy-badge">±${Math.round(avgAcc)}m</span></div>
+                    <div class="user-location-label">
+                        ${samples.length < SAMPLE_SIZE ? '<span class="calibrating-text">Calibrating...</span>' : 'You'} 
+                        <span class="accuracy-badge">±${Math.round(avgAcc)}m</span>
+                    </div>
                     <div class="marker-pulse"></div>
                     <div class="marker-dot"></div>
                 </div>
@@ -214,15 +217,19 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             });
         } else {
             userMarkerRef.current.setLngLat([avgLng, avgLat]);
-            const labelEl = userMarkerRef.current.getElement().querySelector('.accuracy-badge');
-            if (labelEl) labelEl.textContent = `±${Math.round(avgAcc)}m`;
+            const labelEl = userMarkerRef.current.getElement().querySelector('.user-location-label');
+            if (labelEl) {
+                labelEl.innerHTML = `
+                    ${samples.length < SAMPLE_SIZE ? '<span class="calibrating-text">Calibrating...</span>' : 'You'} 
+                    <span class="accuracy-badge">±${Math.round(avgAcc)}m</span>
+                `;
+            }
 
             if (userAccuracyCircleRef.current) {
                 userAccuracyCircleRef.current.setLngLat([avgLng, avgLat]);
                 updateAccuracyCircle(map, avgLat, avgAcc);
             }
         }
-    };
     };
 
     const updateAccuracyCircle = (map: maplibregl.Map, lat: number, acc: number) => {
@@ -1069,6 +1076,15 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           display: flex;
           align-items: center;
           gap: 4px;
+        }
+        .calibrating-text {
+          opacity: 0.8;
+          font-style: italic;
+          animation: pulse-op 1.5s infinite;
+        }
+        @keyframes pulse-op {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
         }
         .accuracy-badge {
           background-color: rgba(255,255,255,0.2);
