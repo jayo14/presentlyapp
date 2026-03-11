@@ -163,24 +163,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     const onSuccess = async (position: GeolocationPosition) => {
         const { latitude, longitude, accuracy } = position.coords;
-        
-        // Ignore extremely poor readings (IP-based or cell tower fallbacks > 100m)
-        if (accuracy > 100) {
-            console.log(`Skipping low-accuracy reading: ${accuracy}m`);
-            return;
-        }
-
         setIsLocating(false);
         
-        // Smoothing: use a sliding window of the last N samples
-        samples.push({ lat: latitude, lng: longitude, acc: accuracy });
-        if (samples.length > SAMPLE_SIZE) samples.shift();
+        let finalLat = latitude;
+        let finalLng = longitude;
+        let finalAcc = accuracy;
+        let isIPFallback = false;
 
-        const avgLat = samples.reduce((sum, s) => sum + s.lat, 0) / samples.length;
-        const avgLng = samples.reduce((sum, s) => sum + s.lng, 0) / samples.length;
-        const avgAcc = samples.reduce((sum, s) => sum + s.acc, 0) / samples.length;
-
-        // Fetch IP location for cross-verification (only once or periodically)
+        // Fetch IP location for cross-verification if not already present
         let ipLoc = (map as any)._ipLoc;
         if (!ipLoc) {
             const { getIPLocation } = await import('../../services/geolocation');
@@ -198,9 +188,31 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             }
         }
 
+        // Fallback: If GPS is extremely poor (>100m), try to use IP location instead
+        if (accuracy > 100) {
+            console.log(`Low GPS accuracy (${accuracy}m). Using IP fallback...`);
+            if (ipLoc) {
+                finalLat = ipLoc.latitude;
+                finalLng = ipLoc.longitude;
+                finalAcc = 5000; // Standard IP accuracy representation
+                isIPFallback = true;
+            } else {
+                return; // Silence if both fail
+            }
+        }
+
+        // Smoothing: only for GPS readings to keep it stable
+        if (!isIPFallback) {
+            samples.push({ lat: finalLat, lng: finalLng, acc: finalAcc });
+            if (samples.length > SAMPLE_SIZE) samples.shift();
+            finalLat = samples.reduce((sum, s) => sum + s.lat, 0) / samples.length;
+            finalLng = samples.reduce((sum, s) => sum + s.lng, 0) / samples.length;
+            finalAcc = samples.reduce((sum, s) => sum + s.acc, 0) / samples.length;
+        }
+
         // Store accuracy for zoom-based updates
-        (map as any)._lastAccuracy = avgAcc;
-        (map as any)._lastLat = avgLat;
+        (map as any)._lastAccuracy = finalAcc;
+        (map as any)._lastLat = finalLat;
         
         // Update marker
         if (!userMarkerRef.current) {
@@ -209,8 +221,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             el.innerHTML = `
                 <div class="user-location-container">
                     <div class="user-location-label">
-                        ${samples.length < SAMPLE_SIZE ? '<span class="calibrating-text">Calibrating...</span>' : 'You'} 
-                        <span class="accuracy-badge">±${Math.round(avgAcc)}m</span>
+                        ${samples.length < SAMPLE_SIZE && !isIPFallback ? '<span class="calibrating-text">Calibrating...</span>' : isIPFallback ? '<span class="text-indigo-400">Network Location</span>' : 'You'} 
+                        <span class="accuracy-badge">±${Math.round(finalAcc)}m</span>
                     </div>
                     <div class="marker-pulse"></div>
                     <div class="marker-dot"></div>
@@ -218,35 +230,34 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             `;
             
             userMarkerRef.current = new maplibregl.Marker({ element: el })
-                .setLngLat([avgLng, avgLat])
+                .setLngLat([finalLng, finalLat])
                 .addTo(map);
             
-            // Accuracy circle (visual representation of precision)
+            // Accuracy circle
             const circleEl = document.createElement('div');
             circleEl.className = 'user-accuracy-circle';
             userAccuracyCircleRef.current = new maplibregl.Marker({ element: circleEl, pitchAlignment: 'map' })
-                .setLngLat([avgLng, avgLat])
+                .setLngLat([finalLng, finalLat])
                 .addTo(map);
             
-            // First time finding location, fly to it with high precision
             map.flyTo({
-                center: [avgLng, avgLat],
-                zoom: 18, // High zoom for precision
+                center: [finalLng, finalLat],
+                zoom: isIPFallback ? 14 : 18, 
                 speed: 1.2
             });
         } else {
-            userMarkerRef.current.setLngLat([avgLng, avgLat]);
+            userMarkerRef.current.setLngLat([finalLng, finalLat]);
             const labelEl = userMarkerRef.current.getElement().querySelector('.user-location-label');
             if (labelEl) {
                 labelEl.innerHTML = `
-                    ${samples.length < SAMPLE_SIZE ? '<span class="calibrating-text">Calibrating...</span>' : 'You'} 
-                    <span class="accuracy-badge">±${Math.round(avgAcc)}m</span>
+                    ${samples.length < SAMPLE_SIZE && !isIPFallback ? '<span class="calibrating-text">Calibrating...</span>' : isIPFallback ? '<span class="text-indigo-300">Network Location</span>' : 'You'} 
+                    <span class="accuracy-badge">±${Math.round(finalAcc)}m</span>
                 `;
             }
 
             if (userAccuracyCircleRef.current) {
-                userAccuracyCircleRef.current.setLngLat([avgLng, avgLat]);
-                updateAccuracyCircle(map, avgLat, avgAcc);
+                userAccuracyCircleRef.current.setLngLat([finalLng, finalLat]);
+                updateAccuracyCircle(map, finalLat, finalAcc);
             }
         }
     };
