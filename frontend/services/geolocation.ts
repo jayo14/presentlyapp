@@ -267,7 +267,7 @@ export const getVisitorId = async (): Promise<string | null> => {
 export const getDeviceEnvironment = (): { renderer: string; isEmulator: boolean; isDesktop: boolean } => {
   let renderer = 'Unknown';
   let isEmulator = false;
-  
+
   try {
     const canvas = document.createElement('canvas');
     const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
@@ -277,16 +277,16 @@ export const getDeviceEnvironment = (): { renderer: string; isEmulator: boolean;
         renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
       }
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // Detector logic for emulators and desktop
   const ua = navigator.userAgent.toLowerCase();
   const isDesktop = !/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
-  
+
   if (
-    renderer.includes('SwiftShader') || 
-    renderer.includes('ANGLE') || 
-    renderer.includes('VirtualBox') || 
+    renderer.includes('SwiftShader') ||
+    renderer.includes('ANGLE') ||
+    renderer.includes('VirtualBox') ||
     renderer.includes('VMware')
   ) {
     isEmulator = true;
