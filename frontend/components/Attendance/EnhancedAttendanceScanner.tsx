@@ -353,7 +353,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setLocationInfo('Getting your precise location...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const samples = await geolocationService.getMultipleSamples(4, 1500);
+      const samples = await geolocationService.getMultipleSamples();
       const location = samples[samples.length - 1];
       
       setLocationInfo(
@@ -844,8 +844,32 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h3 className="text-2xl font-bold text-white mb-3">Verification Failed</h3>
-                <p className="text-red-400 text-base mb-2">{errorMsg}</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Verification Failed</h3>
+                {errorMsg && errorMsg.includes(';') ? (() => {
+                  const parts = errorMsg.split('.');
+                  const header = parts.length > 1 ? parts[0] + '.' : 'Verification Details:';
+                  const remaining = parts.length > 1 ? parts.slice(1).join('.') : errorMsg;
+                  const reasons = remaining.split(';').map(r => r.trim()).filter(Boolean);
+                  
+                  return (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-left mb-6">
+                      <p className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                         <AlertTriangle className="w-4 h-4" />
+                         {header}
+                      </p>
+                      <div className="space-y-2.5">
+                        {reasons.map((reason, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 text-red-300/80 text-sm leading-relaxed">
+                            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400/60 shrink-0" />
+                            <span>{reason}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })() : (
+                  <p className="text-red-400 text-base mb-8 px-4 leading-relaxed">{errorMsg || 'Unable to verify attendance'}</p>
+                )}
               </motion.div>
 
               {/* Helpful Tips */}
