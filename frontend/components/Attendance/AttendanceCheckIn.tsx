@@ -89,7 +89,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
       if (result.location_verified) {
         setStatus('success');
         setLocationInfo(
-          `✓ Check-in successful! Distance: ${result.distance_from_venue.toFixed(0)}m from venue.`
+          `✓ Check-in successful! Distance: ${result.distance_from_venue?.toFixed(0) || '0'}m from venue.`
         );
         setTimeout(() => {
           onSuccess?.();
@@ -206,7 +206,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
                 className="flex-1"
                 disabled={status !== 'idle' && status !== 'error'}
               >
-                {status === 'locating' || status === 'verifying' ? 'Processing...' : 'Check In'}
+                {status === 'error' ? 'Retry Check In' : 'Check In'}
               </Button>
               <Button
                 type="button"
@@ -214,7 +214,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
                 variant="secondary"
                 className="flex-1"
               >
-                {status === 'error' ? 'Try Again' : 'Cancel'}
+                {status === 'error' ? 'Cancel' : 'Cancel'}
               </Button>
             </div>
           </form>
