@@ -5,6 +5,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import { Venue } from '../../types';
 import { MapIcon, Satellite, RefreshCw, Search, X as CloseIcon, Navigation, Loader2 } from 'lucide-react';
+import { getIPLocation } from '../../services/geolocation';
 
 interface VenueMapProps {
   venues: Venue[];
@@ -161,7 +162,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     const SAMPLE_SIZE = 5;
     let ipMarker: maplibregl.Marker | null = null;
 
-    const onSuccess = async (position: GeolocationPosition) => {
+    const onSuccess = (position: GeolocationPosition) => {
         const { latitude, longitude, accuracy } = position.coords;
         setIsLocating(false);
         
@@ -172,25 +173,24 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
         // Fetch IP location for cross-verification if not already present
         let ipLoc = (map as any)._ipLoc;
-        if (!ipLoc) {
-            const { getIPLocation } = await import('../../services/geolocation');
-            ipLoc = await getIPLocation();
-            (map as any)._ipLoc = ipLoc;
-            
-            if (ipLoc) {
-                const el = document.createElement('div');
-                el.className = 'ip-location-marker';
-                el.innerHTML = '<div class="ip-marker-dot"></div>';
-                ipMarker = new maplibregl.Marker({ element: el })
-                    .setLngLat([ipLoc.longitude, ipLoc.latitude])
-                    .setPopup(new maplibregl.Popup().setHTML(`<div class="text-xs font-bold p-1">IP Location: ${ipLoc.city}</div>`))
-                    .addTo(map);
-            }
+        if (!ipLoc && accuracy > 100) { // Only fetch if not already present and GPS accuracy is low
+            getIPLocation().then(loc => {
+                if (loc) {
+                    (map as any)._ipLoc = loc;
+                    const el = document.createElement('div');
+                    el.className = 'ip-location-marker';
+                    el.innerHTML = '<div class="ip-marker-dot"></div>';
+                    ipMarker = new maplibregl.Marker({ element: el })
+                        .setLngLat([loc.longitude, loc.latitude])
+                        .setPopup(new maplibregl.Popup().setHTML(`<div class="text-xs font-bold p-1">IP Location: ${loc.city}</div>`))
+                        .addTo(map);
+                }
+            });
         }
 
-        // Fallback: If GPS is extremely poor (>100m), try to use IP location instead
+        // Fallback: If GPS is extremely poor (>100m)
         if (accuracy > 100) {
-            console.log(`Low GPS accuracy (${accuracy}m). Using IP fallback...`);
+            console.log(`Low GPS accuracy (${accuracy}m). Checking for IP fallback...`);
             if (ipLoc) {
                 finalLat = ipLoc.latitude;
                 finalLng = ipLoc.longitude;
