@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, X, Image as ImageIcon, Keyboard, Plus, MapPin, CheckCircle2, ChevronRight, Activity, Loader2, LocateFixed, Smartphone, RefreshCw, ArrowLeft, ChevronDown, Home, BarChart, User } from 'lucide-react';
 import { Button } from '../Button';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
@@ -8,7 +8,7 @@ import { studentApi, StudentDashboardData, EnrolledCourse, TimetableEntry, Stude
 import { sessionApi } from '../../services/api/attendance';
 import { geolocationService } from '../../services/geolocation';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
-import { FindMyLocation } from '../Location/FindMyLocation';
+const FindMyLocation = lazy(() => import('../Location/FindMyLocation').then(module => ({ default: module.FindMyLocation })));
 import EnhancedAttendanceScanner from '../Attendance/EnhancedAttendanceScanner';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
@@ -381,7 +381,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               </div>
 
               {/* Location MVP Feature */}
-              <FindMyLocation className="shadow-lg shadow-primary/5" />
+              <Suspense fallback={<div className="h-[300px] w-full flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 rounded-2xl animate-pulse text-zinc-500"><Loader2 className="w-8 h-8 animate-spin mb-2 text-primary" /><p>Loading Map...</p></div>}>
+                  <FindMyLocation className="shadow-lg shadow-primary/5" />
+              </Suspense>
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
