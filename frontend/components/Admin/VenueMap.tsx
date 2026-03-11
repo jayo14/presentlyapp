@@ -144,174 +144,169 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady || !showUserLocation) {
-        if (userMarkerRef.current) {
-            userMarkerRef.current.remove();
-            userMarkerRef.current = null;
-        }
-        if (userAccuracyCircleRef.current) {
-            userAccuracyCircleRef.current.remove();
-            userAccuracyCircleRef.current = null;
-        }
-        setIsLocating(false);
-        return;
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+      if (userAccuracyCircleRef.current) {
+        userAccuracyCircleRef.current.remove();
+        userAccuracyCircleRef.current = null;
+      }
+      setIsLocating(false);
+      return;
     }
 
     setIsLocating(true);
     let watchId: number;
+    let fetchingIP = false;
+    let innerIpMarker: maplibregl.Marker | null = null;
     const samples: { lat: number; lng: number; acc: number }[] = [];
     const SAMPLE_SIZE = 5;
-    let ipMarker: maplibregl.Marker | null = null;
 
     const onSuccess = (position: GeolocationPosition) => {
-        const { latitude, longitude, accuracy } = position.coords;
-        setIsLocating(false);
-        
-        let finalLat = latitude;
-        let finalLng = longitude;
-        let finalAcc = accuracy;
-        let isIPFallback = false;
+      const { latitude, longitude, accuracy } = position.coords;
+      setIsLocating(false);
 
-        // Fetch IP location for cross-verification if not already present
-        let ipLoc = (map as any)._ipLoc;
-        if (!ipLoc && accuracy > 100) { // Only fetch if not already present and GPS accuracy is low
-            getIPLocation().then(loc => {
-                if (loc) {
-                    (map as any)._ipLoc = loc;
-                    const el = document.createElement('div');
-                    el.className = 'ip-location-marker';
-                    el.innerHTML = '<div class="ip-marker-dot"></div>';
-                    ipMarker = new maplibregl.Marker({ element: el })
-                        .setLngLat([loc.longitude, loc.latitude])
-                        .setPopup(new maplibregl.Popup().setHTML(`<div class="text-xs font-bold p-1">IP Location: ${loc.city}</div>`))
-                        .addTo(map);
-                }
-            });
-        }
+      let finalLat = latitude;
+      let finalLng = longitude;
+      let finalAcc = accuracy;
+      let isIPFallback = false;
 
-        // Fallback: If GPS is extremely poor (>100m)
-        if (accuracy > 100) {
-            console.log(`Low GPS accuracy (${accuracy}m). Checking for IP fallback...`);
-            if (ipLoc) {
-                finalLat = ipLoc.latitude;
-                finalLng = ipLoc.longitude;
-                finalAcc = 5000; // Standard IP accuracy representation
-                isIPFallback = true;
-            } else {
-                return; // Silence if both fail
-            }
-        }
-
-        // Smoothing: only for GPS readings to keep it stable
-        if (!isIPFallback) {
-            samples.push({ lat: finalLat, lng: finalLng, acc: finalAcc });
-            if (samples.length > SAMPLE_SIZE) samples.shift();
-            finalLat = samples.reduce((sum, s) => sum + s.lat, 0) / samples.length;
-            finalLng = samples.reduce((sum, s) => sum + s.lng, 0) / samples.length;
-            finalAcc = samples.reduce((sum, s) => sum + s.acc, 0) / samples.length;
-        }
-
-        // Store accuracy for zoom-based updates
-        (map as any)._lastAccuracy = finalAcc;
-        (map as any)._lastLat = finalLat;
-        
-        // Update marker
-        if (!userMarkerRef.current) {
+      // Handle IP Location fetch for fallback
+      const ipLoc = (map as any)._ipLoc;
+      if (!ipLoc && !fetchingIP && accuracy > 100) {
+        fetchingIP = true;
+        getIPLocation().then((loc) => {
+          if (loc && mapReady) {
+            (map as any)._ipLoc = loc;
             const el = document.createElement('div');
-            el.className = 'user-location-marker';
-            el.innerHTML = `
-                <div class="user-location-container">
-                    <div class="user-location-label">
-                        ${samples.length < SAMPLE_SIZE && !isIPFallback ? '<span class="calibrating-text">Calibrating...</span>' : isIPFallback ? '<span class="text-indigo-400">Network Location</span>' : 'You'} 
-                        <span class="accuracy-badge">±${Math.round(finalAcc)}m</span>
-                    </div>
-                    <div class="marker-pulse"></div>
-                    <div class="marker-dot"></div>
-                </div>
-            `;
-            
-            userMarkerRef.current = new maplibregl.Marker({ element: el })
-                .setLngLat([finalLng, finalLat])
-                .addTo(map);
-            
-            // Accuracy circle
-            const circleEl = document.createElement('div');
-            circleEl.className = 'user-accuracy-circle';
-            userAccuracyCircleRef.current = new maplibregl.Marker({ element: circleEl, pitchAlignment: 'map' })
-                .setLngLat([finalLng, finalLat])
-                .addTo(map);
-            
-            map.flyTo({
-                center: [finalLng, finalLat],
-                zoom: isIPFallback ? 14 : 18, 
-                speed: 1.2
-            });
-        } else {
-            userMarkerRef.current.setLngLat([finalLng, finalLat]);
-            const labelEl = userMarkerRef.current.getElement().querySelector('.user-location-label');
-            if (labelEl) {
-                labelEl.innerHTML = `
-                    ${samples.length < SAMPLE_SIZE && !isIPFallback ? '<span class="calibrating-text">Calibrating...</span>' : isIPFallback ? '<span class="text-indigo-300">Network Location</span>' : 'You'} 
-                    <span class="accuracy-badge">±${Math.round(finalAcc)}m</span>
-                `;
-            }
+            el.className = 'ip-location-marker';
+            el.innerHTML = '<div class="ip-marker-dot"></div>';
+            innerIpMarker = new maplibregl.Marker({ element: el })
+              .setLngLat([loc.longitude, loc.latitude])
+              .setPopup(new maplibregl.Popup().setHTML(`<div class="text-xs font-bold p-1">IP Location: ${loc.city}</div>`))
+              .addTo(map);
+          }
+          fetchingIP = false;
+        });
+      }
 
-            if (userAccuracyCircleRef.current) {
-                userAccuracyCircleRef.current.setLngLat([finalLng, finalLat]);
-                updateAccuracyCircle(map, finalLat, finalAcc);
-            }
+      // GPS Fallback Logic
+      if (accuracy > 100) {
+        if (ipLoc) {
+          finalLat = ipLoc.latitude;
+          finalLng = ipLoc.longitude;
+          finalAcc = 5000;
+          isIPFallback = true;
+        } else {
+          return;
         }
+      }
+
+      // Smooth valid GPS readings
+      if (!isIPFallback) {
+        samples.push({ lat: finalLat, lng: finalLng, acc: finalAcc });
+        if (samples.length > SAMPLE_SIZE) samples.shift();
+        finalLat = samples.reduce((sum, s) => sum + s.lat, 0) / samples.length;
+        finalLng = samples.reduce((sum, s) => sum + s.lng, 0) / samples.length;
+        finalAcc = samples.reduce((sum, s) => sum + s.acc, 0) / samples.length;
+      }
+
+      (map as any)._lastAccuracy = finalAcc;
+      (map as any)._lastLat = finalLat;
+
+      if (!userMarkerRef.current) {
+        const el = document.createElement('div');
+        el.className = 'user-location-marker';
+        el.innerHTML = `
+          <div class="user-location-container">
+            <div class="user-location-label">
+              ${samples.length < SAMPLE_SIZE && !isIPFallback ? '<span class="calibrating-text">Calibrating...</span>' : isIPFallback ? '<span class="text-indigo-400">Network Location</span>' : 'You'} 
+              <span class="accuracy-badge">±${Math.round(finalAcc)}m</span>
+            </div>
+            <div class="marker-pulse"></div>
+            <div class="marker-dot"></div>
+          </div>
+        `;
+        userMarkerRef.current = new maplibregl.Marker({ element: el })
+          .setLngLat([finalLng, finalLat])
+          .addTo(map);
+
+        const circleEl = document.createElement('div');
+        circleEl.className = 'user-accuracy-circle';
+        userAccuracyCircleRef.current = new maplibregl.Marker({ element: circleEl, pitchAlignment: 'map' })
+          .setLngLat([finalLng, finalLat])
+          .addTo(map);
+
+        map.flyTo({
+          center: [finalLng, finalLat],
+          zoom: isIPFallback ? 14 : 18,
+          speed: 1.2
+        });
+      } else {
+        userMarkerRef.current.setLngLat([finalLng, finalLat]);
+        const labelEl = userMarkerRef.current.getElement().querySelector('.user-location-label');
+        if (labelEl) {
+          labelEl.innerHTML = `
+            ${samples.length < SAMPLE_SIZE && !isIPFallback ? '<span class="calibrating-text">Calibrating...</span>' : isIPFallback ? '<span class="text-indigo-300">Network Location</span>' : 'You'} 
+            <span class="accuracy-badge">±${Math.round(finalAcc)}m</span>
+          `;
+        }
+        if (userAccuracyCircleRef.current) {
+          userAccuracyCircleRef.current.setLngLat([finalLng, finalLat]);
+          updateAccuracyCircle(map, finalLat, finalAcc);
+        }
+      }
     };
 
-    const updateAccuracyCircle = (map: maplibregl.Map, lat: number, acc: number) => {
-        if (!userAccuracyCircleRef.current) return;
-        const metersPerPixel = (40075016.686 * Math.cos(lat * Math.PI / 180)) / Math.pow(2, map.getZoom() + 8);
-        const radiusPx = acc / metersPerPixel;
-        const circleEl = userAccuracyCircleRef.current.getElement();
-        circleEl.style.width = `${radiusPx * 2}px`;
-        circleEl.style.height = `${radiusPx * 2}px`;
+    const updateAccuracyCircle = (mx: maplibregl.Map, lat: number, acc: number) => {
+      if (!userAccuracyCircleRef.current) return;
+      const metersPerPixel = (40075016.686 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, mx.getZoom() + 8);
+      const radiusPx = acc / metersPerPixel;
+      const circleEl = userAccuracyCircleRef.current.getElement();
+      circleEl.style.width = `${radiusPx * 2}px`;
+      circleEl.style.height = `${radiusPx * 2}px`;
     };
 
     const handleZoom = () => {
-        if (mapRef.current && (mapRef.current as any)._lastAccuracy !== undefined) {
-            updateAccuracyCircle(mapRef.current, (mapRef.current as any)._lastLat, (mapRef.current as any)._lastAccuracy);
-        }
+      if (mapRef.current && (mapRef.current as any)._lastAccuracy !== undefined) {
+        updateAccuracyCircle(mapRef.current, (mapRef.current as any)._lastLat, (mapRef.current as any)._lastAccuracy);
+      }
     };
 
     map.on('zoom', handleZoom);
 
     const onError = (error: GeolocationPositionError) => {
-        setIsLocating(false);
-        console.error('Geolocation error:', error);
-        setShowUserLocation(false);
-        // More descriptive errors for better UX
-        const errorMsg = error.code === 1 ? 'Location access denied. Please enable location permissions in your browser.' : 
-                        error.code === 2 ? 'Location unavailable. Ensure GPS is enabled.' : 
-                        'Location request timed out. Trying to get a better signal...';
-        alert(`Failed to get precise location: ${errorMsg}`);
+      setIsLocating(false);
+      console.error('Geolocation error:', error);
+      setShowUserLocation(false);
+      const errorMsg = error.code === 1 ? 'Location access denied.' : 
+                      error.code === 2 ? 'Location unavailable.' : 
+                      'Location request timed out.';
+      alert(`Failed to get location: ${errorMsg}`);
     };
 
-    // Use watchPosition for continuous, high-precision updates
     watchId = navigator.geolocation.watchPosition(onSuccess, onError, {
-        enableHighAccuracy: true,
-        timeout: 20000, // Longer timeout for better initial lock
-        maximumAge: 0 // No cache - get fresh data
+      enableHighAccuracy: true,
+      timeout: 20000,
+      maximumAge: 0
     });
 
     return () => {
-        if (watchId) navigator.geolocation.clearWatch(watchId);
-        if (mapRef.current) {
-            mapRef.current.off('zoom', handleZoom);
-            (mapRef.current as any)._ipLoc = null;
-        }
-        if (ipMarker) ipMarker.remove();
-        if (userMarkerRef.current) {
-            userMarkerRef.current.remove();
-            userMarkerRef.current = null;
-        }
-        if (userAccuracyCircleRef.current) {
-            userAccuracyCircleRef.current.remove();
-            userAccuracyCircleRef.current = null;
-        }
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+      if (mapRef.current) {
+        mapRef.current.off('zoom', handleZoom);
+        (mapRef.current as any)._ipLoc = null;
+      }
+      if (innerIpMarker) innerIpMarker.remove();
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+      if (userAccuracyCircleRef.current) {
+        userAccuracyCircleRef.current.remove();
+        userAccuracyCircleRef.current = null;
+      }
     };
   }, [showUserLocation, mapReady]);
 
