@@ -365,8 +365,12 @@ export const VenueManagement: React.FC = () => {
       {viewMode === 'map' ? (
         <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden relative">
           <Suspense fallback={
-            <div className="flex items-center justify-center h-full">
-              <Loader className="w-8 h-8 animate-spin text-primary" />
+            <div className="relative w-full h-full bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex flex-col items-center justify-center gap-4">
+              <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse"></div>
+              <div className="relative z-10 flex flex-col items-center gap-3">
+                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+                <div className="text-zinc-500 font-medium animate-pulse">Initializing Map Engine...</div>
+              </div>
             </div>
           }>
             <VenueMap

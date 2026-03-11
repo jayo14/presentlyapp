@@ -157,13 +157,31 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     setIsLocating(true);
     let watchId: number;
+    const samples: { lat: number; lng: number; acc: number }[] = [];
+    const SAMPLE_SIZE = 5;
 
     const onSuccess = (position: GeolocationPosition) => {
-        setIsLocating(false);
         const { latitude, longitude, accuracy } = position.coords;
+        
+        // Ignore extremely poor readings (IP-based or cell tower fallbacks > 100m)
+        if (accuracy > 100) {
+            console.log(`Skipping low-accuracy reading: ${accuracy}m`);
+            return;
+        }
+
+        setIsLocating(false);
+        
+        // Smoothing: use a sliding window of the last N samples
+        samples.push({ lat: latitude, lng: longitude, acc: accuracy });
+        if (samples.length > SAMPLE_SIZE) samples.shift();
+
+        const avgLat = samples.reduce((sum, s) => sum + s.lat, 0) / samples.length;
+        const avgLng = samples.reduce((sum, s) => sum + s.lng, 0) / samples.length;
+        const avgAcc = samples.reduce((sum, s) => sum + s.acc, 0) / samples.length;
+
         // Store accuracy for zoom-based updates
-        (map as any)._lastAccuracy = accuracy;
-        (map as any)._lastLat = latitude;
+        (map as any)._lastAccuracy = avgAcc;
+        (map as any)._lastLat = avgLat;
         
         // Update marker
         if (!userMarkerRef.current) {
@@ -171,36 +189,40 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             el.className = 'user-location-marker';
             el.innerHTML = `
                 <div class="user-location-container">
-                    <div class="user-location-label">You</div>
+                    <div class="user-location-label">You <span class="accuracy-badge">±${Math.round(avgAcc)}m</span></div>
                     <div class="marker-pulse"></div>
                     <div class="marker-dot"></div>
                 </div>
             `;
             
             userMarkerRef.current = new maplibregl.Marker({ element: el })
-                .setLngLat([longitude, latitude])
+                .setLngLat([avgLng, avgLat])
                 .addTo(map);
             
             // Accuracy circle (visual representation of precision)
             const circleEl = document.createElement('div');
             circleEl.className = 'user-accuracy-circle';
             userAccuracyCircleRef.current = new maplibregl.Marker({ element: circleEl, pitchAlignment: 'map' })
-                .setLngLat([longitude, latitude])
+                .setLngLat([avgLng, avgLat])
                 .addTo(map);
             
             // First time finding location, fly to it with high precision
             map.flyTo({
-                center: [longitude, latitude],
+                center: [avgLng, avgLat],
                 zoom: 18, // High zoom for precision
                 speed: 1.2
             });
         } else {
-            userMarkerRef.current.setLngLat([longitude, latitude]);
+            userMarkerRef.current.setLngLat([avgLng, avgLat]);
+            const labelEl = userMarkerRef.current.getElement().querySelector('.accuracy-badge');
+            if (labelEl) labelEl.textContent = `±${Math.round(avgAcc)}m`;
+
             if (userAccuracyCircleRef.current) {
-                userAccuracyCircleRef.current.setLngLat([longitude, latitude]);
-                updateAccuracyCircle(map, latitude, accuracy);
+                userAccuracyCircleRef.current.setLngLat([avgLng, avgLat]);
+                updateAccuracyCircle(map, avgLat, avgAcc);
             }
         }
+    };
     };
 
     const updateAccuracyCircle = (map: maplibregl.Map, lat: number, acc: number) => {
@@ -1037,13 +1059,23 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           color: white;
           font-size: 10px;
           font-weight: bold;
-          padding: 2px 6px;
-          border-radius: 4px;
+          padding: 2px 8px;
+          border-radius: 6px;
           margin-bottom: 4px;
           white-space: nowrap;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-          border: 1px solid rgba(255,255,255,0.2);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+          border: 1px solid rgba(255,255,255,0.3);
           z-index: 3;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .accuracy-badge {
+          background-color: rgba(255,255,255,0.2);
+          padding: 1px 4px;
+          border-radius: 3px;
+          font-size: 8px;
+          opacity: 0.9;
         }
         .marker-dot {
           width: 14px;
