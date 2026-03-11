@@ -279,33 +279,25 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     }
 
     try {
-      // Step 1: Get precise location
+      // Step 1: Integrated Anti-Cheat & Stabilized Location
       setStatus('locating');
       setErrorMsg('');
-      setLocationInfo('Getting your precise location...');
+      setLocationInfo('Calibrating high-precision GPS...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const samples = await geolocationService.getMultipleSamples();
-      const location = samples[samples.length - 1];
+      // This one call now handles the 15-step pipeline (Warm-up, Samples, IP-check, HW-check)
+      const payload = await geolocationService.getAttendancePayload();
       
       setLocationInfo(
-        `Location acquired (±${location.accuracy?.toFixed(0)}m accuracy)` +
-        (location.altitude ? ` at ${location.altitude.toFixed(0)}m elevation` : '')
+        `High-precision lock acquired (±${payload.accuracy?.toFixed(1)}m)`
       );
 
-      // Step 2: Get anti-cheat signals (Fingerprint + WebGL)
-      const antiCheat = await geolocationService.getAntiCheatSignals();
-
-      // Step 3: Verify attendance
+      // Step 2: Verify attendance with the enriched payload
       setStatus('verifying');
-      setLocationInfo('Verifying session and location...');
+      setLocationInfo('Verifying session and security signals...');
       await triggerHaptic(ImpactStyle.Light);
 
-      const attendanceResponse = await onVerify(codeToVerify, { 
-        ...location, 
-        samples,
-        ...antiCheat
-      });
+      const attendanceResponse = await onVerify(codeToVerify, payload);
 
       if (attendanceResponse) {
         setStatus('success');
@@ -323,7 +315,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         setAttendanceData({
           courseCode: attendanceResponse.course_code || (codeToVerify.length >= 6 ? codeToVerify.substring(0, 6).toUpperCase() : codeToVerify.toUpperCase()),
           courseName: attendanceResponse.course_name || 'Course Session',
-          location: attendanceResponse.venue_name || `Location (±${location.accuracy?.toFixed(0)}m)`,
+          location: attendanceResponse.venue_name || `Location (±${payload.accuracy?.toFixed(0)}m)`,
           sessionCode: codeToVerify
         });
         
@@ -334,6 +326,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       }
     } catch (err: any) {
       setStatus('error');
+      // If the error contains a semicolon, it's a structured anti-cheat rejection
       setErrorMsg(err.message || 'Failed to mark attendance. Please try again.');
       setLocationInfo('');
       await triggerHaptic(ImpactStyle.Heavy);

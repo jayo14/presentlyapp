@@ -8,11 +8,8 @@ import {
 } from './venueValidation';
 
 /**
- * Geolocation utilities for frontend attendance check-in
- * Enhanced with anti-spoofing and multi-sample precision.
- *
- * All distance and polygon checks are delegated to Turf.js via `venueValidation`
- * to guarantee precise, well-tested geospatial maths across the app.
+ * Geolocation and Anti-Cheat System for Presently
+ * Designed by: Senior Geolocation & Anti-Cheat Engineer
  */
 
 export interface GeolocationPosition {
@@ -31,313 +28,207 @@ export interface AntiCheatSignals {
   motionDetected?: boolean;
   ipCity?: string;
   ipLocation?: { latitude: number; longitude: number };
+  sampleCount: number;
+  isStaticGPS: boolean;
+  isEmulator: boolean;
+  isDesktop: boolean;
 }
 
-const DEFAULT_SAMPLE_COUNT = 3;
-const DEFAULT_SAMPLE_INTERVAL = 1200; // 1.2 seconds
+// Configuration Constants
+const WARMUP_DELAY = 3000; // 3 seconds warm-up
+const SAMPLE_INTERVAL = 1000; // 1 second between samples
+const MAX_SAMPLES = 5;
+const MIN_SAMPLES = 3;
+const MAX_ACCURACY_GATE = 60; // Hard rejection if > 60m
+const IP_VALIDATION_THRESHOLD = 50000; // 50km
+const IS_DEV = process.env.NODE_ENV === 'development';
 
 /**
- * Get multiple high-accuracy location samples for anti-spoofing.
+ * STEP 1 — Permission Validation
  */
-export const getMultipleSamples = async (
-  count: number = DEFAULT_SAMPLE_COUNT,
-  interval: number = DEFAULT_SAMPLE_INTERVAL,
-): Promise<GeolocationPosition[]> => {
-  const samples: GeolocationPosition[] = [];
-
-  for (let i = 0; i < count; i++) {
-    const pos = await getCurrentPosition();
-    samples.push(pos);
-    if (i < count - 1) {
-      await new Promise((resolve) => setTimeout(resolve, interval));
-    }
-  }
-
-  return samples;
-};
-
-/**
- * Get current position with high accuracy and stability.
- *
- * Uses Capacitor's high-accuracy mode and returns the best (lowest-accuracy)
- * fix observed within the allowed time budget.
- */
-/**
- * Get current position with high accuracy, smoothing, and jitter rejection.
- * 
- * Collects multiple high-accuracy samples, filters out those with poor accuracy
- * (threshold: 50m), and averages the best ones to provide a stable, "Google-like"
- * location experience.
- */
-export const getCurrentPosition = (
-  options: {
-    timeout?: number;
-    desiredAccuracy?: number;
-    maxWait?: number;
-    requiredSamples?: number;
-  } = {},
-): Promise<GeolocationPosition> => {
-  const {
-    timeout = 10000, 
-    desiredAccuracy = 20, // metres
-    maxWait = 5000, 
-    requiredSamples = 3, 
-  } = options;
-
-  return new Promise(async (resolve, reject) => {
-    let watchId: string | null = null;
-    let timerId: any;
-    let hasResolved = false;
-    const samples: GeolocationPosition[] = [];
-    let bestSinglePosition: GeolocationPosition | null = null;
-
-    const cleanup = () => {
-      if (watchId) {
-        Geolocation.clearWatch({ id: watchId }).catch(err => console.error('Error clearing watch:', err));
-      }
-      if (timerId) clearTimeout(timerId);
-    };
-
-    const finish = (position: GeolocationPosition) => {
-      if (hasResolved) return;
-      hasResolved = true;
-      cleanup();
-      resolve(position);
-    };
-
-    const handleError = async (error: any) => {
-      // 1. If we have at least some "good" samples (already filtered by watchPosition logic), use them
-      if (samples.length > 0 && !hasResolved) {
-        finish(calculateAveragePosition(samples));
-        return;
-      }
-
-      // 2. If best position is actually decent (< 400m), use it
-      if (bestSinglePosition && bestSinglePosition.accuracy < 400 && !hasResolved) {
-          finish(bestSinglePosition);
-          return;
-      }
-
-      // 3. NO decent GPS data - try IP fallback before giving up or using garbage GPS
-      if (!hasResolved) {
-          console.log(`GPS signal is poor or missing (${bestSinglePosition?.accuracy?.toFixed(0) || 'None'}m). Attempting IP-based geolocation fallback...`);
-          const ipLoc = await getIPLocation();
-          if (ipLoc) {
-              finish({
-                  latitude: ipLoc.latitude,
-                  longitude: ipLoc.longitude,
-                  accuracy: 5000, // Approximate IP accuracy
-                  timestamp: Date.now(),
-                  isMock: false
-              });
-              return;
-          }
-      }
-
-      // 4. Last resort: if IP fallback failed but we have a bestSinglePosition (even a bad one), use it
-      if (bestSinglePosition && !hasResolved) {
-          finish(bestSinglePosition);
-          return;
-      }
-
-      if (hasResolved) return;
-      hasResolved = true;
-      cleanup();
-      reject(new Error(error?.message || 'Failed to get precise location'));
-    };
-
-    const calculateAveragePosition = (posSamples: GeolocationPosition[]): GeolocationPosition => {
-      if (posSamples.length === 0) throw new Error('No samples to average');
-      
-      const sumLat = posSamples.reduce((sum, p) => sum + p.latitude, 0);
-      const sumLng = posSamples.reduce((sum, p) => sum + p.longitude, 0);
-      const avgAccuracy = posSamples.reduce((sum, p) => sum + p.accuracy, 0) / posSamples.length;
-      
-      return {
-        ...posSamples[posSamples.length - 1], // Use metadata from last sample
-        latitude: sumLat / posSamples.length,
-        longitude: sumLng / posSamples.length,
-        accuracy: avgAccuracy,
-      };
-    };
-
-    // Overall timeout safeguard
-    timerId = setTimeout(() => {
-      if (samples.length > 0) {
-        finish(calculateAveragePosition(samples));
-      } else if (bestSinglePosition) {
-        finish(bestSinglePosition);
-      } else {
-        handleError({ message: 'GPS signal too weak or timed out. Please ensure you are outdoors or near a window.' });
-      }
-    }, timeout);
-
-    try {
-      watchId = await Geolocation.watchPosition(
-        { 
-            enableHighAccuracy: true, 
-            timeout: 10000, 
-            maximumAge: 0 
-        },
-        (position, err) => {
-          if (err) {
-            console.warn('Geolocation watch error:', err);
-            return;
-          }
-          
-          if (position) {
-            const currentPos: GeolocationPosition = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              altitude: position.coords.altitude || undefined,
-              accuracy: position.coords.accuracy,
-              altitudeAccuracy: position.coords.altitudeAccuracy || undefined,
-              timestamp: position.timestamp,
-            };
-
-            // Track the absolute best single position as fallback
-            if (!bestSinglePosition || currentPos.accuracy < bestSinglePosition.accuracy) {
-              bestSinglePosition = currentPos;
-            }
-
-            // FILTER (Step 2): Reject bad GPS readings (IP fallback or weak signal)
-            // Anything over 40m is likely not pure GPS or is too noisy for geofencing
-            // However, we still track it as 'bestSinglePosition' in case we get NOTHING better
-            if (currentPos.accuracy > 40) {
-              // Only log if it's exceptionally bad to avoid noise, but keep it for fallback
-              if (currentPos.accuracy > 500) {
-                console.log(`Poor signal (Step 2): ${currentPos.accuracy.toFixed(1)}m. Waiting for calibration...`);
-              }
-              return;
-            }
-
-            // Collect good samples for SMOOTHING
-            samples.push(currentPos);
-
-            // Optimization: If we have enough good samples and the last one is very accurate, resolve
-            if (samples.length >= requiredSamples && currentPos.accuracy <= desiredAccuracy) {
-              finish(calculateAveragePosition(samples));
-            }
-          }
-        },
-      );
-    } catch (err) {
-      handleError(err);
-    }
-
-    // Secondary timer to resolve with partial samples if we're taking too long but have data
-    setTimeout(() => {
-      if (!hasResolved && samples.length >= 2) {
-        finish(calculateAveragePosition(samples));
-      }
-    }, maxWait);
-  });
-};
-
-/**
- * Distance between two points in metres.
- * Delegates to Turf.js haversineDistance for maximum precision.
- */
-export const calculateDistance = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number => {
-  return haversineDistance(lat1, lon1, lat2, lon2);
-};
-
-/**
- * Point-in-polygon helper that supports both [lat,lng] and [lng,lat] polygon inputs.
- * Uses Turf.js under the hood via venueValidation.pointInPolygon.
- */
-export const pointInPolygon = (
-  point: [number, number],
-  polygon: number[][],
-): boolean => {
-  if (!polygon || polygon.length < 3) return false;
-
-  let coords = polygon;
-  const [a, b] = polygon[0];
-  const isLatLng = Math.abs(a) <= 90 && Math.abs(b) <= 180;
-  if (isLatLng) {
-    coords = polygon.map(([lat, lng]) => [lng, lat]);
-  }
-
-  return turfPointInPolygon(point, coords);
-};
-
-/**
- * High-level venue-location verification using Turf.js.
- * Accepts student + venue coordinates, optional boundary and radius.
- */
-export const verifyVenueLocation = (
-  studentLat: number,
-  studentLng: number,
-  venueLat: number,
-  venueLng: number,
-  boundary: number[][] | null | undefined,
-  radius: number,
-): ValidationResult => {
-  return validateLocation(studentLat, studentLng, venueLat, venueLng, boundary, radius);
-};
-
-/**
- * Human-friendly distance formatting while preserving metre-level precision.
- */
-export const formatDistance = (distanceMetres: number): string => {
-  if (!Number.isFinite(distanceMetres)) return '–';
-  if (distanceMetres < 1000) {
-    return `${Math.round(distanceMetres)} m`;
-  }
-  const km = distanceMetres / 1000;
-  return `${km.toFixed(2)} km`;
-};
-
 export const checkLocationPermission = async (): Promise<boolean> => {
   try {
     const status = await Geolocation.checkPermissions();
+    if (IS_DEV) console.log('[Auth] Permission status:', status.location);
     return status.location === 'granted';
-  } catch {
+  } catch (err) {
+    console.error('[Auth] Permission check failed:', err);
     return false;
   }
 };
 
 /**
- * Get the WebGL renderer name to detect emulators.
+ * Main Stabilized Geolocation Pipeline
+ * Covers STEP 2 through STEP 6
  */
-export const getWebGLRenderer = (): string | null => {
+export const getStabilizedPosition = async (): Promise<{
+  position: GeolocationPosition;
+  isStatic: boolean;
+  samplesCollected: number;
+}> => {
+  // STEP 2 — GPS Warm-Up Phase
+  if (IS_DEV) console.log('[GPS] Starting warm-up phase...');
   try {
-    const canvas = document.createElement('canvas');
-    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
-    if (gl) {
-      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-      if (debugInfo) {
-        return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+    // Initial call to wake up GPS hardware
+    await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
+    await new Promise((resolve) => setTimeout(resolve, WARMUP_DELAY));
+    if (IS_DEV) console.log('[GPS] Warm-up complete. Ignore first reading.');
+  } catch (err) {
+    if (IS_DEV) console.warn('[GPS] Warm-up failed (common indoors):', err);
+  }
+
+  // STEP 3 — Multi-Sample Stabilization
+  return new Promise((resolve, reject) => {
+    const validSamples: GeolocationPosition[] = [];
+    let watchId: string | null = null;
+    let sampleTimer: NodeJS.Timeout | null = null;
+    let totalAttempts = 0;
+
+    const cleanup = () => {
+      if (watchId) Geolocation.clearWatch({ id: watchId });
+      if (sampleTimer) clearInterval(sampleTimer);
+    };
+
+    const startWatching = async () => {
+      watchId = await Geolocation.watchPosition(
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+        (position, err) => {
+          if (err || !position) return;
+
+          const current: GeolocationPosition = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp,
+          };
+
+          // Filter: Discard if accuracy > 100m
+          if (current.accuracy > 100) {
+            if (IS_DEV) console.log(`[GPS] Discarding poor sample: ${current.accuracy.toFixed(1)}m`);
+            return;
+          }
+
+          validSamples.push(current);
+          if (IS_DEV) console.log(`[GPS] Sample ${validSamples.length}: ±${current.accuracy.toFixed(1)}m`);
+
+          if (validSamples.length >= MAX_SAMPLES) {
+            processResults();
+          }
+        }
+      );
+    };
+
+    const processResults = () => {
+      cleanup();
+
+      if (validSamples.length < MIN_SAMPLES) {
+        reject(new Error('Location accuracy is too low. Please move outdoors or near a window. (Insufficient Samples)'));
+        return;
       }
-    }
-  } catch (e) {
-    console.error('WebGL detection error:', e);
-  }
-  return null;
+
+      // STEP 4 — Jitter Smoothing (Averaging)
+      const avgLat = validSamples.reduce((s, p) => s + p.latitude, 0) / validSamples.length;
+      const avgLng = validSamples.reduce((s, p) => s + p.longitude, 0) / validSamples.length;
+      const avgAcc = validSamples.reduce((s, p) => s + p.accuracy, 0) / validSamples.length;
+
+      const stabilized: GeolocationPosition = {
+        ...validSamples[validSamples.length - 1],
+        latitude: avgLat,
+        longitude: avgLng,
+        accuracy: avgAcc,
+      };
+
+      if (IS_DEV) {
+        console.log('[GPS] Stabilized Position:', { lat: avgLat, lng: avgLng, acc: avgAcc });
+      }
+
+      // STEP 5 — Hard Accuracy Gate
+      if (avgAcc > MAX_ACCURACY_GATE) {
+        reject(new Error('Location accuracy is too low. Please move outdoors or near a window.'));
+        return;
+      }
+
+      // STEP 6 — Static GPS Detection
+      // Check if coordinates changed at all across samples (variance check)
+      const first = validSamples[0];
+      const isStatic = validSamples.every(
+        (s) => s.latitude === first.latitude && s.longitude === first.longitude
+      );
+
+      if (isStatic) {
+        if (IS_DEV) console.warn('[Anti-Cheat] STATIC GPS SIGNAL DETECTED');
+        reject(new Error('Static GPS signal detected. Secure environment required.'));
+        return;
+      }
+
+      resolve({
+        position: stabilized,
+        isStatic: false,
+        samplesCollected: validSamples.length,
+      });
+    };
+
+    // Safety timeout after 15 seconds
+    setTimeout(() => {
+      if (validSamples.length >= MIN_SAMPLES) {
+        processResults();
+      } else {
+        cleanup();
+        reject(new Error('GPS signal too weak or timed out. Please ensure you are outdoors.'));
+      }
+    }, 15000);
+
+    startWatching();
+  });
 };
 
 /**
- * Get device fingerprint (visitorId).
+ * Basic High-Accuracy Position (for Map UI)
  */
-export const getVisitorId = async (): Promise<string | null> => {
-  try {
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    return result.visitorId;
-  } catch (e) {
-    console.error('Fingerprint generation error:', e);
-    return null;
-  }
+export const getCurrentPosition = async (timeout: number = 10000): Promise<GeolocationPosition> => {
+  const position = await Geolocation.getCurrentPosition({
+    enableHighAccuracy: true,
+    timeout,
+    maximumAge: 0
+  });
+
+  return {
+    latitude: position.coords.latitude,
+    longitude: position.coords.longitude,
+    accuracy: position.coords.accuracy,
+    timestamp: position.timestamp
+  };
 };
 
 /**
- * Get location based on IP address as a secondary verification method.
+ * STEP 7 — Motion Verification
+ */
+export const detectMotion = async (durationMs: number = 3000): Promise<boolean> => {
+  return new Promise((resolve) => {
+    let moved = false;
+    const handleMotion = (event: DeviceMotionEvent) => {
+      const acc = event.acceleration;
+      if (acc && (Math.abs(acc.x || 0) > 0.05 || Math.abs(acc.y || 0) > 0.05 || Math.abs(acc.z || 0) > 0.05)) {
+        moved = true;
+      }
+    };
+
+    if (typeof DeviceMotionEvent !== 'undefined') {
+      window.addEventListener('devicemotion', handleMotion);
+      setTimeout(() => {
+        window.removeEventListener('devicemotion', handleMotion);
+        if (IS_DEV) console.log(`[Anti-Cheat] Motion detected: ${moved}`);
+        resolve(moved);
+      }, durationMs);
+    } else {
+      if (IS_DEV) console.warn('[Anti-Cheat] DeviceMotionEvent NOT supported');
+      resolve(false);
+    }
+  });
+};
+
+/**
+ * STEP 8 — IP Location Validation
  */
 export const getIPLocation = async (): Promise<{ latitude: number; longitude: number; city: string } | null> => {
   try {
@@ -352,84 +243,130 @@ export const getIPLocation = async (): Promise<{ latitude: number; longitude: nu
     }
     return null;
   } catch (e) {
-    console.error('IP Geolocation error:', e);
+    if (IS_DEV) console.error('[Anti-Cheat] IP Geolocation failed:', e);
     return null;
   }
 };
 
 /**
- * Validates GPS position against IP location.
- * A threshold of ~50km is used to account for ISP gateway routing.
+ * STEP 9 — Device Fingerprinting
  */
-export const validateGPSWithIP = async (gpsLat: number, gpsLng: number): Promise<{ 
-  valid: boolean, 
-  distance: number, 
-  ipCity?: string 
-}> => {
-  const ipLoc = await getIPLocation();
-  if (!ipLoc) return { valid: true, distance: 0 }; // Fail safe if API is down
+export const getVisitorId = async (): Promise<string | null> => {
+  try {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    return result.visitorId;
+  } catch (e) {
+    return null;
+  }
+};
 
-  const dist = haversineDistance(gpsLat, gpsLng, ipLoc.latitude, ipLoc.longitude);
+/**
+ * STEP 10 — Device Environment Detection (WebGL + UserAgent)
+ */
+export const getDeviceEnvironment = (): { renderer: string; isEmulator: boolean; isDesktop: boolean } => {
+  let renderer = 'Unknown';
+  let isEmulator = false;
   
-  // 50km is a standard safe threshold for IP geolocation vs GPS
-  return {
-    valid: dist <= 50000,
-    distance: dist,
-    ipCity: ipLoc.city
-  };
-};
-
-/**
- * Detect device motion during the sampling window.
- * Returns true if ANY acceleration (excluding gravity) was detected.
- */
-export const detectMotion = async (durationMs: number = 5000): Promise<boolean> => {
-  return new Promise((resolve) => {
-    let moved = false;
-    const handleMotion = (event: DeviceMotionEvent) => {
-      const acc = event.acceleration;
-      if (acc && (Math.abs(acc.x || 0) > 0.1 || Math.abs(acc.y || 0) > 0.1 || Math.abs(acc.z || 0) > 0.1)) {
-        moved = true;
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    if (gl) {
+      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
       }
-    };
+    }
+  } catch (e) {}
 
-    window.addEventListener('devicemotion', handleMotion);
-    setTimeout(() => {
-      window.removeEventListener('devicemotion', handleMotion);
-      resolve(moved);
-    }, durationMs);
-  });
+  // Detector logic for emulators and desktop
+  const ua = navigator.userAgent.toLowerCase();
+  const isDesktop = !/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+  
+  if (
+    renderer.includes('SwiftShader') || 
+    renderer.includes('ANGLE') || 
+    renderer.includes('VirtualBox') || 
+    renderer.includes('VMware')
+  ) {
+    isEmulator = true;
+  }
+
+  if (IS_DEV) console.log('[Anti-Cheat] HW Renderer:', renderer);
+  return { renderer, isEmulator, isDesktop };
 };
 
 /**
- * Collect all anti-cheat signals.
+ * FINAL PIPELINE ASSEMBLY (STEP 12)
  */
-export const getAntiCheatSignals = async (): Promise<AntiCheatSignals> => {
-  const [visitorId, webglRenderer, motionDetected, ipLoc] = await Promise.all([
-    getVisitorId(),
-    Promise.resolve(getWebGLRenderer()),
-    detectMotion(3000), // Check for 3 seconds of micro-movement
-    getIPLocation(),
-  ]);
+export const getAttendancePayload = async (): Promise<any> => {
+  // Step 1: Permission Check
+  if (!(await checkLocationPermission())) {
+    throw new Error('Location permission denied. Please allow access to mark attendance.');
+  }
 
-  return { 
-    visitorId: visitorId || undefined, 
-    webglRenderer: webglRenderer || undefined,
-    motionDetected,
+  // Step 2-6: Stabilized Coordinates
+  const { position, isStatic, samplesCollected } = await getStabilizedPosition();
+
+  // Step 7: Motion
+  const motionDetected = await detectMotion(3000);
+
+  // Step 8: IP Cross-check
+  const ipLoc = await getIPLocation();
+  let ipDistance = 0;
+  if (ipLoc) {
+    ipDistance = haversineDistance(position.latitude, position.longitude, ipLoc.latitude, ipLoc.longitude);
+    if (IS_DEV) console.log(`[Anti-Cheat] IP vs GPS Distance: ${ipDistance.toFixed(0)}m`);
+  }
+
+  // Step 9-10 & 14: HW detection
+  const visitorId = await getVisitorId();
+  const { renderer, isEmulator, isDesktop } = getDeviceEnvironment();
+
+  // Step 14 - Laptop / Desktop / Emulator Detection
+  if (isEmulator) {
+    throw new Error('EMULATOR_DETECTED; Attendance must be marked using a physical mobile device.');
+  }
+
+  if (isDesktop && !motionDetected) {
+    throw new Error('DESKTOP_DETECTION; Attendance must be marked using a mobile device.');
+  }
+
+  // Final Payload Construction (Step 12)
+  return {
+    latitude: position.latitude,
+    longitude: position.longitude,
+    accuracy: position.accuracy,
+    timestamp: position.timestamp,
+    deviceFingerprint: visitorId,
+    webglRenderer: renderer,
+    ipLocation: ipLoc ? { latitude: ipLoc.latitude, longitude: ipLoc.longitude } : undefined,
     ipCity: ipLoc?.city,
-    ipLocation: ipLoc ? { latitude: ipLoc.latitude, longitude: ipLoc.longitude } : undefined
+    motionDetected,
+    sampleCount: samplesCollected,
+    isStaticGPS: isStatic,
+    isDesktop,
+    ipDistance,
+    // Indicators for backend scoring
+    flags: {
+      poorIPMatch: ipDistance > IP_VALIDATION_THRESHOLD,
+      noMotion: !motionDetected,
+      staticGPS: isStatic,
+      desktopUser: isDesktop
+    }
   };
 };
 
+/**
+ * Export helpers for UI (Step 11 & Distance formatting)
+ */
 export const geolocationService = {
   getCurrentPosition,
-  getMultipleSamples,
-  calculateDistance,
-  pointInPolygon,
-  verifyVenueLocation,
-  formatDistance,
-  checkLocationPermission,
-  getAntiCheatSignals,
-  getIPLocation,
-  validateGPSWithIP,
+  getAttendancePayload,
+  formatDistance: (distanceMetres: number): string => {
+    if (!Number.isFinite(distanceMetres)) return '–';
+    if (distanceMetres < 1000) return `${Math.round(distanceMetres)} m`;
+    return `${(distanceMetres / 1000).toFixed(2)} km`;
+  },
+  haversineDistance
 };
