@@ -159,8 +159,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     let watchId: number;
     const samples: { lat: number; lng: number; acc: number }[] = [];
     const SAMPLE_SIZE = 5;
+    let ipMarker: maplibregl.Marker | null = null;
 
-    const onSuccess = (position: GeolocationPosition) => {
+    const onSuccess = async (position: GeolocationPosition) => {
         const { latitude, longitude, accuracy } = position.coords;
         
         // Ignore extremely poor readings (IP-based or cell tower fallbacks > 100m)
@@ -178,6 +179,24 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         const avgLat = samples.reduce((sum, s) => sum + s.lat, 0) / samples.length;
         const avgLng = samples.reduce((sum, s) => sum + s.lng, 0) / samples.length;
         const avgAcc = samples.reduce((sum, s) => sum + s.acc, 0) / samples.length;
+
+        // Fetch IP location for cross-verification (only once or periodically)
+        let ipLoc = (map as any)._ipLoc;
+        if (!ipLoc) {
+            const { getIPLocation } = await import('../../services/geolocation');
+            ipLoc = await getIPLocation();
+            (map as any)._ipLoc = ipLoc;
+            
+            if (ipLoc) {
+                const el = document.createElement('div');
+                el.className = 'ip-location-marker';
+                el.innerHTML = '<div class="ip-marker-dot"></div>';
+                ipMarker = new maplibregl.Marker({ element: el })
+                    .setLngLat([ipLoc.longitude, ipLoc.latitude])
+                    .setPopup(new maplibregl.Popup().setHTML(`<div class="text-xs font-bold p-1">IP Location: ${ipLoc.city}</div>`))
+                    .addTo(map);
+            }
+        }
 
         // Store accuracy for zoom-based updates
         (map as any)._lastAccuracy = avgAcc;
@@ -271,7 +290,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         if (watchId) navigator.geolocation.clearWatch(watchId);
         if (mapRef.current) {
             mapRef.current.off('zoom', handleZoom);
+            (mapRef.current as any)._ipLoc = null;
         }
+        if (ipMarker) ipMarker.remove();
         if (userMarkerRef.current) {
             userMarkerRef.current.remove();
             userMarkerRef.current = null;
@@ -1122,6 +1143,19 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             transform: scale(3.5);
             opacity: 0;
           }
+        }
+
+        .ip-location-marker {
+          z-index: 1;
+        }
+        .ip-marker-dot {
+          width: 10px;
+          height: 10px;
+          background-color: #6366f1;
+          border: 2px solid white;
+          border-radius: 50%;
+          box-shadow: 0 0 4px rgba(0,0,0,0.3);
+          opacity: 0.6;
         }
       `}</style>
     </div>

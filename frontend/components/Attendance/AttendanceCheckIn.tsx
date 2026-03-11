@@ -3,7 +3,7 @@ import { MapPin, Loader, CheckCircle, XCircle, AlertTriangle } from 'lucide-reac
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { sessionApi, CheckInData } from '../../services/api/attendance';
-import { getCurrentPosition, verifyVenueLocation, formatDistance } from '../../services/geolocation';
+import { getCurrentPosition, verifyVenueLocation, formatDistance, validateGPSWithIP } from '../../services/geolocation';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface AttendanceCheckInProps {
@@ -48,6 +48,18 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         (position.altitude ? ` @ ${position.altitude.toFixed(0)}m elevation` : '')
       );
 
+      // Step 1b: Verify with IP Geolocation (Anti-spoofing)
+      setLocationInfo('Cross-verifying with network signals...');
+      const ipValidation = await validateGPSWithIP(position.latitude, position.longitude);
+      
+      if (!ipValidation.valid) {
+        console.warn(`IP Geolocation mismatch: GPS is >50km from IP city (${ipValidation.ipCity})`);
+        // We don't block yet, but we can flag it or warn the user
+        // setError(`Warning: Your network location (${ipValidation.ipCity}) doesn't match your GPS. Please disable any VPNs.`);
+      } else {
+        setLocationInfo(`Location verified via network (${ipValidation.ipCity})`);
+      }
+
       // Step 2: Check in
       setStatus('verifying');
       setLocationInfo('Verifying session and location...');
@@ -87,7 +99,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         setStatus('error');
         setError(
           result.warning || 
-          `Location not verified. You are ${result.distance_from_venue.toFixed(0)}m from the venue.`
+          `Location not verified. You are ${result.distance_from_venue?.toFixed(0) || '0'}m from the venue.`
         );
       }
     } catch (err: any) {
@@ -184,7 +196,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
                 className="text-center text-lg tracking-wider font-mono"
                 maxLength={12}
                 autoFocus
-                disabled={status === 'locating' || status === 'verifying'}
+                disabled={status !== 'idle' && status !== 'error'}
               />
             </div>
 
@@ -192,7 +204,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
               <Button
                 type="submit"
                 className="flex-1"
-                disabled={status === 'locating' || status === 'verifying' || !sessionCode}
+                disabled={status !== 'idle' && status !== 'error'}
               >
                 {status === 'locating' || status === 'verifying' ? 'Processing...' : 'Check In'}
               </Button>

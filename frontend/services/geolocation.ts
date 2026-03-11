@@ -30,6 +30,7 @@ export interface AntiCheatSignals {
   webglRenderer?: string;
   motionDetected?: boolean;
   ipCity?: string;
+  ipLocation?: { latitude: number; longitude: number };
 }
 
 const DEFAULT_SAMPLE_COUNT = 4;
@@ -307,16 +308,46 @@ export const getVisitorId = async (): Promise<string | null> => {
 };
 
 /**
- * Simple IP-based city lookup as a coarse sanity check.
+ * Get location based on IP address as a secondary verification method.
  */
-export const getIPCity = async (): Promise<string | null> => {
+export const getIPLocation = async (): Promise<{ latitude: number; longitude: number; city: string } | null> => {
   try {
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
-    return data.city || null;
+    if (data.latitude && data.longitude) {
+      return {
+        latitude: data.latitude,
+        longitude: data.longitude,
+        city: data.city || 'Unknown'
+      };
+    }
+    return null;
   } catch (e) {
+    console.error('IP Geolocation error:', e);
     return null;
   }
+};
+
+/**
+ * Validates GPS position against IP location.
+ * A threshold of ~50km is used to account for ISP gateway routing.
+ */
+export const validateGPSWithIP = async (gpsLat: number, gpsLng: number): Promise<{ 
+  valid: boolean, 
+  distance: number, 
+  ipCity?: string 
+}> => {
+  const ipLoc = await getIPLocation();
+  if (!ipLoc) return { valid: true, distance: 0 }; // Fail safe if API is down
+
+  const dist = haversineDistance(gpsLat, gpsLng, ipLoc.latitude, ipLoc.longitude);
+  
+  // 50km is a standard safe threshold for IP geolocation vs GPS
+  return {
+    valid: dist <= 50000,
+    distance: dist,
+    ipCity: ipLoc.city
+  };
 };
 
 /**
@@ -345,18 +376,19 @@ export const detectMotion = async (durationMs: number = 5000): Promise<boolean> 
  * Collect all anti-cheat signals.
  */
 export const getAntiCheatSignals = async (): Promise<AntiCheatSignals> => {
-  const [visitorId, webglRenderer, motionDetected, ipCity] = await Promise.all([
+  const [visitorId, webglRenderer, motionDetected, ipLoc] = await Promise.all([
     getVisitorId(),
     Promise.resolve(getWebGLRenderer()),
     detectMotion(3000), // Check for 3 seconds of micro-movement
-    getIPCity(),
+    getIPLocation(),
   ]);
 
   return { 
     visitorId: visitorId || undefined, 
     webglRenderer: webglRenderer || undefined,
     motionDetected,
-    ipCity: ipCity || undefined
+    ipCity: ipLoc?.city,
+    ipLocation: ipLoc ? { latitude: ipLoc.latitude, longitude: ipLoc.longitude } : undefined
   };
 };
 
@@ -369,4 +401,6 @@ export const geolocationService = {
   formatDistance,
   checkLocationPermission,
   getAntiCheatSignals,
+  getIPLocation,
+  validateGPSWithIP,
 };
