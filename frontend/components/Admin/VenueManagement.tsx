@@ -17,6 +17,7 @@ export const VenueManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null);
@@ -26,6 +27,14 @@ export const VenueManagement: React.FC = () => {
   const [newVenueBoundary, setNewVenueBoundary] = useState<number[][] | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [activeVenueIds, setActiveVenueIds] = useState<Set<number>>(new Set());
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Load initial data
   useEffect(() => {
@@ -88,14 +97,20 @@ export const VenueManagement: React.FC = () => {
     }
   };
 
-  const filteredVenues = Array.isArray(venues) ? venues.filter(venue => {
-    if (!venue) return false;
-    const search = searchTerm.toLowerCase();
-    const nameMatch = venue.name?.toLowerCase().includes(search) ?? false;
-    const codeMatch = venue.code?.toLowerCase().includes(search) ?? false;
-    const buildingMatch = venue.building_name?.toLowerCase().includes(search) ?? false;
-    return nameMatch || codeMatch || buildingMatch;
-  }) : [];
+  const getFilteredVenues = (term: string) => {
+    if (!Array.isArray(venues)) return [];
+    const search = term.toLowerCase();
+    return venues.filter(venue => {
+      if (!venue) return false;
+      const nameMatch = venue.name?.toLowerCase().includes(search) ?? false;
+      const codeMatch = venue.code?.toLowerCase().includes(search) ?? false;
+      const buildingMatch = venue.building_name?.toLowerCase().includes(search) ?? false;
+      return nameMatch || codeMatch || buildingMatch;
+    });
+  };
+
+  const filteredVenues = getFilteredVenues(debouncedSearchTerm);
+  const displayVenues = getFilteredVenues(searchTerm);
 
   const handleCreateVenue = () => {
     setEditingVenue(null);
@@ -367,7 +382,7 @@ export const VenueManagement: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
-        {filteredVenues.map(venue => (
+        {displayVenues.map(venue => (
           <div
             key={venue.id}
             className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors"
