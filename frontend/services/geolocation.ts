@@ -105,7 +105,7 @@ export const getCurrentPosition = (
       resolve(position);
     };
 
-    const handleError = (error: any) => {
+    const handleError = async (error: any) => {
       // If we have at least some samples or a best position, prefer that over an error
       if (samples.length > 0 && !hasResolved) {
         finish(calculateAveragePosition(samples));
@@ -115,6 +115,23 @@ export const getCurrentPosition = (
           finish(bestSinglePosition);
           return;
       }
+
+      // NO GPS data at all - try IP fallback before giving up
+      if (!hasResolved) {
+          console.log('GPS failed. Attempting IP-based geolocation fallback...');
+          const ipLoc = await getIPLocation();
+          if (ipLoc) {
+              finish({
+                  latitude: ipLoc.latitude,
+                  longitude: ipLoc.longitude,
+                  accuracy: 5000, // Approximate IP accuracy
+                  timestamp: Date.now(),
+                  isMock: false
+              });
+              return;
+          }
+      }
+
       if (hasResolved) return;
       hasResolved = true;
       cleanup();
@@ -177,8 +194,12 @@ export const getCurrentPosition = (
 
             // FILTER (Step 2): Reject bad GPS readings (IP fallback or weak signal)
             // Anything over 40m is likely not pure GPS or is too noisy for geofencing
+            // However, we still track it as 'bestSinglePosition' in case we get NOTHING better
             if (currentPos.accuracy > 40) {
-              console.log(`Rejecting weak signal (Step 2): ${currentPos.accuracy.toFixed(1)}m`);
+              // Only log if it's exceptionally bad to avoid noise, but keep it for fallback
+              if (currentPos.accuracy > 500) {
+                console.log(`Poor signal (Step 2): ${currentPos.accuracy.toFixed(1)}m. Waiting for calibration...`);
+              }
               return;
             }
 
