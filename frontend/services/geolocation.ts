@@ -106,19 +106,21 @@ export const getCurrentPosition = (
     };
 
     const handleError = async (error: any) => {
-      // If we have at least some samples or a best position, prefer that over an error
+      // 1. If we have at least some "good" samples (already filtered by watchPosition logic), use them
       if (samples.length > 0 && !hasResolved) {
         finish(calculateAveragePosition(samples));
         return;
       }
-      if (bestSinglePosition && !hasResolved) {
+
+      // 2. If best position is actually decent (< 400m), use it
+      if (bestSinglePosition && bestSinglePosition.accuracy < 400 && !hasResolved) {
           finish(bestSinglePosition);
           return;
       }
 
-      // NO GPS data at all - try IP fallback before giving up
+      // 3. NO decent GPS data - try IP fallback before giving up or using garbage GPS
       if (!hasResolved) {
-          console.log('GPS failed. Attempting IP-based geolocation fallback...');
+          console.log(`GPS signal is poor or missing (${bestSinglePosition?.accuracy?.toFixed(0) || 'None'}m). Attempting IP-based geolocation fallback...`);
           const ipLoc = await getIPLocation();
           if (ipLoc) {
               finish({
@@ -130,6 +132,12 @@ export const getCurrentPosition = (
               });
               return;
           }
+      }
+
+      // 4. Last resort: if IP fallback failed but we have a bestSinglePosition (even a bad one), use it
+      if (bestSinglePosition && !hasResolved) {
+          finish(bestSinglePosition);
+          return;
       }
 
       if (hasResolved) return;
