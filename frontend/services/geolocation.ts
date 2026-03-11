@@ -33,8 +33,8 @@ export interface AntiCheatSignals {
   ipLocation?: { latitude: number; longitude: number };
 }
 
-const DEFAULT_SAMPLE_COUNT = 4;
-const DEFAULT_SAMPLE_INTERVAL = 2000; // 2 seconds
+const DEFAULT_SAMPLE_COUNT = 3;
+const DEFAULT_SAMPLE_INTERVAL = 1200; // 1.2 seconds
 
 /**
  * Get multiple high-accuracy location samples for anti-spoofing.
@@ -46,7 +46,7 @@ export const getMultipleSamples = async (
   const samples: GeolocationPosition[] = [];
 
   for (let i = 0; i < count; i++) {
-    const pos = await getCurrentPosition({ timeout: 15000 });
+    const pos = await getCurrentPosition();
     samples.push(pos);
     if (i < count - 1) {
       await new Promise((resolve) => setTimeout(resolve, interval));
@@ -78,10 +78,10 @@ export const getCurrentPosition = (
   } = {},
 ): Promise<GeolocationPosition> => {
   const {
-    timeout = 30000,
+    timeout = 10000, 
     desiredAccuracy = 20, // metres
-    maxWait = 15000,
-    requiredSamples = 5,
+    maxWait = 5000, 
+    requiredSamples = 3, 
   } = options;
 
   return new Promise(async (resolve, reject) => {
