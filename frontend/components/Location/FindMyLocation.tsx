@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Loader2, AlertCircle, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
 import { Button } from '../Button';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { geolocationService } from '../../services/geolocation';
 
 interface FindMyLocationProps {
