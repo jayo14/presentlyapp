@@ -283,6 +283,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     venuesRef.current
       .filter((venue) => venue.latitude && venue.longitude)
+      .filter((venue) => activeSessRef.current.has(venue.id) || selectedVenueRef.current?.id === venue.id)
       .forEach((venue) => {
         const isSelected = selectedVenueRef.current?.id === venue.id;
         const isActive = activeSessRef.current.has(venue.id);
@@ -430,10 +431,11 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         type: 'circle',
         source: 'venue-points',
         paint: {
-          'circle-radius': 6,
+          'circle-radius': ['case', ['boolean', ['feature-state', 'selected'], false], 10, 6],
           'circle-color': ['get', 'color'],
           'circle-stroke-width': 3,
           'circle-stroke-color': '#ffffff',
+          'circle-opacity': 0.8,
         },
       });
     }
@@ -613,16 +615,22 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
     if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
+    
+    // Only re-render markers for a subset if the list is large, or just always for safety
+    // but now renderVenueMarkers only picks active/selected ones anyway.
     renderVenueMarkers(map);
 
-    // Fly to selected venue; otherwise fit bounds
+    // Fly to selected venue; otherwise fit bounds ONLY if venues changed (not on every active session update)
+    const venueCountChanged = venues.length !== (map as any)._lastVenueCount;
+    (map as any)._lastVenueCount = venues.length;
+
     if (selectedVenue?.latitude && selectedVenue?.longitude) {
       map.flyTo({
         center: [Number(selectedVenue.longitude), Number(selectedVenue.latitude)],
         zoom: 16,
         speed: 1.2,
       });
-    } else if (venues.length > 0) {
+    } else if (venues.length > 0 && venueCountChanged) {
       const bounds = new maplibregl.LngLatBounds();
       venues.forEach((v) => {
         if (v.latitude && v.longitude) bounds.extend([Number(v.longitude), Number(v.latitude)]);
