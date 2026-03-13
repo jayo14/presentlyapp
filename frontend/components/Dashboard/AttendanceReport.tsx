@@ -2,12 +2,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Search, Filter, Download, ChevronDown, CheckCircle2, XCircle, 
-  Clock, AlertCircle, BookOpen, Calendar, User, ArrowUpDown, TrendingUp, TrendingDown, MapPin, Building2
+  Clock, AlertCircle, BookOpen, Calendar, User, ArrowUpDown, TrendingUp, TrendingDown, MapPin, Building2, FileText, FileSpreadsheet
 } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { courseApi, sessionApi, attendanceApi, Attendance, AttendanceSession } from '../../services/api/attendance';
 import { analyticsApi, CourseAttendanceAnalytics, StudentAnalytics } from '../../services/api/analytics';
+import { dashboardApi } from '../../services/api/dashboard';
 import { Course as CourseType } from '../../types';
 import { toast } from 'sonner';
 
