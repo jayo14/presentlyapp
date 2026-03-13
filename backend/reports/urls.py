@@ -25,6 +25,7 @@ urlpatterns = [
     path('scheduled/<int:pk>/toggle/', views.ToggleScheduledReportView.as_view(), name='scheduled-toggle'),
     
     # Quick exports
-    path('export/attendance/', views.QuickExportAttendanceView.as_view(), name='export-attendance'),
+    path('export/attendance/', views.QuickExportAttendanceView.as_view(), name='export-attendance-quick'),
+    path('export/attendance/<str:format>/', views.ExportAttendanceView.as_view(), name='export-attendance-format'),
     path('export/students/', views.QuickExportStudentsView.as_view(), name='export-students'),
 ]

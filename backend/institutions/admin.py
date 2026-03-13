@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from unfold.admin import ModelAdmin
 
-from .models import User, Institution, College, Department, Venue, Course, AttendanceSession, Attendance, EmailVerificationOTP
+from .models import (
+    User, Institution, College, Department, Venue, Course, AttendanceSession, 
+    Attendance, EmailVerificationOTP, Timetable
+)
 
 
 @admin.register(User)
@@ -15,7 +18,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('full_name', 'avatar_url', 'phone_number')}),
+        ('Personal Info', {'fields': ('full_name', 'avatar_url', 'phone_number', 'signature_image')}),
         ('Role & Institution', {'fields': ('role', 'institution', 'college', 'onboarding_complete')}),
         ('Student Fields', {'fields': ('matric_number', 'department', 'level')}),
         ('Lecturer Fields', {'fields': ('staff_id', 'courses')}),
@@ -108,11 +111,11 @@ class CourseAdmin(ModelAdmin):
 @admin.register(AttendanceSession)
 class AttendanceSessionAdmin(ModelAdmin):
     """Admin configuration for AttendanceSession model"""
-    list_display = ['session_code', 'course', 'venue', 'start_time', 'end_time', 'is_active', 'created_at']
-    list_filter = ['course', 'venue', 'is_active', 'start_time']
+    list_display = ['session_code', 'course', 'venue', 'start_time', 'end_time', 'is_active', 'is_valid', 'created_at']
+    list_filter = ['course', 'venue', 'is_active', 'is_valid', 'start_time']
     search_fields = ['session_code', 'course__code', 'course__title', 'venue__name']
     ordering = ['-start_time']
-    readonly_fields = ['created_at', 'updated_at', 'session_code']
+    readonly_fields = ['created_at', 'updated_at', 'session_code', 'is_valid', 'invalidation_reason']
 
 
 @admin.register(Attendance)
@@ -138,3 +141,11 @@ class EmailVerificationOTPAdmin(ModelAdmin):
         # Prevent manual OTP creation through admin
         return False
 
+@admin.register(Timetable)
+class TimetableAdmin(ModelAdmin):
+    """Admin configuration for Timetable model"""
+    list_display = ['course', 'day_of_week', 'start_time', 'end_time', 'venue', 'semester', 'is_active']
+    list_filter = ['day_of_week', 'semester', 'academic_year', 'is_active']
+    search_fields = ['course__code', 'course__title', 'venue__name']
+    ordering = ['day_of_week', 'start_time']
+    readonly_fields = ['created_at', 'updated_at']

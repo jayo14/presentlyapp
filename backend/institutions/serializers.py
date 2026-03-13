@@ -215,7 +215,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'id', 'email', 'full_name', 'name', 'role', 'avatar_url', 'onboarding_complete', 'signup_method',
             'institution', 'institution_name', 'college', 'college_name',
             'phone_number', 'matric_number', 'department', 'level',
-            'staff_id', 'courses', 'assigned_lecturer',
+            'staff_id', 'courses', 'assigned_lecturer', 'signature_image',
             'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone',
             'created_at', 'updated_at'
         ]
@@ -386,11 +386,12 @@ class TimetableSerializer(serializers.ModelSerializer):
     """Serializer for Timetable (DEFERRED FEATURE - Read-only)"""
     course_details = CourseSerializer(source='course', read_only=True)
     venue_details = VenueSerializer(source='venue', read_only=True)
+    created_by_name = serializers.CharField(source='created_by.full_name', read_only=True)
     
     class Meta:
         model = Timetable
         fields = '__all__'
-        read_only_fields = ['created_at', 'updated_at', 'is_active']  # is_active should remain False
+        read_only_fields = ['created_at', 'updated_at', 'created_by']
 
 
 class AttendanceSessionSerializer(serializers.ModelSerializer):
@@ -410,7 +411,7 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AttendanceSession
         fields = '__all__'
-        read_only_fields = ['created_at', 'updated_at', 'session_code', 'qr_code_url']
+        read_only_fields = ['created_at', 'updated_at', 'session_code', 'qr_code_url', 'is_valid', 'invalidation_reason']
     
     def get_attendee_count(self, obj):
         return obj.attendances.count()
