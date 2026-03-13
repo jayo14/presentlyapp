@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Calendar, QrCode, Clock, ArrowUpDown, Trash2, X, Search, Camera, CheckCircle2, FileText, Download, BookOpen, MoreVertical, Share2, Copy, Edit2, AlertCircle, TrendingUp, TrendingDown, Filter, ChevronDown, BarChart3, Timer, AlertOctagon, Loader2 } from 'lucide-react';
+import { Plus, Users, Calendar, QrCode, Clock, ArrowUpDown, Trash2, X, Search, Camera, CheckCircle2, FileText, Download, BookOpen, MoreVertical, Share2, Copy, Edit2, AlertCircle, TrendingUp, TrendingDown, Filter, ChevronDown, BarChart3, Timer, AlertOctagon, Loader2, RefreshCw, MapPin } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Session } from '../../types';
@@ -220,9 +220,84 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
            description="View your teaching schedule and class timetable on Presently."
            noIndex
          />
-         <div className="p-8 text-center text-zinc-400 flex flex-col items-center gap-4">
-           <Loader2 className="w-8 h-8 animate-spin" />
-           <span>Timetable Module Loading</span>
+         <div className="space-y-6 animate-in fade-in duration-500">
+             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6">
+                 <div>
+                     <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Teaching Schedule</h2>
+                     <p className="text-zinc-500 text-sm">View your weekly class timetable and lecture venues.</p>
+                 </div>
+                 <Button variant="secondary" onClick={fetchTimetable} disabled={timetableLoading}>
+                     <RefreshCw size={16} className={`mr-2 ${timetableLoading ? 'animate-spin' : ''}`} />
+                     Refresh
+                 </Button>
+             </div>
+
+             {timetableLoading && timetableData.length === 0 ? (
+                 <div className="flex flex-col items-center justify-center h-64 text-zinc-500">
+                     <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
+                     <p>Loading your schedule...</p>
+                 </div>
+             ) : (
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                     {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
+                         const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
+                         const dayClasses = timetableData.filter(t => t.day_of_week === dayUpper && t.is_active);
+                         
+                         return (
+                             <div key={day} className="flex flex-col gap-4">
+                                 <div className="flex items-center gap-2 px-1">
+                                     <div className="w-2 h-2 rounded-full bg-primary ring-4 ring-primary/20" />
+                                     <h3 className="font-bold text-zinc-900 dark:text-white uppercase tracking-wider text-xs">{day}</h3>
+                                     <span className="text-[10px] font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-md ml-auto">
+                                         {dayClasses.length}
+                                     </span>
+                                 </div>
+
+                                 <div className="space-y-3">
+                                     {dayClasses.length > 0 ? (
+                                         dayClasses.map((t) => (
+                                             <div 
+                                                 key={t.id} 
+                                                 className="group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+                                             >
+                                                 <div className="absolute top-0 left-0 w-1 h-full bg-primary/0 group-hover:bg-primary rounded-l-full transition-all" />
+                                                 
+                                                 <div className="flex justify-between items-start mb-2">
+                                                     <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t.course_code}</span>
+                                                     <div className="bg-zinc-100 dark:bg-zinc-800 p-1.5 rounded-lg text-zinc-400 group-hover:text-primary transition-colors">
+                                                         <Clock size={14} />
+                                                     </div>
+                                                 </div>
+
+                                                 <h4 className="font-bold text-zinc-900 dark:text-white text-sm mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                                                     {t.course_name}
+                                                 </h4>
+
+                                                 <div className="space-y-2">
+                                                     <div className="flex items-center gap-2 text-xs text-zinc-500">
+                                                         <Timer size={12} />
+                                                         <span>{t.start_time} - {t.end_time}</span>
+                                                     </div>
+                                                     {t.venue_name && (
+                                                         <div className="flex items-center gap-2 text-xs text-zinc-500">
+                                                             <MapPin size={12} />
+                                                             <span className="truncate">{t.venue_name}</span>
+                                                         </div>
+                                                     )}
+                                                 </div>
+                                             </div>
+                                         ))
+                                     ) : (
+                                         <div className="bg-zinc-50/50 dark:bg-zinc-900/30 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center">
+                                             <p className="text-[10px] text-zinc-400 font-medium italic">No classes</p>
+                                         </div>
+                                     )}
+                                 </div>
+                             </div>
+                         );
+                     })}
+                 </div>
+             )}
          </div>
          </>
        );
