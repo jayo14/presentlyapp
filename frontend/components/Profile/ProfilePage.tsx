@@ -93,7 +93,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       setUploadingSignature(true);
       await dashboardApi.uploadSignature(file);
       toast.success('Digital signature uploaded successfully');
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.currentUser });
     } catch (err) {
       console.error('Signature upload error:', err);
       toast.error('Failed to upload signature');

@@ -56,6 +56,7 @@ export interface UserProfile {
   location_enabled: boolean;
   dark_mode: boolean;
   timezone: string;
+  signature_url?: string;
   created_at: string;
   updated_at: string;
   // Optional stats (populated by some endpoints)
