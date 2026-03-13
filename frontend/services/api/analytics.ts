@@ -35,8 +35,25 @@ export interface CourseAttendanceAnalytics {
 }
 
 export const analyticsApi = {
-  // Get lecturer dashboard analytics
+  // Get lecturer dashboard analytics – try new summary endpoint, fall back to legacy
   getLecturerDashboard: async (): Promise<LecturerDashboardAnalytics> => {
+    try {
+      const response = await apiClient.get('/institutions/dashboard/lecturer/');
+      const summary = response.data;
+      if (summary?.success && summary.data) {
+        return {
+          total_sessions: summary.data.stats?.todays_sessions ?? 0,
+          avg_attendance_percentage: 0,
+          active_sessions_count: summary.data.stats?.active_sessions ?? 0,
+          total_students: summary.data.stats?.total_students ?? 0,
+          weekly_overview: [],
+          // Attach raw data for components that need it
+          _raw: summary.data,
+        } as any;
+      }
+    } catch {
+      // Fall through to legacy endpoint
+    }
     const response = await apiClient.get('/analytics/dashboard/lecturer/');
     return response.data;
   },
