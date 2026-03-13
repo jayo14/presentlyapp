@@ -4,12 +4,12 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     register_view, login_view, google_auth_view, google_callback_view, logout_view, current_user_view,
-    complete_onboarding_view, upload_avatar_view, change_password_view,
+    complete_onboarding_view, upload_avatar_view, upload_signature_view, change_password_view,
     send_verification_otp_view, verify_email_otp_view,
     request_password_reset_view, reset_password_view, verify_reset_token_view, public_check_in_view,
     InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
     CourseViewSet, CourseEnrollmentViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet,
-    VenueViewSet, TimetableViewSet
+    VenueViewSet, TimetableViewSet, student_dashboard_summary, lecturer_dashboard_summary
 )
 
 # Create router for ViewSets
@@ -35,6 +35,7 @@ urlpatterns = [
     path('auth/me/', current_user_view, name='current-user'),
     path('auth/onboarding/', complete_onboarding_view, name='complete-onboarding'),
     path('auth/upload-avatar/', upload_avatar_view, name='upload-avatar'),
+    path('auth/upload-signature/', upload_signature_view, name='upload-signature'),
     path('auth/change-password/', change_password_view, name='change-password'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     
@@ -49,6 +50,10 @@ urlpatterns = [
     
     # Public check-in (QR code URL)
     path('check-in/<str:session_code>/', public_check_in_view, name='public-check-in'),
+    
+    # Dashboard summaries
+    path('dashboard/student/', student_dashboard_summary, name='student-dashboard-summary'),
+    path('dashboard/lecturer/', lecturer_dashboard_summary, name='lecturer-dashboard-summary'),
     
     # Include router URLs
     path('', include(router.urls)),

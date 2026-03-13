@@ -28,15 +28,16 @@ from presently.firebase_config import initialize_firebase
 from .attendance_logic import perform_attendance_check_in
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
-    Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog
+    Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable
 )
 from accounts.models import UserDevice
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
     DepartmentSerializer, VenueSerializer, CourseSerializer, CourseEnrollmentSerializer, AttendanceSessionSerializer,
-    AttendanceSerializer, PasswordChangeSerializer
+    AttendanceSerializer, PasswordChangeSerializer, TimetableSerializer
 )
+from .attendance_logic import perform_attendance_check_in, check_session_validity
 from .geolocation_utils import verify_location, calculate_distance
 
 # Configure logging
@@ -686,11 +687,64 @@ def logout_view(request):
 @permission_classes([IsAuthenticated])
 def current_user_view(request):
     """Get current user profile"""
-    serializer = UserProfileSerializer(request.user)
+    serializer = UserProfileSerializer(request.user, context={'request': request})
     return Response({
         'success': True,
         'user': serializer.data
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_signature_view(request):
+    """Upload a digital signature image to Cloudinary"""
+    if not (settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET):
+        return Response(
+            {'success': False, 'error': 'Image upload service is not configured.'},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    _ensure_cloudinary_configured()
+
+    upload_data = None
+    if 'signature' in request.FILES:
+        upload_data = request.FILES['signature']
+    elif 'signature_base64' in request.data:
+        upload_data = request.data['signature_base64']
+    else:
+        return Response(
+            {'success': False, 'error': 'No image provided. Send "signature" as a file or "signature_base64" as a data-URI.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        # Upload to Cloudinary with a specific folder
+        result = cloudinary.uploader.upload(
+            upload_data,
+            folder=f"signatures/{request.user.id}",
+            overwrite=True,
+            resource_type="image"
+        )
+        
+        signature_url = result.get('secure_url')
+        
+        # Save signature URL to student profile
+        user = request.user
+        user.signature_image = signature_url
+        user.save()
+        
+        return Response({
+            'success': True,
+            'signature_url': signature_url,
+            'message': 'Digital signature uploaded successfully'
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.error(f"Signature upload error: {str(e)}")
+        return Response({
+            'success': False,
+            'error': f"Upload failed: {str(e)}"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -1631,11 +1685,47 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         session.end_time = timezone.now()
         session.save()
         
+        # Trigger session invalidation check
+        is_valid = check_session_validity(session)
+        
         return Response({
             'success': True,
             'message': 'Session ended successfully',
+            'is_valid': is_valid,
+            'invalidation_reason': session.invalidation_reason,
             'end_time': session.end_time
         })
+
+    @action(detail=True, methods=['post'])
+    def manual_mark(self, request, pk=None):
+        """Lecturer manually marks a student present"""
+        session = self.get_object()
+        student_id = request.data.get('student_id')
+        status_choice = request.data.get('status', 'PRESENT')
+        reason = request.data.get('reason', 'Manual override by lecturer')
+
+        if not student_id:
+            return Response({'success': False, 'error': 'student_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            student = User.objects.get(id=student_id, role=UserRole.STUDENT)
+            attendance, created = Attendance.objects.update_or_create(
+                session=session,
+                student=student,
+                defaults={
+                    'status': status_choice,
+                    'confidence_score': 100,  # Manual override is 100% trusted
+                    'notes': reason,
+                    'checked_in_at': timezone.now()
+                }
+            )
+            return Response({
+                'success': True,
+                'message': f"Student {student.full_name} marked as {status_choice}",
+                'data': AttendanceSerializer(attendance).data
+            })
+        except User.DoesNotExist:
+            return Response({'success': False, 'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['post'])
     def check_in(self, request, pk=None):
@@ -1649,47 +1739,131 @@ class AttendanceViewSet(viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return self.queryset.model.objects.none()
         queryset = Attendance.objects.all().order_by('-checked_in_at')
-        session_id = self.request.query_params.get('session', None)
-        student_id = self.request.query_params.get('student', None)
-        
+        course_id = self.request.query_params.get('course')
+        session_id = self.request.query_params.get('session')
+        student_id = self.request.query_params.get('student')
+        status_filter = self.request.query_params.get('status')
+
+        if course_id:
+            queryset = queryset.filter(session__course_id=course_id)
         if session_id:
             queryset = queryset.filter(session_id=session_id)
         if student_id:
             queryset = queryset.filter(student_id=student_id)
-        
-        # Students can only see their own attendance
-        if self.request.user.role == UserRole.STUDENT:
-            queryset = queryset.filter(student=self.request.user)
-        # Lecturers can see attendance for their courses
-        elif self.request.user.role == UserRole.LECTURER:
-            queryset = queryset.filter(session__course__lecturer=self.request.user)
-        
+        if status_filter:
+            queryset = queryset.filter(status=status_filter.upper())
+
+        # Roles restrictions
+        user = self.request.user
+        if user.role == UserRole.STUDENT:
+            queryset = queryset.filter(student=user)
+        elif user.role == UserRole.LECTURER:
+            queryset = queryset.filter(session__course__lecturer=user)
+
         return queryset
 
 
-class TimetableViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet for Timetable (DEFERRED - Read-only)"""
-    queryset = __import__('institutions.models', fromlist=['Timetable']).Timetable.objects.all()
-    serializer_class = __import__('institutions.serializers', fromlist=['TimetableSerializer']).TimetableSerializer
-    permission_classes = [IsAuthenticated]
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_dashboard_summary(request):
+    """Aggregated stats for the Student Dashboard"""
+    user = request.user
+    if user.role != UserRole.STUDENT:
+        return Response({'success': False, 'error': 'Not a student'}, status=403)
+        
+    now = timezone.now()
+    # Enrollment count
+    enrollments = CourseEnrollment.objects.filter(student=user, is_active=True)
+    course_ids = enrollments.values_list('course_id', flat=True)
     
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return self.queryset.model.objects.none()
-        # Always return empty queryset since feature is deferred
-        return self.queryset.model.objects.none()
+    # Active sessions in enrolled courses
+    active_sessions = AttendanceSession.objects.filter(
+        course_id__in=course_ids,
+        is_active=True,
+        end_time__gt=now
+    ).select_related('course', 'venue')
+    
+    # Overall attendance rate
+    all_sessions = AttendanceSession.objects.filter(course_id__in=course_ids, is_active=False)
+    attended_count = Attendance.objects.filter(student=user, status='PRESENT', session__in=all_sessions).count()
+    total_sessions_counted = all_sessions.count()
+    overall_attendance = (attended_count / total_sessions_counted * 100) if total_sessions_counted > 0 else 0
+    
+    # Upcoming classes from timetable
+    upcoming_classes = Timetable.objects.filter(
+        course_id__in=course_ids,
+        is_active=True
+    ).order_by('day_of_week', 'start_time')[:5]
+
+    return Response({
+        'success': True,
+        'data': {
+            'overview': {
+                'courses_count': len(course_ids),
+                'overall_attendance': round(overall_attendance, 1),
+                'active_sessions_count': active_sessions.count()
+            },
+            'active_sessions': AttendanceSessionSerializer(active_sessions, many=True).data,
+            'upcoming_classes': TimetableSerializer(upcoming_classes, many=True).data,
+            'recent_attendance': AttendanceSerializer(
+                Attendance.objects.filter(student=user).order_by('-checked_in_at')[:5], 
+                many=True
+            ).data
+        }
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def lecturer_dashboard_summary(request):
+    """Aggregated stats for the Lecturer Dashboard"""
+    user = request.user
+    if user.role != UserRole.LECTURER:
+        return Response({'success': False, 'error': 'Not a lecturer'}, status=403)
+
+    # Managed courses
+    courses = Course.objects.filter(lecturer=user)
+    course_ids = courses.values_list('id', flat=True)
+    
+    # Active sessions
+    active_sessions = AttendanceSession.objects.filter(
+        course_id__in=course_ids,
+        is_active=True
+    ).select_related('course', 'venue')
+    
+    # Total students reached (unique students in all courses)
+    total_students = CourseEnrollment.objects.filter(course_id__in=course_ids, is_active=True).values('student').distinct().count()
+    
+    # Today's sessions count
+    today = timezone.now().date()
+    todays_sessions = AttendanceSession.objects.filter(course_id__in=course_ids, start_time__date=today).count()
+
+    return Response({
+        'success': True,
+        'data': {
+            'stats': {
+                'total_courses': len(course_ids),
+                'total_students': total_students,
+                'active_sessions': active_sessions.count(),
+                'todays_sessions': todays_sessions
+            },
+            'active_sessions': AttendanceSessionSerializer(active_sessions, many=True).data,
+            'recent_sessions': AttendanceSessionSerializer(
+                AttendanceSession.objects.filter(course_id__in=course_ids).order_by('-start_time')[:5],
+                many=True
+            ).data
+        }
+    })
 
 
 class UserViewSet(viewsets.ModelViewSet):
     """ViewSet for User management (Admin only)"""
     queryset = User.objects.all()
     serializer_class = UserProfileSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.IsAdminUser]
     
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -1784,3 +1958,36 @@ def public_check_in_view(request, session_code):
     
     elif request.method == 'POST':
         return perform_attendance_check_in(request, session)
+
+class TimetableViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing Timetable entries"""
+    queryset = Timetable.objects.filter(is_active=True)
+    serializer_class = TimetableSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == UserRole.STUDENT:
+            # Get registered courses for student
+            enrolled_courses = CourseEnrollment.objects.filter(student=user, is_active=True).values_list('course_id', flat=True)
+            return self.queryset.filter(course_id__in=enrolled_courses)
+        elif user.role == UserRole.LECTURER:
+            return self.queryset.filter(course__lecturer=user)
+        return self.queryset
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=False, methods=['GET'])
+    def student(self, request):
+        """Get student's weekly schedule"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['GET'])
+    def lecturer(self, request):
+        """Get lecturer's weekly schedule"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
