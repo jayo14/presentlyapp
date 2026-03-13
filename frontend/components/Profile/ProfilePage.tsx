@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { 
   ArrowLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight, Loader,
   BookOpen, Calendar, PlusCircle, Edit, User, Mail, Phone, MapPin, Award, TrendingUp,
-  Clock, CheckCircle, Camera
+  Clock, CheckCircle, Camera, FileText, Upload
 } from 'lucide-react';
+import { dashboardApi } from '../../services/api/dashboard';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth';
 import { useAvatarUpload } from '../../hooks/useAvatarUpload';
@@ -34,6 +35,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const queryClient = useQueryClient();
   const { uploadAvatar, isUploading: uploadingAvatar } = useAvatarUpload();
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const signatureInputRef = React.useRef<HTMLInputElement>(null);
+  const [uploadingSignature, setUploadingSignature] = useState(false);
   // Removed local state, using hook instead
   
   const userName = user?.full_name || propUserName || 'Dr. Sarah Smith';
@@ -79,6 +82,23 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         text: `Check out ${userName}'s profile on Presently`,
         url: window.location.href,
       }).catch(() => {});
+    }
+  };
+
+  const handleSignatureUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingSignature(true);
+      await dashboardApi.uploadSignature(file);
+      toast.success('Digital signature uploaded successfully');
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() });
+    } catch (err) {
+      console.error('Signature upload error:', err);
+      toast.error('Failed to upload signature');
+    } finally {
+      setUploadingSignature(false);
     }
   };
 
@@ -276,6 +296,49 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Lecturer Signature Section (Mobile) */}
+      {userRole === UserRole.LECTURER && (
+        <div className="px-4 mb-8">
+          <h3 className="text-white text-lg font-semibold mb-4">Digital Signature</h3>
+          <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-6 flex flex-col items-center gap-4">
+            <div className="w-full h-32 bg-white/5 border-2 border-dashed border-zinc-700 rounded-xl flex items-center justify-center relative overflow-hidden group">
+              {user?.signature_url ? (
+                <img src={user.signature_url} alt="Digital Signature" className="max-h-full object-contain invert dark:invert-0" />
+              ) : (
+                <div className="text-center">
+                  <FileText size={32} className="text-zinc-500 mx-auto mb-2" />
+                  <p className="text-xs text-zinc-500">No signature uploaded</p>
+                </div>
+              )}
+              {uploadingSignature && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10">
+                  <Loader className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              )}
+            </div>
+            <input 
+              type="file" 
+              ref={signatureInputRef} 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleSignatureUpload}
+            />
+            <Button 
+              variant="secondary" 
+              className="w-full" 
+              onClick={() => signatureInputRef.current?.click()}
+              disabled={uploadingSignature}
+            >
+              <Upload size={18} className="mr-2" />
+              {user?.signature_url ? 'Update Signature' : 'Upload Signature'}
+            </Button>
+            <p className="text-[10px] text-zinc-500 text-center px-4">
+              Used for validating and signing attendance reports. Recommended size: 400x200px (PNG).
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Logout Button */}
       <div className="px-4">
@@ -517,6 +580,47 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <ChevronRight size={20} className="text-text-secondary group-hover:text-primary transition-colors" />
           </button>
         </div>
+
+        {/* Lecturer Signature Section (Desktop) */}
+        {userRole === UserRole.LECTURER && (
+          <div className="mt-8">
+            <h3 className="text-text-primary text-lg font-semibold mb-4">Digital Signature</h3>
+            <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-8 flex gap-8 items-center">
+              <div className="flex-1">
+                <p className="text-text-secondary text-sm mb-4">
+                  Your digital signature is used to sign and authenticate attendance reports. 
+                  Ensure the image is clear and has a transparent or white background.
+                </p>
+                <Button 
+                  variant="secondary" 
+                  onClick={() => signatureInputRef.current?.click()}
+                  disabled={uploadingSignature}
+                >
+                  <Upload size={18} className="mr-2" />
+                  {user?.signature_url ? 'Change Signature' : 'Upload Signature'}
+                </Button>
+                <p className="text-xs text-text-secondary mt-3">
+                  Format: PNG, JPG (Max 2MB).
+                </p>
+              </div>
+              <div className="w-64 h-32 bg-zinc-50 dark:bg-zinc-950 border border-border dark:border-zinc-800 rounded-xl flex items-center justify-center relative overflow-hidden">
+                {user?.signature_url ? (
+                  <img src={user.signature_url} alt="Signature Preview" className="max-h-full object-contain invert dark:invert-0" />
+                ) : (
+                  <div className="text-center p-4">
+                    <FileText size={32} className="text-zinc-300 dark:text-zinc-700 mx-auto mb-2" />
+                    <p className="text-[10px] text-zinc-400">Preview will appear here</p>
+                  </div>
+                )}
+                {uploadingSignature && (
+                  <div className="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-10">
+                    <Loader className="w-8 h-8 animate-spin text-primary" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Logout Button */}
