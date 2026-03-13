@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Search, Filter, Download, ChevronDown, CheckCircle2, XCircle, 
-  Clock, AlertCircle, BookOpen, Calendar, User, ArrowUpDown, TrendingUp, TrendingDown, MapPin, Building2, FileText, FileSpreadsheet
+  Clock, AlertCircle, BookOpen, Calendar, User, ArrowUpDown, TrendingUp, TrendingDown, MapPin, Building2, FileText, FileSpreadsheet, UserPlus, X
 } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -39,6 +39,9 @@ export const AttendanceReport: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'good' | 'at_risk'>('ALL');
   const [selectedDept, setSelectedDepartment] = useState<string>('ALL');
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showManualMarkModal, setShowManualMarkModal] = useState(false);
+  const [manualMatric, setManualMatric] = useState('');
+  const [markingManual, setMarkingManual] = useState(false);
 
   useEffect(() => {
     loadCourses();
@@ -242,6 +245,29 @@ export const AttendanceReport: React.FC = () => {
     setShowExportMenu(false);
   };
 
+  const handleManualMark = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedSessionId || !manualMatric) {
+      toast.error('Please enter a matric number');
+      return;
+    }
+    
+    try {
+      setMarkingManual(true);
+      await dashboardApi.manualMark(selectedSessionId.toString(), manualMatric);
+      toast.success(`Student (${manualMatric}) marked as present`);
+      setManualMatric('');
+      setShowManualMarkModal(false);
+      loadSessionAttendance(selectedSessionId);
+    } catch (err: any) {
+      console.error('Manual mark error:', err);
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Failed to mark student';
+      toast.error(errorMsg);
+    } finally {
+      setMarkingManual(false);
+    }
+  };
+
   if (loadingCourses) {
     return (
         <div className="flex flex-col items-center justify-center h-64 text-zinc-500">
@@ -369,6 +395,17 @@ export const AttendanceReport: React.FC = () => {
                         </div>
                     )}
                 </div>
+            )}
+            
+            {selectedSessionId && (
+                <Button 
+                    variant="primary" 
+                    onClick={() => setShowManualMarkModal(true)} 
+                    className="gap-2 h-11 px-6 rounded-xl"
+                >
+                    <UserPlus size={18} />
+                    <span className="hidden sm:inline">Manual Mark</span>
+                </Button>
             )}
         </div>
       </div>
@@ -569,6 +606,68 @@ export const AttendanceReport: React.FC = () => {
                 </div>
             </div>
           </>
+      )}
+
+      {/* Manual Mark Modal */}
+      {showManualMarkModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary transition-transform hover:scale-110">
+                            <UserPlus size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Manual Mark</h3>
+                            <p className="text-xs text-zinc-500 font-medium">Mark student as present for this session</p>
+                        </div>
+                    </div>
+                    <button 
+                      onClick={() => setShowManualMarkModal(false)}
+                      className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl text-zinc-400 transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
+                </div>
+
+                <form onSubmit={handleManualMark} className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Student Matric Number</label>
+                        <div className="relative">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                            <input 
+                                autoFocus
+                                type="text" 
+                                value={manualMatric}
+                                onChange={(e) => setManualMatric(e.target.value.toUpperCase())}
+                                placeholder="e.g. CSC/2019/001"
+                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-[1.25rem] pl-12 pr-4 py-4 text-zinc-9100 dark:text-white font-bold focus:ring-4 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <Button 
+                            type="button" 
+                            variant="secondary" 
+                            className="flex-1 h-14 rounded-2xl text-xs font-black uppercase tracking-widest"
+                            onClick={() => setShowManualMarkModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            type="submit" 
+                            variant="primary" 
+                            className="flex-[2] h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                            disabled={markingManual}
+                        >
+                            {markingManual ? 'Marking...' : 'Mark Present'}
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </div>
       )}
     </div>
   );
