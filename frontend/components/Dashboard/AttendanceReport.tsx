@@ -254,7 +254,7 @@ export const AttendanceReport: React.FC = () => {
     
     try {
       setMarkingManual(true);
-      await dashboardApi.manualMark(selectedSessionId.toString(), manualMatric);
+      await dashboardApi.manualMark(selectedSessionId, manualMatric, 'PRESENT');
       toast.success(`Student (${manualMatric}) marked as present`);
       setManualMatric('');
       setShowManualMarkModal(false);
