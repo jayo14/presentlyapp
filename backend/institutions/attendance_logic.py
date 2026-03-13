@@ -17,6 +17,31 @@ _TRUST_THRESHOLD = 85
 _FLAG_THRESHOLD = 50
 
 
+def check_session_validity(session):
+    """
+    Checks if a session is valid based on student participation.
+    Rule: A session is marked invalid if less than 10% of enrolled students attended.
+    """
+    total_enrolled = session.course.enrolled_students_count  # Assuming helper property/count exists or used via query
+    from .models import CourseEnrollment
+    total_enrolled = CourseEnrollment.objects.filter(course=session.course, is_active=True).count()
+    
+    total_marked = session.attendances.count()
+    
+    if total_enrolled > 0:
+        participation_rate = total_marked / total_enrolled
+        if participation_rate < 0.10:  # Less than 10%
+            session.is_valid = False
+            session.invalidation_reason = f"Low attendance: Only {total_marked}/{total_enrolled} students ({participation_rate*100:.1f}%) attended."
+            session.save()
+            return False
+    
+    session.is_valid = True
+    session.invalidation_reason = None
+    session.save()
+    return True
+
+
 def _validate_sample_stability(samples):
     """
     Validate that the sample window is stable (no spoofing indicators).

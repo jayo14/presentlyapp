@@ -248,6 +248,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     dark_mode = models.BooleanField(default=True)
     timezone = models.CharField(max_length=50, default='UTC', help_text="User's preferred timezone")
     
+    # Security & Verification
+    signature_image = models.ImageField(upload_to='signatures/', null=True, blank=True, help_text="Student's digital signature")
+    
     # Django required fields
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -534,6 +537,10 @@ class AttendanceSession(models.Model):
     # QR code data (will store URL for external access)
     qr_code_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL that the QR code points to")
     
+    # Invalidation Rule
+    is_valid = models.BooleanField(default=True)
+    invalidation_reason = models.TextField(blank=True, null=True)
+    
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -724,25 +731,30 @@ class Timetable(models.Model):
     
     # Day and time
     DAY_CHOICES = [
-        (0, 'Monday'),
-        (1, 'Tuesday'),
-        (2, 'Wednesday'),
-        (3, 'Thursday'),
-        (4, 'Friday'),
-        (5, 'Saturday'),
-        (6, 'Sunday'),
+        ('MONDAY', 'Monday'),
+        ('TUESDAY', 'Tuesday'),
+        ('WEDNESDAY', 'Wednesday'),
+        ('THURSDAY', 'Thursday'),
+        ('FRIDAY', 'Friday'),
+        ('SATURDAY', 'Saturday'),
+        ('SUNDAY', 'Sunday'),
     ]
-    day_of_week = models.IntegerField(choices=DAY_CHOICES)
+    day_of_week = models.CharField(max_length=10, choices=DAY_CHOICES)
     start_time = models.TimeField()
     end_time = models.TimeField()
     
+    # Context
+    semester = models.CharField(max_length=20, choices=Course.SEMESTER_CHOICES)
+    academic_year = models.CharField(max_length=20, help_text="e.g. 2023/2024")
+    
     # Recurrence
     is_recurring = models.BooleanField(default=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
     
-    # Status - DISABLED FOR NOW
-    is_active = models.BooleanField(default=False, help_text="DEFERRED FEATURE - Keep disabled")
+    # Ownership & Status
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_timetables')
+    is_active = models.BooleanField(default=True)
     
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
