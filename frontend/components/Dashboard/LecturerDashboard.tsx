@@ -20,6 +20,7 @@ import { SessionDetailDialog } from '../Attendance/SessionDetailDialog';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { AttendanceReport } from './AttendanceReport';
 import { SEO } from '../SEO';
+import { studentApi, TimetableEntry } from '../../services/api/student';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -58,6 +59,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   // Department data
   const [departments, setDepartments] = useState<Department[]>([]);
 
+  // Timetable state
+  const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
+  const [timetableLoading, setTimetableLoading] = useState(false);
+
   // Fetch real data on mount and setup auto-refresh
   useEffect(() => {
     fetchCourses();
@@ -73,6 +78,27 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch timetable when view changes
+  useEffect(() => {
+    if (view === 'timetable') {
+      fetchTimetable();
+    }
+  }, [view]);
+
+  const fetchTimetable = async () => {
+    try {
+      setTimetableLoading(true);
+      const data = await studentApi.getTimetable();
+      setTimetableData(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching timetable:', err);
+      setTimetableData([]);
+      toast.error('Failed to load timetable');
+    } finally {
+      setTimetableLoading(false);
+    }
+  };
 
   const fetchDashboardAnalytics = async () => {
     try {

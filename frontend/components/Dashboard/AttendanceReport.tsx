@@ -38,6 +38,7 @@ export const AttendanceReport: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'good' | 'at_risk'>('ALL');
   const [selectedDept, setSelectedDepartment] = useState<string>('ALL');
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   useEffect(() => {
     loadCourses();
@@ -218,6 +219,29 @@ export const AttendanceReport: React.FC = () => {
     document.body.removeChild(link);
   };
 
+  const handleServerExport = async (format: 'csv' | 'excel' | 'pdf') => {
+    if (!selectedCourseId) return;
+    const toastId = toast.loading(`Generating ${format.toUpperCase()} report...`);
+    try {
+      const blob = await dashboardApi.exportAttendance(format, selectedCourseId);
+      const ext = format === 'excel' ? 'xlsx' : format;
+      const fileName = `${analyticsData?.course_code || 'attendance'}_report.${ext}`;
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success(`${format.toUpperCase()} report downloaded!`, { id: toastId });
+    } catch (err) {
+      console.error(`Failed to export ${format}:`, err);
+      toast.error(`Failed to generate ${format.toUpperCase()} report`, { id: toastId });
+    }
+    setShowExportMenu(false);
+  };
+
   if (loadingCourses) {
     return (
         <div className="flex flex-col items-center justify-center h-64 text-zinc-500">
@@ -300,32 +324,6 @@ export const AttendanceReport: React.FC = () => {
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
             </div>
 
-  // State for export dropdown
-  const [showExportMenu, setShowExportMenu] = useState(false);
-  
-  const handleServerExport = async (format: 'csv' | 'excel' | 'pdf') => {
-    if (!selectedCourseId) return;
-    const toastId = toast.loading(`Generating ${format.toUpperCase()} report...`);
-    try {
-      const blob = await dashboardApi.exportAttendance(format, selectedCourseId);
-      const ext = format === 'excel' ? 'xlsx' : format;
-      const fileName = `${analyticsData?.course_code || 'attendance'}_report.${ext}`;
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      toast.success(`${format.toUpperCase()} report downloaded!`, { id: toastId });
-    } catch (err) {
-      console.error(`Failed to export ${format}:`, err);
-      toast.error(`Failed to generate ${format.toUpperCase()} report`, { id: toastId });
-    }
-    setShowExportMenu(false);
-  };
-
             {analyticsData && (
                 <div className="relative">
                     <Button 
@@ -341,7 +339,7 @@ export const AttendanceReport: React.FC = () => {
                     {showExportMenu && (
                         <div className="absolute right-0 top-full mt-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 w-48 py-1 animate-in fade-in slide-in-from-top-1 duration-200">
                             <button 
-                                onClick={handleExport}
+                                onClick={() => { handleExport(); setShowExportMenu(false); }}
                                 className="w-full px-4 py-2.5 text-left text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-3 transition-colors"
                             >
                                 <Download size={16} className="text-green-500" />
