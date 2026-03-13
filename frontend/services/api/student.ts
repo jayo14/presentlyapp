@@ -107,8 +107,44 @@ export interface AvailableCourse extends Course {
 }
 
 export const studentApi = {
-  // Get student dashboard data
+  // Get student dashboard data – try dedicated summary endpoint first, fall back to analytics
   getDashboard: async (): Promise<StudentDashboardData> => {
+    try {
+      const response = await apiClient.get('/institutions/dashboard/student/');
+      const summary = response.data;
+      // Transform the new response shape into StudentDashboardData for backwards compatibility
+      if (summary?.success && summary.data) {
+        return {
+          user: {} as any, // User data comes from useCurrentUser hook
+          enrolled_courses: [],
+          attendance_stats: {
+            average_attendance: summary.data.overview?.overall_attendance ?? 0,
+            total_present: 0,
+            total_late: 0,
+            total_absent: 0,
+            total_sessions: 0,
+          },
+          next_class: summary.data.upcoming_classes?.[0] ? {
+            id: summary.data.upcoming_classes[0].id,
+            course_code: summary.data.upcoming_classes[0].course_code || '',
+            course_name: summary.data.upcoming_classes[0].course_name || '',
+            start_time: summary.data.upcoming_classes[0].start_time,
+            venue_name: summary.data.upcoming_classes[0].venue_name,
+          } : undefined,
+          recent_activity: (summary.data.recent_attendance || []).map((rec: any) => ({
+            id: rec.id,
+            type: 'attendance' as const,
+            course_code: rec.course_code,
+            timestamp: rec.checked_in_at,
+            status: rec.status,
+            description: `Checked in – ${rec.status}`,
+          })),
+          _summary: summary.data, // Attach raw summary for enhanced dashboard features
+        } as any;
+      }
+    } catch {
+      // Fall through to legacy endpoint
+    }
     const response = await apiClient.get('/analytics/dashboard/student/');
     return response.data;
   },
