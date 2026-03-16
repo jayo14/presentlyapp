@@ -5,6 +5,7 @@ import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
 import { Dock, DockItem } from '@/components/magicui/dock';
+import NotificationInbox from './NotificationInbox';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -205,8 +206,33 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row transition-colors duration-300">
+      {/* Top Header */}
+      <header className="h-16 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-6">
+        <div className="md:hidden">
+          <button onClick={() => setIsMobileMenuOpen(true)} className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+            <Menu size={24} />
+          </button>
+        </div>
+        <div className="hidden md:block">
+          <Logo className="text-zinc-900 dark:text-white" />
+        </div>
+        <div className="flex items-center gap-4">
+          <NotificationInbox />
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
+            {displayAvatar ? (
+              <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                {displayInitials}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* lassName="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row transition-colors duration-300">
       {/* Sidebar (Desktop) */}
-      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-20' : 'w-64'} border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-950 h-screen sticky top-0 transition-all duration-300 relative`}>
+      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-20' : 'w-64'} border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-950 h-[calc(100vh-4rem)] sticky top-16 transition-all duration-300 relative`}>
         <div className={`p-6 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
           {sidebarCollapsed ? (
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
@@ -454,25 +480,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto h-screen bg-zinc-50 dark:bg-black scroll-smooth transition-colors duration-300">
-        {/* Mobile Top Header */}
-        <div className="md:hidden flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-zinc-600 dark:text-zinc-400">
-            <Menu size={24} />
-          </button>
-          <Logo className="text-zinc-900 dark:text-white" />
-          <button
-            onClick={() => handleNavClick('profile')}
-            className="w-10 h-10 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-800"
-          >
-            {currentUser?.avatar_url ? (
-              <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                {userName.charAt(0)}
-              </div>
-            )}
-          </button>
-        </div>
         <div className="max-w-7xl mx-auto p-4 md:p-8 pb-24 md:pb-8 h-full flex flex-col">
             {children}
         </div>
