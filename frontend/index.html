@@ -20,6 +20,11 @@
     })();
   </script>
 
+  <!-- Define g to prevent ReferenceError if used by third-party scripts -->
+  <script>
+    window.g = window.g || function() {};
+  </script>
+
   <!-- Primary Meta Tags -->
   <title>Presently | Smart Attendance Management System</title>
   <meta name="title" content="Presently | Smart Attendance Management System" />
