@@ -27,6 +27,7 @@ SITE_NAME = os.environ.get('SITE_NAME', 'Presently')
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     # Django Unfold (must be before django.contrib.admin)
     'unfold',
     'unfold.contrib.filters',
@@ -43,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'corsheaders',
     'drf_yasg',
     'fcm_django',
 
@@ -59,10 +59,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.gzip.GZipMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -223,16 +223,34 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration for frontend
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8081",
-#     "http://127.0.0.1:8081",
-#     "https://studious-space-broccoli-4j79w564rjxp27p5j-8081.app.github.dev",
-#     "https://studious-space-broccoli-4j79w564rjxp27p5j-8000.app.github.dev",
-# ]
+FRONTEND_ORIGIN = os.environ.get('FRONTEND_URL', 'http://localhost:3000').rstrip('/')
 
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# For development: Allow all origins. For production: restrict to specific origins
+if DEBUG or os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True':
+    CORS_ALLOW_ALL_ORIGINS = True
+    CORS_ALLOWED_ORIGINS = []
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        FRONTEND_ORIGIN,
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.app.github.dev",
+]
+
+CORS_ALLOWED_METHODS = [
+    'DELETE',
+    'GET',
+    'HEAD',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -244,6 +262,12 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'x-csrftoken',
+    'authorization',
 ]
 
 # Email Configuration (Gmail SMTP or Gmail API)
