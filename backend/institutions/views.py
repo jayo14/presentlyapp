@@ -25,6 +25,16 @@ from google.auth.transport import requests as google_requests
 from user_agents import parse
 from presently.firebase_config import initialize_firebase
 
+# Novu integration
+try:
+    from novu.api import EventApi
+    novu = EventApi(api_key=settings.NOVU_SECRET_KEY)
+    NOVU_AVAILABLE = True
+except ImportError:
+    novu = None
+    NOVU_AVAILABLE = False
+    logging.warning("Novu package not installed. Notification features will be disabled.")
+
 from .attendance_logic import perform_attendance_check_in
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
@@ -280,6 +290,22 @@ def register_view(request):
             # Send verification email
             send_verification_email(user, otp_obj.otp)
             
+            # Trigger Novu notification
+            if NOVU_AVAILABLE:
+                try:
+                    novu.trigger(
+                        name="auth-email-verification",
+                        recipients=[{"subscriberId": str(user.id)}],
+                        payload={
+                            "user_email": user.email,
+                            "user_name": user.full_name,
+                            "otp_code": otp_obj.otp,
+                            "expires_in": 900
+                        }
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to send Novu notification for email verification: {str(e)}")
+            
             logger.info(f"User registered: {user.email}, OTP sent")
             
             return Response({
@@ -402,6 +428,22 @@ def send_verification_otp_view(request):
         # Send email
         try:
             send_verification_email(user, otp_obj.otp)
+            
+            # Trigger Novu notification
+            if NOVU_AVAILABLE:
+                try:
+                    novu.trigger(
+                        name="auth-otp-verification",
+                        recipients=[{"subscriberId": str(user.id)}],
+                        payload={
+                            "user_email": user.email,
+                            "user_name": user.full_name,
+                            "otp_code": otp_obj.otp,
+                            "expires_in": 900
+                        }
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to send Novu notification for OTP verification: {str(e)}")
         except Exception as e:
             logger.error(f"Failed to send OTP email: {str(e)}")
             return Response({
@@ -613,6 +655,26 @@ def login_view(request):
                     )
                     msg.attach_alternative(html_message, 'text/html')
                     msg.send(fail_silently=True)
+                    
+                    # Trigger Novu notification for new device
+                    if NOVU_AVAILABLE:
+                        try:
+                            novu.trigger(
+                                name="auth-new-device-login",
+                                recipients=[{"subscriberId": str(user.id)}],
+                                payload={
+                                    "user_email": user.email,
+                                    "user_name": user.full_name,
+                                    "device_name": device_name,
+                                    "device_category": device_category,
+                                    "os_name": os_name,
+                                    "browser_name": browser_name,
+                                    "ip_address": ip_address,
+                                    "login_time": timezone.now().isoformat()
+                                }
+                            )
+                        except Exception as e:
+                            logger.error(f"Failed to send Novu notification for new device login: {str(e)}")
             else:
                 # Log bot access but don't track or send alerts
                 auth_logger.info(f"Bot user agent detected for user {user.email}: {user_agent}")
@@ -894,6 +956,22 @@ The Presently Team
         )
         msg.attach_alternative(html_message, "text/html")
         msg.send(fail_silently=False)
+        
+        # Trigger Novu notification
+        if NOVU_AVAILABLE:
+            try:
+                novu.trigger(
+                    name="auth-password-reset",
+                    recipients=[{"subscriberId": str(user.id)}],
+                    payload={
+                        "user_email": user.email,
+                        "user_name": user.full_name,
+                        "reset_link": reset_link,
+                        "expires_in": 86400  # 24 hours
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Failed to send Novu notification for password reset: {str(e)}")
         
         logger.info(f"Password reset email sent to {email}")
         
@@ -1931,6 +2009,142 @@ class UserViewSet(viewsets.ModelViewSet):
             'success': True,
             'message': f'Password for {user.full_name} has been reset successfully.'
         })
+
+    @action(detail=False, methods=['post'], url_path='invite')
+    def invite_user(self, request):
+        """Invite a new user to the platform (Admin only)"""
+        email = request.data.get('email')
+        full_name = request.data.get('full_name', '')
+        role = request.data.get('role', UserRole.STUDENT)
+        institution_id = request.data.get('institution_id')
+        college_id = request.data.get('college_id')
+        
+        if not email:
+            return Response({
+                'success': False,
+                'error': 'Email is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if user already exists
+        if User.objects.filter(email=email).exists():
+            return Response({
+                'success': False,
+                'error': 'User with this email already exists'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate institution and college if provided
+        institution = None
+        college = None
+        if institution_id:
+            try:
+                institution = Institution.objects.get(id=institution_id, is_active=True)
+            except Institution.DoesNotExist:
+                return Response({
+                    'success': False,
+                    'error': 'Invalid institution'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if college_id:
+            try:
+                college = College.objects.get(id=college_id, is_active=True)
+                if institution and college.institution != institution:
+                    return Response({
+                        'success': False,
+                        'error': 'College does not belong to the selected institution'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            except College.DoesNotExist:
+                return Response({
+                    'success': False,
+                    'error': 'Invalid college'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create user with invitation
+        user = User.objects.create(
+            email=email,
+            full_name=full_name,
+            role=role,
+            institution=institution,
+            college=college,
+            is_active=True,
+            email_verified=False,
+            onboarding_complete=False,
+            invited_by=request.user
+        )
+        
+        # Generate invitation token
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        # Create invitation link
+        invite_link = f"{settings.FRONTEND_URL}/accept-invite?uid={uid}&token={token}"
+        
+        # Send invitation email
+        subject = f'Invitation to join {settings.SITE_NAME or "Presently"}'
+        
+        context = {
+            'user': user,
+            'invite_link': invite_link,
+            'invited_by': request.user.full_name,
+            'platform_name': settings.SITE_NAME or 'Presently'
+        }
+
+        html_message = render_to_string('emails/user_invitation.html', context)
+        
+        plain_message = f"""
+Hello {user.full_name},
+
+You have been invited to join {settings.SITE_NAME or 'Presently'} by {request.user.full_name}.
+
+Click the link below to accept your invitation and set up your account:
+{invite_link}
+
+This invitation will expire in 7 days.
+
+Best regards,
+The {settings.SITE_NAME or 'Presently'} Team
+        """
+        
+        from django.core.mail import EmailMultiAlternatives
+        
+        msg = EmailMultiAlternatives(
+            subject,
+            plain_message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email]
+        )
+        msg.attach_alternative(html_message, "text/html")
+        msg.send(fail_silently=False)
+        
+        # Trigger Novu notification
+        if NOVU_AVAILABLE:
+            try:
+                novu.trigger(
+                    name="auth-invite-user",
+                    recipients=[{"subscriberId": str(user.id)}],
+                    payload={
+                        "user_email": user.email,
+                        "user_name": user.full_name,
+                        "invite_link": invite_link,
+                        "invited_by": request.user.full_name,
+                        "platform_name": settings.SITE_NAME or 'Presently',
+                        "expires_in": 604800  # 7 days
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Failed to send Novu notification for user invitation: {str(e)}")
+        
+        logger.info(f"User invited: {user.email} by {request.user.email}")
+        
+        return Response({
+            'success': True,
+            'message': f'Invitation sent to {user.email}',
+            'user': {
+                'id': str(user.id),
+                'email': user.email,
+                'full_name': user.full_name,
+                'role': user.role
+            }
+        }, status=status.HTTP_201_CREATED)
 
 
 

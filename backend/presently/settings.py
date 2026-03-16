@@ -20,6 +20,9 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
+# Site Configuration
+SITE_NAME = os.environ.get('SITE_NAME', 'Presently')
+
 
 # Application definition
 
