@@ -9,7 +9,7 @@ from .views import (
     request_password_reset_view, reset_password_view, verify_reset_token_view, public_check_in_view,
     InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
     CourseViewSet, CourseEnrollmentViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet,
-    VenueViewSet, TimetableViewSet, student_dashboard_summary, lecturer_dashboard_summary
+    VenueViewSet, TimetableViewSet, student_dashboard_summary, lecturer_dashboard_summary, dashboard_venues_head
 )
 
 # Create router for ViewSets
@@ -54,6 +54,7 @@ urlpatterns = [
     # Dashboard summaries
     path('dashboard/student/', student_dashboard_summary, name='student-dashboard-summary'),
     path('dashboard/lecturer/', lecturer_dashboard_summary, name='lecturer-dashboard-summary'),
+    path('dashboard/venues/', dashboard_venues_head, name='dashboard-venues-head'),
     
     # Include router URLs
     path('', include(router.urls)),

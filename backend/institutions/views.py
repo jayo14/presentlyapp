@@ -905,9 +905,11 @@ def change_password_view(request):
     }, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['HEAD'])
 @permission_classes([AllowAny])
-def request_password_reset_view(request):
+def dashboard_venues_head(request):
+    """Handle HEAD requests for dashboard/venues to prevent 404 errors from feedback scripts"""
+    return Response(status=status.HTTP_200_OK)
     """Request password reset - sends email with reset link"""
     email = request.data.get('email')
     
