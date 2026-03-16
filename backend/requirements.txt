@@ -62,7 +62,6 @@ inflection==0.5.1
 kombu==5.6.2
 msgpack==1.1.2
 nox==2022.11.21
-novu==1.0.0
 numpy==2.4.0
 openpyxl==3.1.5
 packaging==25.0
