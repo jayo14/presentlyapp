@@ -16,6 +16,7 @@ from django.db import transaction
 from django_ratelimit.decorators import ratelimit
 import secrets
 import logging
+import os
 import cloudinary
 import cloudinary.uploader
 import firebase_admin
@@ -27,9 +28,15 @@ from presently.firebase_config import initialize_firebase
 
 # Novu integration
 try:
-    from novu.api import EventApi
-    novu = EventApi(api_key=settings.NOVU_SECRET_KEY)
-    NOVU_AVAILABLE = True
+    novu_secret_key = os.environ.get('NOVU_SECRET_KEY')
+    if novu_secret_key:
+        from novu.api import EventApi
+        novu = EventApi(api_key=novu_secret_key)
+        NOVU_AVAILABLE = True
+    else:
+        novu = None
+        NOVU_AVAILABLE = False
+        logging.warning("NOVU_SECRET_KEY not set. Notification features will be disabled.")
 except ImportError:
     novu = None
     NOVU_AVAILABLE = False
@@ -1114,7 +1121,7 @@ class InstitutionViewSet(viewsets.ModelViewSet):
             return self.queryset.model.objects.none()
         queryset = Institution.objects.all().order_by('full_name')
         # Non-admin users can only see active institutions
-        if self.request.user.role != UserRole.ADMIN:
+        if self.request.user.is_authenticated and self.request.user.role != UserRole.ADMIN:
             queryset = queryset.filter(is_active=True)
         return queryset
 
@@ -1137,7 +1144,7 @@ class CollegeViewSet(viewsets.ModelViewSet):
         if institution_id:
             queryset = queryset.filter(institution_id=institution_id)
         # Non-admin users can only see active colleges
-        if self.request.user.role != UserRole.ADMIN:
+        if self.request.user.is_authenticated and self.request.user.role != UserRole.ADMIN:
             queryset = queryset.filter(is_active=True)
         return queryset
 
@@ -1186,7 +1193,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(institution=institution_id)
         
         # Non-admin users can only see active departments
-        if self.request.user.role != UserRole.ADMIN:
+        if self.request.user.is_authenticated and self.request.user.role != UserRole.ADMIN:
             queryset = queryset.filter(is_active=True)
         return queryset
 
@@ -1310,9 +1317,9 @@ class CourseViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(lecturer_id=lecturer_id)
         
         # Lecturers can see their own courses (including inactive ones)
-        if self.request.user.role == UserRole.LECTURER:
+        if self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
             queryset = queryset.filter(lecturer=self.request.user)
-        elif self.request.user.role == UserRole.STUDENT:
+        elif self.request.user.is_authenticated and self.request.user.role == UserRole.STUDENT:
             # For students, filter by enrollment if requested OR if listing "my courses" (no other filters)
             # Only apply this if it's a list action
             search_param = self.request.query_params.get('search', None)
@@ -1567,11 +1574,11 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_active=is_active.lower() == 'true')
         
         # Students can only see their own enrollments
-        if self.request.user.role == UserRole.STUDENT:
+        if self.request.user.is_authenticated and self.request.user.role == UserRole.STUDENT:
             queryset = queryset.filter(student=self.request.user)
         
         # Lecturers can only see enrollments for their courses
-        elif self.request.user.role == UserRole.LECTURER:
+        elif self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
             queryset = queryset.filter(course__lecturer=self.request.user)
         
         return queryset.select_related('student', 'course')
@@ -1742,7 +1749,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_active=is_active.lower() == 'true')
         
         # Lecturers can only see sessions for their courses
-        if self.request.user.role == UserRole.LECTURER:
+        if self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
             queryset = queryset.filter(course__lecturer=self.request.user)
         
         return queryset
@@ -1836,9 +1843,9 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
         # Roles restrictions
         user = self.request.user
-        if user.role == UserRole.STUDENT:
+        if user.is_authenticated and user.role == UserRole.STUDENT:
             queryset = queryset.filter(student=user)
-        elif user.role == UserRole.LECTURER:
+        elif user.is_authenticated and user.role == UserRole.LECTURER:
             queryset = queryset.filter(session__course__lecturer=user)
 
         return queryset
@@ -2181,12 +2188,13 @@ class TimetableViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.role == UserRole.STUDENT:
-            # Get registered courses for student
-            enrolled_courses = CourseEnrollment.objects.filter(student=user, is_active=True).values_list('course_id', flat=True)
-            return self.queryset.filter(course_id__in=enrolled_courses)
-        elif user.role == UserRole.LECTURER:
-            return self.queryset.filter(course__lecturer=user)
+        if user.is_authenticated:
+            if user.role == UserRole.STUDENT:
+                # Get registered courses for student
+                enrolled_courses = CourseEnrollment.objects.filter(student=user, is_active=True).values_list('course_id', flat=True)
+                return self.queryset.filter(course_id__in=enrolled_courses)
+            elif user.role == UserRole.LECTURER:
+                return self.queryset.filter(course__lecturer=user)
         return self.queryset
 
     def perform_create(self, serializer):
