@@ -533,42 +533,38 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   
   // Mobile Layout (Modern Redesign with Enhanced UX)
   const mobileDashboardLayout = (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950 pb-24">
-          {/* Modern Header with Gradient */}
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
+          {/* Modern Header */}
           <div className="relative overflow-hidden">
-              {/* Background Gradient Decorations */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-              <div className="absolute top-20 left-0 w-48 h-48 bg-gradient-to-br from-indigo-400/20 to-pink-500/20 rounded-full blur-3xl"></div>
-              
-              <div className="relative p-6">
-                  <div className="flex items-start justify-between mb-6">
-                      <div className="flex items-center gap-4">
+              <div className="relative p-4">
+                  <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
                           <motion.div 
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
-                                                            className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/30"
+                              className="w-12 h-12 rounded-xl overflow-hidden bg-primary flex items-center justify-center text-white text-lg font-bold"
                           >
-                                                            {displayAvatar ? (
-                                                                <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
-                                                            ) : (
-                                                                displayInitials
-                                                            )}
+                              {displayAvatar ? (
+                                  <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+                              ) : (
+                                  displayInitials
+                              )}
                           </motion.div>
                           <div>
                               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
                                   {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
                               </p>
-                              <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-0.5">
+                              <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-0.5">
                                   Hello, {userName.split(' ')[0]}!
                               </h1>
                           </div>
                       </div>
                       <motion.button 
                           whileTap={{ scale: 0.95 }}
-                          className="relative w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200 dark:border-slate-700"
+                          className="relative w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-700"
                       >
-                          <Activity size={20} className="text-slate-700 dark:text-slate-300" />
-                          <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-gradient-to-br from-red-500 to-pink-500 rounded-full shadow-lg shadow-red-500/50"></div>
+                          <Activity size={18} className="text-slate-700 dark:text-slate-300" />
+                          <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></div>
                       </motion.button>
                   </div>
               </div>
@@ -581,59 +577,53 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
-                      className="mx-4 mb-4 bg-gradient-to-r from-red-500 to-rose-500 rounded-2xl p-4 flex items-center gap-3 shadow-lg shadow-red-500/30"
+                      className="mx-3 mb-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 p-3 rounded-xl flex items-center gap-3"
                   >
-                      <div className="bg-white/20 backdrop-blur-sm p-2.5 rounded-xl">
-                          <AlertCircle size={20} className="text-white" />
+                      <div className="bg-red-100 dark:bg-red-900/20 p-2 rounded-lg">
+                          <AlertCircle size={16} className="text-red-600 dark:text-red-400" />
                       </div>
                       <div className="flex-1">
-                          <p className="text-sm font-bold text-white">Attendance Alert</p>
-                          <p className="text-xs text-white/90 mt-0.5">
+                          <p className="text-sm font-bold text-red-700 dark:text-red-300">Attendance Alert</p>
+                          <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
                               Below 75% in {lowAttendanceCourses.length} course{lowAttendanceCourses.length > 1 ? 's' : ''}
                           </p>
                       </div>
                       <motion.button
                           whileTap={{ scale: 0.9 }}
                           onClick={handleDismissWarning}
-                          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                       >
-                          <X size={18} className="text-white" />
+                          <X size={16} className="text-red-600 dark:text-red-400" />
                       </motion.button>
                   </motion.div>
               )}
           </AnimatePresence>
 
           {/* Quick Actions - Prominent CTAs */}
-          <div className="px-4 mb-6">
-              <div className="grid grid-cols-2 gap-3">
+          <div className="px-3 mb-4">
+              <div className="grid grid-cols-2 gap-2">
                   <motion.button 
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setIsAttendanceModalOpen(true)}
-                      className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-5 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all"
+                      className="bg-blue-500 text-white rounded-xl p-4 shadow-sm hover:bg-blue-600 transition-colors"
                   >
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                      <div className="relative">
-                          <div className="bg-white/20 backdrop-blur-sm w-12 h-12 rounded-xl flex items-center justify-center mb-3">
-                              <QrCode size={24} />
-                          </div>
-                          <h3 className="font-bold text-lg mb-1">Scan QR</h3>
-                          <p className="text-xs text-white/80">Mark attendance</p>
+                      <div className="bg-white/20 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                          <QrCode size={20} />
                       </div>
+                      <h3 className="font-bold text-sm mb-1">Scan QR</h3>
+                      <p className="text-xs text-white/80">Mark attendance</p>
                   </motion.button>
                   
                   <motion.button 
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setIsRegistrationOpen(true)}
-                      className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-5 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all"
+                      className="bg-purple-500 text-white rounded-xl p-4 shadow-sm hover:bg-purple-600 transition-colors"
                   >
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                      <div className="relative">
-                          <div className="bg-white/20 backdrop-blur-sm w-12 h-12 rounded-xl flex items-center justify-center mb-3">
-                              <Plus size={24} />
-                          </div>
-                          <h3 className="font-bold text-lg mb-1">Register</h3>
-                          <p className="text-xs text-white/80">Add courses</p>
+                      <div className="bg-white/20 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                          <Plus size={20} />
                       </div>
+                      <h3 className="font-bold text-sm mb-1">Register</h3>
+                      <p className="text-xs text-white/80">Add courses</p>
                   </motion.button>
               </div>
           </div>
@@ -643,37 +633,33 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="px-4 mb-6"
+                  className="mx-3 mb-4"
               >
-                  <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center gap-1.5">
-                          <div className="w-2 h-2 bg-gradient-to-br from-red-500 to-pink-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
-                          <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Happening Now</span>
+                  <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Happening Now</span>
                       </div>
                   </div>
                   
-                  <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700">
-                      {/* Gradient Background */}
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-400/10 to-emerald-500/10 rounded-full blur-3xl"></div>
-                      
-                      <div className="relative p-6">
-                          <div className="flex items-start justify-between mb-4">
-                              <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-amber-400 text-slate-900 text-xs font-bold rounded-xl shadow-lg shadow-yellow-400/30">
+                  <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+                      <div className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                              <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 text-xs font-bold rounded-lg">
                                   {nextClass.venue_name || 'Lecture Hall'}
                               </span>
                               {nextClass.end_time && (
-                                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl">
-                                      <Clock size={14} className="text-slate-600 dark:text-slate-400" />
+                                  <div className="flex items-center gap-1 px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg">
+                                      <Clock size={12} className="text-slate-600 dark:text-slate-400" />
                                       <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                          {/* Note: Timer updates via dashboard auto-refresh (every 60s) */}
                                           {Math.max(0, Math.floor((new Date(nextClass.end_time).getTime() - Date.now()) / 60000))}m left
                                       </span>
                                   </div>
                               )}
                           </div>
                           
-                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{nextClass.course_name}</h3>
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-5 flex items-center gap-2">
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{nextClass.course_name}</h3>
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
                               <User size={14} />
                               {nextClass.lecturer_name || 'Lecturer TBA'}
                               <span className="text-slate-400 dark:text-slate-500">•</span>
@@ -684,9 +670,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                           <motion.button 
                               whileTap={{ scale: 0.98 }}
                               onClick={() => setIsAttendanceModalOpen(true)}
-                              className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all"
+                              className="w-full bg-blue-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-blue-600 transition-colors"
                           >
-                              <QrCode size={20} />
+                              <QrCode size={18} />
                               Mark Attendance Now
                           </motion.button>
                       </div>
@@ -695,51 +681,45 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           )}
 
           {/* Stats Overview - Enhanced Cards */}
-          <div className="px-4 mb-6">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Your Stats</h2>
+          <div className="px-3 mb-4">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Your Stats</h2>
               
               {/* Main Attendance Card */}
               <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-6 mb-4 shadow-xl shadow-indigo-500/30 relative overflow-hidden"
+                  className="bg-primary text-black rounded-2xl p-4 mb-3 shadow-sm"
               >
-                  {/* Decorative Elements */}
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-2xl"></div>
-                  
-                  <div className="relative">
-                      <div className="flex items-center justify-between mb-6">
-                          <div>
-                              <p className="text-white/80 text-sm font-medium mb-1">Overall Attendance</p>
-                              <h3 className="text-5xl font-black text-white">{avgAttendance.toFixed(1)}%</h3>
-                          </div>
-                          <div className="relative w-20 h-20">
-                              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
-                                  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="6"/>
-                                  <circle 
-                                      cx="40" cy="40" r="32" fill="none" stroke="white" strokeWidth="6"
-                                      strokeDasharray={`${(avgAttendance / 100) * (2 * Math.PI * 32)} ${2 * Math.PI * 32}`}
-                                      strokeLinecap="round"
-                                  />
-                              </svg>
-                          </div>
+                  <div className="flex items-center justify-between mb-3">
+                      <div>
+                          <p className="text-black/70 text-sm font-medium mb-1">Overall Attendance</p>
+                          <h3 className="text-4xl font-black">{avgAttendance.toFixed(1)}%</h3>
                       </div>
-                      
-                      {/* Detailed Stats Grid */}
-                      <div className="grid grid-cols-3 gap-3">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center">
-                              <p className="text-3xl font-bold text-white mb-1">{dashboardData?.attendance_stats?.total_sessions || 0}</p>
-                              <p className="text-xs text-white/80 font-medium">Total Classes</p>
-                          </div>
-                          <div className="bg-green-500/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-green-400/30">
-                              <p className="text-3xl font-bold text-white mb-1">{dashboardData?.attendance_stats?.total_present || 0}</p>
-                              <p className="text-xs text-white/90 font-medium">Present</p>
-                          </div>
-                          <div className="bg-red-500/30 backdrop-blur-sm rounded-2xl p-4 text-center border border-red-400/30">
-                              <p className="text-3xl font-bold text-white mb-1">{dashboardData?.attendance_stats?.total_absent || 0}</p>
-                              <p className="text-xs text-white/90 font-medium">Missed</p>
-                          </div>
+                      <div className="relative w-16 h-16">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
+                              <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(0,0,0,0.1)" strokeWidth="4"/>
+                              <circle 
+                                  cx="32" cy="32" r="28" fill="none" stroke="black" strokeWidth="4"
+                                  strokeDasharray={`${(avgAttendance / 100) * 175.9} 175.9`}
+                                  strokeLinecap="round"
+                              />
+                          </svg>
+                      </div>
+                  </div>
+                  
+                  {/* Detailed Stats Grid */}
+                  <div className="grid grid-cols-3 gap-2">
+                      <div className="bg-black/10 backdrop-blur-sm rounded-lg p-3 text-center">
+                          <p className="text-2xl font-bold mb-1">{dashboardData?.attendance_stats?.total_sessions || 0}</p>
+                          <p className="text-xs text-black/70 font-medium">Total Classes</p>
+                      </div>
+                      <div className="bg-green-500/20 rounded-lg p-3 text-center">
+                          <p className="text-2xl font-bold mb-1">{dashboardData?.attendance_stats?.total_present || 0}</p>
+                          <p className="text-xs text-black/70 font-medium">Present</p>
+                      </div>
+                      <div className="bg-red-500/20 rounded-lg p-3 text-center">
+                          <p className="text-2xl font-bold mb-1">{dashboardData?.attendance_stats?.total_absent || 0}</p>
+                          <p className="text-xs text-black/70 font-medium">Missed</p>
                       </div>
                   </div>
               </motion.div>
@@ -749,19 +729,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-lg border border-slate-200 dark:border-slate-700"
+                  className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700"
               >
                   <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl flex items-center justify-center">
-                              <BookOpen size={24} className="text-blue-600 dark:text-blue-400" />
+                      <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                              <BookOpen size={20} className="text-blue-600 dark:text-blue-400" />
                           </div>
                           <div>
-                              <p className="text-3xl font-bold text-slate-900 dark:text-white">{enrolledCourses.length}</p>
+                              <p className="text-2xl font-bold text-slate-900 dark:text-white">{enrolledCourses.length}</p>
                               <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Enrolled Courses</p>
                           </div>
                       </div>
-                      <ChevronRight size={24} className="text-slate-400" />
+                      <ChevronRight size={20} className="text-slate-400" />
                   </div>
               </motion.div>
           </div>
