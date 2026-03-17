@@ -53,6 +53,7 @@ urlpatterns = [
     path('', include('institutions.urls')),  # Auth, Institutions, Courses, Sessions, Attendance
     
     # Feature APIs
+    path('attendance/', include('attendance.urls')),  # GPS-verified attendance submission
     path('notifications/', include('notifications.urls')),  # Push notifications, FCM
     path('analytics/', include('analytics.urls')),  # Real-time analytics, insights
     path('reports/', include('reports.urls')),  # PDF/Excel exports
