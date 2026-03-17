@@ -16,6 +16,7 @@ export interface LoginData {
 
 export interface OnboardingData {
   role: UserRole;
+  first_name?: string;
   phone_number?: string;
   matric_number?: string;
   department?: string;
