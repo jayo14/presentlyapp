@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, ArrowLeft, Lock, X, CheckCircle, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Mail, ArrowLeft, Lock, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { useRequestPasswordReset } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { SEO } from '../SEO';
 import { toast } from 'sonner';
-import { Box, Input, VStack, HStack, Text, Heading, Spinner } from '@chakra-ui/react';
 
 type PageState = 'form' | 'sent' | 'error';
 
@@ -18,7 +16,6 @@ export const ForgotPassword: React.FC = () => {
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const requestPasswordResetMutation = useRequestPasswordReset();
 
-  // Rate limiting - 1 email per 2 minutes (120 seconds)
   const COOLDOWN_SECONDS = 120;
 
   useEffect(() => {
@@ -27,35 +24,19 @@ export const ForgotPassword: React.FC = () => {
         const elapsed = Math.floor((Date.now() - lastSentTime) / 1000);
         const remaining = Math.max(0, COOLDOWN_SECONDS - elapsed);
         setCooldownRemaining(remaining);
-        
-        if (remaining === 0) {
-          clearInterval(interval);
-        }
+        if (remaining === 0) clearInterval(interval);
       }, 1000);
-
       return () => clearInterval(interval);
     }
   }, [lastSentTime]);
 
-  // Real-time email validation
   const validateEmail = (emailValue: string) => {
-    if (!emailValue) {
-      setEmailError('');
-      return false;
-    }
-    
-    // Basic email format validation
+    if (!emailValue) { setEmailError(''); return false; }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailValue)) {
       setEmailError('Please enter a valid email address');
       return false;
     }
-
-    // Optional: Check for university domain if configured
-    // Remove .edu check to allow international institutions
-    // This can be configured via environment variable if needed
-    // Example: VITE_REQUIRE_EDU_EMAIL=true
-
     setEmailError('');
     return true;
   };
@@ -66,23 +47,15 @@ export const ForgotPassword: React.FC = () => {
     validateEmail(value);
   };
 
-  const clearEmail = () => {
-    setEmail('');
-    setEmailError('');
-  };
+  const clearEmail = () => { setEmail(''); setEmailError(''); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Check rate limiting
     if (cooldownRemaining > 0) {
       toast.error(`Please wait ${cooldownRemaining} seconds before requesting another link`);
       return;
     }
-
-    if (!validateEmail(email)) {
-      return;
-    }
+    if (!validateEmail(email)) return;
 
     requestPasswordResetMutation.mutate(email, {
       onSuccess: () => {
@@ -105,8 +78,6 @@ export const ForgotPassword: React.FC = () => {
     setPageState('form');
   };
 
-  const onBack = () => navigate(-1);
-
   const formatCooldown = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -114,257 +85,143 @@ export const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <Box 
-      minH="100vh" 
-      bg="#09090b"
-      color="white" 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
-      p={4}
-      position="relative"
-    >
-      <SEO 
+    <div className="min-h-screen bg-[#09090b] text-white flex flex-col items-center justify-center p-4 relative">
+      <SEO
         title="Forgot Password | Presently"
         description="Reset your Presently password to regain access to your account."
       />
-      
-      {/* Back Button */}
-      <Box
-        as="button"
-        onClick={onBack}
-        position="absolute"
-        top={6}
-        left={6}
-        color="gray.300"
-        _hover={{ color: "white" }}
-        display="flex"
-        alignItems="center"
-        gap={2}
-        transition="colors 0.2s"
+
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-6 left-6 text-gray-300 hover:text-white flex items-center gap-2 transition-colors"
+        aria-label="Go back"
       >
         <ArrowLeft size={20} />
-      </Box>
+      </button>
 
-      <Box w="full" maxW="md">
-        {/* Icon with Lock */}
-        <VStack mb={8} textAlign="center">
-          <Box
-            w={24}
-            h={24}
-            borderRadius="full"
-            bg="#FFD700"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            mb={6}
-          >
+      <div className="w-full max-w-md">
+        {/* Icon + Title */}
+        <div className="mb-8 text-center flex flex-col items-center">
+          <div className="w-24 h-24 rounded-full bg-[#FFD700] flex items-center justify-center mb-6">
             <Lock size={48} color="#09090b" strokeWidth={2.5} />
-          </Box>
-          
-          <Heading as="h2" size="3xl" fontWeight="bold" color="white" mb={2}>
-            Reset Password
-          </Heading>
-          <Text color="gray.400" textAlign="center">
+          </div>
+          <h2 className="text-4xl font-bold text-white mb-2">Reset Password</h2>
+          <p className="text-[#a1a1aa] text-center">
             Enter your registered university email address and we'll send you a secure link to reset your password.
-          </Text>
-        </VStack>
+          </p>
+        </div>
 
-        {/* Form Card */}
-        <Box 
-          bg="#18181b"
-          borderWidth={1}
-          borderColor="#27272a"
-          p={6}
-          borderRadius="2xl"
-          shadow="lg"
-        >
+        <div className="bg-[#18181b] border border-[#27272a] p-6 rounded-2xl shadow-lg">
           {pageState === 'form' && (
             <form onSubmit={handleSubmit}>
-              <VStack gap={5} align="stretch">
-                {/* Email Input */}
-                <Box>
-                  <Text as="label" fontSize="sm" fontWeight="medium" color="gray.300" mb={2} display="block">
-                    University Email
-                  </Text>
-                  <Box position="relative">
-                    <Mail 
-                      style={{ 
-                        position: 'absolute', 
-                        left: '16px', 
-                        top: '50%', 
-                        transform: 'translateY(-50%)',
-                        color: '#6B7280',
-                        zIndex: 10
-                      }} 
-                      size={20} 
-                    />
-                    <Input
+              <div className="flex flex-col gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">University Email</label>
+                  <div className="relative">
+                    <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280] z-10" />
+                    <input
                       type="email"
                       placeholder="name@university.edu"
                       required
                       value={email}
                       onChange={handleEmailChange}
                       disabled={requestPasswordResetMutation.isPending}
-                      pl={12}
-                      pr={email ? 12 : 4}
-                      h={14}
-                      bg="#27272a"
-                      borderColor={emailError ? "#ef4444" : "#3f3f46"}
-                      borderRadius="2xl"
-                      color="white"
-                      _placeholder={{ color: "gray.500" }}
-                      _focus={{ borderColor: emailError ? "#ef4444" : "#FFD700", outline: "none", ring: 1, ringColor: emailError ? "#ef4444" : "#FFD700" }}
+                      className={[
+                        'w-full h-14 pl-12 pr-12 bg-[#27272a] border rounded-2xl text-white placeholder-[#71717a]',
+                        'focus:outline-none focus:ring-1 transition-colors',
+                        emailError
+                          ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                          : 'border-[#3f3f46] focus:border-[#FFD700] focus:ring-[#FFD700]',
+                        'disabled:opacity-50',
+                      ].join(' ')}
                     />
                     {email && !requestPasswordResetMutation.isPending && (
-                      <Box
-                        as="button"
+                      <button
                         type="button"
                         onClick={clearEmail}
-                        position="absolute"
-                        right="16px"
-                        top="50%"
-                        transform="translateY(-50%)"
-                        color="gray.400"
-                        _hover={{ color: "white" }}
-                        transition="colors 0.2s"
-                        zIndex={10}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors z-10"
+                        aria-label="Clear email"
                       >
                         <X size={20} />
-                      </Box>
+                      </button>
                     )}
-                  </Box>
+                  </div>
                   {emailError && (
-                    <HStack mt={2} color="red.400" fontSize="xs">
+                    <div className="flex items-center gap-1.5 mt-2 text-red-400 text-xs">
                       <AlertCircle size={14} />
-                      <Text>{emailError}</Text>
-                    </HStack>
+                      <span>{emailError}</span>
+                    </div>
                   )}
-                </Box>
+                </div>
 
-                {/* Submit Button */}
-                <Button
+                <button
                   type="submit"
                   disabled={requestPasswordResetMutation.isPending || !email || !!emailError || cooldownRemaining > 0}
-                  w="full"
-                  h={14}
-                  bg="#FFD700"
-                  color="#09090b"
-                  borderRadius="2xl"
-                  fontWeight="bold"
-                  fontSize="lg"
-                  _hover={{ bg: "#FFE44D", transform: "translateY(-1px)" }}
-                  _active={{ transform: "translateY(0)" }}
-                  transition="all 0.2s"
-                  _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
+                  className="w-full h-14 bg-[#FFD700] text-[#09090b] rounded-2xl font-bold text-lg hover:bg-[#FFE44D] hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {requestPasswordResetMutation.isPending ? (
-                    <HStack>
-                      <Spinner size="sm" color="#09090b" />
-                      <Text>Sending...</Text>
-                    </HStack>
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      <span>Sending...</span>
+                    </>
                   ) : cooldownRemaining > 0 ? (
                     `Wait ${formatCooldown(cooldownRemaining)}`
                   ) : (
                     'Send Reset Link'
                   )}
-                </Button>
+                </button>
 
-                {/* Support Link */}
-                <Text textAlign="center" fontSize="sm" color="gray.400" mt={2}>
+                <p className="text-center text-sm text-[#a1a1aa] mt-2">
                   Having trouble?{' '}
-                  <Box
-                    as="button"
+                  <button
                     type="button"
                     onClick={() => window.open('mailto:support@presently.app', '_blank')}
-                    color="#FFD700"
-                    fontWeight="semibold"
-                    _hover={{ textDecoration: "underline" }}
+                    className="text-[#FFD700] font-semibold hover:underline"
                   >
                     Contact Support
-                  </Box>
-                </Text>
-              </VStack>
+                  </button>
+                </p>
+              </div>
             </form>
           )}
 
-          {/* Success Status */}
           {pageState === 'sent' && (
-            <VStack gap={6} textAlign="center">
-              <Box
-                w={16}
-                h={16}
-                borderRadius="full"
-                bg="green.500"
-                opacity={0.1}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mx="auto"
-              >
-                <CheckCircle size={40} color="#22c55e" />
-              </Box>
-              <VStack gap={2}>
-                <Heading as="h3" size="lg" color="green.400">
-                  Link sent!
-                </Heading>
-                <Text color="gray.400">
-                  Check your email for the password reset link.
-                </Text>
-              </VStack>
-              <Box
-                as="button"
+            <div className="flex flex-col items-center gap-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center">
+                <CheckCircle size={40} className="text-green-500" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-xl font-bold text-green-400">Link sent!</h3>
+                <p className="text-[#a1a1aa]">Check your email for the password reset link.</p>
+              </div>
+              <button
                 onClick={handleReset}
-                color="#FFD700"
-                fontWeight="semibold"
-                _hover={{ textDecoration: "underline" }}
+                className="text-[#FFD700] font-semibold hover:underline"
               >
                 Send to a different email
-              </Box>
-            </VStack>
+              </button>
+            </div>
           )}
 
-          {/* Error Status */}
           {pageState === 'error' && (
-            <VStack gap={6} textAlign="center">
-              <Box
-                w={16}
-                h={16}
-                borderRadius="full"
-                bg="red.500"
-                opacity={0.1}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mx="auto"
-              >
-                <AlertCircle size={40} color="#ef4444" />
-              </Box>
-              <VStack gap={2}>
-                <Heading as="h3" size="lg" color="red.400">
-                  Something went wrong
-                </Heading>
-                <Text color="gray.400">
-                  We couldn't send the reset link. Please try again.
-                </Text>
-              </VStack>
-              <Button
+            <div className="flex flex-col items-center gap-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
+                <AlertCircle size={40} className="text-red-500" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-xl font-bold text-red-400">Something went wrong</h3>
+                <p className="text-[#a1a1aa]">We couldn't send the reset link. Please try again.</p>
+              </div>
+              <button
                 onClick={handleReset}
-                w="full"
-                bg="#FFD700"
-                color="#09090b"
-                borderRadius="full"
-                fontWeight="semibold"
-                _hover={{ bg: "#FFE44D" }}
-                transition="all 0.2s"
+                className="w-full h-12 bg-[#FFD700] text-[#09090b] rounded-full font-semibold hover:bg-[#FFE44D] transition-all"
               >
                 Try Again
-              </Button>
-            </VStack>
+              </button>
+            </div>
           )}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
