@@ -54,6 +54,7 @@ interface OnboardingState {
   selectedDepartment: number | null;
   
   formData: {
+    firstName: string;
     phoneNumber: string;
     matricNumber: string;
     department: string;
@@ -125,6 +126,7 @@ const initialState: OnboardingState = {
   selectedDepartment: null,
   
   formData: {
+    firstName: '',
     phoneNumber: '',
     matricNumber: '',
     department: '',
@@ -335,7 +337,7 @@ export const Onboarding: React.FC = () => {
       dispatch({ type: 'SET_INSTITUTIONS_LOADING', payload: true });
       const data = await institutionsApi.getAllInstitutions();
       const institutionList = Array.isArray(data) ? data : (data.results || data.data || []);
-      const activeInstitutions = Array.isArray(institutionList) ? institutionList.filter(inst => inst.is_active) : [];
+      const activeInstitutions = Array.isArray(institutionList) ? institutionList.filter(inst => inst.is_active !== false) : [];
       dispatch({ type: 'SET_INSTITUTIONS', payload: activeInstitutions });
       saveToCache(CACHE_KEYS.institutions, activeInstitutions);
     } catch (err) {
@@ -500,6 +502,7 @@ export const Onboarding: React.FC = () => {
         // Prepare onboarding data
         const onboardingData = {
           role: state.selectedRole,
+          first_name: state.formData.firstName || undefined,
           phone_number: state.formData.phoneNumber || undefined,
           matric_number: state.formData.matricNumber || undefined,
           department: state.selectedDepartment?.toString() || state.formData.department || undefined,
@@ -650,13 +653,6 @@ export const Onboarding: React.FC = () => {
         desc: 'I want to manage classes, record attendance, and export reports.',
         features: ['Create sessions', 'Generate reports', 'Manage courses']
       },
-      { 
-        id: UserRole.CLASS_REP, 
-        icon: UserCheck, 
-        label: 'Class Rep', 
-        desc: 'I want to assist with class management and student coordination.',
-        features: ['View attendance', 'Coordinate classes', 'Send announcements']
-      },
     ];
 
     return (
@@ -763,6 +759,19 @@ export const Onboarding: React.FC = () => {
       </div>
 
       <div className="space-y-4">
+        <div>
+          <Input 
+            name="firstName"
+            label="First Name" 
+            placeholder="John" 
+            icon={<User size={16} />}
+            value={state.formData.firstName}
+            onChange={handleInputChange}
+          />
+          {state.validationErrors.firstName && (
+            <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.firstName}</p>
+          )}
+        </div>
         <div>
           <Input 
             name="phoneNumber"

@@ -224,11 +224,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class OnboardingSerializer(serializers.ModelSerializer):
     """Serializer for user onboarding"""
+    first_name = serializers.CharField(max_length=200, required=False, allow_blank=True)
     
     class Meta:
         model = User
         fields = [
-            'role', 'phone_number', 'matric_number', 'department', 'level',
+            'first_name', 'role', 'phone_number', 'matric_number', 'department', 'level',
             'staff_id', 'courses', 'assigned_lecturer', 'institution', 'college',
             'avatar_url', 'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone'
         ]
@@ -238,8 +239,15 @@ class OnboardingSerializer(serializers.ModelSerializer):
         import logging
         logger = logging.getLogger(__name__)
         
+        # Extract first_name to map to full_name
+        first_name = validated_data.pop('first_name', None)
+        
         # Extract courses before updating
         courses_data = validated_data.pop('courses', None)
+        
+        # Set full_name from first_name if provided
+        if first_name:
+            instance.full_name = first_name
         
         # Update all provided fields
         for field, value in validated_data.items():
