@@ -59,10 +59,6 @@ class Command(BaseCommand):
         timetables = self.create_timetables(courses)
         self.stdout.write(f'Created {len(timetables)} timetables')
         
-        # Create attendance records
-        attendance_count = self.create_attendance(enrollments, timetables)
-        self.stdout.write(f'Created {attendance_count} attendance records')
-        
         self.stdout.write(self.style.SUCCESS('\nSeed data population completed successfully!'))
 
     def clear_data(self):
@@ -416,8 +412,8 @@ class Command(BaseCommand):
                     student=student,
                     course=course,
                     defaults={
-                        'enrollment_date': timezone.now(),
-                        'status': 'Active',
+                        'is_active': True,
+                        'status': 'ENROLLED',
                     }
                 )
                 enrollments.append(enrollment)

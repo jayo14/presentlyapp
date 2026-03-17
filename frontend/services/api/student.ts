@@ -110,7 +110,7 @@ export const studentApi = {
   // Get student dashboard data – try dedicated summary endpoint first, fall back to analytics
   getDashboard: async (): Promise<StudentDashboardData> => {
     try {
-      const response = await apiClient.get('/institutions/dashboard/student/');
+      const response = await apiClient.get('/dashboard/student/');
       const summary = response.data;
       // Transform the new response shape into StudentDashboardData for backwards compatibility
       if (summary?.success && summary.data) {
