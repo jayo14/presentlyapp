@@ -77,19 +77,19 @@ export interface LecturerDashboardSummary {
 export const dashboardApi = {
   /**
    * Fetch the aggregated Student Dashboard summary.
-   * Endpoint: GET /institutions/dashboard/student/
+   * Endpoint: GET /dashboard/student/
    */
   getStudentSummary: async (): Promise<StudentDashboardSummary> => {
-    const response = await apiClient.get('/institutions/dashboard/student/');
+    const response = await apiClient.get('/dashboard/student/');
     return response.data;
   },
 
   /**
    * Fetch the aggregated Lecturer Dashboard summary. 
-   * Endpoint: GET /institutions/dashboard/lecturer/
+   * Endpoint: GET /dashboard/lecturer/
    */
   getLecturerSummary: async (): Promise<LecturerDashboardSummary> => {
-    const response = await apiClient.get('/institutions/dashboard/lecturer/');
+    const response = await apiClient.get('/dashboard/lecturer/');
     return response.data;
   },
 
