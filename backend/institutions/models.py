@@ -744,8 +744,8 @@ class Timetable(models.Model):
     end_time = models.TimeField()
     
     # Context
-    semester = models.CharField(max_length=20, choices=Course.SEMESTER_CHOICES)
-    academic_year = models.CharField(max_length=20, help_text="e.g. 2023/2024")
+    semester = models.CharField(max_length=20, choices=Course.SEMESTER_CHOICES, default='FIRST')
+    academic_year = models.CharField(max_length=20, default="2025/2026", blank=True, help_text="e.g. 2023/2024")
     
     # Recurrence
     is_recurring = models.BooleanField(default=True)
@@ -753,7 +753,7 @@ class Timetable(models.Model):
     end_date = models.DateField(null=True, blank=True)
     
     # Ownership & Status
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_timetables')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_timetables', null=True, blank=True)
     is_active = models.BooleanField(default=True)
     
     # Metadata
