@@ -2,14 +2,31 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 // API Base URL - Django backend
-// Ensure /api suffix is present to avoid 404 errors
-const rawApiUrl: string = import.meta.env.VITE_API_URL || '';
-let API_BASE_URL: string = rawApiUrl;
+// Ensure requests always target backend host from env (never relative to frontend host)
+const DEFAULT_API_URL = 'http://localhost:8000/api';
 
-// Normalize the URL: remove trailing slash and ensure /api suffix
-if (!API_BASE_URL.endsWith('/api')) {
-  API_BASE_URL = API_BASE_URL.replace(/\/$/, '') + '/api';
-}
+const normalizeApiBaseUrl = (apiUrl?: string): string => {
+  const trimmedUrl = (apiUrl || '').trim();
+
+  if (!trimmedUrl) {
+    return DEFAULT_API_URL;
+  }
+
+  const normalizedUrl = trimmedUrl.replace(/\/$/, '');
+  const withApiSuffix = normalizedUrl.endsWith('/api')
+    ? normalizedUrl
+    : `${normalizedUrl}/api`;
+
+  if (!/^https?:\/\//i.test(withApiSuffix)) {
+    console.warn('[API Client] VITE_API_URL must be absolute (http/https). Falling back to default backend URL.');
+    return DEFAULT_API_URL;
+  }
+
+  return withApiSuffix;
+};
+
+const rawApiUrl: string = import.meta.env.VITE_API_URL || '';
+const API_BASE_URL: string = normalizeApiBaseUrl(rawApiUrl);
 
 // Log for debugging in development
 if (import.meta.env.DEV) {

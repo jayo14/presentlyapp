@@ -5,6 +5,7 @@
 
 import { getPendingSyncItems, deleteData, STORES } from './offlineDB';
 import { toast } from 'sonner';
+import { apiClient } from '../../services/api/client';
 
 export class OfflineSyncManager {
   private syncInProgress = false;
@@ -153,38 +154,14 @@ export class OfflineSyncManager {
    * Sync attendance record
    */
   private async syncAttendance(payload: any): Promise<void> {
-    const token = localStorage.getItem('token');
-    const response = await fetch('/api/attendance/check-in/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to sync attendance: ${response.statusText}`);
-    }
+    await apiClient.post('/attendance/check-in/', payload);
   }
 
   /**
    * Sync profile update
    */
   private async syncProfileUpdate(payload: any): Promise<void> {
-    const token = localStorage.getItem('token');
-    const response = await fetch('/api/users/profile/', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to sync profile: ${response.statusText}`);
-    }
+    await apiClient.patch('/users/profile/', payload);
   }
 
   /**
