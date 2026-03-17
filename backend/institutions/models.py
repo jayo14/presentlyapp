@@ -540,7 +540,33 @@ class AttendanceSession(models.Model):
     # Invalidation Rule
     is_valid = models.BooleanField(default=True)
     invalidation_reason = models.TextField(blank=True, null=True)
-    
+
+    # GPS / submission validation settings (Phase 1-3 mobile app)
+    lecturer_coordinates = models.JSONField(
+        blank=True, null=True,
+        help_text="Lecturer GPS position: {lat, lng}"
+    )
+    allowed_radius_meters = models.IntegerField(
+        default=50,
+        help_text="Maximum allowed distance from lecturer in meters"
+    )
+    required_presence_window_ms = models.IntegerField(
+        default=20000,
+        help_text="Minimum presence window the student must hold in milliseconds"
+    )
+    min_samples = models.IntegerField(
+        default=3,
+        help_text="Minimum number of GPS samples required"
+    )
+    strict_mode = models.BooleanField(
+        default=False,
+        help_text="When True, any flag causes automatic REJECTED verdict"
+    )
+    expires_at = models.DateTimeField(
+        blank=True, null=True,
+        help_text="Hard expiry for submission acceptance (separate from expiry_time)"
+    )
+
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
