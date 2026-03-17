@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box, Container, Heading, Text, VStack, Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
 import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,63 +6,62 @@ const PrivacyPolicy: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Box minH="100vh" bg="#09090b" color="white" py={12}>
-      <Container maxW="4xl">
-        <Breadcrumb spacing="8px" separator={<ChevronRight size={14} />} mb={8} color="zinc.400" fontSize="sm">
-          <BreadcrumbItem>
-            <BreadcrumbLink onClick={() => navigate('/')}>Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>
-            <BreadcrumbLink href="#">Privacy Policy</BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
+    <div className="min-h-screen bg-[#09090b] text-white py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-1 text-sm text-[#71717a] mb-8">
+          <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Home</button>
+          <ChevronRight size={14} />
+          <span className="text-white">Privacy Policy</span>
+        </nav>
 
-        <VStack align="stretch" spacing={8}>
-          <Box>
-            <Heading as="h1" size="2xl" mb={4} color="#FFD700">Privacy Policy</Heading>
-            <Text color="zinc.400">Last Updated: May 2024</Text>
-          </Box>
+        <div className="flex flex-col gap-8">
+          <div>
+            <h1 className="text-4xl font-bold text-[#FFD700] mb-4">Privacy Policy</h1>
+            <p className="text-[#71717a]">Last Updated: May 2024</p>
+          </div>
 
-          <VStack align="stretch" spacing={6}>
-            <Box>
-              <Heading as="h2" size="lg" mb={3}>1. Information We Collect</Heading>
-              <Text color="zinc.300">
+          <div className="flex flex-col gap-6">
+            <div>
+              <h2 className="text-xl font-semibold mb-3">1. Information We Collect</h2>
+              <p className="text-zinc-300">
                 We collect information you provide directly to us, such as your name, email address, matriculation number, and institutional affiliation.
-              </Text>
-            </Box>
+              </p>
+            </div>
 
-            <Box>
-              <Heading as="h2" size="lg" mb={3}>2. Location Data</Heading>
-              <Text color="zinc.300">
+            <div>
+              <h2 className="text-xl font-semibold mb-3">2. Location Data</h2>
+              <p className="text-zinc-300">
                 To verify attendance, we collect precise GPS location data from your device at the time of check-in. This data is only collected when you explicitly attempt to mark attendance and is compared against the authorized venue coordinates.
-              </Text>
-            </Box>
+              </p>
+            </div>
 
-            <Box>
-              <Heading as="h2" size="lg" mb={3}>3. How We Use Your Information</Heading>
-              <Text color="zinc.300">
+            <div>
+              <h2 className="text-xl font-semibold mb-3">3. How We Use Your Information</h2>
+              <p className="text-zinc-300">
                 We use the information to manage your attendance records, generate reports for lecturers and administrators, and improve our services. We do not sell your personal information to third parties.
-              </Text>
-            </Box>
+              </p>
+            </div>
 
-            <Box>
-              <Heading as="h2" size="lg" mb={3}>4. Data Security</Heading>
-              <Text color="zinc.300">
+            <div>
+              <h2 className="text-xl font-semibold mb-3">4. Data Security</h2>
+              <p className="text-zinc-300">
                 We implement a variety of security measures to maintain the safety of your personal information. Your data is stored on secure servers and transmitted using encrypted connections.
-              </Text>
-            </Box>
+              </p>
+            </div>
 
-            <Box>
-              <Heading as="h2" size="lg" mb={3}>5. Your Rights</Heading>
-              <Text color="zinc.300">
+            <div>
+              <h2 className="text-xl font-semibold mb-3">5. Your Rights</h2>
+              <p className="text-zinc-300">
                 You have the right to access, correct, or delete your personal data. Please contact us or your institutional administrator to exercise these rights.
-              </Text>
-            </Box>
-          </VStack>
-        </VStack>
-      </Container>
-    </Box>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default PrivacyPolicy;
+
