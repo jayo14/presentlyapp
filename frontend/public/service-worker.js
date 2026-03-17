@@ -9,6 +9,14 @@ const ASSETS_TO_CACHE = [
   '/favicon-32x32.png',
 ];
 
+const resolveApiBaseUrl = () => {
+  const configuredUrl = new URL(self.location.href).searchParams.get('apiBaseUrl') || 'http://localhost:8000/api';
+  const normalizedUrl = configuredUrl.replace(/\/$/, '');
+  return normalizedUrl.endsWith('/api') ? normalizedUrl : `${normalizedUrl}/api`;
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
+
 // Listen for skip waiting message from client
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -162,7 +170,7 @@ async function syncAttendanceData() {
       try {
         // TODO: Add authentication headers
         // const authToken = await getAuthToken(); // Retrieve from IndexedDB
-        const response = await fetch('/api/attendance/check-in/', {
+        const response = await fetch(`${API_BASE_URL}/attendance/check-in/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
