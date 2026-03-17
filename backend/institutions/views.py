@@ -8,8 +8,6 @@ from django.db.models import Q
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
@@ -25,22 +23,7 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 from user_agents import parse
 from presently.firebase_config import initialize_firebase
-
-# Novu integration
-try:
-    novu_secret_key = os.environ.get('NOVU_SECRET_KEY')
-    if novu_secret_key:
-        from novu.api import EventApi
-        novu = EventApi(api_key=novu_secret_key)
-        NOVU_AVAILABLE = True
-    else:
-        novu = None
-        NOVU_AVAILABLE = False
-        logging.warning("NOVU_SECRET_KEY not set. Notification features will be disabled.")
-except ImportError:
-    novu = None
-    NOVU_AVAILABLE = False
-    logging.warning("Novu package not installed. Notification features will be disabled.")
+from utils.novu_service import NovuService
 
 from .attendance_logic import perform_attendance_check_in
 from .models import (
@@ -294,24 +277,8 @@ def register_view(request):
             # Create OTP
             otp_obj = EmailVerificationOTP.create_otp(user)
             
-            # Send verification email
+            # Send verification email using Novu
             send_verification_email(user, otp_obj.otp)
-            
-            # Trigger Novu notification
-            if NOVU_AVAILABLE:
-                try:
-                    novu.trigger(
-                        name="auth-email-verification",
-                        recipients=[{"subscriberId": str(user.id)}],
-                        payload={
-                            "user_email": user.email,
-                            "user_name": user.full_name,
-                            "otp_code": otp_obj.otp,
-                            "expires_in": 900
-                        }
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to send Novu notification for email verification: {str(e)}")
             
             logger.info(f"User registered: {user.email}, OTP sent")
             
@@ -373,33 +340,17 @@ def register_view(request):
 # Add these views to institutions/views.py after the register_view
 
 def send_verification_email(user, otp_code):
-    """Send OTP verification email"""
+    """Send OTP verification email via Novu"""
     try:
-        subject = "Welcome to Presently - Verify Your Email"
-        
-        context = {
-            "user": user,
-            "otp_code": otp_code,
-        }
-        
-        html_message = render_to_string("emails/welcome_otp.html", context)
-
-        plain_message = f"Hello {user.full_name},\n\nThank you for signing up for Presently!\n\nYour email verification code is: {otp_code}\n\nThis code will expire in 15 minutes.\n\nBest regards,\nThe Presently Team"
-        
-        from django.core.mail import EmailMultiAlternatives
-        
-        msg = EmailMultiAlternatives(
-            subject,
-            plain_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email]
+        success = NovuService.send_email_verification_otp(
+            user_id=str(user.id),
+            user_email=user.email,
+            user_name=user.full_name,
+            otp_code=otp_code
         )
-        msg.attach_alternative(html_message, "text/html")
-        msg.send(fail_silently=False)
-        
-        logger.info(f"Verification email sent to {user.email}")
+        if not success:
+            raise Exception("Failed to send verification email via Novu")
         return True
-        
     except Exception as e:
         logger.error(f"Failed to send verification email to {user.email}: {str(e)}", exc_info=True)
         raise
@@ -432,25 +383,14 @@ def send_verification_otp_view(request):
         # Create new OTP
         otp_obj = EmailVerificationOTP.create_otp(user)
         
-        # Send email
+        # Send OTP email via Novu
         try:
-            send_verification_email(user, otp_obj.otp)
-            
-            # Trigger Novu notification
-            if NOVU_AVAILABLE:
-                try:
-                    novu.trigger(
-                        name="auth-otp-verification",
-                        recipients=[{"subscriberId": str(user.id)}],
-                        payload={
-                            "user_email": user.email,
-                            "user_name": user.full_name,
-                            "otp_code": otp_obj.otp,
-                            "expires_in": 900
-                        }
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to send Novu notification for OTP verification: {str(e)}")
+            NovuService.send_otp_resend(
+                user_id=str(user.id),
+                user_email=user.email,
+                user_name=user.full_name,
+                otp_code=otp_obj.otp
+            )
         except Exception as e:
             logger.error(f"Failed to send OTP email: {str(e)}")
             return Response({
@@ -627,61 +567,22 @@ def login_view(request):
                     device.last_login = timezone.now()
                     device.save()
                 else:
-                    # New device detected - Send security alert
-                    subject = 'New Login Detected - Presently'
-                    context = {
-                        'user': user,
-                        'device_category': device_category,
+                    # New device detected - Send security alert via Novu
+                    device_info = {
+                        'device_type': device_category,
                         'device_name': device_name,
-                        'os_name': os_name,
-                        'os_version': os_version,
                         'browser': f"{browser_name} {browser_version}",
-                        'location': ip_address,
-                        'time': timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC'),
-                        'confirm_url': f"{settings.FRONTEND_URL}/auth/confirm-device",
-                        'secure_url': f"{settings.FRONTEND_URL}/auth/reset-password",
+                        'os': f"{os_name} {os_version}",
+                        'login_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')
                     }
-
-                    html_message = render_to_string('emails/new_device_alert.html', context)
-                    plain_message = (
-                        f"New Login Detected - Presently\n\n"
-                        f"Hello {user.full_name},\n"
-                        f"We detected a login to your Presently account from a new device.\n"
-                        f"Device: {device_name}\n"
-                        f"Location: {ip_address}\n"
-                        f"Time: {context['time']}\n"
-                        f"If this was not you, please secure your account.\n"
-                    )
-
-                    from django.core.mail import EmailMultiAlternatives
-                    msg = EmailMultiAlternatives(
-                        subject,
-                        plain_message,
-                        settings.DEFAULT_FROM_EMAIL,
-                        [user.email]
-                    )
-                    msg.attach_alternative(html_message, 'text/html')
-                    msg.send(fail_silently=True)
                     
-                    # Trigger Novu notification for new device
-                    if NOVU_AVAILABLE:
-                        try:
-                            novu.trigger(
-                                name="auth-new-device-login",
-                                recipients=[{"subscriberId": str(user.id)}],
-                                payload={
-                                    "user_email": user.email,
-                                    "user_name": user.full_name,
-                                    "device_name": device_name,
-                                    "device_category": device_category,
-                                    "os_name": os_name,
-                                    "browser_name": browser_name,
-                                    "ip_address": ip_address,
-                                    "login_time": timezone.now().isoformat()
-                                }
-                            )
-                        except Exception as e:
-                            logger.error(f"Failed to send Novu notification for new device login: {str(e)}")
+                    NovuService.send_new_device_alert(
+                        user_id=str(user.id),
+                        user_email=user.email,
+                        user_name=user.full_name,
+                        device_info=device_info,
+                        ip_address=ip_address
+                    )
             else:
                 # Log bot access but don't track or send alerts
                 auth_logger.info(f"Bot user agent detected for user {user.email}: {user_agent}")
@@ -910,80 +811,40 @@ def change_password_view(request):
 def dashboard_venues_head(request):
     """Handle HEAD requests for dashboard/venues to prevent 404 errors from feedback scripts"""
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def request_password_reset_view(request):
     """Request password reset - sends email with reset link"""
     email = request.data.get('email')
-    
+
     if not email:
         return Response({
             'success': False,
             'error': 'Email is required'
         }, status=status.HTTP_400_BAD_REQUEST)
-    
+
     try:
         user = User.objects.get(email=email, is_active=True)
-        
+
         # Generate password reset token
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        
+
         # Create reset link
         reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
-        
-        # Send email with HTML template
-        subject = 'Password Reset Request - Presently'
-        
-        context = {
-            'user': user,
-            'reset_link': reset_link,
-        }
 
-        html_message = render_to_string('emails/password_reset.html', context)
-        
-        plain_message = f"""
-Hello {user.full_name},
-
-You requested to reset your password for your Presently account.
-
-Click the link below to reset your password:
-{reset_link}
-
-This link will expire in 24 hours.
-
-If you did not request this password reset, please ignore this email.
-
-Best regards,
-The Presently Team
-        """
-        
-        from django.core.mail import EmailMultiAlternatives
-        
-        msg = EmailMultiAlternatives(
-            subject,
-            plain_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email]
+        # Send password reset email via Novu
+        NovuService.send_password_reset(
+            user_id=str(user.id),
+            user_email=user.email,
+            user_name=user.full_name,
+            reset_link=reset_link
         )
-        msg.attach_alternative(html_message, "text/html")
-        msg.send(fail_silently=False)
-        
-        # Trigger Novu notification
-        if NOVU_AVAILABLE:
-            try:
-                novu.trigger(
-                    name="auth-password-reset",
-                    recipients=[{"subscriberId": str(user.id)}],
-                    payload={
-                        "user_email": user.email,
-                        "user_name": user.full_name,
-                        "reset_link": reset_link,
-                        "expires_in": 86400  # 24 hours
-                    }
-                )
-            except Exception as e:
-                logger.error(f"Failed to send Novu notification for password reset: {str(e)}")
-        
+
         logger.info(f"Password reset email sent to {email}")
-        
+
         return Response({
             'success': True,
             'message': 'Password reset email sent successfully'
@@ -2087,60 +1948,14 @@ class UserViewSet(viewsets.ModelViewSet):
         # Create invitation link
         invite_link = f"{settings.FRONTEND_URL}/accept-invite?uid={uid}&token={token}"
         
-        # Send invitation email
-        subject = f'Invitation to join {settings.SITE_NAME or "Presently"}'
-        
-        context = {
-            'user': user,
-            'invite_link': invite_link,
-            'invited_by': request.user.full_name,
-            'platform_name': settings.SITE_NAME or 'Presently'
-        }
-
-        html_message = render_to_string('emails/user_invitation.html', context)
-        
-        plain_message = f"""
-Hello {user.full_name},
-
-You have been invited to join {settings.SITE_NAME or 'Presently'} by {request.user.full_name}.
-
-Click the link below to accept your invitation and set up your account:
-{invite_link}
-
-This invitation will expire in 7 days.
-
-Best regards,
-The {settings.SITE_NAME or 'Presently'} Team
-        """
-        
-        from django.core.mail import EmailMultiAlternatives
-        
-        msg = EmailMultiAlternatives(
-            subject,
-            plain_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email]
+        # Send invitation email via Novu
+        NovuService.send_user_invitation(
+            user_email=user.email,
+            user_name=user.full_name,
+            inviter_name=request.user.full_name,
+            invitation_link=invite_link,
+            institution_name=settings.SITE_NAME or 'Presently'
         )
-        msg.attach_alternative(html_message, "text/html")
-        msg.send(fail_silently=False)
-        
-        # Trigger Novu notification
-        if NOVU_AVAILABLE:
-            try:
-                novu.trigger(
-                    name="auth-invite-user",
-                    recipients=[{"subscriberId": str(user.id)}],
-                    payload={
-                        "user_email": user.email,
-                        "user_name": user.full_name,
-                        "invite_link": invite_link,
-                        "invited_by": request.user.full_name,
-                        "platform_name": settings.SITE_NAME or 'Presently',
-                        "expires_in": 604800  # 7 days
-                    }
-                )
-            except Exception as e:
-                logger.error(f"Failed to send Novu notification for user invitation: {str(e)}")
         
         logger.info(f"User invited: {user.email} by {request.user.email}")
         
