@@ -104,7 +104,7 @@ export const OTPVerification: React.FC = () => {
   const formatCountdown = () => {
     const minutes = Math.floor(countdown / 60);
     const seconds = countdown % 60;
-    return seconds < 60 ? `${seconds}` : `${minutes}:${String(seconds).padStart(2, '0')}`;
+    return minutes > 0 ? `${minutes}:${String(seconds).padStart(2, '0')}` : `${seconds}`;
   };
 
   return (

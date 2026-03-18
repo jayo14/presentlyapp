@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, HStack } from '@chakra-ui/react';
 import { WifiOff, Wifi } from 'lucide-react';
-import { useColorModeValue } from '@/components/ui/color-mode';
 
 export const OfflineIndicator: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showIndicator, setShowIndicator] = useState(false);
-
-  const bgColor = useColorModeValue('#fee2e2', '#7f1d1d');
-  const textColor = useColorModeValue('#991b1b', '#fca5a5');
-  const onlineBg = useColorModeValue('#d1fae5', '#064e3b');
-  const onlineText = useColorModeValue('#065f46', '#6ee7b7');
 
   useEffect(() => {
     const handleOnline = () => {
@@ -42,31 +35,18 @@ export const OfflineIndicator: React.FC = () => {
   if (!showIndicator) return null;
 
   return (
-    <Box
-      position="fixed"
-      top={4}
-      left="50%"
-      transform="translateX(-50%)"
-      zIndex={9999}
-      bg={isOnline ? onlineBg : bgColor}
-      color={isOnline ? onlineText : textColor}
-      px={4}
-      py={2}
-      borderRadius="full"
-      boxShadow="lg"
-      transition="all 0.3s"
-      animation={isOnline ? '' : 'pulse 2s infinite'}
+    <div
+      className={[
+        'fixed top-4 left-1/2 -translate-x-1/2 z-[9999]',
+        'px-4 py-2 rounded-full shadow-lg transition-all duration-300',
+        'flex items-center gap-2 text-sm font-medium',
+        isOnline
+          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+          : 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 animate-pulse',
+      ].join(' ')}
     >
-      <HStack gap={2}>
-        {isOnline ? (
-          <Wifi size={16} />
-        ) : (
-          <WifiOff size={16} />
-        )}
-        <Text fontSize="sm" fontWeight="medium">
-          {isOnline ? 'Back online' : 'You are offline'}
-        </Text>
-      </HStack>
-    </Box>
+      {isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
+      <span>{isOnline ? 'Back online' : 'You are offline'}</span>
+    </div>
   );
 };
