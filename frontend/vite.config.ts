@@ -30,15 +30,10 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           output: {
             manualChunks(id) {
-              // Group React, Emotion, and Chakra UI together to avoid circular chunk dependencies.
-              // These packages are tightly coupled and must be in the same chunk.
+              // Group React and animation libs together to avoid circular chunk dependencies.
               if (
                 id.includes('node_modules/react/') ||
                 id.includes('node_modules/react-dom/') ||
-                id.includes('node_modules/@emotion/') ||
-                id.includes('node_modules/@chakra-ui/') ||
-                id.includes('node_modules/@ark-ui/') ||
-                id.includes('node_modules/@zag-js/') ||
                 id.includes('node_modules/framer-motion/')
               ) {
                 return 'vendor-react';
@@ -88,9 +83,6 @@ export default defineConfig(({ mode }) => {
           'lucide-react',
           'maplibre-gl',
           '@mapbox/mapbox-gl-draw',
-          '@chakra-ui/react',
-          '@emotion/react',
-          '@emotion/styled',
           'react-icons',
           'framer-motion',
           'next-themes',
