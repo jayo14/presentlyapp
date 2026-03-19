@@ -16,40 +16,59 @@
 }
 
 @layer base {
-  /* CSS variables for theme colors */
+  /* CSS variables for Material Design 3 color palette */
   :root {
-    --background: 224 71% 4%; /* #010409 */
-    --foreground: 210 40% 98%;
-
-    --card: 224 71% 4%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 224 71% 4%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 52 47% 65%; /* #FFD700 */
-    --primary-foreground: 220 100% 20%; /* #09090b */
-
-    --secondary: 220 100% 20%; /* #09090b */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
-
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 213 94% 68%;
-
+    /* Primary colors */
+    --primary: #755b00;
+    --primary-container: #ffca0d;
+    --primary-fixed: #ffdf90;
+    --primary-fixed-dim: #f3c000;
+    --on-primary-fixed: #241a00;
+    
+    /* Secondary colors */
+    --secondary: #5f5e61;
+    --secondary-fixed-dim: #c8c6c9;
+    
+    /* Surface colors */
+    --surface: #fbf8fc;
+    --surface-bright: #fbf8fc;
+    --surface-container: #f0edf1;
+    --surface-container-low: #f5f3f6;
+    --surface-container-lowest: #ffffff;
+    --surface-container-high: #eae7eb;
+    --surface-container-highest: #e4e1e5;
+    --surface-variant: #e4e1e5;
+    
+    /* Text colors */
+    --on-surface: #1b1b1e;
+    --on-surface-variant: #4e4632;
+    
+    /* Background and other colors */
+    --background: #fbf8fc;
+    --outline-variant: #d2c5ab;
+    --error: #ba1a1a;
+    --inverse-surface: #303033;
+    
+    /* Card and popover backgrounds */
+    --card: #fbf8fc;
+    --card-foreground: #1b1b1e;
+    --popover: #fbf8fc;
+    --popover-foreground: #1b1b1e;
+    
+    /* Semantic tokens */
+    --primary-foreground: #241a00;
+    --secondary-foreground: #fbf8fc;
+    --muted: #e4e1e5;
+    --muted-foreground: #5f5e61;
+    --accent: #ffca0d;
+    --accent-foreground: #241a00;
+    --destructive: #ba1a1a;
+    --destructive-foreground: #fbf8fc;
+    --border: #e4e1e5;
+    --input: #f5f3f6;
+    --ring: #755b00;
     --radius: 0.5rem;
   }
-  
-  /* Root CSS variables removed - using Tailwind theme colors instead */
 }
 
 /* Custom Scrollbar Styles */
@@ -63,18 +82,18 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: #FFD700;
+    background-color: #755b00;
     @apply rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #09090b;
+    background-color: #ffca0d;
   }
 
   /* Firefox support */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #FFD700 transparent;
+    scrollbar-color: #755b00 transparent;
   }
 }
 
@@ -82,8 +101,12 @@
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
-  @apply bg-zinc-950 dark:bg-zinc-950;
+  background-color: var(--surface-container-lowest);
   z-index: 1;
+}
+
+.dark .leaflet-container {
+  background-color: var(--inverse-surface);
 }
 
 .leaflet-control-container .leaflet-top,
@@ -99,30 +122,30 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: rgb(184, 134, 11); /* primary color light mode */
+    background: #755b00; /* primary color */
     cursor: pointer;
-    border: 2px solid rgb(9, 9, 11);
-    box-shadow: 0 2px 4px rgba(184, 134, 11, 0.3);
+    border: 2px solid #fbf8fc;
+    box-shadow: 0 2px 4px rgba(117, 91, 0, 0.3);
   }
 
   .dark input[type="range"].slider-primary::-webkit-slider-thumb {
-    background: rgb(255, 215, 0); /* dark-primary color dark mode */
-    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+    background: #ffca0d; /* primary-container color */
+    box-shadow: 0 2px 4px rgba(255, 202, 13, 0.3);
   }
 
   input[type="range"].slider-primary::-moz-range-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: rgb(184, 134, 11);
+    background: #755b00;
     cursor: pointer;
-    border: 2px solid rgb(9, 9, 11);
-    box-shadow: 0 2px 4px rgba(184, 134, 11, 0.3);
+    border: 2px solid #fbf8fc;
+    box-shadow: 0 2px 4px rgba(117, 91, 0, 0.3);
   }
   
   .dark input[type="range"].slider-primary::-moz-range-thumb {
-    background: rgb(255, 215, 0);
-    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+    background: #ffca0d;
+    box-shadow: 0 2px 4px rgba(255, 202, 13, 0.3);
   }
 
   input[type="range"].slider-primary::-webkit-slider-runnable-track {
