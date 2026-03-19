@@ -6,7 +6,6 @@ import { User, UserRole } from '../../types';
 import apiClient from '../../services/api/client';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
-import { Box, Button as ChakraButton, HStack, Text } from '@chakra-ui/react';
 import { SEO } from '../SEO';
 
 export const UserManagement: React.FC = () => {
@@ -413,30 +412,30 @@ export const UserManagement: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <HStack justify="space-between" p={4}>
-          <Text fontSize="sm" color="zinc.400">
+        <div className="flex items-center justify-between p-4">
+          <span className="text-sm text-zinc-400">
             Showing {users.length} of {totalUsers} users
-          </Text>
-          <HStack>
-            <ChakraButton
+          </span>
+          <div className="flex items-center gap-2">
+            <button
               onClick={() => setCurrentPage(currentPage - 1)}
-              isDisabled={currentPage === 1}
-              size="sm"
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 text-sm rounded-md border border-zinc-700 bg-zinc-800 text-white hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Previous
-            </ChakraButton>
-            <Text fontSize="sm" p={2}>
+            </button>
+            <span className="text-sm text-zinc-400 px-2">
               {currentPage} / {totalPages}
-            </Text>
-            <ChakraButton
+            </span>
+            <button
               onClick={() => setCurrentPage(currentPage + 1)}
-              isDisabled={currentPage === totalPages}
-              size="sm"
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 text-sm rounded-md border border-zinc-700 bg-zinc-800 text-white hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next
-            </ChakraButton>
-          </HStack>
-        </HStack>
+            </button>
+          </div>
+        </div>
       </div>
 
       {filteredUsers.length === 0 && !loading && (
