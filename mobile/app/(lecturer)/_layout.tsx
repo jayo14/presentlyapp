@@ -4,10 +4,12 @@ import { useTheme } from '@/hooks/useTheme';
 import { Platform, ActivityIndicator, View, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LecturerLayout() {
   const { colors, isDark } = useTheme();
   const { user, isLoading } = useAuth();
+  const insets = useSafeAreaInsets();
 
   // Show loading state while checking auth
   if (isLoading) {
@@ -29,6 +31,9 @@ export default function LecturerLayout() {
     return <Redirect href={destination} />;
   }
 
+  // Calculate bottom position accounting for Android navigation bar
+  const bottomPosition = Platform.OS === 'ios' ? 24 : Math.max(16, insets.bottom);
+
   return (
     <Tabs
       screenOptions={{
@@ -42,7 +47,7 @@ export default function LecturerLayout() {
           paddingBottom: Platform.OS === 'ios' ? 32 : 12,
           paddingTop: 12,
           position: 'absolute',
-          bottom: Platform.OS === 'ios' ? 24 : 16,
+          bottom: bottomPosition,
           left: 16,
           right: 16,
           borderRadius: 32,
