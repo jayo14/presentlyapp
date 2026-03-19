@@ -40,7 +40,7 @@ const mapApiUser = (data: any, fallbackEmail: string): User => {
 
   return {
     id: String(userData?.id ?? userData?._id ?? userData?.uuid ?? 'user-1'),
-    fullName: userData?.full_name ?? userData?.fullName ?? userData?.name ?? fullNameFromParts || 'User',
+    fullName: (userData?.full_name ?? userData?.fullName ?? userData?.name ?? fullNameFromParts) || 'User',
     email: userData?.email ?? fallbackEmail,
     role: normalizeRole(userData?.role ?? userData?.user_type),
     emailVerified: userData?.is_verified ?? userData?.emailVerified ?? true,

@@ -14,12 +14,13 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-comp
 // before deploying to production. These values are public identifiers and safe to expose.
 // Get them from Firebase Console > Project Settings > General > Your apps > Web app
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB-RoAIMRtlNxPJel6rrfyjBrokjfSjU-g",
+  authDomain: "presently-silk.firebaseapp.com",
+  projectId: "presently-silk",
+  storageBucket: "presently-silk.firebasestorage.app",
+  messagingSenderId: "879167844474",
+  appId: "1:879167844474:web:e2610155ff9228d0c18bc3",
+  measurementId: "G-78VRQFZFKQ"
 };
 
 // Initialize Firebase app in service worker
