@@ -1,515 +1,839 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowRight,
-  CheckCircle2,
-  MapPin,
-  ShieldCheck,
-  Clock,
-  Users,
-  BarChart3,
-  Smartphone,
-  ChevronRight,
-  Menu,
-  X,
-  Lock,
-  Zap,
-  Globe
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+// ─── Inline SVG Icons (no external dependency needed) ────────────────────────
 
-const Logo = () => (
-  <div className="flex items-center gap-2 cursor-pointer group">
-    <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
-      <div className="w-5 h-5 bg-black rounded-sm rotate-45 flex items-center justify-center overflow-hidden">
-        <div className="w-full h-full bg-primary -translate-x-1/2 -translate-y-1/2 rotate-45" />
-      </div>
-    </div>
-    <span className="text-2xl font-black text-white tracking-tighter">Presently</span>
-  </div>
+const ArrowForwardIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+   </svg>
 );
 
+const VerifiedIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+   </svg>
+);
+
+const AnalyticsIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#755b00' }}>
+      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+   </svg>
+);
+
+const LockIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="white">
+      <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+   </svg>
+);
+
+const CloudIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#5f5e61' }}>
+      <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17 15.18 9l1.41 1.41L10 17z" />
+   </svg>
+);
+
+const GroupIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#5f5e61' }}>
+      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+   </svg>
+);
+
+const NotificationsIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#5f5e61' }}>
+      <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+   </svg>
+);
+
+const BoltIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#755b00' }}>
+      <path d="M7 2v11h3v9l7-12h-4l4-8z" />
+   </svg>
+);
+
+const LanguageIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z" />
+   </svg>
+);
+
+const ShareIcon = () => (
+   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" />
+   </svg>
+);
+
+// ─── Styles injected once ─────────────────────────────────────────────────────
+
+const GLOBAL_STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --primary:              #755b00;
+    --primary-container:    #ffca0d;
+    --primary-fixed:        #ffdf90;
+    --primary-fixed-dim:    #f3c000;
+    --on-primary:           #ffffff;
+    --on-primary-fixed:     #241a00;
+    --on-primary-fixed-var: #584400;
+    --on-primary-container: #6f5600;
+    --secondary:            #5f5e61;
+    --secondary-container:  #e4e1e5;
+    --on-secondary:         #ffffff;
+    --on-secondary-container:#656467;
+    --tertiary:             #5d5e66;
+    --surface:              #fbf8fc;
+    --surface-bright:       #fbf8fc;
+    --surface-dim:          #dcd9dd;
+    --surface-variant:      #e4e1e5;
+    --surface-tint:         #755b00;
+    --surface-container:    #f0edf1;
+    --surface-container-low:#f5f3f6;
+    --surface-container-lowest:#ffffff;
+    --surface-container-high:#eae7eb;
+    --surface-container-highest:#e4e1e5;
+    --on-surface:           #1b1b1e;
+    --on-surface-variant:   #4e4632;
+    --on-background:        #1b1b1e;
+    --background:           #fbf8fc;
+    --outline:              #80765f;
+    --outline-variant:      #d2c5ab;
+    --error:                #ba1a1a;
+    --inverse-surface:      #303033;
+    --inverse-on-surface:   #f3f0f4;
+    --inverse-primary:      #f3c000;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--background);
+    color: var(--on-surface);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .editorial-shadow { box-shadow: 0 12px 32px rgba(27,27,30,0.07); }
+
+  /* Hover card lift */
+  .hover-lift { transition: transform 0.35s ease, box-shadow 0.35s ease; }
+  .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(27,27,30,0.10); }
+
+  /* Rotate card on hover */
+  .hero-card { transition: transform 0.7s cubic-bezier(0.23,1,0.32,1); transform: rotate(3deg); }
+  .hero-card:hover { transform: rotate(0deg); }
+
+  /* Animated gradient orb behind hero */
+  @keyframes pulse-orb {
+    0%, 100% { opacity: 0.08; transform: scale(1); }
+    50%       { opacity: 0.14; transform: scale(1.08); }
+  }
+  .orb-animate { animation: pulse-orb 6s ease-in-out infinite; }
+
+  /* Bar chart rise */
+  @keyframes bar-rise {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+  }
+  .bar-animate {
+    transform-origin: bottom;
+    animation: bar-rise 1s cubic-bezier(0.23,1,0.32,1) both;
+  }
+  .bar-animate:nth-child(1) { animation-delay: 0.1s; }
+  .bar-animate:nth-child(2) { animation-delay: 0.2s; }
+  .bar-animate:nth-child(3) { animation-delay: 0.3s; }
+  .bar-animate:nth-child(4) { animation-delay: 0.4s; }
+  .bar-animate:nth-child(5) { animation-delay: 0.5s; }
+  .bar-animate:nth-child(6) { animation-delay: 0.6s; }
+
+  /* Progress bar fill */
+  @keyframes fill-bar {
+    from { width: 0; }
+  }
+  .fill-88 { animation: fill-bar 1.2s 0.3s cubic-bezier(0.23,1,0.32,1) both; width: 88%; }
+  .fill-65 { animation: fill-bar 1.2s 0.5s cubic-bezier(0.23,1,0.32,1) both; width: 65%; }
+
+  /* Fade-in on scroll via IntersectionObserver (applied via JS class) */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger children */
+  .fade-up:nth-child(2) { transition-delay: 0.1s; }
+  .fade-up:nth-child(3) { transition-delay: 0.2s; }
+  .fade-up:nth-child(4) { transition-delay: 0.3s; }
+
+  /* Mobile nav */
+  @media (max-width: 767px) {
+    .mobile-hide { display: none !important; }
+  }
+`;
+
+// ─── Scroll fade hook ─────────────────────────────────────────────────────────
+
+function useFadeOnScroll() {
+   React.useEffect(() => {
+      const els = document.querySelectorAll('.fade-up');
+      const io = new IntersectionObserver(
+         (entries) => entries.forEach(e => e.target.classList.toggle('visible', e.isIntersecting)),
+         { threshold: 0.15 }
+      );
+      els.forEach(el => io.observe(el));
+      return () => io.disconnect();
+   }, []);
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+const Logo: React.FC<{ onClick?: () => void }> = ({ onClick }) => (
+   <button
+      onClick={onClick}
+      style={{
+         background: 'none', border: 'none', cursor: 'pointer',
+         fontFamily: "'Plus Jakarta Sans', sans-serif",
+         fontWeight: 800, fontSize: '1.4rem', letterSpacing: '-0.04em',
+         color: 'var(--on-surface)',
+      }}
+   >
+      Academia.ID
+   </button>
+);
+
+const NavLink: React.FC<{ href: string; children: React.ReactNode; active?: boolean }> = ({ href, children, active }) => (
+   <a
+      href={href}
+      style={{
+         fontFamily: "'Plus Jakarta Sans', sans-serif",
+         fontWeight: 600, fontSize: '0.875rem', letterSpacing: '-0.01em',
+         textDecoration: 'none',
+         color: active ? 'var(--primary)' : 'var(--secondary)',
+         borderBottom: active ? '2px solid var(--primary-container)' : '2px solid transparent',
+         paddingBottom: active ? '4px' : '0',
+         transition: 'color 0.2s',
+      }}
+      onMouseEnter={e => { if (!active) (e.target as HTMLElement).style.color = 'var(--on-surface)'; }}
+      onMouseLeave={e => { if (!active) (e.target as HTMLElement).style.color = 'var(--secondary)'; }}
+   >
+      {children}
+   </a>
+);
+
+const PrimaryButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { large?: boolean }> = ({ children, large, style, ...props }) => (
+   <button
+      {...props}
+      style={{
+         background: 'var(--primary-container)',
+         color: 'var(--on-primary-fixed)',
+         border: 'none',
+         borderRadius: large ? '0.875rem' : '0.75rem',
+         padding: large ? '1.1rem 2.5rem' : '0.625rem 1.5rem',
+         fontFamily: "'Plus Jakarta Sans', sans-serif",
+         fontWeight: 700,
+         fontSize: large ? '1.125rem' : '0.875rem',
+         cursor: 'pointer',
+         display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+         transition: 'transform 0.15s, opacity 0.15s',
+         ...style,
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.88'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+      onMouseDown={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.97)'; }}
+      onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+   >
+      {children}
+   </button>
+);
+
+const OutlineButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { large?: boolean; light?: boolean }> = ({ children, large, light, style, ...props }) => (
+   <button
+      {...props}
+      style={{
+         background: 'transparent',
+         color: light ? 'var(--surface)' : 'var(--on-surface)',
+         border: `2px solid ${light ? 'rgba(251,248,252,0.22)' : 'rgba(210,197,171,0.35)'}`,
+         borderRadius: large ? '0.875rem' : '0.75rem',
+         padding: large ? '1.1rem 2.5rem' : '0.625rem 1.5rem',
+         fontFamily: "'Plus Jakarta Sans', sans-serif",
+         fontWeight: 700,
+         fontSize: large ? '1.125rem' : '0.875rem',
+         cursor: 'pointer',
+         display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+         transition: 'background 0.2s',
+         ...style,
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = light ? 'rgba(251,248,252,0.1)' : 'var(--surface-container-low)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+   >
+      {children}
+   </button>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currency, setCurrency] = useState<'USD' | 'NGN'>('USD');
-  
-  const heroRef = useRef<HTMLDivElement>(null);
-  const problemRef = useRef<HTMLDivElement>(null);
-  const storyRef = useRef<HTMLDivElement>(null);
-  const mockupsRef = useRef<HTMLDivElement>(null);
-  const pulseRef = useRef<HTMLDivElement>(null);
+   const navigate = useNavigate();
+   const [menuOpen, setMenuOpen] = useState(false);
 
-  const prices = currency === 'USD'
-    ? { lecturer: '$15', department: '$500', institution: 'Custom' }
-    : { lecturer: '₦22,500', department: '₦750,000', institution: 'Custom' };
+   useFadeOnScroll();
 
-  useEffect(() => {
-    // 1. Hero Entrance Animation — staggered reveal
-    const heroTl = gsap.timeline();
-    heroTl.from(".hero-headline span", {
-      y: 100,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 1.2,
-      ease: "power4.out"
-    })
-    .from(".hero-subtext", {
-      opacity: 0,
-      y: 20,
-      duration: 0.8
-    }, "-=0.6")
-    .from(".hero-cta", {
-      opacity: 0,
-      y: 20,
-      stagger: 0.1,
-      duration: 0.8
-    }, "-=0.4");
+   const goRegister = () => navigate('/auth/register');
+   const goLogin = () => navigate('/auth/login');
 
-    // 2. GPS Pulse Animation
-    gsap.to(pulseRef.current, {
-      scale: 1.5,
-      opacity: 0,
-      duration: 3,
-      repeat: -1,
-      ease: "sine.out"
-    });
+   return (
+      <>
+         {/* Inject global styles */}
+         <style>{GLOBAL_STYLES}</style>
 
-    // 3. Problem Statements — one at a time on scroll
-    const problems = gsap.utils.toArray(".problem-item");
-    problems.forEach((item: any, i) => {
-      gsap.fromTo(item,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          scrollTrigger: {
-            trigger: item,
-            start: "top 80%",
-            end: "bottom 20%",
-            toggleActions: "play none none reverse"
-          }
-        }
-      );
-    });
+         <div style={{ background: 'var(--background)', minHeight: '100vh', overflowX: 'hidden' }}>
 
-    // 4. Phone mockups — slide in and snap on scroll
-    if (storyRef.current && mockupsRef.current) {
-        const mockupItems = gsap.utils.toArray(".mockup-step");
+            {/* ── Navigation ─────────────────────────────────────────────────── */}
+            <nav style={{
+               position: 'fixed', top: 0, width: '100%', zIndex: 50,
+               background: 'rgba(251,248,252,0.82)', backdropFilter: 'blur(20px)',
+               WebkitBackdropFilter: 'blur(20px)',
+               borderBottom: '1px solid rgba(210,197,171,0.15)',
+            }}>
+               <div style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  maxWidth: 1440, margin: '0 auto', padding: '1rem 2rem',
+               }}>
+                  <Logo onClick={() => navigate('/')} />
 
-        ScrollTrigger.create({
-            trigger: storyRef.current,
-            start: "top top",
-            end: "+=300%",
-            pin: true,
-            scrub: 1,
-            onUpdate: (self) => {
-                const progress = self.progress;
-                // Snap index calculation
-                const index = Math.min(Math.floor(progress * mockupItems.length), mockupItems.length - 1);
+                  {/* Desktop links */}
+                  <div className="mobile-hide" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                     <NavLink href="#platform" active>Platform</NavLink>
+                     <NavLink href="#solutions">Solutions</NavLink>
+                     <NavLink href="#resources">Resources</NavLink>
+                     <NavLink href="#pricing">Pricing</NavLink>
+                  </div>
 
-                gsap.to(mockupItems, { opacity: 0, zIndex: 0, duration: 0.3 });
-                gsap.to(mockupItems[index] as HTMLElement, { opacity: 1, zIndex: 1, duration: 0.4 });
-
-                // Animate captions
-                const captions = gsap.utils.toArray(".step-caption");
-                gsap.to(captions, { opacity: 0.2, scale: 0.95, duration: 0.3 });
-                gsap.to(captions[index] as HTMLElement, { opacity: 1, scale: 1, duration: 0.3 });
-            }
-        });
-    }
-
-    // 5. Impact Counters — count up when scrolled into view
-    const counters = gsap.utils.toArray(".impact-counter");
-    counters.forEach((counter: any) => {
-      const targetText = counter.innerText;
-      const target = parseInt(targetText);
-
-      gsap.fromTo(counter,
-        { innerText: 0 },
-        {
-          innerText: target,
-          duration: 2,
-          snap: { innerText: 1 },
-          scrollTrigger: {
-            trigger: counter,
-            start: "top 90%",
-          },
-          onUpdate: function() {
-              counter.innerText = Math.ceil(this.targets()[0].innerText);
-          }
-        }
-      );
-    });
-
-    // Clean up ScrollTriggers on unmount
-    return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
-    };
-  }, []);
-
-  const onGetStarted = () => navigate('/auth/register');
-
-  return (
-    <div className="bg-black min-h-screen font-lexend selection:bg-primary selection:text-black">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 px-6 py-8 flex justify-between items-center backdrop-blur-md bg-black/20 border-b border-white/5">
-        <Logo />
-        <div className="hidden md:flex items-center gap-10">
-          <a href="#problem" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">The Problem</a>
-          <a href="#product" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Product</a>
-          <a href="#pricing" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Pricing</a>
-          <a href="/documentation" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Documentation</a>
-          <a href="/volunteers" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors">Volunteers</a>
-        </div>
-        <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/auth/login')} className="text-sm font-bold text-white hover:text-primary transition-colors">Sign In</button>
-          <Button className="rounded-full px-8 font-black" onClick={onGetStarted}>Request Demo</Button>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden px-6 pt-20">
-        <div ref={pulseRef} className="absolute w-[600px] h-[600px] rounded-full border border-primary/20 -z-10" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,202,13,0.05)_0%,transparent_70%)] -z-20" />
-
-        <div className="max-w-5xl text-center space-y-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/50 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-             <Globe size={12} className="text-primary" /> Location-Verified Academic Records
-          </div>
-          <h1 className="hero-headline text-7xl md:text-9xl font-black text-white tracking-tighter leading-[0.85] flex flex-col">
-            <span>Your Students</span>
-            <span>Are Present.</span>
-            <span className="text-primary">Prove It.</span>
-          </h1>
-          <p className="hero-subtext text-xl md:text-2xl text-zinc-400 max-w-2xl mx-auto font-medium leading-relaxed">
-            Attendance solved. Finally. Presently ends the chaos of paper registers and proxy check-ins with tamper-proof, location-verified records.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-            <Button size="lg" className="hero-cta h-16 px-10 text-lg rounded-full shadow-2xl shadow-primary/20 group" onClick={() => document.getElementById('product')?.scrollIntoView({ behavior: 'smooth' })}>
-              See It In Action <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button size="lg" variant="outline" className="hero-cta h-16 px-10 text-lg rounded-full border-white/10 hover:bg-white/5 text-white" onClick={onGetStarted}>
-              Request a Demo
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* The Problem Section */}
-      <section id="problem" className="py-64 px-6 bg-black relative">
-         <div className="max-w-4xl mx-auto space-y-32">
-            <div className="problem-item space-y-6">
-               <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight">
-                  "15 minutes of roll call. Class hasn't started. Students are restless."
-               </h2>
-            </div>
-            <div className="problem-item space-y-6">
-               <h2 className="text-4xl md:text-6xl font-bold text-zinc-400 tracking-tight leading-tight">
-                  "A student claims they attended. You have no proof. Neither do they."
-               </h2>
-            </div>
-            <div className="problem-item space-y-6">
-               <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight">
-                  "Accreditation is next month. Where are the attendance records?"
-               </h2>
-               <p className="text-2xl text-primary font-black mt-12">Presently ends all three. Permanently.</p>
-            </div>
-         </div>
-      </section>
-
-      {/* Product Story Section - Phone Mockups Snap */}
-      <section id="product" ref={storyRef} className="h-screen bg-zinc-950 flex items-center overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-2 gap-24 items-center">
-          <div className="space-y-24">
-             <div className="step-caption space-y-4">
-                <h3 className="text-4xl font-bold text-white">No roll call. No disruption.</h3>
-                <p className="text-xl text-zinc-400 font-medium">Lecturer opens the app, taps "Start Session", and classes begin immediately. 200 students notified in one second.</p>
-             </div>
-             <div className="step-caption space-y-4 opacity-20">
-                <h3 className="text-4xl font-bold text-white">Presence confirmed.</h3>
-                <p className="text-xl text-zinc-400 font-medium">Students check in automatically as they enter the room. 4-point GPS verification ensures they are where they say they are.</p>
-             </div>
-             <div className="step-caption space-y-4 opacity-20">
-                <h3 className="text-4xl font-bold text-white">You see everything.</h3>
-                <p className="text-xl text-zinc-400 font-medium">Real-time dashboards show live attendance trends, fraud alerts, and eligibility status for every student in the building.</p>
-             </div>
-          </div>
-          <div className="relative flex justify-center items-center h-[700px]">
-             <div ref={mockupsRef} className="w-[320px] h-[640px] bg-zinc-900 rounded-[3rem] border-8 border-zinc-800 shadow-2xl relative overflow-hidden">
-                {/* Step 1: Lecturer App */}
-                <div className="mockup-step absolute inset-0 bg-black p-6 flex flex-col items-center justify-center text-center space-y-8 z-10">
-                   <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
-                      <Zap className="text-primary" size={40} />
-                   </div>
-                   <div className="space-y-2">
-                    <p className="text-white font-bold text-xl">Start Session</p>
-                    <p className="text-zinc-400 text-sm">CSC 301 • Hall A401</p>
-                   </div>
-                   <Button className="w-full bg-primary text-black font-black py-4 rounded-xl">Activate GPS</Button>
-                </div>
-                {/* Step 2: Student Verification */}
-                <div className="mockup-step absolute inset-0 bg-black p-6 flex flex-col items-center justify-center text-center space-y-8 opacity-0">
-                   <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center">
-                      <ShieldCheck className="text-green-500" size={40} />
-                   </div>
-                   <div className="space-y-2">
-                    <p className="text-white font-bold text-xl">Verified Present</p>
-                    <p className="text-zinc-400 text-sm">Accuracy: 2.4m</p>
-                   </div>
-                   <div className="w-full h-1 bg-green-500 rounded-full" />
-                   <p className="text-zinc-400 text-xs">One check-in per student, guaranteed.</p>
-                </div>
-                {/* Step 3: Admin Dashboard */}
-                <div className="mockup-step absolute inset-0 bg-black p-6 flex flex-col space-y-8 opacity-0">
-                   <div className="flex justify-between items-center mt-10">
-                      <p className="text-white font-bold">Live Dashboard</p>
-                      <div className="px-3 py-1 bg-red-500/10 text-red-500 text-[10px] font-bold rounded-full">LIVE</div>
-                   </div>
-                   <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-zinc-900 p-4 rounded-2xl">
-                         <p className="text-zinc-400 text-[10px] font-bold">TOTAL</p>
-                         <p className="text-white text-2xl font-black">184</p>
-                      </div>
-                      <div className="bg-zinc-900 p-4 rounded-2xl">
-                         <p className="text-zinc-400 text-[10px] font-bold">FRAUD</p>
-                         <p className="text-red-500 text-2xl font-black">0</p>
-                      </div>
-                   </div>
-                   <div className="flex-1 bg-zinc-900 rounded-2xl p-4">
-                      <div className="space-y-3">
-                         {[1,2,3].map(i => (
-                            <div key={i} className="flex items-center gap-3">
-                               <div className="w-8 h-8 rounded-full bg-zinc-800" />
-                               <div className="flex-1 space-y-1">
-                                  <div className="w-full h-1 bg-zinc-800 rounded" />
-                                  <div className="w-1/2 h-1 bg-zinc-800/50 rounded" />
-                               </div>
-                            </div>
-                         ))}
-                      </div>
-                   </div>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Impact Section - Outcomes over Features */}
-      <section className="py-64 px-6 border-y border-white/5">
-         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
-            <div className="bg-zinc-950 p-12 rounded-[2.5rem] border border-white/5 space-y-6">
-               <div className="text-6xl font-black text-primary tracking-tighter"><span className="impact-counter">12</span>m</div>
-               <h4 className="text-2xl font-bold text-white">Saved per class</h4>
-               <p className="text-zinc-400 font-medium">That's 3 full teaching days per semester, back in your classroom.</p>
-            </div>
-            <div className="bg-zinc-950 p-12 rounded-[2.5rem] border border-white/5 space-y-6">
-               <div className="text-6xl font-black text-primary tracking-tighter"><span className="impact-counter">0</span>%</div>
-               <h4 className="text-2xl font-bold text-white">Proxy attendance</h4>
-               <p className="text-zinc-400 font-medium">Proxy attendance dropped to zero at institutions using Presently.</p>
-            </div>
-            <div className="bg-zinc-950 p-12 rounded-[2.5rem] border border-white/5 space-y-6">
-               <div className="text-6xl font-black text-primary tracking-tighter"><span className="impact-counter">100</span>%</div>
-               <h4 className="text-2xl font-bold text-white">Audit Success</h4>
-               <p className="text-zinc-400 font-medium">Accreditation audits completed in hours, not weeks.</p>
-            </div>
-         </div>
-      </section>
-
-      {/* Audiences Section - Benefit-first transformations */}
-      <section className="py-64 px-6 bg-black">
-        <div className="max-w-7xl mx-auto space-y-24">
-          <div className="text-center space-y-6">
-            <h2 className="text-5xl md:text-7xl font-bold text-white tracking-tight">Built for Transformation.</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Lecturer Card */}
-            <div className="group bg-zinc-950 p-12 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all space-y-12">
-              <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Zap className="text-primary" size={32} />
-              </div>
-              <div className="space-y-4">
-                <h4 className="text-2xl font-bold text-white">Lecturers</h4>
-                <p className="text-zinc-400 text-lg leading-relaxed font-medium italic">"You walk in. You teach. Attendance handles itself."</p>
-                <p className="text-zinc-400 text-sm leading-relaxed">No more calling names. No more manual data entry. Just pure focus on academic delivery.</p>
-              </div>
-            </div>
-            {/* Department Card */}
-            <div className="group bg-zinc-950 p-12 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all space-y-12">
-              <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <BarChart3 className="text-primary" size={32} />
-              </div>
-              <div className="space-y-4">
-                <h4 className="text-2xl font-bold text-white">Departments</h4>
-                <p className="text-zinc-400 text-lg leading-relaxed font-medium italic">"You see every course, every session, every anomaly — without chasing anyone."</p>
-                <p className="text-zinc-400 text-sm leading-relaxed">System-wide visibility into lecture attendance patterns and student eligibility across all courses.</p>
-              </div>
-            </div>
-            {/* Institution Card */}
-            <div className="group bg-zinc-950 p-12 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all space-y-12">
-              <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <ShieldCheck className="text-primary" size={32} />
-              </div>
-              <div className="space-y-4">
-                <h4 className="text-2xl font-bold text-white">Institutions</h4>
-                <p className="text-zinc-400 text-lg leading-relaxed font-medium italic">"When accreditation comes, your records are already ready."</p>
-                <p className="text-zinc-400 text-sm leading-relaxed">Institutional-grade data integrity and audit logs that satisfy the most rigorous accreditation bodies.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* App Store Section */}
-      <section className="py-48 px-6 border-y border-white/5 bg-zinc-950">
-         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
-            <div className="space-y-10">
-               <h3 className="text-5xl md:text-7xl font-bold text-white tracking-tighter leading-tight">Proven integrity, <br /> right in your pocket.</h3>
-               <p className="text-xl text-zinc-400 leading-relaxed font-medium">Download Presently to start verifying attendance in your classroom today. Available for all students and lecturers.</p>
-               <div className="flex flex-wrap gap-6 pt-4">
-                  {/* TODO: Replace with real App Store URL before launch */}
-                  <a href="https://apps.apple.com/app/presently" className="store-cta hover:scale-105 transition-transform">
-                     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" width={162} height={56} className="h-14" />
-                  </a>
-                  {/* TODO: Replace with real Play Store URL before launch */}
-                  <a href="https://play.google.com/store/apps/details?id=app.presently" className="store-cta hover:scale-105 transition-transform">
-                     <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width={200} height={80} className="h-20 -mt-3" />
-                  </a>
+                  {/* Actions */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                     <button
+                        onClick={goLogin}
+                        style={{
+                           background: 'none', border: 'none', cursor: 'pointer',
+                           fontWeight: 600, fontSize: '0.875rem', color: 'var(--on-surface-variant)',
+                           transition: 'opacity 0.2s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                     >
+                        Sign In
+                     </button>
+                     <PrimaryButton onClick={goRegister}>Get Started</PrimaryButton>
+                  </div>
                </div>
-            </div>
-            <div className="relative aspect-video bg-zinc-900 rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden p-12">
-               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
-               <div className="relative w-full h-full flex items-center justify-center">
-                  <BarChart3 className="text-primary/20" size={240} />
+            </nav>
+
+            <main style={{ paddingTop: '5.5rem' }}>
+
+               {/* ── Hero ───────────────────────────────────────────────────────── */}
+               <section id="platform" style={{
+                  position: 'relative', padding: '5rem 2rem 6rem',
+                  maxWidth: 1440, margin: '0 auto', overflow: 'visible',
+               }}>
+                  {/* Background orb */}
+                  <div className="orb-animate" style={{
+                     position: 'absolute', top: '10%', right: '5%',
+                     width: 600, height: 600, borderRadius: '50%',
+                     background: 'radial-gradient(circle, var(--primary-container), transparent 70%)',
+                     pointerEvents: 'none', zIndex: 0,
+                  }} />
+
+                  <div style={{
+                     display: 'grid',
+                     gridTemplateColumns: 'repeat(12, 1fr)',
+                     gap: '2rem',
+                     alignItems: 'center',
+                     position: 'relative', zIndex: 1,
+                  }}>
+                     {/* Left copy */}
+                     <div style={{ gridColumn: 'span 7' }}>
+                        <span style={{
+                           display: 'inline-block', padding: '0.375rem 1rem',
+                           borderRadius: 999, background: 'var(--surface-container-low)',
+                           color: 'var(--primary)', fontWeight: 700, fontSize: '0.7rem',
+                           letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '1.5rem',
+                        }}>
+                           The Precision Curator
+                        </span>
+
+                        <h1 className="font-headline" style={{
+                           fontSize: 'clamp(3rem, 7vw, 5.5rem)',
+                           lineHeight: 1.05, fontWeight: 800, letterSpacing: '-0.04em',
+                           color: 'var(--on-surface)', marginBottom: '2rem',
+                        }}>
+                           Attendance, <br />
+                           <em style={{ color: 'var(--primary)', fontStyle: 'italic' }}>Reinvented.</em>
+                        </h1>
+
+                        <p style={{
+                           fontSize: '1.2rem', color: 'var(--on-surface-variant)',
+                           maxWidth: 520, marginBottom: '2.5rem', lineHeight: 1.65,
+                        }}>
+                           A high-end editorial approach to institutional oversight. Manage attendance with
+                           the precision of a curator and the speed of light.
+                        </p>
+
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                           <PrimaryButton large onClick={goRegister}>
+                              Deploy Now <ArrowForwardIcon />
+                           </PrimaryButton>
+                           <OutlineButton large onClick={() => document.getElementById('solutions')?.scrollIntoView({ behavior: 'smooth' })}>
+                              View Demo
+                           </OutlineButton>
+                        </div>
+                     </div>
+
+                     {/* Right visual card */}
+                     <div style={{ gridColumn: 'span 5', position: 'relative' }}>
+                        <div style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
+                           {/* Glow */}
+                           <div style={{
+                              position: 'absolute', inset: 0,
+                              background: 'radial-gradient(circle at center, var(--primary-container), transparent 70%)',
+                              opacity: 0.15, borderRadius: '50%', filter: 'blur(40px)',
+                           }} />
+
+                           {/* Main card */}
+                           <div className="hero-card glass-panel editorial-shadow" style={{
+                              borderRadius: '2rem', padding: '2rem',
+                              border: '1px solid rgba(210,197,171,0.15)',
+                              position: 'relative', zIndex: 2,
+                           }}>
+                              {/* Window dots */}
+                              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2.5rem' }}>
+                                 {['#ba1a1a', '#755b00', '#e4e1e5'].map((c, i) => (
+                                    <div key={i} style={{ width: 12, height: 12, borderRadius: '50%', background: c }} />
+                                 ))}
+                                 <span style={{
+                                    marginLeft: 'auto', fontSize: '0.65rem', fontWeight: 700,
+                                    letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--secondary)',
+                                 }}>Live Insights</span>
+                              </div>
+
+                              {/* Progress bars */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                 <div style={{ height: 14, borderRadius: 999, background: 'var(--surface-container-high)', overflow: 'hidden' }}>
+                                    <div className="fill-88" style={{ height: '100%', background: 'var(--primary)', borderRadius: 999 }} />
+                                 </div>
+                                 <div style={{ height: 14, borderRadius: 999, background: 'var(--surface-container-high)', overflow: 'hidden' }}>
+                                    <div className="fill-65" style={{ height: '100%', background: 'var(--primary-fixed-dim)', borderRadius: 999 }} />
+                                 </div>
+
+                                 {/* Stats */}
+                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', paddingTop: '1rem' }}>
+                                    {[
+                                       { label: 'Total Active', value: '1,284', valueColor: 'var(--on-surface)' },
+                                       { label: 'Engagement', value: '94.2%', valueColor: 'var(--primary)' },
+                                    ].map(({ label, value, valueColor }) => (
+                                       <div key={label} style={{
+                                          background: 'var(--surface-container-low)',
+                                          padding: '1rem', borderRadius: '0.75rem',
+                                       }}>
+                                          <p style={{ fontSize: '0.7rem', color: 'var(--secondary)', marginBottom: '0.25rem' }}>{label}</p>
+                                          <p className="font-headline" style={{ fontSize: '1.5rem', fontWeight: 900, color: valueColor }}>{value}</p>
+                                       </div>
+                                    ))}
+                                 </div>
+                              </div>
+
+                              {/* Check-in row */}
+                              <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(210,197,171,0.15)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                 <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--surface-container-high)' }} />
+                                 <div>
+                                    <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--on-surface)' }}>Julian Alexander</p>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>Verified Check-in • 2m ago</p>
+                                 </div>
+                              </div>
+                           </div>
+
+                           {/* Spillover badge */}
+                           <div className="glass-panel editorial-shadow" style={{
+                              position: 'absolute', bottom: -32, left: -32,
+                              padding: '1.25rem 1.5rem', borderRadius: '1.25rem',
+                              border: '1px solid rgba(210,197,171,0.18)',
+                              display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 3,
+                           }}>
+                              <div style={{
+                                 width: 48, height: 48, borderRadius: '0.75rem',
+                                 background: 'var(--primary-container)',
+                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>
+                                 <VerifiedIcon />
+                              </div>
+                              <div>
+                                 <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>Accuracy Rank</p>
+                                 <p className="font-headline" style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--primary)' }}>Global #1</p>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+
+               {/* ── Bento Feature Grid ─────────────────────────────────────────── */}
+               <section id="solutions" style={{ background: 'var(--surface-container-low)', padding: '8rem 2rem' }}>
+                  <div style={{ maxWidth: 1440, margin: '0 auto' }}>
+                     <div className="fade-up" style={{ marginBottom: '5rem' }}>
+                        <h2 className="font-headline" style={{
+                           fontSize: 'clamp(2rem, 4vw, 3.25rem)',
+                           fontWeight: 700, letterSpacing: '-0.03em',
+                           color: 'var(--on-surface)', marginBottom: '1rem',
+                        }}>
+                           Refined Control.<br />Sophisticated Oversight.
+                        </h2>
+                        <p style={{ color: 'var(--on-surface-variant)', maxWidth: 600, fontSize: '1.1rem', lineHeight: 1.65 }}>
+                           We don't just count heads; we provide the narrative behind the numbers through
+                           high-performance data architecture.
+                        </p>
+                     </div>
+
+                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '2rem' }}>
+
+                        {/* Main feature card */}
+                        <div className="fade-up hover-lift" style={{
+                           gridColumn: 'span 8', background: 'var(--surface-container-lowest)',
+                           padding: '2.5rem', borderRadius: '2rem',
+                           border: '1px solid rgba(210,197,171,0.12)',
+                           height: 480, position: 'relative', overflow: 'hidden',
+                           display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                        }}>
+                           <div style={{ position: 'relative', zIndex: 2 }}>
+                              <div style={{ marginBottom: '1.5rem' }}><AnalyticsIcon /></div>
+                              <h3 className="font-headline" style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--on-surface)' }}>
+                                 Real-time Visual Analytics
+                              </h3>
+                              <p style={{ color: 'var(--on-surface-variant)', maxWidth: 380 }}>
+                                 Every check-in is processed instantly, feeding into a global heat map of your institution's daily flow.
+                              </p>
+                           </div>
+                           <div>
+                              <button style={{
+                                 background: 'var(--on-surface)', color: 'var(--surface)',
+                                 border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem',
+                                 fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer',
+                                 transition: 'opacity 0.2s',
+                              }}>Explore Analytics</button>
+                           </div>
+
+                           {/* Abstract circle */}
+                           <div style={{
+                              position: 'absolute', top: 0, right: 0, width: '45%', height: '100%',
+                              opacity: 0.07, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              pointerEvents: 'none',
+                           }}>
+                              <div style={{ width: '100%', aspectRatio: '1', border: '40px solid var(--primary)', borderRadius: '50%' }} />
+                           </div>
+
+                           {/* Mini bar chart */}
+                           <div style={{
+                              position: 'absolute', bottom: 32, right: 32,
+                              background: 'var(--surface-container-low)',
+                              borderRadius: '1rem', padding: '1.25rem',
+                              width: 220, transform: 'rotate(8deg)',
+                              boxShadow: '0 12px 32px rgba(27,27,30,0.08)',
+                           }}>
+                              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '0.5rem', height: 96 }}>
+                                 {[40, 80, 60, 100].map((h, i) => (
+                                    <div key={i} className="bar-animate" style={{
+                                       flex: 1, height: `${h}%`, borderRadius: '4px 4px 0 0',
+                                       background: i === 3 ? 'var(--primary)' : 'var(--primary-fixed)',
+                                    }} />
+                                 ))}
+                              </div>
+                              <p style={{
+                                 textAlign: 'center', fontWeight: 700, fontSize: '0.65rem',
+                                 letterSpacing: '0.15em', textTransform: 'uppercase',
+                                 marginTop: '0.75rem', color: 'var(--secondary)',
+                              }}>Weekly Peak</p>
+                           </div>
+                        </div>
+
+                        {/* Secondary – Biometric */}
+                        <div className="fade-up hover-lift" style={{
+                           gridColumn: 'span 4', background: 'var(--primary)', color: 'white',
+                           padding: '2.5rem', borderRadius: '2rem',
+                           height: 480, display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                        }}>
+                           <div>
+                              <div style={{ marginBottom: '1.5rem' }}><LockIcon /></div>
+                              <h3 className="font-headline" style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.75rem' }}>
+                                 Biometric Fidelity
+                              </h3>
+                              <p style={{ color: 'var(--primary-fixed)', opacity: 0.9, lineHeight: 1.6 }}>
+                                 Hardware-grade security protocols ensuring every attendance record is immutable and verified.
+                              </p>
+                           </div>
+                           <div style={{ paddingTop: '2rem', marginTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
+                              <p className="font-headline" style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '0.25rem' }}>99.9%</p>
+                              <p style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.75 }}>
+                                 Verification Accuracy
+                              </p>
+                           </div>
+                        </div>
+
+                        {/* Tertiary cards */}
+                        {[
+                           {
+                              icon: <CloudIcon />, title: 'Cloud-Native Sync', desc: 'Offline first architecture that syncs the moment you're back online.' },
+                  { icon: <GroupIcon />, title: 'Automated Rosters', desc: 'Import your entire database in seconds with AI-powered mapping.' },
+                  { icon: <NotificationsIcon />, title: 'Smart Alerts', desc: 'Notify staff or parents instantly based on customizable triggers.' },
+                        ].map(({ icon, title, desc }) => (
+                           <div key={title} className="fade-up hover-lift" style={{
+                              gridColumn: 'span 4', background: 'var(--surface-container-lowest)',
+                              padding: '2rem', borderRadius: '2rem',
+                              border: '1px solid rgba(210,197,171,0.12)',
+                           }}>
+                              <div style={{ marginBottom: '1rem' }}>{icon}</div>
+                              <h4 className="font-headline" style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--on-surface)' }}>{title}</h4>
+                              <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.875rem', lineHeight: 1.6 }}>{desc}</p>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+               </section>
+
+               {/* ── Engine Room / Daily Volume ─────────────────────────────────── */}
+               <section id="resources" style={{ padding: '8rem 2rem', maxWidth: 1440, margin: '0 auto', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '5rem' }}>
+
+                     {/* Left copy */}
+                     <div style={{ flex: '1 1 400px' }}>
+                        <h2 className="font-headline fade-up" style={{
+                           fontSize: 'clamp(2.25rem, 5vw, 4rem)',
+                           fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1,
+                           marginBottom: '3rem', color: 'var(--on-surface)',
+                        }}>
+                           The Engine Room of{' '}
+                           <span style={{ color: 'var(--primary)' }}>Engagement.</span>
+                        </h2>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+                           {[
+                              {
+                                 num: '01', title: 'Intelligent Scheduling',
+                                 desc: 'Our engine predicts attendance trends based on historical data, allowing you to optimize staff allocation.',
+                              },
+                              {
+                                 num: '02', title: 'Automated Compliance',
+                                 desc: 'Stay audit-ready with automated reporting that meets the highest regulatory standards.',
+                              },
+                           ].map(({ num, title, desc }) => (
+                              <div key={num} className="fade-up" style={{ display: 'flex', gap: '1.5rem' }}>
+                                 <div style={{
+                                    flexShrink: 0, width: 48, height: 48, borderRadius: '50%',
+                                    background: 'var(--surface-container-high)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                 }}>
+                                    <span className="font-headline" style={{ fontWeight: 700, color: 'var(--primary)' }}>{num}</span>
+                                 </div>
+                                 <div>
+                                    <h4 className="font-headline" style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>{title}</h4>
+                                    <p style={{ color: 'var(--on-surface-variant)', lineHeight: 1.65 }}>{desc}</p>
+                                 </div>
+                              </div>
+                           ))}
+                        </div>
+                     </div>
+
+                     {/* Right chart card */}
+                     <div style={{ flex: '1 1 400px', position: 'relative' }}>
+                        <div className="fade-up" style={{
+                           background: 'var(--surface-container-low)', borderRadius: '3rem',
+                           padding: '3rem', border: '1px solid rgba(210,197,171,0.12)',
+                        }}>
+                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                              <div>
+                                 <h5 className="font-headline" style={{ fontSize: '1.5rem', fontWeight: 900 }}>Daily Volume</h5>
+                                 <p style={{ fontSize: '0.875rem', color: 'var(--secondary)' }}>Week 42 · Faculty of Science</p>
+                              </div>
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                 {[
+                                    { label: 'LIVE', bg: 'var(--primary-container)', color: 'var(--on-primary-fixed)' },
+                                    { label: 'REPORT', bg: 'var(--surface-container-highest)', color: 'var(--on-surface)' },
+                                 ].map(({ label, bg, color }) => (
+                                    <span key={label} style={{
+                                       background: bg, color, padding: '0.25rem 0.75rem',
+                                       borderRadius: 999, fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em',
+                                    }}>{label}</span>
+                                 ))}
+                              </div>
+                           </div>
+
+                           {/* Bar chart */}
+                           <div style={{ position: 'relative', height: 224, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '0.75rem' }}>
+                              {[30, 50, 80, 60, 40, 70].map((h, i) => (
+                                 <div key={i} style={{ flex: 1, height: `${h}%`, background: 'var(--surface-container-high)', borderRadius: '0.75rem', position: 'relative', overflow: 'hidden' }}>
+                                    <div className="bar-animate" style={{
+                                       position: 'absolute', bottom: 0, left: 0, right: 0,
+                                       height: i === 2 ? '100%' : '72%',
+                                       background: i === 2 ? 'var(--primary-container)' : 'var(--primary)',
+                                       borderRadius: '0.75rem',
+                                    }} />
+                                    {i === 2 && (
+                                       <div style={{
+                                          position: 'absolute', top: -24, left: '50%', transform: 'translateX(-50%)',
+                                          fontSize: '0.65rem', fontWeight: 900, color: 'var(--primary)',
+                                          letterSpacing: '0.1em',
+                                       }}>PEAK</div>
+                                    )}
+                                 </div>
+                              ))}
+                           </div>
+
+                           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
+                              {['08:00', '12:00', '16:00', '20:00'].map(t => (
+                                 <span key={t} style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--secondary)', opacity: 0.5 }}>{t}</span>
+                              ))}
+                           </div>
+                        </div>
+
+                        {/* Floating performance card */}
+                        <div className="glass-panel editorial-shadow" style={{
+                           position: 'absolute', bottom: -32, right: -24,
+                           padding: '2rem', borderRadius: '1.5rem',
+                           border: '1px solid rgba(210,197,171,0.2)',
+                           maxWidth: 280, zIndex: 2,
+                        }}>
+                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                              <BoltIcon />
+                              <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>System Performance</span>
+                           </div>
+                           <p style={{ fontSize: '0.78rem', color: 'var(--on-surface-variant)', lineHeight: 1.6, marginBottom: '1rem' }}>
+                              The core engine is currently processing 14k events per second with zero latency degradation.
+                           </p>
+                           <div style={{ display: 'flex' }}>
+                              {[1, 2, 3].map(i => (
+                                 <div key={i} style={{
+                                    width: 32, height: 32, borderRadius: '50%',
+                                    background: `hsl(0 0% ${50 + i * 8}%)`,
+                                    border: '2px solid var(--surface)',
+                                    marginLeft: i > 1 ? -10 : 0,
+                                 }} />
+                              ))}
+                              <div style={{
+                                 width: 32, height: 32, borderRadius: '50%',
+                                 background: 'var(--primary-container)', border: '2px solid var(--surface)',
+                                 marginLeft: -10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                 fontSize: '0.6rem', fontWeight: 700, color: 'var(--on-primary-fixed)',
+                              }}>+12</div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+
+               {/* ── Final CTA ──────────────────────────────────────────────────── */}
+               <section id="pricing" style={{ padding: '8rem 2rem' }}>
+                  <div style={{ maxWidth: 1440, margin: '0 auto' }}>
+                     <div className="fade-up" style={{
+                        background: 'var(--inverse-surface)', borderRadius: '4rem',
+                        padding: 'clamp(3rem, 8vw, 8rem)', position: 'relative',
+                        overflow: 'hidden', textAlign: 'center',
+                     }}>
+                        {/* Abstract circles */}
+                        {[800, 600, 400].map(size => (
+                           <div key={size} style={{
+                              position: 'absolute', top: '50%', left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              width: size, height: size, borderRadius: '50%',
+                              border: '1px solid rgba(251,248,252,0.08)',
+                              pointerEvents: 'none',
+                           }} />
+                        ))}
+
+                        <div style={{ position: 'relative', zIndex: 2, maxWidth: 700, margin: '0 auto' }}>
+                           <h2 className="font-headline" style={{
+                              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+                              fontWeight: 800, letterSpacing: '-0.04em',
+                              color: 'var(--surface)', marginBottom: '2rem',
+                           }}>
+                              Ready to Elevate Your Institution?
+                           </h2>
+                           <p style={{ color: 'var(--surface-variant)', fontSize: '1.2rem', marginBottom: '3rem', opacity: 0.8, lineHeight: 1.6 }}>
+                              Join over 400 world-class universities using Academia.ID to curate their daily presence.
+                           </p>
+                           <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                              <PrimaryButton large onClick={goRegister}>Request Access</PrimaryButton>
+                              <OutlineButton large light onClick={goRegister}>Contact Sales</OutlineButton>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+            </main>
+
+            {/* ── Footer ───────────────────────────────────────────────────────── */}
+            <footer style={{
+               background: 'var(--surface-bright)',
+               borderTop: '1px solid rgba(210,197,171,0.18)',
+               padding: '3rem 2rem',
+            }}>
+               <div style={{
+                  maxWidth: 1440, margin: '0 auto',
+                  display: 'flex', flexWrap: 'wrap',
+                  justifyContent: 'space-between', alignItems: 'center', gap: '2rem',
+               }}>
+                  <div>
+                     <div className="font-headline" style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.35rem', color: 'var(--on-surface)' }}>
+                        Academia.ID
+                     </div>
+                     <p style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>
+                        © {new Date().getFullYear()} Academia.ID Editorial Systems. All rights reserved.
+                     </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                     {['Privacy Policy', 'Terms of Service', 'Security', 'Contact'].map(link => (
+                        <a key={link} href="#" style={{
+                           fontSize: '0.75rem', color: 'var(--secondary)',
+                           textDecoration: 'none', transition: 'color 0.2s',
+                        }}
+                           onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
+                           onMouseLeave={e => (e.currentTarget.style.color = 'var(--secondary)')}
+                        >
+                           {link}
+                        </a>
+                     ))}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                     {[<LanguageIcon key="lang" />, <ShareIcon key="share" />].map((icon, i) => (
+                        <button key={i} style={{
+                           background: 'none', border: 'none', cursor: 'pointer',
+                           color: 'var(--secondary)', transition: 'color 0.2s',
+                           display: 'flex', alignItems: 'center',
+                        }}
+                           onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
+                           onMouseLeave={e => (e.currentTarget.style.color = 'var(--secondary)')}
+                        >
+                           {icon}
+                        </button>
+                     ))}
+                  </div>
                </div>
-            </div>
+            </footer>
          </div>
-      </section>
-
-      {/* Social Proof */}
-      <section className="py-32 bg-black">
-         <div className="max-w-7xl mx-auto px-6">
-            <p className="text-[10px] font-black text-zinc-700 text-center mb-16 uppercase tracking-[0.4em]">Institutional Infrastructure For</p>
-            <div className="flex flex-wrap justify-center items-center gap-x-24 gap-y-12 opacity-20 grayscale invert">
-               <div className="text-3xl font-black text-white italic">UNILAG</div>
-               <div className="text-3xl font-black text-white italic">COVENANT</div>
-               <div className="text-3xl font-black text-white italic">ABU ZARIA</div>
-               <div className="text-3xl font-black text-white italic">BABCOCK</div>
-               <div className="text-3xl font-black text-white italic">LASU</div>
-            </div>
-         </div>
-      </section>
-
-      {/* Pricing Section - Outcome-focused tiers */}
-      <section id="pricing" className="py-64 px-6 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-primary/5 blur-[160px] -z-10" />
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-24 space-y-6">
-            <h2 className="text-6xl md:text-8xl font-bold text-white tracking-tighter">The End of the Problem.</h2>
-            <p className="text-zinc-400 text-xl font-medium">Choose the scale of your transformation.</p>
-            <div className="inline-flex bg-zinc-900 border border-white/5 p-1.5 rounded-full mt-12">
-               <button onClick={() => setCurrency('USD')} className={`px-10 py-3 rounded-full text-xs font-black transition-all ${currency === 'USD' ? 'bg-primary text-black' : 'text-zinc-400 hover:text-white'}`}>USD</button>
-               <button onClick={() => setCurrency('NGN')} className={`px-10 py-3 rounded-full text-xs font-black transition-all ${currency === 'NGN' ? 'bg-primary text-black' : 'text-zinc-400 hover:text-white'}`}>NGN</button>
-            </div>
-          </div>
-          <div className="grid lg:grid-cols-3 gap-8">
-             {/* Lecturer Tier */}
-             <div className="bg-zinc-950 border border-white/5 p-12 rounded-[2.5rem] space-y-12 hover:border-white/10 transition-colors">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-white">Lecturer</h3>
-                  <p className="text-zinc-400 font-medium">For individual academics ending roll calls in their classrooms.</p>
-                </div>
-                <div className="text-6xl font-black text-white tracking-tighter">{prices.lecturer} <span className="text-lg text-zinc-400 font-bold tracking-normal">/ sem</span></div>
-                <ul className="space-y-6 text-zinc-400 font-bold">
-                   <li className="flex gap-4 items-center"><CheckCircle2 className="text-primary" size={18} /> Unlimited students & courses</li>
-                   <li className="flex gap-4 items-center"><CheckCircle2 className="text-primary" size={18} /> Real-time GPS verification</li>
-                   <li className="flex gap-4 items-center"><CheckCircle2 className="text-primary" size={18} /> Digital eligibility reports</li>
-                </ul>
-                <Button className="w-full h-20 text-lg rounded-2xl shadow-xl shadow-primary/10 font-black" onClick={onGetStarted}>Get Started Free</Button>
-             </div>
-             {/* Departmental Tier - Premium Focus */}
-             <div className="bg-primary p-12 rounded-[2.5rem] space-y-12 text-black relative overflow-hidden shadow-2xl shadow-primary/20 group scale-105 z-10">
-                <div className="absolute top-8 right-8 bg-black/10 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md">Institutional</div>
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold">Department</h3>
-                  <p className="text-black/60 font-bold leading-relaxed">System-wide visibility and fraud protection for entire academic units.</p>
-                </div>
-                <div className="text-6xl font-black tracking-tighter">{prices.department} <span className="text-lg text-black/40 font-black tracking-normal">/ sem</span></div>
-                <ul className="space-y-6 text-black/70 font-black">
-                   <li className="flex gap-4 items-center"><CheckCircle2 size={18} /> Centralized admin dashboard</li>
-                   <li className="flex gap-4 items-center"><CheckCircle2 size={18} /> Real-time fraud & anomaly alerts</li>
-                   <li className="flex gap-4 items-center"><CheckCircle2 size={18} /> Accreditation-ready data exports</li>
-                </ul>
-                <Button variant="secondary" className="w-full h-20 text-lg rounded-2xl bg-black text-white hover:bg-zinc-900 border-none transition-transform group-hover:scale-[1.02] font-black" onClick={onGetStarted}>Deploy Departmentally</Button>
-             </div>
-             {/* Institutional Tier */}
-             <div className="bg-zinc-950 border border-white/5 p-12 rounded-[2.5rem] space-y-12 hover:border-white/10 transition-colors">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-white">Institution</h3>
-                  <p className="text-zinc-400 font-medium">Enterprise infrastructure for universities with multi-campus scaling.</p>
-                </div>
-                <div className="text-6xl font-black text-white tracking-tighter">Custom</div>
-                <ul className="space-y-6 text-zinc-400 font-bold">
-                   <li className="flex gap-4 items-center"><CheckCircle2 className="text-primary" size={18} /> SIS / Canvas Integration</li>
-                   <li className="flex gap-4 items-center"><CheckCircle2 className="text-primary" size={18} /> Dedicated Support Manager</li>
-                   <li className="flex gap-4 items-center"><CheckCircle2 className="text-primary" size={18} /> On-premise Data Hosting</li>
-                </ul>
-                <Button variant="outline" className="w-full h-20 text-lg rounded-2xl border-white/10 text-white font-black hover:bg-white/5" onClick={onGetStarted}>Contact Sales</Button>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="py-64 px-6 bg-black text-center relative overflow-hidden">
-         <div className="absolute inset-0 bg-primary/2 -z-10" />
-         <div className="max-w-6xl mx-auto space-y-20">
-            <h2 className="text-6xl md:text-9xl font-black text-white tracking-tighter leading-[0.8]">
-               Attendance Solved.<br />
-               <span className="text-zinc-800">Prove It.</span>
-            </h2>
-            <p className="text-2xl text-zinc-400 font-bold max-w-3xl mx-auto">The Only Question Is When You Stop Tolerating The Old Way.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-               <Button size="lg" className="h-24 px-16 text-3xl rounded-full shadow-2xl shadow-primary/30 group font-black" onClick={onGetStarted}>
-                  Request a Demo <ArrowRight className="ml-4 group-hover:translate-x-2 transition-transform" />
-               </Button>
-            </div>
-         </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-32 px-6 border-t border-white/5 bg-zinc-950">
-         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16 md:gap-8">
-            <div className="space-y-10 col-span-2">
-               <Logo />
-               <p className="text-zinc-400 text-lg max-w-sm leading-relaxed font-bold">
-                  Location-verified attendance infrastructure for universities. Built for integrity, auditability, and the Nigerian academic reality.
-               </p>
-            </div>
-            <div className="space-y-8">
-               <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px]">Platform</h4>
-               <div className="flex flex-col gap-6 text-zinc-400 text-sm font-bold">
-                  <button onClick={() => navigate('/documentation')} className="text-left hover:text-white transition-colors">Documentation</button>
-                  <button className="text-left hover:text-white transition-colors">Security</button>
-                  <button className="text-left hover:text-white transition-colors">Integrations</button>
-                  <button className="text-left hover:text-white transition-colors">Pricing</button>
-               </div>
-            </div>
-            <div className="space-y-8">
-               <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px]">Company</h4>
-               <div className="flex flex-col gap-6 text-zinc-400 text-sm font-bold">
-                  <button onClick={() => navigate('/volunteers')} className="text-left hover:text-white transition-colors">Volunteers</button>
-                  <button className="text-left hover:text-white transition-colors">Privacy</button>
-                  <button className="text-left hover:text-white transition-colors">Terms</button>
-                  <p className="text-zinc-800 mt-4">© {new Date().getFullYear()} Presently.</p>
-               </div>
-            </div>
-         </div>
-      </footer>
-    </div>
-  );
+      </>
+   );
 };
+
+export default LandingPage;
