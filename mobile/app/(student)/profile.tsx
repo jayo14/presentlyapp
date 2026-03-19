@@ -1,17 +1,21 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { Mail, Hash, Building2, GraduationCap, LogOut, Phone, School, Settings, ChevronRight, User, ShieldCheck, Camera } from 'lucide-react-native';
 import { useState } from 'react';
 import { CustomModal } from '@/components/CustomModal';
 import Fonts from '@/constants/fonts';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user, signOut } = useAuth();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   const confirmSignOut = async () => {
@@ -46,7 +50,7 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 32 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Card */}
@@ -119,7 +123,7 @@ export default function ProfileScreen() {
         </View>
 
         <Text style={[styles.versionText, { color: colors.textSecondary }]}>Presently Premium v1.0.4</Text>
-        <View style={{ height: 40 }} />
+        <View style={{ height: bottomDockOffset + 12 }} />
       </ScrollView>
     </SafeAreaView>
   );

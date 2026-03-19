@@ -9,6 +9,8 @@ import Fonts from '@/constants/fonts';
 import Svg, { Circle } from 'react-native-svg';
 import { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371;
@@ -23,6 +25,9 @@ export default function StudentDashboard() {
   const { colors, isDark } = useTheme();
   const { user } = useAuth();
   const { stats, history, courses, getActiveSession, refreshData, isLoading } = useAttendance();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [refreshing, setRefreshing] = useState(false);
   const [rangeStatus, setRangeStatus] = useState<'in_range' | 'out_of_range' | 'unknown'>('unknown');
   const locationWatchRef = useRef<Location.LocationSubscription | null>(null);
@@ -110,7 +115,7 @@ export default function StudentDashboard() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 40 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
@@ -329,7 +334,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   scrollContent: {
-    paddingBottom: 140,
+    paddingBottom: 24,
   },
   section: {
     paddingHorizontal: 16,

@@ -4,11 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { AttendanceProvider, useAttendance } from '@/contexts/AttendanceContext';
 import { QrCode, MapPin, Hash, CheckCircle, Clock, Calendar } from 'lucide-react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function SessionsContent() {
   const { colors } = useTheme();
   const { history, refreshData } = useAttendance();
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -79,7 +84,7 @@ function SessionsContent() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 32 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -188,7 +193,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 32,
+    paddingBottom: 16,
   },
   header: {
     marginTop: 8,

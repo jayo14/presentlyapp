@@ -9,6 +9,8 @@ import { Plus, Clock, MapPin, Calendar, X, ChevronDown, BookOpen, QrCode, Hash, 
 import { MaterialIcons } from '@expo/vector-icons';
 import Fonts from '@/constants/fonts';
 import Slider from '@react-native-community/slider';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -16,6 +18,9 @@ export default function LecturerSessionsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user } = useAuth();
+    const tabBarHeight = useBottomTabBarHeight();
+    const insets = useSafeAreaInsets();
+    const bottomDockOffset = tabBarHeight + insets.bottom;
   const [sessions, setSessions] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
   const [venues, setVenues] = useState<any[]>([]);
@@ -410,14 +415,14 @@ export default function LecturerSessionsScreen() {
                 <View style={[styles.progressStep, { backgroundColor: creationStep >= 3 ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#F3F4F6') }]} />
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 120 }]}>
                 {creationStep === 1 && renderStep1()}
                 {creationStep === 2 && renderStep2()}
                 {creationStep === 3 && renderStep3()}
             </ScrollView>
 
             {creationStep < 3 && (
-                <View style={styles.footerAction}>
+                <View style={[styles.footerAction, { bottom: bottomDockOffset + 16 }]}>
                     <TouchableOpacity style={[styles.continueBtn, { backgroundColor: colors.primary }]} onPress={handleNextStep}>
                         <Text style={styles.continueBtnText}>Continue</Text>
                         <ArrowRight size={20} color="#0A0A0A" />
@@ -510,7 +515,7 @@ export default function LecturerSessionsScreen() {
       <FlatList
         data={sessions}
         keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContent}
+                contentContainerStyle={[styles.listContent, { paddingBottom: bottomDockOffset + 56 }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
         ListEmptyComponent={() => (
             <View style={{ alignItems: 'center', marginTop: 100 }}>

@@ -1,12 +1,13 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert, Modal, Image, Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, Search, X, CheckCircle } from 'lucide-react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Fonts from '@/constants/fonts';
 import { api } from '@/services/api';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +15,9 @@ export default function ManualOverrideScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
 
   const [session, setSession] = useState<any>(null);
   const [absentStudents, setAbsentStudents] = useState<any[]>([]);
@@ -110,7 +114,7 @@ export default function ManualOverrideScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 24 }]}>
         <View style={styles.listHeader}>
             <Text style={[styles.listTitle, { color: isDark ? colors.primary + 'B3' : '#666' }]}>Absent Students ({filteredStudents.length})</Text>
             <View style={[styles.badge, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>

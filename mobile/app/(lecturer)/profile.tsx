@@ -1,17 +1,21 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChevronLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight, Camera } from 'lucide-react-native';
 import { useState } from 'react';
 import { CustomModal } from '@/components/CustomModal';
 import Fonts from '@/constants/fonts';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function LecturerProfileScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user, signOut } = useAuth();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   const confirmSignOut = async () => {
@@ -43,7 +47,7 @@ export default function LecturerProfileScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 32 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Header */}
@@ -118,7 +122,7 @@ export default function LecturerProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: bottomDockOffset + 12 }} />
       </ScrollView>
     </SafeAreaView>
   );

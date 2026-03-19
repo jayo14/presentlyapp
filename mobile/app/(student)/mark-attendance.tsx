@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput, KeyboardAvoidingView, Platform, ScrollView, Dimensions, Alert } from 'react-native';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAttendance } from '@/contexts/AttendanceContext';
 import { ChevronLeft, Keyboard, QrCode as QrIcon, Camera, X, Clipboard as ClipboardIcon } from 'lucide-react-native';
@@ -13,6 +13,7 @@ import { enrollmentsService } from '@/services/enrollments';
 import * as Location from 'expo-location';
 import * as Clipboard from 'expo-clipboard';
 import { locationService, type LocationSample } from '../../services/location';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,6 +25,9 @@ export default function MarkAttendanceScreen() {
   const router = useRouter();
   const { tab } = useLocalSearchParams<{ tab?: string }>();
   const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const { refreshData } = useAttendance();
   const [activeTab, setActiveTab] = useState<'qr' | 'code'>(tab === 'code' ? 'code' : 'qr');
   const [permission, requestPermission] = useCameraPermissions();
@@ -243,7 +247,7 @@ export default function MarkAttendanceScreen() {
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 24 }]} keyboardShouldPersistTaps="handled">
           <Text style={[styles.headline, { color: colors.text }]}>Enter Session Code</Text>
           <Text style={[styles.subtext, { color: isDark ? 'rgba(255,255,255,0.6)' : '#666' }]}>
             Ask your lecturer for the unique code to confirm your attendance manually.
