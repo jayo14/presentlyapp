@@ -4,15 +4,20 @@ import { useTheme } from '@/hooks/useTheme';
 import { Platform, View, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AdminLayout() {
   const { colors, isDark } = useTheme();
   const { user, isLoading } = useAuth();
+  const insets = useSafeAreaInsets();
 
   if (!isLoading && user && user.role !== 'admin') {
     const destination = user.role === 'lecturer' ? '/(lecturer)' : '/(student)';
     return <Redirect href={destination} />;
   }
+
+  // Calculate bottom position accounting for Android navigation bar
+  const bottomPosition = Platform.OS === 'ios' ? 24 : Math.max(16, insets.bottom);
 
   return (
     <Tabs
@@ -27,7 +32,7 @@ export default function AdminLayout() {
           paddingBottom: Platform.OS === 'ios' ? 32 : 12,
           paddingTop: 12,
           position: 'absolute',
-          bottom: Platform.OS === 'ios' ? 24 : 16,
+          bottom: bottomPosition,
           left: 16,
           right: 16,
           borderRadius: 32,
