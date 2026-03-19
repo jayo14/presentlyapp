@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator, ImageBackground, Modal, FlatList, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { Bell, Clock,MapPin, BookOpen, Calendar, TrendingUp, CheckCircle, AlertCircle, Mail, ChevronRight, Plus, X, QrCode, Hash, Navigation, ShieldCheck, Edit, ArrowRight, Radio } from 'lucide-react-native';
@@ -10,11 +10,15 @@ import { useLecturerDashboard, useUpcomingSessions } from '@/hooks/useLecturerDa
 import { api } from '@/services/api';
 import Slider from '@react-native-community/slider';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function LecturerDashboard() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user } = useAuth();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
 
   const {
     data: dashboardData,
@@ -39,12 +43,21 @@ export default function LecturerDashboard() {
   // Form State
   const [selectedCourse, setSelectedCourse] = useState<any | null>(null);
   const [selectedVenue, setSelectedVenue] = useState<any | null>(null);
+  const [sessionStartAt, setSessionStartAt] = useState(() => {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    now.setMinutes(Math.ceil(now.getMinutes() / 15) * 15);
+    return now;
+  });
+  const [durationMinutes, setDurationMinutes] = useState(90);
   const [methods, setMethods] = useState({ qr: true, pin: false, gps: true });
   const [radius, setRadius] = useState(150);
   
   // Modals
   const [showCoursePicker, setShowCoursePicker] = useState(false);
   const [showVenuePicker, setShowVenuePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const onRefresh = useCallback(async () => {
     await Promise.all([refetchStats(), refetchUpcoming()]);
@@ -52,6 +65,63 @@ export default function LecturerDashboard() {
 
   const nextSession = upcomingSessionsData?.[0] || upcomingSessionsData?.results?.[0];
   const refreshing = isRefetchingStats;
+
+  const dateOptions = Array.from({ length: 14 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() + index);
+    return date;
+  });
+
+  const timeOptions = Array.from({ length: 48 }, (_, index) => {
+    const hour = Math.floor(index / 2);
+    const minute = index % 2 === 0 ? 0 : 30;
+    const time = new Date(sessionStartAt);
+    time.setHours(hour, minute, 0, 0);
+    return time;
+  });
+
+  const formatSessionDate = (date: Date) =>
+    date.toLocaleDateString([], {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+
+  const formatSessionTime = (date: Date) =>
+    date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+  const mergeDatePart = (base: Date, nextDate: Date) => {
+    const updated = new Date(base);
+    updated.setFullYear(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate());
+    return updated;
+  };
+
+  const mergeTimePart = (base: Date, nextTime: Date) => {
+    const updated = new Date(base);
+    updated.setHours(nextTime.getHours(), nextTime.getMinutes(), 0, 0);
+    return updated;
+  };
+
+  const resetCreationFlow = () => {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    now.setMinutes(Math.ceil(now.getMinutes() / 15) * 15);
+    setCreationStep(1);
+    setSelectedCourse(null);
+    setSelectedVenue(null);
+    setSessionStartAt(now);
+    setDurationMinutes(90);
+    setMethods({ qr: true, pin: false, gps: true });
+    setRadius(150);
+    setShowCoursePicker(false);
+    setShowVenuePicker(false);
+    setShowDatePicker(false);
+    setShowTimePicker(false);
+  };
 
   const startSessionCreation = async () => {
     try {
@@ -62,7 +132,7 @@ export default function LecturerDashboard() {
       setCourses(Array.isArray(coursesData) ? coursesData : ((coursesData as any)?.results || []));
       setVenues(Array.isArray(venuesData) ? venuesData : ((venuesData as any)?.results || []));
       setIsCreatingSession(true);
-      setCreationStep(1);
+      resetCreationFlow();
     } catch(e) {
       Alert.alert('Error', 'Failed to load courses and venues');
       console.error(e);
@@ -75,26 +145,48 @@ export default function LecturerDashboard() {
         Alert.alert('Required', 'Please select a course first');
         return;
       }
+
+      if (sessionStartAt.getTime() <= Date.now()) {
+        Alert.alert('Invalid time', 'Please select a future start date and time.');
+        return;
+      }
     }
+
+    if (creationStep === 2) {
+      if (!methods.qr && !methods.pin && !methods.gps) {
+        Alert.alert('Required', 'Please enable at least one verification method.');
+        return;
+      }
+
+      if (methods.gps && !selectedVenue) {
+        Alert.alert('Venue required', 'Please select a venue when GPS geofencing is enabled.');
+        return;
+      }
+    }
+
     if (creationStep < 3) setCreationStep(creationStep + 1);
     else handleCreateSession();
   };
 
   const handleBackStep = () => {
     if (creationStep > 1) setCreationStep(creationStep - 1);
-    else setIsCreatingSession(false);
+    else {
+      setIsCreatingSession(false);
+      resetCreationFlow();
+    }
   };
 
   const handleCreateSession = async () => {
     try {
       setCreationLoading(true);
+      const endTime = new Date(sessionStartAt.getTime() + durationMinutes * 60 * 1000);
       const sessionData = {
         course: selectedCourse.id,
         venue: selectedVenue?.id,
-        start_time: new Date().toISOString(),
-        end_time: new Date(Date.now() + 1.5 * 60 * 60 * 1000).toISOString(),
+        start_time: sessionStartAt.toISOString(),
+        end_time: endTime.toISOString(),
         is_active: true,
-        verification_radius: radius,
+        verification_radius: methods.gps ? radius : null,
         require_qr: methods.qr,
         require_gps: methods.gps,
         require_pin: methods.pin,
@@ -103,9 +195,7 @@ export default function LecturerDashboard() {
       const response = await api.sessions.create(sessionData);
       Alert.alert('Success', 'Session created successfully');
       setIsCreatingSession(false);
-      setCreationStep(1);
-      setSelectedCourse(null);
-      setSelectedVenue(null);
+      resetCreationFlow();
       refetchUpcoming();
       router.push(`/(lecturer)/session/${response.id}`);
     } catch (error) {
@@ -149,6 +239,54 @@ export default function LecturerDashboard() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.dateTimeRow}>
+          <View style={styles.dateTimeColumn}>
+            <Text style={styles.inputLabel}>Date</Text>
+            <TouchableOpacity
+              style={[styles.dateTimeBox, { backgroundColor: isDark ? '#1A1A1A' : '#f8f8f5', borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB' }]}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Calendar size={18} color={isDark ? '#666' : '#888'} />
+              <Text style={[styles.dateTimeText, { color: colors.text }]}>{formatSessionDate(sessionStartAt)}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.dateTimeColumn}>
+            <Text style={styles.inputLabel}>Start Time</Text>
+            <TouchableOpacity
+              style={[styles.dateTimeBox, { backgroundColor: isDark ? '#1A1A1A' : '#f8f8f5', borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB' }]}
+              onPress={() => setShowTimePicker(true)}
+            >
+              <Clock size={18} color={isDark ? '#666' : '#888'} />
+              <Text style={[styles.dateTimeText, { color: colors.text }]}>{formatSessionTime(sessionStartAt)}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Duration</Text>
+          <View style={styles.durationRow}>
+            {[45, 60, 90, 120, 150].map((minutes) => {
+              const isSelected = durationMinutes === minutes;
+              return (
+                <TouchableOpacity
+                  key={minutes}
+                  style={[
+                    styles.durationChip,
+                    {
+                      backgroundColor: isSelected ? colors.primary : (isDark ? '#1A1A1A' : '#f8f8f5'),
+                      borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'),
+                    },
+                  ]}
+                  onPress={() => setDurationMinutes(minutes)}
+                >
+                  <Text style={[styles.durationChipText, { color: isSelected ? '#231e0f' : colors.text }]}>{minutes}m</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -170,7 +308,7 @@ export default function LecturerDashboard() {
               <Text style={[styles.methodName, { color: colors.text }]}>QR Code</Text>
             </View>
             <TouchableOpacity onPress={() => setMethods({...methods, qr: !methods.qr})}>
-              <MaterialIcons name={methods.qr ? "check-circle" : "circle-outline"} size={24} color={methods.qr ? colors.primary : '#999'} />
+              <MaterialIcons name={methods.qr ? "check-circle" : "radio-button-unchecked"} size={24} color={methods.qr ? colors.primary : '#999'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -184,7 +322,7 @@ export default function LecturerDashboard() {
               <Text style={[styles.methodName, { color: colors.text }]}>Session Code</Text>
             </View>
             <TouchableOpacity onPress={() => setMethods({...methods, pin: !methods.pin})}>
-              <MaterialIcons name={methods.pin ? "check-circle" : "circle-outline"} size={24} color={methods.pin ? colors.primary : '#999'} />
+              <MaterialIcons name={methods.pin ? "check-circle" : "radio-button-unchecked"} size={24} color={methods.pin ? colors.primary : '#999'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -201,7 +339,7 @@ export default function LecturerDashboard() {
               </View>
             </View>
             <TouchableOpacity onPress={() => setMethods({...methods, gps: !methods.gps})}>
-              <MaterialIcons name={methods.gps ? "check-circle" : "circle-outline"} size={24} color={methods.gps ? colors.primary : '#999'} />
+              <MaterialIcons name={methods.gps ? "check-circle" : "radio-button-unchecked"} size={24} color={methods.gps ? colors.primary : '#999'} />
             </TouchableOpacity>
           </View>
           {methods.gps && (
@@ -250,6 +388,17 @@ export default function LecturerDashboard() {
           </View>
           <View style={styles.reviewDivider} />
           <View style={styles.reviewItem}>
+            <Clock size={22} color={colors.primary} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.reviewLabel}>TIME SLOT</Text>
+              <Text style={[styles.reviewValue, { color: colors.text }]}> 
+                {formatSessionDate(sessionStartAt)} • {formatSessionTime(sessionStartAt)}
+              </Text>
+              <Text style={styles.reviewSubValue}>Duration: {durationMinutes} minutes</Text>
+            </View>
+          </View>
+          <View style={styles.reviewDivider} />
+          <View style={styles.reviewItem}>
             <ShieldCheck size={22} color={colors.primary} />
             <View style={{ flex: 1 }}>
               <Text style={styles.reviewLabel}>VERIFICATION</Text>
@@ -282,13 +431,13 @@ export default function LecturerDashboard() {
           <View style={[styles.progressStep, { backgroundColor: creationStep >= 3 ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : '#F3F4F6') }]} />
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 120 }]}>
           {creationStep === 1 && renderStep1()}
           {creationStep === 2 && renderStep2()}
           {creationStep === 3 && renderStep3()}
         </ScrollView>
 
-        <View style={styles.footerAction}>
+        <View style={[styles.footerAction, { bottom: bottomDockOffset + 16 }]}> 
           <TouchableOpacity 
             style={[styles.continueBtn, { backgroundColor: colors.primary, opacity: creationLoading ? 0.6 : 1 }]} 
             onPress={handleNextStep}
@@ -368,6 +517,78 @@ export default function LecturerDashboard() {
             </View>
           </View>
         </Modal>
+
+        <Modal visible={showDatePicker} animationType="slide" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { backgroundColor: colors.background }]}> 
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>Select Date</Text>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <X size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={dateOptions}
+                keyExtractor={item => item.toISOString()}
+                renderItem={({ item }) => {
+                  const isSelected = item.toDateString() === sessionStartAt.toDateString();
+
+                  return (
+                    <TouchableOpacity
+                      style={[styles.modalItem, { borderBottomColor: colors.border }]}
+                      onPress={() => {
+                        setSessionStartAt(prev => mergeDatePart(prev, item));
+                        setShowDatePicker(false);
+                      }}
+                    >
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.modalItemTitle, { color: colors.text }]}>{formatSessionDate(item)}</Text>
+                        <Text style={[styles.modalItemSubtitle, { color: '#999' }]}>{item.toDateString() === new Date().toDateString() ? 'Today' : item.toLocaleDateString([], { weekday: 'long' })}</Text>
+                      </View>
+                      {isSelected && <MaterialIcons name="check-circle" size={20} color={colors.primary} />}
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={showTimePicker} animationType="slide" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { backgroundColor: colors.background }]}> 
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>Select Start Time</Text>
+                <TouchableOpacity onPress={() => setShowTimePicker(false)}>
+                  <X size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={timeOptions}
+                keyExtractor={item => `${item.getHours()}-${item.getMinutes()}`}
+                initialNumToRender={16}
+                renderItem={({ item }) => {
+                  const isSelected =
+                    item.getHours() === sessionStartAt.getHours() &&
+                    item.getMinutes() === sessionStartAt.getMinutes();
+
+                  return (
+                    <TouchableOpacity
+                      style={[styles.modalItem, { borderBottomColor: colors.border }]}
+                      onPress={() => {
+                        setSessionStartAt(prev => mergeTimePart(prev, item));
+                        setShowTimePicker(false);
+                      }}
+                    >
+                      <Text style={[styles.modalItemTitle, { color: colors.text, flex: 1 }]}>{formatSessionTime(item)}</Text>
+                      {isSelected && <MaterialIcons name="check-circle" size={20} color={colors.primary} />}
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     );
   }
@@ -400,7 +621,7 @@ export default function LecturerDashboard() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 120 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
@@ -504,13 +725,13 @@ export default function LecturerDashboard() {
                 )}
             </View>
         </View>
-        <View style={{ height: 130 }} />
+        <View style={{ height: bottomDockOffset + 40 }} />
       </ScrollView>
 
       {/* FAB for Create Session */}
       {nextSession && (
         <TouchableOpacity
-          style={[styles.fab, { backgroundColor: colors.primary }]}
+          style={[styles.fab, { backgroundColor: colors.primary, bottom: bottomDockOffset + 16 }]}
           onPress={startSessionCreation}
         >
           <Plus size={28} color="#231e0f" />
@@ -858,6 +1079,46 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: Fonts.lexend.medium,
   },
+  dateTimeRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  dateTimeColumn: {
+    flex: 1,
+    gap: 8,
+  },
+  dateTimeBox: {
+    height: 56,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  dateTimeText: {
+    fontSize: 14,
+    fontFamily: Fonts.lexend.medium,
+    flex: 1,
+  },
+  durationRow: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  durationChip: {
+    minWidth: 66,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  durationChipText: {
+    fontSize: 13,
+    fontFamily: Fonts.lexend.bold,
+  },
   footerAction: {
     position: 'absolute',
     bottom: 40,
@@ -937,6 +1198,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.lexend.bold,
     marginTop: 4,
+  },
+  reviewSubValue: {
+    fontSize: 12,
+    fontFamily: Fonts.lexend.regular,
+    color: '#999',
+    marginTop: 2,
   },
   reviewDivider: {
     height: 1,

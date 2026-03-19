@@ -1,14 +1,18 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { AttendanceProvider, useAttendance } from '@/contexts/AttendanceContext';
 import { ChevronLeft, CheckCircle, XCircle, Clock } from 'lucide-react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 function HistoryContent() {
   const router = useRouter();
   const { colors } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const { history, courses } = useAttendance();
   const [selectedTab, setSelectedTab] = useState<'all' | 'courses'>('all');
 
@@ -104,7 +108,7 @@ function HistoryContent() {
 
       {selectedTab === 'all' ? (
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 24 }]}
           showsVerticalScrollIndicator={false}
         >
           {history.length === 0 ? (
@@ -168,7 +172,7 @@ function HistoryContent() {
         </ScrollView>
       ) : (
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 24 }]}
           showsVerticalScrollIndicator={false}
         >
           {courses.map((course) => (

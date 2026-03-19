@@ -1,17 +1,21 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { Search, Plus, MoreVertical } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function LecturerCourseHubScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user } = useAuth();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -72,7 +76,7 @@ export default function LecturerCourseHubScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 72 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFCA0D" />}
       >
@@ -130,12 +134,12 @@ export default function LecturerCourseHubScreen() {
                 )}
             </View>
         )}
-        <View style={{ height: 120 }} />
+        <View style={{ height: bottomDockOffset + 24 }} />
       </ScrollView>
 
       {/* FAB */}
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, { bottom: bottomDockOffset + 16 }]}
         onPress={() => router.push('/(lecturer)/create-course')}
       >
         <Plus size={32} color="#0A0A0A" strokeWidth={2.5} />

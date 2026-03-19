@@ -1,10 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, usePathname, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import {
@@ -29,6 +29,64 @@ import {
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const segments = useSegments();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const topSegment = segments[0];
+    const inAuth = topSegment === "auth";
+    const inOnboarding = topSegment === "onboarding";
+    const inSplash = topSegment === "splash";
+    const inProtected = ["(student)", "(lecturer)", "(admin)", "(tabs)"].includes(topSegment || "");
+
+    if (!user) {
+      if (inProtected && pathname !== "/auth/sign-in") {
+        router.replace("/auth/sign-in");
+      }
+      return;
+    }
+
+    if (!isAuthenticated) {
+      if (!inAuth && pathname !== "/auth/verify-email") {
+        router.replace("/auth/verify-email");
+      }
+      return;
+    }
+
+    if (!user.onboardingCompleted) {
+      if (!inOnboarding && pathname !== "/onboarding") {
+        router.replace("/onboarding");
+      }
+      return;
+    }
+
+    const roleRoot =
+      user.role === "admin"
+        ? "/(admin)"
+        : user.role === "lecturer"
+          ? "/(lecturer)"
+          : "/(student)";
+
+    const inWrongRoleGroup =
+      (topSegment === "(admin)" && user.role !== "admin") ||
+      (topSegment === "(lecturer)" && user.role !== "lecturer") ||
+      (topSegment === "(student)" && user.role !== "student");
+
+    if (inAuth || inOnboarding || inSplash || topSegment === "(tabs)" || inWrongRoleGroup) {
+      if (pathname !== roleRoot) {
+        router.replace(roleRoot as any);
+      }
+    }
+  }, [isLoading, isAuthenticated, pathname, router, segments, user]);
+
+  return <>{children}</>;
+}
 
 function RootLayoutNav() {
   return (
@@ -74,10 +132,12 @@ export default function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ThemeProvider>
           <AuthProvider>
-            <AttendanceProvider>
-              <StatusBar style="auto" />
-              <RootLayoutNav />
-            </AttendanceProvider>
+            <AuthGate>
+              <AttendanceProvider>
+                <StatusBar style="auto" />
+                <RootLayoutNav />
+              </AttendanceProvider>
+            </AuthGate>
           </AuthProvider>
         </ThemeProvider>
       </GestureHandlerRootView>

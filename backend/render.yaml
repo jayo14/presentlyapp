@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: presently-backend-web
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: ./entrypoint.sh gunicorn presently.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+    healthCheckPath: /admin/login/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: presently-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: presently-redis
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: CORS_ALLOW_ALL_ORIGINS
+        value: "False"
+
+  - type: worker
+    name: presently-backend-worker
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A presently worker --loglevel=info
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: presently-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: presently-redis
+          property: connectionString
+
+databases:
+  - name: presently-db
+    plan: free
+
+  - name: presently-redis
+    type: redis
+    plan: free

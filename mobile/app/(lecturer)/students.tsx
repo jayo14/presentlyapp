@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, MoreVertical, Search } from 'lucide-react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import Fonts from '@/constants/fonts';
 import { useState } from 'react';
 import { api } from '@/services/api';
 import { useCourse, useCourseEnrolledStudents, useCourseAttendance } from '@/hooks/useCourses';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const { width } = Dimensions.get('window');
 
@@ -15,6 +16,9 @@ export default function LecturerStudentsScreen() {
   const router = useRouter();
   const { courseId, courseName, courseCode } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -54,7 +58,7 @@ export default function LecturerStudentsScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 56 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
@@ -101,7 +105,7 @@ export default function LecturerStudentsScreen() {
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary }]} activeOpacity={0.8}>
+      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary, bottom: bottomDockOffset + 16 }]} activeOpacity={0.8}>
         <MaterialIcons name="ios-share" size={24} color="#231e0f" />
       </TouchableOpacity>
     </SafeAreaView>

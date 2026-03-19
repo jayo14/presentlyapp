@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Animated, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { X, ArrowRight, ArrowLeft, Minus, Plus, UnfoldVertical, Landmark, Building2, GraduationCap, Layers, User, Lock, Search, Info, CheckCircle2 } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useRef, useEffect } from 'react';
 import { api } from '@/services/api';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const { width } = Dimensions.get('window');
 
@@ -44,6 +45,9 @@ function SelectionModal({ visible, title, data, onSelect, onClose, isDark }: any
 export default function CreateCourseScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
       title: '',
@@ -175,7 +179,7 @@ export default function CreateCourseScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 120 }]} showsVerticalScrollIndicator={false}>
         {step === 1 && (
             <Step1
                 formData={formData}
@@ -208,7 +212,7 @@ export default function CreateCourseScreen() {
       />
 
       {/* Footer */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: bottomDockOffset + 16 }]}> 
         <TouchableOpacity
             style={[styles.nextBtn, { opacity: loading ? 0.7 : 1 }]}
             onPress={handleNext}
