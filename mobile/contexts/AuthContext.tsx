@@ -1,5 +1,6 @@
 import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect } from 'react';
+import { AppState } from 'react-native';
 import { storage } from '@/utils/storage';
 import type { User } from '@/types';
 import { api } from '@/services/api';
@@ -25,9 +26,21 @@ const normalizeRole = (role?: string): User['role'] => {
 
 const mapApiUser = (data: any, fallbackEmail: string): User => {
   const userData = data?.user ?? data;
+  const firstName = userData?.first_name ?? userData?.firstName;
+  const lastName = userData?.last_name ?? userData?.lastName;
+  const fullNameFromParts = [firstName, lastName].filter(Boolean).join(' ').trim();
+  const profilePicture =
+    userData?.avatar_url ??
+    userData?.profile_picture ??
+    userData?.profilePicture ??
+    userData?.avatar ??
+    userData?.photo_url ??
+    userData?.photoURL ??
+    '';
+
   return {
     id: String(userData?.id ?? userData?._id ?? userData?.uuid ?? 'user-1'),
-    fullName: userData?.full_name ?? userData?.fullName ?? userData?.name ?? 'User',
+    fullName: userData?.full_name ?? userData?.fullName ?? userData?.name ?? fullNameFromParts || 'User',
     email: userData?.email ?? fallbackEmail,
     role: normalizeRole(userData?.role ?? userData?.user_type),
     emailVerified: userData?.is_verified ?? userData?.emailVerified ?? true,
@@ -40,7 +53,7 @@ const mapApiUser = (data: any, fallbackEmail: string): User => {
     phoneNumber: userData?.phone_number ?? userData?.phoneNumber,
     school: userData?.institution_name ?? userData?.institution ?? userData?.school,
     college: userData?.college_name ?? userData?.college,
-    profilePicture: userData?.avatar_url ?? userData?.profile_picture ?? userData?.profilePicture,
+    profilePicture,
     institutionId: userData?.institution_id ?? userData?.institution?.id ?? userData?.institution,
   };
 };
@@ -96,6 +109,22 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     return () => clearInterval(intervalId);
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active' && isAuthenticated) {
+        refreshUser();
+      }
+    });
+
+    return () => subscription.remove();
+  }, [isAuthenticated]);
+
+  const persistUser = async (nextUser: User) => {
+    await storage.setUser(nextUser);
+    await storage.saveUser(nextUser);
+    setUser(nextUser);
+  };
+
   const checkAuth = async () => {
     try {
       const [token, refreshToken, savedUser] = await Promise.all([
@@ -108,9 +137,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         try {
           const userData = await api.auth.me();
           const freshUser = mapApiUser(userData, savedUser?.email || userData?.email || '');
-          await storage.setUser(freshUser);
-          await storage.saveUser(freshUser);
-          setUser(freshUser);
+          await persistUser(freshUser);
           setIsAuthenticated(!!freshUser.emailVerified);
           return;
         } catch (meError: any) {
@@ -146,9 +173,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     try {
       const userData = await api.auth.me();
       const updatedUser = mapApiUser(userData, userData?.email || '');
-      await storage.setUser(updatedUser);
-      await storage.saveUser(updatedUser);
-      setUser(updatedUser);
+      await persistUser(updatedUser);
       setIsAuthenticated(!!updatedUser.emailVerified);
       return { success: true, user: updatedUser };
     } catch (error: any) {
@@ -188,10 +213,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
           const userToLog = mapApiUser(userData || {}, email);
           const isVerified = !!userToLog.emailVerified;
 
-          await storage.setUser(userToLog);
-          await storage.saveUser(userToLog);
-          
-          setUser(userToLog);
+          await persistUser(userToLog);
           setIsAuthenticated(isVerified);
           
           return { success: true, requiresVerification: !isVerified, user: userToLog };
@@ -224,9 +246,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         if (userData) {
           const newUser = mapApiUser(userData, data?.email || userData?.email || '');
           const isVerified = !!newUser.emailVerified;
-          await storage.setUser(newUser);
-          await storage.saveUser(newUser);
-          setUser(newUser);
+          await persistUser(newUser);
           setIsAuthenticated(isVerified);
           return { success: true, requiresVerification: !isVerified, user: newUser };
         }
@@ -249,12 +269,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       const refreshToken = getRefreshToken(response);
       if (accessToken) {
         const verifiedUser = { ...savedUser, emailVerified: true };
-        await storage.setUser(verifiedUser);
+        await persistUser(verifiedUser);
         await storage.setAuthToken(accessToken);
         if (refreshToken) {
           await storage.setRefreshToken(refreshToken);
         }
-        setUser(verifiedUser);
         setIsAuthenticated(true);
         return { success: true };
       }
@@ -327,9 +346,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       if (userData || accessToken) {
         const userToLog = mapApiUser(userData || {}, userData?.email || '');
         const isVerified = !!userToLog.emailVerified;
-        await storage.setUser(userToLog);
-        await storage.saveUser(userToLog);
-        setUser(userToLog);
+        await persistUser(userToLog);
         setIsAuthenticated(isVerified);
         return { success: true, requiresVerification: !isVerified, user: userToLog };
       }
@@ -347,9 +364,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       if (userData) {
         const updatedUser = mapApiUser(userData, userData?.email || '');
         updatedUser.onboardingCompleted = true;
-        await storage.setUser(updatedUser);
-        await storage.saveUser(updatedUser);
-        setUser(updatedUser);
+        await persistUser(updatedUser);
         return { success: true, user: updatedUser };
       }
       return { success: true };
@@ -374,8 +389,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       const userData = await api.auth.me().catch(() => null);
       if (userData) {
         const userToLog = mapApiUser(userData, userData?.email || '');
-        await storage.setUser(userToLog);
-        setUser(userToLog);
+        await persistUser(userToLog);
         setIsAuthenticated(!!userToLog.emailVerified);
       } else if (fallbackUser) {
         setUser(fallbackUser);
@@ -395,11 +409,22 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     }
   };
 
-  const updateProfilePicture = async (avatarUrl: string) => {
+  const updateProfileDetails = async (details: Partial<User>) => {
     if (!user) return;
-    const updatedUser = { ...user, profilePicture: avatarUrl };
-    setUser(updatedUser);
-    await storage.setUser(updatedUser);
+    const updatedUser = {
+      ...user,
+      ...details,
+      profilePicture:
+        typeof details.profilePicture === 'string'
+          ? details.profilePicture.trim()
+          : user.profilePicture,
+    };
+
+    await persistUser(updatedUser);
+  };
+
+  const updateProfilePicture = async (avatarUrl: string) => {
+    await updateProfileDetails({ profilePicture: avatarUrl });
   };
 
   const signOut = async () => {
@@ -437,6 +462,19 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     refreshUser,
     signOut,
     checkAuth,
+    updateProfileDetails,
     updateProfilePicture,
+    profile: {
+      displayName: user?.fullName || 'User',
+      initials:
+        user?.fullName
+          ?.split(' ')
+          .map((part) => part?.[0])
+          .filter(Boolean)
+          .join('')
+          .substring(0, 2)
+          .toUpperCase() || 'U',
+      avatarUrl: user?.profilePicture || '',
+    },
   };
 });

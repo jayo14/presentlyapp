@@ -1,16 +1,20 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, Calendar, AlertTriangle, TrendingUp } from 'lucide-react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Fonts from '@/constants/fonts';
 import { useLecturerDashboard } from '@/hooks/useLecturerDashboard';
 import { useCourses } from '@/hooks/useApi';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function LecturerAnalyticsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
+    const tabBarHeight = useBottomTabBarHeight();
+    const insets = useSafeAreaInsets();
+    const bottomDockOffset = tabBarHeight + insets.bottom;
 
   const { data: dashboardData, isLoading: statsLoading } = useLecturerDashboard();
   const { data: coursesData, isLoading: coursesLoading } = useCourses();
@@ -41,7 +45,7 @@ export default function LecturerAnalyticsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 40 }]} showsVerticalScrollIndicator={false}>
         {/* Overall Average Section */}
         <View style={styles.avgSection}>
             <View style={styles.progressContainer}>
@@ -122,7 +126,7 @@ export default function LecturerAnalyticsScreen() {
                 ))}
             </View>
         </View>
-        <View style={{ height: 100 }} />
+                <View style={{ height: bottomDockOffset + 12 }} />
       </ScrollView>
     </SafeAreaView>
   );

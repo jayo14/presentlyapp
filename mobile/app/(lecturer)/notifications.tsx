@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, Settings, PlayCircle, FileText, AlertTriangle, PenTool, RefreshCw, ChevronRight, CheckCircle, Info, Circle } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
@@ -8,10 +8,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, parseISO } from 'date-fns';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function LecturerNotificationsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'All' | 'Unread' | 'Important'>('All');
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -79,7 +83,7 @@ export default function LecturerNotificationsScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 16 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >

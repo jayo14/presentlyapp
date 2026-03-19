@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { CheckCircle2, Landmark, Layers, Calendar, QrCode, Users, Edit, ChevronRight } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,6 +12,9 @@ export default function CreateCourseSuccessScreen() {
   const router = useRouter();
   const { id, code, title } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
 
   const bgColor = isDark ? '#0A0A0A' : colors.background;
 
@@ -27,7 +31,7 @@ export default function CreateCourseSuccessScreen() {
         <View style={[styles.confetti, { top: '70%', left: '50%', opacity: 0.2 }]} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 24 }]} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
             <View style={styles.successBadge}>
                 <CheckCircle2 size={32} color="#FFCA0D" />

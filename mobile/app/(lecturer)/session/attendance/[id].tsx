@@ -1,12 +1,13 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Dimensions, ScrollView } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { storage } from '@/utils/storage';
 import { Session } from '@/types';
 import { ChevronLeft, MoreVertical, Search, Share2 } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +15,9 @@ export default function AttendanceRecordsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   
   const [session, setSession] = useState<Session | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,7 +66,7 @@ export default function AttendanceRecordsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 24 }]} showsVerticalScrollIndicator={false}>
         {/* Stats Section */}
         <View style={styles.statsRow}>
             <View style={[styles.statCard, { backgroundColor: isDark ? '#2d2714' : '#FFFFFF', borderColor: isDark ? '#6a5d2f' : '#E2E8F0' }]}>

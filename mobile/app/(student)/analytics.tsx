@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAttendance } from '@/contexts/AttendanceContext';
 import { ChevronLeft, TrendingUp, BookOpen, TrendingDown } from 'lucide-react-native';
@@ -8,11 +8,15 @@ import Fonts from '@/constants/fonts';
 import Svg, { Circle } from 'react-native-svg';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function StudentAnalyticsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { stats, courses, refreshData } = useAttendance();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [weeklyTrends, setWeeklyTrends] = useState<any[]>([]);
   const [trendInfo, setTrendInfo] = useState<{ label: string; positive: boolean } | null>(null);
   const [fetching, setFetching] = useState(false);
@@ -83,7 +87,7 @@ export default function StudentAnalyticsScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 32 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
@@ -218,7 +222,7 @@ export default function StudentAnalyticsScreen() {
             )}
           </View>
         </View>
-        <View style={{ height: 40 }} />
+        <View style={{ height: bottomDockOffset + 12 }} />
       </ScrollView>
     </SafeAreaView>
   );

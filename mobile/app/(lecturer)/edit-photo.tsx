@@ -12,7 +12,7 @@ import Fonts from '@/constants/fonts';
 export default function EditPhotoScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { user, updateProfilePicture } = useAuth();
+  const { user, updateProfilePicture, refreshUser } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
 
@@ -63,6 +63,7 @@ export default function EditPhotoScreen() {
       const response: any = await api.auth.uploadAvatar(formData);
       if (response?.avatar_url) {
         await updateProfilePicture(response.avatar_url);
+        await refreshUser();
         router.back();
       } else {
         Alert.alert('Upload Failed', 'Could not save profile photo. Please try again.');
@@ -134,7 +135,14 @@ export default function EditPhotoScreen() {
               onPress={() => {
                 Alert.alert('Remove Photo', 'Remove your current profile photo?', [
                   { text: 'Cancel', style: 'cancel' },
-                  { text: 'Remove', style: 'destructive', onPress: () => updateProfilePicture('') },
+                  {
+                    text: 'Remove',
+                    style: 'destructive',
+                    onPress: async () => {
+                      await updateProfilePicture('');
+                      await refreshUser();
+                    },
+                  },
                 ]);
               }}
             >

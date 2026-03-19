@@ -1,15 +1,19 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChevronLeft, ChevronRight, User, Smartphone, Moon, Shield, FileText } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { colors, isDark, toggleTheme } = useTheme();
   const { user } = useAuth();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
@@ -21,7 +25,7 @@ export default function SettingsScreen() {
         <View style={{ width: 44 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 16 }]} showsVerticalScrollIndicator={false}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
         <View style={styles.section}>
             <SettingsItem

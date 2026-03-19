@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, ActivityIndicator, RefreshControl, Modal, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, MoreHorizontal, QrCode, StopCircle, MapPin, CheckCircle2, XCircle, Flag, FileText, Copy, X } from 'lucide-react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
 import * as Clipboard from 'expo-clipboard';
 import QRCode from 'react-native-qrcode-svg';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,6 +17,9 @@ export default function SessionScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
+    const tabBarHeight = useBottomTabBarHeight();
+    const insets = useSafeAreaInsets();
+    const bottomDockOffset = tabBarHeight + insets.bottom;
   const [session, setSession] = useState<any>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -95,7 +99,7 @@ export default function SessionScreen() {
             </View>
 
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomDockOffset + 24 }]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
             >
@@ -217,7 +221,7 @@ export default function SessionScreen() {
             </View>
 
             <ScrollView
-                contentContainerStyle={styles.summaryContent}
+                contentContainerStyle={[styles.summaryContent, { paddingBottom: bottomDockOffset + 24 }]}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
             >
                 <View style={[styles.heroCard, { backgroundColor: colors.primary + '1A', borderColor: colors.primary + '33' }]}>

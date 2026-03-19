@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { storage } from '@/utils/storage';
 import { Venue } from '@/types';
@@ -10,9 +10,13 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { mockVenues } from '@/mocks/venues';
 import { CustomModal } from '@/components/CustomModal';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function VenuesScreen() {
   const { colors } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const bottomDockOffset = tabBarHeight + insets.bottom;
   const [venues, setVenues] = useState<Venue[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -225,7 +229,7 @@ export default function VenuesScreen() {
         <FlatList
           data={venues}
           keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: bottomDockOffset + 24 }]}
           renderItem={({ item }) => (
             <View style={[styles.card, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
               <View style={styles.cardHeader}>
