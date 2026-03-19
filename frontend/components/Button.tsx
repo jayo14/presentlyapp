@@ -17,10 +17,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "inline-flex items-center justify-center rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:pointer-events-none";
   
   const variants = {
-    primary: "bg-primary text-primary-foreground hover:bg-primary-hover dark:bg-dark-primary-DEFAULT dark:text-dark-primary-foreground dark:hover:bg-dark-primary-hover shadow-md shadow-primary/20",
-    secondary: "bg-background-secondary text-primary hover:bg-background-tertiary border-2 border-primary dark:bg-dark-background-secondary dark:text-dark-primary-DEFAULT dark:border-dark-primary-DEFAULT dark:hover:bg-dark-background-tertiary",
-    outline: "border-2 border-primary text-primary hover:bg-primary/10 dark:border-dark-primary-DEFAULT dark:text-dark-primary-DEFAULT dark:hover:bg-dark-primary-DEFAULT/10",
-    ghost: "text-text-tertiary hover:text-text-primary hover:bg-background-tertiary dark:text-dark-text-tertiary dark:hover:text-dark-text-primary dark:hover:bg-dark-background-tertiary",
+    primary: "bg-primary-container text-on-primary-fixed hover:bg-primary-fixed-dim shadow-md shadow-primary/20",
+    secondary: "bg-surface-container text-on-surface hover:bg-surface-container-high border-2 border-outline-variant",
+    outline: "border-2 border-primary text-primary hover:bg-primary/10",
+    ghost: "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high",
   };
 
   const sizes = {
