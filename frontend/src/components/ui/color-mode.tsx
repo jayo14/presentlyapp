@@ -5,9 +5,22 @@ import { Moon, Sun } from "lucide-react"
 
 export interface ColorModeProviderProps extends ThemeProviderProps {}
 
+// Define theme attribute values for next-themes
+export const THEME_LIGHT = "light"
+export const THEME_DARK = "dark"
+export const THEME_SYSTEM = "system"
+
 export function ColorModeProvider(props: ColorModeProviderProps) {
   return (
-    <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="light"
+      enableSystem={false}
+      disableTransitionOnChange
+      storageKey="theme-preference"
+      themes={[THEME_LIGHT, THEME_DARK]}
+      {...props}
+    />
   )
 }
 
@@ -21,12 +34,12 @@ export interface UseColorModeReturn {
 
 export function useColorMode(): UseColorModeReturn {
   const { resolvedTheme, setTheme, forcedTheme } = useTheme()
-  const colorMode = forcedTheme || resolvedTheme
+  const colorMode = (forcedTheme || resolvedTheme || "light") as ColorMode
   const toggleColorMode = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+    setTheme(colorMode === "dark" ? "light" : "dark")
   }
   return {
-    colorMode: colorMode as ColorMode,
+    colorMode,
     setColorMode: setTheme,
     toggleColorMode,
   }
