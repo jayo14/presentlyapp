@@ -34,7 +34,8 @@ export default defineConfig(({ mode }) => {
               if (
                 id.includes('node_modules/react/') ||
                 id.includes('node_modules/react-dom/') ||
-                id.includes('node_modules/framer-motion/')
+                id.includes('node_modules/framer-motion/') ||
+                id.includes('node_modules/next-themes/')
               ) {
                 return 'vendor-react';
               }
