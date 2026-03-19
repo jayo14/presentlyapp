@@ -504,7 +504,7 @@ export default function LecturerDashboard() {
                 )}
             </View>
         </View>
-        <View style={{ height: 100 }} />
+        <View style={{ height: 130 }} />
       </ScrollView>
 
       {/* FAB for Create Session */}
@@ -516,144 +516,6 @@ export default function LecturerDashboard() {
           <Plus size={28} color="#231e0f" />
         </TouchableOpacity>
       )}
-    </SafeAreaView>
-  );
-}
-
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Top Header */}
-      <View style={styles.header}>
-        <View style={styles.profileRow}>
-            <TouchableOpacity
-                style={[styles.avatarContainer, { borderColor: colors.primary + '4D' }]}
-                onPress={() => router.push('/(lecturer)/profile')}
-            >
-                <Image
-                    source={{ uri: user?.profilePicture || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" }}
-                    style={styles.avatar}
-                />
-            </TouchableOpacity>
-            <View>
-                <Text style={[styles.welcomeSub, { color: isDark ? '#ccbf8e' : '#666666' }]}>GOOD MORNING,</Text>
-                <Text style={[styles.userName, { color: colors.text }]}>Prof. {user?.fullName?.split(' ')[0] || 'Lecturer'}</Text>
-            </View>
-        </View>
-        <TouchableOpacity
-            style={[styles.iconBtn, { backgroundColor: isDark ? '#2d281a' : '#F9FAFB' }]}
-            onPress={() => router.push('/(lecturer)/notifications')}
-        >
-          <Bell size={22} color={colors.text} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
-      >
-        {/* Next Class Card Section */}
-        <View style={styles.section}>
-            {nextSession ? (
-                <View style={[styles.nextClassCard, { backgroundColor: isDark ? '#352e18' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
-                    <Image
-                        source={{ uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBlxoJsKgpZimzuMN9_wIy2nQKrP6xfFobHPPC15rReLLYJ7PMTH4lJGYUO7gawKCDatFSRKvtW3W5Q_pYm2C1qvmULm56p9l0uPqnFWg0RbId2dgvNPpL2N93K5OuqLrvC1m-mZ08yHo9ElAVoWDhR0_NEg28ZQZ1WI4xj2Q2tqy3yIy-dzGAUIN7RPK0MxOEKZ3aAT-dQ8cSviIs7HhgdE1QOlj-IPnLnzsjZ4S7JpE5qis-MOWdsTrM2UcvFzShcXtqjTlLZT_Nh" }}
-                        style={styles.nextClassImage}
-                    />
-                    <View style={styles.nextClassContent}>
-                        <View style={styles.nextClassHeader}>
-                            <View style={styles.liveIndicator}>
-                                <View style={styles.liveDot} />
-                                <Text style={styles.liveText}>NEXT CLASS</Text>
-                            </View>
-                        </View>
-                        <Text style={[styles.nextClassName, { color: colors.text }]}>{nextSession.course_code} - {nextSession.course_name}</Text>
-
-                        <View style={styles.nextClassFooter}>
-                            <View style={styles.nextClassDetails}>
-                                <View style={styles.detailRow}>
-                                    <Clock size={14} color={isDark ? '#ccbf8e' : '#666666'} />
-                                    <Text style={[styles.detailText, { color: isDark ? '#ccbf8e' : '#666666' }]}>
-                                        {new Date(nextSession.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(nextSession.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </Text>
-                                </View>
-                                <View style={styles.detailRow}>
-                                    <MapPin size={14} color={isDark ? '#ccbf8e' : '#666666'} />
-                                    <Text style={[styles.detailText, { color: isDark ? '#ccbf8e' : '#666666' }]}>{nextSession.venue_name || 'Hall A'}</Text>
-                                </View>
-                            </View>
-                            <TouchableOpacity
-                                style={[styles.startSessionBtn, { backgroundColor: colors.primary }]}
-                                onPress={() => router.push({ pathname: '/(lecturer)/sessions', params: { sessionId: nextSession.id }})}
-                            >
-                                <Text style={styles.startSessionText}>Start Session</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            ) : !statsLoading && (
-                <View style={[styles.noSessionCard, { backgroundColor: isDark ? '#352e18' : '#F9FAFB', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
-                    <Calendar size={32} color={colors.primary} />
-                    <Text style={[styles.noSessionText, { color: colors.text }]}>No upcoming classes scheduled</Text>
-                    <TouchableOpacity
-                        style={[styles.createBtn, { backgroundColor: colors.primary }]}
-                        onPress={() => router.push('/(lecturer)/sessions')}
-                    >
-                        <Text style={styles.startSessionText}>Create Session</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </View>
-
-        {/* Quick Stats Section */}
-        <View style={styles.statsSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Stats</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statsScroll}>
-                <StatCard
-                    icon={<BookOpen size={18} color={colors.primary} />}
-                    label="Courses"
-                    value={dashboardData?.total_courses?.toString() || "0"}
-                    colors={colors}
-                    isDark={isDark}
-                />
-                <StatCard
-                    icon={<Calendar size={18} color={colors.primary} />}
-                    label="Today"
-                    value={dashboardData?.active_sessions_count?.toString() || "0"}
-                    colors={colors}
-                    isDark={isDark}
-                />
-                <StatCard
-                    icon={<TrendingUp size={18} color={colors.primary} />}
-                    label="Attendance"
-                    value={`${dashboardData?.avg_attendance_percentage || 0}%`}
-                    colors={colors}
-                    isDark={isDark}
-                />
-            </ScrollView>
-        </View>
-
-        {/* Recent Activity Section */}
-        <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
-            <View style={styles.activityList}>
-                {dashboardData?.weekly_overview?.slice(0, 3).map((item, idx) => (
-                    <ActivityItem
-                        key={idx}
-                        icon={<CheckCircle size={20} color="#10B981" />}
-                        title="Attendance Recorded"
-                        subtitle={`${item.name} Session • ${item.attendees} Students`}
-                        badge={`${item.attendees} mark`}
-                        colors={colors}
-                        isDark={isDark}
-                    />
-                )) || (
-                    <Text style={{ textAlign: 'center', color: colors.textSecondary, marginTop: 10 }}>No recent activity</Text>
-                )}
-            </View>
-        </View>
-        <View style={{ height: 100 }} />
-      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -739,7 +601,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   scrollContent: {
-    paddingBottom: 140,
+    paddingBottom: 180,
   },
   section: {
     paddingHorizontal: 16,
@@ -911,7 +773,7 @@ const styles = StyleSheet.create({
   // Session Creation Styles
   fab: {
     position: 'absolute',
-    bottom: 100,
+    bottom: 130,
     right: 20,
     width: 56,
     height: 56,
