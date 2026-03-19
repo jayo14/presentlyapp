@@ -22,9 +22,6 @@
     "@capacitor/splash-screen": "^8.0.0",
     "@capacitor/status-bar": "^8.0.0",
     "@capacitor/toast": "^8.0.0",
-    "@chakra-ui/react": "^3.33.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
     "@fingerprintjs/fingerprintjs": "^5.1.0",
     "@geoman-io/leaflet-geoman-free": "^2.19.0",
     "@google/genai": "^1.30.0",
@@ -87,18 +84,6 @@
   "overrides": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@emotion/react": {
-      "react": "$react"
-    },
-    "@emotion/styled": {
-      "react": "$react"
-    },
-    "@chakra-ui/react": {
-      "react": "$react",
-      "react-dom": "$react-dom",
-      "@emotion/react": "$@emotion/react",
-      "@emotion/styled": "$@emotion/styled"
-    },
     "react-helmet-async": {
       "react": "$react",
       "react-dom": "$react-dom"
