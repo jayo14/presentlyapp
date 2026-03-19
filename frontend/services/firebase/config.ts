@@ -8,6 +8,7 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getMessaging, Messaging, isSupported } from 'firebase/messaging';
 import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
+import { getAnalytics, Analytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
 
 // Firebase configuration from environment variables
 // These values should be set in .env.local file
@@ -24,6 +25,7 @@ const firebaseConfig = {
 let app: FirebaseApp | null = null;
 let messaging: Messaging | null = null;
 let auth: Auth | null = null;
+let analytics: Analytics | null = null;
 
 /**
  * Initialize Firebase App
@@ -63,6 +65,35 @@ export const getFirebaseAuth = (): Auth | null => {
   
   auth = getAuth(firebaseApp);
   return auth;
+};
+
+/**
+ * Get Firebase Analytics instance
+ * Returns null when analytics is unavailable in the current runtime
+ */
+export const getFirebaseAnalytics = async (): Promise<Analytics | null> => {
+  if (analytics) return analytics;
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const firebaseApp = initializeFirebase();
+  if (!firebaseApp) return null;
+
+  const supported = await isAnalyticsSupported();
+  if (!supported) {
+    console.warn('[Firebase] Analytics is not supported in this browser/runtime');
+    return null;
+  }
+
+  try {
+    analytics = getAnalytics(firebaseApp);
+    return analytics;
+  } catch (error) {
+    console.error('[Firebase] Error initializing Firebase Analytics:', error);
+    return null;
+  }
 };
 
 /**
