@@ -12,17 +12,18 @@ const normalizeApiBaseUrl = (apiUrl?: string): string => {
     return DEFAULT_API_URL;
   }
 
-  const normalizedUrl = trimmedUrl.replace(/\/$/, '');
-  const withApiSuffix = normalizedUrl.endsWith('/api')
-    ? normalizedUrl
-    : `${normalizedUrl}/api`;
+  const normalizedUrl = trimmedUrl.replace(/\/+$/, '');
 
-  if (!/^https?:\/\//i.test(withApiSuffix)) {
+  if (!/^https?:\/\//i.test(normalizedUrl)) {
     console.warn('[API Client] VITE_API_URL must be absolute (http/https). Falling back to default backend URL.');
     return DEFAULT_API_URL;
   }
 
-  return withApiSuffix;
+  // Normalize any accidental duplicate api segment: .../api/api -> .../api
+  const withoutDuplicateApi = normalizedUrl.replace(/\/api(?:\/api)+$/i, '/api');
+  return withoutDuplicateApi.endsWith('/api')
+    ? withoutDuplicateApi
+    : `${withoutDuplicateApi}/api`;
 };
 
 const rawApiUrl: string = import.meta.env.VITE_API_URL || '';

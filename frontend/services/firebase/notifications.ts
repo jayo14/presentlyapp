@@ -200,20 +200,23 @@ export const sendTokenToServer = async (
   accessToken: string
 ): Promise<boolean> => {
   try {
-    const API_URL = import.meta.env.VITE_API_URL;
-    
+    const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
     // Ensure API URL is configured
     if (!API_URL) {
       console.error('[FCM] API URL not configured. Cannot send token to server.');
       return false;
     }
-    
+
     if (!accessToken) {
       console.error('[FCM] Access token missing. Cannot send token to server.');
       return false;
     }
-    
-    const response = await fetch(`${API_URL}/api/notifications/devices/register/`, {
+
+    const normalizedApiUrl = API_URL.replace(/\/api(?:\/api)+$/i, '/api');
+    const baseUrl = normalizedApiUrl.endsWith('/api') ? normalizedApiUrl : `${normalizedApiUrl}/api`;
+
+    const response = await fetch(`${baseUrl}/notifications/devices/register/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
