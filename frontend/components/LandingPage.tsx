@@ -234,8 +234,8 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   useFadeOnScroll();
 
-  const goRegister = () => navigate('/auth/register');
-  const goLogin = () => navigate('/auth/login');
+  const goRegister = () => navigate('/register');
+  const goLogin = () => navigate('/login');
 
   return (
     <TooltipProvider>
@@ -293,10 +293,11 @@ export const LandingPage: React.FC = () => {
               style={{ display: 'flex', gap: '2rem' }}
             >
               {[
-                { label: 'Platform', href: '#platform', active: true },
-                { label: 'Solutions', href: '#solutions' },
+                { label: 'Solutions', href: '#solutions', active: true },
                 { label: 'Resources', href: '#resources' },
                 { label: 'Pricing', href: '#pricing' },
+                { label: 'Documentation', href: '/documentation' },
+                { label: 'Volunteers', href: '/volunteers' },
               ].map(({ label, href, active }) => (
                 <a
                   key={label}
@@ -1461,12 +1462,12 @@ export const LandingPage: React.FC = () => {
                           transition: 'filter 0.5s',
                         }}
                         onMouseEnter={(e) =>
-                          ((e.target as HTMLImageElement).style.filter =
-                            'grayscale(0)')
+                        ((e.target as HTMLImageElement).style.filter =
+                          'grayscale(0)')
                         }
                         onMouseLeave={(e) =>
-                          ((e.target as HTMLImageElement).style.filter =
-                            'grayscale(1)')
+                        ((e.target as HTMLImageElement).style.filter =
+                          'grayscale(1)')
                         }
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display =
@@ -2092,8 +2093,8 @@ export const LandingPage: React.FC = () => {
                       transition: 'color 0.2s',
                     }}
                     onMouseEnter={(e) =>
-                      (e.currentTarget.style.color =
-                        'var(--primary-container)')
+                    (e.currentTarget.style.color =
+                      'var(--primary-container)')
                     }
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.color = 'var(--secondary)')
