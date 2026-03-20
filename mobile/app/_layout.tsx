@@ -60,8 +60,8 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     }
 
     if (!user.onboardingCompleted) {
-      if (!inOnboarding && pathname !== "/onboarding") {
-        router.replace("/onboarding");
+      if (pathname !== "/onboarding/role-selection") {
+        router.replace("/onboarding/role-selection");
       }
       return;
     }

@@ -81,14 +81,7 @@ export default function VerifyEmailScreen() {
     setLoading(false);
 
     if (result.success) {
-      const role = user?.role ?? 'student';
-      const destination = "/onboarding"; // Always go to onboarding after verification
-      /*
-        role === 'admin'
-          ? '/(admin)'
-          : role === 'lecturer'
-            ? '/(lecturer)'
-            : '/(student)'; */
+      const destination = '/onboarding/role-selection';
 
       router.replace(destination);
     } else {

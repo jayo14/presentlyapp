@@ -13,8 +13,8 @@ import Constants from 'expo-constants';
 const normalizeUrl = (url: string) => url.replace(/\/$/, '');
 
 const ensureApiPath = (url: string) => {
-  const normalized = normalizeUrl(url);
-  return normalized.endsWith('/api') ? normalized : `${normalized}/api`;
+  const normalized = normalizeUrl(url).replace(/(\/api)+$/i, '');
+  return `${normalized}/api`;
 };
 
 const getApiUrl = () => {
@@ -28,8 +28,7 @@ const getApiUrl = () => {
   if (process.env.EXPO_PUBLIC_API_BASE_URL) {
     return ensureApiPath(process.env.EXPO_PUBLIC_API_BASE_URL);
   }
-  // return 'https://presently.koyeb.app/api';
-  return 'https://presently.koyeb.app/api';
+  return 'https://presentlyapp.onrender.com/api';
 };
 
 export const ENV = {
