@@ -44,12 +44,12 @@ export default function OnboardingScreen() {
       });
       setCurrentIndex(currentIndex + 1);
     } else {
-      router.replace('/auth/sign-in');
+      router.replace('/onboarding/role-selection');
     }
   };
 
   const handleSkip = () => {
-    router.replace('/auth/sign-in');
+    router.replace('/onboarding/role-selection');
   };
 
   const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
