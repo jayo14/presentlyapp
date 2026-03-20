@@ -152,8 +152,6 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 160,
-    // @ts-ignore
-    filter: 'blur(120px)',
   },
   glowBottom: {
     position: 'absolute',
@@ -162,8 +160,6 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 160,
-    // @ts-ignore
-    filter: 'blur(120px)',
   },
   content: {
     flex: 1,
