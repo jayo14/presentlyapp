@@ -201,18 +201,61 @@ def google_callback_view(request):
         'grant_type': 'authorization_code',
     }
 
-    response = requests.post(token_url, data=data)
-    token_data = response.json()
+    try:
+        # Exchange code for access token with 10-second timeout
+        response = requests.post(token_url, data=data, timeout=10)
+        response.raise_for_status()  # Raise for 4xx/5xx status codes
+        token_data = response.json()
+    except requests.Timeout:
+        return Response(
+            {'error': 'Google token exchange timeout. Please try again.'},
+            status=status.HTTP_504_GATEWAY_TIMEOUT
+        )
+    except requests.RequestException as e:
+        return Response(
+            {'error': f'Failed to exchange code with Google: {str(e)}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except ValueError as e:
+        return Response(
+            {'error': 'Invalid response from Google token endpoint'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     if 'error' in token_data:
-        return Response({'error': token_data.get('error_description', 'Failed to exchange code')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'error': token_data.get('error_description', 'Failed to exchange code')},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     access_token = token_data.get('access_token')
+    if not access_token:
+        return Response(
+            {'error': 'No access token in Google response'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     # Get user info
     user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
-    user_info_response = requests.get(user_info_url, params={'access_token': access_token})
-    user_info = user_info_response.json()
+    try:
+        user_info_response = requests.get(user_info_url, params={'access_token': access_token}, timeout=10)
+        user_info_response.raise_for_status()
+        user_info = user_info_response.json()
+    except requests.Timeout:
+        return Response(
+            {'error': 'Google user info request timeout. Please try again.'},
+            status=status.HTTP_504_GATEWAY_TIMEOUT
+        )
+    except requests.RequestException as e:
+        return Response(
+            {'error': f'Failed to get user info from Google: {str(e)}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except ValueError as e:
+        return Response(
+            {'error': 'Invalid response from Google user info endpoint'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     email = user_info.get('email')
     name = user_info.get('name', '')
