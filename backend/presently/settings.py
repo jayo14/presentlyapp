@@ -270,26 +270,32 @@ CORS_EXPOSE_HEADERS = [
     'authorization',
 ]
 
-# Email Configuration (Gmail SMTP or Gmail API)
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+# Email Configuration (Brevo SMTP-first)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp-relay.brevo.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'apikey')
+EMAIL_HOST_PASSWORD = (
+    os.environ.get('EMAIL_HOST_PASSWORD')
+    or os.environ.get('BREVO_SMTP_KEY')
+    or os.environ.get('BREVO_API_KEY', '')
+)
 GMAIL_API_REFRESH_TOKEN = os.environ.get('GMAIL_API_REFRESH_TOKEN', '')
+USE_GMAIL_API_EMAIL_BACKEND = os.environ.get('USE_GMAIL_API_EMAIL_BACKEND', 'False') == 'True'
 
-# Choose backend based on available credentials
-if os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
+# Choose backend: SMTP by default, optional Gmail API only when explicitly enabled.
+if USE_GMAIL_API_EMAIL_BACKEND and os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
     EMAIL_BACKEND = 'presently.email_backend.GmailApiEmailBackend'
     print("INFO: Using Gmail API email backend.")
-elif os.environ.get('EMAIL_HOST_USER') and os.environ.get('EMAIL_HOST_PASSWORD'):
+elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    print(f"INFO: Using SMTP email backend ({EMAIL_HOST}).")
+    print(f"INFO: Using SMTP email backend ({EMAIL_HOST}:{EMAIL_PORT}).")
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    print("WARNING: Using console email backend. Emails will be printed to terminal instead of being sent.")
+    print("WARNING: SMTP credentials not found; using console email backend.")
 
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') or os.environ.get('EMAIL_HOST_USER') or 'getpresently.io@gmail.com'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') or os.environ.get('EMAIL_HOST_USER') or 'noreply@presently.app'
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links
