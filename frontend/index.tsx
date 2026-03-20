@@ -14,8 +14,9 @@ if (!rootElement) {
 }
 
 const normalizeApiBaseUrl = (apiUrl?: string): string => {
-  const normalizedUrl = (apiUrl || 'http://localhost:8000/api').replace(/\/$/, '');
-  return normalizedUrl.endsWith('/api') ? normalizedUrl : `${normalizedUrl}/api`;
+  const normalizedUrl = (apiUrl || 'http://localhost:8000/api').replace(/\/+$/, '');
+  const withoutDuplicateApi = normalizedUrl.replace(/\/api(?:\/api)+$/i, '/api');
+  return withoutDuplicateApi.endsWith('/api') ? withoutDuplicateApi : `${withoutDuplicateApi}/api`;
 };
 
 // Firebase analytics bootstrap
