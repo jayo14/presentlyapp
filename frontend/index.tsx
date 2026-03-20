@@ -6,6 +6,7 @@ import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { reportWebVitals } from './utils/reportWebVitals';
 import { Provider } from '@/components/ui/provider';
+import { getFirebaseAnalytics, isFirebaseConfigured } from './services/firebase/config';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -16,6 +17,21 @@ const normalizeApiBaseUrl = (apiUrl?: string): string => {
   const normalizedUrl = (apiUrl || 'http://localhost:8000/api').replace(/\/$/, '');
   return normalizedUrl.endsWith('/api') ? normalizedUrl : `${normalizedUrl}/api`;
 };
+
+// Firebase analytics bootstrap
+
+const initializeFirebaseAnalytics = async () => {
+  const analyticsEnabled = import.meta.env.VITE_ENABLE_FIREBASE_ANALYTICS === 'true';
+  if (!analyticsEnabled || !isFirebaseConfigured()) return;
+
+  try {
+    await getFirebaseAnalytics();
+  } catch (error) {
+    console.warn('Firebase Analytics initialization skipped:', error);
+  }
+};
+
+void initializeFirebaseAnalytics();
 
 // Register Service Worker
 if ('serviceWorker' in navigator) {
