@@ -61,10 +61,16 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
   const [boundaryInput, setBoundaryInput] = useState('');
 
   useEffect(() => {
-    if (initialBoundary) {
+    if (initialBoundary && initialBoundary.length > 0) {
       setBoundaryInput(JSON.stringify(initialBoundary, null, 2));
-    } else if (venue?.boundary_coordinates) {
+      setFormData((prev) => ({
+        ...prev,
+        boundary_coordinates: initialBoundary,
+      }));
+    } else if (venue?.boundary_coordinates && venue.boundary_coordinates.length > 0) {
       setBoundaryInput(JSON.stringify(venue.boundary_coordinates, null, 2));
+    } else {
+      setBoundaryInput('');
     }
   }, [venue, initialBoundary]);
 
@@ -126,8 +132,13 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
       );
       return;
     }
-    if (formData.latitude == null || formData.longitude == null) {
-      setError('Latitude and longitude are required');
+    const hasBoundaryNow = !!(formData.boundary_coordinates && formData.boundary_coordinates.length >= 3);
+    if (!hasBoundaryNow && (formData.latitude == null || formData.longitude == null)) {
+      setError('Latitude and longitude are required when boundary polygon is not provided');
+      return;
+    }
+    if (!hasBoundaryNow && !formData.verification_radius) {
+      setError('Verification radius is required when boundary polygon is not provided');
       return;
     }
 
@@ -135,6 +146,12 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
       setLoading(true);
       setError(null);
       const payload: Partial<Venue> = { ...formData };
+
+      if (hasBoundaryNow && (payload.latitude == null || payload.longitude == null)) {
+        const [firstLat, firstLng] = payload.boundary_coordinates![0];
+        payload.latitude = firstLat;
+        payload.longitude = firstLng;
+      }
       if (!payload.boundary_coordinates?.length) {
         delete payload.boundary_coordinates;
       }
@@ -149,6 +166,7 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
   const hasBoundary = !!(
     formData.boundary_coordinates && formData.boundary_coordinates.length >= 3
   );
+  const isPolygonMode = hasBoundary || drawMode === 'polygon';
 
   return (
     <div
@@ -170,7 +188,7 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
               <p className="text-xs text-zinc-400 mt-0.5">
                 Mode:{' '}
                 <span className="text-primary font-medium">
-                  {drawMode === 'polygon' ? 'Polygon (drawn on map)' : 'Point + radius'}
+                  {isPolygonMode ? 'Polygon (drawn on map)' : 'Point + radius'}
                 </span>
               </p>
             )}
@@ -309,68 +327,74 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
           {/* ── Geolocation ──────────────────────────────────────── */}
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-foreground">Geolocation Data *</h3>
-              <Button
-                type="button"
-                onClick={getCurrentLocation}
-                className="gap-2 text-sm"
-                disabled={loading}
-              >
-                <MapPin className="w-4 h-4" />
-                Use Current Location
-              </Button>
+              <h3 className="text-lg font-semibold text-foreground">
+                Geolocation Data {isPolygonMode ? '(Optional)' : '*'}
+              </h3>
+              {!isPolygonMode && (
+                <Button
+                  type="button"
+                  onClick={getCurrentLocation}
+                  className="gap-2 text-sm"
+                  disabled={loading}
+                >
+                  <MapPin className="w-4 h-4" />
+                  Use Current Location
+                </Button>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  Latitude *
-                </label>
-                <Input
-                  type="number"
-                  step="0.00000001"
-                  value={formData.latitude}
-                  onChange={(e) => handleChange('latitude', Number(e.target.value))}
-                  placeholder="e.g., 7.5629"
-                  required
-                />
-              </div>
+            {!isPolygonMode && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Latitude *
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.00000001"
+                    value={formData.latitude}
+                    onChange={(e) => handleChange('latitude', Number(e.target.value))}
+                    placeholder="e.g., 7.5629"
+                    required
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  Longitude *
-                </label>
-                <Input
-                  type="number"
-                  step="0.00000001"
-                  value={formData.longitude}
-                  onChange={(e) => handleChange('longitude', Number(e.target.value))}
-                  placeholder="e.g., 4.5200"
-                  required
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Longitude *
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.00000001"
+                    value={formData.longitude}
+                    onChange={(e) => handleChange('longitude', Number(e.target.value))}
+                    placeholder="e.g., 4.5200"
+                    required
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  Elevation (m)
-                </label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={formData.elevation || ''}
-                  onChange={(e) =>
-                    handleChange(
-                      'elevation',
-                      e.target.value ? Number(e.target.value) : undefined,
-                    )
-                  }
-                  placeholder="Height above sea level"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Elevation (m)
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.elevation || ''}
+                    onChange={(e) =>
+                      handleChange(
+                        'elevation',
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
+                    placeholder="Height above sea level"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Radius – show when no polygon drawn */}
-            {!hasBoundary && (
+            {!isPolygonMode && (
               <div className="mt-4">
                 <label className="block text-sm font-medium text-zinc-400 mb-2">
                   Verification Radius (metres)
@@ -389,6 +413,11 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
                   polygon-based verification instead.
                 </p>
               </div>
+            )}
+            {isPolygonMode && (
+              <p className="text-xs text-zinc-500 mt-2">
+                Boundary polygon is set, so latitude/longitude and verification radius are optional.
+              </p>
             )}
           </section>
 
