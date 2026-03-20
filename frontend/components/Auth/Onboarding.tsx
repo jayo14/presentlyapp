@@ -44,6 +44,7 @@ interface OnboardingState {
   
   institutions: Institution[];
   institutionsLoading: boolean;
+  institutionsError: string;
   colleges: College[];
   collegesLoading: boolean;
   departments: Department[];
@@ -86,6 +87,7 @@ type OnboardingAction =
   | { type: 'SET_COURSES_ERROR'; payload: string }
   | { type: 'SET_INSTITUTIONS'; payload: Institution[] }
   | { type: 'SET_INSTITUTIONS_LOADING'; payload: boolean }
+  | { type: 'SET_INSTITUTIONS_ERROR'; payload: string }
   | { type: 'SET_COLLEGES'; payload: College[] }
   | { type: 'SET_COLLEGES_LOADING'; payload: boolean }
   | { type: 'SET_DEPARTMENTS'; payload: Department[] }
@@ -115,6 +117,7 @@ const initialState: OnboardingState = {
   
   institutions: [],
   institutionsLoading: false,
+  institutionsError: '',
   colleges: [],
   collegesLoading: false,
   departments: [],
@@ -166,9 +169,11 @@ function onboardingReducer(state: OnboardingState, action: OnboardingAction): On
     case 'SET_COURSES_ERROR':
       return { ...state, coursesError: action.payload };
     case 'SET_INSTITUTIONS':
-      return { ...state, institutions: action.payload };
+      return { ...state, institutions: action.payload, institutionsError: '' };
     case 'SET_INSTITUTIONS_LOADING':
       return { ...state, institutionsLoading: action.payload };
+    case 'SET_INSTITUTIONS_ERROR':
+      return { ...state, institutionsError: action.payload };
     case 'SET_COLLEGES':
       return { ...state, colleges: action.payload };
     case 'SET_COLLEGES_LOADING':
@@ -325,12 +330,14 @@ export const Onboarding: React.FC = () => {
   }, [state.selectedRole, state.step]);
 
   const fetchInstitutions = async () => {
-    // Always clear the cached institutions before fetching — a stale empty-array
-    // cache would silently prevent the dropdown from populating.
-    localStorage.removeItem(CACHE_KEYS.institutions);
+    const cached = getFromCache<Institution[]>(CACHE_KEYS.institutions);
+    if (cached && cached.length > 0) {
+      dispatch({ type: 'SET_INSTITUTIONS', payload: cached });
+    }
 
     try {
       dispatch({ type: 'SET_INSTITUTIONS_LOADING', payload: true });
+      dispatch({ type: 'SET_INSTITUTIONS_ERROR', payload: '' });
       const data = await institutionsApi.getAllInstitutions();
       const institutionList = Array.isArray(data) ? data : (data.results || data.data || []);
       const activeInstitutions = Array.isArray(institutionList) ? institutionList.filter(inst => inst.is_active !== false) : [];
@@ -338,7 +345,10 @@ export const Onboarding: React.FC = () => {
       saveToCache(CACHE_KEYS.institutions, activeInstitutions);
     } catch (err) {
       console.error('Error fetching institutions:', err);
-      dispatch({ type: 'SET_INSTITUTIONS', payload: [] });
+      if (!cached || cached.length === 0) {
+        dispatch({ type: 'SET_INSTITUTIONS', payload: [] });
+        dispatch({ type: 'SET_INSTITUTIONS_ERROR', payload: 'Failed to load institutions. Please retry.' });
+      }
     } finally {
       dispatch({ type: 'SET_INSTITUTIONS_LOADING', payload: false });
     }
@@ -834,6 +844,30 @@ export const Onboarding: React.FC = () => {
                 <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary -rotate-90" strokeWidth={2.5} />
                 <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary rotate-90" strokeWidth={2.5} />
               </div>
+            </div>
+          )}
+          {!state.institutionsLoading && state.institutionsError && (
+            <div className="mt-2 flex items-center gap-2">
+              <p className="text-red-600 text-xs">{state.institutionsError}</p>
+              <button
+                type="button"
+                onClick={fetchInstitutions}
+                className="text-xs text-primary hover:underline"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {!state.institutionsLoading && !state.institutionsError && state.institutions.length === 0 && (
+            <div className="mt-2 flex items-center gap-2">
+              <p className="text-amber-600 text-xs">No institutions available yet.</p>
+              <button
+                type="button"
+                onClick={fetchInstitutions}
+                className="text-xs text-primary hover:underline"
+              >
+                Refresh
+              </button>
             </div>
           )}
           {state.validationErrors.institution && (

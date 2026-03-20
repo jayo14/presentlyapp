@@ -860,7 +860,7 @@ def dashboard_venues_head(request):
 @permission_classes([AllowAny])
 def request_password_reset_view(request):
     """Request password reset - sends email with reset link"""
-    email = request.data.get('email')
+    email = (request.data.get('email') or '').strip().lower()
 
     if not email:
         return Response({
@@ -878,13 +878,20 @@ def request_password_reset_view(request):
         # Create reset link
         reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
-        # Send password reset email via Novu
-        NovuService.send_password_reset(
+        # Send password reset email via Novu (with SMTP fallback in NovuService)
+        email_sent = NovuService.send_password_reset(
             user_id=str(user.id),
             user_email=user.email,
             user_name=user.full_name,
             reset_link=reset_link
         )
+
+        if not email_sent:
+            logger.error("Password reset delivery failed for %s (Novu + SMTP fallback)", email)
+            return Response({
+                'success': False,
+                'error': 'Failed to send password reset email'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         logger.info(f"Password reset email sent to {email}")
 
@@ -893,12 +900,11 @@ def request_password_reset_view(request):
             'message': 'Password reset email sent successfully'
         }, status=status.HTTP_200_OK)
     except User.DoesNotExist:
-        # Don't reveal if user exists or not for security
-        logger.warning(f"Password reset requested for non-existent email: {email}")
+        logger.warning("Password reset requested for non-existent email: %s", email)
         return Response({
-            'success': True,
-            'message': 'Password reset email sent successfully'
-        }, status=status.HTTP_200_OK)
+            'success': False,
+            'error': 'No active account found with this email address'
+        }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         logger.error(f"Failed to send password reset email to {email}: {str(e)}", exc_info=True)
         return Response({
