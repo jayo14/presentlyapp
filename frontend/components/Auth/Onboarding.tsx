@@ -1157,6 +1157,7 @@ export const Onboarding: React.FC = () => {
     </div>
   );
 
+  return (
     <div
       className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col items-center justify-center p-4"
       aria-label="Account setup wizard"
@@ -1277,4 +1278,5 @@ export const Onboarding: React.FC = () => {
         </p>
       </div>
     </div>
+  );
 };

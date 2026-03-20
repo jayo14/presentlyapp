@@ -161,9 +161,9 @@ export const PublicCheckInPage: React.FC = () => {
       
       const checkInData = {
         code: sessionCode,
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        elevation: position.coords.altitude || undefined
+        latitude: position.latitude,
+        longitude: position.longitude,
+        elevation: position.altitude || undefined
       };
 
       const result = await sessionApi.checkIn(session.id, checkInData);
