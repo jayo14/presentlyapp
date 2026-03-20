@@ -29,6 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { SEO } from './SEO';
 
 // ─── Global Styles ────────────────────────────────────────────────────────────
 // NOTE: We avoid importing next-themes here. If you need dark mode, wrap
@@ -202,7 +203,7 @@ function useFadeOnScroll() {
 const TESTIMONIALS = [
   {
     quote:
-      '"The level of precision Academia.ID provides has completely transformed our faculty oversight. It\'s not just a tool; it\'s an editorial standard for data."',
+      '"The level of precision Presently provides has completely transformed our faculty oversight. It\'s not just a tool; it\'s an editorial standard for data."',
     name: 'Dr. Alistair Thorne',
     role: 'Dean of Sciences, Oakhaven',
     img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA9COqM4fJRsMreUnVWeh12TR5PdxZdzG1I9fC6lFkKmkjk5_VCGgj2TzHp2Iazhal4OWk9nKEpCPLlrE-2rh_hW_a3uJgTpQrQSxu2w8K6FZmDQfj56CAYV8oJajR1hehYzwyhkLTxXQN5mrPfv27TeJfeq1sRoU4RdpmL_qO-91MfxFC_koJNIamvXbkodHlBGL8DCKouB9PHtB2_wPZrTbHEsBtKOJLAqMaRMWB0GQz0CvOn5ozoEzfPfGLw-n-GWXLC-4mKSdo',
@@ -239,6 +240,13 @@ export const LandingPage: React.FC = () => {
 
   return (
     <TooltipProvider>
+      <SEO
+        title="Presently | Smart Attendance Management for Institutions"
+        description="Presently helps institutions manage attendance with GPS verification, anti-proxy protection, real-time analytics, and audit-ready compliance workflows."
+        keywords="presently, attendance management, university attendance software, GPS attendance tracking, academic compliance platform, education analytics"
+        url="https://presentlyapp.vercel.app/"
+        image="https://presentlyapp.vercel.app/og-image.png"
+      />
       <style>{GLOBAL_STYLES}</style>
       <div
         style={{
@@ -1951,6 +1959,8 @@ export const LandingPage: React.FC = () => {
             </div>
           </section>
 
+
+
           {/* ── FINAL CTA ──────────────────────────────────────────────────── */}
           <section id="pricing" style={{ padding: '8rem 2rem' }}>
             <div style={{ maxWidth: 1440, margin: '0 auto' }}>
@@ -2010,7 +2020,7 @@ export const LandingPage: React.FC = () => {
                       lineHeight: 1.6,
                     }}
                   >
-                    Join over 400 world-class universities using Academia.ID
+                    Join over 400 world-class universities using Presently
                     to curate their daily presence.
                   </p>
                   <div
@@ -2070,10 +2080,10 @@ export const LandingPage: React.FC = () => {
                   color: 'var(--on-surface)',
                 }}
               >
-                Academia.ID
+                Presently
               </div>
               <p style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>
-                © {new Date().getFullYear()} Academia.ID Editorial Systems.
+                © {new Date().getFullYear()} Presently Editorial Systems.
                 All rights reserved.
               </p>
             </div>
