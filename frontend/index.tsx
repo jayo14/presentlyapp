@@ -19,6 +19,26 @@ const normalizeApiBaseUrl = (apiUrl?: string): string => {
   return withoutDuplicateApi.endsWith('/api') ? withoutDuplicateApi : `${withoutDuplicateApi}/api`;
 };
 
+const clearStaleServiceWorkersInDev = async () => {
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((registration) => registration.unregister()));
+
+    if ('caches' in window) {
+      const cacheKeys = await caches.keys();
+      await Promise.all(cacheKeys.map((cacheKey) => caches.delete(cacheKey)));
+    }
+
+    console.log('[SW] Development mode detected. Existing service workers and caches were cleared.');
+  } catch (error) {
+    console.warn('[SW] Failed to clear development service workers/caches:', error);
+  }
+};
+
 // Firebase analytics bootstrap
 
 const initializeFirebaseAnalytics = async () => {
@@ -34,8 +54,9 @@ const initializeFirebaseAnalytics = async () => {
 
 void initializeFirebaseAnalytics();
 
-// Register Service Worker
-if ('serviceWorker' in navigator) {
+// Register Service Worker in production only.
+// In development, stale SW caches can cause old chunks to be served and crash the app.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     const apiBaseUrl = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
     const serviceWorkerUrl = `/service-worker.js?apiBaseUrl=${encodeURIComponent(apiBaseUrl)}`;
@@ -48,6 +69,8 @@ if ('serviceWorker' in navigator) {
         console.warn('SW registration failed: ', registrationError);
       });
   });
+} else if (import.meta.env.DEV) {
+  void clearStaleServiceWorkersInDev();
 }
 
 const root = ReactDOM.createRoot(rootElement);

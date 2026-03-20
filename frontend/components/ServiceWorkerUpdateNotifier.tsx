@@ -12,7 +12,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) {
+    if (!import.meta.env.PROD || !('serviceWorker' in navigator)) {
       return;
     }
 
