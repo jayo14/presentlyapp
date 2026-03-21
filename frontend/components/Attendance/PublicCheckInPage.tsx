@@ -304,7 +304,7 @@ export const PublicCheckInPage: React.FC = () => {
             <>
               <div className="space-y-4">
                 <div className="p-4 rounded-2xl bg-surface/50 border border-outline flex items-start gap-4">
-                  <div className={`p-2 rounded-lg ${checkingIn ? 'bg-zinc-800' : 'bg-green-500/10 text-green-500'}`}>
+                  <div className={`p-2 rounded-lg ${checkingIn ? 'bg-surfaceHigh' : 'bg-green-500/10 text-green-500'}`}>
                     <MapPin size={20} />
                   </div>
                   <div>

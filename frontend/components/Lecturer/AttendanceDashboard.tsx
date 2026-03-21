@@ -264,7 +264,7 @@ export const AttendanceDashboard: React.FC = () => {
                 <QrCode size={20} className="text-primary" />
                 QR Code
               </h3>
-              <button onClick={refreshQRCode} className="p-2 hover:bg-inputccent hover:text-muted-foregroundccent-foreground rounded-full">
+              <button onClick={refreshQRCode} className="p-2 hover:bg-surfaceLow hover:text-textMuted rounded-full">
                 <RefreshCw size={16} className="text-primary" />
               </button>
             </div>

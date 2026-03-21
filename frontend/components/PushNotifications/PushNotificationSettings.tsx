@@ -208,7 +208,7 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
                   {showToken ? 'Hide' : 'Show'} device token (for debugging)
                 </button>
                 {showToken && (
-                  <div className="mt-2 p-2 bg-inputccent rounded text-xs font-mono break-all">
+                  <div className="mt-2 p-2 bg-surfaceLow rounded text-xs font-mono break-all">
                     {token}
                   </div>
                 )}

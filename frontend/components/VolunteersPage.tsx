@@ -37,7 +37,7 @@ export const VolunteersPage: React.FC = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-cardackgroundlack flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -59,7 +59,7 @@ export const VolunteersPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cardackgroundlack text-textMuted font-sans selection:bg-primary selection:text-on-primary-fixedlack overflow-x-hidden">
+    <div className="min-h-screen bg-background text-textMuted font-sans selection:bg-primary selection:text-on-primary-fixed overflow-x-hidden">
       <LandingHeader />
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">
@@ -91,7 +91,7 @@ export const VolunteersPage: React.FC = () => {
                 className={`p-6 rounded-2xl border transition-all cursor-pointer ${
                   selectedRole === role.id
                     ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(184,134,11,0.2)]'
-                    : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
+                    : 'bg-surfaceLow border-outline hover:border-primary/20'
                 }`}
               >
                 <role.icon className={`mb-4 ${selectedRole === role.id ? 'text-primary' : 'text-muted-foreground'}`} size={28} />
@@ -144,7 +144,7 @@ export const VolunteersPage: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-textMuted">Why do you want to join?</label>
               <textarea
-                className="w-full bg-cardackgroundlack border border-outline rounded-xl p-4 text-textMuted focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] resize-none"
+                className="w-full bg-surface border border-outline rounded-xl p-4 text-textMuted focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] resize-none"
                 placeholder="Tell us a bit about yourself and your motivation..."
                 required
                 value={formData.reason}

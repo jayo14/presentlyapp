@@ -297,7 +297,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             
             <div className="flex items-center justify-between p-4 bg-surface text-text border border-outline rounded-xl shadow-sm hover:border-outline transition-colors">
               <div className="flex items-center gap-3">
-                <div className="bg-inputccent p-2 rounded-full">
+                <div className="bg-surfaceLow p-2 rounded-full">
                   <Lock size={18} className="text-textMuted" />
                 </div>
                 <div>
@@ -414,7 +414,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
         <div className="space-y-4">
              <div className="flex items-center justify-between p-4 bg-surface text-text border border-outline rounded-xl shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="bg-inputccent p-2 rounded-full text-text">
+                    <div className="bg-surfaceLow p-2 rounded-full text-text">
                         {darkMode ? <Moon size={18} /> : <Sun size={18} />}
                     </div>
                     <div>
@@ -482,7 +482,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button 
                 onClick={() => setIsReportModalOpen(true)}
-                className="flex items-center gap-4 p-4 bg-surface text-text border border-outline rounded-xl hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors text-left shadow-sm"
+                className="flex items-center gap-4 p-4 bg-surface text-text border border-outline rounded-xl hover:bg-surfaceLow hover:text-textMuted transition-colors text-left shadow-sm"
             >
                 <div className="bg-red-500/10 p-3 rounded-full text-red-500">
                     <AlertTriangle size={20} />
@@ -492,7 +492,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                     <p className="text-xs text-textMuted">Found a bug? Let us know.</p>
                 </div>
             </button>
-            <button className="flex items-center gap-4 p-4 bg-surface text-text border border-outline rounded-xl hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors text-left shadow-sm">
+            <button className="flex items-center gap-4 p-4 bg-surface text-text border border-outline rounded-xl hover:bg-surfaceLow hover:text-textMuted transition-colors text-left shadow-sm">
                 <div className="bg-cardackgroundlue-500/10 p-3 rounded-full text-on-primary-fixedlue-500">
                     <FileText size={20} />
                 </div>
