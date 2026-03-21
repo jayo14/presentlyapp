@@ -31,7 +31,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          className="stroke-border-light dark:stroke-dark-border-light"
+          className="stroke-border-light"
           strokeWidth={strokeWidth}
           fill="none"
         />

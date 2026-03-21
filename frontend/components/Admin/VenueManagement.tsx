@@ -232,21 +232,21 @@ export const VenueManagement: React.FC = () => {
           <div>
             <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
               Venue Management
-              <span className="text-xs font-normal bg-zinc-800 px-2 py-1 rounded-full text-zinc-400">
+              <span className="text-xs font-normal bg-accent px-2 py-1 rounded-full text-muted-foreground">
                 {filteredVenues.length}
               </span>
             </h2>
-            <p className="text-sm text-zinc-400">Manage venue locations with geolocation data</p>
+            <p className="text-sm text-muted-foreground">Manage venue locations with geolocation data</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-accent rounded-lg p-1">
             <button
               onClick={() => setViewMode('map')}
               className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                 viewMode === 'map' 
                   ? 'bg-primary text-white' 
-                  : 'text-zinc-400 hover:text-white'
+                  : 'text-muted-foreground hover:text-white'
               }`}
             >
               <MapIcon className="w-4 h-4" />
@@ -256,7 +256,7 @@ export const VenueManagement: React.FC = () => {
               className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                 viewMode === 'grid' 
                   ? 'bg-primary text-white' 
-                  : 'text-zinc-400 hover:text-white'
+                  : 'text-muted-foreground hover:text-white'
               }`}
             >
               <Grid className="w-4 h-4" />
@@ -303,9 +303,9 @@ export const VenueManagement: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl flex flex-col md:flex-row gap-4 flex-shrink-0">
+      <div className="bg-card/50 border border-border p-4 rounded-xl flex flex-col md:flex-row gap-4 flex-shrink-0">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name, code or building..."
@@ -314,7 +314,7 @@ export const VenueManagement: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setSelectedVenue(null); // Clear selection on search
             }}
-            className="w-full pl-10 pr-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
           />
           {searchTerm && (
             <button 
@@ -322,7 +322,7 @@ export const VenueManagement: React.FC = () => {
                   setSearchTerm('');
                   setSelectedVenue(null);
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary-foreground transition-colors"
             >
               <CloseIcon size={16} />
             </button>
@@ -330,14 +330,14 @@ export const VenueManagement: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-2">
-            <Building className="w-5 h-5 text-zinc-500 hidden md:block" />
+            <Building className="w-5 h-5 text-muted-foreground hidden md:block" />
             <select
               value={selectedInstitution || ''}
               onChange={(e) => {
                   setSelectedInstitution(e.target.value ? Number(e.target.value) : null);
                   setSearchTerm(''); // Clear search when switching institutions
               }}
-              className="px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary min-w-[200px]"
+              className="px-4 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary min-w-[200px]"
             >
               <option value="">All Institutions</option>
               {institutions.map(inst => (
@@ -354,7 +354,7 @@ export const VenueManagement: React.FC = () => {
                     setSearchTerm('');
                     setSelectedInstitution(null);
                 }}
-                className="text-zinc-500 hover:text-white"
+                className="text-muted-foreground hover:text-primary-foreground"
             >
                 Reset
             </Button>
@@ -363,13 +363,13 @@ export const VenueManagement: React.FC = () => {
 
       {/* Map or Grid View */}
       {viewMode === 'map' ? (
-        <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden relative">
+        <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-card border border-border rounded-lg overflow-hidden relative">
           <Suspense fallback={
-            <div className="relative w-full h-full bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex flex-col items-center justify-center gap-4">
+            <div className="relative w-full h-full bg-card border border-border rounded-lg overflow-hidden flex flex-col items-center justify-center gap-4">
               <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse"></div>
               <div className="relative z-10 flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
-                <div className="text-zinc-500 font-medium animate-pulse">Initializing Map Engine...</div>
+                <div className="w-12 h-12 rounded-full border-input border-primary/20 border-t-primary animate-spin"></div>
+                <div className="text-muted-foreground font-medium animate-pulse">Initializing Map Engine...</div>
               </div>
             </div>
           }>
@@ -389,14 +389,14 @@ export const VenueManagement: React.FC = () => {
         {displayVenues.map(venue => (
           <div
             key={venue.id}
-            className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors"
+            className="bg-card border border-border rounded-lg p-4 hover:border-border transition-colors"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-primary" />
                 <div>
                   <h3 className="font-semibold text-foreground">{venue.name}</h3>
-                  <p className="text-xs text-zinc-400">{venue.code}</p>
+                  <p className="text-xs text-muted-foreground">{venue.code}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -405,21 +405,21 @@ export const VenueManagement: React.FC = () => {
                     setSelectedVenue(venue);
                     setViewMode('map');
                   }}
-                  className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-primary"
+                  className="p-2 hover:bg-accent rounded-lg transition-colors text-primary"
                   title="View on map"
                 >
                   <MapIcon className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleEditVenue(venue)}
-                  className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-accent rounded-lg transition-colors"
                   title="Edit venue"
                 >
-                  <Edit2 className="w-4 h-4 text-zinc-400" />
+                  <Edit2 className="w-4 h-4 text-muted-foreground" />
                 </button>
                 <button
                   onClick={() => handleDeleteVenue(venue.id)}
-                  className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-accent rounded-lg transition-colors"
                   title="Delete venue"
                 >
                   <Trash2 className="w-4 h-4 text-red-400" />
@@ -429,13 +429,13 @@ export const VenueManagement: React.FC = () => {
 
             <div className="space-y-2 text-sm">
               {venue.building_name && (
-                <div className="flex items-center gap-2 text-zinc-400">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Building className="w-4 h-4" />
                   <span>{venue.building_name}</span>
                 </div>
               )}
               
-              <div className="flex items-center gap-2 text-zinc-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <MapIcon className="w-4 h-4" />
                 <span>
                   {venue.latitude && venue.longitude ? (
@@ -450,7 +450,7 @@ export const VenueManagement: React.FC = () => {
               </div>
 
               {venue.capacity && (
-                <div className="text-zinc-400">
+                <div className="text-muted-foreground">
                   Capacity: {venue.capacity} people
                 </div>
               )}
@@ -461,11 +461,11 @@ export const VenueManagement: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 mt-2 pt-2 border-t border-zinc-800">
+              <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
                 <span className={`px-2 py-1 rounded text-xs ${
                   venue.is_active 
                     ? 'bg-green-500/10 text-green-500' 
-                    : 'bg-zinc-700 text-zinc-400'
+                    : 'bg-zinc-700 text-muted-foreground'
                 }`}>
                   {venue.is_active ? 'Active' : 'Inactive'}
                 </span>
@@ -477,14 +477,14 @@ export const VenueManagement: React.FC = () => {
       )}
 
       {filteredVenues.length === 0 && !loading && (
-        <div className="text-center py-12 bg-zinc-900/30 border border-dashed border-zinc-800 rounded-2xl">
+        <div className="text-center py-12 bg-card/30 border border-dashed border-border rounded-2xl">
           <MapPin className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-          <p className="text-zinc-400 font-medium">
+          <p className="text-muted-foreground font-medium">
             {venues.length === 0 
               ? "No venues created yet" 
               : `No venues match your filters (${venues.length} total venues)`}
           </p>
-          <p className="text-zinc-500 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             {venues.length === 0 
               ? "Create your first venue to start mapping your campus" 
               : "Try adjusting your search term or institution filter"}
@@ -513,7 +513,7 @@ export const VenueManagement: React.FC = () => {
       {/* Venue Modal */}
       {showModal && (
         <Suspense fallback={
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-50">
             <Loader className="w-8 h-8 animate-spin text-primary" />
           </div>
         }>

@@ -156,7 +156,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
       <div className="flex flex-col gap-4">
         <button 
           onClick={onBack}
-          className="flex items-center gap-2 text-sm text-zinc-400 hover:text-primary transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Institutions
@@ -169,7 +169,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
             </div>
             <div>
               <h2 className="text-2xl font-bold text-foreground">{institution.full_name}</h2>
-              <p className="text-sm text-zinc-400">Colleges & Faculties Management</p>
+              <p className="text-sm text-muted-foreground">Colleges & Faculties Management</p>
             </div>
           </div>
           <Button onClick={handleCreateCollege} className="gap-2">
@@ -181,12 +181,12 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-          <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold">Total Colleges</p>
+        <div className="bg-card/50 border border-border rounded-xl p-4">
+          <p className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Total Colleges</p>
           <p className="text-2xl font-bold text-foreground mt-1">{colleges.length}</p>
         </div>
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-          <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold">Total Departments</p>
+        <div className="bg-card/50 border border-border rounded-xl p-4">
+          <p className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Total Departments</p>
           <p className="text-2xl font-bold text-cyan-500 mt-1">
             {colleges.reduce((sum, college) => sum + (college.departmentCount || 0), 0)}
           </p>
@@ -196,13 +196,13 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search colleges by name or code..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11 bg-zinc-900 border-zinc-800"
+            className="pl-10 h-11 bg-card border-border"
           />
         </div>
       </div>
@@ -211,7 +211,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader className="w-10 h-10 animate-spin text-primary" />
-          <p className="text-zinc-500 animate-pulse">Loading colleges...</p>
+          <p className="text-muted-foreground animate-pulse">Loading colleges...</p>
         </div>
       )}
 
@@ -229,31 +229,31 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
           {filteredColleges.map(college => (
             <div
               key={college.id}
-              className="group bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 flex flex-col cursor-pointer"
+              className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-border hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 flex flex-col cursor-pointer"
               onClick={() => handleCollegeClick(college)}
             >
               <div className="p-6 flex-1">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
                       <GraduationCap className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">{college.name}</h3>
-                      <p className="text-xs font-mono text-zinc-500 uppercase">{college.code}</p>
+                      <p className="text-xs font-mono text-muted-foreground uppercase">{college.code}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={(e) => { e.stopPropagation(); handleEditCollege(college); }}
-                      className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                      className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-primary-foreground transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDeleteCollege(college.id); }}
-                      className="p-2 hover:bg-zinc-800 rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                      className="p-2 hover:bg-accent rounded-lg text-red-400 hover:text-red-300 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -261,36 +261,36 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
                 </div>
 
                 {college.description && (
-                  <p className="text-sm text-zinc-400 line-clamp-2 mb-4 leading-relaxed italic">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed italic">
                     "{college.description}"
                   </p>
                 )}
 
-                <div className="space-y-2.5 pt-4 border-t border-zinc-800/50">
+                <div className="space-y-2.5 pt-4 border-t border-border/50">
                   {college.dean_name && (
-                    <div className="flex items-center gap-2 text-sm text-zinc-400">
-                      <Users className="w-4 h-4 text-zinc-500" />
-                      <span className="font-medium text-zinc-300">Dean: {college.dean_name}</span>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium text-muted-foreground">Dean: {college.dean_name}</span>
                     </div>
                   )}
                   {college.office_location && (
-                    <div className="flex items-center gap-2 text-sm text-zinc-400">
-                      <MapPin className="w-4 h-4 text-zinc-500" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
                       <span>{college.office_location}</span>
                     </div>
                   )}
                    {college.departmentCount !== undefined && (
-                    <div className="flex items-center gap-2 text-sm text-zinc-400">
-                        <Users className="w-4 h-4 text-zinc-500" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Users className="w-4 h-4 text-muted-foreground" />
                         <span>{college.departmentCount} Department{college.departmentCount !== 1 ? 's' : ''}</span>
                     </div>
                     )}
                 </div>
               </div>
               
-              <div className="px-6 py-4 bg-zinc-950/50 border-t border-zinc-800/50 flex items-center justify-between group-hover:bg-zinc-800/30 transition-colors">
+              <div className="px-6 py-4 bg-background/50 border-t border-border/50 flex items-center justify-between group-hover:bg-accent/30 transition-colors">
                 <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
-                  college.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-zinc-500'
+                  college.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-muted-foreground'
                 }`}>
                   {college.is_active ? 'Active' : 'Inactive'}
                 </span>
@@ -306,10 +306,10 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
 
       {/* Empty State */}
       {!loading && filteredColleges.length === 0 && (
-        <div className="text-center py-20 bg-zinc-900/30 border border-dashed border-zinc-800 rounded-3xl">
-          <GraduationCap className="w-16 h-16 text-zinc-800 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-zinc-400">No colleges found</h3>
-          <p className="text-zinc-500 text-sm mt-1 mb-6">Start by adding a new college or faculty to this institution.</p>
+        <div className="text-center py-20 bg-card/30 border border-dashed border-border rounded-3xl">
+          <GraduationCap className="w-16 h-16 text-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-muted-foreground">No colleges found</h3>
+          <p className="text-muted-foreground text-sm mt-1 mb-6">Start by adding a new college or faculty to this institution.</p>
           <Button onClick={handleCreateCollege} variant="secondary">
             <Plus className="w-4 h-4 mr-2" />
             Add First College

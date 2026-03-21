@@ -99,8 +99,8 @@ export const InstitutionFormPage: React.FC = () => {
   if (fetching) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-zinc-500 animate-pulse">Loading institution data...</p>
+        <div className="w-12 h-12 border-input border-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-muted-foreground animate-pulse">Loading institution data...</p>
       </div>
     );
   }
@@ -111,7 +111,7 @@ export const InstitutionFormPage: React.FC = () => {
       <div className="flex flex-col gap-4">
         <button 
           onClick={() => navigate('/dashboard/institutions')}
-          className="flex items-center gap-2 text-sm text-zinc-400 hover:text-primary transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Institutions
@@ -126,7 +126,7 @@ export const InstitutionFormPage: React.FC = () => {
               <h1 className="text-3xl font-bold text-foreground">
                 {id && id !== 'new' ? 'Edit Institution' : 'New Institution'}
               </h1>
-              <p className="text-zinc-400">Configure institutional profile and settings</p>
+              <p className="text-muted-foreground">Configure institutional profile and settings</p>
             </div>
           </div>
           <div className="hidden md:flex gap-3">
@@ -148,8 +148,8 @@ export const InstitutionFormPage: React.FC = () => {
         )}
 
         {/* Basic Information Section */}
-        <section className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-zinc-800 bg-zinc-950/50">
+        <section className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-border bg-background/50">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               <Building2 className="w-4 h-4 text-primary" />
               Basic Profile
@@ -157,40 +157,40 @@ export const InstitutionFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Full Legal Name *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Full Legal Name *</label>
               <Input
                 value={formData.full_name || ''}
                 onChange={(e) => handleChange('full_name', e.target.value)}
                 placeholder="e.g., Lagos State University of Science and Technology"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Display Name / Abbreviation *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Display Name / Abbreviation *</label>
               <Input
                 value={formData.short_name || ''}
                 onChange={(e) => handleChange('short_name', e.target.value)}
                 placeholder="e.g., LASUSTECH"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Alternative Code</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Alternative Code</label>
               <Input
                 value={formData.abbreviation || ''}
                 onChange={(e) => handleChange('abbreviation', e.target.value)}
                 placeholder="e.g., LST"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Institution Type *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Institution Type *</label>
               <select
                 value={formData.institution_type || ''}
                 onChange={(e) => handleChange('institution_type', e.target.value)}
-                className="w-full h-12 px-4 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-background border border-border rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="UNIVERSITY">University</option>
                 <option value="POLYTECHNIC">Polytechnic</option>
@@ -199,21 +199,21 @@ export const InstitutionFormPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Established Year</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Established Year</label>
               <Input
                 type="number"
                 value={formData.established_year || ''}
                 onChange={(e) => handleChange('established_year', parseInt(e.target.value))}
                 placeholder="e.g., 2021"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
           </div>
         </section>
 
         {/* Location & Contact Section */}
-        <section className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-zinc-800 bg-zinc-950/50">
+        <section className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-border bg-background/50">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               <Globe className="w-4 h-4 text-primary" />
               Location & Connectivity
@@ -221,90 +221,90 @@ export const InstitutionFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Country *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Country *</label>
               <Input
                 value={formData.country || ''}
                 onChange={(e) => handleChange('country', e.target.value)}
                 placeholder="e.g., Nigeria"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">State / Province</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">State / Province</label>
               <Input
                 value={formData.state_province || ''}
                 onChange={(e) => handleChange('state_province', e.target.value)}
                 placeholder="e.g., Lagos"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">City *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">City *</label>
               <Input
                 value={formData.city || ''}
                 onChange={(e) => handleChange('city', e.target.value)}
                 placeholder="e.g., Ikorodu"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Postal Code</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Postal Code</label>
               <Input
                 value={formData.postal_code || ''}
                 onChange={(e) => handleChange('postal_code', e.target.value)}
                 placeholder="e.g., 100001"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="institution-address" className="block text-sm font-semibold text-zinc-400 mb-2">Street Address</label>
+              <label htmlFor="institution-address" className="block text-sm font-semibold text-muted-foreground mb-2">Street Address</label>
               <textarea
                 id="institution-address"
                 value={formData.address || ''}
                 onChange={(e) => handleChange('address', e.target.value)}
                 placeholder="Full street address, building name, etc."
                 rows={3}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground text-sm placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors resize-none"
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground text-sm placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors resize-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Website URL</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Website URL</label>
               <div className="relative">
-                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="url"
                   value={formData.website_url || ''}
                   onChange={(e) => handleChange('website_url', e.target.value)}
                   placeholder="https://lasustech.edu.ng"
-                  className="h-12 pl-10 bg-zinc-950 border-zinc-800 focus:border-primary"
+                  className="h-12 pl-10 bg-background border-border focus:border-primary"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Official Email</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Official Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="email"
                   value={formData.contact_email || ''}
                   onChange={(e) => handleChange('contact_email', e.target.value)}
                   placeholder="info@lasustech.edu.ng"
-                  className="h-12 pl-10 bg-zinc-950 border-zinc-800 focus:border-primary"
+                  className="h-12 pl-10 bg-background border-border focus:border-primary"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Contact Phone</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Contact Phone</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="tel"
                   value={formData.contact_phone || ''}
                   onChange={(e) => handleChange('contact_phone', e.target.value)}
                   placeholder="+234..."
-                  className="h-12 pl-10 bg-zinc-950 border-zinc-800 focus:border-primary"
+                  className="h-12 pl-10 bg-background border-border focus:border-primary"
                 />
               </div>
             </div>
@@ -312,8 +312,8 @@ export const InstitutionFormPage: React.FC = () => {
         </section>
 
         {/* Accreditation & Status Section */}
-        <section className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-zinc-800 bg-zinc-950/50">
+        <section className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-border bg-background/50">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               <Award className="w-4 h-4 text-primary" />
               Compliance & Visibility
@@ -321,11 +321,11 @@ export const InstitutionFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Accreditation Status</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Accreditation Status</label>
               <select
                 value={formData.accreditation_status || ''}
                 onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                className="w-full h-12 px-4 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-background border border-border rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="ACCREDITED">Fully Accredited</option>
                 <option value="PROVISIONAL">Provisional</option>
@@ -343,7 +343,7 @@ export const InstitutionFormPage: React.FC = () => {
                     onChange={(e) => handleChange('is_active', e.target.checked)}
                     className="hidden"
                   />
-                  <span className="text-sm font-bold text-zinc-300 group-hover:text-primary transition-colors">Active Status</span>
+                  <span className="text-sm font-bold text-muted-foreground group-hover:text-primary transition-colors">Active Status</span>
                </label>
             </div>
           </div>

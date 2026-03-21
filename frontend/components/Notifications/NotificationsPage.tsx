@@ -147,23 +147,23 @@ export const NotificationsPage: React.FC = () => {
 
   // Mobile Layout (matching the dark theme design)
   const mobileLayout = (
-    <div className="min-h-screen bg-zinc-950 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Mobile Header */}
-      <div className="sticky top-0 z-10 bg-zinc-950 border-b border-zinc-800">
+      <div className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between p-4">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-accent rounded-lg transition-colors"
           >
-            <ArrowLeft size={24} className="text-white" />
+            <ArrowLeft size={24} className="text-primary-foreground" />
           </button>
-          <h1 className="text-xl font-bold text-white">Notifications</h1>
+          <h1 className="text-xl font-bold text-primary-foreground">Notifications</h1>
           <button 
             onClick={() => navigate('/dashboard/settings#notifications')}
-            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-accent rounded-lg transition-colors"
             aria-label="Notification Settings"
           >
-            <Settings size={24} className="text-zinc-400" />
+            <Settings size={24} className="text-muted-foreground" />
           </button>
         </div>
 
@@ -180,7 +180,7 @@ export const NotificationsPage: React.FC = () => {
               className={`pb-2 text-sm font-medium whitespace-nowrap transition-all ${
                 activeTab === tab.id 
                   ? 'text-primary border-b-2 border-primary' 
-                  : 'text-zinc-400'
+                  : 'text-muted-foreground'
               }`}
             >
               {tab.label}
@@ -195,7 +195,7 @@ export const NotificationsPage: React.FC = () => {
           filteredNotifications.map((notification) => (
             <div 
               key={notification.id} 
-              className="bg-zinc-900 rounded-xl p-4 flex items-start gap-3"
+              className="bg-card rounded-xl p-4 flex items-start gap-3"
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
                 {getIcon(notification.type)}
@@ -203,33 +203,33 @@ export const NotificationsPage: React.FC = () => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-semibold text-white text-base leading-tight">
+                  <h3 className="font-semibold text-primary-foreground text-on-primary-fixedase leading-tight">
                     {notification.title}
                   </h3>
                   {!notification.is_read && (
                     <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
                   )}
                 </div>
-                <p className="text-zinc-400 text-sm mb-2">
+                <p className="text-muted-foreground text-sm mb-2">
                   {formatTimeAgo(notification.created_at)}
                 </p>
                 {notification.message && (
-                  <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2">
+                  <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
                     {notification.message}
                   </p>
                 )}
               </div>
 
               {notification.type === 'ALERT' && (
-                <ChevronRight size={20} className="text-zinc-600 shrink-0 mt-1" />
+                <ChevronRight size={20} className="text-muted-foreground shrink-0 mt-1" />
               )}
             </div>
           ))
         ) : (
           <div className="text-center py-20">
-            <Bell size={48} className="mx-auto text-zinc-600 mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">No notifications</h3>
-            <p className="text-zinc-400">You're all caught up!</p>
+            <Bell size={48} className="mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-primary-foreground mb-2">No notifications</h3>
+            <p className="text-muted-foreground">You're all caught up!</p>
           </div>
         )}
       </div>
@@ -240,11 +240,11 @@ export const NotificationsPage: React.FC = () => {
   const desktopLayout = (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500 pb-24 md:pb-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-border dark:border-zinc-800 px-4">
+      <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-border px-4">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-surface rounded-lg transition-colors"
           >
             <ArrowLeft size={24} className="text-text-primary" />
           </button>
@@ -260,7 +260,7 @@ export const NotificationsPage: React.FC = () => {
         </div>
         <button 
           onClick={() => navigate('/dashboard/settings#notifications')}
-          className="p-2 hover:bg-surface dark:hover:bg-zinc-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-surface rounded-lg transition-colors"
           aria-label="Notification Settings"
         >
           <Settings size={24} className="text-text-secondary hover:text-primary transition-colors" />
@@ -282,7 +282,7 @@ export const NotificationsPage: React.FC = () => {
               className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                 activeTab === tab.id 
                   ? 'bg-primary text-white shadow-md' 
-                  : 'bg-surface dark:bg-zinc-900 text-text-secondary hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  : 'bg-surface dark:bg-zinc-900 text-text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
               }`}
             >
               {tab.label}
@@ -385,7 +385,7 @@ export const NotificationsPage: React.FC = () => {
               className={`bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer ${
                 !notification.is_read ? 'border-l-4 border-l-primary' : ''
               } ${
-                bulkMode ? 'hover:bg-zinc-100 dark:hover:bg-zinc-800' : 'hover:shadow-md'
+                bulkMode ? 'hover:bg-inputccent hover:text-muted-foregroundccent-foreground' : 'hover:shadow-md'
               }`}
               onClick={() => bulkMode && handleSelectNotification(notification.id)}
             >
@@ -395,7 +395,7 @@ export const NotificationsPage: React.FC = () => {
                     type="checkbox"
                     checked={selectedNotifications.includes(notification.id)}
                     onChange={() => handleSelectNotification(notification.id)}
-                    className="w-5 h-5 rounded border-2 border-zinc-300 dark:border-zinc-600 text-primary focus:ring-primary"
+                    className="w-5 h-5 rounded border-border border-border text-primary focus:ring-primary"
                   />
                 </div>
               )}
@@ -406,7 +406,7 @@ export const NotificationsPage: React.FC = () => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-semibold text-text-primary text-base leading-tight">
+                  <h3 className="font-semibold text-text-primary text-on-primary-fixedase leading-tight">
                     {notification.title}
                   </h3>
                   <span className="text-text-secondary text-xs whitespace-nowrap">
@@ -437,7 +437,7 @@ export const NotificationsPage: React.FC = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-20 bg-surface dark:bg-zinc-900/50 rounded-2xl border border-border dark:border-zinc-800">
+          <div className="text-center py-20 bg-surface rounded-2xl border border-border">
             <Bell size={48} className="mx-auto text-text-secondary mb-4" />
             <h3 className="text-lg font-semibold text-text-primary mb-2">No notifications</h3>
             <p className="text-text-secondary">You're all caught up!</p>

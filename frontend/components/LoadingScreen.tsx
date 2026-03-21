@@ -21,7 +21,7 @@ export const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Loadi
         {/* Animated Logo/Icon Container */}
         <div className="relative w-24 h-24">
           {/* Outer rotating ring */}
-          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary border-r-primary/30 animate-spin" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute inset-0 rounded-full border-border border-transparent border-t-primary border-r-primary/30 animate-spin" style={{ animationDuration: '3s' }}></div>
 
           {/* Middle pulsing ring */}
           <div className="absolute inset-2 rounded-full border border-primary/20 animate-pulse" style={{ animationDuration: '2s' }}></div>
@@ -55,13 +55,13 @@ export const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Loadi
 
         {/* Text content */}
         <div className="text-center space-y-3">
-          <h2 className="text-2xl font-bold text-white tracking-tight">
+          <h2 className="text-2xl font-bold text-primary-foreground tracking-tight">
             Presently
           </h2>
 
           {/* Loading text with animated dots */}
           <div className="flex items-center justify-center gap-1">
-            <p className="text-zinc-400 text-sm">{message}</p>
+            <p className="text-muted-foreground text-sm">{message}</p>
             <div className="flex gap-1">
               <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0s' }}></span>
               <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
@@ -70,13 +70,13 @@ export const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Loadi
           </div>
 
           {/* Subtext */}
-          <p className="text-xs text-zinc-500 font-medium tracking-wide uppercase">
+          <p className="text-xs text-muted-foreground font-medium tracking-wide uppercase">
             One moment...
           </p>
         </div>
 
         {/* Optional progress indicator */}
-        <div className="w-32 h-1 bg-zinc-800 rounded-full overflow-hidden">
+        <div className="w-32 h-1 bg-accent rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-primary/40 via-primary to-primary/40 rounded-full"
             style={{

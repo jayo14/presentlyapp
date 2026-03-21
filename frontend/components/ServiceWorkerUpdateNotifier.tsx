@@ -97,7 +97,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-md animate-slide-up">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-800 p-4">
+      <div className="bg-card text-foreground rounded-lg shadow-lg border border-border p-4">
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
             <RefreshCw className="w-5 h-5 text-primary" />
@@ -105,14 +105,14 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
           
           <div className="flex-1">
             <h4 className="font-semibold mb-1">Update Available</h4>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               A new version of Presently is available. Refresh to get the latest features and improvements.
             </p>
             
             <div className="flex gap-2">
               <button
                 onClick={handleUpdate}
-                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-black text-sm font-medium rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-on-primary-fixedlack text-sm font-medium rounded-lg transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Update Now</span>
@@ -120,7 +120,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
               
               <button
                 onClick={handleDismiss}
-                className="px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 text-muted-foreground hover:text-foreground text-sm font-medium rounded-lg transition-colors"
               >
                 Later
               </button>
@@ -129,7 +129,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
           
           <button
             onClick={handleDismiss}
-            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="text-muted-foreground hover:text-muted-foreground"
             aria-label="Dismiss update notification"
           >
             <X className="w-5 h-5" />

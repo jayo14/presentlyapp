@@ -75,13 +75,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
   };
 
   const SectionHeader = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
-    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border">
       <div className="bg-primary/10 p-2 rounded-lg text-primary">
         <Icon size={24} />
       </div>
       <div>
-        <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">{title}</h2>
-        <p className="text-sm text-zinc-500">{description}</p>
+        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
     </div>
   );
@@ -90,120 +90,120 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
 
   // Mobile Layout (matching the dark theme design)
   const mobileLayout = (
-    <div className="min-h-screen bg-zinc-950 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Mobile Header */}
-      <div className="flex items-center p-4 border-b border-zinc-800">
+      <div className="flex items-center p-4 border-b border-border">
         <button 
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-zinc-800 rounded-lg transition-colors mr-3"
+          className="p-2 hover:bg-accent rounded-lg transition-colors mr-3"
         >
-          <ArrowLeft size={24} className="text-white" />
+          <ArrowLeft size={24} className="text-primary-foreground" />
         </button>
-        <h1 className="text-xl font-bold text-white">
+        <h1 className="text-xl font-bold text-primary-foreground">
           {userRole === UserRole.LECTURER ? 'Lecturer Settings' : 'Settings'}
         </h1>
       </div>
 
       {/* Account Section */}
       <div className="p-4">
-        <h2 className="text-white text-lg font-semibold mb-4">Account</h2>
+        <h2 className="text-primary-foreground text-lg font-semibold mb-4">Account</h2>
         
         <div className="space-y-3">
           {/* Edit Profile */}
           <button 
             onClick={() => {/* Handle edit profile */}}
-            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <User size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-white font-medium text-base text-left">
+            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
               Edit Profile
             </span>
-            <ChevronRight size={20} className="text-zinc-600" />
+            <ChevronRight size={20} className="text-muted-foreground" />
           </button>
 
           {/* Change Phone Number */}
           <button 
             onClick={() => {/* Handle change phone */}}
-            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Phone size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-white font-medium text-base text-left">
+            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
               Change Phone Number
             </span>
-            <ChevronRight size={20} className="text-zinc-600" />
+            <ChevronRight size={20} className="text-muted-foreground" />
           </button>
 
           {/* Notification Preferences */}
           <button 
             onClick={() => {/* Handle notification prefs */}}
-            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Bell size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-white font-medium text-base text-left">
+            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
               Notification Preferences
             </span>
-            <ChevronRight size={20} className="text-zinc-600" />
+            <ChevronRight size={20} className="text-muted-foreground" />
           </button>
         </div>
       </div>
 
       {/* Appearance Section */}
       <div className="p-4 mt-6">
-        <h2 className="text-white text-lg font-semibold mb-4">Appearance</h2>
+        <h2 className="text-primary-foreground text-lg font-semibold mb-4">Appearance</h2>
         
         {/* Dark Mode Toggle */}
-        <div className="bg-zinc-900 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-card rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Moon size={22} className="text-primary" />
             </div>
-            <span className="text-white font-medium text-base">
+            <span className="text-primary-foreground font-medium text-on-primary-fixedase">
               Dark Mode
             </span>
           </div>
           <div className={`w-12 h-6 rounded-full p-1 flex transition-colors ${darkMode ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}>
-            <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+            <div className="w-4 h-4 rounded-full bg-card shadow-sm" />
           </div>
         </div>
       </div>
 
       {/* Privacy & Security Section */}
       <div className="p-4 mt-6">
-        <h2 className="text-white text-lg font-semibold mb-4">Privacy & Security</h2>
+        <h2 className="text-primary-foreground text-lg font-semibold mb-4">Privacy & Security</h2>
         
         <div className="space-y-3">
           {/* Two-Factor Authentication */}
           <button 
             onClick={() => {/* Handle 2FA */}}
-            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Lock size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-white font-medium text-base text-left">
+            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
               Two-Factor Authentication
             </span>
-            <ChevronRight size={20} className="text-zinc-600" />
+            <ChevronRight size={20} className="text-muted-foreground" />
           </button>
 
           {/* Data Export Preferences */}
           <button 
             onClick={() => {/* Handle data export */}}
-            className="w-full bg-zinc-900 rounded-2xl p-4 flex items-center hover:bg-zinc-800 transition-colors"
+            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Database size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-white font-medium text-base text-left">
+            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
               Data Export Preferences
             </span>
-            <ChevronRight size={20} className="text-zinc-600" />
+            <ChevronRight size={20} className="text-muted-foreground" />
           </button>
         </div>
       </div>
@@ -215,17 +215,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
     <div className="max-w-3xl mx-auto pb-20 animate-in fade-in duration-500">
       
       {/* Header with title matching design */}
-      <div className="flex items-center mb-8 pt-4 pb-6 border-b border-zinc-800">
-        <h1 className="text-xl font-bold text-white">
+      <div className="flex items-center mb-8 pt-4 pb-6 border-b border-border">
+        <h1 className="text-xl font-bold text-primary-foreground">
           {userRole === UserRole.LECTURER ? 'Lecturer Settings' : 'Settings'}
         </h1>
       </div>
       
       {/* Account Settings - Available to All */}
       <section className="px-6">
-        <h2 className="text-2xl font-bold text-white mb-4">Account</h2>
+        <h2 className="text-2xl font-bold text-primary-foreground mb-4">Account</h2>
         {isLoading ? (
-          <div className="text-center py-8 text-zinc-500">Loading user data...</div>
+          <div className="text-center py-8 text-muted-foreground">Loading user data...</div>
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -295,14 +295,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
               )}
             </div>
             
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <div className="flex items-center justify-between p-4 bg-card text-foreground border border-border rounded-xl shadow-sm hover:border-border transition-colors">
               <div className="flex items-center gap-3">
-                <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full">
-                  <Lock size={18} className="text-zinc-500 dark:text-zinc-400" />
+                <div className="bg-inputccent p-2 rounded-full">
+                  <Lock size={18} className="text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-white">Password</p>
-                  <p className="text-xs text-zinc-500">Update your password</p>
+                  <p className="text-sm font-medium text-foreground">Password</p>
+                  <p className="text-xs text-muted-foreground">Update your password</p>
                 </div>
               </div>
               <Button 
@@ -316,12 +316,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
 
           {/* Student Specific: Digital Signature */}
           {userRole === UserRole.STUDENT && (
-            <div className="space-y-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-                <h3 className="text-sm font-medium text-zinc-900 dark:text-white">Digital Signature</h3>
+            <div className="space-y-4 pt-4 border-t border-border">
+                <h3 className="text-sm font-medium text-foreground">Digital Signature</h3>
                 {pendingSignature ? (
-                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-sm">
-                         <p className="text-sm font-medium text-zinc-900 dark:text-white mb-3 text-center">Confirm new signature?</p>
-                         <div className="h-32 bg-white rounded-lg mb-4 flex items-center justify-center overflow-hidden border border-zinc-200">
+                     <div className="bg-card text-foreground border border-border rounded-xl p-4 shadow-sm">
+                         <p className="text-sm font-medium text-foreground mb-3 text-center">Confirm new signature?</p>
+                         <div className="h-32 bg-card rounded-lg mb-4 flex items-center justify-center overflow-hidden border border-border">
                              <img src={pendingSignature} alt="Signature Preview" className="max-h-full max-w-full object-contain" />
                          </div>
                          <div className="flex gap-2">
@@ -330,17 +330,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                          </div>
                      </div>
                 ) : (
-                    <label className="border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group bg-white dark:bg-transparent">
+                    <label className="border border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-muted transition-colors cursor-pointer group bg-card">
                         <input type="file" accept="image/*" className="hidden" onChange={handleSignatureUpload} />
                         {signature ? (
                             <div className="mb-2 h-16 w-full flex justify-center">
-                                <img src={signature} alt="Signature" className="h-full object-contain dark:filter dark:invert" />
+                                <img src={signature} alt="Signature" className="h-full object-contain" />
                             </div>
                         ) : (
-                            <Upload className="mb-2 text-zinc-400 group-hover:text-primary transition-colors" size={24} />
+                            <Upload className="mb-2 text-muted-foreground group-hover:text-primary transition-colors" size={24} />
                         )}
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{signature ? 'Change Digital Signature' : 'Upload Digital Signature'}</p>
-                        <p className="text-xs text-zinc-500">Used for signing attendance sheets.</p>
+                        <p className="text-sm font-medium text-foreground">{signature ? 'Change Digital Signature' : 'Upload Digital Signature'}</p>
+                        <p className="text-xs text-muted-foreground">Used for signing attendance sheets.</p>
                     </label>
                 )}
             </div>
@@ -357,15 +357,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
           description="Control how and when you want to be notified." 
         />
         <div className="space-y-4">
-          <div className="space-y-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2 shadow-sm">
+          <div className="space-y-2 bg-card text-foreground/50 border border-border rounded-xl p-2 shadow-sm">
               {[
                   { label: 'Email Notifications', desc: 'Receive attendance summaries via email.', state: emailNotifs, setter: setEmailNotifs },
                   { label: 'Class Reminders', desc: 'Notify me 15 minutes before class starts.', state: reminderBeforeClass, setter: setReminderBeforeClass },
               ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors rounded-lg">
+                  <div key={i} className="flex items-center justify-between p-4 hover:bg-muted transition-colors rounded-lg">
                       <div>
-                          <p className="text-sm font-medium text-zinc-900 dark:text-white">{item.label}</p>
-                          <p className="text-xs text-zinc-500">{item.desc}</p>
+                          <p className="text-sm font-medium text-foreground">{item.label}</p>
+                          <p className="text-xs text-muted-foreground">{item.desc}</p>
                       </div>
                       <Switch checked={item.state} onCheckedChange={item.setter} />
                   </div>
@@ -386,17 +386,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             description="Manage global system settings." 
           />
            <div className="space-y-4">
-             <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+             <div className="flex items-center justify-between p-4 bg-card text-foreground border border-border rounded-xl shadow-sm">
                 <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-white">Maintenance Mode</p>
-                    <p className="text-xs text-zinc-500">Disable access for all non-admin users.</p>
+                    <p className="text-sm font-medium text-foreground">Maintenance Mode</p>
+                    <p className="text-xs text-muted-foreground">Disable access for all non-admin users.</p>
                 </div>
                 <Switch checked={false} onCheckedChange={() => {}} />
             </div>
-             <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+             <div className="flex items-center justify-between p-4 bg-card text-foreground border border-border rounded-xl shadow-sm">
                 <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-white">Backup Frequency</p>
-                    <p className="text-xs text-zinc-500">Daily at 02:00 AM</p>
+                    <p className="text-sm font-medium text-foreground">Backup Frequency</p>
+                    <p className="text-xs text-muted-foreground">Daily at 02:00 AM</p>
                 </div>
                 <Button variant="outline" size="sm">Configure</Button>
             </div>
@@ -412,23 +412,23 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
           description="Customize the look and feel of the application." 
         />
         <div className="space-y-4">
-             <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+             <div className="flex items-center justify-between p-4 bg-card text-foreground border border-border rounded-xl shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full text-zinc-900 dark:text-white">
+                    <div className="bg-inputccent p-2 rounded-full text-foreground">
                         {darkMode ? <Moon size={18} /> : <Sun size={18} />}
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">Dark Mode</p>
-                        <p className="text-xs text-zinc-500">Switch between dark and light themes.</p>
+                        <p className="text-sm font-medium text-foreground">Dark Mode</p>
+                        <p className="text-xs text-muted-foreground">Switch between dark and light themes.</p>
                     </div>
                 </div>
                 <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+            <div className="flex items-center justify-between p-4 bg-card text-foreground border border-border rounded-xl shadow-sm">
                 <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-white">High Contrast</p>
-                    <p className="text-xs text-zinc-500">Increase contrast for better visibility.</p>
+                    <p className="text-sm font-medium text-foreground">High Contrast</p>
+                    <p className="text-xs text-muted-foreground">Increase contrast for better visibility.</p>
                 </div>
                 <Switch checked={highContrast} onCheckedChange={setHighContrast} />
             </div>
@@ -444,26 +444,26 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             description="Manage your data and security preferences." 
         />
         <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+            <div className="flex items-center justify-between p-4 bg-card text-foreground border border-border rounded-xl shadow-sm">
                  <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-white">Location Access</p>
-                    <p className="text-xs text-zinc-500">Allow GPS for attendance verification.</p>
+                    <p className="text-sm font-medium text-foreground">Location Access</p>
+                    <p className="text-xs text-muted-foreground">Allow GPS for attendance verification.</p>
                 </div>
                 <Switch checked={locationAccess} onCheckedChange={setLocationAccess} />
             </div>
             
-            <div className="p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4 shadow-sm">
+            <div className="p-4 bg-card text-foreground border border-border rounded-xl space-y-4 shadow-sm">
                 <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">Active Sessions</p>
-                        <p className="text-xs text-zinc-500">Manage devices logged into your account.</p>
+                        <p className="text-sm font-medium text-foreground">Active Sessions</p>
+                        <p className="text-xs text-muted-foreground">Manage devices logged into your account.</p>
                     </div>
                     <Button variant="outline" size="sm">View All</Button>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg">
-                    <Laptop size={18} className="text-zinc-500 dark:text-zinc-400" />
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                    <Laptop size={18} className="text-muted-foreground" />
                     <div className="flex-1">
-                        <p className="text-sm text-zinc-900 dark:text-white">Windows PC - Chrome</p>
+                        <p className="text-sm text-foreground">Windows PC - Chrome</p>
                         <p className="text-xs text-green-500">Active now</p>
                     </div>
                 </div>
@@ -482,31 +482,31 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button 
                 onClick={() => setIsReportModalOpen(true)}
-                className="flex items-center gap-4 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-left shadow-sm"
+                className="flex items-center gap-4 p-4 bg-card text-foreground border border-border rounded-xl hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors text-left shadow-sm"
             >
                 <div className="bg-red-500/10 p-3 rounded-full text-red-500">
                     <AlertTriangle size={20} />
                 </div>
                 <div>
-                    <p className="font-medium text-zinc-900 dark:text-white">Report an Issue</p>
-                    <p className="text-xs text-zinc-500">Found a bug? Let us know.</p>
+                    <p className="font-medium text-foreground">Report an Issue</p>
+                    <p className="text-xs text-muted-foreground">Found a bug? Let us know.</p>
                 </div>
             </button>
-            <button className="flex items-center gap-4 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors text-left shadow-sm">
-                <div className="bg-blue-500/10 p-3 rounded-full text-blue-500">
+            <button className="flex items-center gap-4 p-4 bg-card text-foreground border border-border rounded-xl hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors text-left shadow-sm">
+                <div className="bg-cardackgroundlue-500/10 p-3 rounded-full text-on-primary-fixedlue-500">
                     <FileText size={20} />
                 </div>
                 <div>
-                    <p className="font-medium text-zinc-900 dark:text-white">Documentation</p>
-                    <p className="text-xs text-zinc-500">Read guides and FAQs.</p>
+                    <p className="font-medium text-foreground">Documentation</p>
+                    <p className="text-xs text-muted-foreground">Read guides and FAQs.</p>
                 </div>
             </button>
         </div>
       </section>
 
       {/* Logout */}
-      <div className="pt-8 border-t border-zinc-200 dark:border-zinc-800">
-        <Button onClick={onLogout} variant="secondary" className="w-full gap-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-400/10 border-red-200 dark:border-red-900/30">
+      <div className="pt-8 border-t border-border">
+        <Button onClick={onLogout} variant="secondary" className="w-full gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
             <LogOut size={18} />
             Log Out
         </Button>
@@ -514,18 +514,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
 
       {/* Report Issue Modal */}
       {isReportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cardackgroundlack/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div 
                 {...reportModalProps}
                 aria-labelledby="report-title"
-                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200 outline-none"
+                className="bg-card text-foreground border border-border rounded-2xl w-full max-w-md p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200 outline-none"
             >
                 <div className="flex justify-between items-start mb-4">
                     <div>
-                        <h3 id="report-title" className="text-xl font-bold text-zinc-900 dark:text-white">Report an Issue</h3>
-                        <p className="text-sm text-zinc-500">We appreciate your feedback!</p>
+                        <h3 id="report-title" className="text-xl font-bold text-foreground">Report an Issue</h3>
+                        <p className="text-sm text-muted-foreground">We appreciate your feedback!</p>
                     </div>
-                    <button onClick={() => setIsReportModalOpen(false)} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white" aria-label="Close dialog">
+                    <button onClick={() => setIsReportModalOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Close dialog">
                         <AlertTriangle size={20} className="hidden" /> {/* Dummy to keep imports happy if unused */}
                         <span className="text-2xl">&times;</span>
                     </button>
@@ -533,19 +533,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                 
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Subject</label>
-                        <select className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full px-4 p-2.5 text-zinc-900 dark:text-white text-sm focus:ring-primary focus:border-primary outline-none">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1.5">Subject</label>
+                        <select className="w-full bg-muted border border-border rounded-full px-4 p-2.5 text-foreground text-sm focus:ring-primary focus:border-primary outline-none">
                             <option>Bug Report</option>
                             <option>Feature Request</option>
                             <option>Other</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Description</label>
+                        <label className="block text-sm font-medium text-muted-foreground mb-1.5">Description</label>
                         <textarea 
                             rows={4} 
                             placeholder="Please describe the issue in detail..."
-                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-3 text-zinc-900 dark:text-white text-sm focus:ring-primary focus:border-primary resize-none placeholder-zinc-500"
+                            className="w-full bg-muted border border-border rounded-3xl p-3 text-foreground text-sm focus:ring-primary focus:border-primary resize-none placeholder-zinc-500"
                         ></textarea>
                     </div>
                     <div className="flex gap-3 pt-2">

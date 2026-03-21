@@ -105,7 +105,7 @@ export const Register: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-cardackgroundackground">
         <div className="flex flex-col items-center gap-4">
           <Loader2 size={40} className="animate-spin text-primary" />
           <p className="text-secondary">Loading</p>
@@ -115,7 +115,7 @@ export const Register: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-cardackgroundackground flex flex-col items-center justify-center p-4 relative">
       <SEO
         title="Register | Presently"
         description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
@@ -236,9 +236,9 @@ export const Register: React.FC = () => {
           </form>
 
           <div className="flex items-center gap-4 my-8">
-            <div className="h-px bg-border flex-1" />
+            <div className="h-px bg-cardackgroundorder flex-1" />
             <span className="text-xs text-secondary uppercase font-bold tracking-wide">Or sign up with</span>
-            <div className="h-px bg-border flex-1" />
+            <div className="h-px bg-cardackgroundorder flex-1" />
           </div>
 
           <div className="flex justify-center gap-6 mb-4">

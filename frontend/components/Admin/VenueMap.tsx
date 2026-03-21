@@ -506,9 +506,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           'text-field': ['get', 'name'],
           'text-font': ['Arial Unicode MS', 'Open Sans Regular'],
           'text-size': 14,
-          'text-anchor': 'center',
+          'text-muted-foregroundnchor': 'center',
           'text-offset': [0, 0],
-          'text-allow-overlap': true,
+          'text-muted-foregroundllow-overlap': true,
           'text-ignore-placement': false,
           'text-optional': true,
           'text-max-width': 8,
@@ -533,9 +533,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           'text-field': ['get', 'name'],
           'text-font': ['Arial Unicode MS', 'Open Sans Regular'],
           'text-size': 12,
-          'text-anchor': 'top',
+          'text-muted-foregroundnchor': 'top',
           'text-offset': [0, 1],
-          'text-allow-overlap': true,
+          'text-muted-foregroundllow-overlap': true,
           'text-ignore-placement': false,
           'text-max-width': 8,
         },
@@ -895,19 +895,19 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         <div className="relative">
           <Search
             size={15}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
           />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search venues…"
-            className="w-full pl-8 pr-8 py-1.5 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full pl-8 pr-8 py-1.5 text-sm bg-card text-foreground border border-border rounded-lg shadow text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
           />
           {searchTerm && (
             <button
               onClick={() => { setSearchTerm(''); setSearchResults([]); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
             >
               <CloseIcon size={14} />
             </button>
@@ -916,12 +916,12 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
         {/* Dropdown results */}
         {searchResults.length > 0 && (
-          <ul className="mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden">
+          <ul className="mt-1 bg-card text-foreground border border-border rounded-lg shadow-lg overflow-hidden">
             {searchResults.map((v) => (
               <li key={v.id}>
                 <button
                   type="button"
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors flex items-center gap-2"
                   onClick={() => {
                     flyToVenue(v);
                     setSearchTerm('');
@@ -935,7 +935,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
                   <div>
                     <p className="font-medium text-foreground">{v.name}</p>
                     {v.building_name && (
-                      <p className="text-xs text-zinc-400">{v.building_name}</p>
+                      <p className="text-xs text-muted-foreground">{v.building_name}</p>
                     )}
                   </div>
                 </button>
@@ -947,13 +947,13 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
       {/* Map-style / reset controls (top-right) */}
       <div className="absolute top-4 right-12 z-10 flex flex-col gap-2">
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl flex flex-col overflow-hidden">
+        <div className="bg-card text-foreground border border-border rounded-xl shadow-xl flex flex-col overflow-hidden">
           <button
             onClick={() => setMapType('road')}
             className={`p-2 transition-colors flex items-center justify-center ${
               mapType === 'road'
-                ? 'bg-primary text-black'
-                : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                ? 'bg-primary text-on-primary-fixedlack'
+                : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
             }`}
             title="Road Map"
           >
@@ -963,8 +963,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             onClick={() => setMapType('satellite')}
             className={`p-2 transition-colors flex items-center justify-center ${
               mapType === 'satellite'
-                ? 'bg-primary text-black'
-                : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                ? 'bg-primary text-on-primary-fixedlack'
+                : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
             }`}
             title="Satellite View"
           >
@@ -974,17 +974,17 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             onClick={() => setShowUserLocation(!showUserLocation)}
             className={`p-2 transition-colors flex items-center justify-center ${
               showUserLocation
-                ? 'bg-blue-500 text-white'
-                : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                ? 'bg-cardackgroundlue-500 text-white'
+                : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
             }`}
             title={showUserLocation ? "Stop Tracking Location" : "Find My Location"}
           >
             {isLocating ? <Loader2 size={20} className="animate-spin" /> : <Navigation size={20} />}
           </button>
-          <div className="h-px bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-px bg-zinc-200" />
           <button
             onClick={handleReset}
-            className="p-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center"
+            className="p-2 text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors flex items-center justify-center"
             title="Reset View"
           >
             <RefreshCw size={20} />
@@ -995,21 +995,21 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       {/* Drawing mode badge */}
       {drawingMode && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
-          <span className="bg-primary text-black text-xs font-semibold px-4 py-2 rounded-full shadow-lg animate-pulse flex items-center gap-2">
+          <span className="bg-primary text-on-primary-fixedlack text-xs font-semibold px-4 py-2 rounded-full shadow-lg animate-pulse flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
             Draw Mode Active
           </span>
-          <span className="bg-zinc-900 text-zinc-300 text-xs px-3 py-1.5 rounded-lg border border-zinc-700 shadow">
+          <span className="bg-card text-muted-foreground text-xs px-3 py-1.5 rounded-lg border border-border shadow">
             Click to add vertices • Double-click to finish • ESC to cancel
           </span>
         </div>
       )}
 
       {/* Map Legend */}
-      <div className="absolute bottom-4 right-4 z-10 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[140px]">
-        <h4 className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Map Legend</h4>
+      <div className="absolute bottom-4 right-4 z-10 bg-card/90 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[140px]">
+        <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Map Legend</h4>
         
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#ef4444] border border-white shadow-sm relative overflow-visible">
