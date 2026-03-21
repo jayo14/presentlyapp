@@ -85,7 +85,7 @@ export const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-text flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative">
       <SEO
         title="Forgot Password | Presently"
         description="Reset your Presently password to regain access to your account."
@@ -102,23 +102,23 @@ export const ForgotPassword: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Icon + Title */}
         <div className="mb-8 text-center flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-[#FFD700] flex items-center justify-center mb-6">
-            <Lock size={48} color="#09090b" strokeWidth={2.5} />
+          <div className="w-24 h-24 rounded-full bg-primaryContainer flex items-center justify-center mb-6">
+            <Lock size={48} className="text-on-primary-fixed" strokeWidth={2.5} />
           </div>
           <h2 className="font-headline text-4xl font-bold text-text mb-2">Reset Password</h2>
-          <p className="text-[#a1a1aa] text-center">
+          <p className="text-textMuted text-center">
             Enter your registered university email address and we'll send you a secure link to reset your password.
           </p>
         </div>
 
-        <div className="bg-[#18181b] border border-[#27272a] p-6 rounded-2xl shadow-lg">
+        <div className="bg-surface border border-outline p-6 rounded-2xl shadow-lg">
           {pageState === 'form' && (
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col gap-5">
                 <div>
                   <label className="block text-sm font-medium text-textMuted mb-2">University Email</label>
                   <div className="relative">
-                    <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280] z-10" />
+                    <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10" />
                     <input
                       type="email"
                       placeholder="name@university.edu"
@@ -127,11 +127,11 @@ export const ForgotPassword: React.FC = () => {
                       onChange={handleEmailChange}
                       disabled={requestPasswordResetMutation.isPending}
                       className={[
-                        'w-full h-14 pl-12 pr-12 bg-[#27272a] border rounded-2xl text-white placeholder-[#71717a]',
+                        'w-full h-14 pl-12 pr-12 bg-surfaceLow border rounded-2xl text-text placeholder-textMuted',
                         'focus:outline-none focus:ring-1 transition-colors',
                         emailError
-                          ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                          : 'border-[#3f3f46] focus:border-[#FFD700] focus:ring-[#FFD700]',
+                          ? 'border-destructive focus:border-destructive focus:ring-destructive'
+                          : 'border-outline focus:border-primary focus:ring-primary',
                         'disabled:opacity-50',
                       ].join(' ')}
                     />
@@ -157,7 +157,7 @@ export const ForgotPassword: React.FC = () => {
                 <button
                   type="submit"
                   disabled={requestPasswordResetMutation.isPending || !email || !!emailError || cooldownRemaining > 0}
-                  className="w-full h-14 bg-[#FFD700] text-[#09090b] rounded-2xl font-bold text-lg hover:bg-[#FFE44D] hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {requestPasswordResetMutation.isPending ? (
                     <>
@@ -171,12 +171,12 @@ export const ForgotPassword: React.FC = () => {
                   )}
                 </button>
 
-                <p className="text-center text-sm text-[#a1a1aa] mt-2">
+                <p className="text-center text-sm text-textMuted mt-2">
                   Having trouble?{' '}
                   <button
                     type="button"
                     onClick={() => window.open('mailto:support@presently.app', '_blank')}
-                    className="text-[#FFD700] font-semibold hover:underline"
+                    className="text-primary font-semibold hover:underline"
                   >
                     Contact Support
                   </button>
@@ -214,7 +214,7 @@ export const ForgotPassword: React.FC = () => {
               </div>
               <button
                 onClick={handleReset}
-                className="w-full h-12 bg-[#FFD700] text-[#09090b] rounded-full font-semibold hover:bg-[#FFE44D] transition-all"
+                className="w-full h-12 bg-primaryContainer text-on-primary-fixed rounded-full font-semibold hover:opacity-90 transition-all"
               >
                 Try Again
               </button>

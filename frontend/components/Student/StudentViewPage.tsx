@@ -443,7 +443,7 @@ export const StudentViewPage: React.FC = () => {
               </div>
 
               {record.notes && (
-                <div className="mt-3 p-3 bg-inputccent rounded-lg">
+                <div className="mt-3 p-3 bg-surfaceLow rounded-lg">
                   <p className="text-xs text-text-textMuted flex items-start gap-2">
                     <FileText size={12} className="mt-0.5" />
                     <span>{record.notes}</span>

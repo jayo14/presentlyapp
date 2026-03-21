@@ -537,7 +537,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           {/* Settings */}
           <button 
             onClick={() => navigate('/dashboard/settings')}
-            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group"
+            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-surfaceLow hover:text-textMuted transition-all hover:shadow-md group"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
               <Settings size={22} className="text-primary" />
@@ -551,7 +551,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           {/* Notifications */}
           <button 
             onClick={() => navigate('/dashboard/notifications')}
-            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group relative"
+            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-surfaceLow hover:text-textMuted transition-all hover:shadow-md group relative"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
               <Bell size={22} className="text-primary" />
@@ -569,7 +569,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           {/* Help & Support */}
           <button 
             onClick={() => window.location.href = 'mailto:support@presently.app'}
-            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group"
+            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-surfaceLow hover:text-textMuted transition-all hover:shadow-md group"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
               <HelpCircle size={22} className="text-primary" />

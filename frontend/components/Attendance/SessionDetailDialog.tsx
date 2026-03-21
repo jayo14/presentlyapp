@@ -224,7 +224,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
               <div className="space-y-3">
                 <div className="text-[10px] sm:text-xs font-bold text-textMuted uppercase tracking-wide">Share Link</div>
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-inputccent px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium truncate text-textMuted border border-outline">
+                  <div className="flex-1 bg-surfaceLow px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium truncate text-textMuted border border-outline">
                     {sessionUrl}
                   </div>
                   <Button variant="secondary" size="icon" className="flex-shrink-0" onClick={handleCopyLink} title="Copy Link">
@@ -244,7 +244,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
                       <span className="truncate">End Session Early</span>
                   </Button>
                 ) : (
-                  <div className="flex items-center justify-center gap-2 p-3 bg-inputccent rounded-xl text-textMuted font-bold text-sm">
+                  <div className="flex items-center justify-center gap-2 p-3 bg-surfaceLow rounded-xl text-textMuted font-bold text-sm">
                       <AlertTriangle size={18} className="flex-shrink-0" /> Session Ended
                   </div>
                 )}
