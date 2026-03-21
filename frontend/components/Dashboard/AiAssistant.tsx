@@ -62,7 +62,7 @@ export const AiAssistant: React.FC = () => {
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 bg-primary text-black p-4 rounded-full shadow-lg shadow-primary/20 hover:scale-110 transition-transform duration-200 ${isOpen ? 'hidden' : 'flex'}`}
+        className={`fixed bottom-6 right-6 z-40 bg-primary text-on-primary-fixedlack p-4 rounded-full shadow-lg shadow-primary/20 hover:scale-110 transition-transform duration-200 ${isOpen ? 'hidden' : 'flex'}`}
       >
         <Sparkles size={24} />
       </button>
@@ -78,12 +78,12 @@ export const AiAssistant: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-semibold text-white text-sm">Presently AI</h3>
-                <p className="text-xs text-zinc-500">Powered by Gemini</p>
+                <p className="text-xs text-muted-foreground">Powered by Gemini</p>
               </div>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
-              className="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-zinc-800 transition-colors"
+              className="text-muted-foreground hover:text-white p-1 rounded-md hover:bg-zinc-800 transition-colors"
             >
               <X size={18} />
             </button>
@@ -99,7 +99,7 @@ export const AiAssistant: React.FC = () => {
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
                     msg.role === 'user'
-                      ? 'bg-primary text-black rounded-tr-sm'
+                      ? 'bg-primary text-on-primary-fixedlack rounded-tr-sm'
                       : 'bg-zinc-800 text-zinc-200 rounded-tl-sm'
                   }`}
                 >
@@ -110,7 +110,7 @@ export const AiAssistant: React.FC = () => {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-3">
-                  <Loader2 size={16} className="animate-spin text-zinc-400" />
+                  <Loader2 size={16} className="animate-spin text-muted-foreground" />
                 </div>
               </div>
             )}

@@ -30,6 +30,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { SEO } from './SEO';
+import { Logo } from './Logo';
 
 // ─── Global Styles ────────────────────────────────────────────────────────────
 // The app relies on the global index.css loaded at the root.
@@ -128,22 +129,8 @@ export const LandingPage: React.FC = () => {
               padding: '1rem 2rem',
             }}
           >
-            {/* Logo */}
-            <button
-              onClick={() => navigate('/')}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontWeight: 800,
-                fontSize: '1.4rem',
-                letterSpacing: '-0.04em',
-                color: 'var(--on-surface)',
-              }}
-            >
-              Presently
-            </button>
+
+            <Logo />
 
             {/* Nav links */}
             <div
@@ -1921,6 +1908,7 @@ export const LandingPage: React.FC = () => {
             }}
           >
             <div>
+              <Logo />
               <div
                 className="font-headline"
                 style={{

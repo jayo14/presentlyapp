@@ -131,15 +131,15 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
   return (
     <div className={`bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col ${className}`}>
       {/* Header */}
-      <div className="p-6 border-b border-zinc-800">
+      <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
               <MapPin className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">My Location</h3>
-              <p className="text-xs text-zinc-500">Live Geolocation</p>
+              <h3 className="text-lg font-semibold text-primary-foreground">My Location</h3>
+              <p className="text-xs text-muted-foreground">Live Geolocation</p>
             </div>
           </div>
           <Button
@@ -162,13 +162,13 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
       </div>
 
       {/* Map Container */}
-      <div className="relative flex-1 min-h-[300px] bg-zinc-950">
+      <div className="relative flex-1 min-h-[300px] bg-background">
         <div ref={mapContainerRef} className="absolute inset-0 z-0" />
 
         {!location && !isLocating && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/50 backdrop-blur-sm z-10 p-6 text-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm z-10 p-6 text-center">
             <MapPin className="w-12 h-12 text-zinc-700 mb-4" />
-            <p className="text-zinc-400 text-sm mb-4">Map view is ready. Click 'Find Me' to see your current position.</p>
+            <p className="text-muted-foreground text-sm mb-4">Map view is ready. Click 'Find Me' to see your current position.</p>
             <Button variant="secondary" onClick={handleFindLocation} size="sm">
               Activate GPS
             </Button>
@@ -176,15 +176,15 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
         )}
 
         {isLocating && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/50 backdrop-blur-sm z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm z-10">
             <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
-            <p className="text-zinc-400 text-sm">Accessing GPS...</p>
+            <p className="text-muted-foreground text-sm">Accessing GPS...</p>
           </div>
         )}
 
         <button
           onClick={handleRefreshMap}
-          className="absolute bottom-4 right-4 z-[1000] p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg text-zinc-500 hover:text-primary transition-colors"
+          className="absolute bottom-4 right-4 z-[1000] p-2 bg-card text-foreground border border-border rounded-lg shadow-lg text-muted-foreground hover:text-primary transition-colors"
           title="Fix Map Rendering"
         >
           <RefreshCw size={18} />
@@ -193,7 +193,7 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
 
       {/* Footer Info */}
       {location && (
-        <div className="p-4 bg-zinc-800/50 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+        <div className="p-4 bg-accent/50 border-t border-border flex items-center justify-between text-[10px] font-mono text-muted-foreground">
           <span>LAT: {location.latitude.toFixed(6)}</span>
           <span>LNG: {location.longitude.toFixed(6)}</span>
           <span>ACC: ±{Math.round(location.accuracy)}m</span>

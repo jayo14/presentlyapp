@@ -665,9 +665,9 @@ export const Onboarding: React.FC = () => {
     return (
       <div className="space-y-6">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-zinc-900 mb-2">How will you use Presently?</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">How will you use Presently?</h2>
           <p className="text-zinc-700">Select your role to get started</p>
-          <p className="text-xs text-zinc-600 mt-2">Step 1 of {totalSteps}</p>
+          <p className="text-xs text-muted-foreground mt-2">Step 1 of {totalSteps}</p>
         </div>
         
         <div className="grid gap-4">
@@ -675,7 +675,7 @@ export const Onboarding: React.FC = () => {
             <button
               key={role.id}
               onClick={() => dispatch({ type: 'SET_ROLE', payload: role.id })}
-              className={`flex flex-col p-5 rounded-xl border-2 transition-all w-full text-left group hover:shadow-md
+              className={`flex flex-col p-5 rounded-xl border-border transition-all w-full text-left group hover:shadow-md
                 ${state.selectedRole === role.id 
                   ? 'border-primary bg-primary/10 shadow-md' 
                   : 'border-zinc-300 bg-zinc-50 hover:border-primary/30'
@@ -691,8 +691,8 @@ export const Onboarding: React.FC = () => {
                   </p>
                   <p className="text-sm text-zinc-700 leading-relaxed">{role.desc}</p>
                 </div>
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-400'}`}>
-                   {state.selectedRole === role.id && <Check size={16} className="text-white" />}
+                <div className={`w-6 h-6 rounded-full border-border flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-400'}`}>
+                   {state.selectedRole === role.id && <Check size={16} className="text-primary-foreground" />}
                 </div>
               </div>
               
@@ -717,7 +717,7 @@ export const Onboarding: React.FC = () => {
   const renderPersonalDetails = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-2">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
           Welcome, {user?.full_name || user?.name || 'there'}!
         </h2>
         <p className="text-zinc-700">Let's set up your profile.</p>
@@ -726,7 +726,7 @@ export const Onboarding: React.FC = () => {
       <div className="flex flex-col items-center mb-8 gap-4">
         <div className="relative group cursor-pointer">
            <div
-             className="w-28 h-28 rounded-full bg-zinc-200 overflow-hidden border-4 border-zinc-300 ring-2 ring-zinc-200 group-hover:ring-primary transition-all"
+             className="w-28 h-28 rounded-full bg-zinc-200 overflow-hidden border-input border-border ring-2 ring-zinc-200 group-hover:ring-primary transition-all"
              aria-hidden="true"
            >
               {state.pendingImage ? (
@@ -734,7 +734,7 @@ export const Onboarding: React.FC = () => {
               ) : state.profileImage ? (
                   <img src={state.profileImage} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                  <div className="w-full h-full flex items-center justify-center text-zinc-500">
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                       <User size={40} />
                   </div>
               )}
@@ -745,7 +745,7 @@ export const Onboarding: React.FC = () => {
                type="button"
                onClick={handleCameraClick}
                aria-label="Upload profile photo"
-               className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+               className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
              >
                 <Camera size={16} />
              </button>
@@ -793,18 +793,18 @@ export const Onboarding: React.FC = () => {
     <div className="space-y-6">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">
+          <h2 className="text-xl font-bold text-text-primary">
             Institutional Details
           </h2>
-          <span className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
+          <span className="text-on-primary-fixedase font-semibold text-text-primary">
             3 of 3
           </span>
         </div>
 
-        <h3 className="text-3xl md:text-4xl font-black text-text-primary dark:text-dark-text-primary mb-3">
+        <h3 className="text-3xl md:text-4xl font-black text-text-primary mb-3">
           Link your Institution
         </h3>
-        <p className="text-sm text-zinc-600 dark:text-dark-text-secondary">
+        <p className="text-sm text-muted-foreground">
           Almost there! Select your specific academic location to finalize your profile.
         </p>
       </div>
@@ -814,12 +814,12 @@ export const Onboarding: React.FC = () => {
         <div>
           <label
             htmlFor="institution-select"
-            className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2"
+            className="block text-on-primary-fixedase font-semibold text-text-primary mb-2"
           >
             Select University
           </label>
           {state.institutionsLoading ? (
-            <div className="w-full h-14 bg-zinc-100 dark:bg-dark-background-tertiary rounded-2xl animate-pulse" aria-hidden="true" />
+            <div className="w-full h-14 bg-muted rounded-2xl animate-pulse" aria-hidden="true" />
           ) : (
             <div className="relative">
               <select
@@ -831,7 +831,7 @@ export const Onboarding: React.FC = () => {
                 }}
                 aria-required="true"
                 aria-label="Select your university or institution"
-                className="w-full bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light text-text-primary dark:text-dark-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
+                className="w-full bg-card border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
               >
                 <option value="">Select your institution</option>
                 {state.institutions.map(inst => (
@@ -841,8 +841,8 @@ export const Onboarding: React.FC = () => {
                 ))}
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
-                <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary -rotate-90" strokeWidth={2.5} />
-                <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary rotate-90" strokeWidth={2.5} />
+                <ChevronRight size={14} className="text-[#8B7355] -rotate-90" strokeWidth={2.5} />
+                <ChevronRight size={14} className="text-[#8B7355] rotate-90" strokeWidth={2.5} />
               </div>
             </div>
           )}
@@ -860,7 +860,7 @@ export const Onboarding: React.FC = () => {
           )}
           {!state.institutionsLoading && !state.institutionsError && state.institutions.length === 0 && (
             <div className="mt-2 flex items-center gap-2">
-              <p className="text-amber-600 text-xs">No institutions available yet.</p>
+              <p className="text-muted-foregroundmber-600 text-xs">No institutions available yet.</p>
               <button
                 type="button"
                 onClick={fetchInstitutions}
@@ -880,12 +880,12 @@ export const Onboarding: React.FC = () => {
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             <label
               htmlFor="college-select"
-              className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2"
+              className="block text-on-primary-fixedase font-semibold text-text-primary mb-2"
             >
               Select Faculty
             </label>
             {state.collegesLoading ? (
-              <div className="w-full h-14 bg-zinc-100 dark:bg-dark-background-tertiary rounded-2xl animate-pulse" aria-hidden="true" />
+              <div className="w-full h-14 bg-muted rounded-2xl animate-pulse" aria-hidden="true" />
             ) : (
               <div className="relative">
                 <select
@@ -899,7 +899,7 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your faculty or college"
                   aria-disabled={state.colleges.length === 0}
-                  className="w-full bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light text-text-primary dark:text-dark-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-card border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select college/faculty</option>
                   {state.colleges.map(col => (
@@ -909,8 +909,8 @@ export const Onboarding: React.FC = () => {
                   ))}
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
-                  <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary -rotate-90" strokeWidth={2.5} />
-                  <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-[#8B7355] -rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-[#8B7355] rotate-90" strokeWidth={2.5} />
                 </div>
               </div>
             )}
@@ -925,12 +925,12 @@ export const Onboarding: React.FC = () => {
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             <label
               htmlFor="department-select"
-              className="block text-base font-semibold text-text-primary dark:text-dark-text-primary mb-2"
+              className="block text-on-primary-fixedase font-semibold text-text-primary mb-2"
             >
               Select Department
             </label>
             {state.departmentsLoading ? (
-              <div className="w-full h-14 bg-zinc-100 dark:bg-dark-background-tertiary rounded-2xl animate-pulse" aria-hidden="true" />
+              <div className="w-full h-14 bg-muted rounded-2xl animate-pulse" aria-hidden="true" />
             ) : (
               <div className="relative">
                 <select
@@ -944,7 +944,7 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your department"
                   aria-disabled={state.departments.length === 0}
-                  className="w-full bg-white dark:bg-dark-background-tertiary border border-[#E0E0E0] dark:border-dark-border-light text-text-primary dark:text-dark-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 dark:focus:ring-dark-primary-DEFAULT/20 focus:border-[#FDB913] dark:focus:border-dark-primary-DEFAULT outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-card border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select department</option>
                   {state.departments.map(dept => (
@@ -954,8 +954,8 @@ export const Onboarding: React.FC = () => {
                   ))}
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
-                  <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary -rotate-90" strokeWidth={2.5} />
-                  <ChevronRight size={14} className="text-[#8B7355] dark:text-dark-text-tertiary rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-[#8B7355] -rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-[#8B7355] rotate-90" strokeWidth={2.5} />
                 </div>
               </div>
             )}
@@ -996,10 +996,10 @@ export const Onboarding: React.FC = () => {
 
         {state.selectedRole === UserRole.STUDENT && (
              <div className="w-full">
-                 <label className="block text-sm font-medium text-zinc-700 mb-1.5">Digital Signature <span className="text-zinc-500 font-normal">(Optional)</span></label>
-                 <div className="border border-dashed border-zinc-400 bg-zinc-100 rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-200 hover:border-primary/50 cursor-pointer transition-colors group">
-                    <Upload className="h-6 w-6 text-zinc-500 group-hover:text-primary mb-2 transition-colors" />
-                    <p className="text-xs text-zinc-600 group-hover:text-zinc-800">Upload signature image</p>
+                 <label className="block text-sm font-medium text-zinc-700 mb-1.5">Digital Signature <span className="text-muted-foreground font-normal">(Optional)</span></label>
+                 <div className="border border-dashed border-border bg-muted rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-200 hover:border-primary/50 cursor-pointer transition-colors group">
+                    <Upload className="h-6 w-6 text-muted-foreground group-hover:text-primary mb-2 transition-colors" />
+                    <p className="text-xs text-muted-foreground group-hover:text-foreground">Upload signature image</p>
                  </div>
             </div>
         )}
@@ -1044,7 +1044,7 @@ export const Onboarding: React.FC = () => {
   const renderCourseRegistration = () => (
     <div className="space-y-6 h-full flex flex-col">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Register Courses</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Register Courses</h2>
         <p className="text-zinc-700">Select courses to add to your dashboard.</p>
       </div>
 
@@ -1065,7 +1065,7 @@ export const Onboarding: React.FC = () => {
         </div>
       ) : state.courses.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-zinc-500 text-sm">No courses available at the moment.</p>
+          <p className="text-muted-foreground text-sm">No courses available at the moment.</p>
         </div>
       ) : (
         <>
@@ -1099,20 +1099,20 @@ export const Onboarding: React.FC = () => {
                             </div>
                             <p className="text-xs text-zinc-700 mt-1">{course.title}</p>
                             {course.lecturer_name && (
-                              <p className="text-[10px] text-zinc-600 mt-0.5">{course.lecturer_name}</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">{course.lecturer_name}</p>
                             )}
                         </div>
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
                             isSelected ? 'bg-primary border-primary text-white' : 'border-zinc-400 bg-transparent'
                         }`} aria-hidden="true">
-                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-zinc-500" />}
+                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-muted-foreground" />}
                         </div>
                     </button>
                 );
             })}
           </div>
 
-          <div className="text-center text-xs text-zinc-600 pt-2" aria-live="polite" aria-atomic="true">
+          <div className="text-center text-xs text-muted-foreground pt-2" aria-live="polite" aria-atomic="true">
             You selected {state.selectedCourses.length} course{state.selectedCourses.length !== 1 ? 's' : ''}.
           </div>
         </>
@@ -1123,7 +1123,7 @@ export const Onboarding: React.FC = () => {
   const renderPreferences = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-zinc-900 mb-2">Permissions</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Permissions</h2>
         <p className="text-zinc-700">Customize your app experience.</p>
       </div>
 
@@ -1176,14 +1176,14 @@ export const Onboarding: React.FC = () => {
                     </div>
                     <div className="text-left">
                         <p className={`font-medium transition-colors ${item.state ? 'text-zinc-900' : 'text-zinc-800'}`}>{item.label}</p>
-                        <p className="text-xs text-zinc-600">{item.desc}</p>
+                        <p className="text-xs text-muted-foreground">{item.desc}</p>
                     </div>
                 </div>
                 <div
                   className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-400 justify-start'}`}
                   aria-hidden="true"
                 >
-                    <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                    <div className="w-4 h-4 rounded-full bg-card shadow-sm" />
                 </div>
             </div>
         ))}
@@ -1193,7 +1193,7 @@ export const Onboarding: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen bg-[#F5F5F0] dark:bg-dark-background-primary flex flex-col items-center justify-center p-4"
+      className="min-h-screen bg-[#F5F5F0] flex flex-col items-center justify-center p-4"
       aria-label="Account setup wizard"
     >
       <div className="w-full max-w-lg">
@@ -1213,20 +1213,20 @@ export const Onboarding: React.FC = () => {
         </div>
 
         <div
-          className="bg-white dark:bg-dark-background-secondary border border-[#E0E0E0] dark:border-dark-border-light p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden"
+          className="bg-card border border-[#E0E0E0] p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden"
           role="main"
         >
           {/* Error Display */}
           {state.error && (
             <div
               role="alert"
-              className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2"
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2"
             >
               <AlertCircle size={20} className="flex-shrink-0 mt-0.5" aria-hidden="true" />
               <div className="flex-1">{state.error}</div>
               <button
                 onClick={() => dispatch({ type: 'SET_ERROR', payload: '' })}
-                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-500 rounded"
+                className="text-red-500 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-500 rounded"
                 aria-label="Dismiss error"
               >
                 <X size={16} aria-hidden="true" />
@@ -1244,7 +1244,7 @@ export const Onboarding: React.FC = () => {
             aria-valuemax={totalSteps}
           >
             {Array.from({ length: totalSteps }).map((_, i) => (
-              <div key={i} className="flex-1 h-1.5 rounded-full bg-[#E0E0E0] dark:bg-dark-background-tertiary overflow-hidden">
+              <div key={i} className="flex-1 h-1.5 rounded-full bg-[#E0E0E0] overflow-hidden">
                 <div
                   className={`h-full bg-[#FDB913] transition-all duration-500 ease-out ${state.step >= i + 1 ? 'w-full' : 'w-0'}`}
                 />
@@ -1272,18 +1272,18 @@ export const Onboarding: React.FC = () => {
               </motion.div>
             </AnimatePresence>
 
-            <div className="flex gap-4 mt-8 pt-6 border-t border-[#E0E0E0] dark:border-dark-border-light">
+            <div className="flex gap-4 mt-8 pt-6 border-t border-[#E0E0E0]">
               {state.step > 1 && (
                 <button
                   onClick={handleBack}
                   aria-label="Go back to previous step"
-                  className="px-4 py-3 bg-white dark:bg-dark-background-tertiary border border-zinc-300 dark:border-dark-border-light text-zinc-700 dark:text-dark-text-primary rounded-full hover:bg-[#F5F5F0] dark:hover:bg-dark-background-primary transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
+                  className="px-4 py-3 bg-card border border-border text-zinc-700 rounded-full hover:bg-[#F5F5F0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
                 >
                   <ChevronLeft size={20} aria-hidden="true" />
                 </button>
               )}
               <button
-                className="flex-1 py-5 bg-[#FDB913] hover:bg-[#E5A912] text-black font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
+                className="flex-1 py-5 bg-[#FDB913] hover:bg-[#E5A912] text-on-primary-fixedlack font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
                 onClick={handleNext}
                 disabled={(state.step === 1 && !state.selectedRole) || (state.pendingImage !== null) || completeOnboardingMutation.isPending}
                 aria-busy={completeOnboardingMutation.isPending}
@@ -1307,7 +1307,7 @@ export const Onboarding: React.FC = () => {
           </div>
         </div>
 
-        <p className="text-center text-zinc-600 text-xs mt-6" aria-hidden="true">
+        <p className="text-center text-muted-foreground text-xs mt-6" aria-hidden="true">
           Step {state.step} of {totalSteps}
         </p>
       </div>

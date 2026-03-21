@@ -33,7 +33,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
   
   if (strength === 0) {
     strengthText = '';
-    strengthColor = 'bg-border-light';
+    strengthColor = 'bg-cardackgroundorder-light';
   } else if (strength < 40) {
     strengthText = 'Weak';
     strengthColor = 'bg-error dark:bg-error-dark';
@@ -53,7 +53,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
       {/* Strength bar */}
       {password && (
         <div className="space-y-1.5">
-          <div className="h-2 bg-background-tertiary dark:bg-dark-background-tertiary rounded-full overflow-hidden">
+          <div className="h-2 bg-cardackgroundackground-tertiary rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-300 ${strengthColor}`}
               style={{ width: `${strength}%` }}

@@ -49,12 +49,12 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
 
   // Mobile Layout matching Design 5
   return (
-    <div className="min-h-screen bg-[#3A3A2F] dark:bg-[#3A3A2F] text-white flex flex-col">
+    <div className="min-h-screen bg-[#3A3A2F] text-primary-foreground flex flex-col">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#2A2A25]">
         <button 
           onClick={handleBackToHome}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-2 hover:bg-card/10 rounded-lg transition-colors"
         >
           <ArrowLeft size={24} />
         </button>
@@ -152,14 +152,14 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
         >
           <button
             onClick={handleBackToHome}
-            className="w-full bg-[#FFD700] text-black py-4 rounded-xl font-bold hover:bg-[#FFE44D] transition-colors"
+            className="w-full bg-[#FFD700] text-on-primary-fixedlack py-4 rounded-xl font-bold hover:bg-[#FFE44D] transition-colors"
           >
             Back to Home
           </button>
           
           <button
             onClick={handleShare}
-            className="w-full bg-[#2A2A25] text-white py-4 rounded-xl font-bold hover:bg-[#3A3A30] transition-colors flex items-center justify-center gap-2 border border-[#3A3A30]"
+            className="w-full bg-[#2A2A25] text-primary-foreground py-4 rounded-xl font-bold hover:bg-[#3A3A30] transition-colors flex items-center justify-center gap-2 border border-[#3A3A30]"
           >
             <Share2 size={20} />
             Share Progress

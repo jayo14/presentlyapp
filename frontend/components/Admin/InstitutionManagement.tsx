@@ -113,7 +113,7 @@ export const InstitutionManagement: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
         <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        <p className="text-zinc-500 animate-pulse">Loading institution details...</p>
+        <p className="text-muted-foreground animate-pulse">Loading institution details...</p>
       </div>
     );
   }
@@ -140,7 +140,7 @@ export const InstitutionManagement: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground">Institutions</h2>
-            <p className="text-zinc-500 text-sm">Manage educational organizations and their hierarchy</p>
+            <p className="text-muted-foreground text-sm">Manage educational organizations and their hierarchy</p>
           </div>
         </div>
         <Button onClick={handleCreateInstitution} className="gap-2">
@@ -162,18 +162,18 @@ export const InstitutionManagement: React.FC = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-          <p className="text-zinc-400 text-sm">Total Institutions</p>
+        <div className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+          <p className="text-muted-foreground text-sm">Total Institutions</p>
           <p className="text-2xl font-bold text-foreground">{(institutions || []).length}</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-          <p className="text-zinc-400 text-sm">Active Institutions</p>
+        <div className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+          <p className="text-muted-foreground text-sm">Active Institutions</p>
           <p className="text-2xl font-bold text-emerald-500">
             {(institutions || []).filter(i => i?.is_active).length}
           </p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-          <p className="text-zinc-400 text-sm">Total Colleges</p>
+        <div className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+          <p className="text-muted-foreground text-sm">Total Colleges</p>
           <p className="text-2xl font-bold text-primary">
             {(institutions || []).reduce((sum, inst) => sum + (inst?.collegeCount || 0), 0)}
           </p>
@@ -183,20 +183,20 @@ export const InstitutionManagement: React.FC = () => {
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search institutions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11 bg-zinc-900 border-zinc-800"
+            className="pl-10 h-11 bg-card border-border"
           />
         </div>
         
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
-          className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full text-foreground focus:outline-none focus:border-primary transition-colors h-11"
+          className="px-4 py-2 bg-card border border-border rounded-full text-foreground focus:outline-none focus:border-primary transition-colors h-11"
         >
           <option value="all">All Types</option>
           <option value="UNIVERSITY">Universities</option>
@@ -210,7 +210,7 @@ export const InstitutionManagement: React.FC = () => {
       {loading && (institutions || []).length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="w-10 h-10 animate-spin text-primary" />
-          <p className="text-zinc-500 animate-pulse">Fetching institutions...</p>
+          <p className="text-muted-foreground animate-pulse">Fetching institutions...</p>
         </div>
       )}
 
@@ -220,13 +220,13 @@ export const InstitutionManagement: React.FC = () => {
           {filteredInstitutions.map(inst => (
             <div
               key={inst.id}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 hover:shadow-xl transition-all cursor-pointer group flex flex-col h-full relative"
+              className="bg-card border border-border rounded-xl overflow-hidden hover:border-border hover:shadow-xl transition-all cursor-pointer group flex flex-col h-full relative"
               onClick={() => handleInstitutionClick(inst)}
             >
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div className="w-12 h-12 rounded-lg bg-accent border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
                       {inst.logo_url ? (
                         <img 
                           src={inst.logo_url} 
@@ -238,24 +238,24 @@ export const InstitutionManagement: React.FC = () => {
                           }}
                         />
                       ) : (
-                        <Building2 className="w-6 h-6 text-zinc-500" />
+                        <Building2 className="w-6 h-6 text-muted-foreground" />
                       )}
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1" title={inst.full_name}>
                         {inst.full_name}
                       </h3>
-                      <p className="text-xs font-medium text-zinc-500">{inst.short_name} • {inst.abbreviation}</p>
+                      <p className="text-xs font-medium text-muted-foreground">{inst.short_name} • {inst.abbreviation}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900/80 backdrop-blur-sm p-1 rounded-lg">
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-card/80 backdrop-blur-sm p-1 rounded-lg">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditInstitution(inst);
                       }}
-                      className="p-1.5 hover:bg-zinc-800 rounded-md transition-colors text-zinc-400 hover:text-white"
+                      className="p-1.5 hover:bg-accent rounded-md transition-colors text-muted-foreground hover:text-primary-foreground"
                       title="Edit institution"
                     >
                       <Edit2 className="w-4 h-4" />
@@ -265,7 +265,7 @@ export const InstitutionManagement: React.FC = () => {
                         e.stopPropagation();
                         handleDeleteInstitution(inst.id);
                       }}
-                      className="p-1.5 hover:bg-zinc-800 rounded-md transition-colors text-red-400 hover:text-red-300"
+                      className="p-1.5 hover:bg-accent rounded-md transition-colors text-red-400 hover:text-red-300"
                       title="Delete institution"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -274,22 +274,22 @@ export const InstitutionManagement: React.FC = () => {
                 </div>
 
                 {inst.description && (
-                  <p className="text-sm text-zinc-400 mb-4 line-clamp-2 leading-relaxed flex-1">
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed flex-1">
                     {inst.description}
                   </p>
                 )}
 
-                <div className="space-y-3 pt-4 mt-auto border-t border-zinc-800/50">
-                  <div className="flex items-center justify-between text-sm text-zinc-400">
+                <div className="space-y-3 pt-4 mt-auto border-t border-border/50">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-zinc-500" />
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
                       <span className="truncate max-w-[120px]" title={`${inst.city}, ${inst.state_province || inst.country}`}>
                         {inst.city}, {inst.state_province || inst.country}
                       </span>
                     </div>
                     {inst.collegeCount !== undefined && (
                       <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-zinc-500" />
+                        <Users className="w-4 h-4 text-muted-foreground" />
                         <span>{inst.collegeCount} College{inst.collegeCount !== 1 ? 's' : ''}</span>
                       </div>
                     )}
@@ -297,7 +297,7 @@ export const InstitutionManagement: React.FC = () => {
                   
                   <div className="flex flex-wrap gap-2 pt-1">
                     {inst.institution_type && (
-                       <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-wide">
+                       <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500 border border-blue-500/20 uppercase tracking-wide">
                         {inst.institution_type}
                       </span>
                     )}
@@ -308,7 +308,7 @@ export const InstitutionManagement: React.FC = () => {
                           ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                           : inst.accreditation_status === 'PROVISIONAL'
                           ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                          : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                          : 'bg-zinc-800 text-muted-foreground border-zinc-700'
                       }`}>
                         {inst.accreditation_status}
                       </span>
@@ -317,7 +317,7 @@ export const InstitutionManagement: React.FC = () => {
                     <span className={`px-2 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wide ml-auto ${
                       inst.is_active 
                         ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
-                        : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                        : 'bg-zinc-800 text-muted-foreground border-zinc-700'
                     }`}>
                       {inst.is_active ? 'Active' : 'Inactive'}
                     </span>
@@ -338,10 +338,10 @@ export const InstitutionManagement: React.FC = () => {
 
       {/* Empty State */}
       {!loading && filteredInstitutions.length === 0 && (
-        <div className="text-center py-20 bg-zinc-900/30 border border-dashed border-zinc-800 rounded-3xl">
-          <Building2 className="w-16 h-16 text-zinc-800 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-zinc-400">No institutions found</h3>
-          <p className="text-zinc-500 text-sm mt-1 mb-6">Start by adding a new educational institution to the system.</p>
+        <div className="text-center py-20 bg-card/30 border border-dashed border-border rounded-3xl">
+          <Building2 className="w-16 h-16 text-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-muted-foreground">No institutions found</h3>
+          <p className="text-muted-foreground text-sm mt-1 mb-6">Start by adding a new educational institution to the system.</p>
           <Button onClick={handleCreateInstitution} variant="secondary">
             <Plus className="w-4 h-4 mr-2" />
             Add First Institution

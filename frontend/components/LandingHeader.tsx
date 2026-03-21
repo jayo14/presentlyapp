@@ -82,14 +82,14 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black/50 backdrop-blur-xl border-b border-white/5 py-6">
+    <nav className="fixed top-0 w-full z-50 bg-cardackgroundlack/50 backdrop-blur-xl border-b border-white/5 py-6">
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <div className="cursor-pointer" onClick={() => navigate('/')}>
           <Logo className="h-8 w-auto" />
         </div>
         
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
           {navItems.map((item) => {
             const active = isActive(item);
             return (
@@ -97,7 +97,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
                 key={item.label}
                 to={item.to}
                 className={`relative pb-1 transition-all duration-300 ease-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-primary/60 after:transition-all after:duration-300 after:ease-out hover:after:w-full ${
-                  active ? 'text-white' : 'text-zinc-400 hover:text-white'
+                  active ? 'text-white' : 'text-muted-foreground hover:text-white'
                 }`}
               >
                 {item.label}
@@ -111,14 +111,14 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               </Link>
             );
           })}
-          <div className="h-4 w-px bg-white/10 mx-2" />
-          <Button variant="ghost" className="text-white hover:text-primary px-4" onClick={handleLogin}>Sign In</Button>
-          <Button className="bg-primary text-black hover:bg-primary-dark px-6 font-bold" onClick={handleGetStarted}>Get Started</Button>
+          <div className="h-4 w-px bg-card/10 mx-2" />
+          <Button variant="ghost" className="text-primary-foreground hover:text-primary px-4" onClick={handleLogin}>Sign In</Button>
+          <Button className="bg-primary text-on-primary-fixedlack hover:bg-primary-dark px-6 font-bold" onClick={handleGetStarted}>Get Started</Button>
         </div>
 
         {/* Mobile Menu Toggle */}
         <button 
-          className="md:hidden p-2 text-zinc-400 hover:text-white"
+          className="md:hidden p-2 text-muted-foreground hover:text-primary-foreground"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -132,7 +132,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-zinc-950 border-b border-white/5 overflow-hidden"
+            className="md:hidden bg-background border-b border-white/5 overflow-hidden"
           >
             <div className="px-6 py-8 flex flex-col gap-6">
               {navItems.map((item) => {
@@ -145,7 +145,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
                     className={`rounded-lg px-2 py-1 text-lg font-medium transition-all duration-300 ease-out ${
                       active
                         ? 'bg-white/10 text-white'
-                        : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                        : 'text-muted-foreground hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     {item.label}
@@ -154,8 +154,8 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               })}
               <hr className="border-white/5" />
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full h-14 border-white/10 text-white" onClick={handleLogin}>Sign In</Button>
-                <Button className="w-full h-14 bg-primary text-black font-bold" onClick={handleGetStarted}>Get Started</Button>
+                <Button variant="outline" className="w-full h-14 border-white/10 text-primary-foreground" onClick={handleLogin}>Sign In</Button>
+                <Button className="w-full h-14 bg-primary text-on-primary-fixedlack font-bold" onClick={handleGetStarted}>Get Started</Button>
               </div>
             </div>
           </motion.div>

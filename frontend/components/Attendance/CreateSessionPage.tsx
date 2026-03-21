@@ -205,8 +205,8 @@ export const CreateSessionPage: React.FC = () => {
             onClick={() => { setDuration(mins.toString()); setDurationUnit('minutes'); }}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 duration === mins.toString() && durationUnit === 'minutes'
-                ? 'bg-primary text-black ring-2 ring-primary/20' 
-                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                ? 'bg-primary text-on-primary-fixedlack ring-2 ring-primary/20' 
+                : 'bg-inputccent text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700'
             }`}
         >
             {label}
@@ -220,7 +220,7 @@ export const CreateSessionPage: React.FC = () => {
 
     // Mobile Layout (matching the dark theme design)
     const mobileLayout = (
-        <div className="min-h-screen bg-zinc-950 pb-24" onKeyDown={handleKeyDown}>
+        <div className="min-h-screen bg-background pb-24" onKeyDown={handleKeyDown}>
             {createdSession && (
                 <SessionDetailDialog 
                     session={createdSession as any} 
@@ -229,25 +229,25 @@ export const CreateSessionPage: React.FC = () => {
             )}
 
             {/* Mobile Header */}
-            <div className="flex items-center p-4 border-b border-zinc-800">
+            <div className="flex items-center p-4 border-b border-border">
                 <button 
                     onClick={() => navigate(-1)}
-                    className="p-2 hover:bg-zinc-800 rounded-lg transition-colors mr-3"
+                    className="p-2 hover:bg-accent rounded-lg transition-colors mr-3"
                 >
-                    <ArrowLeft size={24} className="text-white" />
+                    <ArrowLeft size={24} className="text-primary-foreground" />
                 </button>
-                <h1 className="text-xl font-bold text-white">New Attendance Session</h1>
+                <h1 className="text-xl font-bold text-primary-foreground">New Attendance Session</h1>
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-6">
                 {/* Course Selection */}
                 <div>
-                    <label className="block text-white text-sm font-semibold mb-3">Course Selection</label>
+                    <label className="block text-primary-foreground text-sm font-semibold mb-3">Course Selection</label>
                     <div className="relative">
                         <select
                             value={selectedCourse}
                             onChange={(e) => setSelectedCourse(e.target.value)}
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-base outline-none appearance-none pr-10"
+                            className="w-full bg-card border border-border rounded-xl p-4 text-primary-foreground text-on-primary-fixedase outline-none appearance-none pr-10"
                             required
                         >
                             <option value="">Search course...</option>
@@ -261,12 +261,12 @@ export const CreateSessionPage: React.FC = () => {
 
                 {/* Lecture Hall */}
                 <div>
-                    <label className="block text-white text-sm font-semibold mb-3">Lecture Hall</label>
+                    <label className="block text-primary-foreground text-sm font-semibold mb-3">Lecture Hall</label>
                     <div className="relative">
                         <select
                             value={selectedVenue}
                             onChange={(e) => setSelectedVenue(e.target.value)}
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-base outline-none appearance-none pr-10"
+                            className="w-full bg-card border border-border rounded-xl p-4 text-primary-foreground text-on-primary-fixedase outline-none appearance-none pr-10"
                             required
                         >
                             <option value="">Select location</option>
@@ -280,10 +280,10 @@ export const CreateSessionPage: React.FC = () => {
 
                 {/* Verification Methods */}
                 <div>
-                    <label className="block text-white text-sm font-semibold mb-3">Verification Methods</label>
+                    <label className="block text-primary-foreground text-sm font-semibold mb-3">Verification Methods</label>
                     <div className="space-y-3">
                         {/* QR Code */}
-                        <div className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between">
+                        <div className="bg-card rounded-xl p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                                     <div className="w-6 h-6 grid grid-cols-2 gap-0.5">
@@ -293,45 +293,45 @@ export const CreateSessionPage: React.FC = () => {
                                         <div className="bg-primary rounded-sm"></div>
                                     </div>
                                 </div>
-                                <span className="text-white font-medium">QR Code</span>
+                                <span className="text-primary-foreground font-medium">QR Code</span>
                             </div>
                             <div 
                                 onClick={() => setQrCodeEnabled(!qrCodeEnabled)}
                                 className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${qrCodeEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
                             >
-                                <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                                <div className="w-4 h-4 rounded-full bg-card shadow-sm" />
                             </div>
                         </div>
 
                         {/* 8-Digit Code */}
-                        <div className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between">
+                        <div className="bg-card rounded-xl p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                                     <span className="text-primary font-bold text-xs">123</span>
                                 </div>
-                                <span className="text-white font-medium">8-Digit Code</span>
+                                <span className="text-primary-foreground font-medium">8-Digit Code</span>
                             </div>
                             <div 
                                 onClick={() => setDigitCodeEnabled(!digitCodeEnabled)}
                                 className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${digitCodeEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
                             >
-                                <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                                <div className="w-4 h-4 rounded-full bg-card shadow-sm" />
                             </div>
                         </div>
 
                         {/* GPS Verification */}
-                        <div className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between">
+                        <div className="bg-card rounded-xl p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                                     <Target size={20} className="text-primary" />
                                 </div>
-                                <span className="text-white font-medium">GPS Verification</span>
+                                <span className="text-primary-foreground font-medium">GPS Verification</span>
                             </div>
                             <div 
                                 onClick={() => setGpsEnabled(!gpsEnabled)}
                                 className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${gpsEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
                             >
-                                <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                                <div className="w-4 h-4 rounded-full bg-card shadow-sm" />
                             </div>
                         </div>
                     </div>
@@ -341,7 +341,7 @@ export const CreateSessionPage: React.FC = () => {
                 {gpsEnabled && (
                     <div>
                         <div className="flex items-center justify-between mb-3">
-                            <label className="block text-white text-sm font-semibold">Geofence Radius</label>
+                            <label className="block text-primary-foreground text-sm font-semibold">Geofence Radius</label>
                             <span className="text-primary text-lg font-bold">{geofenceRadius}m</span>
                         </div>
                         <div className="relative">
@@ -352,12 +352,12 @@ export const CreateSessionPage: React.FC = () => {
                                 step="10"
                                 value={geofenceRadius}
                                 onChange={(e) => setGeofenceRadius(parseInt(e.target.value))}
-                                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer slider-primary"
+                                className="w-full h-2 bg-accent rounded-lg appearance-none cursor-pointer slider-primary"
                                 style={{
                                     background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${((geofenceRadius - 50) / 450) * 100}%, #27272a ${((geofenceRadius - 50) / 450) * 100}%, #27272a 100%)`
                                 }}
                             />
-                            <div className="flex justify-between mt-2 text-xs text-zinc-500">
+                            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                                 <span>50m</span>
                                 <span>500m</span>
                             </div>
@@ -369,7 +369,7 @@ export const CreateSessionPage: React.FC = () => {
                 <button 
                     type="submit"
                     disabled={loading || !selectedCourse || !selectedVenue}
-                    className="w-full bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-primary hover:bg-primary/90 text-on-primary-fixedlack font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Creating...' : 'Create Session'}
                 </button>
@@ -393,29 +393,29 @@ export const CreateSessionPage: React.FC = () => {
                     <ArrowLeft size={20} />
                 </Button>
                 <div>
-                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Create Session</h2>
+                    <h2 className="text-2xl font-bold text-foreground">Create Session</h2>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 
                 {/* 1. Location / Context Section */}
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+                <div className="bg-card text-foreground border border-border rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
                     {/* Collapsed View (Summary) */}
                     {!isHierarchyExpanded && selectedDepartments.length > 0 ? (
-                        <div className="p-4 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50">
+                        <div className="p-4 flex items-center justify-between bg-muted/50">
                             <div className="flex items-center gap-3">
                                 <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
                                     <Building2 size={20} />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-zinc-500 uppercase tracking-wide font-bold">Departments</p>
-                                    <p className="font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-bold">Departments</p>
+                                    <p className="font-semibold text-foreground flex items-center gap-2">
                                         {selectedDepartments.length} Selected
                                     </p>
                                 </div>
                             </div>
-                            <Button variant="ghost" size="sm" onClick={() => setIsHierarchyExpanded(true)} type="button" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
+                            <Button variant="ghost" size="sm" onClick={() => setIsHierarchyExpanded(true)} type="button" className="text-muted-foreground hover:text-foreground">
                                 <Edit2 size={14} className="mr-2" /> Change
                             </Button>
                         </div>
@@ -424,16 +424,16 @@ export const CreateSessionPage: React.FC = () => {
                         <div className="p-6 space-y-5 animate-in slide-in-from-top-2">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-lg text-zinc-600 dark:text-zinc-400">
+                                    <div className="bg-inputccent p-2 rounded-lg text-muted-foreground">
                                         <MapPin size={20} />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-zinc-900 dark:text-white">Location Context</h3>
-                                        <p className="text-xs text-zinc-500">Where does this course belong?</p>
+                                        <h3 className="font-semibold text-foreground">Location Context</h3>
+                                        <p className="text-xs text-muted-foreground">Where does this course belong?</p>
                                     </div>
                                 </div>
                                 {selectedDepartments.length > 0 && (
-                                    <Button variant="ghost" size="icon" onClick={() => setIsHierarchyExpanded(false)} type="button" className="h-8 w-8 -mt-2 -mr-2 text-zinc-400">
+                                    <Button variant="ghost" size="icon" onClick={() => setIsHierarchyExpanded(false)} type="button" className="h-8 w-8 -mt-2 -mr-2 text-muted-foreground">
                                         <X size={16} />
                                     </Button>
                                 )}
@@ -441,29 +441,29 @@ export const CreateSessionPage: React.FC = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-zinc-500 uppercase mb-1.5">Institution</label>
+                                    <label className="block text-xs font-medium text-muted-foreground uppercase mb-1.5">Institution</label>
                                     <div className="relative">
                                         <select
                                             value={selectedInstitution || ''}
                                             onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
+                                            className="w-full bg-muted border border-border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
                                         >
                                             <option value="">Select Institution</option>
                                             {institutions.map(inst => (
                                                 <option key={inst.id} value={inst.id}>{inst.full_name}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={14} />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-zinc-500 uppercase mb-1.5">College (Optional)</label>
+                                    <label className="block text-xs font-medium text-muted-foreground uppercase mb-1.5">College (Optional)</label>
                                     <div className="relative">
                                         <select
                                             value={selectedCollege || ''}
                                             onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50"
+                                            className="w-full bg-muted border border-border rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50"
                                             disabled={!selectedInstitution}
                                         >
                                             <option value="">All Colleges</option>
@@ -471,26 +471,26 @@ export const CreateSessionPage: React.FC = () => {
                                                 <option key={col.id} value={col.id}>{col.name}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={14} />
                                     </div>
                                 </div>
                             </div>
 
                             <div>
                                 <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-xs font-medium text-zinc-500 uppercase">Select Departments</label>
+                                    <label className="block text-xs font-medium text-muted-foreground uppercase">Select Departments</label>
                                     <span className="text-xs text-primary font-medium">{selectedDepartments.length} selected</span>
                                 </div>
                                 {selectedInstitution ? (
                                     <div className="space-y-3">
                                         <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                                             <input
                                                 type="text"
                                                 placeholder="Filter departments..."
                                                 value={deptSearchTerm}
                                                 onChange={(e) => setDeptSearchTerm(e.target.value)}
-                                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                                                className="w-full bg-muted border border-border rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                                             />
                                         </div>
                                         
@@ -504,16 +504,16 @@ export const CreateSessionPage: React.FC = () => {
                                                         className={`cursor-pointer p-3 rounded-xl border transition-all relative group ${
                                                             isSelected
                                                             ? 'bg-primary/10 border-primary shadow-sm' 
-                                                            : 'bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
+                                                            : 'bg-zinc-50 dark:bg-zinc-950 border-border hover:border-zinc-300 dark:hover:border-zinc-700'
                                                         }`}
                                                     >
                                                         <div className="flex justify-between items-start">
                                                             <div>
-                                                                <h4 className={`font-semibold text-sm ${isSelected ? 'text-primary' : 'text-zinc-900 dark:text-white'}`}>{dept.name}</h4>
+                                                                <h4 className={`font-semibold text-sm ${isSelected ? 'text-primary' : 'text-foreground'}`}>{dept.name}</h4>
                                                                 <p className="text-xs opacity-70 font-mono mt-0.5">{dept.code}</p>
                                                             </div>
                                                             {isSelected && (
-                                                                <div className="bg-primary text-black rounded-full p-0.5">
+                                                                <div className="bg-primary text-on-primary-fixedlack rounded-full p-0.5">
                                                                     <Check size={12} strokeWidth={3} />
                                                                 </div>
                                                             )}
@@ -522,14 +522,14 @@ export const CreateSessionPage: React.FC = () => {
                                                 );
                                             })}
                                             {filteredDepartments.length === 0 && (
-                                                <div className="col-span-full text-center py-6 text-zinc-500 text-sm italic bg-zinc-50 dark:bg-zinc-950 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
+                                                <div className="col-span-full text-center py-6 text-muted-foreground text-sm italic bg-muted rounded-xl border border-dashed border-border">
                                                     No departments found.
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-zinc-50 dark:bg-zinc-950 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg p-6 text-center text-zinc-500 text-sm">
+                                    <div className="bg-muted border border-dashed border-border rounded-lg p-6 text-center text-muted-foreground text-sm">
                                         Please select an institution first to view departments.
                                     </div>
                                 )}
@@ -539,14 +539,14 @@ export const CreateSessionPage: React.FC = () => {
                 </div>
 
                 {/* 2. Core Session Details */}
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="bg-card text-foreground border border-border rounded-2xl p-6 shadow-sm space-y-6">
                     <div>
-                        <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Select Course</label>
+                        <label className="block text-sm font-bold text-foreground mb-2">Select Course</label>
                         <div className="relative">
                             <select
                                 value={selectedCourse}
                                 onChange={(e) => setSelectedCourse(e.target.value)}
-                                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50 transition-all"
+                                className="w-full bg-muted border border-border rounded-xl p-4 text-on-primary-fixedase outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50 transition-all"
                                 disabled={selectedDepartments.length === 0}
                                 required
                             >
@@ -555,19 +555,19 @@ export const CreateSessionPage: React.FC = () => {
                                     <option key={course.id} value={course.id}>{course.code} - {course.title}</option>
                                 ))}
                             </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={20} />
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={20} />
                         </div>
-                        {selectedDepartments.length === 0 && <p className="text-xs text-amber-500 mt-2 flex items-center gap-1"><AlertCircle size={12}/> Please select at least one department above first.</p>}
+                        {selectedDepartments.length === 0 && <p className="text-xs text-muted-foregroundmber-500 mt-2 flex items-center gap-1"><AlertCircle size={12}/> Please select at least one department above first.</p>}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Venue</label>
+                            <label className="block text-sm font-bold text-foreground mb-2">Venue</label>
                             <div className="relative">
                                 <select
                                     value={selectedVenue}
                                     onChange={(e) => setSelectedVenue(e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
+                                    className="w-full bg-muted border border-border rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
                                     required
                                 >
                                     <option value="">Select venue...</option>
@@ -575,12 +575,12 @@ export const CreateSessionPage: React.FC = () => {
                                         <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
                                     ))}
                                 </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Duration</label>
+                            <label className="block text-sm font-bold text-foreground mb-2">Duration</label>
                             <div className="flex gap-2 mb-2">
                                 <div className="relative flex-1">
                                     <Input 
@@ -595,14 +595,14 @@ export const CreateSessionPage: React.FC = () => {
                                 </div>
                                 <div className="relative w-28">
                                     <select 
-                                        className="w-full h-[42px] bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 text-sm focus:ring-primary focus:border-primary outline-none appearance-none"
+                                        className="w-full h-[42px] bg-muted border border-border rounded-lg px-3 text-sm focus:ring-primary focus:border-primary outline-none appearance-none"
                                         value={durationUnit}
                                         onChange={(e) => setDurationUnit(e.target.value as any)}
                                     >
                                         <option value="minutes">Mins</option>
                                         <option value="hours">Hours</option>
                                     </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={14} />
                                 </div>
                             </div>
                             <div className="flex gap-2 flex-wrap">
@@ -617,10 +617,10 @@ export const CreateSessionPage: React.FC = () => {
 
                 {/* Action Bar */}
                 <div className="sticky bottom-4 z-10">
-                     <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4">
+                     <div className="bg-card/80 backdrop-blur-lg border border-border p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4">
                         <div className="hidden sm:block">
-                            <p className="text-sm font-medium text-zinc-900 dark:text-white">Ready to start?</p>
-                            <p className="text-xs text-zinc-500">Students can join immediately.</p>
+                            <p className="text-sm font-medium text-foreground">Ready to start?</p>
+                            <p className="text-xs text-muted-foreground">Students can join immediately.</p>
                         </div>
                         <div className="flex gap-3 w-full sm:w-auto">
                             <Button variant="secondary" className="flex-1 sm:flex-none" onClick={() => navigate('/dashboard')} type="button">

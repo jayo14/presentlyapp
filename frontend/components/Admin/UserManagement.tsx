@@ -140,11 +140,11 @@ export const UserManagement: React.FC = () => {
       case UserRole.ADMIN:
         return 'bg-purple-500/10 text-purple-500 border-purple-500/30';
       case UserRole.LECTURER:
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/30';
+        return 'bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500 border-blue-500/30';
       case UserRole.CLASS_REP:
         return 'bg-green-500/10 text-green-500 border-green-500/30';
       default:
-        return 'bg-zinc-700 text-zinc-400 border-zinc-600';
+        return 'bg-zinc-700 text-muted-foreground border-zinc-600';
     }
   };
 
@@ -186,7 +186,7 @@ export const UserManagement: React.FC = () => {
           <Users className="w-8 h-8 text-primary" />
           <div>
             <h2 className="text-2xl font-bold text-foreground">User Management</h2>
-            <p className="text-sm text-zinc-400">Manage system users and permissions</p>
+            <p className="text-sm text-muted-foreground">Manage system users and permissions</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -210,24 +210,24 @@ export const UserManagement: React.FC = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <p className="text-zinc-400 text-sm">Total Users</p>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-muted-foreground text-sm">Total Users</p>
           <p className="text-2xl font-bold text-foreground">{users.length}</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <p className="text-zinc-400 text-sm">Students</p>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-muted-foreground text-sm">Students</p>
           <p className="text-2xl font-bold text-foreground">
             {users.filter(u => u.role === UserRole.STUDENT).length}
           </p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <p className="text-zinc-400 text-sm">Lecturers</p>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-muted-foreground text-sm">Lecturers</p>
           <p className="text-2xl font-bold text-foreground">
             {users.filter(u => u.role === UserRole.LECTURER).length}
           </p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <p className="text-zinc-400 text-sm">Admins</p>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-muted-foreground text-sm">Admins</p>
           <p className="text-2xl font-bold text-foreground">
             {users.filter(u => u.role === UserRole.ADMIN).length}
           </p>
@@ -237,7 +237,7 @@ export const UserManagement: React.FC = () => {
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search users..."
@@ -250,7 +250,7 @@ export const UserManagement: React.FC = () => {
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-foreground focus:outline-none focus:border-primary"
+          className="px-4 py-2 bg-accent border border-border rounded-lg text-foreground focus:outline-none focus:border-primary"
         >
           <option value="all">All Roles</option>
           <option value={UserRole.STUDENT}>Students</option>
@@ -261,28 +261,28 @@ export const UserManagement: React.FC = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-zinc-800">
+            <thead className="bg-accent">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
               {filteredUsers.map(user => (
-                <tr key={user.id} className="hover:bg-zinc-800/50 transition-colors">
+                <tr key={user.id} className="hover:bg-accent/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -292,7 +292,7 @@ export const UserManagement: React.FC = () => {
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-foreground">{user.name || 'No Name'}</div>
-                        <div className="text-sm text-zinc-400">{user.email}</div>
+                        <div className="text-sm text-muted-foreground">{user.email}</div>
                       </div>
                     </div>
                   </td>
@@ -321,7 +321,7 @@ export const UserManagement: React.FC = () => {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleViewUser(user)}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-all"
+                        className="p-2 text-muted-foreground hover:text-primary-foreground hover:bg-zinc-700 rounded-lg transition-all"
                         title="View Details"
                       >
                         <Eye className="w-4 h-4" />
@@ -333,7 +333,7 @@ export const UserManagement: React.FC = () => {
                           className={`p-2 rounded-lg transition-all ${
                             showActionsMenu === user.id 
                               ? 'bg-primary text-white' 
-                              : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
+                              : 'text-muted-foreground hover:text-white hover:bg-zinc-700'
                           }`}
                           title="More Actions"
                         >
@@ -346,13 +346,13 @@ export const UserManagement: React.FC = () => {
                               className="fixed inset-0 z-10" 
                               onClick={() => setShowActionsMenu(null)}
                             ></div>
-                            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-zinc-900 border border-zinc-800 shadow-2xl z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-card border border-border shadow-2xl z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right">
                               <button
                                 onClick={() => {
                                   handleSendEmail(user.email);
                                   setShowActionsMenu(null);
                                 }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-accent transition-colors"
                               >
                                 <Mail className="w-4 h-4" />
                                 <span>Send Email</span>
@@ -362,7 +362,7 @@ export const UserManagement: React.FC = () => {
                                   handleResetPassword(user.id, user.email);
                                   setShowActionsMenu(null);
                                 }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-accent transition-colors"
                               >
                                 <Key className="w-4 h-4" />
                                 <span>Reset Password</span>
@@ -390,7 +390,7 @@ export const UserManagement: React.FC = () => {
                                   </>
                                 )}
                               </button>
-                              <div className="h-px bg-zinc-800 my-1"></div>
+                              <div className="h-px bg-accent my-1"></div>
                               <button
                                 onClick={() => {
                                   handleDeleteUser(user.id);
@@ -413,24 +413,24 @@ export const UserManagement: React.FC = () => {
           </table>
         </div>
         <div className="flex items-center justify-between p-4">
-          <span className="text-sm text-zinc-400">
+          <span className="text-sm text-muted-foreground">
             Showing {users.length} of {totalUsers} users
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 text-sm rounded-md border border-zinc-700 bg-zinc-800 text-white hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm rounded-md border border-border bg-accent text-primary-foreground hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Previous
             </button>
-            <span className="text-sm text-zinc-400 px-2">
+            <span className="text-sm text-muted-foreground px-2">
               {currentPage} / {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 text-sm rounded-md border border-zinc-700 bg-zinc-800 text-white hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm rounded-md border border-border bg-accent text-primary-foreground hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next
             </button>
@@ -441,23 +441,23 @@ export const UserManagement: React.FC = () => {
       {filteredUsers.length === 0 && !loading && (
         <div className="text-center py-12">
           <Users className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-          <p className="text-zinc-400">No users found</p>
+          <p className="text-muted-foreground">No users found</p>
         </div>
       )}
 
       {/* User Details Modal */}
       {showModal && selectedUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-50 p-4">
           <div 
             {...modalProps}
             aria-labelledby="user-details-title"
-            className="bg-zinc-900 border border-zinc-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
+            className="bg-card border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
           >
-            <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
+            <div className="p-6 border-b border-border flex justify-between items-center">
               <h3 id="user-details-title" className="text-xl font-bold text-foreground">User Details</h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-zinc-400 hover:text-white transition-colors"
+                className="text-muted-foreground hover:text-primary-foreground transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -472,7 +472,7 @@ export const UserManagement: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold text-foreground">{selectedUser.name || 'No Name'}</h4>
-                  <p className="text-zinc-400">{selectedUser.email}</p>
+                  <p className="text-muted-foreground">{selectedUser.email}</p>
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 border ${getRoleColor(selectedUser.role)}`}>
                     {selectedUser.role}
                   </span>
@@ -481,44 +481,44 @@ export const UserManagement: React.FC = () => {
               
               <div className="grid grid-cols-2 gap-4 mt-6">
                 <div>
-                  <p className="text-xs text-zinc-500 uppercase">Status</p>
+                  <p className="text-xs text-muted-foreground uppercase">Status</p>
                   <p className="text-foreground font-medium mt-1">
                     {selectedUser.is_active !== false ? 'Active' : 'Suspended'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-500 uppercase">Onboarding</p>
+                  <p className="text-xs text-muted-foreground uppercase">Onboarding</p>
                   <p className="text-foreground font-medium mt-1">
                     {selectedUser.onboarding_complete ? 'Complete' : 'Pending'}
                   </p>
                 </div>
                 {selectedUser.matric_number && (
                   <div>
-                    <p className="text-xs text-zinc-500 uppercase">Matric Number</p>
+                    <p className="text-xs text-muted-foreground uppercase">Matric Number</p>
                     <p className="text-foreground font-medium mt-1">{selectedUser.matric_number}</p>
                   </div>
                 )}
                 {selectedUser.level && (
                   <div>
-                    <p className="text-xs text-zinc-500 uppercase">Level</p>
+                    <p className="text-xs text-muted-foreground uppercase">Level</p>
                     <p className="text-foreground font-medium mt-1">{selectedUser.level}</p>
                   </div>
                 )}
                 {selectedUser.department && (
                   <div className="col-span-2">
-                    <p className="text-xs text-zinc-500 uppercase">Department</p>
+                    <p className="text-xs text-muted-foreground uppercase">Department</p>
                     <p className="text-foreground font-medium mt-1">{selectedUser.department}</p>
                   </div>
                 )}
                 {selectedUser.college && (
                   <div className="col-span-2">
-                    <p className="text-xs text-zinc-500 uppercase">College</p>
+                    <p className="text-xs text-muted-foreground uppercase">College</p>
                     <p className="text-foreground font-medium mt-1">{selectedUser.college}</p>
                   </div>
                 )}
               </div>
 
-              <div className="flex gap-2 mt-6 pt-4 border-t border-zinc-800">
+              <div className="flex gap-2 mt-6 pt-4 border-t border-border">
                 <Button
                   variant="secondary"
                   onClick={() => handleSendEmail(selectedUser.email)}
