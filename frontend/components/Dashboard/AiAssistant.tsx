@@ -69,21 +69,21 @@ export const AiAssistant: React.FC = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[350px] md:w-[400px] h-[500px] bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
+        <div className="fixed bottom-6 right-6 z-50 w-[350px] md:w-[400px] h-[500px] bg-surfaceLow border border-outline rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
           {/* Header */}
-          <div className="p-4 border-b border-zinc-800 bg-zinc-900 flex justify-between items-center">
+          <div className="p-4 border-b border-outline bg-surfaceLow flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                 <Sparkles size={16} />
               </div>
               <div>
-                <h3 className="font-semibold text-white text-sm">Presently AI</h3>
-                <p className="text-xs text-muted-foreground">Powered by Gemini</p>
+                <h3 className="font-headline font-semibold text-text text-sm">Presently AI</h3>
+                <p className="text-xs text-textMuted">Powered by Gemini</p>
               </div>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
-              className="text-muted-foreground hover:text-white p-1 rounded-md hover:bg-zinc-800 transition-colors"
+              className="text-textMuted hover:text-text p-1 rounded-md hover:bg-surfaceLow transition-colors"
             >
               <X size={18} />
             </button>
@@ -109,8 +109,8 @@ export const AiAssistant: React.FC = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-3">
-                  <Loader2 size={16} className="animate-spin text-muted-foreground" />
+                <div className="bg-surfaceLow rounded-2xl rounded-tl-sm px-4 py-3">
+                  <Loader2 size={16} className="animate-spin text-textMuted" />
                 </div>
               </div>
             )}
@@ -118,13 +118,13 @@ export const AiAssistant: React.FC = () => {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSend} className="p-3 border-t border-zinc-800 bg-zinc-900 flex gap-2">
+          <form onSubmit={handleSend} className="p-3 border-t border-outline bg-surfaceLow flex gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask anything..."
-              className="flex-1 bg-zinc-800 border-none rounded-xl px-4 text-sm text-white focus:ring-1 focus:ring-primary placeholder-zinc-500"
+              className="flex-1 bg-surfaceLow border-none rounded-xl px-4 text-sm text-text focus:ring-1 focus:ring-primary placeholder:text-textMuted"
             />
             <Button 
               type="submit" 

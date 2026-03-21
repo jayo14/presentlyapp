@@ -89,7 +89,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
         </div>
         
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-textMuted">
           {navItems.map((item) => {
             const active = isActive(item);
             return (
@@ -111,14 +111,14 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               </Link>
             );
           })}
-          <div className="h-4 w-px bg-card/10 mx-2" />
-          <Button variant="ghost" className="text-primary-foreground hover:text-primary px-4" onClick={handleLogin}>Sign In</Button>
+          <div className="h-4 w-px bg-surface/10 mx-2" />
+          <Button variant="ghost" className="text-text hover:text-primary px-4" onClick={handleLogin}>Sign In</Button>
           <Button className="bg-primary text-on-primary-fixedlack hover:bg-primary-dark px-6 font-bold" onClick={handleGetStarted}>Get Started</Button>
         </div>
 
         {/* Mobile Menu Toggle */}
         <button 
-          className="md:hidden p-2 text-muted-foreground hover:text-primary-foreground"
+          className="md:hidden p-2 text-textMuted hover:text-text"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -154,7 +154,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               })}
               <hr className="border-white/5" />
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full h-14 border-white/10 text-primary-foreground" onClick={handleLogin}>Sign In</Button>
+                <Button variant="outline" className="w-full h-14 border-white/10 text-text" onClick={handleLogin}>Sign In</Button>
                 <Button className="w-full h-14 bg-primary text-on-primary-fixedlack font-bold" onClick={handleGetStarted}>Get Started</Button>
               </div>
             </div>

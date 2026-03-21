@@ -124,7 +124,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
       <div 
         {...modalProps}
         aria-labelledby="checkin-title"
-        className="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl outline-none"
+        className="bg-surface border border-outline rounded-2xl max-w-md w-full p-6 shadow-2xl outline-none"
       >
         {/* Header */}
         <div className="text-center mb-6" aria-live="polite">
@@ -135,14 +135,14 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
             {status === 'success' && <CheckCircle className="w-8 h-8 text-green-500" />}
             {status === 'error' && <XCircle className="w-8 h-8 text-red-500" />}
           </div>
-          <h2 id="checkin-title" className="text-2xl font-bold text-foreground mb-2">
+          <h2 id="checkin-title" className="font-headline text-2xl font-bold text-text mb-2">
             {status === 'idle' && 'Check In to Session'}
             {status === 'locating' && 'Getting Location...'}
             {status === 'verifying' && 'Verifying...'}
             {status === 'success' && 'Success!'}
             {status === 'error' && 'Check-In Failed'}
           </h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-textMuted text-sm">
             {status === 'idle' && 'Enter your session code to check in'}
             {status === 'locating' && 'Please allow location access'}
             {status === 'verifying' && 'Verifying your location and session'}
@@ -185,7 +185,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         {(status === 'idle' || status === 'error') && (
           <form onSubmit={handleCheckIn} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
+              <label className="block text-sm font-medium text-textMuted mb-2">
                 Session Code
               </label>
               <Input
@@ -228,7 +228,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
                 Close
               </Button>
             ) : (
-              <div className="text-center text-muted-foreground text-sm">
+              <div className="text-center text-textMuted text-sm">
                 Please wait...
               </div>
             )}
@@ -236,8 +236,8 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         )}
 
         {/* Additional Info */}
-        <div className="mt-6 pt-4 border-t border-border">
-          <div className="flex items-start gap-2 text-xs text-muted-foreground">
+        <div className="mt-6 pt-4 border-t border-outline">
+          <div className="flex items-start gap-2 text-xs text-textMuted">
             <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <p>
               Your location will be used to verify you are within the venue boundaries.

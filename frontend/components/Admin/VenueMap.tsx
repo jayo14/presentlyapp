@@ -895,19 +895,19 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         <div className="relative">
           <Search
             size={15}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none"
           />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search venues…"
-            className="w-full pl-8 pr-8 py-1.5 text-sm bg-card text-foreground border border-border rounded-lg shadow text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full pl-8 pr-8 py-1.5 text-sm bg-surface text-text border border-outline rounded-lg shadow text-text focus:outline-none focus:ring-1 focus:ring-primary"
           />
           {searchTerm && (
             <button
               onClick={() => { setSearchTerm(''); setSearchResults([]); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMuted"
             >
               <CloseIcon size={14} />
             </button>
@@ -916,7 +916,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
         {/* Dropdown results */}
         {searchResults.length > 0 && (
-          <ul className="mt-1 bg-card text-foreground border border-border rounded-lg shadow-lg overflow-hidden">
+          <ul className="mt-1 bg-surface text-text border border-outline rounded-lg shadow-lg overflow-hidden">
             {searchResults.map((v) => (
               <li key={v.id}>
                 <button
@@ -933,9 +933,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
                     style={{ backgroundColor: v.venue_color || '#6366f1' }}
                   />
                   <div>
-                    <p className="font-medium text-foreground">{v.name}</p>
+                    <p className="font-medium text-text">{v.name}</p>
                     {v.building_name && (
-                      <p className="text-xs text-muted-foreground">{v.building_name}</p>
+                      <p className="text-xs text-textMuted">{v.building_name}</p>
                     )}
                   </div>
                 </button>
@@ -947,7 +947,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
       {/* Map-style / reset controls (top-right) */}
       <div className="absolute top-4 right-12 z-10 flex flex-col gap-2">
-        <div className="bg-card text-foreground border border-border rounded-xl shadow-xl flex flex-col overflow-hidden">
+        <div className="bg-surface text-text border border-outline rounded-xl shadow-xl flex flex-col overflow-hidden">
           <button
             onClick={() => setMapType('road')}
             className={`p-2 transition-colors flex items-center justify-center ${
@@ -981,10 +981,10 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           >
             {isLocating ? <Loader2 size={20} className="animate-spin" /> : <Navigation size={20} />}
           </button>
-          <div className="h-px bg-zinc-200" />
+          <div className="h-px bg-surfaceLow" />
           <button
             onClick={handleReset}
-            className="p-2 text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors flex items-center justify-center"
+            className="p-2 text-textMuted hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors flex items-center justify-center"
             title="Reset View"
           >
             <RefreshCw size={20} />
@@ -1001,36 +1001,36 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
             </svg>
             Draw Mode Active
           </span>
-          <span className="bg-card text-muted-foreground text-xs px-3 py-1.5 rounded-lg border border-border shadow">
+          <span className="bg-surface text-textMuted text-xs px-3 py-1.5 rounded-lg border border-outline shadow">
             Click to add vertices • Double-click to finish • ESC to cancel
           </span>
         </div>
       )}
 
       {/* Map Legend */}
-      <div className="absolute bottom-4 right-4 z-10 bg-card/90 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[140px]">
-        <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Map Legend</h4>
+      <div className="absolute bottom-4 right-4 z-10 bg-surface/90 backdrop-blur-sm border border-outline rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[140px]">
+        <h4 className="font-headline text-[10px] font-bold uppercase tracking-wider text-textMuted">Map Legend</h4>
         
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#ef4444] border border-white shadow-sm relative overflow-visible">
             <div className="absolute inset-0 rounded-full bg-[#ef4444] animate-ping opacity-40"></div>
           </div>
-          <span className="text-xs font-medium text-foreground">Active Session</span>
+          <span className="text-xs font-medium text-text">Active Session</span>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#f9c406] border border-white shadow-sm"></div>
-          <span className="text-xs font-medium text-foreground">Selected Venue</span>
+          <span className="text-xs font-medium text-text">Selected Venue</span>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#3b82f6] border border-white shadow-sm"></div>
-          <span className="text-xs font-medium text-foreground">Regular Venue</span>
+          <span className="text-xs font-medium text-text">Regular Venue</span>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-[#a855f7] border border-white shadow-sm transform rotate-45"></div>
-          <span className="text-xs font-medium text-foreground">Your Location</span>
+          <span className="text-xs font-medium text-text">Your Location</span>
         </div>
       </div>
 

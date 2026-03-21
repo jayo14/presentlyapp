@@ -49,16 +49,16 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
 
   // Mobile Layout matching Design 5
   return (
-    <div className="min-h-screen bg-[#3A3A2F] text-primary-foreground flex flex-col">
+    <div className="min-h-screen bg-[#3A3A2F] text-text flex flex-col">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#2A2A25]">
         <button 
           onClick={handleBackToHome}
-          className="p-2 hover:bg-card/10 rounded-lg transition-colors"
+          className="p-2 hover:bg-surface/10 rounded-lg transition-colors"
         >
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold">Success</h1>
+        <h1 className="font-headline text-xl font-bold">Success</h1>
         <div className="w-10"></div> {/* Spacer for centering */}
       </div>
 
@@ -95,7 +95,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
           transition={{ delay: 0.3 }}
           className="text-center mb-8"
         >
-          <h2 className="text-3xl font-bold mb-2">Attendance Marked!</h2>
+          <h2 className="font-headline text-3xl font-bold mb-2">Attendance Marked!</h2>
           <p className="text-[#FFD700] text-sm">You're all set for today's lecture.</p>
         </motion.div>
 
@@ -115,19 +115,19 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
           </div>
 
           {/* Course Info */}
-          <h3 className="text-xl font-bold mb-4">
+          <h3 className="font-headline text-xl font-bold mb-4">
             {courseCode} - {courseName}
           </h3>
 
           {/* Location and Time */}
           <div className="space-y-3 mb-4">
             <div className="flex items-center gap-3 text-sm">
-              <MapPin size={18} className="text-gray-400" />
-              <span className="text-gray-300">Location: {location}</span>
+              <MapPin size={18} className="text-textMuted" />
+              <span className="text-textMuted">Location: {location}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <Clock size={18} className="text-gray-400" />
-              <span className="text-gray-300">Time: {time}</span>
+              <Clock size={18} className="text-textMuted" />
+              <span className="text-textMuted">Time: {time}</span>
             </div>
           </div>
 
@@ -138,7 +138,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
             </div>
           ) : (
             <div className="w-full h-32 bg-[#3A3A30] rounded-xl flex items-center justify-center">
-              <MapPin size={32} className="text-gray-600" />
+              <MapPin size={32} className="text-textMuted" />
             </div>
           )}
         </motion.div>
@@ -159,7 +159,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
           
           <button
             onClick={handleShare}
-            className="w-full bg-[#2A2A25] text-primary-foreground py-4 rounded-xl font-bold hover:bg-[#3A3A30] transition-colors flex items-center justify-center gap-2 border border-[#3A3A30]"
+            className="w-full bg-[#2A2A25] text-text py-4 rounded-xl font-bold hover:bg-[#3A3A30] transition-colors flex items-center justify-center gap-2 border border-[#3A3A30]"
           >
             <Share2 size={20} />
             Share Progress

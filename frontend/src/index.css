@@ -63,43 +63,48 @@
   }
 
   .dark {
+    --background:               #121212;
+    --surface:                  #1e1e1e;
+    --surface-bright:           #2a2a2a;
+    --surface-container:        #1a1a1a;
+    --surface-container-low:    #181818;
+    --surface-container-lowest: #151515;
+    --surface-container-high:   #242424;
+    --surface-container-highest:#2c2c2c;
+    --surface-variant:          #3a3a3a;
+
+    --on-surface:               #f5f5f5;
+    --on-surface-variant:       #cfc6b0;
+
+    --outline-variant:          #5a5340;
+
     --primary:                  #ffca0d;
-    --primary-container:        #755b00;
+    --primary-container:        #f3c000;
     --primary-fixed:            #f3c000;
     --primary-fixed-dim:        #ffdf90;
-    --on-primary-fixed:         #ffeebf;
+    --on-primary-fixed:         #241a00;
+
     --secondary:                #c8c6c9;
     --secondary-fixed-dim:      #5f5e61;
-    --surface:                  #1b1b1e;
-    --surface-bright:           #303033;
-    --surface-container:        #262629;
-    --surface-container-low:    #1b1b1e;
-    --surface-container-lowest: #0f0f11;
-    --surface-container-high:   #303033;
-    --surface-container-highest:#3b3b3e;
-    --surface-variant:          #4e4632;
-    --on-surface:               #fbf8fc;
-    --on-surface-variant:       #d2c5ab;
-    --background:               #121212;
-    --outline-variant:          #4e4632;
+
     --error:                    #ffb4ab;
     --inverse-surface:          #fbf8fc;
 
     /* Semantic tokens for shadcn compats */
     --foreground: var(--on-surface);
-    --card: #18181b;
-    --card-foreground: #fbf8fc;
-    --popover: #18181b;
-    --popover-foreground: #fbf8fc;
+    --card: var(--surface);
+    --card-foreground: var(--on-surface);
+    --popover: var(--surface);
+    --popover-foreground: var(--on-surface);
     --primary-foreground: #241a00;
     --secondary-foreground: #fbf8fc;
-    --muted: #27272a;
-    --muted-foreground: oklch(0.708 0 0);
+    --muted: var(--surface-container-low);
+    --muted-foreground: var(--on-surface-variant);
     --accent: var(--surface-container-high);
     --accent-foreground: var(--on-surface);
     --destructive: oklch(0.704 0.191 22.216);
-    --border: #27272a;
-    --input: #27272a;
+    --border: var(--outline-variant);
+    --input: var(--surface-variant);
     --ring: var(--primary-container);
   }
 
@@ -126,13 +131,9 @@
 
 @layer components {
   .glass-panel {
-    background: rgba(255,255,255,0.82);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-  }
-  
-  .dark .glass-panel {
-    background: rgba(30, 30, 34, 0.82);
   }
   
   .editorial-shadow { box-shadow: 0 12px 32px rgba(27,27,30,0.07); }

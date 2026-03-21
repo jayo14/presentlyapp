@@ -405,13 +405,13 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         >
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center bg-card/10 hover:bg-card/20 backdrop-blur-lg rounded-full transition-colors"
+            className="w-10 h-10 flex items-center justify-center bg-surface/10 hover:bg-surface/20 backdrop-blur-lg rounded-full transition-colors"
             aria-label="Close scanner"
           >
-            <X className="w-5 h-5 text-primary-foreground" />
+            <X className="w-5 h-5 text-text" />
           </button>
           
-          <div className="px-4 py-2 bg-card/10 backdrop-blur-lg rounded-full text-primary-foreground text-sm font-medium">
+          <div className="px-4 py-2 bg-surface/10 backdrop-blur-lg rounded-full text-text text-sm font-medium">
             Mark Attendance
           </div>
 
@@ -476,7 +476,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               {status === 'verifying' && <Loader2 className="w-5 h-5 text-on-primary-fixedlue-400 animate-spin" />}
               {status === 'success' && <CheckCircle className="w-5 h-5 text-green-400" />}
               {status === 'error' && <XCircle className="w-5 h-5 text-red-400" />}
-              <p className="text-primary-foreground text-sm flex-1">{locationInfo}</p>
+              <p className="text-text text-sm flex-1">{locationInfo}</p>
             </motion.div>
           )}
 
@@ -515,7 +515,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               <div className="absolute inset-0 flex items-center justify-center bg-cardackgroundlack">
                 <div className="text-center">
                   <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                  <p className="text-primary-foreground/70">Starting camera...</p>
+                  <p className="text-text/70">Starting camera...</p>
                 </div>
               </div>
             )}
@@ -524,8 +524,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               <div className="absolute inset-0 flex items-center justify-center bg-cardackgroundlack p-8">
                 <div className="text-center">
                   <CameraIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                  <h3 className="text-primary-foreground text-xl font-bold mb-2">Camera Access Required</h3>
-                  <p className="text-primary-foreground/70 mb-6">Please enable camera permissions to scan QR codes</p>
+                  <h3 className="font-headline text-text text-xl font-bold mb-2">Camera Access Required</h3>
+                  <p className="text-text/70 mb-6">Please enable camera permissions to scan QR codes</p>
                   <Button onClick={startCamera} className="mx-auto">
                     Try Again
                   </Button>
@@ -546,10 +546,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 {/* Scanning Frame */}
                 <div className="relative w-[85vw] h-[85vw] max-w-[400px] max-h-[400px]">
                   {/* Pulsing Background Ring */}
-                  <div className="absolute inset-0 rounded-3xl border-border border-white/20 pulse-ring" />
+                  <div className="absolute inset-0 rounded-3xl border-outline border-white/20 pulse-ring" />
                   
                   {/* Main Frame */}
-                  <div className="absolute inset-0 rounded-3xl border-border border-white/30 bg-card/5 backdrop-blur-[2px] overflow-hidden">
+                  <div className="absolute inset-0 rounded-3xl border-outline border-white/30 bg-surface/5 backdrop-blur-[2px] overflow-hidden">
                     {/* Corner Indicators - Animated */}
                     <motion.div 
                       className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary rounded-tl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
@@ -601,7 +601,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
                   {/* Center Crosshair */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-8 h-8 border-border border-primary/50 rounded-full" />
+                    <div className="w-8 h-8 border-outline border-primary/50 rounded-full" />
                   </div>
                 </div>
 
@@ -617,7 +617,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                       repeat: isScanning ? Infinity : 0,
                     }}
                   >
-                    <p className="text-primary-foreground font-medium flex items-center gap-2 justify-center">
+                    <p className="text-text font-medium flex items-center gap-2 justify-center">
                       {isScanning && (
                         <motion.span
                           animate={{ rotate: 360 }}
@@ -649,8 +649,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 <Keyboard className="w-12 h-12 text-primary" />
               </div>
 
-              <h3 className="text-3xl font-bold text-primary-foreground text-center mb-3">Enter Session Code</h3>
-              <p className="text-primary-foreground/60 text-center mb-12">
+              <h3 className="font-headline text-3xl font-bold text-text text-center mb-3">Enter Session Code</h3>
+              <p className="text-text/60 text-center mb-12">
                 Type the 6-8 character code displayed on screen
               </p>
 
@@ -663,7 +663,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   placeholder="XXXXXXXX"
                   aria-label="Attendance Session Code"
                   autoFocus
-                  className="w-full bg-card/10 backdrop-blur-lg border-border border-white/20 rounded-2xl px-6 py-6 text-center text-4xl font-mono tracking-[0.3em] uppercase text-primary-foreground placeholder-white/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all mb-6"
+                  className="w-full bg-surface/10 backdrop-blur-lg border-outline border-white/20 rounded-2xl px-6 py-6 text-center text-4xl font-mono tracking-[0.3em] uppercase text-text placeholder-white/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all mb-6"
                 />
                 
                 {/* Paste Button for Accessibility */}
@@ -671,7 +671,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   <Button
                     onClick={handlePaste}
                     variant="secondary"
-                    className="bg-card/10 hover:bg-card/20 border-white/10 text-primary-foreground rounded-xl py-3 flex items-center gap-2"
+                    className="bg-surface/10 hover:bg-surface/20 border-white/10 text-text rounded-xl py-3 flex items-center gap-2"
                     aria-label="Paste session code from clipboard"
                   >
                     <Clipboard className="w-4 h-4" />
@@ -682,7 +682,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                     <Button
                       onClick={() => setSessionCode('')}
                       variant="secondary"
-                      className="bg-card/10 hover:bg-card/20 border-white/10 text-primary-foreground rounded-xl py-3 flex items-center gap-2"
+                      className="bg-surface/10 hover:bg-surface/20 border-white/10 text-text rounded-xl py-3 flex items-center gap-2"
                       aria-label="Clear session code"
                     >
                       <RotateCcw className="w-4 h-4" />
@@ -720,16 +720,16 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   <div className="w-24 h-24 bg-cardackgroundlue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
                     <MapPin className="w-12 h-12 text-on-primary-fixedlue-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-primary-foreground mb-2">Getting Location</h3>
-                  <p className="text-primary-foreground/60">Please wait...</p>
+                  <h3 className="font-headline text-2xl font-bold text-text mb-2">Getting Location</h3>
+                  <p className="text-text/60">Please wait...</p>
                 </>
               )}
 
               {status === 'verifying' && (
                 <>
                   <Loader2 className="w-24 h-24 text-primary animate-spin mx-auto mb-6" />
-                  <h3 className="text-2xl font-bold text-primary-foreground mb-2">Verifying</h3>
-                  <p className="text-primary-foreground/60">Checking your attendance...</p>
+                  <h3 className="font-headline text-2xl font-bold text-text mb-2">Verifying</h3>
+                  <p className="text-text/60">Checking your attendance...</p>
                 </>
               )}
             </div>
@@ -769,7 +769,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h3 className="text-2xl font-bold text-primary-foreground mb-2">Verification Failed</h3>
+                <h3 className="font-headline text-2xl font-bold text-text mb-2">Verification Failed</h3>
                 {errorMsg && errorMsg.includes(';') ? (() => {
                   const parts = errorMsg.split('.');
                   const header = parts.length > 1 ? parts[0] + '.' : 'Verification Details:';
@@ -802,10 +802,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-card/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 mb-6 text-left"
+                className="bg-surface/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 mb-6 text-left"
               >
-                <p className="text-primary-foreground/80 text-sm font-semibold mb-2">💡 Troubleshooting Tips:</p>
-                <ul className="text-primary-foreground/60 text-sm space-y-2">
+                <p className="text-text/80 text-sm font-semibold mb-2">💡 Troubleshooting Tips:</p>
+                <ul className="text-text/60 text-sm space-y-2">
                   <li>• Make sure you're within the required range</li>
                   <li>• Check if the session is still active</li>
                   <li>• Ensure your location services are enabled</li>
@@ -830,7 +830,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 
                 <button
                   onClick={handleSwitchToManual}
-                  className="w-full bg-card/10 hover:bg-card/20 text-primary-foreground font-semibold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 border border-white/20"
+                  className="w-full bg-surface/10 hover:bg-surface/20 text-text font-semibold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 border border-white/20"
                 >
                   <Edit3 className="w-5 h-5" />
                   Enter Code Manually
@@ -838,7 +838,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
                 <button
                   onClick={onClose}
-                  className="w-full text-primary-foreground/60 hover:text-primary-foreground font-medium py-3 transition-colors"
+                  className="w-full text-text/60 hover:text-text font-medium py-3 transition-colors"
                 >
                   Cancel
                 </button>

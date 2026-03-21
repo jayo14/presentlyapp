@@ -198,16 +198,16 @@ export const CourseModal: React.FC<CourseModalProps> = ({
       <div 
         {...modalProps}
         aria-labelledby="modal-title"
-        className="bg-card border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
+        className="bg-surface border border-outline rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
       >
         {/* Header */}
-        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-border bg-card">
-          <h2 id="modal-title" className="text-xl font-bold text-foreground">
+        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-outline bg-surface">
+          <h2 id="modal-title" className="font-headline text-xl font-bold text-text">
             {course ? 'Edit Course' : 'Create Course'}
           </h2>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-textMuted hover:text-text transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-6 h-6" />
@@ -225,20 +225,20 @@ export const CourseModal: React.FC<CourseModalProps> = ({
 
           {/* Hierarchical Selection */}
           <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Location in Hierarchy</h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <h3 className="font-headline text-lg font-semibold text-text mb-4">Location in Hierarchy</h3>
+            <p className="text-sm text-textMuted mb-4">
               Select the institutional hierarchy: Institution → College/Faculty → Department
             </p>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Institution *
                 </label>
                 <select
                   value={selectedInstitution || ''}
                   onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-                  className="w-full px-4 py-2 bg-accent border border-border rounded-full text-foreground focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary"
                   required
                 >
                   <option value="">Select Institution</option>
@@ -249,34 +249,34 @@ export const CourseModal: React.FC<CourseModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   College/Faculty
                 </label>
                 <select
                   value={selectedCollege || ''}
                   onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
                   disabled={!selectedInstitution}
-                  className="w-full px-4 py-2 bg-accent border border-border rounded-full text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select College/Faculty (Optional)</option>
                   {colleges.map(college => (
                     <option key={college.id} value={college.id}>{college.name}</option>
                   ))}
                 </select>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-textMuted mt-1">
                   Optional: Select a college to filter departments
                 </p>
               </div>
 
               <div className="relative">
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Department *
                 </label>
                 
                 {selectedInstitution ? (
                   <div className="space-y-2">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
                       <Input
                         type="text"
                         placeholder="Search departments..."
@@ -286,7 +286,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                       />
                     </div>
                     
-                    <div className="max-h-40 overflow-y-auto bg-card border border-border rounded-lg p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="max-h-40 overflow-y-auto bg-surface border border-outline rounded-lg p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                       {filteredDepartments
                         .filter(d => d.name.toLowerCase().includes(deptSearchTerm.toLowerCase()) || d.code.toLowerCase().includes(deptSearchTerm.toLowerCase()))
                         .map(dept => (
@@ -308,14 +308,14 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                         ))
                       }
                       {filteredDepartments.length === 0 && (
-                        <div className="col-span-full p-3 text-center text-xs text-muted-foreground italic">
+                        <div className="col-span-full p-3 text-center text-xs text-textMuted italic">
                           No departments found
                         </div>
                       )}
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full px-4 py-2 bg-accent/50 border border-border border-dashed rounded-lg text-muted-foreground text-sm italic">
+                  <div className="w-full px-4 py-2 bg-surfaceHigh/50 border border-outline border-dashed rounded-lg text-textMuted text-sm italic">
                     Please select an institution first
                   </div>
                 )}
@@ -325,10 +325,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({
 
           {/* Course Information */}
           <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Course Information</h3>
+            <h3 className="font-headline text-lg font-semibold text-text mb-4">Course Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Course Code *
                 </label>
                 <Input
@@ -341,7 +341,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Credit Units *
                 </label>
                 <Input
@@ -355,7 +355,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Course Title *
                 </label>
                 <Input
@@ -368,13 +368,13 @@ export const CourseModal: React.FC<CourseModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Level
                 </label>
                 <select
                   value={formData.level || ''}
                   onChange={(e) => handleChange('level', e.target.value)}
-                  className="w-full px-4 py-2 bg-accent border border-border rounded-full text-foreground focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary"
                 >
                   <option value="">Select Level</option>
                   <option value="100">100 Level</option>
@@ -387,13 +387,13 @@ export const CourseModal: React.FC<CourseModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Semester
                 </label>
                 <select
                   value={formData.semester || ''}
                   onChange={(e) => handleChange('semester', e.target.value)}
-                  className="w-full h-12 px-4 bg-accent border border-border rounded-full text-foreground focus:outline-none focus:border-primary transition-colors"
+                  className="w-full h-12 px-4 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary transition-colors"
                 >
                   <option value="">Select Semester</option>
                   <option value="FIRST">First Semester</option>
@@ -403,14 +403,14 @@ export const CourseModal: React.FC<CourseModalProps> = ({
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
+              <label className="block text-sm font-medium text-textMuted mb-2">
                 Description
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
                 placeholder="Brief description of the course"
-                className="w-full px-4 py-2 bg-accent border border-border rounded-3xl text-foreground focus:outline-none focus:border-primary min-h-[100px]"
+                className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-3xl text-text focus:outline-none focus:border-primary min-h-[100px]"
               />
             </div>
           </div>
@@ -422,15 +422,15 @@ export const CourseModal: React.FC<CourseModalProps> = ({
               id="is_active"
               checked={formData.is_active}
               onChange={(e) => handleChange('is_active', e.target.checked)}
-              className="w-4 h-4 rounded border-border bg-accent text-primary focus:ring-primary"
+              className="w-4 h-4 rounded border-outline bg-surfaceHigh text-primary focus:ring-primary"
             />
-            <label htmlFor="is_active" className="text-sm text-muted-foreground">
+            <label htmlFor="is_active" className="text-sm text-textMuted">
               Course is active and available
             </label>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 pt-4 border-t border-border">
+          <div className="flex items-center gap-3 pt-4 border-t border-outline">
             <Button
               type="submit"
               disabled={loading}

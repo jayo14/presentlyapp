@@ -84,7 +84,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       <div className="min-h-screen bg-light-background flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-16 h-16 border-input border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-light-text-secondary">Loading your courses...</p>
+          <p className="text-light-text-textMuted">Loading your courses...</p>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
               <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <h1 className="text-xl font-bold">My Courses</h1>
+          <h1 className="font-headline text-xl font-bold">My Courses</h1>
         </div>
       </div>
 
@@ -115,10 +115,10 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface rounded-full mb-4">
               <BookOpen size={32} className="text-light-text-tertiary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">
+            <h3 className="font-headline text-xl font-semibold mb-2">
               {searchTerm ? 'No courses found' : 'No courses yet'}
             </h3>
-            <p className="text-light-text-secondary mb-6">
+            <p className="text-light-text-textMuted mb-6">
               {searchTerm ? 'Try adjusting your search' : 'Start by registering for courses'}
             </p>
           </div>
@@ -177,8 +177,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 
                 {/* Course Info */}
                 <div className="p-4">
-                  <h3 className="font-bold text-lg mb-1 truncate">{course.course_name}</h3>
-                  <p className="text-sm text-light-text-secondary mb-3">
+                  <h3 className="font-headline font-bold text-lg mb-1 truncate">{course.course_name}</h3>
+                  <p className="text-sm text-light-text-textMuted mb-3">
                     {course.course_code} • {course.lecturer_name || 'Prof. Not Assigned'}
                   </p>
                   
@@ -215,7 +215,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       {/* Floating Add Button */}
       <button 
         onClick={() => setIsRegistrationOpen(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-primary-foreground shadow-lg hover:bg-primary-hover transition-colors"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-text shadow-lg hover:bg-primary-hover transition-colors"
       >
         <Plus size={28} />
       </button>
@@ -233,7 +233,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
           <span className="text-xs">Courses</span>
         </button>
         <button 
-          className="w-14 h-14 -mt-7 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground hover:bg-primary-hover transition-colors"
+          className="w-14 h-14 -mt-7 bg-primary rounded-2xl flex items-center justify-center text-text hover:bg-primary-hover transition-colors"
         >
           <QrCode size={28} />
         </button>
@@ -269,8 +269,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
               <GraduationCap className="text-primary" size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-light-text">My Courses</h1>
-              <p className="text-light-text-secondary">
+              <h1 className="font-headline text-3xl font-bold text-light-text">My Courses</h1>
+              <p className="text-light-text-textMuted">
                 {courses.length} {courses.length === 1 ? 'course' : 'courses'} enrolled
               </p>
             </div>
@@ -286,7 +286,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
               placeholder="Search courses, codes, or lecturers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-card border border-light-border rounded-full text-light-text placeholder-light-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-3 bg-surface border border-light-border rounded-full text-light-text placeholder-light-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           
@@ -294,7 +294,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="px-4 py-3 bg-card border border-light-border rounded-full text-light-text focus:outline-none focus:ring-2 focus:ring-primary"
+              className="px-4 py-3 bg-surface border border-light-border rounded-full text-light-text focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">All Courses</option>
               <option value="active">Active</option>
@@ -317,10 +317,10 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface rounded-full mb-4">
               <BookOpen className="text-light-text-tertiary" size={32} />
             </div>
-            <h3 className="text-xl font-semibold text-light-text mb-2">
+            <h3 className="font-headline text-xl font-semibold text-light-text mb-2">
               {searchTerm ? 'No courses found' : 'No courses yet'}
             </h3>
-            <p className="text-light-text-secondary mb-6">
+            <p className="text-light-text-textMuted mb-6">
               {searchTerm ? 'Try adjusting your search or filters' : 'Start by registering for courses'}
             </p>
             {!searchTerm && (
@@ -335,12 +335,12 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             {filteredCourses.map((course) => (
               <div
                 key={course.id}
-                className="bg-card border border-light-border rounded-2xl p-6 hover:shadow-lg transition-shadow"
+                className="bg-surface border border-light-border rounded-2xl p-6 hover:shadow-lg transition-shadow"
               >
                 {/* Course Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg text-light-text mb-1 line-clamp-1">
+                    <h3 className="font-headline font-bold text-lg text-light-text mb-1 line-clamp-1">
                       {course.course_name}
                     </h3>
                     <p className="text-sm text-primary font-semibold">
@@ -355,7 +355,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 </div>
 
                 {/* Lecturer Info */}
-                <div className="flex items-center gap-2 mb-4 text-sm text-light-text-secondary">
+                <div className="flex items-center gap-2 mb-4 text-sm text-light-text-textMuted">
                   <User size={16} />
                   <span className="line-clamp-1">{course.lecturer_name || 'Not assigned'}</span>
                 </div>
@@ -388,7 +388,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
                 {/* Course Details */}
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-light-text-secondary">
+                  <div className="flex items-center gap-2 text-light-text-textMuted">
                     <Clock size={16} />
                     <span>{course.credit_units || 0} credit hours</span>
                   </div>

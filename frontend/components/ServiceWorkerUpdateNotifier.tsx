@@ -97,15 +97,15 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-md animate-slide-up">
-      <div className="bg-card text-foreground rounded-lg shadow-lg border border-border p-4">
+      <div className="bg-surface text-text rounded-lg shadow-lg border border-outline p-4">
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
             <RefreshCw className="w-5 h-5 text-primary" />
           </div>
           
           <div className="flex-1">
-            <h4 className="font-semibold mb-1">Update Available</h4>
-            <p className="text-sm text-muted-foreground mb-3">
+            <h4 className="font-headline font-semibold mb-1">Update Available</h4>
+            <p className="text-sm text-textMuted mb-3">
               A new version of Presently is available. Refresh to get the latest features and improvements.
             </p>
             
@@ -120,7 +120,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
               
               <button
                 onClick={handleDismiss}
-                className="px-4 py-2 text-muted-foreground hover:text-foreground text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 text-textMuted hover:text-text text-sm font-medium rounded-lg transition-colors"
               >
                 Later
               </button>
@@ -129,7 +129,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
           
           <button
             onClick={handleDismiss}
-            className="text-muted-foreground hover:text-muted-foreground"
+            className="text-textMuted hover:text-textMuted"
             aria-label="Dismiss update notification"
           >
             <X className="w-5 h-5" />

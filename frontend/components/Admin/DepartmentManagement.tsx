@@ -181,7 +181,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
         {onBack && (
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
+            className="flex items-center gap-2 text-sm text-textMuted hover:text-primary transition-colors w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to {college ? 'College' : 'Institution'}
@@ -194,10 +194,10 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
               <GraduationCap className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-foreground">
+              <h2 className="font-headline text-2xl font-bold text-text">
                 {college ? college.name : institution ? institution.full_name : 'Department Management'}
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-textMuted">
                 {college ? 'Departments in this College' : institution ? 'Departments in this Institution' : 'Manage all departments'}
               </p>
             </div>
@@ -232,14 +232,14 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                   setColleges([]);
                 }
               }}
-              className="pl-3 pr-10 h-11 bg-card border-border rounded-lg text-primary-foreground appearance-none w-full"
+              className="pl-3 pr-10 h-11 bg-surface border-outline rounded-lg text-text appearance-none w-full"
             >
               <option value="">Select Institution</option>
               {institutions.map(inst => (
                 <option key={inst.id} value={inst.id}>{inst.full_name}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-textMuted pointer-events-none" />
           </div>
         )}
         
@@ -248,7 +248,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
             <select
               value={selectedCollege || ''}
               onChange={(e) => setSelectedCollege(parseInt(e.target.value))}
-              className="pl-3 pr-10 h-11 bg-card border-border rounded-lg text-primary-foreground appearance-none w-full"
+              className="pl-3 pr-10 h-11 bg-surface border-outline rounded-lg text-text appearance-none w-full"
               disabled={!selectedInstitution || colleges.length === 0}
             >
               <option value="">Select College</option>
@@ -256,18 +256,18 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                 <option key={col.id} value={col.id}>{col.name}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-textMuted pointer-events-none" />
           </div>
         )}
 
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-textMuted" />
           <Input
             type="text"
             placeholder="Search departments..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11 bg-card border-border"
+            className="pl-10 h-11 bg-surface border-outline"
           />
         </div>
       </div>
@@ -276,7 +276,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
       {loading && departments.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader className="w-10 h-10 animate-spin text-primary" />
-          <p className="text-muted-foreground animate-pulse">Loading departments...</p>
+          <p className="text-textMuted animate-pulse">Loading departments...</p>
         </div>
       )}
 
@@ -295,30 +295,30 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
           {filteredDepartments.map(dept => (
             <div
               key={dept.id}
-              className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-border hover:shadow-xl transition-all duration-300 flex flex-col"
+              className="group bg-surface border border-outline rounded-2xl overflow-hidden hover:border-outline hover:shadow-xl transition-all duration-300 flex flex-col"
             >
               <div className="p-6 flex-1">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-surfaceHigh flex items-center justify-center text-textMuted group-hover:bg-primary/20 group-hover:text-primary transition-colors">
                       <Building className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">{dept.name}</h3>
-                      <p className="text-xs font-mono text-muted-foreground uppercase">{dept.code} • {dept.abbreviation}</p>
+                      <h3 className="font-headline font-bold text-text group-hover:text-primary transition-colors line-clamp-1">{dept.name}</h3>
+                      <p className="text-xs font-mono text-textMuted uppercase">{dept.code} • {dept.abbreviation}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleEditDepartment(dept)}
-                      className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-primary-foreground transition-colors"
+                      className="p-2 hover:bg-surfaceHigh rounded-lg text-textMuted hover:text-text transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteDepartment(dept.id)}
-                      className="p-2 hover:bg-accent rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                      className="p-2 hover:bg-surfaceHigh rounded-lg text-red-400 hover:text-red-300 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -326,28 +326,28 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                 </div>
 
                 {dept.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
+                  <p className="text-sm text-textMuted line-clamp-2 mb-4 leading-relaxed">
                     {dept.description}
                   </p>
                 )}
 
-                <div className="space-y-2.5 pt-4 border-t border-border/50">
+                <div className="space-y-2.5 pt-4 border-t border-outline/50">
                   {dept.head_of_department_name && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-textMuted">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                       <span>HOD: {dept.head_of_department_name}</span>
                     </div>
                   )}
                   {dept.office_location && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-sm text-textMuted">
+                      <MapPin className="w-4 h-4 text-textMuted" />
                       <span>{dept.office_location}</span>
                     </div>
                   )}
                 </div>
               </div>
               
-              <div className="px-6 py-4 bg-background/50 border-t border-border/50 flex items-center justify-between">
+              <div className="px-6 py-4 bg-background/50 border-t border-outline/50 flex items-center justify-between">
                 <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
                   dept.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-muted-foreground'
                 }`}>
@@ -368,10 +368,10 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
 
       {/* Empty State */}
       {!loading && filteredDepartments.length === 0 && (
-        <div className="text-center py-20 bg-card/30 border border-dashed border-border rounded-3xl">
-          <GraduationCap className="w-16 h-16 text-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-muted-foreground">No departments found</h3>
-          <p className="text-muted-foreground text-sm mt-1 mb-6">Start by adding a new department to this {college ? 'college' : 'institution'}.</p>
+        <div className="text-center py-20 bg-surface/30 border border-dashed border-outline rounded-3xl">
+          <GraduationCap className="w-16 h-16 text-text mx-auto mb-4" />
+          <h3 className="font-headline text-lg font-bold text-textMuted">No departments found</h3>
+          <p className="text-textMuted text-sm mt-1 mb-6">Start by adding a new department to this {college ? 'college' : 'institution'}.</p>
           <Button onClick={handleCreateDepartment} variant="secondary">
             <Plus className="w-4 h-4 mr-2" />
             Add First Department

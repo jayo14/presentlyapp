@@ -114,19 +114,19 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const mobileLayout = (
     <div className="min-h-screen bg-background pb-24">
       {/* Mobile Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
+      <div className="flex items-center justify-between p-4 border-b border-outline">
         <button 
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-accent rounded-lg transition-colors"
+          className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
         >
-          <ArrowLeft size={24} className="text-primary-foreground" />
+          <ArrowLeft size={24} className="text-text" />
         </button>
-        <h1 className="text-xl font-bold text-primary-foreground">Profile</h1>
+        <h1 className="font-headline text-xl font-bold text-text">Profile</h1>
         <button 
           onClick={handleShare}
-          className="p-2 hover:bg-accent rounded-full transition-colors"
+          className="p-2 hover:bg-surfaceHigh rounded-full transition-colors"
         >
-          <Share2 size={24} className="text-muted-foreground" />
+          <Share2 size={24} className="text-textMuted" />
         </button>
       </div>
 
@@ -136,7 +136,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div className="relative w-32 h-32 rounded-full overflow-hidden border-input border-primary mb-4 shadow-lg group">
           {uploadingAvatar && (
             <div className="absolute inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-10">
-              <Loader className="w-8 h-8 animate-spin text-primary-foreground" />
+              <Loader className="w-8 h-8 animate-spin text-text" />
             </div>
           )}
           {userAvatar ? (
@@ -146,7 +146,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-card flex items-center justify-center text-primary-foreground text-3xl font-bold">
+            <div className="w-full h-full bg-surface flex items-center justify-center text-text text-3xl font-bold">
               {userInitials}
             </div>
           )}
@@ -154,7 +154,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           <button
             onClick={handleAvatarUpdate}
             disabled={uploadingAvatar}
-            className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute bottom-0 right-0 bg-primary text-text p-2 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Update profile picture"
           >
             <Camera size={16} />
@@ -162,10 +162,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
 
         {/* User Info */}
-        <h2 className="text-2xl font-bold text-primary-foreground mb-2 text-center">
+        <h2 className="font-headline text-2xl font-bold text-text mb-2 text-center">
           {userName}
         </h2>
-        <p className="text-muted-foreground text-sm text-center">
+        <p className="text-textMuted text-sm text-center">
           {userRoleDisplay}
         </p>
       </div>
@@ -178,8 +178,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <BookOpen size={18} className="text-primary" />
             </div>
           </div>
-          <span className="text-primary-foreground text-3xl font-bold block mb-1">{stats.activeCourses}</span>
-          <span className="text-muted-foreground text-xs">Active Courses</span>
+          <span className="text-text text-3xl font-bold block mb-1">{stats.activeCourses}</span>
+          <span className="text-textMuted text-xs">Active Courses</span>
         </div>
         <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/80 border border-blue-500/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow">
           <div className="flex items-center gap-2 mb-2">
@@ -187,8 +187,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <Calendar size={18} className="text-on-primary-fixedlue-400" />
             </div>
           </div>
-          <span className="text-primary-foreground text-3xl font-bold block mb-1">{stats.totalSessions}</span>
-          <span className="text-muted-foreground text-xs">Total Sessions</span>
+          <span className="text-text text-3xl font-bold block mb-1">{stats.totalSessions}</span>
+          <span className="text-textMuted text-xs">Total Sessions</span>
         </div>
         <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/80 border border-green-500/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow">
           <div className="flex items-center gap-2 mb-2">
@@ -196,8 +196,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <TrendingUp size={18} className="text-green-400" />
             </div>
           </div>
-          <span className="text-primary-foreground text-3xl font-bold block mb-1">{stats.attendanceRate}%</span>
-          <span className="text-muted-foreground text-xs">Attendance Rate</span>
+          <span className="text-text text-3xl font-bold block mb-1">{stats.attendanceRate}%</span>
+          <span className="text-textMuted text-xs">Attendance Rate</span>
         </div>
         <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/80 border border-purple-500/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow">
           <div className="flex items-center gap-2 mb-2">
@@ -205,22 +205,22 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <Award size={18} className="text-purple-400" />
             </div>
           </div>
-          <span className="text-primary-foreground text-3xl font-bold block mb-1">{stats.completedCourses}</span>
-          <span className="text-muted-foreground text-xs">Completed</span>
+          <span className="text-text text-3xl font-bold block mb-1">{stats.completedCourses}</span>
+          <span className="text-textMuted text-xs">Completed</span>
         </div>
       </div>
 
       {/* User Details Section */}
       <div className="px-4 mb-8">
-        <h3 className="text-primary-foreground text-lg font-semibold mb-4">Contact Information</h3>
-        <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
+        <h3 className="font-headline text-text text-lg font-semibold mb-4">Contact Information</h3>
+        <div className="bg-surface rounded-2xl border border-outline p-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Mail size={18} className="text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-xs text-muted-foreground">Email</p>
-              <p className="text-sm text-primary-foreground font-medium">{userEmail}</p>
+              <p className="text-xs text-textMuted">Email</p>
+              <p className="text-sm text-text font-medium">{userEmail}</p>
             </div>
           </div>
           {user?.phone && (
@@ -229,8 +229,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <Phone size={18} className="text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-xs text-muted-foreground">Phone</p>
-                <p className="text-sm text-primary-foreground font-medium">{user.phone}</p>
+                <p className="text-xs text-textMuted">Phone</p>
+                <p className="text-sm text-text font-medium">{user.phone}</p>
               </div>
             </div>
           )}
@@ -240,8 +240,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <MapPin size={18} className="text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-xs text-muted-foreground">Department</p>
-                <p className="text-sm text-primary-foreground font-medium">{user.department}</p>
+                <p className="text-xs text-textMuted">Department</p>
+                <p className="text-sm text-text font-medium">{user.department}</p>
               </div>
             </div>
           )}
@@ -250,49 +250,49 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
       {/* Account Section */}
       <div className="px-4 mb-8">
-        <h3 className="text-primary-foreground text-lg font-semibold mb-4">Account</h3>
+        <h3 className="font-headline text-text text-lg font-semibold mb-4">Account</h3>
         
         <div className="space-y-3">
           {/* Settings */}
           <button 
             onClick={() => navigate('/dashboard/settings')}
-            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
+            className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-surfaceHigh transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Settings size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
               Settings
             </span>
-            <ChevronRight size={20} className="text-muted-foreground" />
+            <ChevronRight size={20} className="text-textMuted" />
           </button>
 
           {/* Notifications */}
           <button 
             onClick={() => navigate('/dashboard/notifications')}
-            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
+            className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-surfaceHigh transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Bell size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
               Notifications
             </span>
-            <ChevronRight size={20} className="text-muted-foreground" />
+            <ChevronRight size={20} className="text-textMuted" />
           </button>
 
           {/* Help & Support */}
           <button 
             onClick={() => window.location.href = 'mailto:support@presently.app'}
-            className="w-full bg-card rounded-2xl p-4 flex items-center hover:bg-accent transition-colors"
+            className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-surfaceHigh transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <HelpCircle size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-primary-foreground font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
               Help & Support
             </span>
-            <ChevronRight size={20} className="text-muted-foreground" />
+            <ChevronRight size={20} className="text-textMuted" />
           </button>
         </div>
       </div>
@@ -300,15 +300,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       {/* Lecturer Signature Section (Mobile) */}
       {userRole === UserRole.LECTURER && (
         <div className="px-4 mb-8">
-          <h3 className="text-primary-foreground text-lg font-semibold mb-4">Digital Signature</h3>
-          <div className="bg-card rounded-2xl border border-border p-6 flex flex-col items-center gap-4">
-            <div className="w-full h-32 bg-card/5 border-border border-dashed border-border rounded-xl flex items-center justify-center relative overflow-hidden group">
+          <h3 className="font-headline text-text text-lg font-semibold mb-4">Digital Signature</h3>
+          <div className="bg-surface rounded-2xl border border-outline p-6 flex flex-col items-center gap-4">
+            <div className="w-full h-32 bg-surface/5 border-outline border-dashed border-outline rounded-xl flex items-center justify-center relative overflow-hidden group">
               {user?.signature_url ? (
                 <img src={user.signature_url} alt="Digital Signature" className="max-h-full object-contain invert" />
               ) : (
                 <div className="text-center">
-                  <FileText size={32} className="text-muted-foreground mx-auto mb-2" />
-                  <p className="text-xs text-muted-foreground">No signature uploaded</p>
+                  <FileText size={32} className="text-textMuted mx-auto mb-2" />
+                  <p className="text-xs text-textMuted">No signature uploaded</p>
                 </div>
               )}
               {uploadingSignature && (
@@ -333,7 +333,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               <Upload size={18} className="mr-2" />
               {user?.signature_url ? 'Update Signature' : 'Upload Signature'}
             </Button>
-            <p className="text-[10px] text-muted-foreground text-center px-4">
+            <p className="text-[10px] text-textMuted text-center px-4">
               Used for validating and signing attendance reports. Recommended size: 400x200px (PNG).
             </p>
           </div>
@@ -367,7 +367,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         >
           <ArrowLeft size={24} className="text-text-primary" />
         </button>
-        <h1 className="text-xl font-bold text-text-primary">Profile</h1>
+        <h1 className="font-headline text-xl font-bold text-text-primary">Profile</h1>
         <button 
           onClick={handleShare}
           className="p-2 hover:bg-surface rounded-full transition-colors"
@@ -383,7 +383,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           <div className="relative w-32 h-32 rounded-full overflow-hidden border-input border-primary mb-4 shadow-lg group">
             {uploadingAvatar && (
               <div className="absolute inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-10">
-                <Loader className="w-8 h-8 animate-spin text-primary-foreground" />
+                <Loader className="w-8 h-8 animate-spin text-text" />
               </div>
             )}
             {userAvatar ? (
@@ -393,7 +393,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-card flex items-center justify-center text-primary-foreground text-3xl font-bold">
+              <div className="w-full h-full bg-surface flex items-center justify-center text-text text-3xl font-bold">
                 {userInitials}
               </div>
             )}
@@ -401,7 +401,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <button
               onClick={handleAvatarUpdate}
               disabled={uploadingAvatar}
-              className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute bottom-0 right-0 bg-primary text-text p-2 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Update profile picture"
             >
               <Camera size={16} />
@@ -411,17 +411,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           {/* Edit button floating top-right of avatar */}
           <button
             onClick={() => navigate('/dashboard/settings')}
-            className="absolute top-0 right-4 md:right-6 bg-primary text-primary-foreground p-2.5 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110"
+            className="absolute top-0 right-4 md:right-6 bg-primary text-text p-2.5 rounded-full shadow-lg hover:bg-primary-hover transition-all hover:scale-110"
             aria-label="Edit Profile"
           >
             <Edit size={20} />
           </button>
 
           {/* User Info */}
-          <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-2 text-center">
+          <h2 className="font-headline text-2xl md:text-3xl font-bold text-text-primary mb-2 text-center">
             {userName}
           </h2>
-          <p className="text-text-secondary text-on-primary-fixedase text-center mb-1">
+          <p className="text-text-textMuted text-on-primary-fixedase text-center mb-1">
             {userRoleDisplay}
           </p>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary capitalize">
@@ -438,7 +438,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <BookOpen size={20} className="text-primary" />
           </div>
           <span className="text-text-primary text-3xl font-bold mb-1">{stats.activeCourses}</span>
-          <span className="text-text-secondary text-sm text-center">Active Courses</span>
+          <span className="text-text-textMuted text-sm text-center">Active Courses</span>
         </div>
 
         <div className="bg-surface border border-blue-500/30 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-all hover:scale-105">
@@ -446,7 +446,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <Calendar size={20} className="text-on-primary-fixedlue-500" />
           </div>
           <span className="text-text-primary text-3xl font-bold mb-1">{stats.totalSessions}</span>
-          <span className="text-text-secondary text-sm text-center">Total Sessions</span>
+          <span className="text-text-textMuted text-sm text-center">Total Sessions</span>
         </div>
 
         <div className="bg-surface border border-green-500/30 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-all hover:scale-105">
@@ -454,7 +454,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <TrendingUp size={20} className="text-green-500" />
           </div>
           <span className="text-text-primary text-3xl font-bold mb-1">{stats.attendanceRate}%</span>
-          <span className="text-text-secondary text-sm text-center">Attendance</span>
+          <span className="text-text-textMuted text-sm text-center">Attendance</span>
         </div>
 
         <div className="bg-surface border border-purple-500/30 rounded-2xl p-5 flex flex-col items-center shadow-md hover:shadow-lg transition-all hover:scale-105">
@@ -462,20 +462,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <Award size={20} className="text-purple-500" />
           </div>
           <span className="text-text-primary text-3xl font-bold mb-1">{stats.completedCourses}</span>
-          <span className="text-text-secondary text-sm text-center">Completed</span>
+          <span className="text-text-textMuted text-sm text-center">Completed</span>
         </div>
       </div>
 
       {/* Contact Information Section */}
       <div className="px-4 md:px-6 mb-8">
-        <h3 className="text-text-primary text-lg font-semibold mb-4">Contact Information</h3>
-        <div className="bg-surface border border-border rounded-2xl p-4 space-y-3">
+        <h3 className="font-headline text-text-primary text-lg font-semibold mb-4">Contact Information</h3>
+        <div className="bg-surface border border-outline rounded-2xl p-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Mail size={18} className="text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-xs text-text-secondary">Email</p>
+              <p className="text-xs text-text-textMuted">Email</p>
               <p className="text-sm text-text-primary font-medium">{userEmail}</p>
             </div>
           </div>
@@ -485,7 +485,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <Phone size={18} className="text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-xs text-text-secondary">Phone</p>
+                <p className="text-xs text-text-textMuted">Phone</p>
                 <p className="text-sm text-text-primary font-medium">{user.phone}</p>
               </div>
             </div>
@@ -496,7 +496,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <MapPin size={18} className="text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-xs text-text-secondary">Department</p>
+                <p className="text-xs text-text-textMuted">Department</p>
                 <p className="text-sm text-text-primary font-medium">{user.department}</p>
               </div>
             </div>
@@ -507,7 +507,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       {/* Quick Actions - for lecturers */}
       {userRole === UserRole.LECTURER && (
         <div className="mb-8 px-4 md:px-6">
-          <h3 className="text-text-primary text-lg font-semibold mb-3">Quick Actions</h3>
+          <h3 className="font-headline text-text-primary text-lg font-semibold mb-3">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Button
               onClick={() => navigate('/dashboard/create-session')}
@@ -531,13 +531,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
       {/* Account Section */}
       <div className="px-4 md:px-6 mb-8">
-        <h3 className="text-text-primary text-lg font-semibold mb-4">Account</h3>
+        <h3 className="font-headline text-text-primary text-lg font-semibold mb-4">Account</h3>
 
         <div className="space-y-3">
           {/* Settings */}
           <button 
             onClick={() => navigate('/dashboard/settings')}
-            className="w-full bg-surface border border-border rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group"
+            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
               <Settings size={22} className="text-primary" />
@@ -545,13 +545,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <span className="flex-1 text-text-primary font-medium text-on-primary-fixedase text-left">
               Settings
             </span>
-            <ChevronRight size={20} className="text-text-secondary group-hover:text-primary transition-colors" />
+            <ChevronRight size={20} className="text-text-textMuted group-hover:text-primary transition-colors" />
           </button>
 
           {/* Notifications */}
           <button 
             onClick={() => navigate('/dashboard/notifications')}
-            className="w-full bg-surface border border-border rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group relative"
+            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group relative"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
               <Bell size={22} className="text-primary" />
@@ -560,16 +560,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               Notifications
             </span>
             {/* Badge for unread notifications */}
-            <div className="absolute top-3 right-14 bg-red-500 text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <div className="absolute top-3 right-14 bg-red-500 text-text text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               3
             </div>
-            <ChevronRight size={20} className="text-text-secondary group-hover:text-primary transition-colors" />
+            <ChevronRight size={20} className="text-text-textMuted group-hover:text-primary transition-colors" />
           </button>
 
           {/* Help & Support */}
           <button 
             onClick={() => window.location.href = 'mailto:support@presently.app'}
-            className="w-full bg-surface border border-border rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group"
+            className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-all hover:shadow-md group"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">
               <HelpCircle size={22} className="text-primary" />
@@ -577,17 +577,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <span className="flex-1 text-text-primary font-medium text-on-primary-fixedase text-left">
               Help & Support
             </span>
-            <ChevronRight size={20} className="text-text-secondary group-hover:text-primary transition-colors" />
+            <ChevronRight size={20} className="text-text-textMuted group-hover:text-primary transition-colors" />
           </button>
         </div>
 
         {/* Lecturer Signature Section (Desktop) */}
         {userRole === UserRole.LECTURER && (
           <div className="mt-8">
-            <h3 className="text-text-primary text-lg font-semibold mb-4">Digital Signature</h3>
-            <div className="bg-surface border border-border rounded-2xl p-8 flex gap-8 items-center">
+            <h3 className="font-headline text-text-primary text-lg font-semibold mb-4">Digital Signature</h3>
+            <div className="bg-surface border border-outline rounded-2xl p-8 flex gap-8 items-center">
               <div className="flex-1">
-                <p className="text-text-secondary text-sm mb-4">
+                <p className="text-text-textMuted text-sm mb-4">
                   Your digital signature is used to sign and authenticate attendance reports. 
                   Ensure the image is clear and has a transparent or white background.
                 </p>
@@ -599,21 +599,21 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <Upload size={18} className="mr-2" />
                   {user?.signature_url ? 'Change Signature' : 'Upload Signature'}
                 </Button>
-                <p className="text-xs text-text-secondary mt-3">
+                <p className="text-xs text-text-textMuted mt-3">
                   Format: PNG, JPG (Max 2MB).
                 </p>
               </div>
-              <div className="w-64 h-32 bg-muted border border-border rounded-xl flex items-center justify-center relative overflow-hidden">
+              <div className="w-64 h-32 bg-surfaceLow border border-outline rounded-xl flex items-center justify-center relative overflow-hidden">
                 {user?.signature_url ? (
                   <img src={user.signature_url} alt="Signature Preview" className="max-h-full object-contain invert" />
                 ) : (
                   <div className="text-center p-4">
-                    <FileText size={32} className="text-muted-foreground mx-auto mb-2" />
-                    <p className="text-[10px] text-muted-foreground">Preview will appear here</p>
+                    <FileText size={32} className="text-textMuted mx-auto mb-2" />
+                    <p className="text-[10px] text-textMuted">Preview will appear here</p>
                   </div>
                 )}
                 {uploadingSignature && (
-                  <div className="absolute inset-0 bg-card/60 backdrop-blur-sm flex items-center justify-center z-10">
+                  <div className="absolute inset-0 bg-surface/60 backdrop-blur-sm flex items-center justify-center z-10">
                     <Loader className="w-8 h-8 animate-spin text-primary" />
                   </div>
                 )}
@@ -628,7 +628,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <button 
           onClick={handleLogout}
           disabled={logoutMutation.isPending}
-          className="w-full bg-transparent border-border border-red-500/30 rounded-2xl py-4 flex items-center justify-center hover:bg-red-500/10 transition-all hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed group"
+          className="w-full bg-transparent border-outline border-red-500/30 rounded-2xl py-4 flex items-center justify-center hover:bg-red-500/10 transition-all hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed group"
         >
           <LogOut size={20} className="text-red-500 mr-2 group-hover:scale-110 transition-transform" />
           <span className="text-red-500 font-semibold text-on-primary-fixedase">

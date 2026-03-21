@@ -22,7 +22,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 
   return (
     <div className="w-full">
-      {label && <label className="block text-sm font-medium text-zinc-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-sm font-medium text-textMuted mb-1.5">{label}</label>}
       <div className="relative">
         <input
           type={showPassword ? 'text' : 'password'}
@@ -37,14 +37,14 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           {...props}
         />
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted">
             {icon}
           </div>
         )}
         <button
           type="button"
           onClick={togglePasswordVisibility}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground transition-colors focus:outline-none"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMuted transition-colors focus:outline-none"
           aria-label={showPassword ? 'Hide password' : 'Show password'}
         >
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

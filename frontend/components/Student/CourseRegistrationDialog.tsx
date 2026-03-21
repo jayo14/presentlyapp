@@ -133,12 +133,12 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-card text-foreground border border-border rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col outline-none"
+        className="bg-surface text-text border border-outline rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col outline-none"
       >
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between p-6 border-b border-outline">
           <div>
-            <h2 id="reg-dialog-title" className="text-2xl font-bold text-foreground">Course Registration</h2>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h2 id="reg-dialog-title" className="font-headline text-2xl font-bold text-text">Course Registration</h2>
+            <p className="text-sm text-textMuted mt-1">
               Browse and enroll in available courses
             </p>
           </div>
@@ -147,11 +147,11 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
             className="p-2 hover:bg-inputccent hover:text-muted-foregroundccent-foreground rounded-lg transition-colors"
             aria-label="Close dialog"
           >
-            <X className="w-6 h-6 text-muted-foreground" />
+            <X className="w-6 h-6 text-textMuted" />
           </button>
         </div>
 
-        <div className="p-6 border-b border-border space-y-4">
+        <div className="p-6 border-b border-outline space-y-4">
           {/* Success Banner - matching Design 2 */}
           {showSuccessBanner && (
             <motion.div
@@ -161,10 +161,10 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
               className="p-4 bg-green-50 border border-green-500 rounded-xl flex items-start gap-3 relative"
             >
               <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                <Check className="w-4 h-4 text-primary-foreground" />
+                <Check className="w-4 h-4 text-text" />
               </div>
               <div className="flex-1">
-                <h3 className="text-green-800 font-bold text-sm mb-1">
+                <h3 className="font-headline text-green-800 font-bold text-sm mb-1">
                   Course Added Successfully
                 </h3>
                 <p className="text-green-700 text-xs">
@@ -189,8 +189,8 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
 
           {/* Add via Code Section - matching Design 2 */}
           <div className="space-y-3">
-            <h3 className="text-lg font-bold text-foreground">Add via Code</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-headline text-lg font-bold text-text">Add via Code</h3>
+            <p className="text-sm text-textMuted">
               Enter the unique 6-digit code provided by your course instructor.
             </p>
             <div className="flex gap-3">
@@ -215,22 +215,22 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
           {/* OR Divider */}
           <div className="relative flex items-center justify-center py-2">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+              <div className="w-full border-t border-outline"></div>
             </div>
-            <div className="relative px-4 bg-card text-foreground">
-              <span className="text-sm font-medium text-muted-foreground uppercase">OR BROWSE</span>
+            <div className="relative px-4 bg-surface text-text">
+              <span className="text-sm font-medium text-textMuted uppercase">OR BROWSE</span>
             </div>
           </div>
 
           {/* Browse Department Section - matching Design 2 */}
           <div className="space-y-3">
-            <h3 className="text-lg font-bold text-foreground">Browse Department</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-headline text-lg font-bold text-text">Browse Department</h3>
+            <p className="text-sm text-textMuted">
               Find open electives and major courses.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-textMuted" />
                 <Input
                   type="text"
                   placeholder="Search for departments..."
@@ -243,7 +243,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
               <select
                 value={selectedSemester}
                 onChange={(e) => setSelectedSemester(e.target.value)}
-                className="px-4 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:border-primary"
+                className="px-4 py-2 bg-surfaceLow border border-outline rounded-lg text-text focus:outline-none focus:border-primary"
             >
               <option value="all">All Semesters</option>
               {semesters.map(sem => (
@@ -261,15 +261,15 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
             </div>
           ) : filteredCourses.length === 0 ? (
             <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No courses found</p>
+              <BookOpen className="w-16 h-16 text-textMuted mx-auto mb-4" />
+              <p className="text-textMuted">No courses found</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {filteredCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="bg-muted border border-border rounded-xl p-4 hover:border-primary/50 transition-colors"
+                  className="bg-surfaceLow border border-outline rounded-xl p-4 hover:border-primary/50 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
                     <div className="flex-1 w-full">
@@ -278,23 +278,23 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                           {course.code}
                         </span>
                         {course.semester && (
-                          <span className="px-2 py-1 bg-zinc-200 text-secondary text-xs rounded">
+                          <span className="px-2 py-1 bg-surfaceLow text-textMuted text-xs rounded">
                             {course.semester}
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-on-primary-fixedase sm:text-lg font-semibold text-foreground mb-1">
+                      <h3 className="font-headline text-on-primary-fixedase sm:text-lg font-semibold text-text mb-1">
                         {course.title}
                       </h3>
 
                       {course.description && (
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        <p className="text-sm text-textMuted mb-3 line-clamp-2">
                           {course.description}
                         </p>
                       )}
 
-                      <div className="flex items-center gap-3 text-xs sm:text-sm text-muted-foreground flex-wrap">
+                      <div className="flex items-center gap-3 text-xs sm:text-sm text-textMuted flex-wrap">
                         {course.credit_units && (
                           <div className="flex items-center gap-1">
                             <BookOpen className="w-4 h-4" />

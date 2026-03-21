@@ -103,7 +103,7 @@ export const AuthCallback: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4 text-primary-foreground">
+    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4 text-text">
       <div className="max-w-md w-full text-center">
         <div className="inline-flex items-center justify-center">
           <div className="relative w-16 h-16">
@@ -115,10 +115,10 @@ export const AuthCallback: React.FC = () => {
           <div className="mt-4 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm">
             <p className="font-semibold">Error Details:</p>
             <p className="mt-1 break-words">{errorMessage}</p>
-            <p className="mt-3 text-xs text-muted-foreground">Check browser console for full logs</p>
+            <p className="mt-3 text-xs text-textMuted">Check browser console for full logs</p>
           </div>
         )}
-        <p className="mt-2 text-sm text-muted-foreground">This should only take a moment...</p>
+        <p className="mt-2 text-sm text-textMuted">This should only take a moment...</p>
         {errorMessage && (
           <button
             onClick={() => navigate('/login', { replace: true })}

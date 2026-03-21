@@ -108,12 +108,12 @@ export const OTPVerification: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-primary-foreground flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#09090b] text-text flex flex-col items-center justify-center p-4 relative">
       <SEO title="OTP Verification | Presently" />
 
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 text-gray-300 hover:text-primary-foreground transition-colors"
+        className="absolute top-6 left-6 text-textMuted hover:text-text transition-colors"
         aria-label="Go back"
       >
         <ArrowLeft size={20} />
@@ -122,7 +122,7 @@ export const OTPVerification: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold text-primary-foreground mb-4">
+          <h1 className="font-headline text-4xl font-bold text-text mb-4">
             Verify your {email ? 'email' : 'phone number'}
           </h1>
           <p className="text-[#a1a1aa] mb-2">Enter the 6-digit code we sent to</p>
@@ -155,7 +155,7 @@ export const OTPVerification: React.FC = () => {
         <div className="flex items-center justify-center gap-4 mb-8">
           {!canResend ? (
             <div className="flex items-center gap-2 text-[#a1a1aa] text-sm">
-              <div className="w-8 h-8 rounded-full border-border border-[#27272a] flex items-center justify-center text-xs font-bold text-[#FFD700]">
+              <div className="w-8 h-8 rounded-full border-outline border-[#27272a] flex items-center justify-center text-xs font-bold text-[#FFD700]">
                 {formatCountdown()}
               </div>
               <span>Resend code in {formatCountdown()}s</span>
