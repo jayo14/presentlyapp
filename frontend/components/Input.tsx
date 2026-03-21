@@ -9,7 +9,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input: React.FC<InputProps> = ({ label, error, icon, className = '', ...props }) => {
   return (
     <div className="w-full">
-      {label && <label className="block text-sm font-medium text-text-secondary mb-1.5">{label}</label>}
+      {label && <label className="block text-sm font-medium text-text-textMuted mb-1.5">{label}</label>}
       <div className="relative">
         <input
           className={`

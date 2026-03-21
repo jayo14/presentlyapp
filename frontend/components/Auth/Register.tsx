@@ -108,7 +108,7 @@ export const Register: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-cardackgroundackground">
         <div className="flex flex-col items-center gap-4">
           <Loader2 size={40} className="animate-spin text-primary" />
-          <p className="text-secondary">Loading</p>
+          <p className="text-textMuted">Loading</p>
         </div>
       </div>
     );
@@ -123,7 +123,7 @@ export const Register: React.FC = () => {
 
       <button
         onClick={onBack}
-        className="absolute top-8 left-8 text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors z-10"
+        className="absolute top-8 left-8 text-textMuted hover:text-text flex items-center gap-2 transition-colors z-10"
         aria-label="Go back"
       >
         <ArrowLeft size={20} />
@@ -132,7 +132,7 @@ export const Register: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h2 className="text-4xl font-headline font-bold mb-2">Create an account</h2>
-          <p className="text-secondary">Get started with smart attendance management.</p>
+          <p className="text-textMuted">Get started with smart attendance management.</p>
         </div>
 
         <div className="glass-panel border p-6 rounded-2xl shadow-lg">
@@ -152,7 +152,7 @@ export const Register: React.FC = () => {
                 <div className="relative">
                   <UserIcon
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
                   />
                   <input
                     type="text"
@@ -160,7 +160,7 @@ export const Register: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                 </div>
               </div>
@@ -171,7 +171,7 @@ export const Register: React.FC = () => {
                 <div className="relative">
                   <Mail
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
                   />
                   <input
                     type="email"
@@ -179,7 +179,7 @@ export const Register: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const Register: React.FC = () => {
                 <div className="relative">
                   <Lock
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
                   />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -198,12 +198,12 @@ export const Register: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary transition-colors z-10"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -211,11 +211,11 @@ export const Register: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-xs text-secondary">
+              <p className="text-xs text-textMuted">
                 By clicking "Create Account", you agree to our{' '}
-                <a href="/terms" className="underline hover:text-foreground transition-colors">Terms</a>
+                <a href="/terms" className="underline hover:text-text transition-colors">Terms</a>
                 {' '}and{' '}
-                <a href="/privacy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
+                <a href="/privacy" className="underline hover:text-text transition-colors">Privacy Policy</a>.
               </p>
 
               <button
@@ -237,7 +237,7 @@ export const Register: React.FC = () => {
 
           <div className="flex items-center gap-4 my-8">
             <div className="h-px bg-cardackgroundorder flex-1" />
-            <span className="text-xs text-secondary uppercase font-bold tracking-wide">Or sign up with</span>
+            <span className="text-xs text-textMuted uppercase font-bold tracking-wide">Or sign up with</span>
             <div className="h-px bg-cardackgroundorder flex-1" />
           </div>
 
@@ -267,7 +267,7 @@ export const Register: React.FC = () => {
             </button>
           </div>
 
-          <p className="mt-8 text-center text-sm text-secondary">
+          <p className="mt-8 text-center text-sm text-textMuted">
             Already have an account?{' '}
             <button
               onClick={() => navigate('/login')}

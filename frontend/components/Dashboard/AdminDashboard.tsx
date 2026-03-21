@@ -139,18 +139,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-foreground">Audit Logs</h2>
-            <p className="text-sm text-muted-foreground mt-0.5">Track system activities and security events.</p>
+            <h2 className="font-headline text-xl font-semibold text-text">Audit Logs</h2>
+            <p className="text-sm text-textMuted mt-0.5">Track system activities and security events.</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => loadLogs()}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-secondary bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
             >
               <RefreshCw size={14} />
               Refresh
             </button>
-            <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-secondary bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+            <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors">
               <Download size={14} />
               Export
             </button>
@@ -158,15 +158,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
         </div>
 
         {/* Logs Table Card */}
-        <div className="bg-card text-foreground border border-border rounded-xl overflow-hidden">
+        <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
           {/* Filters */}
-          <div className="p-3 border-b border-border flex flex-col sm:flex-row gap-3">
+          <div className="p-3 border-b border-outline flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
               <input
                 type="text"
                 placeholder="Search logs..."
-                className="w-full bg-muted border border-border rounded-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 value={logSearch}
                 onChange={(e) => {
                   setLogSearch(e.target.value);
@@ -175,7 +175,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
               />
             </div>
             <select
-              className="bg-muted border border-border text-secondary text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none"
+              className="bg-surfaceLow border border-outline text-textMuted text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none"
               value={logType}
               onChange={(e) => {
                 setLogType(e.target.value);
@@ -195,12 +195,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-12">Type</th>
-                  <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Action</th>
-                  <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">User</th>
-                  <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
-                  <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider text-right">Time</th>
+                <tr className="border-b border-outline">
+                  <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider w-12">Type</th>
+                  <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">Action</th>
+                  <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">User</th>
+                  <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">Role</th>
+                  <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider text-right">Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -208,35 +208,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                   Array(5).fill(0).map((_, i) => (
                     <tr key={i}>
                       <td colSpan={5} className="px-4 py-3">
-                        <div className="h-4 bg-accent rounded animate-pulse" />
+                        <div className="h-4 bg-surfaceHigh rounded animate-pulse" />
                       </td>
                     </tr>
                   ))
                 ) : logs.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
+                    <td colSpan={5} className="px-4 py-12 text-center text-textMuted">
                       No logs found.
                     </td>
                   </tr>
                 ) : logs.map(log => (
-                  <tr key={log.id} className="hover:bg-accent hover:text-accent-foreground/50 transition-colors">
+                  <tr key={log.id} className="hover:bg-surfaceHigh hover:text-text/50 transition-colors">
                     <td className="px-4 py-3">
                       {log.level === 'info' && <Info size={16} className="text-on-primary-fixedlue-500" />}
                       {log.level === 'warning' && <AlertTriangle size={16} className="text-muted-foregroundmber-500" />}
                       {log.level === 'error' && <XCircle size={16} className="text-red-500" />}
                       {log.level === 'success' && <CheckCircle size={16} className="text-emerald-500" />}
                     </td>
-                    <td className="px-4 py-3 text-foreground font-medium">{log.action}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{log.user_name || log.ip_address || 'System'}</td>
+                    <td className="px-4 py-3 text-text font-medium">{log.action}</td>
+                    <td className="px-4 py-3 text-textMuted">{log.user_name || log.ip_address || 'System'}</td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex items-center px-2 py-0.5 bg-accent text-muted-foreground rounded text-xs font-medium">
+                      <span className="inline-flex items-center px-2 py-0.5 bg-surfaceHigh text-textMuted rounded text-xs font-medium">
                         {log.user_role || '—'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right text-muted-foreground font-mono text-xs">
+                    <td className="px-4 py-3 text-right text-textMuted font-mono text-xs">
                       {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       <br />
-                      <span className="text-muted-foreground text-[10px]">{new Date(log.timestamp).toLocaleDateString()}</span>
+                      <span className="text-textMuted text-[10px]">{new Date(log.timestamp).toLocaleDateString()}</span>
                     </td>
                   </tr>
                 ))}
@@ -246,22 +246,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
 
           {/* Pagination */}
           {logCount > 0 && (
-            <div className="px-4 py-3 border-t border-border flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                Showing <span className="font-medium text-secondary">{logs.length}</span> of <span className="font-medium text-secondary">{logCount}</span>
+            <div className="px-4 py-3 border-t border-outline flex items-center justify-between">
+              <p className="text-xs text-textMuted">
+                Showing <span className="font-medium text-textMuted">{logs.length}</span> of <span className="font-medium text-textMuted">{logCount}</span>
               </p>
               <div className="flex gap-2">
                 <button
                   disabled={logPage === 1 || logsLoading}
                   onClick={() => loadLogs(logPage - 1)}
-                  className="px-3 py-1.5 text-sm font-medium text-secondary bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
                 <button
                   disabled={logs.length < 30 || (logPage * 30) >= logCount || logsLoading}
                   onClick={() => loadLogs(logPage + 1)}
-                  className="px-3 py-1.5 text-sm font-medium text-secondary bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -288,36 +288,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Welcome back, {userName.split(' ')[0]}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Here's what's happening with your platform.</p>
+          <h1 className="font-headline text-xl font-semibold text-text">Welcome back, {userName.split(' ')[0]}</h1>
+          <p className="text-sm text-textMuted mt-0.5">Here's what's happening with your platform.</p>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-card text-foreground border border-border rounded-xl p-4 transition-shadow hover:shadow-sm">
+          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
                 <stat.icon size={18} className={stat.color} />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-foreground tracking-tight">{stat.value}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+            <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
+            <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* System Activity Chart */}
-      <div className="bg-card text-foreground border border-border rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+      <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-outline flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">System Activity</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Active users and sessions over time</p>
+            <h3 className="font-headline text-sm font-semibold text-text">System Activity</h3>
+            <p className="text-xs text-textMuted mt-0.5">Active users and sessions over time</p>
           </div>
           <button
             onClick={loadSystemData}
-            className="p-2 text-muted-foreground hover:text-accent-foreground rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+            className="p-2 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
           >
             <RefreshCw size={14} />
           </button>

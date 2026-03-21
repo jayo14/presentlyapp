@@ -85,19 +85,19 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
       <div 
         {...modalProps}
         aria-labelledby="modal-title"
-        className="bg-card border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
+        className="bg-surface border border-outline rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
       >
         {/* Header */}
-        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-border bg-card">
+        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-outline bg-surface">
           <div>
-            <h2 id="modal-title" className="text-xl font-bold text-foreground">
+            <h2 id="modal-title" className="font-headline text-xl font-bold text-text">
               {college ? 'Edit College' : 'Create College'}
             </h2>
-            {institution && <p className="text-sm text-muted-foreground mt-1">{institution.full_name}</p>}
+            {institution && <p className="text-sm text-textMuted mt-1">{institution.full_name}</p>}
           </div>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-textMuted hover:text-text transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-6 h-6" />
@@ -115,14 +115,14 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
 
           {/* Basic Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Basic Information
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     College Name *
                   </label>
                   <Input
@@ -132,7 +132,7 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     College Code *
                   </label>
                   <Input
@@ -145,7 +145,7 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Abbreviation
                 </label>
                 <Input
@@ -157,7 +157,7 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Description
                 </label>
                 <textarea
@@ -165,12 +165,12 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
                   onChange={(e) => handleChange('description', e.target.value)}
                   placeholder="Brief description of the college"
                   rows={3}
-                  className="w-full px-4 py-2 bg-accent border border-border rounded-lg text-foreground text-sm placeholder-zinc-500 focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-text text-sm placeholder:text-textMuted focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Year Established
                 </label>
                 <Input
@@ -187,14 +187,14 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
 
           {/* Dean Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Dean Information
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Dean Name
                   </label>
                   <Input
@@ -204,7 +204,7 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Dean Email
                   </label>
                   <Input
@@ -220,14 +220,14 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
 
           {/* Contact Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Contact Information
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Email
                   </label>
                   <Input
@@ -238,7 +238,7 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Phone
                   </label>
                   <Input
@@ -250,7 +250,7 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Website
                 </label>
                 <Input
@@ -265,14 +265,14 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
 
           {/* Location Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Location Within Campus
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Building Block
                   </label>
                   <Input
@@ -282,7 +282,7 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Office Location
                   </label>
                   <Input
@@ -302,16 +302,16 @@ export const CollegeModal: React.FC<CollegeModalProps> = ({
                 type="checkbox"
                 checked={formData.is_active !== false}
                 onChange={(e) => handleChange('is_active', e.target.checked)}
-                className="w-4 h-4 rounded border-border"
+                className="w-4 h-4 rounded border-outline"
               />
-              <label className="text-sm font-medium text-muted-foreground">
+              <label className="text-sm font-medium text-textMuted">
                 Active College
               </label>
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-border">
+          <div className="flex gap-3 pt-4 border-t border-outline">
             <Button
               type="button"
               variant="secondary"

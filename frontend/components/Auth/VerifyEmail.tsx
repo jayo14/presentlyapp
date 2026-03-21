@@ -44,7 +44,7 @@ export const VerifyEmail: React.FC = () => {
           <Logo className="justify-center mb-8 text-2xl" />
         </div>
 
-        <div className="bg-background/80 backdrop-blur-xl border border-border/50 p-8 rounded-2xl shadow-2xl">
+        <div className="bg-background/80 backdrop-blur-xl border border-outline/50 p-8 rounded-2xl shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             {status === 'loading' && (
               <>
@@ -52,8 +52,8 @@ export const VerifyEmail: React.FC = () => {
                   <Loader2 className="text-primary animate-spin" size={40} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-primary-foreground mb-2">Verifying Email</h2>
-                  <p className="text-muted-foreground">{message}</p>
+                  <h2 className="font-headline text-2xl font-bold text-text mb-2">Verifying Email</h2>
+                  <p className="text-textMuted">{message}</p>
                 </div>
               </>
             )}
@@ -64,8 +64,8 @@ export const VerifyEmail: React.FC = () => {
                   <CheckCircle className="text-green-500" size={40} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-primary-foreground mb-2">Email Verified!</h2>
-                  <p className="text-muted-foreground">{message}</p>
+                  <h2 className="font-headline text-2xl font-bold text-text mb-2">Email Verified!</h2>
+                  <p className="text-textMuted">{message}</p>
                 </div>
               </>
             )}
@@ -76,8 +76,8 @@ export const VerifyEmail: React.FC = () => {
                   <XCircle className="text-red-500" size={40} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-primary-foreground mb-2">Verification Failed</h2>
-                  <p className="text-muted-foreground">{message}</p>
+                  <h2 className="font-headline text-2xl font-bold text-text mb-2">Verification Failed</h2>
+                  <p className="text-textMuted">{message}</p>
                 </div>
                 <div className="w-full flex flex-col gap-3 mt-4">
                   <Button 

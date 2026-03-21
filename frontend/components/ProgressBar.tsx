@@ -19,7 +19,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className={`space-y-2 ${className}`}>
       {showLabel && (
         <div className="flex justify-between items-center text-sm">
-          <span className="text-text-secondary font-medium">
+          <span className="text-text-textMuted font-medium">
             Step {current} of {total}
           </span>
           <span className="text-text-tertiary">

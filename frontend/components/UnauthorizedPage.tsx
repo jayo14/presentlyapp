@@ -37,18 +37,18 @@ export const UnauthorizedPage: React.FC = () => {
         </div>
 
         {/* Heading */}
-        <h1 className="text-3xl font-bold text-foreground mb-2">Access Denied</h1>
+        <h1 className="font-headline text-3xl font-bold text-text mb-2">Access Denied</h1>
 
         {/* Message */}
-        <p className="text-muted-foreground mb-6">
+        <p className="text-textMuted mb-6">
           {state?.message ||
             'You do not have permission to access this page. Your current role does not grant you access.'}
         </p>
 
         {/* Required Role Info */}
         {state?.requiredRole && state.requiredRole.length > 0 && (
-          <div className="mb-6 p-4 bg-card/50 border border-border rounded-lg">
-            <p className="text-sm text-muted-foreground mb-2">Required role:</p>
+          <div className="mb-6 p-4 bg-surface/50 border border-outline rounded-lg">
+            <p className="text-sm text-textMuted mb-2">Required role:</p>
             <p className="text-sm font-medium text-muted-foregroundmber-500">
               {state.requiredRole.join(' or ')}
             </p>
@@ -59,20 +59,20 @@ export const UnauthorizedPage: React.FC = () => {
         <div className="flex flex-col gap-3">
           <button
             onClick={() => navigate('/dashboard', { replace: true })}
-            className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors"
+            className="px-4 py-2 bg-primary hover:bg-primary/90 text-text rounded-lg font-medium transition-colors"
           >
             Go to Dashboard
           </button>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-card hover:bg-accent text-foreground rounded-lg font-medium transition-colors border border-border"
+            className="px-4 py-2 bg-surface hover:bg-surfaceHigh text-text rounded-lg font-medium transition-colors border border-outline"
           >
             Go Back
           </button>
         </div>
 
         {/* Contact Support */}
-        <p className="mt-8 text-xs text-muted-foreground">
+        <p className="mt-8 text-xs text-textMuted">
           If you believe this is an error, please{' '}
           <a href="mailto:support@presently.com" className="text-primary hover:underline">
             contact support

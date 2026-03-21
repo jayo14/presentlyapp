@@ -145,8 +145,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <div className="space-y-6 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-foreground">Class Timetable</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">Your weekly class schedule.</p>
+              <h2 className="font-headline text-xl font-semibold text-text">Class Timetable</h2>
+              <p className="text-sm text-textMuted mt-0.5">Your weekly class schedule.</p>
             </div>
             <button
               onClick={() => setIsRegistrationOpen(true)}
@@ -165,24 +165,24 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 : [];
 
               return (
-                <div key={day} className="bg-card text-foreground border border-border rounded-xl p-4">
-                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">{day}</h3>
+                <div key={day} className="bg-surface text-text border border-outline rounded-xl p-4">
+                  <h3 className="font-headline text-xs font-semibold text-primary uppercase tracking-wider mb-3">{day}</h3>
                   <div className="space-y-2">
                     {dayClasses.length > 0 ? (
                       dayClasses.map((t) => (
-                        <div key={t.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
-                          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-muted-foreground">
+                        <div key={t.id} className="flex items-center gap-3 p-3 bg-surfaceLow/50 rounded-lg border border-outline">
+                          <div className="w-8 h-8 rounded-lg bg-surfaceHigh flex items-center justify-center text-textMuted">
                             <Clock size={14} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground">{t.course.course_code} – {t.course_name}</p>
-                            <p className="text-xs text-muted-foreground">{t.start_time} – {t.end_time}</p>
-                            {t.venue_name && <p className="text-xs text-muted-foreground">{t.venue_name}</p>}
+                            <p className="text-sm font-medium text-text">{t.course.course_code} – {t.course_name}</p>
+                            <p className="text-xs text-textMuted">{t.start_time} – {t.end_time}</p>
+                            {t.venue_name && <p className="text-xs text-textMuted">{t.venue_name}</p>}
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-muted-foreground italic">No classes scheduled.</p>
+                      <p className="text-xs text-textMuted italic">No classes scheduled.</p>
                     )}
                   </div>
                 </div>
@@ -208,13 +208,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Header */}
           <div>
-            <h2 className="text-xl font-semibold text-foreground">Performance Insights</h2>
-            <p className="text-sm text-muted-foreground mt-0.5">Track your attendance trends and statistics.</p>
+            <h2 className="font-headline text-xl font-semibold text-text">Performance Insights</h2>
+            <p className="text-sm text-textMuted mt-0.5">Track your attendance trends and statistics.</p>
           </div>
 
           {/* Location Map */}
           <Suspense fallback={
-            <div className="h-[280px] w-full flex flex-col items-center justify-center bg-card text-foreground border border-border rounded-xl animate-pulse text-muted-foreground">
+            <div className="h-[280px] w-full flex flex-col items-center justify-center bg-surface text-text border border-outline rounded-xl animate-pulse text-textMuted">
               <Loader2 className="w-6 h-6 animate-spin mb-2 text-primary" />
               <p className="text-sm">Loading Map...</p>
             </div>
@@ -230,8 +230,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               { label: 'Late', value: dashboardData?.attendance_stats?.total_late || 0, color: 'text-muted-foregroundmber-600 dark:text-muted-foregroundmber-400' },
               { label: 'Absent', value: dashboardData?.attendance_stats?.total_absent || 0, color: 'text-red-600 dark:text-red-400' },
             ].map((stat, i) => (
-              <div key={i} className="bg-card text-foreground border border-border rounded-xl p-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{stat.label}</p>
+              <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4">
+                <p className="text-xs text-textMuted uppercase tracking-wider font-medium">{stat.label}</p>
                 <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>{stat.value}</p>
               </div>
             ))}
@@ -240,8 +240,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           {/* Charts */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Donut Chart */}
-            <div className="md:col-span-5 bg-card text-foreground border border-border rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-foreground mb-4">Status Breakdown</h3>
+            <div className="md:col-span-5 bg-surface text-text border border-outline rounded-xl p-5">
+              <h3 className="font-headline text-sm font-semibold text-text mb-4">Status Breakdown</h3>
               <div className="h-56 w-full relative" style={{ minHeight: '224px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -264,22 +264,22 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       verticalAlign="bottom"
                       height={32}
                       iconType="circle"
-                      formatter={(value) => <span className="text-muted-foreground text-xs ml-1">{value}</span>}
+                      formatter={(value) => <span className="text-textMuted text-xs ml-1">{value}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
                   <div className="text-center">
-                    <p className="text-3xl font-semibold text-foreground">{avgAttendance}%</p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Total</p>
+                    <p className="text-3xl font-semibold text-text">{avgAttendance}%</p>
+                    <p className="text-[10px] text-textMuted uppercase tracking-wider font-medium">Total</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Area Chart */}
-            <div className="md:col-span-7 bg-card text-foreground border border-border rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-foreground mb-4">Weekly Attendance Trend</h3>
+            <div className="md:col-span-7 bg-surface text-text border border-outline rounded-xl p-5">
+              <h3 className="font-headline text-sm font-semibold text-text mb-4">Weekly Attendance Trend</h3>
               <div className="h-56 w-full" style={{ minHeight: '224px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={weeklyAttendanceData}>
@@ -304,21 +304,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           </div>
 
           {/* Course Performance */}
-          <div className="bg-card text-foreground border border-border rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-border">
-              <h3 className="text-sm font-semibold text-foreground">Course Performance</h3>
+          <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-outline">
+              <h3 className="font-headline text-sm font-semibold text-text">Course Performance</h3>
             </div>
             <div className="divide-y divide-zinc-100">
               {(analyticsData?.course_performance || []).map((course) => (
-                <div key={course.course_code} className="px-5 py-3.5 flex items-center gap-4 hover:bg-accent hover:text-accent-foreground/50 transition-colors">
+                <div key={course.course_code} className="px-5 py-3.5 flex items-center gap-4 hover:bg-surfaceHigh hover:text-text/50 transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-medium text-foreground">{course.course_code}</span>
+                      <span className="text-sm font-medium text-text">{course.course_code}</span>
                       <span className={`text-sm font-semibold ${course.attendance_percentage >= 75 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {course.attendance_percentage}%
                       </span>
                     </div>
-                    <div className="w-full bg-accent h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-surfaceHigh h-1.5 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${course.attendance_percentage >= 75 ? 'bg-emerald-500' : 'bg-red-500'}`}
                         style={{ width: `${course.attendance_percentage}%` }}
@@ -326,7 +326,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     </div>
                   </div>
                   <div className="w-24 text-right">
-                    <p className="text-xs text-muted-foreground truncate">{course.course_name}</p>
+                    <p className="text-xs text-textMuted truncate">{course.course_name}</p>
                   </div>
                 </div>
               ))}
@@ -345,14 +345,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         {/* Greeting */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-            <h1 className="text-xl font-semibold text-foreground mt-0.5">Hello, {userName.split(' ')[0]}</h1>
+            <p className="text-sm text-textMuted font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+            <h1 className="font-headline text-xl font-semibold text-text mt-0.5">Hello, {userName.split(' ')[0]}</h1>
           </div>
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-accent border border-border flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-surfaceHigh border border-outline flex items-center justify-center">
             {displayAvatar ? (
               <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-xs font-bold text-muted-foreground">{displayInitials}</span>
+              <span className="text-xs font-bold text-textMuted">{displayInitials}</span>
             )}
           </div>
         </div>
@@ -366,13 +366,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
             <span className="inline-flex items-center px-2 py-0.5 bg-cardackgroundlack/10 rounded text-[10px] font-semibold uppercase tracking-wider mb-2">
               Action Required
             </span>
-            <h2 className="text-xl md:text-2xl font-bold leading-tight">Mark Attendance</h2>
+            <h2 className="font-headline text-xl md:text-2xl font-bold leading-tight">Mark Attendance</h2>
             <p className="text-sm text-on-primary-fixedlack/70 font-medium mt-0.5">Scan QR Code or Enter Session ID</p>
           </div>
-          <div className="relative z-10 bg-card/20 p-3.5 rounded-xl backdrop-blur-sm group-hover:bg-card/30 transition-colors">
+          <div className="relative z-10 bg-surface/20 p-3.5 rounded-xl backdrop-blur-sm group-hover:bg-surface/30 transition-colors">
             <QrCode size={36} className="text-on-primary-fixedlack" />
           </div>
-          <div className="absolute right-0 top-0 w-48 h-48 bg-card/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <div className="absolute right-0 top-0 w-48 h-48 bg-surface/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         </button>
 
         {/* Warning Banner */}
@@ -407,18 +407,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Next Class */}
           {nextClass ? (
-            <div className="bg-card text-foreground p-5 rounded-xl relative overflow-hidden border border-border">
+            <div className="bg-surface text-text p-5 rounded-xl relative overflow-hidden border border-outline">
               <div className="relative z-10">
-                <p className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                <p className="text-textMuted text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Clock size={12} className="text-primary" /> Up Next
                 </p>
-                <h3 className="text-lg font-semibold mb-3">{nextClass.course_name}</h3>
+                <h3 className="font-headline text-lg font-semibold mb-3">{nextClass.course_name}</h3>
                 <div className="flex items-center gap-3">
-                  <div className="bg-accent px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
-                    <Clock size={12} className="text-muted-foreground" /> {nextClass.start_time}
+                  <div className="bg-surfaceHigh px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
+                    <Clock size={12} className="text-textMuted" /> {nextClass.start_time}
                   </div>
-                  <div className="bg-accent px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
-                    <MapPin size={12} className="text-muted-foreground" /> {nextClass.venue_name}
+                  <div className="bg-surfaceHigh px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
+                    <MapPin size={12} className="text-textMuted" /> {nextClass.venue_name}
                   </div>
                 </div>
               </div>
@@ -427,13 +427,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               </div>
             </div>
           ) : (
-            <div className="bg-card text-foreground p-5 rounded-xl relative overflow-hidden border border-border">
+            <div className="bg-surface text-text p-5 rounded-xl relative overflow-hidden border border-outline">
               <div className="relative z-10">
-                <p className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                <p className="text-textMuted text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Clock size={12} className="text-primary" /> Up Next
                 </p>
-                <h3 className="text-lg font-semibold mb-1">No Classes Scheduled</h3>
-                <p className="text-sm text-muted-foreground">You don't have any upcoming classes today.</p>
+                <h3 className="font-headline text-lg font-semibold mb-1">No Classes Scheduled</h3>
+                <p className="text-sm text-textMuted">You don't have any upcoming classes today.</p>
               </div>
             </div>
           )}
@@ -441,50 +441,50 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           {/* Stats + Register CTA */}
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="flex-1 bg-card text-foreground border border-border p-4 rounded-xl">
+              <div className="flex-1 bg-surface text-text border border-outline p-4 rounded-xl">
                 <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 mb-2">
                   <TrendingUp size={16} />
                 </div>
-                <p className="text-2xl font-semibold text-foreground">{avgAttendance}%</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Avg. Attendance</p>
+                <p className="text-2xl font-semibold text-text">{avgAttendance}%</p>
+                <p className="text-xs text-textMuted mt-0.5">Avg. Attendance</p>
               </div>
-              <div className="flex-1 bg-card text-foreground border border-border p-4 rounded-xl">
+              <div className="flex-1 bg-surface text-text border border-outline p-4 rounded-xl">
                 <div className="w-8 h-8 rounded-lg bg-cardackgroundlue-50 flex items-center justify-center text-on-primary-fixedlue-600 mb-2">
                   <BookOpen size={16} />
                 </div>
-                <p className="text-2xl font-semibold text-foreground">{enrolledCourses.length}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Active Courses</p>
+                <p className="text-2xl font-semibold text-text">{enrolledCourses.length}</p>
+                <p className="text-xs text-textMuted mt-0.5">Active Courses</p>
               </div>
             </div>
             <button
               onClick={() => setIsRegistrationOpen(true)}
-              className="w-full bg-muted border border-border p-3.5 rounded-xl flex items-center justify-between hover:bg-accent hover:text-accent-foreground transition-colors"
+              className="w-full bg-surfaceLow border border-outline p-3.5 rounded-xl flex items-center justify-between hover:bg-surfaceHigh hover:text-text transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="bg-accent p-2 rounded-lg">
-                  <Plus size={16} className="text-muted-foreground" />
+                <div className="bg-surfaceHigh p-2 rounded-lg">
+                  <Plus size={16} className="text-textMuted" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-medium text-foreground">Register Courses</p>
-                  <p className="text-xs text-muted-foreground">Manage your enrollment</p>
+                  <p className="text-sm font-medium text-text">Register Courses</p>
+                  <p className="text-xs text-textMuted">Manage your enrollment</p>
                 </div>
               </div>
-              <ChevronRight size={16} className="text-muted-foreground" />
+              <ChevronRight size={16} className="text-textMuted" />
             </button>
           </div>
         </div>
 
         {/* Recent Activity */}
         <div>
-          <h3 className="text-sm font-semibold text-foreground mb-3">Recent Activity</h3>
+          <h3 className="font-headline text-sm font-semibold text-text mb-3">Recent Activity</h3>
           <div className="space-y-2">
             {recentActivity.length === 0 ? (
-              <div className="bg-card text-foreground border border-border rounded-xl p-8 text-center">
-                <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Activity size={20} className="text-muted-foreground" />
+              <div className="bg-surface text-text border border-outline rounded-xl p-8 text-center">
+                <div className="w-12 h-12 bg-surfaceHigh rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Activity size={20} className="text-textMuted" />
                 </div>
-                <p className="text-sm text-secondary font-medium">No recent activity</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Your attendance records will appear here</p>
+                <p className="text-sm text-textMuted font-medium">No recent activity</p>
+                <p className="text-xs text-textMuted mt-0.5">Your attendance records will appear here</p>
               </div>
             ) : (
               recentActivity.slice(0, 8).map((activity, index) => {
@@ -503,15 +503,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 return (
                   <div
                     key={activity.id || `activity-${index}`}
-                    className="flex items-center justify-between p-3 bg-card text-foreground border border-border rounded-xl"
+                    className="flex items-center justify-between p-3 bg-surface text-text border border-outline rounded-xl"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center text-xs font-bold text-muted-foreground">
+                      <div className="w-9 h-9 rounded-lg bg-surfaceHigh flex items-center justify-center text-xs font-bold text-textMuted">
                         {getActivityCourseCode(activity).substring(0, 2)}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">{getActivityCourseCode(activity)}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm font-medium text-text">{getActivityCourseCode(activity)}</p>
+                        <p className="text-xs text-textMuted">
                           {new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>

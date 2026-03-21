@@ -190,8 +190,8 @@ export const CourseManagement: React.FC = () => {
         <div className="flex items-center gap-3">
           <BookOpen className="w-8 h-8 text-primary" />
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Course Management</h2>
-            <p className="text-sm text-muted-foreground">Manage courses across institutions</p>
+            <h2 className="font-headline text-2xl font-bold text-text">Course Management</h2>
+            <p className="text-sm text-textMuted">Manage courses across institutions</p>
           </div>
         </div>
         <Button onClick={handleCreateCourse} className="gap-2">
@@ -212,9 +212,9 @@ export const CourseManagement: React.FC = () => {
       )}
 
       {/* Hierarchical Filters */}
-      <div className="bg-card border border-border rounded-lg p-4">
+      <div className="bg-surface border border-outline rounded-lg p-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-foreground">Filter by Hierarchy</h3>
+          <h3 className="font-headline text-sm font-semibold text-text">Filter by Hierarchy</h3>
           {(selectedInstitution || selectedCollege || selectedDepartment) && (
             <button
               onClick={resetFilters}
@@ -227,13 +227,13 @@ export const CourseManagement: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">
+            <label className="block text-sm font-medium text-textMuted mb-2">
               Institution
             </label>
             <select
               value={selectedInstitution || ''}
               onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-              className="w-full px-4 py-2 bg-accent border border-border rounded-full text-foreground focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary"
             >
               <option value="">All Institutions</option>
               {institutions.map(inst => (
@@ -243,14 +243,14 @@ export const CourseManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">
+            <label className="block text-sm font-medium text-textMuted mb-2">
               College/Faculty
             </label>
             <select
               value={selectedCollege || ''}
               onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedInstitution}
-              className="w-full px-4 py-2 bg-accent border border-border rounded-full text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Colleges</option>
               {colleges.map(college => (
@@ -260,14 +260,14 @@ export const CourseManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">
+            <label className="block text-sm font-medium text-textMuted mb-2">
               Department
             </label>
             <select
               value={selectedDepartment || ''}
               onChange={(e) => setSelectedDepartment(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedCollege}
-              className="w-full px-4 py-2 bg-accent border border-border rounded-full text-foreground focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Departments</option>
               {departments.map(dept => (
@@ -280,7 +280,7 @@ export const CourseManagement: React.FC = () => {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-textMuted" />
         <Input
           type="text"
           placeholder="Search courses by title, code, or department..."
@@ -295,27 +295,27 @@ export const CourseManagement: React.FC = () => {
         {filteredCourses.map(course => (
           <div
             key={course.id}
-            className="bg-card border border-border rounded-lg p-4 hover:border-border transition-colors"
+            className="bg-surface border border-outline rounded-lg p-4 hover:border-outline transition-colors"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-primary" />
                 <div>
-                  <h3 className="font-semibold text-foreground">{course.title}</h3>
-                  <p className="text-xs text-muted-foreground">{course.code}</p>
+                  <h3 className="font-headline font-semibold text-text">{course.title}</h3>
+                  <p className="text-xs text-textMuted">{course.code}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => handleEditCourse(course)}
-                  className="p-2 hover:bg-accent rounded-lg transition-colors"
+                  className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
                   title="Edit course"
                 >
-                  <Edit2 className="w-4 h-4 text-muted-foreground" />
+                  <Edit2 className="w-4 h-4 text-textMuted" />
                 </button>
                 <button
                   onClick={() => handleDeleteCourse(course.id)}
-                  className="p-2 hover:bg-accent rounded-lg transition-colors"
+                  className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
                   title="Delete course"
                 >
                   <Trash2 className="w-4 h-4 text-red-400" />
@@ -325,38 +325,38 @@ export const CourseManagement: React.FC = () => {
 
             <div className="space-y-2 text-sm">
               {course.department_name && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-textMuted">
                   <GraduationCap className="w-4 h-4" />
                   <span>{course.department_name}</span>
                 </div>
               )}
 
               {course.lecturer_name && (
-                <div className="text-muted-foreground">
+                <div className="text-textMuted">
                   Lecturer: {course.lecturer_name}
                 </div>
               )}
 
               {typeof course.enrolled_students_count === 'number' && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-textMuted">
                   <Users className="w-4 h-4" />
                   <span>{course.enrolled_students_count} Student{course.enrolled_students_count !== 1 ? 's' : ''} Enrolled</span>
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <div className="text-muted-foreground">
+              <div className="flex items-center justify-between pt-2 border-t border-outline">
+                <div className="text-textMuted">
                   {course.credit_units} Credit{course.credit_units !== 1 ? 's' : ''}
                 </div>
                 {course.level && (
-                  <div className="text-muted-foreground">
+                  <div className="text-textMuted">
                     Level {course.level}
                   </div>
                 )}
               </div>
 
               {course.semester && (
-                <div className="text-muted-foreground text-xs">
+                <div className="text-textMuted text-xs">
                   Semester: {course.semester}
                 </div>
               )}
@@ -377,9 +377,9 @@ export const CourseManagement: React.FC = () => {
 
       {filteredCourses.length === 0 && !loading && (
         <div className="text-center py-12">
-          <BookOpen className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-          <p className="text-muted-foreground">No courses found</p>
-          <p className="text-muted-foreground text-sm mt-1">Create your first course to get started</p>
+          <BookOpen className="w-16 h-16 text-textMuted mx-auto mb-4" />
+          <p className="text-textMuted">No courses found</p>
+          <p className="text-textMuted text-sm mt-1">Create your first course to get started</p>
         </div>
       )}
 

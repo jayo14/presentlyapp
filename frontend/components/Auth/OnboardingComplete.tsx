@@ -112,7 +112,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
         </div>
 
         {/* Success Card */}
-        <div className="bg-card text-foreground border border-border rounded-3xl shadow-2xl p-8 md:p-12 text-center mb-8">
+        <div className="bg-surface text-text border border-outline rounded-3xl shadow-2xl p-8 md:p-12 text-center mb-8">
           {/* Success Icon */}
           <div className="mb-6 flex justify-center">
             <div className="relative">
@@ -127,37 +127,37 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
           </div>
 
           {/* Header */}
-          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4 flex items-center justify-center gap-3">
+          <h1 className="font-headline text-3xl md:text-4xl font-bold text-text-primary mb-4 flex items-center justify-center gap-3">
             You're all set, {userName}! 🎉
           </h1>
 
           {/* Message */}
-          <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-text-textMuted mb-8 max-w-2xl mx-auto leading-relaxed">
             Your profile is ready. Welcome to a seamless attendance experience with Presently.
           </p>
 
           {/* Quick Tips Card */}
-          <div className="bg-muted/50 border border-border rounded-2xl p-6 mb-8 text-left">
+          <div className="bg-surfaceLow/50 border border-outline rounded-2xl p-6 mb-8 text-left">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp size={20} className="text-primary" />
-              <h3 className="text-lg font-semibold text-text-primary">Quick Tips to Get Started</h3>
+              <h3 className="font-headline text-lg font-semibold text-text-primary">Quick Tips to Get Started</h3>
             </div>
             
             <div className="space-y-4">
               {quickTips.filter(tip => tip.show !== false).map((tip, idx) => (
                 <div 
                   key={idx}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-card transition-colors"
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-surface transition-colors"
                 >
                   <div className="bg-primary/10 p-2 rounded-lg flex-shrink-0">
                     <tip.icon size={20} className="text-primary" />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-text-primary text-sm mb-1">{tip.title}</p>
-                    <p className="text-text-secondary text-xs leading-relaxed">{tip.desc}</p>
+                    <p className="text-text-textMuted text-xs leading-relaxed">{tip.desc}</p>
                   </div>
                   {tip.action && (
-                    <ArrowRight size={18} className="text-text-secondary flex-shrink-0 mt-1" />
+                    <ArrowRight size={18} className="text-text-textMuted flex-shrink-0 mt-1" />
                   )}
                 </div>
               ))}
@@ -189,7 +189,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
 
           {/* Auto-redirect Countdown */}
           {autoRedirect && countdown > 0 && (
-            <div className="mt-6 text-text-secondary text-sm">
+            <div className="mt-6 text-text-textMuted text-sm">
               <p>Entering dashboard in {countdown}s...</p>
               <button 
                 onClick={handleCancelRedirect}
@@ -202,8 +202,8 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
         </div>
 
         {/* Profile Preview Card */}
-        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-6 text-center">
-          <p className="text-text-secondary text-sm mb-2">Your Role</p>
+        <div className="bg-surface/50 backdrop-blur-sm border border-outline rounded-2xl p-6 text-center">
+          <p className="text-text-textMuted text-sm mb-2">Your Role</p>
           <p className="text-text-primary font-semibold text-lg capitalize">
             {userRole.replace('_', ' ')}
           </p>
@@ -211,7 +211,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
 
         {/* Help Text */}
         <div className="mt-8 text-center">
-          <p className="text-text-secondary text-sm">
+          <p className="text-text-textMuted text-sm">
             Need help getting started?{' '}
             <button 
               onClick={() => window.location.href = 'mailto:support@presently.app'}

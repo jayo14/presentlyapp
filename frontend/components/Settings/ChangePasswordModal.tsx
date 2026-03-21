@@ -120,22 +120,22 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
       <div 
         {...modalProps}
         aria-labelledby="modal-title"
-        className="bg-card text-foreground border border-border rounded-2xl max-w-md w-full shadow-2xl outline-none"
+        className="bg-surface text-text border border-outline rounded-2xl max-w-md w-full shadow-2xl outline-none"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between p-6 border-b border-outline">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 p-2 rounded-lg text-primary">
               <Lock size={20} />
             </div>
             <div>
-              <h2 id="modal-title" className="text-xl font-bold text-foreground">Change Password</h2>
-              <p className="text-sm text-muted-foreground">Update your account password</p>
+              <h2 id="modal-title" className="font-headline text-xl font-bold text-text">Change Password</h2>
+              <p className="text-sm text-textMuted">Update your account password</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-textMuted hover:text-text transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-6 h-6" />
@@ -165,7 +165,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
 
               {/* Current Password */}
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Current Password *
                 </label>
                 <div className="relative">
@@ -180,7 +180,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                   <button
                     type="button"
                     onClick={() => setShowOldPassword(!showOldPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMuted"
                   >
                     {showOldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -189,7 +189,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
 
               {/* New Password */}
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   New Password *
                 </label>
                 <div className="relative">
@@ -204,7 +204,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMuted"
                   >
                     {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -214,12 +214,12 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                 {formData.newPassword && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-muted-foreground">Password Strength:</span>
+                      <span className="text-xs text-textMuted">Password Strength:</span>
                       <span className={`text-xs font-semibold ${passwordStrength.color}`}>
                         {passwordStrength.label}
                       </span>
                     </div>
-                    <div className="w-full h-1.5 bg-zinc-200 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-surfaceLow rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 ${
                           passwordStrength.score <= 1
@@ -234,7 +234,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                         }`}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1.5">
+                    <p className="text-xs text-textMuted mt-1.5">
                       Use at least 8 characters with a mix of letters, numbers, and symbols.
                     </p>
                   </div>
@@ -243,7 +243,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Confirm New Password *
                 </label>
                 <div className="relative">
@@ -258,7 +258,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMuted"
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
