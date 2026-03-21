@@ -83,8 +83,8 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
     } else {
       circleRef.current = L.circle(latLng, {
         radius: accuracy,
-        color: '#ffca0d',
-        fillColor: '#ffca0d',
+        color: 'var(--primary)',
+        fillColor: 'var(--primary)',
         fillOpacity: 0.15,
         weight: 1
       }).addTo(map);
@@ -129,7 +129,7 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
   };
 
   return (
-    <div className={`bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col ${className}`}>
+    <div className={`bg-surface border border-outline rounded-2xl overflow-hidden flex flex-col ${className}`}>
       {/* Header */}
       <div className="p-6 border-b border-outline">
         <div className="flex items-center justify-between mb-4">
