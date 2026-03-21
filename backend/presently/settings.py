@@ -295,7 +295,8 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     print("WARNING: SMTP credentials not found; using console email backend.")
 
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') or os.environ.get('EMAIL_HOST_USER') or 'noreply@presently.app'
+raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or os.environ.get('EMAIL_HOST_USER') or 'noreply@presently.app'
+DEFAULT_FROM_EMAIL = raw_from_email if '<' in raw_from_email else f"Presently <{raw_from_email}>"
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links
