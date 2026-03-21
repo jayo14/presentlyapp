@@ -166,7 +166,7 @@ export const AttendanceDashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4">
+          <div className="bg-surface border border-border rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-text-secondary text-sm">Present</span>
               <Check className="text-green-600" size={20} />
@@ -178,7 +178,7 @@ export const AttendanceDashboard: React.FC = () => {
             <p className="text-text-secondary text-xs mt-1">{attendanceRate}% attendance</p>
           </div>
 
-          <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4">
+          <div className="bg-surface border border-border rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-text-secondary text-sm">Absent</span>
               <X className="text-red-600" size={20} />
@@ -187,7 +187,7 @@ export const AttendanceDashboard: React.FC = () => {
             <p className="text-text-secondary text-xs mt-1">Not checked in</p>
           </div>
 
-          <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4">
+          <div className="bg-surface border border-border rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-text-secondary text-sm">Pending</span>
               <Circle className="text-yellow-600" size={20} />
@@ -196,7 +196,7 @@ export const AttendanceDashboard: React.FC = () => {
             <p className="text-text-secondary text-xs mt-1">Processing...</p>
           </div>
 
-          <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4">
+          <div className="bg-surface border border-border rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-text-secondary text-sm">Time</span>
               <Clock className="text-primary" size={20} />
@@ -209,7 +209,7 @@ export const AttendanceDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4">
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-surface border border-border rounded-2xl p-4">
             <div className="flex gap-2">
               {['all', 'present', 'absent', 'pending'].map(status => (
                 <button
@@ -218,7 +218,7 @@ export const AttendanceDashboard: React.FC = () => {
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize ${
                     filterStatus === status
                       ? 'bg-primary text-white'
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-text-secondary'
+                      : 'bg-inputccent text-text-secondary'
                   }`}
                 >
                   {status}
@@ -235,7 +235,7 @@ export const AttendanceDashboard: React.FC = () => {
 
           <div className="space-y-2">
             {filteredStudents.map(student => (
-              <div key={student.id} className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-xl p-4 flex items-center justify-between">
+              <div key={student.id} className="bg-surface border border-border rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
                   <div className={`p-2 rounded-lg ${getStatusColor(student.status)}`}>
                     {getStatusIcon(student.status)}
@@ -258,22 +258,22 @@ export const AttendanceDashboard: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-6">
+          <div className="bg-surface border border-border rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-text-primary font-semibold flex items-center gap-2">
                 <QrCode size={20} className="text-primary" />
                 QR Code
               </h3>
-              <button onClick={refreshQRCode} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full">
+              <button onClick={refreshQRCode} className="p-2 hover:bg-inputccent hover:text-muted-foregroundccent-foreground rounded-full">
                 <RefreshCw size={16} className="text-primary" />
               </button>
             </div>
 
-            <div className="bg-white p-4 rounded-xl mb-4 flex items-center justify-center">
+            <div className="bg-card p-4 rounded-xl mb-4 flex items-center justify-center">
               <QRCodeSVG value={sessionInfo.qrData} size={200} level="H" includeMargin={true} />
             </div>
 
-            <div className="bg-primary/10 dark:bg-primary/20 rounded-lg p-3 mb-3">
+            <div className="bg-primary/10 rounded-lg p-3 mb-3">
               <p className="text-xs text-text-secondary mb-1 text-center">Session Code</p>
               <p className="text-2xl font-mono font-bold text-primary text-center">{sessionInfo.code}</p>
             </div>
@@ -284,7 +284,7 @@ export const AttendanceDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-6 space-y-3">
+          <div className="bg-surface border border-border rounded-2xl p-6 space-y-3">
             <h3 className="text-text-primary font-semibold mb-4">Session Controls</h3>
 
             {sessionInfo.status !== 'ended' && (

@@ -105,8 +105,8 @@ export const CollegeFormPage: React.FC = () => {
   if (fetching) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-zinc-500 animate-pulse">Loading college data...</p>
+        <div className="w-12 h-12 border-input border-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-muted-foreground animate-pulse">Loading college data...</p>
       </div>
     );
   }
@@ -117,7 +117,7 @@ export const CollegeFormPage: React.FC = () => {
       <div className="flex flex-col gap-4">
         <button 
           onClick={() => navigate(`/dashboard/institutions/${id}`)}
-          className="flex items-center gap-2 text-sm text-zinc-400 hover:text-primary transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Colleges
@@ -132,7 +132,7 @@ export const CollegeFormPage: React.FC = () => {
               <h1 className="text-3xl font-bold text-foreground">
                 {collegeId && collegeId !== 'new' ? 'Edit College' : 'New College'}
               </h1>
-              <p className="text-zinc-400">{institution?.full_name || 'Institution'}</p>
+              <p className="text-muted-foreground">{institution?.full_name || 'Institution'}</p>
             </div>
           </div>
           <div className="hidden md:flex gap-3">
@@ -154,8 +154,8 @@ export const CollegeFormPage: React.FC = () => {
         )}
 
         {/* Basic Information Section */}
-        <section className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-zinc-800 bg-zinc-950/50">
+        <section className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-border bg-background/50">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               <Building className="w-4 h-4 text-primary" />
               College Details
@@ -163,60 +163,60 @@ export const CollegeFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">College Name *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">College Name *</label>
               <Input
                 value={formData.name || ''}
                 onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="e.g., College of Engineering"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">College Code *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">College Code *</label>
               <Input
                 value={formData.code || ''}
                 onChange={(e) => handleChange('code', e.target.value.toUpperCase())}
                 placeholder="e.g., COE"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Abbreviation</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Abbreviation</label>
               <Input
                 value={formData.abbreviation || ''}
                 onChange={(e) => handleChange('abbreviation', e.target.value)}
                 placeholder="Alternative abbreviation"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Description</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Description</label>
               <textarea
                 value={formData.description || ''}
                 onChange={(e) => handleChange('description', e.target.value)}
                 placeholder="Brief description of the college"
                 rows={3}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Established Year</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Established Year</label>
               <Input
                 type="number"
                 value={formData.established_year || ''}
                 onChange={(e) => handleChange('established_year', parseInt(e.target.value))}
                 placeholder="e.g., 1980"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
           </div>
         </section>
 
         {/* Administration & Contact */}
-        <section className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-zinc-800 bg-zinc-950/50">
+        <section className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-border bg-background/50">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               <Mail className="w-4 h-4 text-primary" />
               Administration & Contact
@@ -224,53 +224,53 @@ export const CollegeFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Dean Name</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Dean Name</label>
               <Input
                 value={formData.dean_name || ''}
                 onChange={(e) => handleChange('dean_name', e.target.value)}
                 placeholder="e.g., Prof. Sarah Johnson"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Dean Email</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Dean Email</label>
               <Input
                 type="email"
                 value={formData.dean_email || ''}
                 onChange={(e) => handleChange('dean_email', e.target.value)}
                 placeholder="dean@example.edu"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Official Email</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Official Email</label>
               <Input
                 type="email"
                 value={formData.contact_email || ''}
                 onChange={(e) => handleChange('contact_email', e.target.value)}
                 placeholder="college@example.edu"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Contact Phone</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Contact Phone</label>
               <Input
                 value={formData.contact_phone || ''}
                 onChange={(e) => handleChange('contact_phone', e.target.value)}
                 placeholder="+234..."
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Website URL</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Website URL</label>
               <div className="relative">
-                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="url"
                   value={formData.website_url || ''}
                   onChange={(e) => handleChange('website_url', e.target.value)}
                   placeholder="https://..."
-                  className="h-12 pl-10 bg-zinc-950 border-zinc-800 focus:border-primary"
+                  className="h-12 pl-10 bg-background border-border focus:border-primary"
                 />
               </div>
             </div>
@@ -278,8 +278,8 @@ export const CollegeFormPage: React.FC = () => {
         </section>
 
         {/* Location Section */}
-        <section className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-zinc-800 bg-zinc-950/50">
+        <section className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-border bg-background/50">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               <Building className="w-4 h-4 text-primary" />
               Campus Location
@@ -287,28 +287,28 @@ export const CollegeFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Building Block</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Building Block</label>
               <Input
                 value={formData.building_block || ''}
                 onChange={(e) => handleChange('building_block', e.target.value)}
                 placeholder="e.g., Block G"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-zinc-400 mb-2">Office Location</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-2">Office Location</label>
               <Input
                 value={formData.office_location || ''}
                 onChange={(e) => handleChange('office_location', e.target.value)}
                 placeholder="e.g., Room 302"
-                className="h-12 bg-zinc-950 border-zinc-800 focus:border-primary"
+                className="h-12 bg-background border-border focus:border-primary"
               />
             </div>
           </div>
         </section>
 
         {/* Status */}
-        <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+        <section className="bg-card border border-border rounded-2xl p-6">
            <label className="flex items-center gap-3 cursor-pointer group">
               <div className={`w-10 h-6 rounded-full p-1 transition-colors ${formData.is_active ? 'bg-primary' : 'bg-zinc-700'}`}>
                 <div className={`w-4 h-4 bg-white rounded-full transition-transform ${formData.is_active ? 'translate-x-4' : 'translate-x-0'}`} />
@@ -319,7 +319,7 @@ export const CollegeFormPage: React.FC = () => {
                 onChange={(e) => handleChange('is_active', e.target.checked)}
                 className="hidden"
               />
-              <span className="text-sm font-bold text-zinc-300 group-hover:text-primary transition-colors">Active Status</span>
+              <span className="text-sm font-bold text-muted-foreground group-hover:text-primary transition-colors">Active Status</span>
            </label>
         </section>
 

@@ -120,18 +120,18 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cardackgroundlack/80 backdrop-blur-md">
       <div 
         {...modalProps}
         aria-labelledby="checkin-title"
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl outline-none"
+        className="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl outline-none"
       >
         {/* Header */}
         <div className="text-center mb-6" aria-live="polite">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             {status === 'idle' && <MapPin className="w-8 h-8 text-primary" />}
             {status === 'locating' && <Loader className="w-8 h-8 text-primary animate-spin" />}
-            {status === 'verifying' && <Loader className="w-8 h-8 text-blue-500 animate-spin" />}
+            {status === 'verifying' && <Loader className="w-8 h-8 text-on-primary-fixedlue-500 animate-spin" />}
             {status === 'success' && <CheckCircle className="w-8 h-8 text-green-500" />}
             {status === 'error' && <XCircle className="w-8 h-8 text-red-500" />}
           </div>
@@ -142,7 +142,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
             {status === 'success' && 'Success!'}
             {status === 'error' && 'Check-In Failed'}
           </h2>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             {status === 'idle' && 'Enter your session code to check in'}
             {status === 'locating' && 'Please allow location access'}
             {status === 'verifying' && 'Verifying your location and session'}
@@ -156,14 +156,14 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
           <div className={`p-4 rounded-lg mb-4 ${
             status === 'success' 
               ? 'bg-green-500/10 border border-green-500/30' 
-              : 'bg-blue-500/10 border border-blue-500/30'
+              : 'bg-cardackgroundlue-500/10 border border-blue-500/30'
           }`}>
             <div className="flex items-start gap-3">
               <MapPin className={`w-5 h-5 mt-0.5 ${
-                status === 'success' ? 'text-green-500' : 'text-blue-500'
+                status === 'success' ? 'text-green-500' : 'text-on-primary-fixedlue-500'
               }`} />
               <p className={`text-sm ${
-                status === 'success' ? 'text-green-400' : 'text-blue-400'
+                status === 'success' ? 'text-green-400' : 'text-on-primary-fixedlue-400'
               }`}>
                 {locationInfo}
               </p>
@@ -185,7 +185,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         {(status === 'idle' || status === 'error') && (
           <form onSubmit={handleCheckIn} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Session Code
               </label>
               <Input
@@ -228,7 +228,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
                 Close
               </Button>
             ) : (
-              <div className="text-center text-zinc-400 text-sm">
+              <div className="text-center text-muted-foreground text-sm">
                 Please wait...
               </div>
             )}
@@ -236,8 +236,8 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         )}
 
         {/* Additional Info */}
-        <div className="mt-6 pt-4 border-t border-zinc-800">
-          <div className="flex items-start gap-2 text-xs text-zinc-500">
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="flex items-start gap-2 text-xs text-muted-foreground">
             <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <p>
               Your location will be used to verify you are within the venue boundaries.

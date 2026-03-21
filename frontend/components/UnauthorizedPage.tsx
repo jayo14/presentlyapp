@@ -17,7 +17,7 @@ export const UnauthorizedPage: React.FC = () => {
   const state = location.state as LocationState;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-cardackgroundackground flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         {/* Error Icon */}
         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-full inline-flex items-center justify-center w-20 h-20">
@@ -40,16 +40,16 @@ export const UnauthorizedPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-foreground mb-2">Access Denied</h1>
 
         {/* Message */}
-        <p className="text-zinc-400 mb-6">
+        <p className="text-muted-foreground mb-6">
           {state?.message ||
             'You do not have permission to access this page. Your current role does not grant you access.'}
         </p>
 
         {/* Required Role Info */}
         {state?.requiredRole && state.requiredRole.length > 0 && (
-          <div className="mb-6 p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
-            <p className="text-sm text-zinc-400 mb-2">Required role:</p>
-            <p className="text-sm font-medium text-amber-500">
+          <div className="mb-6 p-4 bg-card/50 border border-border rounded-lg">
+            <p className="text-sm text-muted-foreground mb-2">Required role:</p>
+            <p className="text-sm font-medium text-muted-foregroundmber-500">
               {state.requiredRole.join(' or ')}
             </p>
           </div>
@@ -65,14 +65,14 @@ export const UnauthorizedPage: React.FC = () => {
           </button>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-foreground rounded-lg font-medium transition-colors border border-zinc-800"
+            className="px-4 py-2 bg-card hover:bg-accent text-foreground rounded-lg font-medium transition-colors border border-border"
           >
             Go Back
           </button>
         </div>
 
         {/* Contact Support */}
-        <p className="mt-8 text-xs text-zinc-500">
+        <p className="mt-8 text-xs text-muted-foreground">
           If you believe this is an error, please{' '}
           <a href="mailto:support@presently.com" className="text-primary hover:underline">
             contact support

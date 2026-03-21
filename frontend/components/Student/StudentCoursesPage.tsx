@@ -81,10 +81,10 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-light-background dark:bg-dark-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-light-background flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary dark:border-dark-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">Loading your courses...</p>
+          <div className="w-16 h-16 border-input border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-light-text-secondary">Loading your courses...</p>
         </div>
       </div>
     );
@@ -92,13 +92,13 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
   // Mobile Layout (Design 4)
   const mobileLayout = (
-    <div className="min-h-screen bg-light-background dark:bg-dark-background text-light-text dark:text-dark-text pb-20">
+    <div className="min-h-screen bg-light-background text-light-text pb-20">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-light-border dark:border-dark-border">
+      <div className="p-4 flex items-center justify-between border-b border-light-border">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => window.history.back()} 
-            className="p-2 hover:bg-light-surface dark:hover:bg-dark-surface rounded-full transition-colors"
+            className="p-2 hover:bg-light-surface rounded-full transition-colors"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -112,13 +112,13 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       <div className="p-4 space-y-4">
         {filteredCourses.length === 0 ? (
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface dark:bg-dark-surface rounded-full mb-4">
-              <BookOpen size={32} className="text-light-text-tertiary dark:text-dark-text-tertiary" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface rounded-full mb-4">
+              <BookOpen size={32} className="text-light-text-tertiary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">
               {searchTerm ? 'No courses found' : 'No courses yet'}
             </h3>
-            <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
+            <p className="text-light-text-secondary mb-6">
               {searchTerm ? 'Try adjusting your search' : 'Start by registering for courses'}
             </p>
           </div>
@@ -164,7 +164,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             return (
               <div 
                 key={course.id}
-                className="bg-light-surface dark:bg-dark-surface rounded-2xl overflow-hidden"
+                className="bg-light-surface rounded-2xl overflow-hidden"
               >
                 {/* Course Thumbnail */}
                 <div className={`h-24 bg-gradient-to-br ${getCourseImage(course.course_name)} relative flex items-center justify-center`}>
@@ -178,18 +178,18 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 {/* Course Info */}
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-1 truncate">{course.course_name}</h3>
-                  <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-3">
+                  <p className="text-sm text-light-text-secondary mb-3">
                     {course.course_code} • {course.lecturer_name || 'Prof. Not Assigned'}
                   </p>
                   
                   {/* Attendance Progress */}
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">Attendance</span>
+                    <span className="text-xs text-light-text-tertiary">Attendance</span>
                     <span className={`text-sm font-bold ${getProgressTextClass()}`}>
                       {Math.round(attendance)}%
                     </span>
                   </div>
-                  <div className="w-full bg-light-background dark:bg-dark-background rounded-full h-1.5">
+                  <div className="w-full bg-light-background rounded-full h-1.5">
                     <div 
                       className={`h-full rounded-full transition-all ${getProgressColorClass()}`}
                       style={{ width: `${attendance}%` }}
@@ -200,7 +200,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                   <button
                     onClick={() => handleDropCourse(course)}
                     disabled={droppingId === course.id}
-                    className="mt-3 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-error dark:text-error-light border border-error/30 dark:border-error-light/30 hover:bg-error/5 dark:hover:bg-error-light/5 transition-colors disabled:opacity-50"
+                    className="mt-3 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-error border border-error/30 hover:bg-error/5 transition-colors disabled:opacity-50"
                   >
                     <Trash2 size={13} />
                     {droppingId === course.id ? 'Dropping…' : 'Drop Course'}
@@ -215,33 +215,33 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       {/* Floating Add Button */}
       <button 
         onClick={() => setIsRegistrationOpen(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-primary dark:bg-dark-primary rounded-full flex items-center justify-center text-white shadow-lg hover:bg-primary-hover dark:hover:bg-dark-primary-hover transition-colors"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-primary-foreground shadow-lg hover:bg-primary-hover transition-colors"
       >
         <Plus size={28} />
       </button>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-light-surface dark:bg-dark-surface border-t border-light-border dark:border-dark-border px-6 py-3 flex justify-between items-center">
-        <button className="flex flex-col items-center gap-1 text-light-text-tertiary dark:text-dark-text-tertiary">
+      <div className="fixed bottom-0 left-0 right-0 bg-light-surface border-t border-light-border px-6 py-3 flex justify-between items-center">
+        <button className="flex flex-col items-center gap-1 text-light-text-tertiary">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <span className="text-xs">Home</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-primary dark:text-dark-primary">
+        <button className="flex flex-col items-center gap-1 text-primary">
           <GraduationCap size={24} />
           <span className="text-xs">Courses</span>
         </button>
         <button 
-          className="w-14 h-14 -mt-7 bg-primary dark:bg-dark-primary rounded-2xl flex items-center justify-center text-white hover:bg-primary-hover dark:hover:bg-dark-primary-hover transition-colors"
+          className="w-14 h-14 -mt-7 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground hover:bg-primary-hover transition-colors"
         >
           <QrCode size={28} />
         </button>
-        <button className="flex flex-col items-center gap-1 text-light-text-tertiary dark:text-dark-text-tertiary">
+        <button className="flex flex-col items-center gap-1 text-light-text-tertiary">
           <TrendingUp size={24} />
           <span className="text-xs">Analytics</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-light-text-tertiary dark:text-dark-text-tertiary">
+        <button className="flex flex-col items-center gap-1 text-light-text-tertiary">
           <User size={24} />
           <span className="text-xs">Profile</span>
         </button>
@@ -260,17 +260,17 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
   // Desktop Layout (unchanged)
   const desktopLayout = (
-    <div className="min-h-screen bg-light-background dark:bg-dark-background p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-light-background p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-primary/10 dark:bg-dark-primary/10 rounded-xl">
-              <GraduationCap className="text-primary dark:text-dark-primary" size={28} />
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <GraduationCap className="text-primary" size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-light-text dark:text-dark-text">My Courses</h1>
-              <p className="text-light-text-secondary dark:text-dark-text-secondary">
+              <h1 className="text-3xl font-bold text-light-text">My Courses</h1>
+              <p className="text-light-text-secondary">
                 {courses.length} {courses.length === 1 ? 'course' : 'courses'} enrolled
               </p>
             </div>
@@ -280,13 +280,13 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         {/* Search and Filter Bar */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-light-text-tertiary dark:text-dark-text-tertiary" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-light-text-tertiary" size={20} />
             <input
               type="text"
               placeholder="Search courses, codes, or lecturers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-full text-light-text dark:text-dark-text placeholder-light-text-tertiary dark:placeholder-dark-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-dark-primary"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-light-border rounded-full text-light-text placeholder-light-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           
@@ -294,7 +294,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="px-4 py-3 bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-full text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-dark-primary"
+              className="px-4 py-3 bg-card border border-light-border rounded-full text-light-text focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">All Courses</option>
               <option value="active">Active</option>
@@ -314,13 +314,13 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         {/* Courses Grid */}
         {filteredCourses.length === 0 ? (
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface dark:bg-dark-surface rounded-full mb-4">
-              <BookOpen className="text-light-text-tertiary dark:text-dark-text-tertiary" size={32} />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface rounded-full mb-4">
+              <BookOpen className="text-light-text-tertiary" size={32} />
             </div>
-            <h3 className="text-xl font-semibold text-light-text dark:text-dark-text mb-2">
+            <h3 className="text-xl font-semibold text-light-text mb-2">
               {searchTerm ? 'No courses found' : 'No courses yet'}
             </h3>
-            <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
+            <p className="text-light-text-secondary mb-6">
               {searchTerm ? 'Try adjusting your search or filters' : 'Start by registering for courses'}
             </p>
             {!searchTerm && (
@@ -335,27 +335,27 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             {filteredCourses.map((course) => (
               <div
                 key={course.id}
-                className="bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-2xl p-6 hover:shadow-lg transition-shadow"
+                className="bg-card border border-light-border rounded-2xl p-6 hover:shadow-lg transition-shadow"
               >
                 {/* Course Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg text-light-text dark:text-dark-text mb-1 line-clamp-1">
+                    <h3 className="font-bold text-lg text-light-text mb-1 line-clamp-1">
                       {course.course_name}
                     </h3>
-                    <p className="text-sm text-primary dark:text-dark-primary font-semibold">
+                    <p className="text-sm text-primary font-semibold">
                       {course.course_code}
                     </p>
                   </div>
                   {course.is_active === false && (
                     <div className="flex-shrink-0 ml-2">
-                      <CheckCircle2 className="text-success dark:text-success-light" size={24} />
+                      <CheckCircle2 className="text-success" size={24} />
                     </div>
                   )}
                 </div>
 
                 {/* Lecturer Info */}
-                <div className="flex items-center gap-2 mb-4 text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                <div className="flex items-center gap-2 mb-4 text-sm text-light-text-secondary">
                   <User size={16} />
                   <span className="line-clamp-1">{course.lecturer_name || 'Not assigned'}</span>
                 </div>
@@ -363,12 +363,12 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 {/* Attendance Stats */}
                 <div className={`${getAttendanceBgColor(course.attendance_percentage)} rounded-xl p-4 mb-4`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-light-text dark:text-dark-text">Attendance</span>
+                    <span className="text-sm font-medium text-light-text">Attendance</span>
                     <span className={`text-lg font-bold ${getAttendanceColor(course.attendance_percentage)}`}>
                       {course.attendance_percentage}%
                     </span>
                   </div>
-                  <div className="w-full bg-light-background dark:bg-dark-background rounded-full h-2">
+                  <div className="w-full bg-light-background rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all ${
                         course.attendance_percentage >= 75
@@ -380,7 +380,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                       style={{ width: `${course.attendance_percentage}%` }}
                     />
                   </div>
-                  <div className="flex justify-between mt-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
+                  <div className="flex justify-between mt-2 text-xs text-light-text-tertiary">
                     <span>{course.sessions_attended} attended</span>
                     <span>{course.total_sessions} total</span>
                   </div>
@@ -388,7 +388,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
                 {/* Course Details */}
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-light-text-secondary dark:text-dark-text-secondary">
+                  <div className="flex items-center gap-2 text-light-text-secondary">
                     <Clock size={16} />
                     <span>{course.credit_units || 0} credit hours</span>
                   </div>
@@ -396,8 +396,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
                 {/* Performance Indicator */}
                 {course.attendance_percentage < 75 && (
-                  <div className="mt-4 pt-4 border-t border-light-border dark:border-dark-border">
-                    <div className="flex items-start gap-2 text-xs text-warning dark:text-warning-light">
+                  <div className="mt-4 pt-4 border-t border-light-border">
+                    <div className="flex items-start gap-2 text-xs text-warning">
                       <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
                       <span>Attendance below required 75%</span>
                     </div>
@@ -405,11 +405,11 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 )}
 
                 {/* Drop Course */}
-                <div className="mt-4 pt-4 border-t border-light-border dark:border-dark-border">
+                <div className="mt-4 pt-4 border-t border-light-border">
                   <button
                     onClick={() => handleDropCourse(course)}
                     disabled={droppingId === course.id}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-error dark:text-error-light hover:underline disabled:opacity-50 transition-opacity"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-error hover:underline disabled:opacity-50 transition-opacity"
                   >
                     <Trash2 size={13} />
                     {droppingId === course.id ? 'Dropping…' : 'Drop Course'}

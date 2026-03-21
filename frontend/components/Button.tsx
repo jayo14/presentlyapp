@@ -18,15 +18,15 @@ export const Button: React.FC<ButtonProps> = ({
   
   const variants = {
     primary: "bg-primary-container text-on-primary-fixed hover:bg-primary-fixed-dim shadow-md shadow-primary/20",
-    secondary: "bg-surface-container text-on-surface hover:bg-surface-container-high border-2 border-outline-variant",
-    outline: "border-2 border-primary text-primary hover:bg-primary/10",
+    secondary: "bg-surface-container text-on-surface hover:bg-surface-container-high border-border border-outline-variant",
+    outline: "border-border border-primary text-primary hover:bg-primary/10",
     ghost: "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high",
   };
 
   const sizes = {
     sm: "h-8 px-3 text-sm",
     md: "h-10 px-5 text-sm",
-    lg: "h-12 px-8 text-base",
+    lg: "h-12 px-8 text-on-primary-fixedase",
     icon: "h-9 w-9 p-0",
   };
 

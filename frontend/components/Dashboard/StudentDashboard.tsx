@@ -145,12 +145,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <div className="space-y-6 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Class Timetable</h2>
-              <p className="text-sm text-zinc-500 mt-0.5">Your weekly class schedule.</p>
+              <h2 className="text-xl font-semibold text-foreground">Class Timetable</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">Your weekly class schedule.</p>
             </div>
             <button
               onClick={() => setIsRegistrationOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
             >
               <Plus size={16} />
               Register Courses
@@ -165,24 +165,24 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 : [];
 
               return (
-                <div key={day} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+                <div key={day} className="bg-card text-foreground border border-border rounded-xl p-4">
                   <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">{day}</h3>
                   <div className="space-y-2">
                     {dayClasses.length > 0 ? (
                       dayClasses.map((t) => (
-                        <div key={t.id} className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-700">
-                          <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
+                        <div key={t.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+                          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-muted-foreground">
                             <Clock size={14} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-zinc-900 dark:text-white">{t.course.course_code} – {t.course_name}</p>
-                            <p className="text-xs text-zinc-500">{t.start_time} – {t.end_time}</p>
-                            {t.venue_name && <p className="text-xs text-zinc-400">{t.venue_name}</p>}
+                            <p className="text-sm font-medium text-foreground">{t.course.course_code} – {t.course_name}</p>
+                            <p className="text-xs text-muted-foreground">{t.start_time} – {t.end_time}</p>
+                            {t.venue_name && <p className="text-xs text-muted-foreground">{t.venue_name}</p>}
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-zinc-400 italic">No classes scheduled.</p>
+                      <p className="text-xs text-muted-foreground italic">No classes scheduled.</p>
                     )}
                   </div>
                 </div>
@@ -208,13 +208,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Header */}
           <div>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Performance Insights</h2>
-            <p className="text-sm text-zinc-500 mt-0.5">Track your attendance trends and statistics.</p>
+            <h2 className="text-xl font-semibold text-foreground">Performance Insights</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">Track your attendance trends and statistics.</p>
           </div>
 
           {/* Location Map */}
           <Suspense fallback={
-            <div className="h-[280px] w-full flex flex-col items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl animate-pulse text-zinc-400">
+            <div className="h-[280px] w-full flex flex-col items-center justify-center bg-card text-foreground border border-border rounded-xl animate-pulse text-muted-foreground">
               <Loader2 className="w-6 h-6 animate-spin mb-2 text-primary" />
               <p className="text-sm">Loading Map...</p>
             </div>
@@ -225,13 +225,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Avg Attendance', value: `${avgAttendance}%`, color: 'text-zinc-900 dark:text-white' },
+              { label: 'Avg Attendance', value: `${avgAttendance}%`, color: 'text-foreground' },
               { label: 'Present', value: dashboardData?.attendance_stats?.total_present || 0, color: 'text-emerald-600 dark:text-emerald-400' },
-              { label: 'Late', value: dashboardData?.attendance_stats?.total_late || 0, color: 'text-amber-600 dark:text-amber-400' },
+              { label: 'Late', value: dashboardData?.attendance_stats?.total_late || 0, color: 'text-muted-foregroundmber-600 dark:text-muted-foregroundmber-400' },
               { label: 'Absent', value: dashboardData?.attendance_stats?.total_absent || 0, color: 'text-red-600 dark:text-red-400' },
             ].map((stat, i) => (
-              <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
-                <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{stat.label}</p>
+              <div key={i} className="bg-card text-foreground border border-border rounded-xl p-4">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{stat.label}</p>
                 <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>{stat.value}</p>
               </div>
             ))}
@@ -240,8 +240,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           {/* Charts */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Donut Chart */}
-            <div className="md:col-span-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">Status Breakdown</h3>
+            <div className="md:col-span-5 bg-card text-foreground border border-border rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-foreground mb-4">Status Breakdown</h3>
               <div className="h-56 w-full relative" style={{ minHeight: '224px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -264,22 +264,22 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                       verticalAlign="bottom"
                       height={32}
                       iconType="circle"
-                      formatter={(value) => <span className="text-zinc-500 text-xs ml-1">{value}</span>}
+                      formatter={(value) => <span className="text-muted-foreground text-xs ml-1">{value}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
                   <div className="text-center">
-                    <p className="text-3xl font-semibold text-zinc-900 dark:text-white">{avgAttendance}%</p>
-                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-medium">Total</p>
+                    <p className="text-3xl font-semibold text-foreground">{avgAttendance}%</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Total</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Area Chart */}
-            <div className="md:col-span-7 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4">Weekly Attendance Trend</h3>
+            <div className="md:col-span-7 bg-card text-foreground border border-border rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-foreground mb-4">Weekly Attendance Trend</h3>
               <div className="h-56 w-full" style={{ minHeight: '224px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={weeklyAttendanceData}>
@@ -304,21 +304,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           </div>
 
           {/* Course Performance */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Course Performance</h3>
+          <div className="bg-card text-foreground border border-border rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">Course Performance</h3>
             </div>
-            <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div className="divide-y divide-zinc-100">
               {(analyticsData?.course_performance || []).map((course) => (
-                <div key={course.course_code} className="px-5 py-3.5 flex items-center gap-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <div key={course.course_code} className="px-5 py-3.5 flex items-center gap-4 hover:bg-accent hover:text-accent-foreground/50 transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-medium text-zinc-900 dark:text-white">{course.course_code}</span>
+                      <span className="text-sm font-medium text-foreground">{course.course_code}</span>
                       <span className={`text-sm font-semibold ${course.attendance_percentage >= 75 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {course.attendance_percentage}%
                       </span>
                     </div>
-                    <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-accent h-1.5 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${course.attendance_percentage >= 75 ? 'bg-emerald-500' : 'bg-red-500'}`}
                         style={{ width: `${course.attendance_percentage}%` }}
@@ -326,7 +326,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     </div>
                   </div>
                   <div className="w-24 text-right">
-                    <p className="text-xs text-zinc-400 truncate">{course.course_name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{course.course_name}</p>
                   </div>
                 </div>
               ))}
@@ -345,14 +345,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         {/* Greeting */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-zinc-500 font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-            <h1 className="text-xl font-semibold text-zinc-900 dark:text-white mt-0.5">Hello, {userName.split(' ')[0]}</h1>
+            <p className="text-sm text-muted-foreground font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+            <h1 className="text-xl font-semibold text-foreground mt-0.5">Hello, {userName.split(' ')[0]}</h1>
           </div>
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-accent border border-border flex items-center justify-center">
             {displayAvatar ? (
               <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-xs font-bold text-zinc-400">{displayInitials}</span>
+              <span className="text-xs font-bold text-muted-foreground">{displayInitials}</span>
             )}
           </div>
         </div>
@@ -360,19 +360,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         {/* Mark Attendance CTA */}
         <button
           onClick={() => setIsAttendanceModalOpen(true)}
-          className="w-full relative overflow-hidden bg-primary text-black rounded-xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all text-left flex items-center justify-between group"
+          className="w-full relative overflow-hidden bg-primary text-on-primary-fixedlack rounded-xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all text-left flex items-center justify-between group"
         >
           <div className="relative z-10">
-            <span className="inline-flex items-center px-2 py-0.5 bg-black/10 rounded text-[10px] font-semibold uppercase tracking-wider mb-2">
+            <span className="inline-flex items-center px-2 py-0.5 bg-cardackgroundlack/10 rounded text-[10px] font-semibold uppercase tracking-wider mb-2">
               Action Required
             </span>
             <h2 className="text-xl md:text-2xl font-bold leading-tight">Mark Attendance</h2>
-            <p className="text-sm text-black/70 font-medium mt-0.5">Scan QR Code or Enter Session ID</p>
+            <p className="text-sm text-on-primary-fixedlack/70 font-medium mt-0.5">Scan QR Code or Enter Session ID</p>
           </div>
-          <div className="relative z-10 bg-white/20 p-3.5 rounded-xl backdrop-blur-sm group-hover:bg-white/30 transition-colors">
-            <QrCode size={36} className="text-black" />
+          <div className="relative z-10 bg-card/20 p-3.5 rounded-xl backdrop-blur-sm group-hover:bg-card/30 transition-colors">
+            <QrCode size={36} className="text-on-primary-fixedlack" />
           </div>
-          <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <div className="absolute right-0 top-0 w-48 h-48 bg-card/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         </button>
 
         {/* Warning Banner */}
@@ -382,22 +382,22 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-red-50 dark:bg-red-500/5 border border-red-200 dark:border-red-800/50 p-3.5 rounded-xl flex items-center gap-3"
+              className="bg-red-50 border border-red-200 p-3.5 rounded-xl flex items-center gap-3"
             >
-              <div className="bg-red-100 dark:bg-red-500/10 p-2 rounded-lg text-red-600 dark:text-red-400 flex-shrink-0">
+              <div className="bg-red-100 p-2 rounded-lg text-red-600 flex-shrink-0">
                 <AlertCircle size={16} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-red-700 dark:text-red-300">Attendance Warning</p>
-                <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
+                <p className="text-sm font-medium text-red-700">Attendance Warning</p>
+                <p className="text-xs text-red-600 mt-0.5">
                   Below 75% in: {lowAttendanceCourses.map(c => c.code).join(', ')}
                 </p>
               </div>
               <button
                 onClick={handleDismissWarning}
-                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
+                className="p-1.5 hover:bg-red-100 rounded-lg transition-colors flex-shrink-0"
               >
-                <X size={16} className="text-red-600 dark:text-red-400" />
+                <X size={16} className="text-red-600" />
               </button>
             </motion.div>
           )}
@@ -407,18 +407,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Next Class */}
           {nextClass ? (
-            <div className="bg-zinc-900 dark:bg-zinc-900 text-white p-5 rounded-xl relative overflow-hidden border border-zinc-800">
+            <div className="bg-card text-foreground p-5 rounded-xl relative overflow-hidden border border-border">
               <div className="relative z-10">
-                <p className="text-zinc-400 text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                <p className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Clock size={12} className="text-primary" /> Up Next
                 </p>
                 <h3 className="text-lg font-semibold mb-3">{nextClass.course_name}</h3>
                 <div className="flex items-center gap-3">
-                  <div className="bg-zinc-800 px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
-                    <Clock size={12} className="text-zinc-400" /> {nextClass.start_time}
+                  <div className="bg-accent px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
+                    <Clock size={12} className="text-muted-foreground" /> {nextClass.start_time}
                   </div>
-                  <div className="bg-zinc-800 px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
-                    <MapPin size={12} className="text-zinc-400" /> {nextClass.venue_name}
+                  <div className="bg-accent px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
+                    <MapPin size={12} className="text-muted-foreground" /> {nextClass.venue_name}
                   </div>
                 </div>
               </div>
@@ -427,13 +427,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               </div>
             </div>
           ) : (
-            <div className="bg-zinc-900 dark:bg-zinc-900 text-white p-5 rounded-xl relative overflow-hidden border border-zinc-800">
+            <div className="bg-card text-foreground p-5 rounded-xl relative overflow-hidden border border-border">
               <div className="relative z-10">
-                <p className="text-zinc-400 text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                <p className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Clock size={12} className="text-primary" /> Up Next
                 </p>
                 <h3 className="text-lg font-semibold mb-1">No Classes Scheduled</h3>
-                <p className="text-sm text-zinc-400">You don't have any upcoming classes today.</p>
+                <p className="text-sm text-muted-foreground">You don't have any upcoming classes today.</p>
               </div>
             </div>
           )}
@@ -441,50 +441,50 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           {/* Stats + Register CTA */}
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-2">
+              <div className="flex-1 bg-card text-foreground border border-border p-4 rounded-xl">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 mb-2">
                   <TrendingUp size={16} />
                 </div>
-                <p className="text-2xl font-semibold text-zinc-900 dark:text-white">{avgAttendance}%</p>
-                <p className="text-xs text-zinc-500 mt-0.5">Avg. Attendance</p>
+                <p className="text-2xl font-semibold text-foreground">{avgAttendance}%</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Avg. Attendance</p>
               </div>
-              <div className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-2">
+              <div className="flex-1 bg-card text-foreground border border-border p-4 rounded-xl">
+                <div className="w-8 h-8 rounded-lg bg-cardackgroundlue-50 flex items-center justify-center text-on-primary-fixedlue-600 mb-2">
                   <BookOpen size={16} />
                 </div>
-                <p className="text-2xl font-semibold text-zinc-900 dark:text-white">{enrolledCourses.length}</p>
-                <p className="text-xs text-zinc-500 mt-0.5">Active Courses</p>
+                <p className="text-2xl font-semibold text-foreground">{enrolledCourses.length}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Active Courses</p>
               </div>
             </div>
             <button
               onClick={() => setIsRegistrationOpen(true)}
-              className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3.5 rounded-xl flex items-center justify-between hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="w-full bg-muted border border-border p-3.5 rounded-xl flex items-center justify-between hover:bg-accent hover:text-accent-foreground transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-lg">
-                  <Plus size={16} className="text-zinc-400" />
+                <div className="bg-accent p-2 rounded-lg">
+                  <Plus size={16} className="text-muted-foreground" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-white">Register Courses</p>
-                  <p className="text-xs text-zinc-500">Manage your enrollment</p>
+                  <p className="text-sm font-medium text-foreground">Register Courses</p>
+                  <p className="text-xs text-muted-foreground">Manage your enrollment</p>
                 </div>
               </div>
-              <ChevronRight size={16} className="text-zinc-400" />
+              <ChevronRight size={16} className="text-muted-foreground" />
             </button>
           </div>
         </div>
 
         {/* Recent Activity */}
         <div>
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-3">Recent Activity</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3">Recent Activity</h3>
           <div className="space-y-2">
             {recentActivity.length === 0 ? (
-              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-8 text-center">
-                <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Activity size={20} className="text-zinc-400" />
+              <div className="bg-card text-foreground border border-border rounded-xl p-8 text-center">
+                <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Activity size={20} className="text-muted-foreground" />
                 </div>
-                <p className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">No recent activity</p>
-                <p className="text-xs text-zinc-500 mt-0.5">Your attendance records will appear here</p>
+                <p className="text-sm text-secondary font-medium">No recent activity</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Your attendance records will appear here</p>
               </div>
             ) : (
               recentActivity.slice(0, 8).map((activity, index) => {
@@ -493,7 +493,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 const statusColor = isPresent
                   ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
                   : isLate
-                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
+                  ? 'bg-inputmber-50 text-muted-foregroundmber-700 dark:bg-inputmber-500/10 dark:text-muted-foregroundmber-400'
                   : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400';
                 const statusLabel = activity.status === 'PRESENT' ? 'Present'
                   : activity.status === 'LATE' ? 'Late'
@@ -503,15 +503,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 return (
                   <div
                     key={activity.id || `activity-${index}`}
-                    className="flex items-center justify-between p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl"
+                    className="flex items-center justify-between p-3 bg-card text-foreground border border-border rounded-xl"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400">
+                      <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center text-xs font-bold text-muted-foreground">
                         {getActivityCourseCode(activity).substring(0, 2)}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{getActivityCourseCode(activity)}</p>
-                        <p className="text-xs text-zinc-500">
+                        <p className="text-sm font-medium text-foreground">{getActivityCourseCode(activity)}</p>
+                        <p className="text-xs text-muted-foreground">
                           {new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>

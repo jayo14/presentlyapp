@@ -62,18 +62,18 @@ export const SessionsPage: React.FC = () => {
             <button
               onClick={() => navigate('/dashboard')}
               aria-label="Back to dashboard"
-              className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="p-2 text-muted-foreground hover:text-accent-foreground rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
             >
               <ArrowLeft size={18} />
             </button>
             <div>
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Attendance Sessions</h2>
-              <p className="text-sm text-zinc-500 mt-0.5">History of all created attendance sessions.</p>
+              <h2 className="text-xl font-semibold text-foreground">Attendance Sessions</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">History of all created attendance sessions.</p>
             </div>
           </div>
           <button
             onClick={() => navigate('/dashboard/sessions/new')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
           >
             <Plus size={16} />
             New Session
@@ -81,26 +81,26 @@ export const SessionsPage: React.FC = () => {
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+        <div className="bg-card text-foreground border border-border rounded-xl p-3 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={15} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
             <input
               type="text"
               placeholder="Search by course code, name or session code..."
-              className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg pl-9 pr-4 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+              className="w-full bg-muted border border-border rounded-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder-zinc-400 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="flex gap-2">
-            <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
+            <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-secondary bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
               <Filter size={14} />
               Filter
             </button>
             <button
               onClick={fetchSessions}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-secondary bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
               {loading ? 'Loading...' : 'Refresh'}
@@ -112,22 +112,22 @@ export const SessionsPage: React.FC = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-44 bg-zinc-100 dark:bg-zinc-800/50 animate-pulse rounded-xl border border-zinc-200 dark:border-zinc-800" />
+              <div key={i} className="h-44 bg-accent/50 animate-pulse rounded-xl border border-border" />
             ))}
           </div>
         ) : filteredSessions.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
-            <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="text-zinc-400" size={24} />
+          <div className="text-center py-20 bg-card text-foreground border border-dashed border-border rounded-xl">
+            <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="text-muted-foreground" size={24} />
             </div>
-            <h3 className="text-base font-semibold text-zinc-900 dark:text-white mb-1">No sessions found</h3>
-            <p className="text-sm text-zinc-500 mb-6 max-w-sm mx-auto">
+            <h3 className="text-on-primary-fixedase font-semibold text-foreground mb-1">No sessions found</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
               {searchTerm ? `No sessions matching "${searchTerm}"` : "You haven't created any attendance sessions yet."}
             </p>
             {!searchTerm && (
               <button
                 onClick={() => navigate('/dashboard/sessions/new')}
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Create Your First Session
               </button>
@@ -140,18 +140,18 @@ export const SessionsPage: React.FC = () => {
               const status = session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED';
               const statusStyles: Record<string, string> = {
                 'ACTIVE': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-                'EXPIRED': 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-                'ENDED': 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
+                'EXPIRED': 'bg-inputmber-50 text-muted-foregroundmber-700 dark:bg-inputmber-500/10 dark:text-muted-foregroundmber-400',
+                'ENDED': 'bg-muted text-muted-foreground',
               };
 
               return (
                 <div
                   key={session.id}
                   onClick={() => setSelectedSession(session)}
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm transition-all cursor-pointer group"
+                  className="bg-card text-foreground border border-border rounded-xl p-4 hover:border-border hover:shadow-sm transition-all cursor-pointer group"
                 >
                   <div className="flex justify-between items-start mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-xs font-bold text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                       {session.course_code?.substring(0, 2) || 'CS'}
                     </div>
                     <div className="flex items-center gap-2">
@@ -164,7 +164,7 @@ export const SessionsPage: React.FC = () => {
                           setSessionToDelete(session.id);
                           setIsDeleteModalOpen(true);
                         }}
-                        className="p-1 text-zinc-400 hover:text-red-500 transition-colors"
+                        className="p-1 text-muted-foreground hover:text-red-500 transition-colors"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -172,15 +172,15 @@ export const SessionsPage: React.FC = () => {
                   </div>
 
                   <div className="mb-3">
-                    <h4 className="text-sm font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1">{session.course_name}</h4>
-                    <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono mt-0.5">
+                    <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">{session.course_name}</h4>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono mt-0.5">
                       <span className="font-semibold text-primary">{session.course_code}</span>
                       <span>•</span>
                       <span>{session.session_code}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs text-zinc-500">
+                  <div className="flex items-center gap-4 pt-3 border-t border-border text-xs text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <Calendar size={12} />
                       <span>{new Date(session.created_at).toLocaleDateString()}</span>
@@ -207,19 +207,19 @@ export const SessionsPage: React.FC = () => {
 
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-cardackgroundlack/60 backdrop-blur-sm p-4">
             <div
               {...deleteModalProps}
               aria-labelledby="delete-session-title"
-              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none"
+              className="bg-card text-foreground border border-border rounded-xl w-full max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none"
             >
               <div className="text-center space-y-3">
-                <div className="w-14 h-14 bg-red-50 dark:bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
                   <Trash2 size={24} />
                 </div>
                 <div>
-                  <h3 id="delete-session-title" className="text-base font-semibold text-zinc-900 dark:text-white">Delete Session?</h3>
-                  <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">
+                  <h3 id="delete-session-title" className="text-on-primary-fixedase font-semibold text-foreground">Delete Session?</h3>
+                  <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
                     This will permanently remove the session and all associated records.
                   </p>
                 </div>
@@ -227,13 +227,13 @@ export const SessionsPage: React.FC = () => {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-secondary bg-accent rounded-lg hover:bg-accent transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteSession}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-primary-foreground rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Delete
                 </button>

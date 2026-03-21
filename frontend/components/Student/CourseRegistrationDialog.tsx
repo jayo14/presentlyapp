@@ -126,54 +126,54 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-50 p-4">
       <motion.div
         {...modalProps}
         aria-labelledby="reg-dialog-title"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col outline-none"
+        className="bg-card text-foreground border border-border rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col outline-none"
       >
-        <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center justify-between p-6 border-b border-border">
           <div>
-            <h2 id="reg-dialog-title" className="text-2xl font-bold text-zinc-900 dark:text-white">Course Registration</h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            <h2 id="reg-dialog-title" className="text-2xl font-bold text-foreground">Course Registration</h2>
+            <p className="text-sm text-muted-foreground mt-1">
               Browse and enroll in available courses
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-inputccent hover:text-muted-foregroundccent-foreground rounded-lg transition-colors"
             aria-label="Close dialog"
           >
-            <X className="w-6 h-6 text-zinc-500" />
+            <X className="w-6 h-6 text-muted-foreground" />
           </button>
         </div>
 
-        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 space-y-4">
+        <div className="p-6 border-b border-border space-y-4">
           {/* Success Banner - matching Design 2 */}
           {showSuccessBanner && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-500 dark:border-green-700 rounded-xl flex items-start gap-3 relative"
+              className="p-4 bg-green-50 border border-green-500 rounded-xl flex items-start gap-3 relative"
             >
               <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" />
+                <Check className="w-4 h-4 text-primary-foreground" />
               </div>
               <div className="flex-1">
-                <h3 className="text-green-800 dark:text-green-300 font-bold text-sm mb-1">
+                <h3 className="text-green-800 font-bold text-sm mb-1">
                   Course Added Successfully
                 </h3>
-                <p className="text-green-700 dark:text-green-400 text-xs">
+                <p className="text-green-700 text-xs">
                   {lastEnrolledCourse} has been added to your schedule.
                 </p>
               </div>
               <button
                 onClick={() => setShowSuccessBanner(false)}
-                className="flex-shrink-0 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
+                className="flex-shrink-0 text-green-600 hover:text-green-800"
               >
                 <X size={18} />
               </button>
@@ -181,16 +181,16 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
           )}
 
           {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/50 rounded-lg flex items-start gap-3">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
           {/* Add via Code Section - matching Design 2 */}
           <div className="space-y-3">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Add via Code</h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <h3 className="text-lg font-bold text-foreground">Add via Code</h3>
+            <p className="text-sm text-muted-foreground">
               Enter the unique 6-digit code provided by your course instructor.
             </p>
             <div className="flex gap-3">
@@ -215,22 +215,22 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
           {/* OR Divider */}
           <div className="relative flex items-center justify-center py-2">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-zinc-200 dark:border-zinc-700"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
-            <div className="relative px-4 bg-white dark:bg-zinc-900">
-              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase">OR BROWSE</span>
+            <div className="relative px-4 bg-card text-foreground">
+              <span className="text-sm font-medium text-muted-foreground uppercase">OR BROWSE</span>
             </div>
           </div>
 
           {/* Browse Department Section - matching Design 2 */}
           <div className="space-y-3">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Browse Department</h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <h3 className="text-lg font-bold text-foreground">Browse Department</h3>
+            <p className="text-sm text-muted-foreground">
               Find open electives and major courses.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Search for departments..."
@@ -243,7 +243,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
               <select
                 value={selectedSemester}
                 onChange={(e) => setSelectedSemester(e.target.value)}
-                className="px-4 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white focus:outline-none focus:border-primary"
+                className="px-4 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:border-primary"
             >
               <option value="all">All Semesters</option>
               {semesters.map(sem => (
@@ -261,15 +261,15 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
             </div>
           ) : filteredCourses.length === 0 ? (
             <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
-              <p className="text-zinc-500 dark:text-zinc-400">No courses found</p>
+              <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No courses found</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {filteredCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl p-4 hover:border-primary/50 transition-colors"
+                  className="bg-muted border border-border rounded-xl p-4 hover:border-primary/50 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
                     <div className="flex-1 w-full">
@@ -278,23 +278,23 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                           {course.code}
                         </span>
                         {course.semester && (
-                          <span className="px-2 py-1 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded">
+                          <span className="px-2 py-1 bg-zinc-200 text-secondary text-xs rounded">
                             {course.semester}
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white mb-1">
+                      <h3 className="text-on-primary-fixedase sm:text-lg font-semibold text-foreground mb-1">
                         {course.title}
                       </h3>
 
                       {course.description && (
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3 line-clamp-2">
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                           {course.description}
                         </p>
                       )}
 
-                      <div className="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 flex-wrap">
+                      <div className="flex items-center gap-3 text-xs sm:text-sm text-muted-foreground flex-wrap">
                         {course.credit_units && (
                           <div className="flex items-center gap-1">
                             <BookOpen className="w-4 h-4" />
@@ -330,7 +330,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                           )}
                         </Button>
                       ) : (
-                        <div className="px-4 py-2 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                        <div className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
                           <Check className="w-4 h-4" />
                           Enrolled
                         </div>

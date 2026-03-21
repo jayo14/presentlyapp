@@ -85,7 +85,7 @@ export const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#09090b] text-primary-foreground flex flex-col items-center justify-center p-4 relative">
       <SEO
         title="Forgot Password | Presently"
         description="Reset your Presently password to regain access to your account."
@@ -93,7 +93,7 @@ export const ForgotPassword: React.FC = () => {
 
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 text-gray-300 hover:text-white flex items-center gap-2 transition-colors"
+        className="absolute top-6 left-6 text-gray-300 hover:text-primary-foreground flex items-center gap-2 transition-colors"
         aria-label="Go back"
       >
         <ArrowLeft size={20} />
@@ -105,7 +105,7 @@ export const ForgotPassword: React.FC = () => {
           <div className="w-24 h-24 rounded-full bg-[#FFD700] flex items-center justify-center mb-6">
             <Lock size={48} color="#09090b" strokeWidth={2.5} />
           </div>
-          <h2 className="text-4xl font-bold text-white mb-2">Reset Password</h2>
+          <h2 className="text-4xl font-bold text-primary-foreground mb-2">Reset Password</h2>
           <p className="text-[#a1a1aa] text-center">
             Enter your registered university email address and we'll send you a secure link to reset your password.
           </p>
@@ -139,7 +139,7 @@ export const ForgotPassword: React.FC = () => {
                       <button
                         type="button"
                         onClick={clearEmail}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors z-10"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-foreground transition-colors z-10"
                         aria-label="Clear email"
                       >
                         <X size={20} />

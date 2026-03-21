@@ -103,11 +103,11 @@ export const AuthCallback: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4 text-white">
+    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4 text-primary-foreground">
       <div className="max-w-md w-full text-center">
         <div className="inline-flex items-center justify-center">
           <div className="relative w-16 h-16">
-            <div className="absolute inset-0 rounded-full border-4 border-[#FFD700] border-t-transparent animate-spin"></div>
+            <div className="absolute inset-0 rounded-full border-input border-[#FFD700] border-t-transparent animate-spin"></div>
           </div>
         </div>
         <p className="mt-6 text-lg font-medium">{message}</p>
@@ -115,14 +115,14 @@ export const AuthCallback: React.FC = () => {
           <div className="mt-4 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm">
             <p className="font-semibold">Error Details:</p>
             <p className="mt-1 break-words">{errorMessage}</p>
-            <p className="mt-3 text-xs text-zinc-400">Check browser console for full logs</p>
+            <p className="mt-3 text-xs text-muted-foreground">Check browser console for full logs</p>
           </div>
         )}
-        <p className="mt-2 text-sm text-zinc-400">This should only take a moment...</p>
+        <p className="mt-2 text-sm text-muted-foreground">This should only take a moment...</p>
         {errorMessage && (
           <button
             onClick={() => navigate('/login', { replace: true })}
-            className="mt-6 px-4 py-2 bg-[#FFD700] text-black rounded-lg font-medium hover:bg-yellow-400 transition"
+            className="mt-6 px-4 py-2 bg-[#FFD700] text-on-primary-fixedlack rounded-lg font-medium hover:bg-yellow-400 transition"
           >
             Return to Login
           </button>

@@ -95,14 +95,14 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Confetti Animation */}
       <ConfettiAnimation count={50} duration={4000} />
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-inputccent/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
       <div className="w-full max-w-3xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -112,16 +112,16 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
         </div>
 
         {/* Success Card */}
-        <div className="bg-white dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-3xl shadow-2xl p-8 md:p-12 text-center mb-8">
+        <div className="bg-card text-foreground border border-border rounded-3xl shadow-2xl p-8 md:p-12 text-center mb-8">
           {/* Success Icon */}
           <div className="mb-6 flex justify-center">
             <div className="relative">
-              <div className="bg-primary/10 dark:bg-primary/20 p-6 rounded-full">
+              <div className="bg-primary/10 p-6 rounded-full">
                 <PartyPopper size={64} className="text-primary" />
               </div>
               <Sparkles 
                 size={24} 
-                className="text-accent absolute -top-2 -right-2 animate-bounce" 
+                className="text-muted-foregroundccent absolute -top-2 -right-2 animate-bounce" 
               />
             </div>
           </div>
@@ -137,7 +137,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
           </p>
 
           {/* Quick Tips Card */}
-          <div className="bg-zinc-50 dark:bg-zinc-800/50 border border-border dark:border-zinc-700 rounded-2xl p-6 mb-8 text-left">
+          <div className="bg-muted/50 border border-border rounded-2xl p-6 mb-8 text-left">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp size={20} className="text-primary" />
               <h3 className="text-lg font-semibold text-text-primary">Quick Tips to Get Started</h3>
@@ -147,9 +147,9 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
               {quickTips.filter(tip => tip.show !== false).map((tip, idx) => (
                 <div 
                   key={idx}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-white dark:hover:bg-zinc-800 transition-colors"
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-card transition-colors"
                 >
-                  <div className="bg-primary/10 dark:bg-primary/20 p-2 rounded-lg flex-shrink-0">
+                  <div className="bg-primary/10 p-2 rounded-lg flex-shrink-0">
                     <tip.icon size={20} className="text-primary" />
                   </div>
                   <div className="flex-1">
@@ -202,7 +202,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
         </div>
 
         {/* Profile Preview Card */}
-        <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-border dark:border-zinc-800 rounded-2xl p-6 text-center">
+        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-6 text-center">
           <p className="text-text-secondary text-sm mb-2">Your Role</p>
           <p className="text-text-primary font-semibold text-lg capitalize">
             {userRole.replace('_', ' ')}

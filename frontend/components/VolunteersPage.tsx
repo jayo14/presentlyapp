@@ -37,7 +37,7 @@ export const VolunteersPage: React.FC = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      <div className="min-h-screen bg-cardackgroundlack flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -46,8 +46,8 @@ export const VolunteersPage: React.FC = () => {
           <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-8">
             <CheckCircle2 size={40} />
           </div>
-          <h2 className="text-3xl font-bold text-white">Application Received!</h2>
-          <p className="text-zinc-400">
+          <h2 className="text-3xl font-bold text-primary-foreground">Application Received!</h2>
+          <p className="text-muted-foreground">
             Thank you for your interest in joining Presently. Our team will review your profile and reach out within 3-5 business days.
           </p>
           <Button onClick={() => navigate('/')} className="w-full">
@@ -59,7 +59,7 @@ export const VolunteersPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-primary selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-cardackgroundlack text-zinc-100 font-sans selection:bg-primary selection:text-on-primary-fixedlack overflow-x-hidden">
       <LandingHeader />
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">
@@ -74,11 +74,11 @@ export const VolunteersPage: React.FC = () => {
               <Users size={16} />
               <span>Join the Movement</span>
             </motion.div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
+            <h1 className="text-5xl md:text-primaryxl font-bold tracking-tight text-primary-foreground mb-8 leading-[1.1]">
               Build the future of <br />
               <span className="text-primary">Academic Integrity.</span>
             </h1>
-            <p className="text-xl text-zinc-400 leading-relaxed max-w-xl">
+            <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
               We're a team of passionate engineers and designers rebuilding how universities manage attendance and records. Join us as a volunteer and make a real impact.
             </p>
           </div>
@@ -94,9 +94,9 @@ export const VolunteersPage: React.FC = () => {
                     : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
                 }`}
               >
-                <role.icon className={`mb-4 ${selectedRole === role.id ? 'text-primary' : 'text-zinc-500'}`} size={28} />
-                <h3 className="font-bold text-white mb-2">{role.title}</h3>
-                <p className="text-sm text-zinc-500">{role.desc}</p>
+                <role.icon className={`mb-4 ${selectedRole === role.id ? 'text-primary' : 'text-muted-foreground'}`} size={28} />
+                <h3 className="font-bold text-primary-foreground mb-2">{role.title}</h3>
+                <p className="text-sm text-muted-foreground">{role.desc}</p>
               </div>
             ))}
           </div>
@@ -106,13 +106,13 @@ export const VolunteersPage: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-zinc-900/50 border border-zinc-800 p-8 md:p-12 rounded-[32px] sticky top-32"
+          className="bg-card/50 border border-border p-8 md:p-12 rounded-[32px] sticky top-32"
         >
           <h2 className="text-2xl font-bold mb-8">Volunteer Application</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">Full Name</label>
+                <label className="text-sm font-medium text-muted-foreground">Full Name</label>
                 <Input
                   placeholder="John Doe"
                   required
@@ -121,7 +121,7 @@ export const VolunteersPage: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-400">Email Address</label>
+                <label className="text-sm font-medium text-muted-foreground">Email Address</label>
                 <Input
                   type="email"
                   placeholder="john@university.edu"
@@ -133,7 +133,7 @@ export const VolunteersPage: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-400">Portfolio / LinkedIn / GitHub</label>
+              <label className="text-sm font-medium text-muted-foreground">Portfolio / LinkedIn / GitHub</label>
               <Input
                 placeholder="https://..."
                 value={formData.portfolio}
@@ -142,9 +142,9 @@ export const VolunteersPage: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-400">Why do you want to join?</label>
+              <label className="text-sm font-medium text-muted-foreground">Why do you want to join?</label>
               <textarea
-                className="w-full bg-black border border-zinc-800 rounded-xl p-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] resize-none"
+                className="w-full bg-cardackgroundlack border border-border rounded-xl p-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] resize-none"
                 placeholder="Tell us a bit about yourself and your motivation..."
                 required
                 value={formData.reason}
@@ -157,7 +157,7 @@ export const VolunteersPage: React.FC = () => {
             </Button>
 
             {!selectedRole && (
-              <p className="text-xs text-center text-zinc-500 italic">
+              <p className="text-xs text-center text-muted-foreground italic">
                 Please select a role from the left to enable submission.
               </p>
             )}

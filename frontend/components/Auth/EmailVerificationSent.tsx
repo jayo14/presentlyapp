@@ -73,10 +73,10 @@ export const EmailVerificationSent: React.FC = () => {
     date ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : null;
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#09090b] text-primary-foreground flex items-center justify-center p-4 relative">
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-8 left-8 flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+        className="absolute top-8 left-8 flex items-center gap-2 text-gray-300 hover:text-primary-foreground transition-colors"
         aria-label="Go back"
       >
         <ArrowLeft size={18} /> Back
@@ -90,8 +90,8 @@ export const EmailVerificationSent: React.FC = () => {
             <Mail size={48} color="#FFD700" />
           </div>
 
-          <h2 className="text-2xl font-bold text-white mb-3">Verify your Email</h2>
-          <p className="text-[#a1a1aa] text-base leading-relaxed max-w-xl mb-4">
+          <h2 className="text-2xl font-bold text-primary-foreground mb-3">Verify your Email</h2>
+          <p className="text-[#a1a1aa] text-on-primary-fixedase leading-relaxed max-w-xl mb-4">
             We've sent a verification link to your university email address.
             Please click the link to confirm your account and access Presently.
           </p>
@@ -121,7 +121,7 @@ export const EmailVerificationSent: React.FC = () => {
             <button
               onClick={handleResend}
               disabled={resendCooldown > 0 || sendVerificationMutation.isPending}
-              className="w-full h-12 bg-[#27272a] border border-[#3f3f46] text-white rounded-full font-medium flex items-center justify-center gap-2 hover:bg-[#3f3f46] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-12 bg-[#27272a] border border-[#3f3f46] text-primary-foreground rounded-full font-medium flex items-center justify-center gap-2 hover:bg-[#3f3f46] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sendVerificationMutation.isPending ? (
                 <Loader2 size={18} className="animate-spin" />
