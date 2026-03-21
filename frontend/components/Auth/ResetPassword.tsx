@@ -177,6 +177,9 @@ export const ResetPassword: React.FC = () => {
 
   if (pageState === 'invalid-link') {
     return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <SEO title="Invalid Reset Link | Presently" />
+        <div className="flex flex-col items-center gap-6 text-center max-w-md">
           <h2 className="font-headline text-2xl font-bold text-text">Invalid Reset Link</h2>
           <p className="text-textMuted">This password reset link is invalid or has expired.</p>
           <button
