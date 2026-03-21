@@ -145,13 +145,13 @@ export const StudentViewPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'excellent': return 'text-green-600 bg-green-500/10 border-green-500/30';
-      case 'good': return 'text-on-primary-fixedlue-600 bg-cardackgroundlue-500/10 border-blue-500/30';
+      case 'good': return 'text-blue-600 bg-blue-500/10 border-blue-500/30';
       case 'warning': return 'text-yellow-600 bg-yellow-500/10 border-yellow-500/30';
       case 'danger': return 'text-red-600 bg-red-500/10 border-red-500/30';
       case 'present': return 'text-green-600 bg-green-500/10';
       case 'absent': return 'text-red-600 bg-red-500/10';
       case 'late': return 'text-yellow-600 bg-yellow-500/10';
-      case 'excused': return 'text-on-primary-fixedlue-600 bg-cardackgroundlue-500/10';
+      case 'excused': return 'text-blue-600 bg-blue-500/10';
       default: return 'text-text-secondary bg-surface';
     }
   };
@@ -161,8 +161,8 @@ export const StudentViewPage: React.FC = () => {
       case 'present': return <CheckCircle size={16} className="text-green-600" />;
       case 'absent': return <XCircle size={16} className="text-red-600" />;
       case 'late': return <Clock size={16} className="text-yellow-600" />;
-      case 'excused': return <FileText size={16} className="text-on-primary-fixedlue-600" />;
-      default: return <AlertCircle size={16} className="text-text-textMuted" />;
+      case 'excused': return <FileText size={16} className="text-blue-600" />;
+      default: return <AlertCircle size={16} className="text-textMuted" />;
     }
   };
 
@@ -258,8 +258,8 @@ export const StudentViewPage: React.FC = () => {
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
               activeTab === tab.id
-                ? 'bg-primary text-white shadow-md'
-                : 'bg-surface dark:bg-zinc-900 text-text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
+                ? 'bg-primaryContainer text-on-primary-fixed shadow-md'
+                : 'bg-surface text-textMuted hover:bg-surfaceLow hover:text-text'
             }`}
           >
             <tab.icon size={16} />
@@ -334,7 +334,7 @@ export const StudentViewPage: React.FC = () => {
                   <div
                     className={`h-full rounded-full transition-all ${
                       course.status === 'excellent' ? 'bg-green-600' :
-                      course.status === 'good' ? 'bg-cardackgroundlue-600' :
+                      course.status === 'good' ? 'bg-blue-600' :
                       course.status === 'warning' ? 'bg-yellow-600' :
                       'bg-red-600'
                     }`}
