@@ -8,7 +8,7 @@
   ![License](https://img.shields.io/badge/license-Proprietary-red)
 </div>
 
----
+----
 
 ## 📋 Overview
 
