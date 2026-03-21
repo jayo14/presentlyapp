@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
-import { LogOut, Home, User, Bell, Settings, BookOpen, FileText, Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3, Download, GraduationCap, Building2, Building, Timer, Menu, X } from 'lucide-react';
+import {
+  LogOut, Home, User, Bell, Settings, BookOpen, FileText,
+  Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3,
+  Download, GraduationCap, Building2, Timer, Menu, X,
+  ChevronLeft, Search, PanelLeftClose, PanelLeft, Command
+} from 'lucide-react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
 import { Dock, DockItem } from '@/components/magicui/dock';
@@ -23,17 +28,47 @@ interface NavItemProps {
   isActive: boolean;
   onClick: (id: string) => void;
   collapsed?: boolean;
+  badge?: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onClick, collapsed = false }) => (
-  <button 
+const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onClick, collapsed = false, badge }) => (
+  <button
     onClick={() => onClick(id)}
-    className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-full text-sm font-medium transition-all duration-200 ${isActive ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
+    className={`
+      group relative w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} 
+      px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150
+      ${isActive
+        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white'
+        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+      }
+    `}
     title={collapsed ? label : undefined}
   >
-    <Icon size={18} className="flex-shrink-0" />
+    <Icon size={16} className={`flex-shrink-0 ${isActive ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}`} />
     {!collapsed && <span className="truncate">{label}</span>}
+    {!collapsed && badge && (
+      <span className="ml-auto text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 rounded-md">
+        {badge}
+      </span>
+    )}
+    {/* Tooltip for collapsed state */}
+    {collapsed && (
+      <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
+        {label}
+      </div>
+    )}
   </button>
+);
+
+// Section label for sidebar groups
+const NavSection: React.FC<{ label: string; collapsed: boolean }> = ({ label, collapsed }) => (
+  collapsed ? (
+    <div className="h-px bg-zinc-200 dark:bg-zinc-800 mx-2 my-2" />
+  ) : (
+    <div className="px-3 pt-4 pb-1">
+      <span className="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{label}</span>
+    </div>
+  )
 );
 
 // Global variable to persist install prompt event across component unmounts/remounts
@@ -50,7 +85,6 @@ if (typeof window !== 'undefined') {
 export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
   const { data: currentUser } = useCurrentUser();
   const [isDark, setIsDark] = useState(() => {
-    // Initialize from localStorage or default to false
     const savedTheme = localStorage.getItem('theme');
     return savedTheme === 'dark';
   });
@@ -61,65 +95,52 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Update URL when page changes
-  const handleNavClick = (id: string) => {
-      if (id === 'dashboard') {
-          navigate('/dashboard');
-      } else {
-          navigate(`/dashboard/${id}`);
-      }
-      
-      if (setCurrentPage) {
-          setCurrentPage(id);
-      }
-      setIsMobileMenuOpen(false);
-  };
+  const handleNavClick = useCallback((id: string) => {
+    if (id === 'dashboard') {
+      navigate('/dashboard');
+    } else {
+      navigate(`/dashboard/${id}`);
+    }
+    if (setCurrentPage) {
+      setCurrentPage(id);
+    }
+    setIsMobileMenuOpen(false);
+  }, [navigate, setCurrentPage]);
 
   useEffect(() => {
-    // Apply theme on mount based on stored preference
     const savedTheme = localStorage.getItem('theme');
     const shouldBeDark = savedTheme === 'dark';
     setIsDark(shouldBeDark);
-    
     if (shouldBeDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-    
-    // Check if app is already installed
+
     const checkIfInstalled = () => {
-      // Check if running in standalone mode (app is installed)
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                          (window.navigator as any).standalone || 
-                          document.referrer.includes('android-app://');
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as any).standalone ||
+        document.referrer.includes('android-app://');
       setIsAppInstalled(isStandalone);
-      
-      // If app is installed, don't show install prompt
       if (isStandalone) {
         setInstallPrompt(null);
         deferredPromptEvent = null;
       }
     };
-    
     checkIfInstalled();
-    
-    // Sync local state with global variable on mount
+
     if (deferredPromptEvent && !isAppInstalled) {
       setInstallPrompt(deferredPromptEvent);
     }
 
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
-      // Only set the prompt if app is not already installed
       if (!isAppInstalled) {
         deferredPromptEvent = e;
         setInstallPrompt(e);
       }
     };
-
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
@@ -127,11 +148,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
   const handleInstallClick = async () => {
     if (!installPrompt) return;
-    
     installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
-    
-    // The prompt can only be used once. Clear it regardless of outcome.
     deferredPromptEvent = null;
     setInstallPrompt(null);
   };
@@ -139,10 +157,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   const toggleTheme = () => {
     const newIsDark = !isDark;
     setIsDark(newIsDark);
-    
-    // Persist to localStorage
     localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
-    
     if (newIsDark) {
       document.documentElement.classList.add('dark');
     } else {
@@ -150,52 +165,105 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
     }
   };
 
-  const getNavItems = () => {
-    const common = [
-      { id: 'profile', icon: User, label: 'Profile' },
-      { id: 'settings', icon: Settings, label: 'Settings' }
-    ];
-
+  const getNavGroups = () => {
     switch (userRole) {
       case UserRole.ADMIN:
         return [
-          { id: 'dashboard', icon: Home, label: 'Overview' },
-          { id: 'users', icon: Users, label: 'User Mgmt' },
-          { id: 'institutions', icon: Building2, label: 'Institutions' },
-          { id: 'courses', icon: BookOpen, label: 'Courses' },
-          { id: 'venues', icon: Map, label: 'Venues & Maps' },
-          { id: 'logs', icon: ShieldAlert, label: 'Audit Logs' },
-          ...common
+          {
+            label: 'General',
+            items: [
+              { id: 'dashboard', icon: Home, label: 'Overview' },
+            ],
+          },
+          {
+            label: 'Management',
+            items: [
+              { id: 'users', icon: Users, label: 'Users' },
+              { id: 'institutions', icon: Building2, label: 'Institutions' },
+              { id: 'courses', icon: BookOpen, label: 'Courses' },
+              { id: 'venues', icon: Map, label: 'Venues & Maps' },
+            ],
+          },
+          {
+            label: 'System',
+            items: [
+              { id: 'logs', icon: ShieldAlert, label: 'Audit Logs' },
+              { id: 'notifications', icon: Bell, label: 'Notifications' },
+            ],
+          },
         ];
       case UserRole.LECTURER:
         return [
-          { id: 'dashboard', icon: Home, label: 'Home' },
-          { id: 'sessions', icon: Timer, label: 'Sessions' },
-          { id: 'analytics', icon: BarChart3, label: 'Analytics' },
-          { id: 'courses', icon: BookOpen, label: 'Courses' },
-          { id: 'reports', icon: FileText, label: 'Reports' },
-          { id: 'timetable', icon: Calendar, label: 'Timetable' },
-          ...common
+          {
+            label: 'General',
+            items: [
+              { id: 'dashboard', icon: Home, label: 'Home' },
+              { id: 'sessions', icon: Timer, label: 'Sessions' },
+            ],
+          },
+          {
+            label: 'Teaching',
+            items: [
+              { id: 'courses', icon: BookOpen, label: 'My Courses' },
+              { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+              { id: 'reports', icon: FileText, label: 'Reports' },
+              { id: 'timetable', icon: Calendar, label: 'Timetable' },
+            ],
+          },
+          {
+            label: 'Other',
+            items: [
+              { id: 'notifications', icon: Bell, label: 'Notifications' },
+            ],
+          },
         ];
       case UserRole.CLASS_REP:
         return [
-          { id: 'dashboard', icon: Home, label: 'My Attendance' },
-          { id: 'class-mgmt', icon: Users, label: 'Class Mgmt' },
-          { id: 'timetable', icon: Calendar, label: 'Timetable' },
-          ...common
+          {
+            label: 'General',
+            items: [
+              { id: 'dashboard', icon: Home, label: 'My Attendance' },
+            ],
+          },
+          {
+            label: 'Class',
+            items: [
+              { id: 'class-mgmt', icon: Users, label: 'Class Management' },
+              { id: 'timetable', icon: Calendar, label: 'Timetable' },
+              { id: 'notifications', icon: Bell, label: 'Notifications' },
+            ],
+          },
         ];
       case UserRole.STUDENT:
       default:
         return [
-          { id: 'dashboard', icon: Home, label: 'Home' },
-          { id: 'timetable', icon: Calendar, label: 'Timetable' },
-          { id: 'analytics', icon: BarChart3, label: 'Analytics' },
-          ...common
+          {
+            label: 'General',
+            items: [
+              { id: 'dashboard', icon: Home, label: 'Home' },
+              { id: 'timetable', icon: Calendar, label: 'Timetable' },
+              { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+            ],
+          },
+          {
+            label: 'Other',
+            items: [
+              { id: 'notifications', icon: Bell, label: 'Notifications' },
+            ],
+          },
         ];
     }
   };
 
-  const navItems = getNavItems();
+  const navGroups = getNavGroups();
+  const allNavItems = navGroups.flatMap(g => g.items);
+
+  // Common items (settings, profile) for all roles
+  const commonItems = [
+    { id: 'profile', icon: User, label: 'Profile' },
+    { id: 'settings', icon: Settings, label: 'Settings' },
+  ];
+
   const displayAvatar = currentUser?.avatar_url;
   const displayInitials = userName
     .split(' ')
@@ -204,65 +272,54 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
     .map((part) => part[0]?.toUpperCase() || '')
     .join('') || 'U';
 
-  return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row transition-colors duration-300">
-      {/* Top Header */}
-      <header className="h-16 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 md:px-6">
-        <div className="md:hidden">
-          <button onClick={() => setIsMobileMenuOpen(true)} className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
-            <Menu size={24} />
-          </button>
-        </div>
-        <div className="hidden md:block">
-          <Logo className="text-zinc-900 dark:text-white" />
-        </div>
-        <div className="flex items-center gap-4">
-          <NotificationInbox />
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
-            {displayAvatar ? (
-              <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
-                {displayInitials}
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+  // Get current page title for the topnav breadcrumb
+  const getCurrentPageTitle = () => {
+    const allItems = [...allNavItems, ...commonItems];
+    const found = allItems.find(i => i.id === currentPage);
+    return found?.label || 'Dashboard';
+  };
 
-      {/* lassName="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row transition-colors duration-300">
-      {/* Sidebar (Desktop) */}
-      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-20' : 'w-64'} border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-950 h-[calc(100vh-4rem)] sticky top-16 transition-all duration-300 relative`}>
-        <div className={`p-6 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex transition-colors duration-200">
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/* DESKTOP SIDEBAR */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-[68px]' : 'w-[240px]'} border-r border-zinc-200 dark:border-zinc-800 flex-col bg-white dark:bg-zinc-900 h-screen sticky top-0 transition-all duration-200 relative z-30`}>
+        {/* Sidebar Header - Logo */}
+        <div className={`h-14 flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'px-4'} border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0`}>
           {sidebarCollapsed ? (
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-black font-bold text-sm">
               P
             </div>
           ) : (
             <Logo className="text-zinc-900 dark:text-white" />
           )}
         </div>
-        
-        {/* Collapse Toggle Button - Positioned on the right edge */}
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute -right-3 top-20 z-10 w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md text-zinc-600 dark:text-zinc-400 hover:text-primary hover:border-primary transition-all flex items-center justify-center"
-          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          <svg 
-            className={`w-3 h-3 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-          {navItems.map(item => (
-            <NavItem 
-              key={item.id} 
+
+        {/* Nav Items */}
+        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+          {navGroups.map((group, gi) => (
+            <div key={gi}>
+              <NavSection label={group.label} collapsed={sidebarCollapsed} />
+              {group.items.map(item => (
+                <NavItem
+                  key={item.id}
+                  id={item.id}
+                  icon={item.icon}
+                  label={item.label}
+                  isActive={currentPage === item.id}
+                  onClick={handleNavClick}
+                  collapsed={sidebarCollapsed}
+                />
+              ))}
+            </div>
+          ))}
+
+          {/* Divider before common items */}
+          <div className="h-px bg-zinc-200 dark:bg-zinc-800 mx-2 my-3" />
+          {commonItems.map(item => (
+            <NavItem
+              key={item.id}
               id={item.id}
               icon={item.icon}
               label={item.label}
@@ -271,121 +328,133 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               collapsed={sidebarCollapsed}
             />
           ))}
-          {userRole !== UserRole.STUDENT && (
-            <button 
-              onClick={() => handleNavClick('notifications')}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-full text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
-              title={sidebarCollapsed ? 'Notifications' : undefined}
-            >
-              <Bell size={18} className="flex-shrink-0" />
-              {!sidebarCollapsed && <span className="truncate">Notifications</span>}
-            </button>
-          )}
         </nav>
 
-        <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
-           {installPrompt && (
-             <button 
-               onClick={handleInstallClick}
-               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-full text-sm font-medium text-primary hover:bg-primary/10 transition-all duration-200 mb-2`}
-               title={sidebarCollapsed ? 'Install App' : undefined}
-             >
-               <Download size={18} className="flex-shrink-0" />
-               {!sidebarCollapsed && <span className="truncate">Install App</span>}
-             </button>
-           )}
+        {/* Sidebar Footer */}
+        <div className="border-t border-zinc-200 dark:border-zinc-800 p-2 space-y-1 flex-shrink-0">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all group relative`}
+            title={sidebarCollapsed ? (isDark ? 'Dark Mode' : 'Light Mode') : undefined}
+          >
+            {isDark ? <Moon size={16} className="flex-shrink-0" /> : <Sun size={16} className="flex-shrink-0" />}
+            {!sidebarCollapsed && <span className="truncate">{isDark ? 'Dark mode' : 'Light mode'}</span>}
+            {!sidebarCollapsed && (
+              <div className={`ml-auto w-7 h-4 rounded-full p-0.5 flex flex-shrink-0 transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}`}>
+                <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
+              </div>
+            )}
+            {sidebarCollapsed && (
+              <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
+                {isDark ? 'Dark mode' : 'Light mode'}
+              </div>
+            )}
+          </button>
 
-           {userRole !== UserRole.STUDENT ? (
-             <button 
-               onClick={toggleTheme}
-               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} px-4 py-2 rounded-full text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-200`}
-               title={sidebarCollapsed ? (isDark ? 'Dark Mode' : 'Light Mode') : undefined}
-             >
-               {!sidebarCollapsed && (
-                 <div className="flex items-center gap-3 overflow-hidden">
-                    {isDark ? <Moon size={18} className="flex-shrink-0" /> : <Sun size={18} className="flex-shrink-0" />}
-                    <span className="truncate">{isDark ? 'Dark Mode' : 'Light Mode'}</span>
-                 </div>
-               )}
-               {sidebarCollapsed && (isDark ? <Moon size={18} className="flex-shrink-0" /> : <Sun size={18} className="flex-shrink-0" />)}
-               {!sidebarCollapsed && (
-                 <div className={`w-8 h-4 rounded-full p-0.5 flex flex-shrink-0 transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}`}>
-                    <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
-                 </div>
-               )}
-             </button>
-           ) : (
-             <button 
-               onClick={() => handleNavClick('notifications')}
-               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
-               title={sidebarCollapsed ? 'Notifications' : undefined}
-             >
-               <Bell size={18} className="flex-shrink-0" />
-               {!sidebarCollapsed && <span className="truncate">Notifications</span>}
-             </button>
-           )}
+          {/* Install App */}
+          {installPrompt && (
+            <button
+              onClick={handleInstallClick}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium text-primary hover:bg-primary/5 transition-all`}
+              title={sidebarCollapsed ? 'Install App' : undefined}
+            >
+              <Download size={16} className="flex-shrink-0" />
+              {!sidebarCollapsed && <span className="truncate">Install App</span>}
+            </button>
+          )}
 
-          {!sidebarCollapsed && (
-            <div className="flex items-center gap-3 px-4 py-3">
+          {/* User Info */}
+          {!sidebarCollapsed ? (
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-default">
               <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
                 {displayAvatar ? (
                   <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                  <div className="w-full h-full flex items-center justify-center text-[11px] font-bold text-zinc-500 dark:text-zinc-400">
                     {displayInitials}
                   </div>
                 )}
               </div>
               <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">{userName}</p>
-                  <p className="text-xs text-zinc-500 truncate capitalize">{userRole?.toLowerCase().replace('_', ' ')}</p>
+                <p className="text-[13px] font-medium text-zinc-900 dark:text-white truncate leading-tight">{userName}</p>
+                <p className="text-[11px] text-zinc-400 truncate capitalize leading-tight">{userRole?.toLowerCase().replace('_', ' ')}</p>
               </div>
             </div>
-          )}
-          {sidebarCollapsed && (
-            <div className="flex items-center justify-center px-4 py-3">
+          ) : (
+            <div className="flex items-center justify-center py-2 group relative">
               <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
                 {displayAvatar ? (
                   <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                  <div className="w-full h-full flex items-center justify-center text-[11px] font-bold text-zinc-500 dark:text-zinc-400">
                     {displayInitials}
                   </div>
                 )}
               </div>
+              <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
+                {userName}
+              </div>
             </div>
           )}
-          <button 
+
+          {/* Sign Out */}
+          <button
             onClick={onLogout}
-            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-2 rounded-full text-sm font-medium text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-all duration-200`}
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/10 transition-all group relative`}
             title={sidebarCollapsed ? 'Sign Out' : undefined}
           >
-            <LogOut size={18} className="flex-shrink-0" />
-            {!sidebarCollapsed && <span className="truncate">Sign Out</span>}
+            <LogOut size={16} className="flex-shrink-0" />
+            {!sidebarCollapsed && <span className="truncate">Sign out</span>}
+            {sidebarCollapsed && (
+              <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
+                Sign out
+              </div>
+            )}
           </button>
         </div>
+
+        {/* Sidebar Collapse Toggle */}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="absolute -right-3 top-[72px] z-40 w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex items-center justify-center"
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <ChevronLeft className={`w-3.5 h-3.5 transition-transform duration-200 ${sidebarCollapsed ? 'rotate-180' : ''}`} />
+        </button>
       </aside>
 
-      {/* Desktop Header - REMOVED for cleaner desktop experience */}
-
-      {/* Mobile Sidebar Overlay */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/* MOBILE SIDEBAR OVERLAY */}
+      {/* ═══════════════════════════════════════════════════════ */}
       {isMobileMenuOpen && (
-          <div className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in duration-200" onClick={() => setIsMobileMenuOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
       )}
 
-      {/* Mobile Sidebar */}
-      <div className={`fixed inset-y-0 left-0 w-72 bg-white dark:bg-zinc-950 z-50 transform transition-transform duration-300 ease-in-out md:hidden flex flex-col border-r border-zinc-200 dark:border-zinc-800 shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="p-6 flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
-              <Logo className="text-zinc-900 dark:text-white" />
-              <button onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white p-1 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
-                  <X size={24} />
-              </button>
-          </div>
-          
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-              {navItems.map(item => (
-                <NavItem 
-                  key={item.id} 
+      {/* MOBILE SIDEBAR */}
+      <div className={`fixed inset-y-0 left-0 w-[280px] bg-white dark:bg-zinc-900 z-50 transform transition-transform duration-250 ease-out md:hidden flex flex-col border-r border-zinc-200 dark:border-zinc-800 shadow-xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Mobile Sidebar Header */}
+        <div className="h-14 flex justify-between items-center px-4 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0">
+          <Logo className="text-zinc-900 dark:text-white" />
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Mobile Nav */}
+        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+          {navGroups.map((group, gi) => (
+            <div key={gi}>
+              <NavSection label={group.label} collapsed={false} />
+              {group.items.map(item => (
+                <NavItem
+                  key={item.id}
                   id={item.id}
                   icon={item.icon}
                   label={item.label}
@@ -393,48 +462,93 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
                   onClick={handleNavClick}
                 />
               ))}
-              {userRole !== UserRole.STUDENT && (
-                <>
-                  <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-4 mx-2"></div>
-                  <button 
-                    onClick={() => handleNavClick('notifications')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-colors ${currentPage === 'notifications' ? 'bg-primary/10 text-primary' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'}`}
-                  >
-                    <Bell size={18} />
-                    Notifications
-                  </button>
-                </>
-              )}
-          </nav>
+            </div>
+          ))}
+          <div className="h-px bg-zinc-200 dark:bg-zinc-800 mx-2 my-3" />
+          {commonItems.map(item => (
+            <NavItem
+              key={item.id}
+              id={item.id}
+              icon={item.icon}
+              label={item.label}
+              isActive={currentPage === item.id}
+              onClick={handleNavClick}
+            />
+          ))}
+        </nav>
 
-          <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
-              <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
-                    {displayAvatar ? (
-                      <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-sm font-bold text-primary">
-                        {displayInitials}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                      <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{userName}</p>
-                      <p className="text-xs text-zinc-500 truncate capitalize">{userRole?.toLowerCase().replace('_', ' ')}</p>
-                  </div>
-              </div>
-              
-              <button 
-                onClick={onLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-900/30"
-              >
-                <LogOut size={18} />
-                Sign Out
-              </button>
+        {/* Mobile Sidebar Footer */}
+        <div className="border-t border-zinc-200 dark:border-zinc-800 p-3 space-y-2 flex-shrink-0">
+          <div className="flex items-center gap-3 px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl">
+            <div className="w-9 h-9 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
+              {displayAvatar ? (
+                <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                  {displayInitials}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{userName}</p>
+              <p className="text-xs text-zinc-400 truncate capitalize">{userRole?.toLowerCase().replace('_', ' ')}</p>
+            </div>
           </div>
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+          >
+            <LogOut size={16} />
+            Sign out
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Bottom Navigation - MagicUI-style dock */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/* MAIN CONTENT AREA  */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <div className="flex-1 flex flex-col min-h-screen min-w-0">
+        {/* Top Navigation Bar — consistent across all pages */}
+        <header className="h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4 md:px-6 sticky top-0 z-20 flex-shrink-0">
+          {/* Left: Mobile hamburger + Page title */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-1.5 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+              <Menu size={20} />
+            </button>
+            <h1 className="text-[15px] font-semibold text-zinc-900 dark:text-white truncate">
+              {getCurrentPageTitle()}
+            </h1>
+          </div>
+
+          {/* Right: Actions  */}
+          <div className="flex items-center gap-2">
+            <NotificationInbox />
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex-shrink-0 cursor-pointer" onClick={() => handleNavClick('profile')}>
+              {displayAvatar ? (
+                <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[11px] font-bold text-zinc-500 dark:text-zinc-400">
+                  {displayInitials}
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto bg-zinc-50 dark:bg-zinc-950 scroll-smooth">
+          <div className="max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8 pb-24 md:pb-8">
+            {children}
+          </div>
+        </main>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/* MOBILE BOTTOM NAV (Dock)  */}
+      {/* ═══════════════════════════════════════════════════════ */}
       <div className="md:hidden fixed bottom-3 left-3 right-3 z-50 pointer-events-none">
         <Dock
           items={[
@@ -445,25 +559,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               onClick: () => handleNavClick('dashboard'),
               icon: <Home size={22} />,
             },
-            {
-              id: 'courses',
-              label: 'Courses',
-              active: currentPage === 'courses',
-              onClick: () => handleNavClick('courses'),
-              icon: <GraduationCap size={22} />,
-            },
+            ...(userRole === UserRole.ADMIN
+              ? [{
+                  id: 'users',
+                  label: 'Users',
+                  active: currentPage === 'users',
+                  onClick: () => handleNavClick('users'),
+                  icon: <Users size={22} />,
+                } as DockItem]
+              : [{
+                  id: 'courses',
+                  label: 'Courses',
+                  active: currentPage === 'courses',
+                  onClick: () => handleNavClick('courses'),
+                  icon: <GraduationCap size={22} />,
+                } as DockItem]
+            ),
             {
               id: 'analytics',
-              label: 'Records',
-              active: currentPage === 'analytics',
-              onClick: () => handleNavClick('analytics'),
+              label: userRole === UserRole.ADMIN ? 'Logs' : 'Records',
+              active: currentPage === 'analytics' || currentPage === 'logs',
+              onClick: () => handleNavClick(userRole === UserRole.ADMIN ? 'logs' : 'analytics'),
               icon: <BarChart3 size={22} />,
             },
             userRole === UserRole.STUDENT
               ? ({
                   id: 'notifications',
                   label: 'Alerts',
-                  active: currentPage === 'notifications' || currentPage === 'alerts',
+                  active: currentPage === 'notifications',
                   onClick: () => handleNavClick('notifications'),
                   icon: <Bell size={22} />,
                 } as DockItem)
@@ -477,13 +600,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           ]}
         />
       </div>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto h-screen bg-zinc-50 dark:bg-black scroll-smooth transition-colors duration-300">
-        <div className="max-w-7xl mx-auto p-4 md:p-8 pb-24 md:pb-8 h-full flex flex-col">
-            {children}
-        </div>
-      </main>
     </div>
   );
 };
