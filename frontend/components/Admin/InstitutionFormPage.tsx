@@ -334,7 +334,7 @@ export const InstitutionFormPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-4 h-12 mt-8">
                <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className={`w-10 h-6 rounded-full p-1 transition-colors ${formData.is_active ? 'bg-primary' : 'bg-zinc-700'}`}>
+                  <div className={`w-10 h-6 rounded-full p-1 transition-colors ${formData.is_active ? 'bg-primary' : 'bg-surfaceHigh'}`}>
                     <div className={`w-4 h-4 bg-white rounded-full transition-transform ${formData.is_active ? 'translate-x-4' : 'translate-x-0'}`} />
                   </div>
                   <input

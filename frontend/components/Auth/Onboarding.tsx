@@ -686,12 +686,12 @@ export const Onboarding: React.FC = () => {
                   <role.icon size={28} />
                 </div>
                 <div className="flex-1">
-                  <p className={`text-lg font-bold transition-colors mb-1 ${state.selectedRole === role.id ? 'text-primary' : 'text-zinc-900'}`}>
+                  <p className={`text-lg font-bold transition-colors mb-1 ${state.selectedRole === role.id ? 'text-primary' : 'text-text'}`}>
                     {role.label}
                   </p>
                   <p className="text-sm text-textMuted leading-relaxed">{role.desc}</p>
                 </div>
-                <div className={`w-6 h-6 rounded-full border-border flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-400'}`}>
+                <div className={`w-6 h-6 rounded-full border-border flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-outline'}`}>
                    {state.selectedRole === role.id && <Check size={16} className="text-text" />}
                 </div>
               </div>
@@ -726,7 +726,7 @@ export const Onboarding: React.FC = () => {
       <div className="flex flex-col items-center mb-8 gap-4">
         <div className="relative group cursor-pointer">
            <div
-             className="w-28 h-28 rounded-full bg-surfaceLow overflow-hidden border-input border-outline ring-2 ring-zinc-200 group-hover:ring-primary transition-all"
+             className="w-28 h-28 rounded-full bg-surfaceLow overflow-hidden border-input border-outline ring-2 ring-outline group-hover:ring-primary transition-all"
              aria-hidden="true"
            >
               {state.pendingImage ? (
@@ -1092,7 +1092,7 @@ export const Onboarding: React.FC = () => {
                     >
                         <div className="text-left">
                             <div className="flex items-center gap-2">
-                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-zinc-900'}`}>{course.code}</span>
+                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-text'}`}>{course.code}</span>
                                  {course.level && (
                                    <span className="text-[10px] bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
                                  )}
@@ -1175,7 +1175,7 @@ export const Onboarding: React.FC = () => {
                         <item.icon size={20} />
                     </div>
                     <div className="text-left">
-                        <p className={`font-medium transition-colors ${item.state ? 'text-zinc-900' : 'text-zinc-800'}`}>{item.label}</p>
+                        <p className={`font-medium transition-colors ${item.state ? 'text-text' : 'text-text'}`}>{item.label}</p>
                         <p className="text-xs text-textMuted">{item.desc}</p>
                     </div>
                 </div>

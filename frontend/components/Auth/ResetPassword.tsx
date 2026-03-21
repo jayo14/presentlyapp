@@ -28,11 +28,11 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
   }, [countdown, cancelRedirect, onBackToLogin]);
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <SEO title="Password Reset Successful | Presently" />
-      <ConfettiAnimation count={40} duration={3000} colors={['#FFD700', '#22c55e', '#ffffff']} />
+      <ConfettiAnimation count={40} duration={3000} colors={['var(--primary)', '#22c55e', '#ffffff']} />
 
-      <div className="w-full max-w-md bg-[#18181b] border border-[#27272a] rounded-2xl p-8 shadow-xl text-center flex flex-col items-center gap-6">
+      <div className="w-full max-w-md bg-surface border border-outline rounded-2xl p-8 shadow-xl text-center flex flex-col items-center gap-6">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -44,16 +44,16 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
 
         <div className="flex flex-col gap-2">
           <h2 className="font-headline text-2xl font-bold text-green-400">Password Reset Successful!</h2>
-          <p className="text-[#a1a1aa]">
+          <p className="text-textMuted text-center">
             You can now sign in to{' '}
-            <span className="text-[#FFD700] font-semibold">Presently</span>{' '}
+            <span className="text-primary font-semibold">Presently</span>{' '}
             with your new credentials.
           </p>
         </div>
 
         <button
           onClick={onBackToLogin}
-          className="w-full h-12 bg-[#FFD700] text-[#09090b] rounded-full font-bold hover:bg-[#FFE44D] transition-all shadow-lg"
+          className="w-full h-12 bg-primaryContainer text-on-primary-fixed rounded-full font-bold hover:opacity-90 transition-all shadow-lg"
         >
           Back to Login
         </button>
@@ -61,7 +61,7 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
         {!cancelRedirect && countdown > 0 ? (
           <button
             onClick={() => setCancelRedirect(true)}
-            className="text-sm text-[#a1a1aa] hover:text-text transition-colors"
+            className="text-sm text-textMuted hover:text-text transition-colors"
           >
             Redirecting in {countdown} seconds...{' '}
             <span className="underline">Cancel</span>
@@ -116,9 +116,9 @@ export const ResetPassword: React.FC = () => {
   const passwordStrength = calculatePasswordStrength(password);
 
   const getStrengthColor = () => {
-    if (passwordStrength < 40) return 'bg-red-500';
+    if (passwordStrength < 40) return 'bg-destructive';
     if (passwordStrength < 70) return 'bg-yellow-500';
-    return 'bg-[#FFD700]';
+    return 'bg-primary';
   };
 
   const getStrengthLabel = () => {
@@ -128,9 +128,9 @@ export const ResetPassword: React.FC = () => {
   };
 
   const getStrengthTextColor = () => {
-    if (passwordStrength < 40) return 'text-red-400';
+    if (passwordStrength < 40) return 'text-destructive';
     if (passwordStrength < 70) return 'text-yellow-400';
-    return 'text-[#FFD700]';
+    return 'text-primary';
   };
 
   const requirements = [
@@ -165,11 +165,11 @@ export const ResetPassword: React.FC = () => {
 
   if (pageState === 'loading' || verifyTokenMutation.isPending) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <SEO title="Verifying Reset Link | Presently" />
         <div className="flex flex-col items-center gap-4">
-          <Loader2 size={40} className="animate-spin text-[#FFD700]" />
-          <p className="text-[#a1a1aa]">Verifying reset link...</p>
+          <Loader2 size={40} className="animate-spin text-primary" />
+          <p className="text-textMuted">Verifying reset link...</p>
         </div>
       </div>
     );
@@ -177,14 +177,11 @@ export const ResetPassword: React.FC = () => {
 
   if (pageState === 'invalid-link') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#09090b] p-4">
-        <SEO title="Invalid Reset Link | Presently" />
-        <div className="flex flex-col items-center gap-6 text-center max-w-md">
           <h2 className="font-headline text-2xl font-bold text-text">Invalid Reset Link</h2>
-          <p className="text-[#a1a1aa]">This password reset link is invalid or has expired.</p>
+          <p className="text-textMuted">This password reset link is invalid or has expired.</p>
           <button
             onClick={() => navigate('/forgot-password')}
-            className="px-6 py-3 bg-[#FFD700] text-[#09090b] rounded-full font-semibold hover:bg-[#FFE44D] transition-all"
+            className="px-6 py-3 bg-primaryContainer text-on-primary-fixed rounded-full font-semibold hover:opacity-90 transition-all"
           >
             Request New Link
           </button>
@@ -198,7 +195,7 @@ export const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-text flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative">
       <SEO title="Reset Password | Presently" />
 
       <button
@@ -212,12 +209,12 @@ export const ResetPassword: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h2 className="font-headline text-4xl font-bold text-text mb-2">Create new password</h2>
-          <p className="text-[#a1a1aa]">
+          <p className="text-textMuted">
             Your new password must be different from previously used passwords.
           </p>
         </div>
 
-        <div className="bg-[#18181b] border border-[#27272a] p-6 rounded-2xl shadow-lg">
+        <div className="bg-surface border border-outline p-6 rounded-2xl shadow-lg">
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-5">
               {/* New Password */}
@@ -230,7 +227,7 @@ export const ResetPassword: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
                     autoComplete="new-password"
-                    className="w-full h-14 pl-4 pr-12 bg-[#27272a] border border-[#3f3f46] rounded-2xl text-text placeholder-[#71717a] focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-colors"
+                    className="w-full h-14 pl-4 pr-12 bg-surfaceLow border border-outline rounded-2xl text-text placeholder-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                   <button
                     type="button"
@@ -250,7 +247,7 @@ export const ResetPassword: React.FC = () => {
                     <span className="font-medium text-textMuted">Password strength</span>
                     <span className="font-bold text-text">{passwordStrength}%</span>
                   </div>
-                  <div className="w-full h-2 bg-[#27272a] rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-surfaceLow rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${getStrengthColor()}`}
                       style={{ width: `${passwordStrength}%` }}
@@ -287,13 +284,13 @@ export const ResetPassword: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     className={[
-                      'w-full h-14 pl-4 pr-12 bg-[#27272a] border rounded-2xl text-white placeholder-[#71717a]',
+                      'w-full h-14 pl-4 pr-12 bg-surfaceLow border rounded-2xl text-text placeholder-textMuted',
                       'focus:outline-none focus:ring-1 transition-colors',
                       confirmPassword
                         ? passwordsMatch
                           ? 'border-green-500 focus:border-green-500 focus:ring-green-500'
-                          : 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                        : 'border-[#3f3f46] focus:border-[#FFD700] focus:ring-[#FFD700]',
+                          : 'border-destructive focus:border-destructive focus:ring-destructive'
+                        : 'border-outline focus:border-primary focus:ring-primary',
                     ].join(' ')}
                   />
                   <button
@@ -316,7 +313,7 @@ export const ResetPassword: React.FC = () => {
               <button
                 type="submit"
                 disabled={!isPasswordValid || resetPasswordMutation.isPending}
-                className="w-full h-14 bg-[#FFD700] text-[#09090b] rounded-2xl font-bold text-lg hover:bg-[#FFE44D] hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {resetPasswordMutation.isPending ? (
                   <>

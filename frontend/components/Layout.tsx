@@ -47,7 +47,7 @@ const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onCl
     <Icon size={16} className={`flex-shrink-0 ${isActive ? 'text-foreground' : 'text-muted-foreground group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}`} />
     {!collapsed && <span className="truncate">{label}</span>}
     {!collapsed && badge && (
-      <span className="ml-auto text-[10px] font-semibold bg-inputccent text-textMuted px-1.5 py-0.5 rounded-md">
+      <span className="ml-auto text-[10px] font-semibold bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded-md">
         {badge}
       </span>
     )}
@@ -366,8 +366,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
           {/* User Info */}
           {!sidebarCollapsed ? (
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-inputccent hover:text-muted-foregroundccent-foreground/50 transition-colors cursor-default">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-inputccent border border-outline flex-shrink-0">
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surfaceLow hover:text-textMuted/50 transition-colors cursor-default">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0">
                 {displayAvatar ? (
                   <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -383,7 +383,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             </div>
           ) : (
             <div className="flex items-center justify-center py-2 group relative">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-inputccent border border-outline flex-shrink-0">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0">
                 {displayAvatar ? (
                   <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -441,7 +441,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           <Logo className="text-text" />
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="p-1.5 text-textMuted hover:text-textMuted rounded-lg hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors"
+            className="p-1.5 text-textMuted hover:text-textMuted rounded-lg hover:bg-surfaceLow hover:text-textMuted transition-colors"
           >
             <X size={20} />
           </button>
@@ -480,7 +480,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         {/* Mobile Sidebar Footer */}
         <div className="border-t border-outline p-3 space-y-2 flex-shrink-0">
           <div className="flex items-center gap-3 px-3 py-2.5 bg-surfaceLow/50 rounded-xl">
-            <div className="w-9 h-9 rounded-full overflow-hidden bg-inputccent border border-outline flex-shrink-0">
+            <div className="w-9 h-9 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0">
               {displayAvatar ? (
                 <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
               ) : (
@@ -514,7 +514,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-1.5 text-textMuted hover:text-textMuted rounded-lg hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors"
+              className="md:hidden p-1.5 text-textMuted hover:text-textMuted rounded-lg hover:bg-surfaceLow hover:text-textMuted transition-colors"
             >
               <Menu size={20} />
             </button>
@@ -526,7 +526,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           {/* Right: Actions  */}
           <div className="flex items-center gap-2">
             <NotificationInbox />
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-inputccent border border-outline flex-shrink-0 cursor-pointer" onClick={() => handleNavClick('profile')}>
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0 cursor-pointer" onClick={() => handleNavClick('profile')}>
               {displayAvatar ? (
                 <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
               ) : (

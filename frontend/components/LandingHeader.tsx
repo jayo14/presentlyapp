@@ -97,7 +97,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
                 key={item.label}
                 to={item.to}
                 className={`relative pb-1 transition-all duration-300 ease-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-primary/60 after:transition-all after:duration-300 after:ease-out hover:after:w-full ${
-                  active ? 'text-white' : 'text-muted-foreground hover:text-white'
+                  active ? 'text-text' : 'text-muted-foreground hover:text-white'
                 }`}
               >
                 {item.label}

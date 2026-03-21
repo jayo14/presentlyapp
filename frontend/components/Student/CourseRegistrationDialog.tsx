@@ -144,7 +144,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-inputccent hover:text-muted-foregroundccent-foreground rounded-lg transition-colors"
+            className="p-2 hover:bg-surfaceLow hover:text-textMuted rounded-lg transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-6 h-6 text-textMuted" />

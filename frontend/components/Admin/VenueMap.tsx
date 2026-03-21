@@ -921,7 +921,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
               <li key={v.id}>
                 <button
                   type="button"
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-surfaceLow hover:text-textMuted transition-colors flex items-center gap-2"
                   onClick={() => {
                     flyToVenue(v);
                     setSearchTerm('');
@@ -984,7 +984,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           <div className="h-px bg-surfaceLow" />
           <button
             onClick={handleReset}
-            className="p-2 text-textMuted hover:bg-inputccent hover:text-muted-foregroundccent-foreground transition-colors flex items-center justify-center"
+            className="p-2 text-textMuted hover:bg-surfaceLow hover:text-textMuted transition-colors flex items-center justify-center"
             title="Reset View"
           >
             <RefreshCw size={20} />

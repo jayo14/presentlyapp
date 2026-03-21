@@ -424,7 +424,7 @@ export const CreateSessionPage: React.FC = () => {
                         <div className="p-6 space-y-5 animate-in slide-in-from-top-2">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <div className="bg-inputccent p-2 rounded-lg text-textMuted">
+                                    <div className="bg-surfaceLow p-2 rounded-lg text-textMuted">
                                         <MapPin size={20} />
                                     </div>
                                     <div>
@@ -509,7 +509,7 @@ export const CreateSessionPage: React.FC = () => {
                                                     >
                                                         <div className="flex justify-between items-start">
                                                             <div>
-                                                                <h4 className={`font-semibold text-sm ${isSelected ? 'text-primary' : 'text-foreground'}`}>{dept.name}</h4>
+                                                                <h4 className={`font-headline font-semibold text-sm ${isSelected ? 'text-primary' : 'text-foreground'}`}>{dept.name}</h4>
                                                                 <p className="text-xs opacity-70 font-mono mt-0.5">{dept.code}</p>
                                                             </div>
                                                             {isSelected && (

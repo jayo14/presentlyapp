@@ -108,7 +108,7 @@ export const OTPVerification: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-text flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative">
       <SEO title="OTP Verification | Presently" />
 
       <button
@@ -125,8 +125,8 @@ export const OTPVerification: React.FC = () => {
           <h1 className="font-headline text-4xl font-bold text-text mb-4">
             Verify your {email ? 'email' : 'phone number'}
           </h1>
-          <p className="text-[#a1a1aa] mb-2">Enter the 6-digit code we sent to</p>
-          <p className="text-[#FFD700] font-medium">{email || formatPhoneDisplay(phone)}</p>
+          <p className="text-textMuted mb-2">Enter the 6-digit code we sent to</p>
+          <p className="text-primary font-medium">{email || formatPhoneDisplay(phone)}</p>
         </div>
 
         {/* OTP Inputs */}
@@ -142,9 +142,9 @@ export const OTPVerification: React.FC = () => {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className={[
-                'w-12 h-14 text-center text-2xl font-bold bg-[#18181b] rounded-xl text-white',
-                'border-border transition-all focus:outline-none focus:ring-2 focus:ring-[#FFD700]',
-                digit ? 'border-[#FFD700]' : 'border-[#27272a] focus:border-[#FFD700]',
+                'w-12 h-14 text-center text-2xl font-bold bg-surfaceHigh rounded-xl text-text',
+                'border-outline transition-all focus:outline-none focus:ring-2 focus:ring-primary',
+                digit ? 'border-primary' : 'border-outline focus:border-primary',
               ].join(' ')}
               aria-label={`OTP digit ${index + 1}`}
             />
@@ -154,8 +154,8 @@ export const OTPVerification: React.FC = () => {
         {/* Timer */}
         <div className="flex items-center justify-center gap-4 mb-8">
           {!canResend ? (
-            <div className="flex items-center gap-2 text-[#a1a1aa] text-sm">
-              <div className="w-8 h-8 rounded-full border-outline border-[#27272a] flex items-center justify-center text-xs font-bold text-[#FFD700]">
+            <div className="flex items-center gap-2 text-textMuted text-sm">
+              <div className="w-8 h-8 rounded-full border-outline border shadow-sm flex items-center justify-center text-xs font-bold text-primary">
                 {formatCountdown()}
               </div>
               <span>Resend code in {formatCountdown()}s</span>
@@ -164,7 +164,7 @@ export const OTPVerification: React.FC = () => {
             <button
               onClick={handleResend}
               disabled={resendMutation.isPending}
-              className="text-[#FFD700] font-medium hover:underline disabled:opacity-50 flex items-center gap-2"
+              className="text-primary font-medium hover:underline disabled:opacity-50 flex items-center gap-2"
             >
               {resendMutation.isPending && <Loader2 size={16} className="animate-spin" />}
               Resend Code
@@ -185,7 +185,7 @@ export const OTPVerification: React.FC = () => {
         <button
           onClick={handleVerify}
           disabled={!isOtpComplete || verifyMutation.isPending}
-          className="w-full h-14 bg-[#FFD700] text-[#09090b] rounded-2xl font-bold text-lg hover:bg-[#FFE44D] hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {verifyMutation.isPending ? (
             <>
