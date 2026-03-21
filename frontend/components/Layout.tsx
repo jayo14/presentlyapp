@@ -38,8 +38,8 @@ const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onCl
       group relative w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} 
       px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150
       ${isActive
-        ? 'bg-inputccent text-foreground'
-        : 'text-muted-foreground hover:text-zinc-900 dark:hover:text-white hover:bg-inputccent hover:text-muted-foregroundccent-foreground/50'
+        ? 'bg-surfaceLow text-text'
+        : 'text-textMuted hover:text-text hover:bg-surfaceLow'
       }
     `}
     title={collapsed ? label : undefined}
@@ -335,13 +335,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium text-muted-foreground hover:bg-inputccent hover:text-muted-foregroundccent-foreground/50 transition-all group relative`}
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium text-textMuted hover:bg-surfaceLow hover:text-text transition-all group relative`}
             title={sidebarCollapsed ? (isDark ? 'Dark Mode' : 'Light Mode') : undefined}
           >
             {isDark ? <Moon size={16} className="flex-shrink-0" /> : <Sun size={16} className="flex-shrink-0" />}
             {!sidebarCollapsed && <span className="truncate">{isDark ? 'Dark mode' : 'Light mode'}</span>}
             {!sidebarCollapsed && (
-              <div className={`ml-auto w-7 h-4 rounded-full p-0.5 flex flex-shrink-0 transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-zinc-300 dark:bg-zinc-600 justify-start'}`}>
+              <div className={`ml-auto w-7 h-4 rounded-full p-0.5 flex flex-shrink-0 transition-colors ${isDark ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}>
                 <div className="w-3 h-3 rounded-full bg-surface shadow-sm" />
               </div>
             )}
