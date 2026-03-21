@@ -15,7 +15,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   height,
   animation = 'pulse'
 }) => {
-  const baseClasses = 'bg-zinc-800/50';
+  const baseClasses = 'bg-surfaceHigh';
   const animationClass = animation === 'pulse' ? 'animate-pulse' : 'animate-shimmer';
   
   const variantClasses = {
@@ -56,7 +56,7 @@ export const SkeletonText: React.FC<{ lines?: number; className?: string }> = ({
 );
 
 export const SkeletonCard: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <div className={`p-6 bg-zinc-900 border border-zinc-800 rounded-xl ${className}`}>
+  <div className={`p-6 bg-surface border border-outline rounded-xl ${className}`}>
     <Skeleton variant="rectangular" height="200px" className="mb-4" />
     <Skeleton variant="text" width="60%" className="mb-2" />
     <SkeletonText lines={2} />
