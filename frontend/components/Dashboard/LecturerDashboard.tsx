@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Calendar, QrCode, Clock, ArrowUpDown, Trash2, X, Search, Camera, CheckCircle2, FileText, Download, BookOpen, MoreVertical, Share2, Copy, Edit2, AlertCircle, TrendingUp, TrendingDown, Filter, ChevronDown, BarChart3, Timer, AlertOctagon, Loader2, RefreshCw, MapPin } from 'lucide-react';
-import { Button } from '../Button';
-import { Input } from '../Input';
+import { Plus, Users, Calendar, Clock, Trash2, X, BookOpen, FileText, RefreshCw, MapPin, Timer, Loader2, BarChart3 } from 'lucide-react';
 import { Session } from '../../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { courseApi, sessionApi, AttendanceSession } from '../../services/api/attendance';
@@ -27,63 +25,46 @@ interface LecturerDashboardProps {
   userProfile?: UserProfile;
   view?: string;
 }
-// ... imports ...
-
-// ... interfaces ...
 
 export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, userProfile, view = 'dashboard' }) => {
   const navigate = useNavigate();
-  // State
   const [sessions, setSessions] = useState<any[]>([]);
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [venues, setVenues] = useState<VenueType[]>([]);
-  
-  // Modal states
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
-  
+
   const { modalProps: deleteModalProps } = useModalAccessibility(isDeleteModalOpen, () => setIsDeleteModalOpen(false));
 
-  // Dashboard analytics state
   const [dashboardAnalytics, setDashboardAnalytics] = useState<LecturerDashboardAnalytics | null>(null);
   const [courseAnalytics, setCourseAnalytics] = useState<CourseAttendanceAnalytics | null>(null);
-  
-  // Loading states
+
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [venuesLoading, setVenuesLoading] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Department data
-  const [departments, setDepartments] = useState<Department[]>([]);
 
-  // Timetable state
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
   const [timetableLoading, setTimetableLoading] = useState(false);
 
-  // Fetch real data on mount and setup auto-refresh
   useEffect(() => {
     fetchCourses();
     fetchVenues();
     fetchSessions();
     fetchDashboardAnalytics();
-
-    // Auto-refresh data every 60 seconds
     const interval = setInterval(() => {
-        fetchSessions();
-        fetchDashboardAnalytics();
+      fetchSessions();
+      fetchDashboardAnalytics();
     }, 60000);
-
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch timetable when view changes
   useEffect(() => {
-    if (view === 'timetable') {
-      fetchTimetable();
-    }
+    if (view === 'timetable') fetchTimetable();
   }, [view]);
 
   const fetchTimetable = async () => {
@@ -117,13 +98,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
       setCoursesLoading(true);
       setError(null);
       const data = await courseApi.getAll();
-      const coursesArray = Array.isArray(data) ? data : [];
-      // Use the raw data as CourseType or transform if necessary. 
-      // The API returns Course objects, but the previous code was transforming them.
-      // Let's assume the API returns what we need or stick to previous transform if types match.
-      // Actually, CourseType is imported from types, let's see what it expects.
-      // For now, let's just use the array.
-      setCourses(coursesArray); 
+      setCourses(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching courses:', err);
       setError('Failed to load courses');
@@ -157,363 +132,326 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     }
   };
 
-  // Deprecated/Unused
-  const fetchDepartments = async () => {
-      // No-op
-  };
-
   const confirmDelete = async () => {
-      if (!sessionToDelete) return;
-      try {
-          // Assuming sessionToDelete is an ID string, convert to number
-          await sessionApi.delete(parseInt(sessionToDelete));
-          toast.success('Session deleted successfully');
-          setIsDeleteModalOpen(false);
-          setSessionToDelete(null);
-          fetchSessions(); // Refresh
-      } catch (err) {
-          toast.error('Failed to delete session');
-      }
+    if (!sessionToDelete) return;
+    try {
+      await sessionApi.delete(parseInt(sessionToDelete));
+      toast.success('Session deleted successfully');
+      setIsDeleteModalOpen(false);
+      setSessionToDelete(null);
+      fetchSessions();
+    } catch (err) {
+      toast.error('Failed to delete session');
+    }
   };
 
-
-
-
-
-// ... rest of the component logic ...
-
-  // Render Views
+  // ─── View: Courses ─────────────────────────────────────
   if (view === 'courses') {
-      return (
-          <>
-          <SEO
-            title="My Courses | Lecturer Dashboard"
-            description="Manage your courses, enrolled students and course settings on Presently."
-            noIndex
-          />
-          <CourseManagement 
-            userInstitutionId={userProfile?.institution} 
-            userCollegeId={userProfile?.college} 
-          />
-          </>
-      );
+    return (
+      <>
+        <SEO title="My Courses | Lecturer Dashboard" description="Manage your courses, enrolled students and course settings on Presently." noIndex />
+        <CourseManagement userInstitutionId={userProfile?.institution} userCollegeId={userProfile?.college} />
+      </>
+    );
   }
 
+  // ─── View: Reports ─────────────────────────────────────
   if (view === 'reports') {
-      return (
-          <>
-          <SEO
-            title="Attendance Reports | Lecturer Dashboard"
-            description="View and export detailed attendance reports for your courses on Presently."
-            noIndex
-          />
-          <AttendanceReport />
-          </>
-      );
+    return (
+      <>
+        <SEO title="Attendance Reports | Lecturer Dashboard" description="View and export detailed attendance reports for your courses on Presently." noIndex />
+        <AttendanceReport />
+      </>
+    );
   }
-  
+
+  // ─── View: Timetable ──────────────────────────────────
   if (view === 'timetable') {
-       return (
-         <>
-         <SEO
-           title="Timetable | Lecturer Dashboard"
-           description="View your teaching schedule and class timetable on Presently."
-           noIndex
-         />
-         <div className="space-y-6 animate-in fade-in duration-500">
-             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6">
-                 <div>
-                     <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Teaching Schedule</h2>
-                     <p className="text-zinc-500 text-sm">View your weekly class timetable and lecture venues.</p>
-                 </div>
-                 <Button variant="secondary" onClick={fetchTimetable} disabled={timetableLoading}>
-                     <RefreshCw size={16} className={`mr-2 ${timetableLoading ? 'animate-spin' : ''}`} />
-                     Refresh
-                 </Button>
-             </div>
+    return (
+      <>
+        <SEO title="Timetable | Lecturer Dashboard" description="View your teaching schedule and class timetable on Presently." noIndex />
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Teaching Schedule</h2>
+              <p className="text-sm text-zinc-500 mt-0.5">Your weekly class timetable and lecture venues.</p>
+            </div>
+            <button
+              onClick={fetchTimetable}
+              disabled={timetableLoading}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={timetableLoading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
 
-             {timetableLoading && timetableData.length === 0 ? (
-                 <div className="flex flex-col items-center justify-center h-64 text-zinc-500">
-                     <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
-                     <p>Loading your schedule...</p>
-                 </div>
-             ) : (
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                     {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
-                         const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
-                         const dayClasses = timetableData.filter(t => t.day_of_week === dayUpper && t.is_active);
-                         
-                         return (
-                             <div key={day} className="flex flex-col gap-4">
-                                 <div className="flex items-center gap-2 px-1">
-                                     <div className="w-2 h-2 rounded-full bg-primary ring-4 ring-primary/20" />
-                                     <h3 className="font-bold text-zinc-900 dark:text-white uppercase tracking-wider text-xs">{day}</h3>
-                                     <span className="text-[10px] font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-md ml-auto">
-                                         {dayClasses.length}
-                                     </span>
-                                 </div>
+          {timetableLoading && timetableData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-64 text-zinc-400">
+              <Loader2 className="w-8 h-8 animate-spin mb-3 text-primary" />
+              <p className="text-sm">Loading your schedule...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
+                const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
+                const dayClasses = timetableData.filter(t => t.day_of_week === dayUpper && t.is_active);
 
-                                 <div className="space-y-3">
-                                     {dayClasses.length > 0 ? (
-                                         dayClasses.map((t) => (
-                                             <div 
-                                                 key={t.id} 
-                                                 className="group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
-                                             >
-                                                 <div className="absolute top-0 left-0 w-1 h-full bg-primary/0 group-hover:bg-primary rounded-l-full transition-all" />
-                                                 
-                                                 <div className="flex justify-between items-start mb-2">
-                                                     <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t.course_code}</span>
-                                                     <div className="bg-zinc-100 dark:bg-zinc-800 p-1.5 rounded-lg text-zinc-400 group-hover:text-primary transition-colors">
-                                                         <Clock size={14} />
-                                                     </div>
-                                                 </div>
-
-                                                 <h4 className="font-bold text-zinc-900 dark:text-white text-sm mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                                                     {t.course_name}
-                                                 </h4>
-
-                                                 <div className="space-y-2">
-                                                     <div className="flex items-center gap-2 text-xs text-zinc-500">
-                                                         <Timer size={12} />
-                                                         <span>{t.start_time} - {t.end_time}</span>
-                                                     </div>
-                                                     {t.venue_name && (
-                                                         <div className="flex items-center gap-2 text-xs text-zinc-500">
-                                                             <MapPin size={12} />
-                                                             <span className="truncate">{t.venue_name}</span>
-                                                         </div>
-                                                     )}
-                                                 </div>
-                                             </div>
-                                         ))
-                                     ) : (
-                                         <div className="bg-zinc-50/50 dark:bg-zinc-900/30 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center">
-                                             <p className="text-[10px] text-zinc-400 font-medium italic">No classes</p>
-                                         </div>
-                                     )}
-                                 </div>
-                             </div>
-                         );
-                     })}
-                 </div>
-             )}
-         </div>
-         </>
-       );
+                return (
+                  <div key={day} className="space-y-3">
+                    <div className="flex items-center gap-2 px-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <h3 className="text-xs font-semibold text-zinc-900 dark:text-white uppercase tracking-wider">{day}</h3>
+                      <span className="text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded ml-auto">
+                        {dayClasses.length}
+                      </span>
+                    </div>
+                    {dayClasses.length > 0 ? (
+                      dayClasses.map((t) => (
+                        <div
+                          key={t.id}
+                          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3.5 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                        >
+                          <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">{t.course_code}</span>
+                          <h4 className="text-sm font-medium text-zinc-900 dark:text-white mt-1 line-clamp-2">{t.course_name}</h4>
+                          <div className="mt-2.5 space-y-1.5">
+                            <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+                              <Timer size={12} />
+                              <span>{t.start_time} – {t.end_time}</span>
+                            </div>
+                            {t.venue_name && (
+                              <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+                                <MapPin size={12} />
+                                <span className="truncate">{t.venue_name}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl p-5 text-center">
+                        <p className="text-xs text-zinc-400">No classes</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </>
+    );
   }
-  
+
+  // ─── View: Analytics ───────────────────────────────────
   if (view === 'analytics') {
-       return (
-         <>
-         <SEO
-           title="Analytics | Lecturer Dashboard"
-           description="Review attendance analytics, course performance and student engagement data on Presently."
-           noIndex
-         />
-         <LecturerAnalytics />
-         </>
-       );
+    return (
+      <>
+        <SEO title="Analytics | Lecturer Dashboard" description="Review attendance analytics, course performance and student engagement data on Presently." noIndex />
+        <LecturerAnalytics />
+      </>
+    );
   }
 
-  // Default Dashboard View
+  // ─── Default Dashboard View ────────────────────────────
   return (
     <>
-    <SEO
-      title="Lecturer Dashboard | Presently"
-      description="Manage your courses, attendance sessions and view real-time student engagement on Presently."
-      noIndex
-    />
-    <div className="space-y-6 animate-in fade-in duration-500">
+      <SEO title="Lecturer Dashboard | Presently" description="Manage your courses, attendance sessions and view real-time student engagement on Presently." noIndex />
+      <div className="space-y-6 animate-in fade-in duration-300">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Lecturer Dashboard</h2>
-              <p className="text-zinc-400">Manage your courses and attendance sessions.</p>
-            </div>
-            <div className="flex gap-2">
-                <Button onClick={() => navigate('/dashboard/sessions/new')}>
-                    <Plus size={18} className="mr-2"/> Create New Session
-                </Button>
-            </div>
-        </div>
-        
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl">
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
-                        <BookOpen size={20} />
-                    </div>
-                    <h3 className="text-zinc-400 text-sm font-medium">My Courses</h3>
-                </div>
-                <p className="text-3xl font-bold text-zinc-900 dark:text-white">{courses.length}</p>
-            </div>
-             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl">
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-green-50 text-green-500 rounded-lg">
-                        <Clock size={20} />
-                    </div>
-                    <h3 className="text-zinc-400 text-sm font-medium">Active Sessions</h3>
-                </div>
-                <p className="text-3xl font-bold text-zinc-900 dark:text-white">{sessions.filter(s => s.is_active).length}</p>
-            </div>
-             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl">
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-purple-50 text-purple-500 rounded-lg">
-                        <Users size={20} />
-                    </div>
-                    <h3 className="text-zinc-400 text-sm font-medium">Total Students</h3>
-                </div>
-                <p className="text-3xl font-bold text-zinc-900 dark:text-white">{dashboardAnalytics?.total_students || 0}</p>
-            </div>
+          <div>
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Welcome back, {userName.split(' ')[0]}</h2>
+            <p className="text-sm text-zinc-500 mt-0.5">Manage your courses and attendance sessions.</p>
+          </div>
+          <button
+            onClick={() => navigate('/dashboard/sessions/new')}
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Plus size={16} />
+            New Session
+          </button>
         </div>
 
-        {/* Sessions List */}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+                <BookOpen size={18} className="text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <p className="text-2xl font-semibold text-zinc-900 dark:text-white">{courses.length}</p>
+            <p className="text-xs text-zinc-500 mt-0.5">My Courses</p>
+          </div>
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+                <Clock size={18} className="text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+            <p className="text-2xl font-semibold text-zinc-900 dark:text-white">{sessions.filter(s => s.is_active).length}</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Active Sessions</p>
+          </div>
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center">
+                <Users size={18} className="text-violet-600 dark:text-violet-400" />
+              </div>
+            </div>
+            <p className="text-2xl font-semibold text-zinc-900 dark:text-white">{dashboardAnalytics?.total_students || 0}</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Total Students</p>
+          </div>
+        </div>
+
+        {/* Sessions */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-            <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
-                <h3 className="font-bold text-zinc-900 dark:text-white">Recent Sessions</h3>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/sessions')}>View All</Button>
+          <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">Recent Sessions</h3>
+            <button
+              onClick={() => navigate('/dashboard/sessions')}
+              className="text-xs font-medium text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+            >
+              View all →
+            </button>
+          </div>
+
+          {sessions.length === 0 ? (
+            <div className="px-5 py-16 text-center">
+              <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="text-zinc-400" size={24} />
+              </div>
+              <h4 className="text-base font-semibold text-zinc-900 dark:text-white mb-1">No sessions recorded</h4>
+              <p className="text-sm text-zinc-500 mb-6 max-w-xs mx-auto">Start taking attendance for your courses to see sessions here.</p>
+              <button
+                onClick={() => navigate('/dashboard/sessions/new')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Create Your First Session
+              </button>
             </div>
-            <div className="p-6">
-                {sessions.length === 0 ? (
-                    <div className="text-center py-16 text-zinc-400 bg-zinc-50/50 dark:bg-zinc-950/30 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800">
-                        <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Calendar className="text-zinc-400" size={32} />
+          ) : (
+            <div className="p-5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {sessions.slice(0, 6).map(session => {
+                  const isExpired = session.is_active && new Date(session.end_time) < new Date();
+                  const status = session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED';
+                  const statusStyles: Record<string, string> = {
+                    'ACTIVE': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+                    'EXPIRED': 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+                    'ENDED': 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
+                  };
+
+                  return (
+                    <div
+                      key={session.id}
+                      onClick={() => setSelectedSession(session)}
+                      className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer transition-all group"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-400 group-hover:text-primary transition-colors">
+                            {session.course_code?.substring(0, 2) || 'CS'}
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{session.course_code}</h4>
+                            <p className="text-xs text-zinc-500 truncate max-w-[180px]">{session.course_name || 'Class Session'}</p>
+                          </div>
                         </div>
-                        <h4 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">No sessions recorded</h4>
-                        <p className="text-sm mb-8 max-w-xs mx-auto">Start taking attendance for your courses to see active and past sessions here.</p>
-                        <Button onClick={() => navigate('/dashboard/sessions/new')} className="rounded-xl px-8 h-12">Create Your First Session</Button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {sessions.slice(0, 6).map(session => (
-                            <div 
-                                key={session.id} 
-                                onClick={() => setSelectedSession(session)}
-                                className="group relative bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/40 cursor-pointer overflow-hidden flex flex-col justify-between min-h-[320px]"
-                            >
-                                {/* Decorative Background Elements */}
-                                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24 blur-3xl group-hover:bg-primary/10 transition-colors duration-700" />
-                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full -ml-16 -mb-16 blur-3xl transition-colors duration-700" />
-                                
-                                <div className="relative z-10 space-y-8">
-                                    {/* Card Top: Course & Status */}
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-black text-lg text-zinc-400 group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-inner group-hover:scale-110 group-hover:rotate-3">
-                                                {session.course_code?.substring(0,2) || 'CS'}
-                                            </div>
-                                            <div>
-                                                <h4 className="text-2xl font-black text-zinc-900 dark:text-white group-hover:text-primary transition-colors tracking-tight mb-1">{session.course_code}</h4>
-                                                <p className="text-sm text-zinc-400 font-medium truncate max-w-[200px]">{session.course_name || 'Class Session'}</p>
-                                            </div>
-                                        </div>
-                                        
-                                        {(() => {
-                                            const isExpired = session.is_active && new Date(session.end_time) < new Date();
-                                            const status = session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED';
-                                            const statusStyles = {
-                                                'ACTIVE': 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-900/50',
-                                                'EXPIRED': 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
-                                                'ENDED': 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
-                                            };
-                                            return (
-                                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.1em] border uppercase ${statusStyles[status]}`}>
-                                                    {status}
-                                                </span>
-                                            );
-                                        })()}
-                                    </div>
+                        <span className={`text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider ${statusStyles[status]}`}>
+                          {status}
+                        </span>
+                      </div>
 
-                                    {/* Card Middle: Stats Grid */}
-                                    <div className="grid grid-cols-2 gap-6 p-6 bg-zinc-50/50 dark:bg-zinc-950/40 rounded-2xl border border-zinc-100 dark:border-zinc-800/50">
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2 text-zinc-400">
-                                                <Calendar size={14} className="text-primary" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">Session Date</span>
-                                            </div>
-                                            <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
-                                                {new Date(session.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                            </p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2 text-zinc-400">
-                                                <Users size={14} className="text-blue-500" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">Attendance</span>
-                                            </div>
-                                            <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200">
-                                                <span className="text-xl text-zinc-900 dark:text-white font-black">{session.attendee_count || 0}</span> <span className="text-zinc-400 font-medium">Present</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                      <div className="flex items-center gap-4 text-xs text-zinc-500 mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar size={12} />
+                          <span>{new Date(session.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Users size={12} />
+                          <span>{session.attendee_count || 0} present</span>
+                        </div>
+                      </div>
 
-                                {/* Card Bottom: Actions */}
-                                <div className="relative z-10 flex items-center gap-4 mt-8">
-                                    <Button 
-                                        variant="secondary" 
-                                        className="flex-1 h-14 rounded-2xl text-xs font-black uppercase tracking-widest gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-primary dark:hover:bg-primary hover:text-black transition-all group/btn shadow-lg"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/dashboard/reports?courseId=${session.course}&sessionId=${session.id}`);
-                                        }}
-                                    >
-                                        <FileText size={18} className="group-hover/btn:scale-110 transition-transform" />
-                                        View Full Report
-                                    </Button>
-                                    
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setSessionToDelete(session.id.toString());
-                                            setIsDeleteModalOpen(true);
-                                        }}
-                                        className="h-14 w-14 rounded-2xl text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all border border-zinc-200 dark:border-zinc-800 hover:border-red-200"
-                                    >
-                                        <Trash2 size={20}/>
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 mt-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/dashboard/reports?courseId=${session.course}&sessionId=${session.id}`);
+                          }}
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg hover:bg-primary hover:text-black transition-colors"
+                        >
+                          <FileText size={13} />
+                          Report
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSessionToDelete(session.id.toString());
+                            setIsDeleteModalOpen(true);
+                          }}
+                          className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
-                )}
+                  );
+                })}
+              </div>
             </div>
+          )}
         </div>
 
-      {selectedSession && (
-        <SessionDetailDialog 
-            session={selectedSession as any} 
+        {/* Session Detail Dialog */}
+        {selectedSession && (
+          <SessionDetailDialog
+            session={selectedSession as any}
             onClose={() => setSelectedSession(null)}
             onSessionEnded={() => {
-                fetchSessions();
-                fetchDashboardAnalytics();
+              fetchSessions();
+              fetchDashboardAnalytics();
             }}
-        />
-      )}
+          />
+        )}
 
-
-
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div 
-                {...deleteModalProps}
-                aria-labelledby="delete-title"
-                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 outline-none"
+        {/* Delete Confirmation */}
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div
+              {...deleteModalProps}
+              aria-labelledby="delete-title"
+              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none"
             >
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="bg-red-500/10 p-3 rounded-full text-red-500"><Trash2 size={24} /></div>
-                    <div><h3 id="delete-title" className="text-lg font-bold text-zinc-900 dark:text-white">Delete Session?</h3><p className="text-sm text-zinc-400">This action cannot be undone.</p></div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-red-50 dark:bg-red-500/10 p-2.5 rounded-lg text-red-500">
+                  <Trash2 size={20} />
                 </div>
-                <div className="flex gap-3 mt-6">
-                    <Button variant="secondary" className="flex-1" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
-                    <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white shadow-none" onClick={confirmDelete}>Delete</Button>
+                <div>
+                  <h3 id="delete-title" className="text-base font-semibold text-zinc-900 dark:text-white">Delete Session?</h3>
+                  <p className="text-sm text-zinc-500 mt-0.5">This action cannot be undone.</p>
                 </div>
+              </div>
+              <div className="flex gap-3 mt-5">
+                <button
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
     </>
   );
 };

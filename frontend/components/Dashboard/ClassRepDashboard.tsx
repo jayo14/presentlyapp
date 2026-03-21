@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { StudentDashboard } from './StudentDashboard';
-import { Button } from '../Button';
 import { Users, CheckCircle2, XCircle, Search, FileText, Calendar, Plus, Trash2, Clock, MapPin, Upload, Sparkles, Loader2, Save, X } from 'lucide-react';
-import { Input } from '../Input';
 import { analyzeTimetableImage } from '../../services/geminiService';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
@@ -36,16 +34,13 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
       venue: ''
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const { modalProps: manualEntryProps } = useModalAccessibility(isTimetableModalOpen, () => setIsTimetableModalOpen(false));
   const { modalProps: aiScanProps } = useModalAccessibility(isAiScanOpen, () => setIsAiScanOpen(false));
 
   const handleAddEntry = (e: React.FormEvent) => {
       e.preventDefault();
-      const entry: TimetableEntry = {
-          id: Date.now().toString(),
-          ...newEntry
-      };
+      const entry: TimetableEntry = { id: Date.now().toString(), ...newEntry };
       setTimetable([...timetable, entry]);
       setIsTimetableModalOpen(false);
       setNewEntry({ courseCode: '', day: 'Monday', startTime: '', endTime: '', venue: '' });
@@ -58,16 +53,13 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-
       setIsScanning(true);
-      
       const reader = new FileReader();
       reader.onload = async (event) => {
           if (event.target?.result) {
               try {
                   const base64 = event.target.result as string;
                   const scannedEntries = await analyzeTimetableImage(base64);
-                  
                   if (scannedEntries && Array.isArray(scannedEntries)) {
                       const newEntries = scannedEntries.map((entry: any) => ({
                           id: Date.now().toString() + Math.random().toString(),
@@ -91,88 +83,102 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   };
 
   const handleSaveTimetable = () => {
-      // Mock save functionality
       alert("Timetable saved successfully!");
   };
 
-  // If view is dashboard/history, reuse student view but with extra options
+  // Dashboard/history: reuse student view with class rep banner
   if (view === 'dashboard' || view === 'history') {
       return (
-          <div className="space-y-8">
-              <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl flex items-center justify-between">
+          <div className="space-y-6">
+              <div className="bg-primary/5 border border-primary/15 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                      <h3 className="text-primary font-bold">Class Representative Mode</h3>
-                      <p className="text-xs text-zinc-400">You have extra privileges to manage class attendance and timetables.</p>
+                      <h3 className="text-sm font-semibold text-primary">Class Representative Mode</h3>
+                      <p className="text-xs text-zinc-500 mt-0.5">You have extra privileges to manage class attendance and timetables.</p>
                   </div>
-                  <Button size="sm" variant="outline">View Class Report</Button>
+                  <button className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
+                      View Class Report
+                  </button>
               </div>
               <StudentDashboard userName={userName} view={view} />
           </div>
       );
   }
 
-  // Override Timetable view for Class Rep to allow editing
+  // Timetable view (editable for class rep)
   if (view === 'timetable') {
       return (
-        <div className="space-y-6 animate-in fade-in">
+        <div className="space-y-6 animate-in fade-in duration-300">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">Manage Class Timetable</h2>
-                    <p className="text-zinc-400">View, edit, or auto-generate your class schedule.</p>
+                    <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Manage Class Timetable</h2>
+                    <p className="text-sm text-zinc-500 mt-0.5">View, edit, or auto-generate your class schedule.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="secondary" onClick={() => setIsAiScanOpen(true)}>
-                        <Sparkles size={18} className="mr-2 text-primary"/> AI Scan
-                    </Button>
-                    <Button onClick={() => setIsTimetableModalOpen(true)}>
-                        <Plus size={18} className="mr-2"/> Add Class
-                    </Button>
-                    <Button variant="outline" onClick={handleSaveTimetable}>
-                        <Save size={18} className="mr-2"/> Save
-                    </Button>
+                    <button
+                      onClick={() => setIsAiScanOpen(true)}
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                        <Sparkles size={14} className="text-primary" />
+                        AI Scan
+                    </button>
+                    <button
+                      onClick={() => setIsTimetableModalOpen(true)}
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
+                    >
+                        <Plus size={14} />
+                        Add Class
+                    </button>
+                    <button
+                      onClick={handleSaveTimetable}
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                        <Save size={14} />
+                        Save
+                    </button>
                 </div>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid gap-4">
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => {
-                    const dayEntries = timetable.filter(t => t.day === day).sort((a,b) => a.startTime.localeCompare(b.startTime));
+                    const dayEntries = timetable.filter(t => t.day === day).sort((a, b) => a.startTime.localeCompare(b.startTime));
                     return (
-                        <div key={day} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-                            <h3 className="text-primary font-bold mb-4 flex items-center gap-2">
-                                <Calendar size={18} /> {day}
+                        <div key={day} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+                            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <Calendar size={14} />
+                                {day}
                             </h3>
                             {dayEntries.length > 0 ? (
-                                <div className="space-y-3">
+                                <div className="space-y-2">
                                     {dayEntries.map(entry => (
-                                        <div key={entry.id} className="bg-zinc-950 p-4 rounded-lg flex items-center justify-between group">
-                                            <div className="flex items-center gap-4 flex-1">
-                                                <div className="bg-zinc-900 p-2 rounded text-zinc-400">
-                                                    <Clock size={18} />
+                                        <div key={entry.id} className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700 p-3 rounded-lg flex items-center justify-between group">
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
+                                                    <Clock size={14} />
                                                 </div>
-                                                <div className="flex-1">
-                                                    <p className="text-white font-bold">{entry.courseCode}</p>
-                                                    <p className="text-sm text-zinc-500">{entry.startTime} - {entry.endTime}</p>
-                                                    {/* Mobile: Show venue on new line */}
-                                                    <p className="md:hidden text-sm text-zinc-500 mt-1 flex items-center">
-                                                        <MapPin size={12} className="mr-1" /> {entry.venue}
-                                                    </p>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-zinc-900 dark:text-white">{entry.courseCode}</p>
+                                                    <p className="text-xs text-zinc-500">{entry.startTime} – {entry.endTime}</p>
                                                 </div>
-                                                {/* Desktop: Show venue inline */}
-                                                <div className="hidden md:flex items-center text-zinc-500 text-sm ml-4">
-                                                    <MapPin size={14} className="mr-1" /> {entry.venue}
+                                                <div className="hidden sm:flex items-center text-zinc-500 text-xs gap-1">
+                                                    <MapPin size={12} />
+                                                    {entry.venue}
                                                 </div>
+                                                {/* Mobile venue */}
+                                                <p className="sm:hidden text-xs text-zinc-500 flex items-center gap-1">
+                                                    <MapPin size={10} /> {entry.venue}
+                                                </p>
                                             </div>
-                                            <button 
+                                            <button
                                                 onClick={() => handleDeleteEntry(entry.id)}
-                                                className="text-zinc-500 hover:text-red-500 p-2 rounded hover:bg-red-500/10 transition-colors"
+                                                className="ml-2 p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={14} />
                                             </button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-sm text-zinc-600 italic">No classes scheduled.</p>
+                                <p className="text-xs text-zinc-400 italic">No classes scheduled.</p>
                             )}
                         </div>
                     );
@@ -181,60 +187,76 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
 
             {/* Manual Entry Modal */}
             {isTimetableModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div 
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div
                         {...manualEntryProps}
                         aria-labelledby="manual-entry-title"
-                        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 outline-none"
+                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95 outline-none"
                     >
-                        <div className="mb-6 flex justify-between items-center">
-                            <h3 id="manual-entry-title" className="text-xl font-bold text-white">Add Timetable Entry</h3>
-                            <button onClick={() => setIsTimetableModalOpen(false)} aria-label="Close dialog"><X size={20} className="text-zinc-500 hover:text-white"/></button>
+                        <div className="mb-5 flex justify-between items-center">
+                            <h3 id="manual-entry-title" className="text-base font-semibold text-zinc-900 dark:text-white">Add Timetable Entry</h3>
+                            <button onClick={() => setIsTimetableModalOpen(false)} aria-label="Close dialog" className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                <X size={18} />
+                            </button>
                         </div>
                         <form onSubmit={handleAddEntry} className="space-y-4">
-                            <Input 
-                                label="Course Code" 
-                                placeholder="e.g. CS402" 
-                                value={newEntry.courseCode} 
-                                onChange={e => setNewEntry({...newEntry, courseCode: e.target.value})} 
-                                required 
-                            />
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-1.5">Day</label>
-                                <select 
-                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white text-sm focus:ring-primary focus:border-primary"
+                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Course Code</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. CS402"
+                                    value={newEntry.courseCode}
+                                    onChange={e => setNewEntry({...newEntry, courseCode: e.target.value})}
+                                    required
+                                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Day</label>
+                                <select
+                                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                                     value={newEntry.day}
                                     onChange={e => setNewEntry({...newEntry, day: e.target.value})}
                                 >
                                     {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => <option key={d} value={d}>{d}</option>)}
                                 </select>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input 
-                                    label="Start Time" 
-                                    type="time" 
-                                    value={newEntry.startTime} 
-                                    onChange={e => setNewEntry({...newEntry, startTime: e.target.value})} 
-                                    required 
-                                />
-                                <Input 
-                                    label="End Time" 
-                                    type="time" 
-                                    value={newEntry.endTime} 
-                                    onChange={e => setNewEntry({...newEntry, endTime: e.target.value})} 
-                                    required 
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Start Time</label>
+                                    <input
+                                        type="time"
+                                        value={newEntry.startTime}
+                                        onChange={e => setNewEntry({...newEntry, startTime: e.target.value})}
+                                        required
+                                        className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">End Time</label>
+                                    <input
+                                        type="time"
+                                        value={newEntry.endTime}
+                                        onChange={e => setNewEntry({...newEntry, endTime: e.target.value})}
+                                        required
+                                        className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Venue</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. LH 1"
+                                    value={newEntry.venue}
+                                    onChange={e => setNewEntry({...newEntry, venue: e.target.value})}
+                                    required
+                                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                                 />
                             </div>
-                            <Input 
-                                label="Venue" 
-                                placeholder="e.g. LH 1" 
-                                value={newEntry.venue} 
-                                onChange={e => setNewEntry({...newEntry, venue: e.target.value})} 
-                                required 
-                            />
                             <div className="pt-2 flex gap-3">
-                                <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsTimetableModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="flex-1">Add Class</Button>
+                                <button type="button" onClick={() => setIsTimetableModalOpen(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">Cancel</button>
+                                <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">Add Class</button>
                             </div>
                         </form>
                     </div>
@@ -243,49 +265,49 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
 
             {/* AI Scan Modal */}
             {isAiScanOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div 
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div
                         {...aiScanProps}
                         aria-labelledby="ai-scan-title"
-                        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 text-center outline-none"
+                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95 text-center outline-none"
                     >
                         <div className="flex justify-end">
-                            <button onClick={() => setIsAiScanOpen(false)} aria-label="Close dialog"><X size={20} className="text-zinc-500 hover:text-white"/></button>
+                            <button onClick={() => setIsAiScanOpen(false)} aria-label="Close dialog" className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                <X size={18} />
+                            </button>
                         </div>
-                        <div className="mb-6">
-                            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
-                                <Sparkles size={32} />
+                        <div className="mb-5">
+                            <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 text-primary">
+                                <Sparkles size={28} />
                             </div>
-                            <h3 id="ai-scan-title" className="text-xl font-bold text-white mb-2">Scan Timetable</h3>
-                            <p className="text-zinc-400 text-sm">Upload a photo of your class schedule, and AI will automatically extract the details.</p>
+                            <h3 id="ai-scan-title" className="text-base font-semibold text-zinc-900 dark:text-white mb-1">Scan Timetable</h3>
+                            <p className="text-sm text-zinc-500">Upload a photo of your class schedule, and AI will extract the details.</p>
                         </div>
-                        
+
                         {isScanning ? (
                             <div className="py-8">
-                                <Loader2 size={40} className="animate-spin text-primary mx-auto mb-4" />
-                                <p className="text-white font-medium">Analyzing Image...</p>
-                                <p className="text-zinc-500 text-sm mt-1">This uses Gemini 3 Pro Vision</p>
+                                <Loader2 size={36} className="animate-spin text-primary mx-auto mb-3" />
+                                <p className="text-sm font-medium text-zinc-900 dark:text-white">Analyzing Image...</p>
+                                <p className="text-xs text-zinc-500 mt-1">Using Gemini Pro Vision</p>
                             </div>
                         ) : (
-                            <div 
+                            <div
                                 onClick={() => fileInputRef.current?.click()}
-                                className="border-2 border-dashed border-zinc-700 bg-zinc-900/50 rounded-xl p-8 cursor-pointer hover:bg-zinc-900 hover:border-primary transition-all group"
+                                className="border-2 border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-8 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-primary/50 transition-all group"
                             >
-                                <Upload size={32} className="text-zinc-500 group-hover:text-primary mx-auto mb-3 transition-colors" />
-                                <p className="text-white font-medium">Click to Upload Image</p>
-                                <p className="text-zinc-500 text-xs mt-1">Supports JPG, PNG</p>
-                                <input 
-                                    type="file" 
-                                    ref={fileInputRef} 
-                                    className="hidden" 
-                                    accept="image/*" 
-                                    onChange={handleFileUpload} 
+                                <Upload size={28} className="text-zinc-400 group-hover:text-primary mx-auto mb-3 transition-colors" />
+                                <p className="text-sm font-medium text-zinc-900 dark:text-white">Click to Upload Image</p>
+                                <p className="text-xs text-zinc-500 mt-1">Supports JPG, PNG</p>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleFileUpload}
                                 />
                             </div>
                         )}
-                        <div className="mt-6 text-xs text-zinc-600">
-                            Make sure the image is clear and the text is legible for best results.
-                        </div>
+                        <p className="mt-4 text-[11px] text-zinc-400">Make sure the image is clear and text is legible for best results.</p>
                     </div>
                 </div>
             )}
@@ -293,48 +315,65 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
       );
   }
 
+  // Class Management view
   if (view === 'class-mgmt') {
       return (
-          <div className="space-y-6 animate-in fade-in">
-              <h2 className="text-2xl font-bold text-white">Class Management</h2>
-              
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-                  <h3 className="font-bold text-white mb-4">Mark Attendance for Absent Students</h3>
-                  <div className="flex gap-4 mb-6">
-                      <Input placeholder="Search student by name or matric..." icon={<Search size={16}/>} className="bg-zinc-950" />
-                      <Button>Search</Button>
+          <div className="space-y-6 animate-in fade-in duration-300">
+              <div>
+                  <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Class Management</h2>
+                  <p className="text-sm text-zinc-500 mt-0.5">Manage attendance and reports for your class.</p>
+              </div>
+
+              {/* Mark Attendance Card */}
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-3">Mark Attendance for Absent Students</h3>
+                  <div className="flex gap-3 mb-4">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={15} />
+                        <input
+                          type="text"
+                          placeholder="Search student by name or matric..."
+                          className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg pl-9 pr-4 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                        />
+                      </div>
+                      <button className="px-4 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
+                        Search
+                      </button>
                   </div>
-                  
-                  <div className="space-y-3">
+
+                  <div className="space-y-2">
                       {[1, 2, 3].map(i => (
-                          <div key={i} className="flex items-center justify-between p-4 bg-zinc-950 rounded-lg border border-zinc-800">
+                          <div key={i} className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-700">
                               <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-500 font-bold">JD</div>
+                                  <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-500">JD</div>
                                   <div>
-                                      <p className="text-white font-medium">John Doe</p>
-                                      <p className="text-sm text-zinc-500">ENG/2021/00{i}</p>
+                                      <p className="text-sm font-medium text-zinc-900 dark:text-white">John Doe</p>
+                                      <p className="text-xs text-zinc-500">ENG/2021/00{i}</p>
                                   </div>
                               </div>
                               <div className="flex gap-2">
-                                  <Button size="sm" variant="secondary" className="text-green-400 hover:text-green-300">
-                                      <CheckCircle2 size={16} className="mr-2" /> Mark Present
-                                  </Button>
-                                  <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300">
-                                      <XCircle size={16} className="mr-2" /> Mark Absent
-                                  </Button>
+                                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors">
+                                      <CheckCircle2 size={13} />
+                                      Present
+                                  </button>
+                                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+                                      <XCircle size={13} />
+                                      Absent
+                                  </button>
                               </div>
                           </div>
                       ))}
                   </div>
               </div>
 
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-                  <h3 className="font-bold text-white mb-4">Class Reports</h3>
-                  <p className="text-zinc-500 text-sm mb-4">Generate attendance sheets for lecturers.</p>
-                  <Button variant="secondary" className="w-full justify-between">
+              {/* Class Reports Card */}
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-1">Class Reports</h3>
+                  <p className="text-xs text-zinc-500 mb-4">Generate attendance sheets for lecturers.</p>
+                  <button className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">
                       <span>Download Weekly Summary (PDF)</span>
-                      <FileText size={16} />
-                  </Button>
+                      <FileText size={16} className="text-zinc-400" />
+                  </button>
               </div>
           </div>
       );
