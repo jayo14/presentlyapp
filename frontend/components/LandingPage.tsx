@@ -1927,32 +1927,34 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <div
-              style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}
-            >
-              {['Privacy Policy', 'Terms of Service', 'Security', 'Contact'].map(
-                (link) => (
-                  <a
-                    key={link}
-                    href="#"
-                    style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--secondary)',
-                      textDecoration: 'none',
-                      transition: 'color 0.2s',
-                    }}
-                    onMouseEnter={(e) =>
-                    (e.currentTarget.style.color =
-                      'var(--primary-container)')
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.color = 'var(--secondary)')
-                    }
-                  >
-                    {link}
-                  </a>
-                )
-              )}
-            </div>
+  style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}
+>
+  {[
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Security', href: '/security' },
+    { label: 'Contact', href: '/contact' },
+  ].map((link) => (
+    <a
+      key={link.label}
+      href={link.href}
+      style={{
+        fontSize: '0.75rem',
+        color: 'var(--secondary)',
+        textDecoration: 'none',
+        transition: 'color 0.2s',
+      }}
+      onMouseEnter={(e) =>
+        (e.currentTarget.style.color = 'var(--primary-container)')
+      }
+      onMouseLeave={(e) =>
+        (e.currentTarget.style.color = 'var(--secondary)')
+      }
+    >
+      {link.label}
+    </a>
+  ))}
+</div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               <Tooltip>
