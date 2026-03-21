@@ -13,8 +13,9 @@
   <!-- Theme Initialization Script - Must run before page render to prevent flash -->
   <script>
     (function () {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
+      const savedTheme = localStorage.getItem('vite-ui-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
         document.documentElement.classList.add('dark');
       }
     })();
@@ -72,8 +73,8 @@
   <meta name="apple-mobile-web-app-title" content="Presently" />
 
   <!-- Icons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
 
   <!-- Performance: Preconnect to external domains -->

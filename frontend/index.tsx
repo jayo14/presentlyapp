@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { ThemeProvider } from './components/ThemeProvider';
 import { HelmetProvider } from 'react-helmet-async';
 import './src/index.css';
 import App from './App';
@@ -77,11 +78,11 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <Provider>
+      <ThemeProvider>
         <HelmetProvider>
           <App />
         </HelmetProvider>
-      </Provider>
+      </ThemeProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );
