@@ -173,13 +173,13 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         <div className="space-y-6 animate-in fade-in duration-300">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-foreground">Teaching Schedule</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">Your weekly class timetable and lecture venues.</p>
+              <h2 className="font-headline text-xl font-semibold text-text">Teaching Schedule</h2>
+              <p className="text-sm text-textMuted mt-0.5">Your weekly class timetable and lecture venues.</p>
             </div>
             <button
               onClick={fetchTimetable}
               disabled={timetableLoading}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-secondary bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-50"
             >
               <RefreshCw size={14} className={timetableLoading ? 'animate-spin' : ''} />
               Refresh
@@ -187,7 +187,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
 
           {timetableLoading && timetableData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+            <div className="flex flex-col items-center justify-center h-64 text-textMuted">
               <Loader2 className="w-8 h-8 animate-spin mb-3 text-primary" />
               <p className="text-sm">Loading your schedule...</p>
             </div>
@@ -201,8 +201,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                   <div key={day} className="space-y-3">
                     <div className="flex items-center gap-2 px-1">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">{day}</h3>
-                      <span className="text-[10px] font-semibold bg-accent text-muted-foreground px-1.5 py-0.5 rounded ml-auto">
+                      <h3 className="font-headline text-xs font-semibold text-text uppercase tracking-wider">{day}</h3>
+                      <span className="text-[10px] font-semibold bg-surfaceHigh text-textMuted px-1.5 py-0.5 rounded ml-auto">
                         {dayClasses.length}
                       </span>
                     </div>
@@ -210,17 +210,17 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                       dayClasses.map((t) => (
                         <div
                           key={t.id}
-                          className="bg-card text-foreground border border-border p-3.5 rounded-xl hover:border-border transition-colors"
+                          className="bg-surface text-text border border-outline p-3.5 rounded-xl hover:border-outline transition-colors"
                         >
                           <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">{t.course_code}</span>
-                          <h4 className="text-sm font-medium text-foreground mt-1 line-clamp-2">{t.course_name}</h4>
+                          <h4 className="font-headline text-sm font-medium text-text mt-1 line-clamp-2">{t.course_name}</h4>
                           <div className="mt-2.5 space-y-1.5">
-                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1.5 text-xs text-textMuted">
                               <Timer size={12} />
                               <span>{t.start_time} – {t.end_time}</span>
                             </div>
                             {t.venue_name && (
-                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1.5 text-xs text-textMuted">
                                 <MapPin size={12} />
                                 <span className="truncate">{t.venue_name}</span>
                               </div>
@@ -229,8 +229,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                         </div>
                       ))
                     ) : (
-                      <div className="bg-muted/50 border border-dashed border-border rounded-xl p-5 text-center">
-                        <p className="text-xs text-muted-foreground">No classes</p>
+                      <div className="bg-surfaceLow/50 border border-dashed border-outline rounded-xl p-5 text-center">
+                        <p className="text-xs text-textMuted">No classes</p>
                       </div>
                     )}
                   </div>
@@ -261,8 +261,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-foreground">Welcome back, {userName.split(' ')[0]}</h2>
-            <p className="text-sm text-muted-foreground mt-0.5">Manage your courses and attendance sessions.</p>
+            <h2 className="font-headline text-xl font-semibold text-text">Welcome back, {userName.split(' ')[0]}</h2>
+            <p className="text-sm text-textMuted mt-0.5">Manage your courses and attendance sessions.</p>
           </div>
           <button
             onClick={() => navigate('/dashboard/sessions/new')}
@@ -275,42 +275,42 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-card text-foreground border border-border rounded-xl p-4">
+          <div className="bg-surface text-text border border-outline rounded-xl p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-lg bg-cardackgroundlue-50 flex items-center justify-center">
                 <BookOpen size={18} className="text-on-primary-fixedlue-600" />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-foreground">{courses.length}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">My Courses</p>
+            <p className="text-2xl font-semibold text-text">{courses.length}</p>
+            <p className="text-xs text-textMuted mt-0.5">My Courses</p>
           </div>
-          <div className="bg-card text-foreground border border-border rounded-xl p-4">
+          <div className="bg-surface text-text border border-outline rounded-xl p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
                 <Clock size={18} className="text-emerald-600" />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-foreground">{sessions.filter(s => s.is_active).length}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Active Sessions</p>
+            <p className="text-2xl font-semibold text-text">{sessions.filter(s => s.is_active).length}</p>
+            <p className="text-xs text-textMuted mt-0.5">Active Sessions</p>
           </div>
-          <div className="bg-card text-foreground border border-border rounded-xl p-4">
+          <div className="bg-surface text-text border border-outline rounded-xl p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
                 <Users size={18} className="text-violet-600" />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-foreground">{dashboardAnalytics?.total_students || 0}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Total Students</p>
+            <p className="text-2xl font-semibold text-text">{dashboardAnalytics?.total_students || 0}</p>
+            <p className="text-xs text-textMuted mt-0.5">Total Students</p>
           </div>
         </div>
 
         {/* Sessions */}
-        <div className="bg-card text-foreground border border-border rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-border flex justify-between items-center">
-            <h3 className="text-sm font-semibold text-foreground">Recent Sessions</h3>
+        <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-outline flex justify-between items-center">
+            <h3 className="font-headline text-sm font-semibold text-text">Recent Sessions</h3>
             <button
               onClick={() => navigate('/dashboard/sessions')}
-              className="text-xs font-medium text-muted-foreground hover:text-accent-foreground transition-colors"
+              className="text-xs font-medium text-textMuted hover:text-text transition-colors"
             >
               View all →
             </button>
@@ -318,11 +318,11 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
           {sessions.length === 0 ? (
             <div className="px-5 py-16 text-center">
-              <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="text-muted-foreground" size={24} />
+              <div className="w-14 h-14 bg-surfaceHigh rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="text-textMuted" size={24} />
               </div>
-              <h4 className="text-on-primary-fixedase font-semibold text-foreground mb-1">No sessions recorded</h4>
-              <p className="text-sm text-muted-foreground mb-6 max-w-xs mx-auto">Start taking attendance for your courses to see sessions here.</p>
+              <h4 className="font-headline text-on-primary-fixedase font-semibold text-text mb-1">No sessions recorded</h4>
+              <p className="text-sm text-textMuted mb-6 max-w-xs mx-auto">Start taking attendance for your courses to see sessions here.</p>
               <button
                 onClick={() => navigate('/dashboard/sessions/new')}
                 className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors"
@@ -346,16 +346,16 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                     <div
                       key={session.id}
                       onClick={() => setSelectedSession(session)}
-                      className="bg-muted/50 border border-border rounded-xl p-4 hover:border-border cursor-pointer transition-all group"
+                      className="bg-surfaceLow/50 border border-outline rounded-xl p-4 hover:border-outline cursor-pointer transition-all group"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-card text-foreground border border-border flex items-center justify-center text-xs font-bold text-muted-foreground group-hover:text-primary transition-colors">
+                          <div className="w-10 h-10 rounded-lg bg-surface text-text border border-outline flex items-center justify-center text-xs font-bold text-textMuted group-hover:text-primary transition-colors">
                             {session.course_code?.substring(0, 2) || 'CS'}
                           </div>
                           <div>
-                            <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{session.course_code}</h4>
-                            <p className="text-xs text-muted-foreground truncate max-w-[180px]">{session.course_name || 'Class Session'}</p>
+                            <h4 className="font-headline text-sm font-semibold text-text group-hover:text-primary transition-colors">{session.course_code}</h4>
+                            <p className="text-xs text-textMuted truncate max-w-[180px]">{session.course_name || 'Class Session'}</p>
                           </div>
                         </div>
                         <span className={`text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider ${statusStyles[status]}`}>
@@ -363,7 +363,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground mt-3 pt-3 border-t border-border">
+                      <div className="flex items-center gap-4 text-xs text-textMuted mt-3 pt-3 border-t border-outline">
                         <div className="flex items-center gap-1.5">
                           <Calendar size={12} />
                           <span>{new Date(session.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
@@ -381,7 +381,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             e.stopPropagation();
                             navigate(`/dashboard/reports?courseId=${session.course}&sessionId=${session.id}`);
                           }}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary hover:text-on-primary-fixedlack transition-colors"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-primary text-text rounded-lg hover:bg-primary hover:text-on-primary-fixedlack transition-colors"
                         >
                           <FileText size={13} />
                           Report
@@ -392,7 +392,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             setSessionToDelete(session.id.toString());
                             setIsDeleteModalOpen(true);
                           }}
-                          className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -423,27 +423,27 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             <div
               {...deleteModalProps}
               aria-labelledby="delete-title"
-              className="bg-card text-foreground border border-border rounded-xl w-full max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none"
+              className="bg-surface text-text border border-outline rounded-xl w-full max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-red-50 p-2.5 rounded-lg text-red-500">
                   <Trash2 size={20} />
                 </div>
                 <div>
-                  <h3 id="delete-title" className="text-on-primary-fixedase font-semibold text-foreground">Delete Session?</h3>
-                  <p className="text-sm text-muted-foreground mt-0.5">This action cannot be undone.</p>
+                  <h3 id="delete-title" className="font-headline text-on-primary-fixedase font-semibold text-text">Delete Session?</h3>
+                  <p className="text-sm text-textMuted mt-0.5">This action cannot be undone.</p>
                 </div>
               </div>
               <div className="flex gap-3 mt-5">
                 <button
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-secondary bg-accent rounded-lg hover:bg-accent transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-textMuted bg-surfaceHigh rounded-lg hover:bg-surfaceHigh transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-primary-foreground rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-text rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Delete
                 </button>

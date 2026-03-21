@@ -149,21 +149,21 @@ export const NotificationsPage: React.FC = () => {
   const mobileLayout = (
     <div className="min-h-screen bg-background pb-24">
       {/* Mobile Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
+      <div className="sticky top-0 z-10 bg-background border-b border-outline">
         <div className="flex items-center justify-between p-4">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-accent rounded-lg transition-colors"
+            className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
           >
-            <ArrowLeft size={24} className="text-primary-foreground" />
+            <ArrowLeft size={24} className="text-text" />
           </button>
-          <h1 className="text-xl font-bold text-primary-foreground">Notifications</h1>
+          <h1 className="font-headline text-xl font-bold text-text">Notifications</h1>
           <button 
             onClick={() => navigate('/dashboard/settings#notifications')}
-            className="p-2 hover:bg-accent rounded-lg transition-colors"
+            className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
             aria-label="Notification Settings"
           >
-            <Settings size={24} className="text-muted-foreground" />
+            <Settings size={24} className="text-textMuted" />
           </button>
         </div>
 
@@ -195,7 +195,7 @@ export const NotificationsPage: React.FC = () => {
           filteredNotifications.map((notification) => (
             <div 
               key={notification.id} 
-              className="bg-card rounded-xl p-4 flex items-start gap-3"
+              className="bg-surface rounded-xl p-4 flex items-start gap-3"
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
                 {getIcon(notification.type)}
@@ -203,33 +203,33 @@ export const NotificationsPage: React.FC = () => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-semibold text-primary-foreground text-on-primary-fixedase leading-tight">
+                  <h3 className="font-headline font-semibold text-text text-on-primary-fixedase leading-tight">
                     {notification.title}
                   </h3>
                   {!notification.is_read && (
                     <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
                   )}
                 </div>
-                <p className="text-muted-foreground text-sm mb-2">
+                <p className="text-textMuted text-sm mb-2">
                   {formatTimeAgo(notification.created_at)}
                 </p>
                 {notification.message && (
-                  <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
+                  <p className="text-textMuted text-sm leading-relaxed line-clamp-2">
                     {notification.message}
                   </p>
                 )}
               </div>
 
               {notification.type === 'ALERT' && (
-                <ChevronRight size={20} className="text-muted-foreground shrink-0 mt-1" />
+                <ChevronRight size={20} className="text-textMuted shrink-0 mt-1" />
               )}
             </div>
           ))
         ) : (
           <div className="text-center py-20">
-            <Bell size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold text-primary-foreground mb-2">No notifications</h3>
-            <p className="text-muted-foreground">You're all caught up!</p>
+            <Bell size={48} className="mx-auto text-textMuted mb-4" />
+            <h3 className="font-headline text-lg font-semibold text-text mb-2">No notifications</h3>
+            <p className="text-textMuted">You're all caught up!</p>
           </div>
         )}
       </div>
@@ -240,7 +240,7 @@ export const NotificationsPage: React.FC = () => {
   const desktopLayout = (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500 pb-24 md:pb-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-border px-4">
+      <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-outline px-4">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate(-1)}
@@ -249,12 +249,12 @@ export const NotificationsPage: React.FC = () => {
             <ArrowLeft size={24} className="text-text-primary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary flex items-center gap-2">
+            <h1 className="font-headline text-2xl font-bold text-text-primary flex items-center gap-2">
               <Bell size={28} className="text-primary" />
               Notifications
             </h1>
             {unreadCount > 0 && (
-              <p className="text-sm text-text-secondary">{unreadCount} unread</p>
+              <p className="text-sm text-text-textMuted">{unreadCount} unread</p>
             )}
           </div>
         </div>
@@ -263,7 +263,7 @@ export const NotificationsPage: React.FC = () => {
           className="p-2 hover:bg-surface rounded-lg transition-colors"
           aria-label="Notification Settings"
         >
-          <Settings size={24} className="text-text-secondary hover:text-primary transition-colors" />
+          <Settings size={24} className="text-text-textMuted hover:text-primary transition-colors" />
         </button>
       </div>
 
@@ -311,7 +311,7 @@ export const NotificationsPage: React.FC = () => {
               >
                 {selectedNotifications.length === filteredNotifications.length ? 'Deselect All' : 'Select All'}
               </button>
-              <span className="text-text-secondary text-sm">
+              <span className="text-text-textMuted text-sm">
                 {selectedNotifications.length} selected
               </span>
             </>
@@ -395,7 +395,7 @@ export const NotificationsPage: React.FC = () => {
                     type="checkbox"
                     checked={selectedNotifications.includes(notification.id)}
                     onChange={() => handleSelectNotification(notification.id)}
-                    className="w-5 h-5 rounded border-border border-border text-primary focus:ring-primary"
+                    className="w-5 h-5 rounded border-outline border-outline text-primary focus:ring-primary"
                   />
                 </div>
               )}
@@ -406,15 +406,15 @@ export const NotificationsPage: React.FC = () => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-semibold text-text-primary text-on-primary-fixedase leading-tight">
+                  <h3 className="font-headline font-semibold text-text-primary text-on-primary-fixedase leading-tight">
                     {notification.title}
                   </h3>
-                  <span className="text-text-secondary text-xs whitespace-nowrap">
+                  <span className="text-text-textMuted text-xs whitespace-nowrap">
                     {formatTimeAgo(notification.created_at)}
                   </span>
                 </div>
                 {notification.message && (
-                  <p className="text-text-secondary text-sm leading-relaxed line-clamp-2 mb-2">
+                  <p className="text-text-textMuted text-sm leading-relaxed line-clamp-2 mb-2">
                     {notification.message}
                   </p>
                 )}
@@ -437,10 +437,10 @@ export const NotificationsPage: React.FC = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-20 bg-surface rounded-2xl border border-border">
-            <Bell size={48} className="mx-auto text-text-secondary mb-4" />
-            <h3 className="text-lg font-semibold text-text-primary mb-2">No notifications</h3>
-            <p className="text-text-secondary">You're all caught up!</p>
+          <div className="text-center py-20 bg-surface rounded-2xl border border-outline">
+            <Bell size={48} className="mx-auto text-text-textMuted mb-4" />
+            <h3 className="font-headline text-lg font-semibold text-text-primary mb-2">No notifications</h3>
+            <p className="text-text-textMuted">You're all caught up!</p>
           </div>
         )}
       </div>

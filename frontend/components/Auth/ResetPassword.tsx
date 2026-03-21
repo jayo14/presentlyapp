@@ -43,7 +43,7 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
         </motion.div>
 
         <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-bold text-green-400">Password Reset Successful!</h2>
+          <h2 className="font-headline text-2xl font-bold text-green-400">Password Reset Successful!</h2>
           <p className="text-[#a1a1aa]">
             You can now sign in to{' '}
             <span className="text-[#FFD700] font-semibold">Presently</span>{' '}
@@ -61,7 +61,7 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
         {!cancelRedirect && countdown > 0 ? (
           <button
             onClick={() => setCancelRedirect(true)}
-            className="text-sm text-[#a1a1aa] hover:text-primary-foreground transition-colors"
+            className="text-sm text-[#a1a1aa] hover:text-text transition-colors"
           >
             Redirecting in {countdown} seconds...{' '}
             <span className="underline">Cancel</span>
@@ -180,7 +180,7 @@ export const ResetPassword: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-[#09090b] p-4">
         <SEO title="Invalid Reset Link | Presently" />
         <div className="flex flex-col items-center gap-6 text-center max-w-md">
-          <h2 className="text-2xl font-bold text-primary-foreground">Invalid Reset Link</h2>
+          <h2 className="font-headline text-2xl font-bold text-text">Invalid Reset Link</h2>
           <p className="text-[#a1a1aa]">This password reset link is invalid or has expired.</p>
           <button
             onClick={() => navigate('/forgot-password')}
@@ -198,12 +198,12 @@ export const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-primary-foreground flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#09090b] text-text flex flex-col items-center justify-center p-4 relative">
       <SEO title="Reset Password | Presently" />
 
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 text-gray-300 hover:text-primary-foreground transition-colors"
+        className="absolute top-6 left-6 text-textMuted hover:text-text transition-colors"
         aria-label="Go back"
       >
         <ArrowLeft size={20} />
@@ -211,7 +211,7 @@ export const ResetPassword: React.FC = () => {
 
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h2 className="text-4xl font-bold text-primary-foreground mb-2">Create new password</h2>
+          <h2 className="font-headline text-4xl font-bold text-text mb-2">Create new password</h2>
           <p className="text-[#a1a1aa]">
             Your new password must be different from previously used passwords.
           </p>
@@ -222,7 +222,7 @@ export const ResetPassword: React.FC = () => {
             <div className="flex flex-col gap-5">
               {/* New Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                <label className="block text-sm font-medium text-textMuted mb-2">New Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -230,12 +230,12 @@ export const ResetPassword: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
                     autoComplete="new-password"
-                    className="w-full h-14 pl-4 pr-12 bg-[#27272a] border border-[#3f3f46] rounded-2xl text-primary-foreground placeholder-[#71717a] focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-colors"
+                    className="w-full h-14 pl-4 pr-12 bg-[#27272a] border border-[#3f3f46] rounded-2xl text-text placeholder-[#71717a] focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-foreground transition-colors z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-text transition-colors z-10"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -247,8 +247,8 @@ export const ResetPassword: React.FC = () => {
               {password && (
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-sm">
-                    <span className="font-medium text-gray-300">Password strength</span>
-                    <span className="font-bold text-primary-foreground">{passwordStrength}%</span>
+                    <span className="font-medium text-textMuted">Password strength</span>
+                    <span className="font-bold text-text">{passwordStrength}%</span>
                   </div>
                   <div className="w-full h-2 bg-[#27272a] rounded-full overflow-hidden">
                     <div
@@ -278,7 +278,7 @@ export const ResetPassword: React.FC = () => {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
+                <label className="block text-sm font-medium text-textMuted mb-2">Confirm New Password</label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -299,7 +299,7 @@ export const ResetPassword: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-foreground transition-colors z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-text transition-colors z-10"
                     aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}

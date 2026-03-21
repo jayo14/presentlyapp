@@ -73,10 +73,10 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
         aria-labelledby="payment-title"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-card border border-border rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-y-auto md:overflow-hidden outline-none"
+        className="bg-surface border border-outline rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-y-auto md:overflow-hidden outline-none"
       >
         {/* Left Side: Order Summary */}
-        <div className="w-full md:w-5/12 bg-background p-6 md:p-8 border-b md:border-b-0 md:border-r border-border flex flex-col relative overflow-hidden shrink-0">
+        <div className="w-full md:w-5/12 bg-background p-6 md:p-8 border-b md:border-b-0 md:border-r border-outline flex flex-col relative overflow-hidden shrink-0">
            {/* Decor */}
            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
            
@@ -87,35 +87,35 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
               </div>
 
               <div className="mb-6 md:mb-8">
-                  <p className="text-muted-foreground text-sm mb-1">Amount to pay</p>
-                  <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground">₦{amount}<span className="text-lg text-muted-foreground font-normal">.00</span></h2>
-                  <div className="inline-block bg-card border border-border rounded-full px-3 py-1 text-xs text-muted-foreground mt-3">
+                  <p className="text-textMuted text-sm mb-1">Amount to pay</p>
+                  <h2 className="font-headline text-3xl md:text-4xl font-bold text-text">₦{amount}<span className="text-lg text-textMuted font-normal">.00</span></h2>
+                  <div className="inline-block bg-surface border border-outline rounded-full px-3 py-1 text-xs text-textMuted mt-3">
                      Per Semester
                   </div>
               </div>
 
               <div className="space-y-4 mb-8 flex-1 hidden md:block">
-                  <div className="flex justify-between items-center py-3 border-b border-border">
-                      <span className="text-muted-foreground text-sm">Plan</span>
-                      <span className="text-primary-foreground font-medium">{planName}</span>
+                  <div className="flex justify-between items-center py-3 border-b border-outline">
+                      <span className="text-textMuted text-sm">Plan</span>
+                      <span className="text-text font-medium">{planName}</span>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-border">
-                      <span className="text-muted-foreground text-sm">Billing Cycle</span>
-                      <span className="text-primary-foreground font-medium">Semester (4 Months)</span>
+                  <div className="flex justify-between items-center py-3 border-b border-outline">
+                      <span className="text-textMuted text-sm">Billing Cycle</span>
+                      <span className="text-text font-medium">Semester (4 Months)</span>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-border">
-                      <span className="text-muted-foreground text-sm">Access Level</span>
-                      <span className="text-primary-foreground font-medium">Full Access</span>
+                  <div className="flex justify-between items-center py-3 border-b border-outline">
+                      <span className="text-textMuted text-sm">Access Level</span>
+                      <span className="text-text font-medium">Full Access</span>
                   </div>
               </div>
               
               {/* Mobile Only Compact Plan Info */}
-              <div className="md:hidden mb-6 flex justify-between items-center bg-card/50 p-3 rounded-lg border border-border/50">
-                  <span className="text-muted-foreground text-sm">Plan</span>
-                  <span className="text-primary-foreground font-medium text-sm">{planName}</span>
+              <div className="md:hidden mb-6 flex justify-between items-center bg-surface/50 p-3 rounded-lg border border-outline/50">
+                  <span className="text-textMuted text-sm">Plan</span>
+                  <span className="text-text font-medium text-sm">{planName}</span>
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-card p-3 rounded-lg border border-border">
+              <div className="flex items-center gap-2 text-xs text-textMuted bg-surface p-3 rounded-lg border border-outline">
                   <ShieldCheck size={14} className="text-green-500" />
                   <span>Payments are secure and encrypted.</span>
               </div>
@@ -123,14 +123,14 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
         </div>
 
         {/* Right Side: Payment Form */}
-        <div className="w-full md:w-7/12 p-6 md:p-8 bg-card relative flex flex-col md:overflow-y-auto">
-            <button onClick={onCancel} className="absolute top-4 right-4 text-muted-foreground hover:text-primary-foreground p-2 z-10" aria-label="Close dialog">
+        <div className="w-full md:w-7/12 p-6 md:p-8 bg-surface relative flex flex-col md:overflow-y-auto">
+            <button onClick={onCancel} className="absolute top-4 right-4 text-textMuted hover:text-text p-2 z-10" aria-label="Close dialog">
                 <X size={20} />
             </button>
 
             {step === 'details' && (
                 <div className="h-full flex flex-col">
-                    <h3 id="payment-title" className="text-xl font-bold text-primary-foreground mb-6">Payment Details</h3>
+                    <h3 id="payment-title" className="font-headline text-xl font-bold text-text mb-6">Payment Details</h3>
                     
                     {/* Payment Method Tabs */}
                     <div className="flex gap-3 mb-6">
@@ -160,30 +160,30 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                     {paymentMethod === 'card' && (
                         <form onSubmit={handlePay} className="flex-1 flex flex-col space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">Card Number</label>
+                                <label className="block text-xs font-medium text-textMuted mb-1.5 uppercase tracking-wider">Card Number</label>
                                 <div className="relative">
                                     <input 
                                         type="text" 
                                         placeholder="0000 0000 0000 0000" 
-                                        className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-primary-foreground placeholder-zinc-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all font-mono"
+                                        className="w-full bg-background border border-outline rounded-xl px-4 py-3.5 text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary focus:border-primary transition-all font-mono"
                                         value={cardNumber}
                                         onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                                         maxLength={19}
                                         required
                                     />
                                     <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
-                                        <div className="w-8 h-5 bg-accent rounded flex items-center justify-center text-[8px] text-muted-foreground font-bold border border-border">VISA</div>
+                                        <div className="w-8 h-5 bg-surfaceHigh rounded flex items-center justify-center text-[8px] text-textMuted font-bold border border-outline">VISA</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">Expiry Date</label>
+                                    <label className="block text-xs font-medium text-textMuted mb-1.5 uppercase tracking-wider">Expiry Date</label>
                                     <input 
                                         type="text" 
                                         placeholder="MM/YY" 
-                                        className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-primary-foreground placeholder-zinc-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all font-mono text-center"
+                                        className="w-full bg-background border border-outline rounded-xl px-4 py-3.5 text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary focus:border-primary transition-all font-mono text-center"
                                         value={expiry}
                                         onChange={(e) => {
                                             let v = e.target.value.replace(/[^0-9]/g, '');
@@ -195,38 +195,38 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">CVV / CVC</label>
+                                    <label className="block text-xs font-medium text-textMuted mb-1.5 uppercase tracking-wider">CVV / CVC</label>
                                     <div className="relative">
                                         <input 
                                             type="password" 
                                             placeholder="123" 
-                                            className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-primary-foreground placeholder-zinc-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all font-mono text-center"
+                                            className="w-full bg-background border border-outline rounded-xl px-4 py-3.5 text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary focus:border-primary transition-all font-mono text-center"
                                             value={cvv}
                                             onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, '').slice(0, 3))}
                                             maxLength={3}
                                             required
                                         />
-                                        <Lock size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                        <Lock size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted" />
                                     </div>
                                 </div>
                             </div>
                             
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">Cardholder Name</label>
+                                <label className="block text-xs font-medium text-textMuted mb-1.5 uppercase tracking-wider">Cardholder Name</label>
                                 <input 
                                     type="text" 
                                     placeholder="Enter name on card" 
-                                    className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-primary-foreground placeholder-zinc-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                    className="w-full bg-background border border-outline rounded-xl px-4 py-3.5 text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                     required
                                 />
                             </div>
 
-                            <div className="pt-6 mt-auto border-t border-border">
+                            <div className="pt-6 mt-auto border-t border-outline">
                                 <Button type="submit" className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/20 hover:shadow-primary/30 transform hover:-translate-y-0.5 transition-all">
                                     Pay ₦{amount}
                                 </Button>
-                                <p className="text-center text-xs text-muted-foreground mt-4">
-                                    By clicking Pay, you agree to our <a href="#" className="underline hover:text-primary-foreground">Terms of Service</a>.
+                                <p className="text-center text-xs text-textMuted mt-4">
+                                    By clicking Pay, you agree to our <a href="#" className="underline hover:text-text">Terms of Service</a>.
                                 </p>
                             </div>
                         </form>
@@ -234,22 +234,22 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
 
                     {paymentMethod === 'transfer' && (
                         <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
-                            <div className="bg-background border border-border rounded-2xl p-6 text-center mb-6 relative overflow-hidden group">
+                            <div className="bg-background border border-outline rounded-2xl p-6 text-center mb-6 relative overflow-hidden group">
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-white to-primary"></div>
                                 
-                                <p className="text-muted-foreground text-sm mb-2">Transfer <span className="text-primary-foreground font-bold">₦{amount}</span> to:</p>
-                                <h3 className="text-2xl font-bold text-primary-foreground mb-1">Presently Limited</h3>
-                                <p className="text-muted-foreground text-sm mb-6">Zenith Bank</p>
+                                <p className="text-textMuted text-sm mb-2">Transfer <span className="text-text font-bold">₦{amount}</span> to:</p>
+                                <h3 className="font-headline text-2xl font-bold text-text mb-1">Presently Limited</h3>
+                                <p className="text-textMuted text-sm mb-6">Zenith Bank</p>
                                 
                                 <div 
-                                    className="bg-card border border-border rounded-xl p-4 flex items-center justify-between cursor-pointer hover:border-primary hover:bg-accent transition-all active:scale-[0.98]"
+                                    className="bg-surface border border-outline rounded-xl p-4 flex items-center justify-between cursor-pointer hover:border-primary hover:bg-surfaceHigh transition-all active:scale-[0.98]"
                                     onClick={() => copyToClipboard('1012345678')}
                                 >
                                     <div className="text-left">
-                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Account Number</p>
+                                        <p className="text-[10px] uppercase tracking-wider text-textMuted font-semibold mb-1">Account Number</p>
                                         <p className="text-2xl font-mono font-bold text-primary tracking-widest">1012345678</p>
                                     </div>
-                                    <div className="bg-accent p-2 rounded-lg group-hover:bg-primary group-hover:text-on-primary-fixedlack transition-colors">
+                                    <div className="bg-surfaceHigh p-2 rounded-lg group-hover:bg-primary group-hover:text-on-primary-fixedlack transition-colors">
                                         <Copy size={20} />
                                     </div>
                                 </div>
@@ -260,8 +260,8 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                                 </div>
                             </div>
 
-                            <div className="bg-card/50 p-4 rounded-xl border border-border mb-6 text-xs text-muted-foreground leading-relaxed flex gap-3">
-                                <AlertCircle size={16} className="text-muted-foreground shrink-0 mt-0.5" />
+                            <div className="bg-surface/50 p-4 rounded-xl border border-outline mb-6 text-xs text-textMuted leading-relaxed flex gap-3">
+                                <AlertCircle size={16} className="text-textMuted shrink-0 mt-0.5" />
                                 <p>Please ensure you transfer the exact amount. Your account will be activated automatically once the transfer is confirmed.</p>
                             </div>
                             
@@ -275,18 +275,18 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
 
                     {paymentMethod === 'ussd' && (
                         <div className="flex-1 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-right-4 duration-300">
-                            <div className="w-24 h-24 bg-accent/50 rounded-full flex items-center justify-center mb-6">
-                                <Globe size={40} className="text-muted-foreground" />
+                            <div className="w-24 h-24 bg-surfaceHigh/50 rounded-full flex items-center justify-center mb-6">
+                                <Globe size={40} className="text-textMuted" />
                             </div>
-                            <h3 className="text-xl font-bold text-primary-foreground mb-2">USSD Payment</h3>
-                            <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-8">
+                            <h3 className="font-headline text-xl font-bold text-text mb-2">USSD Payment</h3>
+                            <p className="text-textMuted text-sm max-w-xs mx-auto mb-8">
                                 Select your bank to generate a USSD code for quick payment.
                             </p>
                             
                             <div className="grid grid-cols-2 gap-3 w-full">
                                 {['GTBank', 'Zenith', 'UBA', 'Access'].map(bank => (
-                                    <button key={bank} className="p-3 bg-background border border-border rounded-xl hover:border-primary hover:text-primary transition-colors text-sm font-medium text-muted-foreground">
-                                        *{Math.floor(Math.random() * 900) + 100}# <span className="block text-xs text-muted-foreground font-normal">{bank}</span>
+                                    <button key={bank} className="p-3 bg-background border border-outline rounded-xl hover:border-primary hover:text-primary transition-colors text-sm font-medium text-textMuted">
+                                        *{Math.floor(Math.random() * 900) + 100}# <span className="block text-xs text-textMuted font-normal">{bank}</span>
                                     </button>
                                 ))}
                             </div>
@@ -298,17 +298,17 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
             {step === 'processing' && (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
                     <div className="relative">
-                        <div className="w-24 h-24 border-input border-border rounded-full"></div>
+                        <div className="w-24 h-24 border-input border-outline rounded-full"></div>
                         <div className="w-24 h-24 border-input border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-                        <Lock className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground" size={24} />
+                        <Lock className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-textMuted" size={24} />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-primary-foreground mb-2">
+                        <h3 className="font-headline text-xl font-bold text-text mb-2">
                             {paymentMethod === 'transfer' ? 'Verifying Transfer...' : 'Processing Payment...'}
                         </h3>
-                        <p className="text-muted-foreground text-sm">Please do not close this window.</p>
+                        <p className="text-textMuted text-sm">Please do not close this window.</p>
                     </div>
-                    <div className="w-full max-w-xs bg-accent h-1.5 rounded-full overflow-hidden mt-8">
+                    <div className="w-full max-w-xs bg-surfaceHigh h-1.5 rounded-full overflow-hidden mt-8">
                         <div className="h-full bg-primary animate-[progress_2s_ease-in-out_infinite] w-1/3 rounded-full"></div>
                     </div>
                 </div>
@@ -324,17 +324,17 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                         <CheckCircle2 size={48} className="text-on-primary-fixedlack" />
                     </motion.div>
                     <div>
-                        <h3 className="text-2xl font-bold text-primary-foreground mb-2">Payment Successful!</h3>
-                        <p className="text-muted-foreground text-sm">Your {planName} is now active.</p>
+                        <h3 className="font-headline text-2xl font-bold text-text mb-2">Payment Successful!</h3>
+                        <p className="text-textMuted text-sm">Your {planName} is now active.</p>
                     </div>
-                    <div className="bg-accent/50 p-4 rounded-xl border border-border w-full max-w-xs">
+                    <div className="bg-surfaceHigh/50 p-4 rounded-xl border border-outline w-full max-w-xs">
                         <div className="flex justify-between text-sm mb-2">
-                             <span className="text-muted-foreground">Transaction Ref</span>
-                             <span className="text-primary-foreground font-mono">#PRS-{Math.floor(Math.random() * 1000000)}</span>
+                             <span className="text-textMuted">Transaction Ref</span>
+                             <span className="text-text font-mono">#PRS-{Math.floor(Math.random() * 1000000)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                             <span className="text-muted-foreground">Amount Paid</span>
-                             <span className="text-primary-foreground font-bold">₦{amount}</span>
+                             <span className="text-textMuted">Amount Paid</span>
+                             <span className="text-text font-bold">₦{amount}</span>
                         </div>
                     </div>
                 </div>

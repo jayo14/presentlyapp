@@ -162,7 +162,7 @@ export const StudentViewPage: React.FC = () => {
       case 'absent': return <XCircle size={16} className="text-red-600" />;
       case 'late': return <Clock size={16} className="text-yellow-600" />;
       case 'excused': return <FileText size={16} className="text-on-primary-fixedlue-600" />;
-      default: return <AlertCircle size={16} className="text-text-secondary" />;
+      default: return <AlertCircle size={16} className="text-text-textMuted" />;
     }
   };
 
@@ -188,24 +188,24 @@ export const StudentViewPage: React.FC = () => {
       <div className="mb-8 px-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">
+            <h1 className="font-headline text-2xl md:text-3xl font-bold text-text-primary mb-2">
               My Attendance
             </h1>
-            <p className="text-text-secondary">Track your attendance across all courses</p>
+            <p className="text-text-textMuted">Track your attendance across all courses</p>
           </div>
         </div>
 
         {/* Overall Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-          <div className="bg-surface border border-border rounded-2xl p-5 shadow-md">
+          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Overall</span>
+              <span className="text-text-textMuted text-sm">Overall</span>
               <TrendingUp size={20} className="text-primary" />
             </div>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-text-primary">{overallAttendance}%</span>
             </div>
-            <div className="mt-2 h-2 bg-zinc-200 rounded-full overflow-hidden">
+            <div className="mt-2 h-2 bg-surfaceLow rounded-full overflow-hidden">
               <div 
                 className="h-full bg-primary rounded-full transition-all"
                 style={{ width: `${overallAttendance}%` }}
@@ -213,35 +213,35 @@ export const StudentViewPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl p-5 shadow-md">
+          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Courses</span>
+              <span className="text-text-textMuted text-sm">Courses</span>
               <BookOpen size={20} className="text-primary" />
             </div>
             <span className="text-3xl font-bold text-text-primary">{courses.length}</span>
-            <p className="text-text-secondary text-xs mt-1">Active enrollments</p>
+            <p className="text-text-textMuted text-xs mt-1">Active enrollments</p>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl p-5 shadow-md">
+          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Present</span>
+              <span className="text-text-textMuted text-sm">Present</span>
               <CheckCircle size={20} className="text-green-600" />
             </div>
             <span className="text-3xl font-bold text-green-600">
               {courses.reduce((sum, c) => sum + c.attendedSessions, 0)}
             </span>
-            <p className="text-text-secondary text-xs mt-1">Total sessions</p>
+            <p className="text-text-textMuted text-xs mt-1">Total sessions</p>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl p-5 shadow-md">
+          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Absent</span>
+              <span className="text-text-textMuted text-sm">Absent</span>
               <XCircle size={20} className="text-red-600" />
             </div>
             <span className="text-3xl font-bold text-red-600">
               {courses.reduce((sum, c) => sum + (c.totalSessions - c.attendedSessions), 0)}
             </span>
-            <p className="text-text-secondary text-xs mt-1">Missed sessions</p>
+            <p className="text-text-textMuted text-xs mt-1">Missed sessions</p>
           </div>
         </div>
       </div>
@@ -273,11 +273,11 @@ export const StudentViewPage: React.FC = () => {
         <div className="px-4">
           {/* Filter */}
           <div className="flex items-center gap-2 mb-4">
-            <Filter size={16} className="text-text-secondary" />
+            <Filter size={16} className="text-text-textMuted" />
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="px-3 py-1.5 rounded-lg bg-surface border border-border text-sm text-text-primary"
+              className="px-3 py-1.5 rounded-lg bg-surface border border-outline text-sm text-text-primary"
             >
               <option value="all">All Courses</option>
               <option value="excellent">Excellent (&gt;90%)</option>
@@ -292,7 +292,7 @@ export const StudentViewPage: React.FC = () => {
               <div
                 key={course.id}
                 onClick={() => navigate(`/dashboard/courses/${course.id}`)}
-                className="bg-surface border border-border rounded-2xl p-5 hover:shadow-lg transition-all cursor-pointer group"
+                className="bg-surface border border-outline rounded-2xl p-5 hover:shadow-lg transition-all cursor-pointer group"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
@@ -302,19 +302,19 @@ export const StudentViewPage: React.FC = () => {
                         {course.attendancePercentage}%
                       </span>
                     </div>
-                    <h3 className="text-text-primary font-semibold text-on-primary-fixedase mb-1">
+                    <h3 className="font-headline text-text-primary font-semibold text-on-primary-fixedase mb-1">
                       {course.name}
                     </h3>
-                    <p className="text-text-secondary text-sm flex items-center gap-1">
+                    <p className="text-text-textMuted text-sm flex items-center gap-1">
                       <User size={14} />
                       {course.lecturer}
                     </p>
                   </div>
-                  <ChevronRight size={20} className="text-text-secondary group-hover:text-primary transition-colors" />
+                  <ChevronRight size={20} className="text-text-textMuted group-hover:text-primary transition-colors" />
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-text-secondary">
+                  <span className="text-text-textMuted">
                     {course.attendedSessions} / {course.totalSessions} sessions
                   </span>
                   <div className="flex items-center gap-3">
@@ -330,7 +330,7 @@ export const StudentViewPage: React.FC = () => {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mt-3 h-2 bg-zinc-200 rounded-full overflow-hidden">
+                <div className="mt-3 h-2 bg-surfaceLow rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
                       course.status === 'excellent' ? 'bg-green-600' :
@@ -369,12 +369,12 @@ export const StudentViewPage: React.FC = () => {
           {upcomingSessions.map(session => (
             <div
               key={session.id}
-              className="bg-surface border border-border rounded-2xl p-5 hover:shadow-lg transition-all"
+              className="bg-surface border border-outline rounded-2xl p-5 hover:shadow-lg transition-all"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <span className="text-primary font-bold text-sm">{session.courseCode}</span>
-                  <h3 className="text-text-primary font-semibold text-on-primary-fixedase mt-1">
+                  <h3 className="font-headline text-text-primary font-semibold text-on-primary-fixedase mt-1">
                     {session.courseName}
                   </h3>
                 </div>
@@ -384,15 +384,15 @@ export const StudentViewPage: React.FC = () => {
               </div>
 
               <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-text-secondary">
+                <div className="flex items-center gap-2 text-text-textMuted">
                   <Clock size={14} />
                   <span>{session.time}</span>
                 </div>
-                <div className="flex items-center gap-2 text-text-secondary">
+                <div className="flex items-center gap-2 text-text-textMuted">
                   <MapPin size={14} />
                   <span>{session.venue}</span>
                 </div>
-                <div className="flex items-center gap-2 text-text-secondary">
+                <div className="flex items-center gap-2 text-text-textMuted">
                   <User size={14} />
                   <span>{session.lecturer}</span>
                 </div>
@@ -401,10 +401,10 @@ export const StudentViewPage: React.FC = () => {
           ))}
 
           {upcomingSessions.length === 0 && (
-            <div className="text-center py-16 bg-surface rounded-2xl border border-border">
-              <Calendar size={48} className="mx-auto text-text-secondary mb-4" />
-              <h3 className="text-lg font-semibold text-text-primary mb-2">No upcoming sessions</h3>
-              <p className="text-text-secondary">Check back later for scheduled classes</p>
+            <div className="text-center py-16 bg-surface rounded-2xl border border-outline">
+              <Calendar size={48} className="mx-auto text-text-textMuted mb-4" />
+              <h3 className="font-headline text-lg font-semibold text-text-primary mb-2">No upcoming sessions</h3>
+              <p className="text-text-textMuted">Check back later for scheduled classes</p>
             </div>
           )}
         </div>
@@ -416,7 +416,7 @@ export const StudentViewPage: React.FC = () => {
           {attendanceHistory.map(record => (
             <div
               key={record.id}
-              className="bg-surface border border-border rounded-2xl p-5"
+              className="bg-surface border border-outline rounded-2xl p-5"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
@@ -425,7 +425,7 @@ export const StudentViewPage: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-primary font-bold text-sm">{record.courseCode}</span>
-                    <div className="flex items-center gap-3 text-sm text-text-secondary mt-1">
+                    <div className="flex items-center gap-3 text-sm text-text-textMuted mt-1">
                       <span className="flex items-center gap-1">
                         <Calendar size={12} />
                         {new Date(record.date).toLocaleDateString()}
@@ -444,7 +444,7 @@ export const StudentViewPage: React.FC = () => {
 
               {record.notes && (
                 <div className="mt-3 p-3 bg-inputccent rounded-lg">
-                  <p className="text-xs text-text-secondary flex items-start gap-2">
+                  <p className="text-xs text-text-textMuted flex items-start gap-2">
                     <FileText size={12} className="mt-0.5" />
                     <span>{record.notes}</span>
                   </p>

@@ -145,7 +145,7 @@ export const AttendanceDashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
+              <h1 className="font-headline text-2xl md:text-3xl font-bold text-text-primary">
                 {sessionInfo.courseCode} - Live Session
               </h1>
               <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${
@@ -157,7 +157,7 @@ export const AttendanceDashboard: React.FC = () => {
                 {sessionInfo.status === 'active' ? 'Active' : sessionInfo.status === 'paused' ? 'Paused' : 'Ended'}
               </span>
             </div>
-            <p className="text-text-secondary text-sm">{sessionInfo.courseName}</p>
+            <p className="text-text-textMuted text-sm">{sessionInfo.courseName}</p>
           </div>
           <Button onClick={handleRefreshData} variant="secondary" size="sm" disabled={refreshing} className="hidden md:flex">
             <RefreshCw size={16} className={`mr-2 ${refreshing ? 'animate-spin' : ''}`} />
@@ -166,50 +166,50 @@ export const AttendanceDashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="bg-surface border border-outline rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Present</span>
+              <span className="text-text-textMuted text-sm">Present</span>
               <Check className="text-green-600" size={20} />
             </div>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-green-600">{presentCount}</span>
-              <span className="text-text-secondary text-sm mb-1">/ {students.length}</span>
+              <span className="text-text-textMuted text-sm mb-1">/ {students.length}</span>
             </div>
-            <p className="text-text-secondary text-xs mt-1">{attendanceRate}% attendance</p>
+            <p className="text-text-textMuted text-xs mt-1">{attendanceRate}% attendance</p>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="bg-surface border border-outline rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Absent</span>
+              <span className="text-text-textMuted text-sm">Absent</span>
               <X className="text-red-600" size={20} />
             </div>
             <span className="text-3xl font-bold text-red-600">{absentCount}</span>
-            <p className="text-text-secondary text-xs mt-1">Not checked in</p>
+            <p className="text-text-textMuted text-xs mt-1">Not checked in</p>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="bg-surface border border-outline rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Pending</span>
+              <span className="text-text-textMuted text-sm">Pending</span>
               <Circle className="text-yellow-600" size={20} />
             </div>
             <span className="text-3xl font-bold text-yellow-600">{pendingCount}</span>
-            <p className="text-text-secondary text-xs mt-1">Processing...</p>
+            <p className="text-text-textMuted text-xs mt-1">Processing...</p>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="bg-surface border border-outline rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-text-secondary text-sm">Time</span>
+              <span className="text-text-textMuted text-sm">Time</span>
               <Clock className="text-primary" size={20} />
             </div>
             <span className="text-2xl font-bold text-text-primary">{sessionInfo.startTime}</span>
-            <p className="text-text-secondary text-xs mt-1">Ends at {sessionInfo.endTime}</p>
+            <p className="text-text-textMuted text-xs mt-1">Ends at {sessionInfo.endTime}</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4">
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-surface border border-border rounded-2xl p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-surface border border-outline rounded-2xl p-4">
             <div className="flex gap-2">
               {['all', 'present', 'absent', 'pending'].map(status => (
                 <button
@@ -235,14 +235,14 @@ export const AttendanceDashboard: React.FC = () => {
 
           <div className="space-y-2">
             {filteredStudents.map(student => (
-              <div key={student.id} className="bg-surface border border-border rounded-xl p-4 flex items-center justify-between">
+              <div key={student.id} className="bg-surface border border-outline rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
                   <div className={`p-2 rounded-lg ${getStatusColor(student.status)}`}>
                     {getStatusIcon(student.status)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-text-primary font-semibold text-sm truncate">{student.name}</h4>
-                    <p className="text-text-secondary text-xs">{student.matricNumber}</p>
+                    <h4 className="font-headline text-text-primary font-semibold text-sm truncate">{student.name}</h4>
+                    <p className="text-text-textMuted text-xs">{student.matricNumber}</p>
                   </div>
                 </div>
 
@@ -258,9 +258,9 @@ export const AttendanceDashboard: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-surface border border-border rounded-2xl p-6">
+          <div className="bg-surface border border-outline rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-text-primary font-semibold flex items-center gap-2">
+              <h3 className="font-headline text-text-primary font-semibold flex items-center gap-2">
                 <QrCode size={20} className="text-primary" />
                 QR Code
               </h3>
@@ -269,23 +269,23 @@ export const AttendanceDashboard: React.FC = () => {
               </button>
             </div>
 
-            <div className="bg-card p-4 rounded-xl mb-4 flex items-center justify-center">
+            <div className="bg-surface p-4 rounded-xl mb-4 flex items-center justify-center">
               <QRCodeSVG value={sessionInfo.qrData} size={200} level="H" includeMargin={true} />
             </div>
 
             <div className="bg-primary/10 rounded-lg p-3 mb-3">
-              <p className="text-xs text-text-secondary mb-1 text-center">Session Code</p>
+              <p className="text-xs text-text-textMuted mb-1 text-center">Session Code</p>
               <p className="text-2xl font-mono font-bold text-primary text-center">{sessionInfo.code}</p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 text-sm text-text-secondary">
+            <div className="flex items-center justify-center gap-2 text-sm text-text-textMuted">
               <Clock size={14} />
               <span>Refreshes in {qrRefreshCountdown}s</span>
             </div>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl p-6 space-y-3">
-            <h3 className="text-text-primary font-semibold mb-4">Session Controls</h3>
+          <div className="bg-surface border border-outline rounded-2xl p-6 space-y-3">
+            <h3 className="font-headline text-text-primary font-semibold mb-4">Session Controls</h3>
 
             {sessionInfo.status !== 'ended' && (
               <>
@@ -303,9 +303,9 @@ export const AttendanceDashboard: React.FC = () => {
 
             {sessionInfo.status === 'ended' && (
               <div className="text-center py-4">
-                <AlertCircle size={48} className="mx-auto text-text-secondary mb-3" />
+                <AlertCircle size={48} className="mx-auto text-text-textMuted mb-3" />
                 <p className="text-text-primary font-semibold mb-1">Session Ended</p>
-                <p className="text-text-secondary text-sm">Generating report...</p>
+                <p className="text-text-textMuted text-sm">Generating report...</p>
               </div>
             )}
           </div>

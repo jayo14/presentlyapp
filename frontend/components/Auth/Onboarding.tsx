@@ -665,9 +665,9 @@ export const Onboarding: React.FC = () => {
     return (
       <div className="space-y-6">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-foreground mb-2">How will you use Presently?</h2>
-          <p className="text-zinc-700">Select your role to get started</p>
-          <p className="text-xs text-muted-foreground mt-2">Step 1 of {totalSteps}</p>
+          <h2 className="font-headline text-2xl font-bold text-text mb-2">How will you use Presently?</h2>
+          <p className="text-textMuted">Select your role to get started</p>
+          <p className="text-xs text-textMuted mt-2">Step 1 of {totalSteps}</p>
         </div>
         
         <div className="grid gap-4">
@@ -689,10 +689,10 @@ export const Onboarding: React.FC = () => {
                   <p className={`text-lg font-bold transition-colors mb-1 ${state.selectedRole === role.id ? 'text-primary' : 'text-zinc-900'}`}>
                     {role.label}
                   </p>
-                  <p className="text-sm text-zinc-700 leading-relaxed">{role.desc}</p>
+                  <p className="text-sm text-textMuted leading-relaxed">{role.desc}</p>
                 </div>
                 <div className={`w-6 h-6 rounded-full border-border flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-zinc-400'}`}>
-                   {state.selectedRole === role.id && <Check size={16} className="text-primary-foreground" />}
+                   {state.selectedRole === role.id && <Check size={16} className="text-text" />}
                 </div>
               </div>
               
@@ -717,16 +717,16 @@ export const Onboarding: React.FC = () => {
   const renderPersonalDetails = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">
+        <h2 className="font-headline text-2xl font-bold text-text mb-2">
           Welcome, {user?.full_name || user?.name || 'there'}!
         </h2>
-        <p className="text-zinc-700">Let's set up your profile.</p>
+        <p className="text-textMuted">Let's set up your profile.</p>
       </div>
 
       <div className="flex flex-col items-center mb-8 gap-4">
         <div className="relative group cursor-pointer">
            <div
-             className="w-28 h-28 rounded-full bg-zinc-200 overflow-hidden border-input border-border ring-2 ring-zinc-200 group-hover:ring-primary transition-all"
+             className="w-28 h-28 rounded-full bg-surfaceLow overflow-hidden border-input border-outline ring-2 ring-zinc-200 group-hover:ring-primary transition-all"
              aria-hidden="true"
            >
               {state.pendingImage ? (
@@ -734,7 +734,7 @@ export const Onboarding: React.FC = () => {
               ) : state.profileImage ? (
                   <img src={state.profileImage} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                  <div className="w-full h-full flex items-center justify-center text-textMuted">
                       <User size={40} />
                   </div>
               )}
@@ -745,7 +745,7 @@ export const Onboarding: React.FC = () => {
                type="button"
                onClick={handleCameraClick}
                aria-label="Upload profile photo"
-               className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+               className="absolute bottom-0 right-0 bg-primary text-text p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
              >
                 <Camera size={16} />
              </button>
@@ -793,7 +793,7 @@ export const Onboarding: React.FC = () => {
     <div className="space-y-6">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-text-primary">
+          <h2 className="font-headline text-xl font-bold text-text-primary">
             Institutional Details
           </h2>
           <span className="text-on-primary-fixedase font-semibold text-text-primary">
@@ -801,10 +801,10 @@ export const Onboarding: React.FC = () => {
           </span>
         </div>
 
-        <h3 className="text-3xl md:text-4xl font-black text-text-primary mb-3">
+        <h3 className="font-headline text-3xl md:text-4xl font-black text-text-primary mb-3">
           Link your Institution
         </h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-textMuted">
           Almost there! Select your specific academic location to finalize your profile.
         </p>
       </div>
@@ -819,7 +819,7 @@ export const Onboarding: React.FC = () => {
             Select University
           </label>
           {state.institutionsLoading ? (
-            <div className="w-full h-14 bg-muted rounded-2xl animate-pulse" aria-hidden="true" />
+            <div className="w-full h-14 bg-surfaceLow rounded-2xl animate-pulse" aria-hidden="true" />
           ) : (
             <div className="relative">
               <select
@@ -831,7 +831,7 @@ export const Onboarding: React.FC = () => {
                 }}
                 aria-required="true"
                 aria-label="Select your university or institution"
-                className="w-full bg-card border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
+                className="w-full bg-surface border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
               >
                 <option value="">Select your institution</option>
                 {state.institutions.map(inst => (
@@ -885,7 +885,7 @@ export const Onboarding: React.FC = () => {
               Select Faculty
             </label>
             {state.collegesLoading ? (
-              <div className="w-full h-14 bg-muted rounded-2xl animate-pulse" aria-hidden="true" />
+              <div className="w-full h-14 bg-surfaceLow rounded-2xl animate-pulse" aria-hidden="true" />
             ) : (
               <div className="relative">
                 <select
@@ -899,7 +899,7 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your faculty or college"
                   aria-disabled={state.colleges.length === 0}
-                  className="w-full bg-card border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-surface border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select college/faculty</option>
                   {state.colleges.map(col => (
@@ -930,7 +930,7 @@ export const Onboarding: React.FC = () => {
               Select Department
             </label>
             {state.departmentsLoading ? (
-              <div className="w-full h-14 bg-muted rounded-2xl animate-pulse" aria-hidden="true" />
+              <div className="w-full h-14 bg-surfaceLow rounded-2xl animate-pulse" aria-hidden="true" />
             ) : (
               <div className="relative">
                 <select
@@ -944,7 +944,7 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your department"
                   aria-disabled={state.departments.length === 0}
-                  className="w-full bg-card border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-surface border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select department</option>
                   {state.departments.map(dept => (
@@ -996,10 +996,10 @@ export const Onboarding: React.FC = () => {
 
         {state.selectedRole === UserRole.STUDENT && (
              <div className="w-full">
-                 <label className="block text-sm font-medium text-zinc-700 mb-1.5">Digital Signature <span className="text-muted-foreground font-normal">(Optional)</span></label>
-                 <div className="border border-dashed border-border bg-muted rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-zinc-200 hover:border-primary/50 cursor-pointer transition-colors group">
-                    <Upload className="h-6 w-6 text-muted-foreground group-hover:text-primary mb-2 transition-colors" />
-                    <p className="text-xs text-muted-foreground group-hover:text-foreground">Upload signature image</p>
+                 <label className="block text-sm font-medium text-textMuted mb-1.5">Digital Signature <span className="text-textMuted font-normal">(Optional)</span></label>
+                 <div className="border border-dashed border-outline bg-surfaceLow rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-surfaceLow hover:border-primary/50 cursor-pointer transition-colors group">
+                    <Upload className="h-6 w-6 text-textMuted group-hover:text-primary mb-2 transition-colors" />
+                    <p className="text-xs text-textMuted group-hover:text-text">Upload signature image</p>
                  </div>
             </div>
         )}
@@ -1044,8 +1044,8 @@ export const Onboarding: React.FC = () => {
   const renderCourseRegistration = () => (
     <div className="space-y-6 h-full flex flex-col">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Register Courses</h2>
-        <p className="text-zinc-700">Select courses to add to your dashboard.</p>
+        <h2 className="font-headline text-2xl font-bold text-text mb-2">Register Courses</h2>
+        <p className="text-textMuted">Select courses to add to your dashboard.</p>
       </div>
 
       {state.coursesLoading ? (
@@ -1065,7 +1065,7 @@ export const Onboarding: React.FC = () => {
         </div>
       ) : state.courses.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground text-sm">No courses available at the moment.</p>
+          <p className="text-textMuted text-sm">No courses available at the moment.</p>
         </div>
       ) : (
         <>
@@ -1094,25 +1094,25 @@ export const Onboarding: React.FC = () => {
                             <div className="flex items-center gap-2">
                                  <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-zinc-900'}`}>{course.code}</span>
                                  {course.level && (
-                                   <span className="text-[10px] bg-zinc-200 text-zinc-700 px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
+                                   <span className="text-[10px] bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
                                  )}
                             </div>
-                            <p className="text-xs text-zinc-700 mt-1">{course.title}</p>
+                            <p className="text-xs text-textMuted mt-1">{course.title}</p>
                             {course.lecturer_name && (
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{course.lecturer_name}</p>
+                              <p className="text-[10px] text-textMuted mt-0.5">{course.lecturer_name}</p>
                             )}
                         </div>
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
                             isSelected ? 'bg-primary border-primary text-white' : 'border-zinc-400 bg-transparent'
                         }`} aria-hidden="true">
-                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-muted-foreground" />}
+                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
                         </div>
                     </button>
                 );
             })}
           </div>
 
-          <div className="text-center text-xs text-muted-foreground pt-2" aria-live="polite" aria-atomic="true">
+          <div className="text-center text-xs text-textMuted pt-2" aria-live="polite" aria-atomic="true">
             You selected {state.selectedCourses.length} course{state.selectedCourses.length !== 1 ? 's' : ''}.
           </div>
         </>
@@ -1123,8 +1123,8 @@ export const Onboarding: React.FC = () => {
   const renderPreferences = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Permissions</h2>
-        <p className="text-zinc-700">Customize your app experience.</p>
+        <h2 className="font-headline text-2xl font-bold text-text mb-2">Permissions</h2>
+        <p className="text-textMuted">Customize your app experience.</p>
       </div>
 
       <div className="space-y-3" role="group" aria-label="App permissions">
@@ -1176,14 +1176,14 @@ export const Onboarding: React.FC = () => {
                     </div>
                     <div className="text-left">
                         <p className={`font-medium transition-colors ${item.state ? 'text-zinc-900' : 'text-zinc-800'}`}>{item.label}</p>
-                        <p className="text-xs text-muted-foreground">{item.desc}</p>
+                        <p className="text-xs text-textMuted">{item.desc}</p>
                     </div>
                 </div>
                 <div
                   className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-400 justify-start'}`}
                   aria-hidden="true"
                 >
-                    <div className="w-4 h-4 rounded-full bg-card shadow-sm" />
+                    <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
                 </div>
             </div>
         ))}
@@ -1213,7 +1213,7 @@ export const Onboarding: React.FC = () => {
         </div>
 
         <div
-          className="bg-card border border-[#E0E0E0] p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden"
+          className="bg-surface border border-[#E0E0E0] p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden"
           role="main"
         >
           {/* Error Display */}
@@ -1277,7 +1277,7 @@ export const Onboarding: React.FC = () => {
                 <button
                   onClick={handleBack}
                   aria-label="Go back to previous step"
-                  className="px-4 py-3 bg-card border border-border text-zinc-700 rounded-full hover:bg-[#F5F5F0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
+                  className="px-4 py-3 bg-surface border border-outline text-textMuted rounded-full hover:bg-[#F5F5F0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
                 >
                   <ChevronLeft size={20} aria-hidden="true" />
                 </button>
@@ -1307,7 +1307,7 @@ export const Onboarding: React.FC = () => {
           </div>
         </div>
 
-        <p className="text-center text-muted-foreground text-xs mt-6" aria-hidden="true">
+        <p className="text-center text-textMuted text-xs mt-6" aria-hidden="true">
           Step {state.step} of {totalSteps}
         </p>
       </div>

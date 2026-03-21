@@ -137,7 +137,7 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cardackgroundackground text-foreground flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-cardackgroundackground text-text flex flex-col items-center justify-center p-4 relative">
       <SEO
         title="Login | Presently"
         description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
@@ -146,7 +146,7 @@ export const Login: React.FC = () => {
       {/* Back Button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors z-10"
+        className="absolute top-6 left-6 text-textMuted hover:text-text flex items-center gap-2 transition-colors z-10"
         aria-label="Go back"
       >
         <ArrowLeft size={20} />
@@ -156,7 +156,7 @@ export const Login: React.FC = () => {
         {/* Title */}
         <div className="mb-8 text-center">
           <h2 className="text-4xl font-headline font-bold mb-2">Welcome back</h2>
-          <p className="text-secondary">Enter your credentials to access your account.</p>
+          <p className="text-textMuted">Enter your credentials to access your account.</p>
         </div>
 
         {/* Login Form Card */}
@@ -177,7 +177,7 @@ export const Login: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                 </div>
               </div>
@@ -188,7 +188,7 @@ export const Login: React.FC = () => {
                 <div className="relative">
                   <Lock
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
                   />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -196,12 +196,12 @@ export const Login: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary transition-colors z-10"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -218,7 +218,7 @@ export const Login: React.FC = () => {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4 cursor-pointer accent-[#FFD700]"
                   />
-                  <span className="text-secondary">Remember me</span>
+                  <span className="text-textMuted">Remember me</span>
                 </label>
                 <button
                   type="button"
@@ -249,7 +249,7 @@ export const Login: React.FC = () => {
 
           <div className="flex items-center gap-4 my-8">
             <div className="h-px bg-cardackgroundorder flex-1" />
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wide">Or continue with</span>
+            <span className="text-xs text-textMuted uppercase font-bold tracking-wide">Or continue with</span>
             <div className="h-px bg-cardackgroundorder flex-1" />
           </div>
 
@@ -282,7 +282,7 @@ export const Login: React.FC = () => {
             </button>
           </div>
 
-          <p className="mt-8 text-center text-sm text-secondary">
+          <p className="mt-8 text-center text-sm text-textMuted">
             Don't have an account?{' '}
             <button
               onClick={() => navigate('/register')}

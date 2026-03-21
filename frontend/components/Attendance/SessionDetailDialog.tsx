@@ -83,18 +83,18 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
       <div 
         {...modalProps}
         aria-labelledby="dialog-title"
-        className="bg-cardackgroundackground text-foreground border border-border rounded-3xl w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] outline-none relative overflow-hidden"
+        className="bg-cardackgroundackground text-text border border-outline rounded-3xl w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] outline-none relative overflow-hidden"
       >
         {/* End Session Confirmation Overlay */}
         {showEndConfirmation && (
-          <div className="absolute inset-0 z-50 bg-card/95 backdrop-blur-sm flex items-center justify-center p-8 animate-in fade-in duration-200">
+          <div className="absolute inset-0 z-50 bg-surface/95 backdrop-blur-sm flex items-center justify-center p-8 animate-in fade-in duration-200">
             <div className="max-w-sm w-full text-center space-y-6">
               <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle size={40} />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-foreground mb-2">End Session?</h3>
-                <p className="text-muted-foreground text-sm">
+                <h3 className="font-headline text-2xl font-bold text-text mb-2">End Session?</h3>
+                <p className="text-textMuted text-sm">
                   Are you sure you want to end this session early? Students will no longer be able to check in.
                 </p>
               </div>
@@ -107,7 +107,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
                   Cancel
                 </Button>
                 <Button 
-                  className="flex-1 h-12 rounded-xl bg-red-600 hover:bg-red-700 text-primary-foreground border-none"
+                  className="flex-1 h-12 rounded-xl bg-red-600 hover:bg-red-700 text-text border-none"
                   onClick={confirmEndSession}
                   isLoading={isEnding}
                 >
@@ -119,17 +119,17 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
         )}
 
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-border flex justify-between items-center bg-muted/50 flex-shrink-0">
+        <div className="p-4 sm:p-6 border-b border-outline flex justify-between items-center bg-surfaceLow/50 flex-shrink-0">
           <div className="min-w-0 pr-4">
-            <h3 id="dialog-title" className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
+            <h3 id="dialog-title" className="font-headline text-lg sm:text-xl font-bold text-text flex items-center gap-2">
               <span className="p-1.5 bg-primary/10 rounded-lg text-primary flex-shrink-0">
                 <Timer size={20} />
               </span>
               <span className="truncate">Session Details</span>
             </h3>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">{session.course_name} ({session.course_code})</p>
+            <p className="text-xs sm:text-sm text-textMuted mt-1 truncate">{session.course_name} ({session.course_code})</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-full transition-colors flex-shrink-0" aria-label="Close dialog">
+          <button onClick={onClose} className="p-2 hover:bg-surfaceLow rounded-full transition-colors flex-shrink-0" aria-label="Close dialog">
             <X size={20} />
           </button>
         </div>
@@ -137,12 +137,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-100">
             {/* Left Side: QR Code */}
-            <div className="p-6 sm:p-8 flex flex-col items-center justify-center bg-muted/30">
-              <div className="bg-card p-3 sm:p-4 rounded-2xl shadow-lg border border-border mb-6 w-full max-w-[240px] aspect-square flex items-center justify-center">
+            <div className="p-6 sm:p-8 flex flex-col items-center justify-center bg-surfaceLow/30">
+              <div className="bg-surface p-3 sm:p-4 rounded-2xl shadow-lg border border-outline mb-6 w-full max-w-[240px] aspect-square flex items-center justify-center">
                 <QRCodeSVG value={sessionUrl} size={200} level="H" includeMargin className="w-full h-full" />
               </div>
               <div className="text-center space-y-3 group relative w-full">
-                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-muted-foreground flex items-center justify-center gap-2">
+                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-textMuted flex items-center justify-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                   Session Code
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
@@ -154,7 +154,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
                   
                   {/* Code Container */}
                   <div 
-                    className="relative bg-gradient-to-br from-zinc-900 to-black border-border border-primary/20 rounded-2xl p-4 sm:p-6 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:scale-[1.02] active:scale-[0.98] group/code"
+                    className="relative bg-gradient-to-br from-zinc-900 to-black border-outline border-primary/20 rounded-2xl p-4 sm:p-6 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:scale-[1.02] active:scale-[0.98] group/code"
                     onClick={() => {
                       navigator.clipboard.writeText(session.session_code);
                       toast.success('Code copied to clipboard');
@@ -175,14 +175,14 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
                     </div>
                     
                     {/* Copy Hint */}
-                    <div className="mt-3 text-[10px] sm:text-xs text-muted-foreground font-medium opacity-0 group-hover/code:opacity-100 transition-opacity duration-300">
+                    <div className="mt-3 text-[10px] sm:text-xs text-textMuted font-medium opacity-0 group-hover/code:opacity-100 transition-opacity duration-300">
                       Click to copy
                     </div>
                   </div>
                 </div>
                 
                 {/* QR Alternative Text */}
-                <div className="text-[10px] text-muted-foreground pt-2">
+                <div className="text-[10px] text-textMuted pt-2">
                   Students can scan QR or enter this code
                 </div>
               </div>
@@ -191,29 +191,29 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
             {/* Right Side: Stats & Info */}
             <div className="p-6 sm:p-8 space-y-6 sm:space-y-8">
               {/* Countdown */}
-              <div className="bg-card rounded-2xl p-4 sm:p-6 border border-border text-center relative overflow-hidden">
+              <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-outline text-center relative overflow-hidden">
                 <div className="relative z-10">
-                    <div className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-bold mb-1">Time Remaining</div>
+                    <div className="text-[10px] sm:text-xs uppercase tracking-wider text-textMuted font-bold mb-1">Time Remaining</div>
                     <div className={`text-3xl sm:text-4xl font-mono font-bold tracking-tighter ${isExpired ? 'text-red-500' : 'text-primary'}`}>
                       {timeLeft}
                     </div>
                 </div>
                 {/* Background pattern */}
-                <div className="absolute top-0 right-0 -mr-4 -mt-4 opacity-5 text-primary-foreground pointer-events-none">
+                <div className="absolute top-0 right-0 -mr-4 -mt-4 opacity-5 text-text pointer-events-none">
                     <Clock size={100} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                <div className="p-3 sm:p-4 rounded-2xl bg-muted border border-border">
-                  <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
+                <div className="p-3 sm:p-4 rounded-2xl bg-surfaceLow border border-outline">
+                  <div className="text-textMuted mb-1 flex items-center gap-1.5">
                     <Users size={14} className="flex-shrink-0" /> 
                     <span className="text-[10px] font-bold uppercase truncate">Students</span>
                   </div>
                   <div className="text-lg sm:text-xl font-bold">{session.attendee_count || 0}</div>
                 </div>
-                <div className="p-3 sm:p-4 rounded-2xl bg-muted border border-border">
-                  <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
+                <div className="p-3 sm:p-4 rounded-2xl bg-surfaceLow border border-outline">
+                  <div className="text-textMuted mb-1 flex items-center gap-1.5">
                     <MapPin size={14} className="flex-shrink-0" /> 
                     <span className="text-[10px] font-bold uppercase truncate">Radius</span>
                   </div>
@@ -222,9 +222,9 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
               </div>
 
               <div className="space-y-3">
-                <div className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-wide">Share Link</div>
+                <div className="text-[10px] sm:text-xs font-bold text-textMuted uppercase tracking-wide">Share Link</div>
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-inputccent px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium truncate text-muted-foreground border border-border">
+                  <div className="flex-1 bg-inputccent px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium truncate text-textMuted border border-outline">
                     {sessionUrl}
                   </div>
                   <Button variant="secondary" size="icon" className="flex-shrink-0" onClick={handleCopyLink} title="Copy Link">
@@ -236,7 +236,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
               <div className="pt-2 sm:pt-4 flex flex-col gap-3">
                 {session.is_active && !isExpired ? (
                   <Button 
-                      className="w-full bg-red-600 hover:bg-red-700 text-primary-foreground border-none h-11 sm:h-12 rounded-xl text-sm"
+                      className="w-full bg-red-600 hover:bg-red-700 text-text border-none h-11 sm:h-12 rounded-xl text-sm"
                       onClick={handleEndSession}
                       isLoading={isEnding}
                   >
@@ -244,7 +244,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
                       <span className="truncate">End Session Early</span>
                   </Button>
                 ) : (
-                  <div className="flex items-center justify-center gap-2 p-3 bg-inputccent rounded-xl text-muted-foreground font-bold text-sm">
+                  <div className="flex items-center justify-center gap-2 p-3 bg-inputccent rounded-xl text-textMuted font-bold text-sm">
                       <AlertTriangle size={18} className="flex-shrink-0" /> Session Ended
                   </div>
                 )}

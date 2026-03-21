@@ -107,7 +107,7 @@ export const DepartmentFormPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
         <div className="w-12 h-12 border-input border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-muted-foreground animate-pulse">Loading department data...</p>
+        <p className="text-textMuted animate-pulse">Loading department data...</p>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export const DepartmentFormPage: React.FC = () => {
       <div className="flex flex-col gap-4">
         <button 
           onClick={() => navigate(`/dashboard/institutions/${id}/colleges/${collegeId}`)}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
+          className="flex items-center gap-2 text-sm text-textMuted hover:text-primary transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Departments
@@ -130,10 +130,10 @@ export const DepartmentFormPage: React.FC = () => {
               <Building className="w-8 h-8" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="font-headline text-3xl font-bold text-text">
                 {deptId && deptId !== 'new' ? 'Edit Department' : 'New Department'}
               </h1>
-              <p className="text-muted-foreground">{college?.name || 'College'}</p>
+              <p className="text-textMuted">{college?.name || 'College'}</p>
             </div>
           </div>
           <div className="hidden md:flex gap-3">
@@ -155,69 +155,69 @@ export const DepartmentFormPage: React.FC = () => {
         )}
 
         {/* Basic Information Section */}
-        <section className="bg-card border border-border rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-border bg-background/50">
-            <h3 className="font-bold text-foreground flex items-center gap-2">
+        <section className="bg-surface border border-outline rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-outline bg-background/50">
+            <h3 className="font-headline font-bold text-text flex items-center gap-2">
               <Building className="w-4 h-4 text-primary" />
               Department Details
             </h3>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Department Name *</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Department Name *</label>
               <Input
                 value={formData.name || ''}
                 onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="e.g., Computer Science"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Department Code *</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Department Code *</label>
               <Input
                 value={formData.code || ''}
                 onChange={(e) => handleChange('code', e.target.value.toUpperCase())}
                 placeholder="e.g., CSC"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Abbreviation</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Abbreviation</label>
               <Input
                 value={formData.abbreviation || ''}
                 onChange={(e) => handleChange('abbreviation', e.target.value)}
                 placeholder="Alternative abbreviation"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Description</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Description</label>
               <textarea
                 value={formData.description || ''}
                 onChange={(e) => handleChange('description', e.target.value)}
                 placeholder="Brief description of the department"
                 rows={3}
-                className="w-full px-4 py-3 bg-background border border-border rounded-3xl text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 bg-background border border-outline rounded-3xl text-text focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Established Year</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Established Year</label>
               <Input
                 type="number"
                 value={formData.established_year || ''}
                 onChange={(e) => handleChange('established_year', parseInt(e.target.value))}
                 placeholder="e.g., 1995"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Accreditation Status</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Accreditation Status</label>
               <select
                 value={formData.accreditation_status || ''}
                 onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                className="w-full h-12 px-4 bg-background border border-border rounded-full text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-background border border-outline rounded-full text-text focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="ACCREDITED">Fully Accredited</option>
                 <option value="PROVISIONAL">Provisional</option>
@@ -228,66 +228,66 @@ export const DepartmentFormPage: React.FC = () => {
         </section>
 
         {/* Administration & Contact */}
-        <section className="bg-card border border-border rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-border bg-background/50">
-            <h3 className="font-bold text-foreground flex items-center gap-2">
+        <section className="bg-surface border border-outline rounded-2xl overflow-hidden">
+          <div className="p-6 border-b border-outline bg-background/50">
+            <h3 className="font-headline font-bold text-text flex items-center gap-2">
               <Mail className="w-4 h-4 text-primary" />
               Leadership & Contact
             </h3>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">HOD Name</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">HOD Name</label>
               <Input
                 value={formData.head_of_department_name || ''}
                 onChange={(e) => handleChange('head_of_department_name', e.target.value)}
                 placeholder="e.g., Dr. Alan Turing"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">HOD Email</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">HOD Email</label>
               <Input
                 type="email"
                 value={formData.head_of_department_email || ''}
                 onChange={(e) => handleChange('head_of_department_email', e.target.value)}
                 placeholder="hod@example.edu"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Official Email</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Official Email</label>
               <Input
                 type="email"
                 value={formData.contact_email || ''}
                 onChange={(e) => handleChange('contact_email', e.target.value)}
                 placeholder="dept@example.edu"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Contact Phone</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Contact Phone</label>
               <Input
                 value={formData.contact_phone || ''}
                 onChange={(e) => handleChange('contact_phone', e.target.value)}
                 placeholder="+234..."
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-muted-foreground mb-2">Office Location</label>
+              <label className="block text-sm font-semibold text-textMuted mb-2">Office Location</label>
               <Input
                 value={formData.office_location || ''}
                 onChange={(e) => handleChange('office_location', e.target.value)}
                 placeholder="e.g., Block C, Room 101"
-                className="h-12 bg-background border-border focus:border-primary"
+                className="h-12 bg-background border-outline focus:border-primary"
               />
             </div>
           </div>
         </section>
 
         {/* Status */}
-        <section className="bg-card border border-border rounded-2xl p-6">
+        <section className="bg-surface border border-outline rounded-2xl p-6">
            <label className="flex items-center gap-3 cursor-pointer group">
               <div className={`w-10 h-6 rounded-full p-1 transition-colors ${formData.is_active ? 'bg-primary' : 'bg-zinc-700'}`}>
                 <div className={`w-4 h-4 bg-white rounded-full transition-transform ${formData.is_active ? 'translate-x-4' : 'translate-x-0'}`} />
@@ -298,7 +298,7 @@ export const DepartmentFormPage: React.FC = () => {
                 onChange={(e) => handleChange('is_active', e.target.checked)}
                 className="hidden"
               />
-              <span className="text-sm font-bold text-muted-foreground group-hover:text-primary transition-colors">Active Status</span>
+              <span className="text-sm font-bold text-textMuted group-hover:text-primary transition-colors">Active Status</span>
            </label>
         </section>
 

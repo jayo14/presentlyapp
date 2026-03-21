@@ -45,15 +45,15 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
   const isFullyConfigured = isSupported && firebaseStatus.configured;
 
   return (
-    <div className="bg-card text-foreground rounded-lg p-6 border border-border">
+    <div className="bg-surface text-text rounded-lg p-6 border border-outline">
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-lg bg-primary/10">
           <Bell className="w-6 h-6 text-primary" />
         </div>
         
         <div className="flex-1">
-          <h3 className="text-lg font-semibold mb-2">Push Notifications</h3>
-          <p className="text-sm text-muted-foreground mb-4">
+          <h3 className="font-headline text-lg font-semibold mb-2">Push Notifications</h3>
+          <p className="text-sm text-textMuted mb-4">
             Stay updated with real-time notifications about attendance, sessions, and important updates.
           </p>
 
@@ -64,12 +64,12 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
               {isSupported ? (
                 <>
                   <Check className="w-4 h-4 text-green-500" />
-                  <span className="text-muted-foreground">Browser supports push notifications</span>
+                  <span className="text-textMuted">Browser supports push notifications</span>
                 </>
               ) : (
                 <>
                   <X className="w-4 h-4 text-red-500" />
-                  <span className="text-muted-foreground">Browser does not support push notifications</span>
+                  <span className="text-textMuted">Browser does not support push notifications</span>
                 </>
               )}
             </div>
@@ -79,12 +79,12 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
               {firebaseStatus.configured ? (
                 <>
                   <Check className="w-4 h-4 text-green-500" />
-                  <span className="text-muted-foreground">Firebase is configured</span>
+                  <span className="text-textMuted">Firebase is configured</span>
                 </>
               ) : (
                 <>
                   <AlertCircle className="w-4 h-4 text-yellow-500" />
-                  <span className="text-muted-foreground">Firebase needs configuration</span>
+                  <span className="text-textMuted">Firebase needs configuration</span>
                 </>
               )}
             </div>
@@ -94,17 +94,17 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
               {permission === 'granted' ? (
                 <>
                   <Check className="w-4 h-4 text-green-500" />
-                  <span className="text-muted-foreground">Notifications are enabled</span>
+                  <span className="text-textMuted">Notifications are enabled</span>
                 </>
               ) : permission === 'denied' ? (
                 <>
                   <X className="w-4 h-4 text-red-500" />
-                  <span className="text-muted-foreground">Notifications are blocked</span>
+                  <span className="text-textMuted">Notifications are blocked</span>
                 </>
               ) : (
                 <>
-                  <AlertCircle className="w-4 h-4 text-gray-500" />
-                  <span className="text-muted-foreground">Notification permission not requested</span>
+                  <AlertCircle className="w-4 h-4 text-textMuted" />
+                  <span className="text-textMuted">Notification permission not requested</span>
                 </>
               )}
             </div>
@@ -113,7 +113,7 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
             {token && (
               <div className="flex items-center gap-2 text-sm">
                 <Check className="w-4 h-4 text-green-500" />
-                <span className="text-muted-foreground">Device registered for notifications</span>
+                <span className="text-textMuted">Device registered for notifications</span>
               </div>
             )}
           </div>
@@ -191,7 +191,7 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
             ) : (
               <button
                 disabled
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-zinc-200 text-muted-foreground font-medium rounded-lg cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-surfaceLow text-textMuted font-medium rounded-lg cursor-not-allowed"
               >
                 <BellOff className="w-4 h-4" />
                 <span>Notifications Unavailable</span>
@@ -203,7 +203,7 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
               <div className="mt-2">
                 <button
                   onClick={() => setShowToken(!showToken)}
-                  className="text-xs text-muted-foreground hover:text-zinc-700 underline"
+                  className="text-xs text-textMuted hover:text-textMuted underline"
                 >
                   {showToken ? 'Hide' : 'Show'} device token (for debugging)
                 </button>

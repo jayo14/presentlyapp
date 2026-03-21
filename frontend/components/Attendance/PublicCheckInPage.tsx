@@ -188,7 +188,7 @@ export const PublicCheckInPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-        <p className="text-muted-foreground font-medium">Preparing attendance check-in...</p>
+        <p className="text-textMuted font-medium">Preparing attendance check-in...</p>
       </div>
     );
   }
@@ -199,8 +199,8 @@ export const PublicCheckInPage: React.FC = () => {
         <div className="bg-red-500/10 p-6 rounded-full text-red-500 mb-6">
           <AlertCircle size={48} />
         </div>
-        <h2 className="text-2xl font-bold text-primary-foreground mb-2">Invalid Session</h2>
-        <p className="text-muted-foreground mb-8 max-w-md">{error}</p>
+        <h2 className="font-headline text-2xl font-bold text-text mb-2">Invalid Session</h2>
+        <p className="text-textMuted mb-8 max-w-md">{error}</p>
         <Button onClick={() => navigate('/dashboard')} variant="secondary">
           Back to Dashboard
         </Button>
@@ -215,8 +215,8 @@ export const PublicCheckInPage: React.FC = () => {
         <div className="bg-red-500/10 p-6 rounded-full text-red-500 mb-6">
           <AlertCircle size={48} />
         </div>
-        <h2 className="text-2xl font-bold text-primary-foreground mb-2">Session Not Found</h2>
-        <p className="text-muted-foreground mb-8 max-w-md">
+        <h2 className="font-headline text-2xl font-bold text-text mb-2">Session Not Found</h2>
+        <p className="text-textMuted mb-8 max-w-md">
           The attendance session you're trying to access could not be found or is no longer available.
         </p>
         <div className="flex gap-3">
@@ -251,26 +251,26 @@ export const PublicCheckInPage: React.FC = () => {
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="w-full max-w-lg bg-background border border-border rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-500">
+      <div className="w-full max-w-lg bg-background border border-outline rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-500">
         {/* Course Header */}
-        <div className="p-8 border-b border-border bg-card/30">
+        <div className="p-8 border-b border-outline bg-surface/30">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
               <BookOpen size={28} />
             </div>
             <div>
               <div className="text-xs font-bold text-primary uppercase tracking-widest mb-1">{session?.course_code}</div>
-              <h1 className="text-xl font-bold text-primary-foreground">{session?.course_name}</h1>
+              <h1 className="font-headline text-xl font-bold text-text">{session?.course_name}</h1>
             </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4 mt-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock size={16} className="text-muted-foreground" />
+            <div className="flex items-center gap-2 text-sm text-textMuted">
+              <Clock size={16} className="text-textMuted" />
               <span>Ends at {session && new Date(session.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground justify-end">
-              <MapPin size={16} className="text-muted-foreground" />
+            <div className="flex items-center gap-2 text-sm text-textMuted justify-end">
+              <MapPin size={16} className="text-textMuted" />
               <span>{session?.venue_name}</span>
             </div>
           </div>
@@ -282,20 +282,20 @@ export const PublicCheckInPage: React.FC = () => {
               <div className="flex justify-center">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary relative">
                   <UserPlus size={32} />
-                  <div className="absolute -top-1 -right-1 bg-primary text-on-primary-fixedlack text-xs font-black w-6 h-6 rounded-full flex items-center justify-center border-border border-black">
+                  <div className="absolute -top-1 -right-1 bg-primary text-on-primary-fixedlack text-xs font-black w-6 h-6 rounded-full flex items-center justify-center border-outline border-black">
                     {countdown}
                   </div>
                 </div>
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-primary-foreground text-lg">Not Registered for Course</h3>
-                <p className="text-muted-foreground text-sm">You need to be registered for this course to mark attendance.</p>
+                <h3 className="font-headline font-bold text-text text-lg">Not Registered for Course</h3>
+                <p className="text-textMuted text-sm">You need to be registered for this course to mark attendance.</p>
               </div>
               <div className="pt-2 flex flex-col gap-2">
                 <Button className="w-full h-12" onClick={handleEnroll} isLoading={autoEnrolling}>
                   Register & Continue
                 </Button>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
+                <p className="text-[10px] text-textMuted uppercase font-bold tracking-widest">
                   Auto-registering in {countdown} seconds...
                 </p>
               </div>
@@ -303,23 +303,23 @@ export const PublicCheckInPage: React.FC = () => {
           ) : (
             <>
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-card/50 border border-border flex items-start gap-4">
+                <div className="p-4 rounded-2xl bg-surface/50 border border-outline flex items-start gap-4">
                   <div className={`p-2 rounded-lg ${checkingIn ? 'bg-zinc-800' : 'bg-green-500/10 text-green-500'}`}>
                     <MapPin size={20} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-primary-foreground">Location Verification</h4>
-                    <p className="text-xs text-muted-foreground mt-1">We'll verify you are within {session?.location_radius}m of the venue.</p>
+                    <h4 className="font-headline text-sm font-bold text-text">Location Verification</h4>
+                    <p className="text-xs text-textMuted mt-1">We'll verify you are within {session?.location_radius}m of the venue.</p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-card/50 border border-border flex items-start gap-4">
+                <div className="p-4 rounded-2xl bg-surface/50 border border-outline flex items-start gap-4">
                   <div className="p-2 rounded-lg bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500">
                     <CheckCircle2 size={20} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-primary-foreground">Identity Verified</h4>
-                    <p className="text-xs text-muted-foreground mt-1">Marking attendance as <span className="text-muted-foreground font-medium">{user?.full_name}</span></p>
+                    <h4 className="font-headline text-sm font-bold text-text">Identity Verified</h4>
+                    <p className="text-xs text-textMuted mt-1">Marking attendance as <span className="text-textMuted font-medium">{user?.full_name}</span></p>
                   </div>
                 </div>
               </div>
@@ -344,8 +344,8 @@ export const PublicCheckInPage: React.FC = () => {
         </div>
       </div>
       
-      <p className="mt-8 text-muted-foreground text-sm font-medium">
-        Powered by <span className="text-muted-foreground">Presently Smart Attendance</span>
+      <p className="mt-8 text-textMuted text-sm font-medium">
+        Powered by <span className="text-textMuted">Presently Smart Attendance</span>
       </p>
     </div>
     </>

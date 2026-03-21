@@ -93,16 +93,16 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
       <div 
         {...modalProps}
         aria-labelledby="modal-title"
-        className="bg-card border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
+        className="bg-surface border border-outline rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none"
       >
         {/* Header */}
-        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-border bg-card">
-          <h2 id="modal-title" className="text-xl font-bold text-foreground">
+        <div className="sticky top-0 flex items-center justify-between p-6 border-b border-outline bg-surface">
+          <h2 id="modal-title" className="font-headline text-xl font-bold text-text">
             {institution ? 'Edit Institution' : 'Create Institution'}
           </h2>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-textMuted hover:text-text transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-6 h-6" />
@@ -120,14 +120,14 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 
           {/* Basic Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Basic Information
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Institution Name *
                   </label>
                   <Input
@@ -137,7 +137,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Short Name/Abbreviation *
                   </label>
                   <Input
@@ -150,7 +150,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Alternative Abbreviation
                 </label>
                 <Input
@@ -163,13 +163,13 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Institution Type *
                   </label>
                   <select
                     value={formData.institution_type || ''}
                     onChange={(e) => handleChange('institution_type', e.target.value)}
-                    className="w-full px-4 py-2 bg-accent border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary"
+                    className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-text text-sm focus:outline-none focus:border-primary"
                   >
                     <option value="UNIVERSITY">University</option>
                     <option value="POLYTECHNIC">Polytechnic</option>
@@ -178,7 +178,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Year Established
                   </label>
                   <Input
@@ -196,14 +196,14 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 
           {/* Location Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Location Information
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Country *
                   </label>
                   <Input
@@ -213,7 +213,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     State/Province
                   </label>
                   <Input
@@ -226,7 +226,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     City *
                   </label>
                   <Input
@@ -236,7 +236,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Postal Code
                   </label>
                   <Input
@@ -248,7 +248,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Address
                 </label>
                 <textarea
@@ -256,7 +256,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
                   onChange={(e) => handleChange('address', e.target.value)}
                   placeholder="Full street address"
                   rows={3}
-                  className="w-full px-4 py-2 bg-accent border border-border rounded-lg text-foreground text-sm placeholder-zinc-500 focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-text text-sm placeholder:text-textMuted focus:outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -264,14 +264,14 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 
           {/* Contact Information */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Contact Information
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Email
                   </label>
                   <Input
@@ -282,7 +282,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Phone
                   </label>
                   <Input
@@ -294,7 +294,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-textMuted mb-2">
                   Website
                 </label>
                 <Input
@@ -309,20 +309,20 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
 
           {/* Accreditation */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h3 className="font-headline text-sm font-semibold text-text mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
               Accreditation & Status
             </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="block text-sm font-medium text-textMuted mb-2">
                     Accreditation Status
                   </label>
                   <select
                     value={formData.accreditation_status || ''}
                     onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                    className="w-full px-4 py-2 bg-accent border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary"
+                    className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-text text-sm focus:outline-none focus:border-primary"
                   >
                     <option value="ACCREDITED">Accredited</option>
                     <option value="PROVISIONAL">Provisional</option>
@@ -335,9 +335,9 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
                       type="checkbox"
                       checked={formData.is_active !== false}
                       onChange={(e) => handleChange('is_active', e.target.checked)}
-                      className="w-4 h-4 rounded border-border"
+                      className="w-4 h-4 rounded border-outline"
                     />
-                    <span className="text-sm font-medium text-muted-foreground">Active Institution</span>
+                    <span className="text-sm font-medium text-textMuted">Active Institution</span>
                   </label>
                 </div>
               </div>
@@ -345,7 +345,7 @@ export const InstitutionModal: React.FC<InstitutionModalProps> = ({
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-border">
+          <div className="flex gap-3 pt-4 border-t border-outline">
             <Button
               type="button"
               variant="secondary"
