@@ -105,17 +105,17 @@ export const Register: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 size={40} className="animate-spin text-[#FFD700]" />
-          <p className="text-[#a1a1aa]">Loading</p>
+          <Loader2 size={40} className="animate-spin text-primary" />
+          <p className="text-secondary">Loading</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative">
       <SEO
         title="Register | Presently"
         description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
@@ -123,7 +123,7 @@ export const Register: React.FC = () => {
 
       <button
         onClick={onBack}
-        className="absolute top-8 left-8 text-gray-300 hover:text-white flex items-center gap-2 transition-colors z-10"
+        className="absolute top-8 left-8 text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors z-10"
         aria-label="Go back"
       >
         <ArrowLeft size={20} />
@@ -131,11 +131,11 @@ export const Register: React.FC = () => {
 
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-2">Create an account</h2>
-          <p className="text-[#a1a1aa]">Get started with smart attendance management.</p>
+          <h2 className="text-4xl font-headline font-bold mb-2">Create an account</h2>
+          <p className="text-secondary">Get started with smart attendance management.</p>
         </div>
 
-        <div className="bg-[#18181b] border border-[#27272a] p-6 rounded-2xl shadow-lg">
+        <div className="glass-panel border p-6 rounded-2xl shadow-lg">
           {registerMutation.error && (
             <div className="p-3 bg-red-500/10 border border-red-500 rounded-lg mb-4">
               <p className="text-sm text-red-500">
@@ -148,11 +148,11 @@ export const Register: React.FC = () => {
             <div className="flex flex-col gap-5">
               {/* Full Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                <label className="block text-sm font-medium mb-2">Full Name</label>
                 <div className="relative">
                   <UserIcon
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#a1a1aa] z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10"
                   />
                   <input
                     type="text"
@@ -160,18 +160,18 @@ export const Register: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-[#27272a] border border-[#3f3f46] rounded-2xl text-white placeholder-[#71717a] focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <label className="block text-sm font-medium mb-2">Email</label>
                 <div className="relative">
                   <Mail
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#a1a1aa] z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10"
                   />
                   <input
                     type="email"
@@ -179,18 +179,18 @@ export const Register: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-[#27272a] border border-[#3f3f46] rounded-2xl text-white placeholder-[#71717a] focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                 </div>
               </div>
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <label className="block text-sm font-medium mb-2">Password</label>
                 <div className="relative">
                   <Lock
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#a1a1aa] z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10"
                   />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -198,12 +198,12 @@ export const Register: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-[#27272a] border border-[#3f3f46] rounded-2xl text-white placeholder-[#71717a] focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-colors"
+                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a1a1aa] hover:text-[#FFD700] transition-colors z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -211,17 +211,17 @@ export const Register: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-xs text-[#71717a]">
+              <p className="text-xs text-secondary">
                 By clicking "Create Account", you agree to our{' '}
-                <a href="/terms" className="underline hover:text-white transition-colors">Terms</a>
+                <a href="/terms" className="underline hover:text-foreground transition-colors">Terms</a>
                 {' '}and{' '}
-                <a href="/privacy" className="underline hover:text-white transition-colors">Privacy Policy</a>.
+                <a href="/privacy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
               </p>
 
               <button
                 type="submit"
                 disabled={registerMutation.isPending}
-                className="w-full h-14 bg-[#FFD700] text-[#09090b] rounded-2xl font-bold text-lg hover:bg-[#FFE44D] hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="btn-presently-primary w-full flex items-center justify-center gap-2 w-full h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {registerMutation.isPending ? (
                   <>
@@ -235,19 +235,17 @@ export const Register: React.FC = () => {
             </div>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-4 my-8">
-            <div className="h-px bg-[#27272a] flex-1" />
-            <span className="text-xs text-[#71717a] uppercase font-bold tracking-wide">Or sign up with</span>
-            <div className="h-px bg-[#27272a] flex-1" />
+            <div className="h-px bg-border flex-1" />
+            <span className="text-xs text-secondary uppercase font-bold tracking-wide">Or sign up with</span>
+            <div className="h-px bg-border flex-1" />
           </div>
 
-          {/* OAuth Buttons */}
           <div className="flex justify-center gap-6 mb-4">
             <button
               onClick={handleGoogleLogin}
               disabled={googleAuthMutation.isPending || isRedirecting}
-              className="w-14 h-14 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surface-variant border transition-all disabled:opacity-50"
               aria-label="Sign up with Google"
             >
               <svg width="24" height="24" viewBox="0 0 24 24">
@@ -260,20 +258,20 @@ export const Register: React.FC = () => {
 
             <button
               onClick={handleAppleLogin}
-              className="w-14 h-14 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-0.5 transition-all"
+              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surface-variant border transition-all"
               aria-label="Sign up with Apple"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <svg width="24" height="24" viewBox="0 0 24 24" className="fill-foreground">
                 <path d="M17.05 20.28c-.96.95-2.45 2.1-4.05 2.1-1.45 0-2.1-.8-3.65-.8-1.55 0-2.3.75-3.6.8-1.5.05-3.1-1.25-4.15-2.85-1.95-3.15-1.5-8.25.95-11.5 1.25-1.6 2.85-2.6 4.6-2.6 1.45 0 2.3.85 3.55.85s2.1-.9 3.8-.85c1.45.05 2.75.65 3.65 1.7-3.05 1.8-2.55 6 .65 7.4-.7 1.7-1.6 3.4-2.75 4.85zM12.03 5.48c-.05-1.85 1.55-3.65 3.35-3.7.25 1.95-1.7 3.8-3.35 3.7z" />
               </svg>
             </button>
           </div>
 
-          <p className="mt-8 text-center text-sm text-[#a1a1aa]">
+          <p className="mt-8 text-center text-sm text-secondary">
             Already have an account?{' '}
             <button
               onClick={() => navigate('/login')}
-              className="text-[#FFD700] font-semibold hover:text-[#FFE44D] hover:underline transition-colors"
+              className="text-primary font-semibold hover:underline transition-colors"
             >
               Log in
             </button>

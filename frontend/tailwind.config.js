@@ -17,31 +17,56 @@ export default {
         headline: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Material Design 3 Color Palette
-        primary: '#755b00',
-        'primary-container': '#ffca0d',
-        'primary-fixed': '#ffdf90',
-        'primary-fixed-dim': '#f3c000',
-        'on-primary-fixed': '#241a00',
+        // Material Design 3 Color Palette mapped to CSS variables
+        primary: 'var(--primary)',
+        'primary-container': 'var(--primary-container)',
+        'primary-fixed': 'var(--primary-fixed)',
+        'primary-fixed-dim': 'var(--primary-fixed-dim)',
+        'on-primary-fixed': 'var(--on-primary-fixed)',
         
-        secondary: '#5f5e61',
-        'secondary-fixed-dim': '#c8c6c9',
+        secondary: 'var(--secondary)',
+        'secondary-fixed-dim': 'var(--secondary-fixed-dim)',
         
-        surface: '#fbf8fc',
-        'surface-bright': '#fbf8fc',
-        'surface-container': '#f0edf1',
-        'surface-container-low': '#f5f3f6',
-        'surface-container-lowest': '#ffffff',
-        'surface-container-high': '#eae7eb',
-        'surface-container-highest': '#e4e1e5',
-        'surface-variant': '#e4e1e5',
+        surface: 'var(--surface)',
+        'surface-bright': 'var(--surface-bright)',
+        'surface-container': 'var(--surface-container)',
+        'surface-container-low': 'var(--surface-container-low)',
+        'surface-container-lowest': 'var(--surface-container-lowest)',
+        'surface-container-high': 'var(--surface-container-high)',
+        'surface-container-highest': 'var(--surface-container-highest)',
+        'surface-variant': 'var(--surface-variant)',
         
-        'on-surface': '#1b1b1e',
-        'on-surface-variant': '#4e4632',
-        background: '#fbf8fc',
-        'outline-variant': '#d2c5ab',
-        error: '#ba1a1a',
-        'inverse-surface': '#303033',
+        'on-surface': 'var(--on-surface)',
+        'on-surface-variant': 'var(--on-surface-variant)',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        'outline-variant': 'var(--outline-variant)',
+        error: 'var(--error)',
+        'inverse-surface': 'var(--inverse-surface)',
+        
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)'
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)'
+        },
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)'
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)'
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)'
+        },
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
       },
       keyframes: {
         'float': {

@@ -4,7 +4,7 @@ import sys
 
 # Append project dir so django finds settings
 sys.path.append(os.path.dirname(os.path.abspath(__line__ if '__line__' in locals() else __file__)))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'presently.settings')
 django.setup()
 
 from django.core.mail import send_mail
@@ -21,7 +21,7 @@ def test_email():
             subject='Presently App Email Test',
             message='This is a test email sent from Presently via SMTP (Brevo).',
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=['getpresently.io@gmail.com'], # test sending to self
+            recipient_list=['getpresently.io@gmail.com', 'sayojami2007@gmail.com'], # test sending to self
             fail_silently=False,
         )
         print(f"Success: send_mail returned {sent}")
