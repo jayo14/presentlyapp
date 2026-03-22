@@ -308,11 +308,60 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [isBootstrapping, setIsBootstrapping] = useState(true);
+
+  const getHealthEndpoint = () => {
+    const rawApi = (import.meta.env.VITE_API_URL || 'http://localhost:8000').trim().replace(/\/+$/, '');
+    const apiBase = /\/api$/i.test(rawApi) ? rawApi : `${rawApi}/api`;
+    return `${apiBase}/health/`;
+  };
+
   // Initialize offline sync manager
   useEffect(() => {
     offlineSyncManager.init();
     return () => offlineSyncManager.cleanup();
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const wakeServer = async () => {
+      const minimumSplashMs = 2200;
+      const requestTimeoutMs = 5000;
+      const startedAt = Date.now();
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), requestTimeoutMs);
+
+      try {
+        await fetch(getHealthEndpoint(), {
+          method: 'GET',
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+      } catch (err) {
+        console.log('Waking server...');
+      } finally {
+        window.clearTimeout(timeoutId);
+        const elapsed = Date.now() - startedAt;
+        const remaining = Math.max(0, minimumSplashMs - elapsed);
+        window.setTimeout(() => {
+          if (isMounted) {
+            setIsBootstrapping(false);
+          }
+        }, remaining);
+      }
+    };
+
+    wakeServer();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (isBootstrapping) {
+    return <LoadingScreen message="Preparing your dashboard..." />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
