@@ -138,11 +138,10 @@ export const LandingPage: React.FC = () => {
       >
         {/* ── NAV ──────────────────────────────────────────────────────────── */}
         <nav
-          className={`transition-all duration-300 fixed left-0 right-0 z-50 ${
-            isScrolled 
-              ? 'dark:bg-background/90 dark:border-outline/10 shadow-lg' 
-              : ''
-          }`}
+          className={`transition-all duration-300 fixed left-0 right-0 z-50 ${isScrolled
+            ? 'dark:bg-background/90 dark:border-outline/10 shadow-lg'
+            : ''
+            }`}
           style={{
             top: 0,
             width: isScrolled ? 'calc(100% - 2rem)' : '100%',
@@ -867,9 +866,8 @@ export const LandingPage: React.FC = () => {
                 ].map(({ icon, title, desc }) => (
                   <div
                     key={title}
-                    className="fade-up hover-lift"
+                    className="fade-up hover-lift col-span-1 md:col-span-6 xl:col-span-4"
                     style={{
-                      gridColumn: 'span 4',
                       background: 'var(--surface-container-lowest)',
                       padding: '2rem',
                       borderRadius: '2rem',
@@ -1850,7 +1848,8 @@ export const LandingPage: React.FC = () => {
                       width: size,
                       height: size,
                       borderRadius: '50%',
-                      border: '1px solid rgba(251,248,252,0.08)',
+                      border: '1px solid var(--background)',
+                      opacity: 0.15,
                       pointerEvents: 'none',
                     }}
                   />
@@ -1934,54 +1933,44 @@ export const LandingPage: React.FC = () => {
               gap: '2rem',
             }}
           >
-            <div>
+            <div className='flex flex-col gap-2'>
               <Logo />
-              <div
-                className="font-headline"
-                style={{
-                  fontWeight: 700,
-                  fontSize: '1.1rem',
-                  marginBottom: '0.35rem',
-                  color: 'var(--on-surface)',
-                }}
-              >
-                Presently
-              </div>
+
               <p style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>
-                © {new Date().getFullYear()} Presently Editorial Systems.
+                © {new Date().getFullYear()} Presently |
                 All rights reserved.
               </p>
             </div>
 
             <div
-  style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}
->
-  {[
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Security', href: '/security' },
-    { label: 'Contact', href: '/contact' },
-  ].map((link) => (
-    <a
-      key={link.label}
-      href={link.href}
-      style={{
-        fontSize: '0.75rem',
-        color: 'var(--secondary)',
-        textDecoration: 'none',
-        transition: 'color 0.2s',
-      }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.color = 'var(--primary-container)')
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.color = 'var(--secondary)')
-      }
-    >
-      {link.label}
-    </a>
-  ))}
-</div>
+              style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}
+            >
+              {[
+                { label: 'Privacy Policy', href: '/privacy' },
+                { label: 'Terms of Service', href: '/terms' },
+                { label: 'Security', href: '/security' },
+                { label: 'Contact', href: '/contact' },
+              ].map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  style={{
+                    fontSize: '0.75rem',
+                    color: 'var(--secondary)',
+                    textDecoration: 'none',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = 'var(--primary-container)')
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = 'var(--secondary)')
+                  }
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               <Tooltip>
