@@ -93,11 +93,22 @@ class NewsletterSubscribeView(APIView):
             return Response({'error': str(message)}, status=status_code)
 
         source = serializer.validated_data.get('source') or 'blog'
-        subscriber = NewsletterSubscriber.objects.create(
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(
             email=serializer.validated_data['email'],
-            source=source,
-            is_active=True,
+            defaults={
+                'source': source,
+                'is_active': True,
+            },
         )
+
+        if not created and subscriber.is_active:
+            return Response({'error': 'Already subscribed'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not created and not subscriber.is_active:
+            subscriber.is_active = True
+            subscriber.source = source
+            subscriber.save(update_fields=['is_active', 'source'])
+
         if not subscriber.subscribed_at:
             subscriber.subscribed_at = timezone.now()
             subscriber.save(update_fields=['subscribed_at'])
