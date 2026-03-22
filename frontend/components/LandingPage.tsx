@@ -31,6 +31,8 @@ import {
 } from '@/components/ui/tooltip';
 import { SEO } from './SEO';
 import { Logo } from './Logo';
+import { JsonLd } from './seo/JsonLd';
+import { SITE_URL } from './seo/seoConfig';
 
 // ─── Global Styles ────────────────────────────────────────────────────────────
 // The app relies on the global index.css loaded at the root.
@@ -87,18 +89,31 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   useFadeOnScroll();
 
+  const softwareSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Presently',
+    applicationCategory: 'EducationalApplication',
+    operatingSystem: 'Web, Android, iOS',
+    description: 'GPS-verified real-time attendance system for Nigerian universities',
+    url: SITE_URL,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'NGN' },
+    provider: { '@type': 'Organization', name: 'Presently', url: SITE_URL },
+  };
+
   const goRegister = () => navigate('/register');
   const goLogin = () => navigate('/login');
 
   return (
     <TooltipProvider>
       <SEO
-        title="Presently | Smart Attendance Management for Institutions"
-        description="Presently helps institutions manage attendance with GPS verification, anti-proxy protection, real-time analytics, and audit-ready compliance workflows."
-        keywords="presently, attendance management, university attendance software, GPS attendance tracking, academic compliance platform, education analytics"
-        url="https://presentlyapp.vercel.app/"
-        image="https://presentlyapp.vercel.app/og-image.png"
+        title="Presently — GPS-Verified Attendance for Nigerian Universities"
+        description="Real-time, location-verified attendance system built for Nigerian university lecturers and students. No proxies. No paper registers."
+        keywords="nigerian university attendance system, gps verified attendance, campus attendance software, anti proxy attendance"
+        canonicalPath="/"
       />
+      {/* SEO: Homepage SoftwareApplication JSON-LD. */}
+      <JsonLd schema={softwareSchema} />
       <div
         style={{
           background: 'var(--background)',

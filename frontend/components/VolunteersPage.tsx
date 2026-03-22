@@ -10,6 +10,7 @@ import { Button } from './Button';
 import { Logo } from './Logo';
 import { Input } from './Input';
 import { LandingHeader } from './LandingHeader';
+import { SEO } from './SEO';
 
 const roles = [
   { id: 'backend', title: 'Backend Developer', icon: Code, desc: 'Scaling our Python/Django infrastructure and API security.' },
@@ -60,6 +61,12 @@ export const VolunteersPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-textMuted font-sans selection:bg-primary selection:text-on-primary-fixed overflow-x-hidden">
+      {/* SEO: Page metadata for volunteer route. */}
+      <SEO
+        title="Volunteers"
+        description="Join Presently as a volunteer and help build GPS-verified attendance infrastructure for Nigerian universities."
+        canonicalPath="/volunteers"
+      />
       <LandingHeader />
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-start">

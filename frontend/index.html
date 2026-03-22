@@ -5,43 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-78VRQFZFKQ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-78VRQFZFKQ');
-  </script>
-
   <!-- Resource Hints for Performance -->
   <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin />
   <link rel="dns-prefetch" href="https://server.arcgisonline.com" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
 
-  <!-- Theme Initialization Script - Must run before page render to prevent flash -->
-  <script>
-    (function () {
-      const savedTheme = localStorage.getItem('vite-ui-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-        document.documentElement.classList.add('dark');
-      }
-    })();
-  </script>
-
-  <!-- Define g to prevent ReferenceError if used by third-party scripts -->
-  <script>
-    window.g = window.g || function() {};
-    var g = window.g;
-  </script>
-
+  <!-- SEO: Global metadata baseline for public pages. -->
   <!-- Primary Meta Tags -->
-  <title>Presently | Smart Attendance Management System</title>
-  <meta name="title" content="Presently | Smart Attendance Management System" />
+  <title>Presently — GPS-Verified Attendance for Nigerian Universities</title>
+  <meta name="title" content="Presently — GPS-Verified Attendance for Nigerian Universities" />
   <meta name="description"
-    content="Modern, intelligent attendance tracking system for educational institutions. Track attendance with GPS verification, real-time analytics, and AI-powered insights." />
-  <meta name="keywords" content="attendance, tracking, education, GPS, analytics, student, lecturer, institution" />
+    content="Real-time, location-verified attendance system built for Nigerian university lecturers and students. No proxies. No paper registers." />
+  <meta name="keywords" content="gps attendance, nigerian universities, campus attendance system, anti proxy attendance" />
   <meta name="author" content="John A. Samuel (CodeGallantX)" />
   <meta name="creator" content="John A. Samuel (CodeGallantX)" />
   <meta name="publisher" content="Presently" />
@@ -57,19 +31,20 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.getpresently.com.ng" />
-  <meta property="og:title" content="Presently | Smart Attendance Management System" />
+  <meta property="og:title" content="Presently — GPS-Verified Attendance for Nigerian Universities" />
   <meta property="og:description"
-    content="Modern, intelligent attendance tracking system for educational institutions." />
-  <meta property="og:image" content="https://www.getpresently.com.ng/og-image.png" />
+    content="Real-time, location-verified attendance system built for Nigerian university lecturers and students. No proxies. No paper registers." />
+  <meta property="og:image" content="https://www.getpresently.com.ng/og-image.svg" />
   <meta property="og:site_name" content="Presently" />
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
   <meta property="twitter:url" content="https://www.getpresently.com.ng" />
-  <meta property="twitter:title" content="Presently | Smart Attendance Management System" />
+  <meta property="twitter:title" content="Presently — GPS-Verified Attendance for Nigerian Universities" />
   <meta property="twitter:description"
-    content="Modern, intelligent attendance tracking system for educational institutions." />
-  <meta property="twitter:image" content="https://www.getpresently.com.ng/og-image.png" />
+    content="Real-time, location-verified attendance system built for Nigerian university lecturers and students. No proxies. No paper registers." />
+  <meta property="twitter:image" content="https://www.getpresently.com.ng/og-image.svg" />
+  <meta name="twitter:site" content="@PresentlyNG" />
 
   <!-- Canonical URL -->
   <link rel="canonical" href="https://www.getpresently.com.ng" />
@@ -86,21 +61,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="./favicon.ico" />
 
-  <!-- Performance: Preconnect to external domains -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
   <!-- Performance: DNS Prefetch for map tiles -->
   <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
   <link rel="dns-prefetch" href="https://server.arcgisonline.com" />
   <link rel="dns-prefetch" href="https://unpkg.com" />
-
-  <!-- Font loading with display=swap for better FCP - Use swap for immediate text display -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"
-    media="print" onload="this.media='all'" />
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  </noscript>
 
   <!-- Preload critical resources -->
   <link rel="preload" href="/icon-192.png" as="image" type="image/png" />
@@ -115,7 +79,7 @@
     }
 
     body {
-      font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #09090b;
       color: #f4f4f5;
       min-height: 100vh;

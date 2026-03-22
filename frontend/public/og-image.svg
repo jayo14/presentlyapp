@@ -1,0 +1,11 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#121212"/>
+  <rect x="48" y="48" width="1104" height="534" rx="28" fill="#1e1e1e" stroke="#3a3a3a"/>
+  <circle cx="130" cy="118" r="14" fill="#ffca0d"/>
+  <text x="170" y="132" fill="#f5f5f5" font-family="DM Sans, Arial, sans-serif" font-size="42" font-weight="700">Presently</text>
+  <text x="100" y="250" fill="#f5f5f5" font-family="DM Sans, Arial, sans-serif" font-size="68" font-weight="700">GPS-Verified Attendance</text>
+  <text x="100" y="320" fill="#cfc6b0" font-family="DM Sans, Arial, sans-serif" font-size="40" font-weight="500">for Nigerian Universities</text>
+  <text x="100" y="420" fill="#cfc6b0" font-family="DM Sans, Arial, sans-serif" font-size="30" font-weight="400">Real-time • Anti-proxy • Compliance-ready</text>
+  <rect x="100" y="470" width="320" height="66" rx="14" fill="#ffca0d"/>
+  <text x="130" y="512" fill="#241a00" font-family="DM Sans, Arial, sans-serif" font-size="30" font-weight="700">presently.ng</text>
+</svg>
