@@ -588,7 +588,7 @@ export const LandingPage: React.FC = () => {
             }}
           >
             <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-              <div className="fade-up text-center lg:text-left" style={{ marginBottom: '3rem', marginBottom: 'clamp(2rem, 5vw, 5rem)' }}>
+              <div className="fade-up text-center lg:text-left" style={{ marginBottom: 'clamp(2rem, 5vw, 5rem)' }}>
                 <h2
                   className="font-headline text-3xl sm:text-4xl md:text-5xl"
                   style={{
