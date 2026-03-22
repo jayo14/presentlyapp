@@ -691,7 +691,20 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       venues.forEach((v) => {
         if (v.latitude && v.longitude) bounds.extend([Number(v.longitude), Number(v.latitude)]);
       });
-      if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 60, maxZoom: 16 });
+      if (!bounds.isEmpty()) {
+        try {
+          map.fitBounds(bounds, { padding: 60, maxZoom: 16 });
+        } catch (error) {
+          // If map cannot fit bounds (e.g., too small container), fall back to first venue
+          const firstVenue = venues.find(v => v.latitude && v.longitude);
+          if (firstVenue) {
+            map.flyTo({
+              center: [Number(firstVenue.longitude), Number(firstVenue.latitude)],
+              zoom: 14,
+            });
+          }
+        }
+      }
     }
   }, [venues, activeSessions, selectedVenue, mapReady, renderVenueMarkers]);
 

@@ -28,8 +28,6 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCollegeModal, setShowCollegeModal] = useState(false);
-  | null>(null);
-  
   const [selectedCollege, setSelectedCollege] = useState<College | null>(null);
 
   useEffect(() => {
