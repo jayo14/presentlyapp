@@ -182,6 +182,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               { id: 'institutions', icon: Building2, label: 'Institutions' },
               { id: 'courses', icon: BookOpen, label: 'Courses' },
               { id: 'venues', icon: Map, label: 'Venues & Maps' },
+              { id: 'blog', icon: FileText, label: 'Blog management' },
             ],
           },
           {
@@ -561,19 +562,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             },
             ...(userRole === UserRole.ADMIN
               ? [{
-                  id: 'users',
-                  label: 'Users',
-                  active: currentPage === 'users',
-                  onClick: () => handleNavClick('users'),
-                  icon: <Users size={22} />,
-                } as DockItem]
+                id: 'users',
+                label: 'Users',
+                active: currentPage === 'users',
+                onClick: () => handleNavClick('users'),
+                icon: <Users size={22} />,
+              } as DockItem]
               : [{
-                  id: 'courses',
-                  label: 'Courses',
-                  active: currentPage === 'courses',
-                  onClick: () => handleNavClick('courses'),
-                  icon: <GraduationCap size={22} />,
-                } as DockItem]
+                id: 'courses',
+                label: 'Courses',
+                active: currentPage === 'courses',
+                onClick: () => handleNavClick('courses'),
+                icon: <GraduationCap size={22} />,
+              } as DockItem]
             ),
             {
               id: 'analytics',
@@ -584,19 +585,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             },
             userRole === UserRole.STUDENT
               ? ({
-                  id: 'notifications',
-                  label: 'Alerts',
-                  active: currentPage === 'notifications',
-                  onClick: () => handleNavClick('notifications'),
-                  icon: <Bell size={22} />,
-                } as DockItem)
+                id: 'notifications',
+                label: 'Alerts',
+                active: currentPage === 'notifications',
+                onClick: () => handleNavClick('notifications'),
+                icon: <Bell size={22} />,
+              } as DockItem)
               : ({
-                  id: 'profile',
-                  label: 'Profile',
-                  active: currentPage === 'profile',
-                  onClick: () => handleNavClick('profile'),
-                  icon: <User size={22} />,
-                } as DockItem),
+                id: 'profile',
+                label: 'Profile',
+                active: currentPage === 'profile',
+                onClick: () => handleNavClick('profile'),
+                icon: <User size={22} />,
+              } as DockItem),
           ]}
         />
       </div>
