@@ -202,8 +202,10 @@ export const BlogPostPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-text relative selection:bg-primaryContainer selection:text-primary overflow-hidden">
+      {/* Decorative Blobs */}
+      <div className="pointer-events-none absolute -right-20 top-20 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
+      <div className="pointer-events-none absolute -left-40 top-1/2 h-[700px] w-[700px] rounded-full bg-primary/5 blur-[150px]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-primary/5 from-10% to-transparent to-100%" />
-      <div className="pointer-events-none absolute -left-40 top-40 h-96 w-96 rounded-full bg-primary/5 blur-[120px]" />
       
       {/* SEO: Per-article metadata and Article schema */}
       <BlogSEO
@@ -217,37 +219,76 @@ export const BlogPostPage: React.FC = () => {
 
       <LandingHeader />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-24 md:px-6 lg:px-8">
-        <div className="mb-12">
+      <main className="relative z-10 mx-auto max-w-7xl px-4 py-32 md:px-6 lg:px-8">
+        <div className="mb-16">
           <PostHeader post={post} />
         </div>
 
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_300px]">
-          <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-headline prose-headings:text-text prose-a:text-primary hover:prose-a:underline prose-code:text-primary prose-pre:bg-surface prose-pre:border prose-pre:border-outline/10 prose-img:rounded-3xl prose-img:shadow-2xl">
-            <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }} />
-
-            <div className="mt-12 flex flex-wrap gap-3 border-t border-outline/10 pt-8">
-              {post.tags.map((tag) => (
-                <TagBadge key={tag.slug} tag={tag} />
-              ))}
+        <div className="grid gap-16 lg:grid-cols-[1fr_320px]">
+          <div className="relative">
+            {/* Social Share Sidebar (Desktop Only) */}
+            <div className="hidden xl:block absolute -left-20 top-0 sticky top-40 space-y-4">
+              <ShareButtons vertical slug={post.slug} title={post.title} />
             </div>
 
-            <ShareButtons slug={post.slug} title={post.title} />
-          </article>
+            <article className="prose prose-lg dark:prose-invert max-w-none 
+              prose-headings:font-headline prose-headings:text-text prose-headings:tracking-tight
+              prose-h1:text-5xl prose-h1:font-black
+              prose-h2:text-4xl prose-h2:font-extrabold
+              prose-p:text-textMuted prose-p:leading-relaxed
+              prose-a:text-primary prose-a:font-bold hover:prose-a:underline 
+              prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1.5 prose-code:rounded
+              prose-pre:bg-surface/60 prose-pre:border prose-pre:border-outline/10 prose-pre:backdrop-blur-sm
+              prose-img:rounded-[2.5rem] prose-img:shadow-2xl prose-img:border prose-img:border-outline/10
+              prose-blockquote:border-l-primary prose-blockquote:bg-surfaceHigh/40 prose-blockquote:py-2 prose-blockquote:rounded-r-2xl
+            ">
+              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }} />
+
+              <div className="mt-16 flex flex-wrap gap-3 border-t border-outline/10 pt-10">
+                <span className="text-xs font-bold uppercase tracking-widest text-textMuted mr-2 self-center">Tags:</span>
+                {post.tags.map((tag) => (
+                  <TagBadge key={tag.slug} tag={tag} />
+                ))}
+              </div>
+
+              <div className="mt-12 xl:hidden">
+                <ShareButtons slug={post.slug} title={post.title} />
+              </div>
+            </article>
+          </div>
 
           <aside className="hidden lg:block">
-            <div className="sticky top-24">
+            <div className="sticky top-40 space-y-8">
               <TableOfContents content={post.content} />
+              
+              <div className="rounded-[2rem] border border-outline/10 bg-surface/40 backdrop-blur-md p-8">
+                <h4 className="font-headline text-lg font-bold text-text mb-4">About the Author</h4>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-14 w-14 rounded-full bg-surfaceHigh flex items-center justify-center font-black text-xl text-text border border-outline/10">
+                    {post.author_name.slice(0, 1).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-bold text-text">{post.author_name}</p>
+                    <p className="text-xs text-textMuted">Presently Contributor</p>
+                  </div>
+                </div>
+                <p className="text-sm text-textMuted leading-relaxed">
+                  Passionate about the intersection of education and technology in modern Nigeria.
+                </p>
+              </div>
             </div>
           </aside>
         </div>
 
-        <div className="mt-20 border-t border-outline/10 pt-16">
-          <h3 className="mb-8 font-headline text-3xl font-bold text-text">Read Next</h3>
+        <div className="mt-32 border-t border-outline/10 pt-20">
+          <div className="flex items-center justify-between mb-12">
+            <h3 className="font-headline text-4xl font-black text-text tracking-tight">Read Next</h3>
+            <Link to="/blog" className="text-primary font-bold hover:underline">View all articles →</Link>
+          </div>
           <RelatedPosts currentSlug={post.slug} tags={post.tags.map((tag) => tag.slug)} />
         </div>
 
-        <section className="mt-24">
+        <section className="mt-32">
           <NewsletterSignup source={post.slug} />
         </section>
       </main>
