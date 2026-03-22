@@ -16,12 +16,23 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeAnchor, setActiveAnchor] = useState('');
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems = [
     { label: 'Solutions', to: '/#solutions', anchorId: 'solutions', match: { pathname: '/', hash: '#solutions' } },
     { label: 'Pricing', to: '/#pricing', anchorId: 'pricing', match: { pathname: '/', hash: '#pricing' } },
+    { label: 'Blog', to: '/blog', match: { pathname: '/blog' } },
     { label: 'Documentation', to: '/documentation', match: { pathname: '/documentation' } },
     { label: 'Volunteers', to: '/volunteers', match: { pathname: '/volunteers' } },
   ];
@@ -81,14 +92,24 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   };
 
   const glassHeaderStyle: React.CSSProperties = {
-    background:
-      'color-mix(in srgb, var(--surface-container-low) 74%, transparent)',
-    borderColor:
-      'color-mix(in srgb, var(--outline-variant) 36%, transparent)',
-    boxShadow:
-      '0 1px 12px color-mix(in srgb, var(--inverse-surface) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-container-highest) 34%, transparent)',
-    backdropFilter: 'blur(18px) saturate(120%)',
-    WebkitBackdropFilter: 'blur(18px) saturate(120%)',
+    top: 0,
+    left: 0,
+    right: 0,
+    margin: isScrolled ? '1rem auto 0' : '0 auto',
+    width: isScrolled ? 'calc(100% - 2rem)' : '100%',
+    maxWidth: isScrolled ? '1440px' : '100%',
+    borderRadius: isScrolled ? '1rem' : '0',
+    background: isScrolled
+      ? 'color-mix(in srgb, var(--surface-container-low) 74%, transparent)'
+      : 'transparent',
+    borderColor: isScrolled
+      ? 'color-mix(in srgb, var(--outline-variant) 36%, transparent)'
+      : 'transparent',
+    boxShadow: isScrolled
+      ? '0 10px 28px color-mix(in srgb, var(--inverse-surface) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-container-highest) 34%, transparent)'
+      : 'none',
+    backdropFilter: isScrolled ? 'blur(18px) saturate(120%)' : 'none',
+    WebkitBackdropFilter: isScrolled ? 'blur(18px) saturate(120%)' : 'none',
   };
 
   const glassMenuStyle: React.CSSProperties = {
@@ -100,7 +121,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 
   return (
     <nav
-      className="fixed top-0 w-full z-50 border-b py-4 md:py-6 transition-all"
+      className="fixed z-50 transition-all duration-300 border-b py-4"
       style={glassHeaderStyle}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
