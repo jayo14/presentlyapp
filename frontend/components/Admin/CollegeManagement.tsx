@@ -5,7 +5,6 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Institution, College } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
-import CollegeModal from './CollegeModal';
 import { DepartmentManagement } from './DepartmentManagement';
 
 interface CollegeWithStats extends College {
@@ -100,23 +99,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
     navigate(`/dashboard/institutions/${id}/colleges/${college.id}/edit`);
   };
 
-  const handleSaveCollege = async (formData: Partial<College>) => {
-    try {
-      if (editingCollege) {
-        await institutionsApi.updateCollege(editingCollege.id, formData);
-      } else {
-        await institutionsApi.createCollege({
-          ...formData,
-          institution: institution.id,
-        } as Omit<College, 'id'>);
-      }
-      await loadColleges();
-      setShowCollegeModal(false);
-    } catch (err) {
-      setError('Failed to save college');
-      console.error(err);
-    }
-  };
+
 
   const handleDeleteCollege = async (id: number) => {
     if (!confirm('Are you sure you want to delete this college? This will also delete all departments within it.')) {
