@@ -25,13 +25,10 @@ export const RelatedPosts: React.FC<RelatedPostsProps> = ({ currentSlug, tags })
   if (!posts.length) return null;
 
   return (
-    <section className="mt-14">
-      <h2 className="font-headline text-2xl font-bold text-white">Related posts</h2>
-      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {posts.map((post) => (
-          <PostCard key={post.slug} post={post} />
-        ))}
-      </div>
-    </section>
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {posts.map((post) => (
+        <PostCard key={post.slug} post={post} />
+      ))}
+    </div>
   );
 };

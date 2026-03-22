@@ -34,24 +34,28 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => 
   if (!headings.length) return null;
 
   return (
-    <aside className="sticky top-24 rounded-xl border border-zinc-800 bg-[#101827] p-4">
-      <h3 className="font-headline text-sm font-bold uppercase tracking-wide text-zinc-200">Table of contents</h3>
-      <ul className="mt-3 space-y-2">
+    <div className="rounded-2xl border border-outline/10 bg-surface/40 backdrop-blur-md p-6">
+      <h3 className="font-headline text-xs font-bold uppercase tracking-[0.2em] text-textMuted mb-6">In this article</h3>
+      <ul className="space-y-4">
         {headings.map((heading) => (
-          <li key={heading.id}>
+          <li key={heading.id} style={{ paddingLeft: heading.level === 3 ? '1rem' : '0' }}>
             <a
               href={`#${heading.id}`}
               className={[
-                'block text-sm transition-colors',
-                heading.level === 3 ? 'pl-4' : 'pl-1',
-                activeId === heading.id ? 'text-[#00FF94]' : 'text-zinc-400 hover:text-zinc-200',
+                'block text-sm transition-all duration-300 relative',
+                activeId === heading.id 
+                  ? 'text-primary font-bold translate-x-1' 
+                  : 'text-textMuted hover:text-text hover:translate-x-1',
               ].join(' ')}
             >
+              {activeId === heading.id && (
+                <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary/40" />
+              )}
               {heading.text}
             </a>
           </li>
         ))}
       </ul>
-    </aside>
+    </div>
   );
 };
