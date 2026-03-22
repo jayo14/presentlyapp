@@ -37,6 +37,7 @@ import { SEO } from './SEO';
 import { Logo } from './Logo';
 import { JsonLd } from './seo/JsonLd';
 import { SITE_URL } from './seo/seoConfig';
+import { LandingFooter } from './LandingFooter';
 
 // ─── Global Styles ────────────────────────────────────────────────────────────
 // The app relies on the global index.css loaded at the root.
@@ -147,10 +148,11 @@ export const LandingPage: React.FC = () => {
             width: isScrolled ? 'calc(100% - 2rem)' : '100%',
             maxWidth: isScrolled ? 1440 : '100%',
             margin: isScrolled ? '1rem auto 0' : '0 auto',
-            background: isScrolled ? 'var(--surface, rgba(251,248,252,0.84))' : 'transparent',
-            backdropFilter: isScrolled ? 'blur(20px)' : 'none',
-            WebkitBackdropFilter: isScrolled ? 'blur(20px)' : 'none',
-            border: isScrolled ? '1px solid var(--outline, rgba(210,197,171,0.12))' : 'none',
+            background: isScrolled ? 'color-mix(in srgb, var(--surface-container-low) 74%, transparent)' : 'transparent',
+            backdropFilter: isScrolled ? 'blur(18px) saturate(120%)' : 'none',
+            WebkitBackdropFilter: isScrolled ? 'blur(18px) saturate(120%)' : 'none',
+            border: isScrolled ? '1px solid color-mix(in srgb, var(--outline-variant) 36%, transparent)' : 'none',
+            boxShadow: isScrolled ? '0 10px 28px color-mix(in srgb, var(--inverse-surface) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-container-highest) 34%, transparent)' : 'none',
             borderRadius: isScrolled ? '1rem' : 0,
           }}
         >
@@ -650,11 +652,11 @@ export const LandingPage: React.FC = () => {
               </div>
 
               <div
-                className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8"
+                className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 md:gap-8"
               >
                 {/* Analytics card */}
                 <div
-                  className="fade-up hover-lift lg:col-span-8"
+                  className="fade-up hover-lift col-span-1 md:col-span-12 lg:col-span-8"
                   style={{
                     background: 'var(--surface-container-lowest)',
                     padding: 'clamp(1.5rem, 4vw, 2.5rem)',
@@ -722,6 +724,7 @@ export const LandingPage: React.FC = () => {
                   </div>
                   {/* Mini chart */}
                   <div
+                    className="hidden sm:block"
                     style={{
                       position: 'absolute',
                       bottom: 32,
@@ -776,7 +779,7 @@ export const LandingPage: React.FC = () => {
 
                 {/* Biometric card */}
                 <div
-                  className="fade-up hover-lift lg:col-span-4"
+                  className="fade-up hover-lift col-span-1 md:col-span-12 lg:col-span-4"
                   style={{
                     background: 'var(--primary)',
                     padding: 'clamp(1.5rem, 4vw, 2.5rem)',
@@ -866,7 +869,7 @@ export const LandingPage: React.FC = () => {
                 ].map(({ icon, title, desc }) => (
                   <div
                     key={title}
-                    className="fade-up hover-lift col-span-1 md:col-span-6 xl:col-span-4"
+                    className="fade-up hover-lift col-span-1 md:col-span-4"
                     style={{
                       background: 'var(--surface-container-lowest)',
                       padding: '2rem',
