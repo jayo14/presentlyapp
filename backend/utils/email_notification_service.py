@@ -1,11 +1,13 @@
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
+
 
 def _send_smtp_email(
     *,
@@ -21,6 +23,7 @@ def _send_smtp_email(
             if not template_name:
                 raise ValueError("template_name is required when html_content is not provided")
             html_content = render_to_string(template_name, context or {})
+
         text_content = strip_tags(html_content)
         message = EmailMultiAlternatives(
             subject=subject,
@@ -35,8 +38,9 @@ def _send_smtp_email(
         logger.error("SMTP email failed for %s: %s", to_email, exc, exc_info=True)
         return False
 
-class NovuService:
-    """Service for sending notifications through SMTP (previously Novu). Kept name for backwards compat."""
+
+class EmailNotificationService:
+    """Service for sending email notifications via SMTP."""
 
     @staticmethod
     def send_email_verification_otp(user_id: str, user_email: str, user_name: str, otp_code: str) -> bool:
@@ -79,8 +83,13 @@ class NovuService:
         )
 
     @staticmethod
-    def send_new_device_alert(user_id: str, user_email: str, user_name: str,
-                              device_info: Dict[str, Any], ip_address: str) -> bool:
+    def send_new_device_alert(
+        user_id: str,
+        user_email: str,
+        user_name: str,
+        device_info: Dict[str, Any],
+        ip_address: str,
+    ) -> bool:
         """Send new device login alert notification."""
         return _send_smtp_email(
             to_email=user_email,
@@ -88,18 +97,23 @@ class NovuService:
             template_name="emails/new_device_alert.html",
             context={
                 "user": {"full_name": user_name},
-                "device_type": device_info.get('device_type', 'Unknown'),
-                "device_name": device_info.get('device_name', 'Unknown'),
-                "browser": device_info.get('browser', 'Unknown'),
-                "os": device_info.get('os', 'Unknown'),
+                "device_type": device_info.get("device_type", "Unknown"),
+                "device_name": device_info.get("device_name", "Unknown"),
+                "browser": device_info.get("browser", "Unknown"),
+                "os": device_info.get("os", "Unknown"),
                 "ip_address": ip_address,
-                "login_time": device_info.get('login_time', ''),
+                "login_time": device_info.get("login_time", ""),
             },
         )
 
     @staticmethod
-    def send_user_invitation(user_email: str, user_name: str, inviter_name: str,
-                             invitation_link: str, institution_name: str) -> bool:
+    def send_user_invitation(
+        user_email: str,
+        user_name: str,
+        inviter_name: str,
+        invitation_link: str,
+        institution_name: str,
+    ) -> bool:
         """Send user invitation email notification."""
         invitation_html = (
             "<html><body>"
@@ -117,9 +131,12 @@ class NovuService:
         )
 
     @staticmethod
-    def send_bulk_notification(notification_type: str, recipients: List[Dict[str, str]],
-                               payload: Dict[str, Any]) -> bool:
-        """Send bulk notifications to multiple users."""
+    def send_bulk_notification(
+        notification_type: str,
+        recipients: List[Dict[str, str]],
+        payload: Dict[str, Any],
+    ) -> bool:
+        """Send bulk notifications to multiple users via email."""
         results = [
             _send_smtp_email(
                 to_email=r.get("email", ""),
@@ -132,20 +149,39 @@ class NovuService:
 
     @staticmethod
     def is_available() -> bool:
-        """Check if service is available."""
+        """Check if email notification service is available."""
         return True
 
-# Convenience functions for backward compatibility
+
 def send_email_verification_otp(user_id: str, user_email: str, user_name: str, otp_code: str) -> bool:
-    return NovuService.send_email_verification_otp(user_id, user_email, user_name, otp_code)
+    return EmailNotificationService.send_email_verification_otp(user_id, user_email, user_name, otp_code)
+
 
 def send_password_reset(user_id: str, user_email: str, user_name: str, reset_link: str) -> bool:
-    return NovuService.send_password_reset(user_id, user_email, user_name, reset_link)
+    return EmailNotificationService.send_password_reset(user_id, user_email, user_name, reset_link)
 
-def send_new_device_alert(user_id: str, user_email: str, user_name: str,
-                          device_info: Dict[str, Any], ip_address: str) -> bool:
-    return NovuService.send_new_device_alert(user_id, user_email, user_name, device_info, ip_address)
 
-def send_user_invitation(user_email: str, user_name: str, inviter_name: str,
-                         invitation_link: str, institution_name: str) -> bool:
-    return NovuService.send_user_invitation(user_email, user_name, inviter_name, invitation_link, institution_name)
+def send_new_device_alert(
+    user_id: str,
+    user_email: str,
+    user_name: str,
+    device_info: Dict[str, Any],
+    ip_address: str,
+) -> bool:
+    return EmailNotificationService.send_new_device_alert(user_id, user_email, user_name, device_info, ip_address)
+
+
+def send_user_invitation(
+    user_email: str,
+    user_name: str,
+    inviter_name: str,
+    invitation_link: str,
+    institution_name: str,
+) -> bool:
+    return EmailNotificationService.send_user_invitation(
+        user_email,
+        user_name,
+        inviter_name,
+        invitation_link,
+        institution_name,
+    )
