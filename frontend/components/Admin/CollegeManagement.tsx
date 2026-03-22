@@ -28,7 +28,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCollegeModal, setShowCollegeModal] = useState(false);
-  const [editingCollege, setEditingCollege] = useState<College | null>(null);
+  | null>(null);
   
   const [selectedCollege, setSelectedCollege] = useState<College | null>(null);
 
@@ -317,12 +317,7 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
         </div>
       )}
 
-      {/* College Modal */}
-      {showCollegeModal && (
-        <CollegeModal institution={institution}
-          college={editingCollege || undefined}
-          onSave={handleSaveCollege}
-          onClose={() => setShowCollegeModal(false)}
+      
         />
       )}
     </div>

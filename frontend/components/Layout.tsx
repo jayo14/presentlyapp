@@ -284,7 +284,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {/* DESKTOP SIDEBAR */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-[68px]' : 'w-[240px]'} border-r border-outline/20 flex-col bg-surface/95 backdrop-blur-2xl text-foreground h-screen sticky top-0 transition-all duration-200 relative z-30`}>
+      <aside className={`hidden md:flex ${sidebarCollapsed ? 'w-[68px]' : 'w-[240px]'} border-r border-outline/20 flex-col bg-surface/70 backdrop-blur-[60px] text-foreground h-screen sticky top-0 transition-all duration-200 relative z-30`}>
         {/* Sidebar Header - Logo */}
         <div className={`h-14 flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'px-4'} border-b border-border flex-shrink-0`}>
           {sidebarCollapsed ? (
@@ -435,7 +435,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       )}
 
       {/* MOBILE SIDEBAR */}
-      <div className={`fixed inset-y-0 left-0 w-[280px] bg-surface/95 backdrop-blur-2xl text-foreground z-50 transform transition-transform duration-250 ease-out md:hidden flex flex-col border-r border-outline/20 shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 w-[280px] bg-surface/70 backdrop-blur-[60px] text-foreground z-50 transform transition-transform duration-250 ease-out md:hidden flex flex-col border-r border-outline/20 shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Mobile Sidebar Header */}
         <div className="h-14 flex justify-between items-center px-4 border-b border-outline flex-shrink-0">
           <Logo className="text-text" />

@@ -275,7 +275,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onChange={(e) => handleChange('full_name', e.target.value)}
                   onBlur={() => handleBlur('full_name')}
                   placeholder="e.g., Lagos State University of Science and Technology"
-                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
                     touched.full_name && validationErrors.full_name ? 'border-red-500' : ''
                   } ${touched.full_name && !validationErrors.full_name && formData.full_name ? 'border-green-500' : ''}`}
                   required
@@ -302,7 +302,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onChange={(e) => handleChange('short_name', e.target.value)}
                   onBlur={() => handleBlur('short_name')}
                   placeholder="e.g., LASUSTECH"
-                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
                     touched.short_name && validationErrors.short_name ? 'border-red-500' : ''
                   } ${touched.short_name && !validationErrors.short_name && formData.short_name ? 'border-green-500' : ''}`}
                   required
@@ -327,7 +327,7 @@ export const InstitutionFormPage: React.FC = () => {
                 value={formData.abbreviation || ''}
                 onChange={(e) => handleChange('abbreviation', e.target.value)}
                 placeholder="e.g., LST"
-                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
+                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
             <div>
@@ -335,7 +335,7 @@ export const InstitutionFormPage: React.FC = () => {
               <select
                 value={formData.institution_type || ''}
                 onChange={(e) => handleChange('institution_type', e.target.value)}
-                className="w-full h-12 px-4 bg-background text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-white dark:bg-surfaceLow text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="UNIVERSITY">University</option>
                 <option value="POLYTECHNIC">Polytechnic</option>
@@ -350,7 +350,7 @@ export const InstitutionFormPage: React.FC = () => {
                 value={formData.established_year || ''}
                 onChange={(e) => handleChange('established_year', parseInt(e.target.value))}
                 placeholder="e.g., 2021"
-                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
+                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
           </div>
@@ -373,7 +373,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onChange={(e) => handleChange('country', e.target.value)}
                   onBlur={() => handleBlur('country')}
                   placeholder="e.g., Nigeria"
-                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
                     touched.country && validationErrors.country ? 'border-red-500' : ''
                   } ${touched.country && !validationErrors.country && formData.country ? 'border-green-500' : ''}`}
                   required
@@ -398,7 +398,7 @@ export const InstitutionFormPage: React.FC = () => {
                 value={formData.state_province || ''}
                 onChange={(e) => handleChange('state_province', e.target.value)}
                 placeholder="e.g., Lagos"
-                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
+                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
             <div>
@@ -409,7 +409,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onChange={(e) => handleChange('city', e.target.value)}
                   onBlur={() => handleBlur('city')}
                   placeholder="e.g., Ikorodu"
-                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
                     touched.city && validationErrors.city ? 'border-red-500' : ''
                   } ${touched.city && !validationErrors.city && formData.city ? 'border-green-500' : ''}`}
                   required
@@ -434,7 +434,7 @@ export const InstitutionFormPage: React.FC = () => {
                 value={formData.postal_code || ''}
                 onChange={(e) => handleChange('postal_code', e.target.value)}
                 placeholder="e.g., 100001"
-                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
+                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
             <div className="md:col-span-2">
@@ -447,7 +447,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onBlur={() => handleBlur('address')}
                   placeholder="Full street address, building name, etc."
                   rows={3}
-                  className={`w-full px-4 py-3 bg-background text-text placeholder:text-textMuted border border-outline rounded-xl text-sm focus:outline-none focus:border-primary transition-colors resize-none ${
+                  className={`w-full px-4 py-3 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border border-outline rounded-xl text-sm focus:outline-none focus:border-primary transition-colors resize-none ${
                     touched.address && validationErrors.address ? 'border-red-500' : ''
                   } ${touched.address && !validationErrors.address && formData.address ? 'border-green-500' : ''}`}
                   required
@@ -470,7 +470,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onChange={(e) => handleChange('website_url', e.target.value)}
                   onBlur={() => handleBlur('website_url')}
                   placeholder="https://lasustech.edu.ng"
-                  className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                  className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
                     touched.website_url && validationErrors.website_url ? 'border-red-500' : ''
                   } ${touched.website_url && !validationErrors.website_url && formData.website_url ? 'border-green-500' : ''}`}
                 />
@@ -498,7 +498,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onChange={(e) => handleChange('contact_email', e.target.value)}
                   onBlur={() => handleBlur('contact_email')}
                   placeholder="info@lasustech.edu.ng"
-                  className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                  className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
                     touched.contact_email && validationErrors.contact_email ? 'border-red-500' : ''
                   } ${touched.contact_email && !validationErrors.contact_email && formData.contact_email ? 'border-green-500' : ''}`}
                 />
@@ -526,7 +526,7 @@ export const InstitutionFormPage: React.FC = () => {
                   onChange={(e) => handleChange('contact_phone', e.target.value)}
                   onBlur={() => handleBlur('contact_phone')}
                   placeholder="+234..."
-                  className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                  className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
                     touched.contact_phone && validationErrors.contact_phone ? 'border-red-500' : ''
                   } ${touched.contact_phone && !validationErrors.contact_phone && formData.contact_phone ? 'border-green-500' : ''}`}
                 />
@@ -561,7 +561,7 @@ export const InstitutionFormPage: React.FC = () => {
               <select
                 value={formData.accreditation_status || ''}
                 onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                className="w-full h-12 px-4 bg-background text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-white dark:bg-surfaceLow text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="ACCREDITED">Fully Accredited</option>
                 <option value="PROVISIONAL">Provisional</option>
