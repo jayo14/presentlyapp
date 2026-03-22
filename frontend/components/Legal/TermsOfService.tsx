@@ -3,12 +3,19 @@ import { ChevronRight, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LandingHeader } from '../LandingHeader';
 import { Logo } from '../Logo';
+import { SEO } from '../SEO';
 
 const TermsOfService: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background text-text flex flex-col">
+      {/* SEO: Legal page metadata for terms route. */}
+      <SEO
+        title="Terms of Service"
+        description="Read Presently terms of service for platform usage, account responsibilities, and compliance policies."
+        canonicalPath="/terms"
+      />
       {/* Header */}
       <LandingHeader onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />
       

@@ -1,11 +1,20 @@
 import React from 'react';
 import { FileQuestion, ArrowLeft, Home, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from './Button';
 import { motion } from 'framer-motion';
+import { SEO } from './SEO';
 
 export const NotFound: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   return (
     <div className="min-h-screen bg-cardackgroundlack text-text flex flex-col items-center justify-center p-6 relative overflow-hidden">
+                {/* SEO: Prevent indexing of not-found page. */}
+                <SEO
+                    title="Page Not Found"
+                    description="The page you requested does not exist on Presently."
+                    canonicalPath="/404"
+                    noIndex
+                />
         {/* Background blobs */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/5 rounded-full blur-[100px]"></div>
@@ -56,6 +65,11 @@ export const NotFound: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         Home
                     </Button>
                 </div>
+                                <div className="text-sm mt-3">
+                                    <Link to="/universities" className="text-primary hover:underline">
+                                        Browse University Pages
+                                    </Link>
+                                </div>
             </div>
             
             <div className="mt-12 pt-8 border-t border-outline w-full flex justify-between items-center text-xs text-textMuted font-mono">

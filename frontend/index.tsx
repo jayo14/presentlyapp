@@ -9,6 +9,30 @@ import { reportWebVitals } from './utils/reportWebVitals';
 import { Provider } from '@/components/ui/provider';
 import { getFirebaseAnalytics, isFirebaseConfigured } from './services/firebase/config';
 
+// SEO: Initialize theme class before first render without blocking head scripts.
+const initializeTheme = () => {
+  const savedTheme = localStorage.getItem('vite-ui-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    document.documentElement.classList.add('dark');
+  }
+};
+
+// SEO: Load analytics lazily after initial page load.
+const loadGtagLazy = () => {
+  const measurementId = 'G-78VRQFZFKQ';
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  document.head.appendChild(script);
+
+  (window as any).dataLayer = (window as any).dataLayer || [];
+  const gtag = (...args: unknown[]) => (window as any).dataLayer.push(args);
+  (window as any).gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', measurementId);
+};
+
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
@@ -54,6 +78,12 @@ const initializeFirebaseAnalytics = async () => {
 };
 
 void initializeFirebaseAnalytics();
+
+initializeTheme();
+
+window.addEventListener('load', () => {
+  loadGtagLazy();
+});
 
 // Register Service Worker in production only.
 // In development, stale SW caches can cause old chunks to be served and crash the app.

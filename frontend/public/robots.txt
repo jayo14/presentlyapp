@@ -1,26 +1,12 @@
-# Presently - Smart Attendance Management System
-# robots.txt
-
-# Allow all crawlers
 User-agent: *
 Allow: /
-
-# Disallow admin and private routes
-Disallow: /dashboard/
-Disallow: /admin/
+Allow: /blog
+Allow: /privacy
+Allow: /terms
+Allow: /volunteers
+Allow: /documentation
+Disallow: /dashboard
 Disallow: /api/
-Disallow: /onboarding/
-Disallow: /profile/
-Disallow: /settings/
+Disallow: /auth/
 
-# Allow public pages
-Allow: /
-Allow: /login
-Allow: /register
-Allow: /forgot-password
-
-# Sitemap location
-Sitemap: https://presentlyapp.vercel.app/sitemap.xml
-
-# Crawl-delay for respectful crawling
-Crawl-delay: 1
+Sitemap: https://www.getpresently.com.ng/sitemap.xml

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
 import { Logo } from './Logo';
 import { LandingHeader } from './LandingHeader';
+import { SEO } from './SEO';
 
 const videos = [
   {
@@ -65,6 +66,12 @@ export const DocumentationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cardackgroundlack text-textMuted font-sans selection:bg-primary selection:text-on-primary-fixedlack">
+      {/* SEO: Page metadata for documentation route. */}
+      <SEO
+        title="Documentation"
+        description="Product documentation for Presently: onboarding, lecturer workflows, student check-in, and reporting guides."
+        canonicalPath="/documentation"
+      />
       <LandingHeader />
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
@@ -108,7 +115,7 @@ export const DocumentationPage: React.FC = () => {
               <div className="relative aspect-video">
                 <img
                   src={video.thumbnail}
-                  alt={video.title}
+                  alt={`${video.title} - Presently GPS attendance documentation for Nigerian universities`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80"
                 />
                 <div className="absolute inset-0 bg-cardackgroundlack/40 group-hover:bg-cardackgroundlack/20 transition-colors flex items-center justify-center">

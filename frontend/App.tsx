@@ -19,6 +19,12 @@ import { Layout } from './components/Layout';
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
 import { DocumentationPage } from './components/DocumentationPage';
 import { VolunteersPage } from './components/VolunteersPage';
+import { FeaturesPage } from './components/FeaturesPage';
+import { HowItWorksPage } from './components/HowItWorksPage';
+import { UniversitiesPage } from './components/universities/UniversitiesPage';
+import { UniversityLandingPage } from './components/universities/UniversityLandingPage';
+import { BlogListPage } from './components/blog/BlogListPage';
+import { BlogPostPage } from './components/blog/BlogPostPage';
 
 // Lazy load less critical components
 import { LoadingScreen } from './components/LoadingScreen';
@@ -200,9 +206,16 @@ const AppContent: React.FC = () => {
     <Suspense fallback={<LoadingFallback />}>
       <main id="main-content">
         <Routes>
-          <Route path="/" element={<LandingPage onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/documentation" element={<DocumentationPage />} />
           <Route path="/volunteers" element={<VolunteersPage />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/universities" element={<UniversitiesPage />} />
+          <Route path="/universities/:slug" element={<UniversityLandingPage />} />
+          <Route path="/blog" element={<BlogListPage />} />
+          <Route path="/blog/page/:page" element={<BlogListPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

@@ -3,12 +3,19 @@ import { ChevronRight, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LandingHeader } from '../LandingHeader';
 import { Logo } from '../Logo';
+import { SEO } from '../SEO';
 
 const PrivacyPolicy: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background text-text flex flex-col">
+      {/* SEO: Legal page metadata for privacy route. */}
+      <SEO
+        title="Privacy Policy"
+        description="Understand how Presently handles personal data, location verification, and security for university attendance workflows."
+        canonicalPath="/privacy"
+      />
       {/* Header */}
       <LandingHeader onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />
       
