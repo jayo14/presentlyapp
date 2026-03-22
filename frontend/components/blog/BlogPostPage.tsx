@@ -136,11 +136,11 @@ export const BlogPostPage: React.FC = () => {
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeSlug, rehypeHighlight]}
               components={{
-                h2: ({ children }) => {
+                h2: ({ children }: { children?: React.ReactNode }) => {
                   const text = String(children);
                   return <h2 id={slugify(text)}>{children}</h2>;
                 },
-                h3: ({ children }) => {
+                h3: ({ children }: { children?: React.ReactNode }) => {
                   const text = String(children);
                   return <h3 id={slugify(text)}>{children}</h3>;
                 },
