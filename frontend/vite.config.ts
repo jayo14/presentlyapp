@@ -56,10 +56,10 @@ export default defineConfig(({ mode }) => {
         },
         // Optimize chunk size
         chunkSizeWarningLimit: 1500,
-        // Use esbuild minifier — safe for maplibre-gl and mapbox-gl-draw.
         // Terser with passes:2 + safari10 mangle was corrupting internal variable
         // references inside these map libraries, causing "ReferenceError: e is not defined".
-        minify: 'esbuild',
+        // Minification is currently disabled to ensure map components render properly.
+        minify: false,
         // Source maps for debugging (disable in production for performance)
         sourcemap: mode !== 'production',
         // Target modern browsers for smaller bundle size

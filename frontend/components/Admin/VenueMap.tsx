@@ -949,8 +949,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className="relative w-full h-full">
-      <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
+    <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <div ref={mapContainerRef} className="w-full h-full" style={{ position: 'absolute', inset: 0 }} />
 
       {/* Search bar (top-left, above nav controls) */}
       <div className="absolute top-4 left-14 z-10 w-56 md:w-72">
