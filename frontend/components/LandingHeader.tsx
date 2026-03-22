@@ -10,9 +10,9 @@ interface LandingHeaderProps {
   onLogin?: () => void;
 }
 
-export const LandingHeader: React.FC<LandingHeaderProps> = ({ 
-  onGetStarted = () => {}, 
-  onLogin = () => {} 
+export const LandingHeader: React.FC<LandingHeaderProps> = ({
+  onGetStarted = () => { },
+  onLogin = () => { }
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeAnchor, setActiveAnchor] = useState('');
@@ -107,7 +107,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
         <div className="cursor-pointer" onClick={() => navigate('/')}>
           <Logo className="h-7 w-auto sm:h-8" />
         </div>
-        
+
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-4 lg:gap-8 text-sm font-medium text-textMuted">
           {navItems.map((item) => {
@@ -116,9 +116,8 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               <Link
                 key={item.label}
                 to={item.to}
-                className={`relative pb-1 transition-all duration-300 ease-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-primary/60 after:transition-all after:duration-300 after:ease-out hover:after:w-full whitespace-nowrap ${
-                  active ? 'text-text' : 'text-textMuted hover:text-text'
-                }`}
+                className={`relative pb-1 transition-all duration-300 ease-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-primary/60 after:transition-all after:duration-300 after:ease-out hover:after:w-full whitespace-nowrap ${active ? 'text-text' : 'text-textMuted hover:text-text'
+                  }`}
               >
                 {item.label}
                 {active && (
@@ -137,7 +136,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
         </div>
 
         {/* Mobile Menu Toggle */}
-        <button 
+        <button
           className="md:hidden p-2 text-textMuted hover:text-text transition-colors rounded-lg hover:bg-surfaceHigh"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
@@ -165,11 +164,10 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
                     key={item.label}
                     to={item.to}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3 text-base sm:text-lg font-medium transition-all duration-200 ${
-                      active
-                        ? 'bg-primaryContainer/20 text-primary border border-primary/20'
-                        : 'text-textMuted hover:bg-surfaceHigh hover:text-text'
-                    }`}
+                    className={`rounded-xl px-4 py-3 text-base sm:text-lg font-medium transition-all duration-200 ${active
+                      ? 'bg-primaryContainer/20 text-primary border border-primary/20'
+                      : 'text-textMuted hover:bg-surfaceHigh hover:text-text'
+                      }`}
                   >
                     {item.label}
                   </Link>
@@ -177,15 +175,15 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               })}
               <hr className="border-outline/20 my-2" />
               <div className="flex flex-col gap-3 sm:gap-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full h-12 sm:h-14 border-outline/20 text-text hover:bg-surfaceHigh text-base font-semibold" 
+                <Button
+                  variant="outline"
+                  className="w-full h-12 sm:h-14 border-outline/20 text-text hover:bg-surfaceHigh text-base font-semibold"
                   onClick={handleLogin}
                 >
                   Sign In
                 </Button>
-                <Button 
-                  className="w-full h-12 sm:h-14 bg-primary text-on-primary-fixed font-bold text-base hover:opacity-90 transition-opacity" 
+                <Button
+                  className="w-full h-12 sm:h-14 bg-primary text-on-primary-fixed font-bold text-base hover:opacity-90 transition-opacity"
                   onClick={handleGetStarted}
                 >
                   Get Started

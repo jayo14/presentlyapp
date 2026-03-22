@@ -288,8 +288,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         {/* Sidebar Header - Logo */}
         <div className={`h-14 flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'px-4'} border-b border-border flex-shrink-0`}>
           {sidebarCollapsed ? (
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary-fixedlack font-bold text-sm">
-              P
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+              <img src="/logo.png" alt="Presently" className="w-full h-full object-contain" />
             </div>
           ) : (
             <Logo className="text-text" />
