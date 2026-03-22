@@ -17,7 +17,11 @@ import {
   Zap,
   Apple,
   Play,
+  Sun,
+  Moon,
 } from 'lucide-react';
+
+import { useTheme } from './ThemeProvider';
 
 // ─── shadcn/ui primitives (adjust import paths to match your project) ──────────
 import { Button } from '@/components/ui/button';
@@ -88,6 +92,17 @@ const PERFORMANCE_AVATARS = [
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   useFadeOnScroll();
+  const { theme, setTheme } = useTheme();
+  const [isScrolled, setIsScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -123,16 +138,21 @@ export const LandingPage: React.FC = () => {
       >
         {/* ── NAV ──────────────────────────────────────────────────────────── */}
         <nav
-          className="dark:bg-background/90 dark:border-outline/10"
+          className={`transition-all duration-300 fixed left-0 right-0 z-50 ${
+            isScrolled 
+              ? 'dark:bg-background/90 dark:border-outline/10 shadow-lg' 
+              : ''
+          }`}
           style={{
-            position: 'fixed',
             top: 0,
-            width: '100%',
-            zIndex: 50,
-            background: 'rgba(251,248,252,0.84)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '1px solid rgba(210,197,171,0.12)',
+            width: isScrolled ? 'calc(100% - 2rem)' : '100%',
+            maxWidth: isScrolled ? 1440 : '100%',
+            margin: isScrolled ? '1rem auto 0' : '0 auto',
+            background: isScrolled ? 'var(--surface, rgba(251,248,252,0.84))' : 'transparent',
+            backdropFilter: isScrolled ? 'blur(20px)' : 'none',
+            WebkitBackdropFilter: isScrolled ? 'blur(20px)' : 'none',
+            border: isScrolled ? '1px solid var(--outline, rgba(210,197,171,0.12))' : 'none',
+            borderRadius: isScrolled ? '1rem' : 0,
           }}
         >
           <div
@@ -1964,6 +1984,19 @@ export const LandingPage: React.FC = () => {
 </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    style={{ color: 'var(--secondary)' }}
+                  >
+                    {theme === 'dark' ? <Sun size={22} /> : <Moon size={22} />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Toggle Theme</TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button

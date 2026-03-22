@@ -65,8 +65,8 @@ function buildPointGeoJSON(
           color: activeSessions.has(v.id)
             ? '#ef4444'
             : v.id === selectedVenueId
-            ? '#f9c406'
-            : v.venue_color || '#3b82f6',
+              ? '#f9c406'
+              : v.venue_color || '#3b82f6',
         },
       })),
   };
@@ -92,8 +92,8 @@ function buildBoundaryGeoJSON(
         const baseColor = isSelected
           ? '#f9c406'
           : isActive
-          ? '#ef4444'
-          : v.venue_color || '#6366f1';
+            ? '#ef4444'
+            : v.venue_color || '#6366f1';
         return {
           type: 'Feature' as const,
           id: v.id,
@@ -280,9 +280,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       setIsLocating(false);
       console.error('Geolocation error:', error);
       setShowUserLocation(false);
-      const errorMsg = error.code === 1 ? 'Location access denied.' : 
-                      error.code === 2 ? 'Location unavailable.' : 
-                      'Location request timed out.';
+      const errorMsg = error.code === 1 ? 'Location access denied.' :
+        error.code === 2 ? 'Location unavailable.' :
+          'Location request timed out.';
       alert(`Failed to get location: ${errorMsg}`);
     };
 
@@ -346,8 +346,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         const color = isSelected
           ? '#f9c406'
           : isActive
-          ? '#ef4444'
-          : venue.venue_color || '#3b82f6';
+            ? '#ef4444'
+            : venue.venue_color || '#3b82f6';
 
         const pin = document.createElement('button');
         pin.type = 'button';
@@ -698,7 +698,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
     if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
-    
+
     // Only re-render markers for a subset if the list is large, or just always for safety
     // but now renderVenueMarkers only picks active/selected ones anyway.
     renderVenueMarkers(map);
@@ -804,8 +804,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
               id: 'gl-draw-polygon-midpoint',
               type: 'circle',
               filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'midpoint']],
-              paint: { 
-                'circle-radius': 5, 
+              paint: {
+                'circle-radius': 5,
                 'circle-color': '#ffffff',
                 'circle-stroke-color': '#f9c406',
                 'circle-stroke-width': 2,
@@ -864,7 +864,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           // Close the ring if needed (GeoJSON ring is [lng, lat])
           const closed =
             ring.length > 0 &&
-            (ring[0][0] !== ring[ring.length - 1][0] || ring[0][1] !== ring[ring.length - 1][1])
+              (ring[0][0] !== ring[ring.length - 1][0] || ring[0][1] !== ring[ring.length - 1][1])
               ? [...ring, ring[0]]
               : ring;
           // Convert from GeoJSON [lng, lat] to backend [lat, lng] convention
@@ -925,23 +925,23 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     if (!map || !mapReady) return;
 
     const newStyle = mapType === 'satellite' ? SATELLITE_STYLE : ROAD_STYLE;
-    
+
     // When we set a new style, all sources and layers are removed
     // We need to wait for the style to load, then re-add everything
     map.once('styledata', () => {
       // Re-add sources and layers
       addSourcesAndLayers(map);
-      
+
       // Re-sync venue data
       const pSrc = map.getSource('venue-points') as maplibregl.GeoJSONSource | undefined;
       const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
-      
+
       if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
       if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
-      
+
       renderVenueMarkers(map);
     });
-    
+
     map.setStyle(newStyle);
   }, [mapType, mapReady, addSourcesAndLayers, venues, activeSessions, selectedVenue, renderVenueMarkers]);
 
@@ -1012,33 +1012,30 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         <div className="bg-surface text-text border border-outline rounded-xl shadow-xl flex flex-col overflow-hidden">
           <button
             onClick={() => setMapType('road')}
-            className={`p-2 transition-colors flex items-center justify-center ${
-              mapType === 'road'
-                ? 'bg-primary text-on-primary-fixedlack'
-                : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
-            }`}
+            className={`p-2 transition-colors flex items-center justify-center ${mapType === 'road'
+              ? 'bg-primary text-on-primary-fixedlack'
+              : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
+              }`}
             title="Road Map"
           >
             <MapIcon size={20} />
           </button>
           <button
             onClick={() => setMapType('satellite')}
-            className={`p-2 transition-colors flex items-center justify-center ${
-              mapType === 'satellite'
-                ? 'bg-primary text-on-primary-fixedlack'
-                : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
-            }`}
+            className={`p-2 transition-colors flex items-center justify-center ${mapType === 'satellite'
+              ? 'bg-primary text-on-primary-fixedlack'
+              : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
+              }`}
             title="Satellite View"
           >
             <Satellite size={20} />
           </button>
           <button
             onClick={() => setShowUserLocation(!showUserLocation)}
-            className={`p-2 transition-colors flex items-center justify-center ${
-              showUserLocation
-                ? 'bg-cardackgroundlue-500 text-white'
-                : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
-            }`}
+            className={`p-2 transition-colors flex items-center justify-center ${showUserLocation
+              ? 'bg-cardackgroundlue-500 text-white'
+              : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
+              }`}
             title={showUserLocation ? "Stop Tracking Location" : "Find My Location"}
           >
             {isLocating ? <Loader2 size={20} className="animate-spin" /> : <Navigation size={20} />}
@@ -1070,9 +1067,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       )}
 
       {/* Map Legend */}
-      <div className="absolute bottom-4 right-4 z-10 bg-surface/90 backdrop-blur-sm border border-outline rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[140px]">
+      <div className="absolute bottom-4 right-4 z-10 bg-black/50 backdrop-blur-sm border border-outline rounded-lg shadow-lg p-3 flex flex-col gap-2 min-w-[140px]">
         <h4 className="font-headline text-[10px] font-bold uppercase tracking-wider text-textMuted">Map Legend</h4>
-        
+
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-[#ef4444] border border-white shadow-sm relative overflow-visible">
             <div className="absolute inset-0 rounded-full bg-[#ef4444] animate-ping opacity-40"></div>
