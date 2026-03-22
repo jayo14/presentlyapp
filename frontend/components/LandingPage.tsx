@@ -38,23 +38,71 @@ import { Logo } from './Logo';
 import { JsonLd } from './seo/JsonLd';
 import { SITE_URL } from './seo/seoConfig';
 import { LandingFooter } from './LandingFooter';
+import { LandingHeader } from './LandingHeader';
 
 // ─── Global Styles ────────────────────────────────────────────────────────────
 // The app relies on the global index.css loaded at the root.
 
-// ─── Scroll fade hook ─────────────────────────────────────────────────────────
-function useFadeOnScroll() {
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── GSAP animations hook ─────────────────────────────────────────────────────────
+function useGSAPAnimations() {
   React.useEffect(() => {
-    const els = document.querySelectorAll('.fade-up');
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) =>
-          e.target.classList.toggle('visible', e.isIntersecting)
-        ),
-      { threshold: 0.1 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    // Reveal animations for fade-up elements
+    const fadeElements = document.querySelectorAll('.fade-up');
+    fadeElements.forEach((el) => {
+      gsap.fromTo(el, 
+        { 
+          opacity: 0, 
+          y: 40,
+          filter: 'blur(10px)'
+        }, 
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 1.2,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    });
+
+    // Parallax for background orbs
+    const orbs = document.querySelectorAll('.orb-animate');
+    orbs.forEach((orb) => {
+      gsap.to(orb, {
+        y: -100,
+        x: 50,
+        scrollTrigger: {
+          trigger: orb,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1.5
+        }
+      });
+    });
+
+    // Scaling animations for hero elements
+    gsap.from('.hero-card', {
+      scale: 0.9,
+      opacity: 0,
+      rotateX: 10,
+      duration: 1.5,
+      delay: 0.2,
+      ease: 'expo.out'
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
   }, []);
 }
 
@@ -92,7 +140,7 @@ const PERFORMANCE_AVATARS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  useFadeOnScroll();
+  useGSAPAnimations();
   const { theme, setTheme } = useTheme();
   const [isScrolled, setIsScrolled] = React.useState(false);
 
@@ -137,97 +185,7 @@ export const LandingPage: React.FC = () => {
           overflowX: 'hidden',
         }}
       >
-        {/* ── NAV ──────────────────────────────────────────────────────────── */}
-        <nav
-          className={`transition-all duration-300 fixed left-0 right-0 z-50 ${isScrolled
-            ? 'dark:bg-background/90 dark:border-outline/10 shadow-lg'
-            : ''
-            }`}
-          style={{
-            top: 0,
-            width: isScrolled ? 'calc(100% - 2rem)' : '100%',
-            maxWidth: isScrolled ? 1440 : '100%',
-            margin: isScrolled ? '1rem auto 0' : '0 auto',
-            background: isScrolled ? 'color-mix(in srgb, var(--surface-container-low) 74%, transparent)' : 'transparent',
-            backdropFilter: isScrolled ? 'blur(18px) saturate(120%)' : 'none',
-            WebkitBackdropFilter: isScrolled ? 'blur(18px) saturate(120%)' : 'none',
-            border: isScrolled ? '1px solid color-mix(in srgb, var(--outline-variant) 36%, transparent)' : 'none',
-            boxShadow: isScrolled ? '0 10px 28px color-mix(in srgb, var(--inverse-surface) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-container-highest) 34%, transparent)' : 'none',
-            borderRadius: isScrolled ? '1rem' : 0,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              maxWidth: 1440,
-              margin: '0 auto',
-              padding: '0.75rem 1rem',
-            }}
-            className="sm:px-6 md:px-8 md:py-4"
-          >
-
-            <Logo />
-
-            {/* Nav links */}
-            <div
-              className="mobile-hide"
-              style={{ display: 'flex', gap: '2rem' }}
-            >
-              {[
-                { label: 'Solutions', href: '#solutions', active: true },
-                { label: 'Pricing', href: '#pricing' },
-                { label: 'Documentation', href: '/documentation' },
-                { label: 'Volunteers', href: '/volunteers' },
-              ].map(({ label, href, active }) => (
-                <a
-                  key={label}
-                  href={href}
-                  style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontWeight: 600,
-                    fontSize: '0.875rem',
-                    textDecoration: 'none',
-                    color: active ? 'var(--primary)' : 'var(--secondary)',
-                    borderBottom: active
-                      ? '2px solid var(--primary-container)'
-                      : '2px solid transparent',
-                    paddingBottom: active ? 4 : 0,
-                    transition: 'color 0.2s',
-                  }}
-                >
-                  {label}
-                </a>
-              ))}
-            </div>
-
-            {/* Auth buttons */}
-            <div
-              className="hidden sm:flex mobile-hide"
-              style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
-            >
-              <Button
-                variant="ghost"
-                onClick={goLogin}
-                className="hidden md:inline-flex"
-                style={{
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  color: 'var(--on-surface-variant)',
-                }}
-              >
-                Sign In
-              </Button>
-              <Button
-                onClick={goRegister}
-                className="btn-presently-primary text-sm md:text-base px-4 md:px-6"
-              >
-                Get Started
-              </Button>
-            </div>
-          </div>
-        </nav>
+        <LandingHeader onGetStarted={goRegister} onLogin={goLogin} />
 
         <main className="pt-20 sm:pt-24 md:pt-28">
           {/* ── HERO ───────────────────────────────────────────────────────── */}
