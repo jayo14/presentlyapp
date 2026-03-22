@@ -55,13 +55,13 @@ export const LandingFooter: React.FC = () => {
             GPS-verified real-time attendance system optimizing institutional flow and precision.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-secondary hover:text-primary hover:bg-surfaceHigh transition-all">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all">
               <Twitter size={18} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-secondary hover:text-primary hover:bg-surfaceHigh transition-all">
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all">
               <Linkedin size={18} />
             </a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-secondary hover:text-primary hover:bg-surfaceHigh transition-all">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all">
               <Github size={18} />
             </a>
           </div>
@@ -70,30 +70,29 @@ export const LandingFooter: React.FC = () => {
         <div>
           <h4 className="font-headline font-bold mb-4" style={{ color: 'var(--on-surface)' }}>Product</h4>
           <ul className="space-y-3">
-            <li><Link to="/#solutions" className="text-sm text-secondary hover:text-primary transition-colors">Solutions</Link></li>
-            <li><Link to="/#pricing" className="text-sm text-secondary hover:text-primary transition-colors">Pricing</Link></li>
-            <li><Link to="/download" className="text-sm text-secondary hover:text-primary transition-colors">Download App</Link></li>
-            <li><Link to="/hardware" className="text-sm text-secondary hover:text-primary transition-colors">Hardware Sync</Link></li>
+            <li><Link to="#solutions" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Solutions</Link></li>
+            <li><Link to="#pricing" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Pricing</Link></li>
+            <li><Link to="/#mobileapp" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Download App</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-headline font-bold mb-4" style={{ color: 'var(--on-surface)' }}>Resources</h4>
           <ul className="space-y-3">
-            <li><Link to="/documentation" className="text-sm text-secondary hover:text-primary transition-colors">Documentation</Link></li>
-            <li><Link to="/volunteers" className="text-sm text-secondary hover:text-primary transition-colors">Volunteers</Link></li>
-            <li><Link to="/blog" className="text-sm text-secondary hover:text-primary transition-colors">Blog</Link></li>
-            <li><Link to="/support" className="text-sm text-secondary hover:text-primary transition-colors">Help Center</Link></li>
+            <li><Link to="/documentation" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Documentation</Link></li>
+            <li><Link to="/volunteers" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Volunteers</Link></li>
+            <li><Link to="/blog" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Blog</Link></li>
+            <li><Link to="/support" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Help Center</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-headline font-bold mb-4" style={{ color: 'var(--on-surface)' }}>Company</h4>
           <ul className="space-y-3">
-            <li><Link to="/about" className="text-sm text-secondary hover:text-primary transition-colors">About Us</Link></li>
-            <li><Link to="/contact" className="text-sm text-secondary hover:text-primary transition-colors">Contact</Link></li>
-            <li><Link to="/privacy" className="text-sm text-secondary hover:text-primary transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/terms" className="text-sm text-secondary hover:text-primary transition-colors">Terms of Service</Link></li>
+            <li><Link to="/about" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">About Us</Link></li>
+            <li><Link to="/contact" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Contact</Link></li>
+            <li><Link to="/privacy" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
       </div>
@@ -111,8 +110,8 @@ export const LandingFooter: React.FC = () => {
           gap: '2rem',
         }}
       >
-        <p style={{ fontSize: '0.875rem', color: 'var(--secondary)' }}>
-          © {new Date().getFullYear()} Presently Editorial Systems. All rights reserved.
+        <p style={{ fontSize: '0.875rem', color: 'var(--on-surface-variant)' }}>
+          © {new Date().getFullYear()} Presently. All rights reserved.
         </p>
 
         <TooltipProvider>
@@ -124,35 +123,35 @@ export const LandingFooter: React.FC = () => {
                   size="icon"
                   className="rounded-full hover:bg-surfaceHigh"
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  style={{ color: 'var(--secondary)' }}
+                  style={{ color: 'var(--on-surface-variant)' }}
                 >
                   {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Toggle Theme</TooltipContent>
             </Tooltip>
-            
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="rounded-full hover:bg-surfaceHigh"
-                  style={{ color: 'var(--secondary)' }}
+                  style={{ color: 'var(--on-surface-variant)' }}
                 >
                   <Languages size={20} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Language</TooltipContent>
             </Tooltip>
-            
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="rounded-full hover:bg-surfaceHigh"
-                  style={{ color: 'var(--secondary)' }}
+                  style={{ color: 'var(--on-surface-variant)' }}
                 >
                   <Share2 size={20} />
                 </Button>

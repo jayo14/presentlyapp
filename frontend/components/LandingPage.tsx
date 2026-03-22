@@ -1378,6 +1378,7 @@ export const LandingPage: React.FC = () => {
 
           {/* ── MOBILE APP ─────────────────────────────────────────────────── */}
           <section
+            id='mobileapp'
             style={{
               padding: '8rem 2rem',
               background: 'var(--surface-container-lowest)',
