@@ -142,16 +142,6 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   useGSAPAnimations();
   const { theme, setTheme } = useTheme();
-  const [isScrolled, setIsScrolled] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const softwareSchema = {
     '@context': 'https://schema.org',
