@@ -5,7 +5,6 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Department, College, Institution } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
-import DepartmentModal from './DepartmentModal';
 import { SEO } from '../SEO';
 
 interface DepartmentManagementProps {
@@ -29,10 +28,6 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // These are for standalone mode
-  const [showDepartmentModal, setShowDepartmentModal] = useState(false);
-  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
 
   useEffect(() => {
     // This effect runs once on mount or when institution/college props change.
@@ -130,35 +125,6 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
     (dept.abbreviation || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreateDepartment = () => {
-    setEditingDepartment(null);
-    setShowDepartmentModal(true);
-  };
-
-  const handleEditDepartment = (dept: Department) => {
-    setEditingDepartment(dept);
-    setShowDepartmentModal(true);
-  };
-
-  const handleSaveDepartment = async (formData: Partial<Department>) => {
-    try {
-      if (editingDepartment) {
-        await institutionsApi.updateDepartment(editingDepartment.id, formData);
-      } else {
-        await institutionsApi.createDepartment({
-          ...formData,
-          institution: institution?.id || selectedInstitution,
-          college: college?.id || selectedCollege,
-        } as Omit<Department, 'id'>);
-      }
-      await loadDepartmentsByContext();
-      setShowDepartmentModal(false);
-      setEditingDepartment(null);
-    } catch (err: any) {
-      throw new Error(err.response?.data?.message || 'Failed to save department');
-    }
-  };
-
   const handleDeleteDepartment = async (id: number) => {
     if (!confirm('Are you sure you want to delete this department?')) {
       return;
@@ -203,11 +169,15 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
             </div>
           </div>
           <Button 
-            onClick={handleCreateDepartment} 
+            onClick={() => {
+              const instId = institution?.id || selectedInstitution;
+              const collId = college?.id || selectedCollege;
+              navigate(`/dashboard/institutions/${instId}/colleges/${collId}/departments/new`);
+            }}
             className="gap-2"
             disabled={
               !(institution || selectedInstitution) || 
-              (!(college || selectedCollege) && selectedInstitution !== null) // If institution is selected but no college, allow creating directly under institution
+              (!(college || selectedCollege) && selectedInstitution !== null)
             }
           >
             <Plus className="w-4 h-4" />
@@ -311,7 +281,11 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                   
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleEditDepartment(dept)}
+                      onClick={() => {
+                        const instId = institution?.id || selectedInstitution;
+                        const collId = college?.id || selectedCollege;
+                        navigate(`/dashboard/institutions/${instId}/colleges/${collId}/departments/${dept.id}`);
+                      }}
                       className="p-2 hover:bg-surfaceHigh rounded-lg text-textMuted hover:text-text transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
@@ -372,23 +346,18 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
           <GraduationCap className="w-16 h-16 text-text mx-auto mb-4" />
           <h3 className="font-headline text-lg font-bold text-textMuted">No departments found</h3>
           <p className="text-textMuted text-sm mt-1 mb-6">Start by adding a new department to this {college ? 'college' : 'institution'}.</p>
-          <Button onClick={handleCreateDepartment} variant="secondary">
+          <Button 
+            onClick={() => {
+              const instId = institution?.id || selectedInstitution;
+              const collId = college?.id || selectedCollege;
+              navigate(`/dashboard/institutions/${instId}/colleges/${collId}/departments/new`);
+            }}
+            variant="secondary"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add First Department
           </Button>
         </div>
-      )}
-
-      {/* Department Modal */}
-      {showDepartmentModal && (
-        <DepartmentModal
-          department={editingDepartment || undefined}
-          onSave={handleSaveDepartment}
-          onClose={() => {
-            setShowDepartmentModal(false);
-            setEditingDepartment(null);
-          }}
-        />
       )}
     </div>
   );

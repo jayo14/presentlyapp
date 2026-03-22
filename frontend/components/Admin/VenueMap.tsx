@@ -878,10 +878,31 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     };
   }, [drawingMode, mapReady]);
 
-  // Style switch
+  // Style switch - need to re-add sources/layers after setStyle
   useEffect(() => {
-    mapRef.current?.setStyle(mapType === 'satellite' ? SATELLITE_STYLE : ROAD_STYLE);
-  }, [mapType]);
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+
+    const newStyle = mapType === 'satellite' ? SATELLITE_STYLE : ROAD_STYLE;
+    
+    // When we set a new style, all sources and layers are removed
+    // We need to wait for the style to load, then re-add everything
+    map.once('styledata', () => {
+      // Re-add sources and layers
+      addSourcesAndLayers(map);
+      
+      // Re-sync venue data
+      const pSrc = map.getSource('venue-points') as maplibregl.GeoJSONSource | undefined;
+      const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
+      
+      if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
+      if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
+      
+      renderVenueMarkers(map);
+    });
+    
+    map.setStyle(newStyle);
+  }, [mapType, mapReady, addSourcesAndLayers, venues, activeSessions, selectedVenue, renderVenueMarkers]);
 
   const handleReset = () =>
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });

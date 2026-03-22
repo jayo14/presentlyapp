@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Save, AlertCircle, Building2, Globe, Mail, Phone, Calendar, Award, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, Building2, Globe, Mail, Phone, Calendar, Award, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Institution } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
 import { toast } from 'sonner';
+
+interface ValidationErrors {
+  full_name?: string;
+  short_name?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  website_url?: string;
+  contact_email?: string;
+  contact_phone?: string;
+}
 
 export const InstitutionFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +24,8 @@ export const InstitutionFormPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   
   const [formData, setFormData] = useState<Partial<Institution>>({
     full_name: '',
@@ -64,10 +77,108 @@ export const InstitutionFormPage: React.FC = () => {
       ...prev,
       [field]: value
     }));
+    
+    // Real-time validation
+    const error = validateField(field, value);
+    setValidationErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+
+  const handleBlur = (field: keyof Institution) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+
+  // Real-time validation function
+  const validateField = (field: keyof Institution, value: any): string | undefined {
+    switch (field) {
+      case 'full_name':
+        if (!value || !value.trim()) return 'Institution name is required';
+        if (value.trim().length < 3) return 'Name must be at least 3 characters';
+        if (value.trim().length > 255) return 'Name must be less than 255 characters';
+        break;
+      
+      case 'short_name':
+        if (!value || !value.trim()) return 'Display name is required';
+        if (value.trim().length < 2) return 'Display name must be at least 2 characters';
+        break;
+      
+      case 'country':
+        if (!value || !value.trim()) return 'Country is required';
+        break;
+      
+      case 'city':
+        if (!value || !value.trim()) return 'City is required';
+        break;
+      
+      case 'address':
+        if (!value || !value.trim()) return 'Address is required';
+        if (value.trim().length < 5) return 'Address must be at least 5 characters';
+        break;
+      
+      case 'website_url':
+        if (value && value.trim()) {
+          try {
+            new URL(value);
+          } catch {
+            return 'Please enter a valid URL';
+          }
+        }
+        break;
+      
+      case 'contact_email':
+        if (value && value.trim()) {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            return 'Please enter a valid email address';
+          }
+        }
+        break;
+      
+      case 'contact_phone':
+        if (value && value.trim()) {
+          const digitsOnly = value.replace(/\D/g, '');
+          if (digitsOnly.length < 10) {
+            return 'Phone number must be at least 10 digits';
+          }
+        }
+        break;
+    }
+    return undefined;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate all required fields
+    const errors: ValidationErrors = {};
+    errors.full_name = validateField('full_name', formData.full_name);
+    errors.short_name = validateField('short_name', formData.short_name);
+    errors.country = validateField('country', formData.country);
+    errors.city = validateField('city', formData.city);
+    errors.address = validateField('address', formData.address);
+    errors.website_url = validateField('website_url', formData.website_url);
+    errors.contact_email = validateField('contact_email', formData.contact_email);
+    errors.contact_phone = validateField('contact_phone', formData.contact_phone);
+    
+    // Filter out undefined errors
+    const hasErrors = Object.values(errors).some(error => error !== undefined);
+    
+    if (hasErrors) {
+      setValidationErrors(errors);
+      setTouched({
+        full_name: true,
+        short_name: true,
+        country: true,
+        city: true,
+        address: true,
+        website_url: true,
+        contact_email: true,
+        contact_phone: true,
+      });
+      toast.error('Please fix all validation errors');
+      return;
+    }
     
     if (!formData.full_name?.trim()) {
       toast.error('Institution name is required');
@@ -119,7 +230,7 @@ export const InstitutionFormPage: React.FC = () => {
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+            <div className="w-16 h-16 rounded-2xl bg-primaryContainer/20 editorial-shadow flex items-center justify-center text-primary">
               <Building2 className="w-8 h-8" />
             </div>
             <div>
@@ -148,8 +259,8 @@ export const InstitutionFormPage: React.FC = () => {
         )}
 
         {/* Basic Information Section */}
-        <section className="bg-surface border border-outline rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-outline bg-background/50">
+        <section className="glass-panel border border-outline/20 rounded-2xl editorial-shadow overflow-hidden">
+          <div className="p-6 border-b border-outline bg-surfaceContainer">
             <h3 className="font-headline font-bold text-text flex items-center gap-2">
               <Building2 className="w-4 h-4 text-primary" />
               Basic Profile
@@ -157,40 +268,74 @@ export const InstitutionFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-textMuted mb-2">Full Legal Name *</label>
-              <Input
-                value={formData.full_name || ''}
-                onChange={(e) => handleChange('full_name', e.target.value)}
-                placeholder="e.g., Lagos State University of Science and Technology"
-                className="h-12 bg-background border-outline focus:border-primary"
-                required
-              />
+              <label className="block text-sm font-semibold text-text mb-2">Full Legal Name *</label>
+              <div className="relative">
+                <Input
+                  value={formData.full_name || ''}
+                  onChange={(e) => handleChange('full_name', e.target.value)}
+                  onBlur={() => handleBlur('full_name')}
+                  placeholder="e.g., Lagos State University of Science and Technology"
+                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                    touched.full_name && validationErrors.full_name ? 'border-red-500' : ''
+                  } ${touched.full_name && !validationErrors.full_name && formData.full_name ? 'border-green-500' : ''}`}
+                  required
+                />
+                {touched.full_name && !validationErrors.full_name && formData.full_name && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                )}
+                {touched.full_name && validationErrors.full_name && (
+                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                )}
+              </div>
+              {touched.full_name && validationErrors.full_name && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.full_name}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Display Name / Abbreviation *</label>
-              <Input
-                value={formData.short_name || ''}
-                onChange={(e) => handleChange('short_name', e.target.value)}
-                placeholder="e.g., LASUSTECH"
-                className="h-12 bg-background border-outline focus:border-primary"
-                required
-              />
+              <label className="block text-sm font-semibold text-text mb-2">Display Name / Abbreviation *</label>
+              <div className="relative">
+                <Input
+                  value={formData.short_name || ''}
+                  onChange={(e) => handleChange('short_name', e.target.value)}
+                  onBlur={() => handleBlur('short_name')}
+                  placeholder="e.g., LASUSTECH"
+                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                    touched.short_name && validationErrors.short_name ? 'border-red-500' : ''
+                  } ${touched.short_name && !validationErrors.short_name && formData.short_name ? 'border-green-500' : ''}`}
+                  required
+                />
+                {touched.short_name && !validationErrors.short_name && formData.short_name && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                )}
+                {touched.short_name && validationErrors.short_name && (
+                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                )}
+              </div>
+              {touched.short_name && validationErrors.short_name && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.short_name}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Alternative Code</label>
+              <label className="block text-sm font-semibold text-text mb-2">Alternative Code</label>
               <Input
                 value={formData.abbreviation || ''}
                 onChange={(e) => handleChange('abbreviation', e.target.value)}
                 placeholder="e.g., LST"
-                className="h-12 bg-background border-outline focus:border-primary"
+                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Institution Type *</label>
+              <label className="block text-sm font-semibold text-text mb-2">Institution Type *</label>
               <select
                 value={formData.institution_type || ''}
                 onChange={(e) => handleChange('institution_type', e.target.value)}
-                className="w-full h-12 px-4 bg-background border border-outline rounded-xl text-text focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-background text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="UNIVERSITY">University</option>
                 <option value="POLYTECHNIC">Polytechnic</option>
@@ -199,21 +344,21 @@ export const InstitutionFormPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Established Year</label>
+              <label className="block text-sm font-semibold text-text mb-2">Established Year</label>
               <Input
                 type="number"
                 value={formData.established_year || ''}
                 onChange={(e) => handleChange('established_year', parseInt(e.target.value))}
                 placeholder="e.g., 2021"
-                className="h-12 bg-background border-outline focus:border-primary"
+                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
           </div>
         </section>
 
         {/* Location & Contact Section */}
-        <section className="bg-surface border border-outline rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-outline bg-background/50">
+        <section className="glass-panel border border-outline/20 rounded-2xl editorial-shadow overflow-hidden">
+          <div className="p-6 border-b border-outline bg-surfaceContainer">
             <h3 className="font-headline font-bold text-text flex items-center gap-2">
               <Globe className="w-4 h-4 text-primary" />
               Location & Connectivity
@@ -221,99 +366,190 @@ export const InstitutionFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Country *</label>
-              <Input
-                value={formData.country || ''}
-                onChange={(e) => handleChange('country', e.target.value)}
-                placeholder="e.g., Nigeria"
-                className="h-12 bg-background border-outline focus:border-primary"
-                required
-              />
+              <label className="block text-sm font-semibold text-text mb-2">Country *</label>
+              <div className="relative">
+                <Input
+                  value={formData.country || ''}
+                  onChange={(e) => handleChange('country', e.target.value)}
+                  onBlur={() => handleBlur('country')}
+                  placeholder="e.g., Nigeria"
+                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                    touched.country && validationErrors.country ? 'border-red-500' : ''
+                  } ${touched.country && !validationErrors.country && formData.country ? 'border-green-500' : ''}`}
+                  required
+                />
+                {touched.country && !validationErrors.country && formData.country && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                )}
+                {touched.country && validationErrors.country && (
+                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                )}
+              </div>
+              {touched.country && validationErrors.country && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.country}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">State / Province</label>
+              <label className="block text-sm font-semibold text-text mb-2">State / Province</label>
               <Input
                 value={formData.state_province || ''}
                 onChange={(e) => handleChange('state_province', e.target.value)}
                 placeholder="e.g., Lagos"
-                className="h-12 bg-background border-outline focus:border-primary"
+                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">City *</label>
-              <Input
-                value={formData.city || ''}
-                onChange={(e) => handleChange('city', e.target.value)}
-                placeholder="e.g., Ikorodu"
-                className="h-12 bg-background border-outline focus:border-primary"
-                required
-              />
+              <label className="block text-sm font-semibold text-text mb-2">City *</label>
+              <div className="relative">
+                <Input
+                  value={formData.city || ''}
+                  onChange={(e) => handleChange('city', e.target.value)}
+                  onBlur={() => handleBlur('city')}
+                  placeholder="e.g., Ikorodu"
+                  className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                    touched.city && validationErrors.city ? 'border-red-500' : ''
+                  } ${touched.city && !validationErrors.city && formData.city ? 'border-green-500' : ''}`}
+                  required
+                />
+                {touched.city && !validationErrors.city && formData.city && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                )}
+                {touched.city && validationErrors.city && (
+                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                )}
+              </div>
+              {touched.city && validationErrors.city && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.city}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Postal Code</label>
+              <label className="block text-sm font-semibold text-text mb-2">Postal Code</label>
               <Input
                 value={formData.postal_code || ''}
                 onChange={(e) => handleChange('postal_code', e.target.value)}
                 placeholder="e.g., 100001"
-                className="h-12 bg-background border-outline focus:border-primary"
+                className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
               />
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="institution-address" className="block text-sm font-semibold text-textMuted mb-2">Street Address</label>
-              <textarea
-                id="institution-address"
-                value={formData.address || ''}
-                onChange={(e) => handleChange('address', e.target.value)}
-                placeholder="Full street address, building name, etc."
-                rows={3}
-                className="w-full px-4 py-3 bg-background border border-outline rounded-xl text-text text-sm placeholder:text-textMuted focus:outline-none focus:border-primary transition-colors resize-none"
-              />
+              <label htmlFor="institution-address" className="block text-sm font-semibold text-text mb-2">Street Address *</label>
+              <div className="relative">
+                <textarea
+                  id="institution-address"
+                  value={formData.address || ''}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                  onBlur={() => handleBlur('address')}
+                  placeholder="Full street address, building name, etc."
+                  rows={3}
+                  className={`w-full px-4 py-3 bg-background text-text placeholder:text-textMuted border border-outline rounded-xl text-sm focus:outline-none focus:border-primary transition-colors resize-none ${
+                    touched.address && validationErrors.address ? 'border-red-500' : ''
+                  } ${touched.address && !validationErrors.address && formData.address ? 'border-green-500' : ''}`}
+                  required
+                />
+              </div>
+              {touched.address && validationErrors.address && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.address}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Website URL</label>
+              <label className="block text-sm font-semibold text-text mb-2">Website URL</label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
                 <Input
                   type="url"
                   value={formData.website_url || ''}
                   onChange={(e) => handleChange('website_url', e.target.value)}
+                  onBlur={() => handleBlur('website_url')}
                   placeholder="https://lasustech.edu.ng"
-                  className="h-12 pl-10 bg-background border-outline focus:border-primary"
+                  className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                    touched.website_url && validationErrors.website_url ? 'border-red-500' : ''
+                  } ${touched.website_url && !validationErrors.website_url && formData.website_url ? 'border-green-500' : ''}`}
                 />
+                {touched.website_url && !validationErrors.website_url && formData.website_url && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                )}
+                {touched.website_url && validationErrors.website_url && (
+                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                )}
               </div>
+              {touched.website_url && validationErrors.website_url && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.website_url}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Official Email</label>
+              <label className="block text-sm font-semibold text-text mb-2">Official Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
                 <Input
                   type="email"
                   value={formData.contact_email || ''}
                   onChange={(e) => handleChange('contact_email', e.target.value)}
+                  onBlur={() => handleBlur('contact_email')}
                   placeholder="info@lasustech.edu.ng"
-                  className="h-12 pl-10 bg-background border-outline focus:border-primary"
+                  className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                    touched.contact_email && validationErrors.contact_email ? 'border-red-500' : ''
+                  } ${touched.contact_email && !validationErrors.contact_email && formData.contact_email ? 'border-green-500' : ''}`}
                 />
+                {touched.contact_email && !validationErrors.contact_email && formData.contact_email && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                )}
+                {touched.contact_email && validationErrors.contact_email && (
+                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                )}
               </div>
+              {touched.contact_email && validationErrors.contact_email && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.contact_email}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Contact Phone</label>
+              <label className="block text-sm font-semibold text-text mb-2">Contact Phone</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
                 <Input
                   type="tel"
                   value={formData.contact_phone || ''}
                   onChange={(e) => handleChange('contact_phone', e.target.value)}
+                  onBlur={() => handleBlur('contact_phone')}
                   placeholder="+234..."
-                  className="h-12 pl-10 bg-background border-outline focus:border-primary"
+                  className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary ${
+                    touched.contact_phone && validationErrors.contact_phone ? 'border-red-500' : ''
+                  } ${touched.contact_phone && !validationErrors.contact_phone && formData.contact_phone ? 'border-green-500' : ''}`}
                 />
+                {touched.contact_phone && !validationErrors.contact_phone && formData.contact_phone && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                )}
+                {touched.contact_phone && validationErrors.contact_phone && (
+                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                )}
               </div>
+              {touched.contact_phone && validationErrors.contact_phone && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {validationErrors.contact_phone}
+                </p>
+              )}
             </div>
           </div>
         </section>
 
         {/* Accreditation & Status Section */}
-        <section className="bg-surface border border-outline rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-outline bg-background/50">
+        <section className="glass-panel border border-outline/20 rounded-2xl editorial-shadow overflow-hidden">
+          <div className="p-6 border-b border-outline bg-surfaceContainer">
             <h3 className="font-headline font-bold text-text flex items-center gap-2">
               <Award className="w-4 h-4 text-primary" />
               Compliance & Visibility
@@ -321,11 +557,11 @@ export const InstitutionFormPage: React.FC = () => {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-textMuted mb-2">Accreditation Status</label>
+              <label className="block text-sm font-semibold text-text mb-2">Accreditation Status</label>
               <select
                 value={formData.accreditation_status || ''}
                 onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                className="w-full h-12 px-4 bg-background border border-outline rounded-xl text-text focus:outline-none focus:border-primary transition-colors"
+                className="w-full h-12 px-4 bg-background text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
               >
                 <option value="ACCREDITED">Fully Accredited</option>
                 <option value="PROVISIONAL">Provisional</option>
