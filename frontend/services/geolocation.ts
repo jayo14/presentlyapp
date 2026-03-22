@@ -41,7 +41,7 @@ const MAX_SAMPLES = 5;
 const MIN_SAMPLES = 3;
 const MAX_ACCURACY_GATE = 60; // Hard rejection if > 60m
 const IP_VALIDATION_THRESHOLD = 50000; // 50km
-const IS_DEV = process.env.NODE_ENV === 'development';
+const IS_DEV = import.meta.env.DEV;
 
 /**
  * STEP 1 — Permission Validation
