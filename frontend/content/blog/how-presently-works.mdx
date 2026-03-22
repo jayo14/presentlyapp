@@ -1,0 +1,81 @@
+---
+title: "How Presently Verifies Attendance Using GPS - No Hardware Required"
+slug: "how-presently-works"
+excerpt: "A technical breakdown of how Presently uses real-time GPS verification to make proxy attendance difficult, using devices students already own."
+coverImage: "/blog/how-it-works-cover.jpg"
+author:
+  name: "John"
+  avatar: "/team/john.jpg"
+category: "Product"
+tags: ["gps", "attendance", "vite", "django", "presently"]
+publishedAt: "2025-07-20"
+readingTime: 5
+seoTitle: "How Presently GPS Attendance Verification Works"
+seoDescription: "Inside Presently: how we verify student attendance with real-time GPS checks and session controls without dedicated hardware."
+---
+
+## The goal
+
+Presently is designed to answer one question reliably: **Was this student physically present at the approved venue during the active class session?**
+
+We solve this with software-first verification instead of expensive classroom hardware.
+
+## Architecture at a glance
+
+- **Frontend:** React + Vite application for web clients.
+- **Backend:** Django REST Framework for session logic and validation.
+- **Map layer:** venue geometry and geospatial context in the admin workflow.
+
+## Session lifecycle
+
+### 1. Lecturer starts a session
+
+A session includes:
+
+- course context
+- venue
+- start/end window
+- validation method
+
+Once active, the system accepts check-ins only within policy.
+
+### 2. Student submits check-in
+
+The client sends geolocation coordinates and session context to the backend endpoint.
+
+### 3. Backend validates the request
+
+Server-side checks include:
+
+- session is active
+- user is eligible for the course
+- current time is within check-in policy window
+- coordinate is inside or near the configured venue boundary
+
+### 4. Event is recorded and surfaced
+
+On success, attendance is written and reflected on dashboards for lecturers and administrators.
+
+## Why GPS over hardware-only approaches
+
+Hardware gates are useful but expensive to deploy and maintain at scale. GPS verification with proper backend rules offers a faster rollout path across multiple faculties.
+
+It is not just cheaper. It is easier to iterate and improve semester-by-semester.
+
+## Reliability safeguards
+
+- **Server-enforced rules:** client cannot decide attendance eligibility.
+- **Venue constraints:** checks are bound to configured location context.
+- **Auditability:** attendance history and compliance outcomes remain traceable.
+
+## What this enables
+
+- cleaner exam clearance workflows
+- better attendance analytics
+- fewer disputes around participation records
+
+## Closing
+
+Presently is built for practical campus realities in Nigeria: constrained budgets, large class sizes, and the need for trustworthy digital records.
+
+No additional student hardware is required. The goal is simple: make valid attendance easy, and invalid attendance hard.
