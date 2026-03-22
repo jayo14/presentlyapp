@@ -23,7 +23,7 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 from user_agents import parse
 from presently.firebase_config import initialize_firebase
-from utils.novu_service import NovuService
+from utils.email_notification_service import EmailNotificationService
 
 from .attendance_logic import perform_attendance_check_in
 from .models import (
@@ -320,7 +320,7 @@ def register_view(request):
             # Create OTP
             otp_obj = EmailVerificationOTP.create_otp(user)
             
-            # Send verification email using Novu
+            # Send verification email using internal email service
             send_verification_email(user, otp_obj.otp)
             
             logger.info(f"User registered: {user.email}, OTP sent")
@@ -383,16 +383,16 @@ def register_view(request):
 # Add these views to institutions/views.py after the register_view
 
 def send_verification_email(user, otp_code):
-    """Send OTP verification email via Novu"""
+    """Send OTP verification email via SMTP email service."""
     try:
-        success = NovuService.send_email_verification_otp(
+        success = EmailNotificationService.send_email_verification_otp(
             user_id=str(user.id),
             user_email=user.email,
             user_name=user.full_name,
             otp_code=otp_code
         )
         if not success:
-            raise Exception("Failed to send verification email via Novu")
+            raise Exception("Failed to send verification email")
         return True
     except Exception as e:
         logger.error(f"Failed to send verification email to {user.email}: {str(e)}", exc_info=True)
@@ -426,9 +426,9 @@ def send_verification_otp_view(request):
         # Create new OTP
         otp_obj = EmailVerificationOTP.create_otp(user)
         
-        # Send OTP email via Novu
+        # Send OTP email via internal email service
         try:
-            NovuService.send_otp_resend(
+            EmailNotificationService.send_otp_resend(
                 user_id=str(user.id),
                 user_email=user.email,
                 user_name=user.full_name,
@@ -610,7 +610,7 @@ def login_view(request):
                     device.last_login = timezone.now()
                     device.save()
                 else:
-                    # New device detected - Send security alert via Novu
+                    # New device detected - send security alert email
                     device_info = {
                         'device_type': device_category,
                         'device_name': device_name,
@@ -619,7 +619,7 @@ def login_view(request):
                         'login_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')
                     }
                     
-                    NovuService.send_new_device_alert(
+                    EmailNotificationService.send_new_device_alert(
                         user_id=str(user.id),
                         user_email=user.email,
                         user_name=user.full_name,
@@ -878,8 +878,8 @@ def request_password_reset_view(request):
         # Create reset link
         reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
-        # Send password reset email via Novu (with SMTP fallback in NovuService)
-        email_sent = NovuService.send_password_reset(
+        # Send password reset email via internal email service
+        email_sent = EmailNotificationService.send_password_reset(
             user_id=str(user.id),
             user_email=user.email,
             user_name=user.full_name,
@@ -887,7 +887,7 @@ def request_password_reset_view(request):
         )
 
         if not email_sent:
-            logger.error("Password reset delivery failed for %s (Novu + SMTP fallback)", email)
+            logger.error("Password reset delivery failed for %s", email)
             return Response({
                 'success': False,
                 'error': 'Failed to send password reset email'
@@ -1997,8 +1997,8 @@ class UserViewSet(viewsets.ModelViewSet):
         # Create invitation link
         invite_link = f"{settings.FRONTEND_URL}/accept-invite?uid={uid}&token={token}"
         
-        # Send invitation email via Novu
-        NovuService.send_user_invitation(
+        # Send invitation email via internal email service
+        EmailNotificationService.send_user_invitation(
             user_email=user.email,
             user_name=user.full_name,
             inviter_name=request.user.full_name,
