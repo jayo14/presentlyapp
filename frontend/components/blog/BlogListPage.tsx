@@ -89,6 +89,8 @@ export const BlogListPage: React.FC = () => {
     name: 'Blog | Presently',
     description: 'Attendance, EdTech, and building for Nigerian universities.',
     url: 'https://www.getpresently.com.ng/blog',
+  };
+
   return (
     <div className="min-h-screen bg-background text-text selection:bg-primaryContainer selection:text-primary">
       {/* SEO: Blog listing metadata and WebPage schema */}
@@ -101,11 +103,11 @@ export const BlogListPage: React.FC = () => {
 
       <LandingHeader />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-24 md:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-7xl px-4 py-24 md:px-6 lg:px-8 mt-6">
         <section className="relative overflow-hidden rounded-[2.5rem] border border-outline/20 bg-surface/40 p-8 md:p-16 backdrop-blur-xl">
           <div className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary/20 blur-[120px]" />
           <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-primary/10 blur-[100px]" />
-          
+
           <div className="relative z-10">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Presently Editorial</p>
             <h1 className="mt-4 font-headline text-5xl font-black tracking-tight text-text md:text-7xl">
@@ -149,7 +151,7 @@ export const BlogListPage: React.FC = () => {
                 <h2 className="font-headline text-3xl font-bold text-text">{featuredPost.title}</h2>
                 <p className="text-textMuted">{featuredPost.excerpt}</p>
                 <div className="flex flex-wrap gap-2">
-                  {featuredPost.tags.map((tag) => (
+                  {featuredPost.tags?.map((tag) => (
                     <TagBadge key={tag.slug} tag={tag} active={tagFilter === tag.slug} />
                   ))}
                 </div>

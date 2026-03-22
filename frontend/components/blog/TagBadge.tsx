@@ -18,13 +18,13 @@ export const TagBadge: React.FC<TagBadgeProps> = ({ tag, active = false }) => {
     <Link
       to={target}
       className={[
-        'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium transition-colors',
+        'inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wider transition-all duration-300',
         active
-          ? 'border-transparent bg-[#00FF94] text-[#0D1117]'
-          : 'border-zinc-700 text-zinc-300 hover:border-[#00FF94] hover:text-[#00FF94]',
+          ? 'border-primary bg-primary text-on-primary-fixed shadow-lg shadow-primary/20'
+          : 'border-outline/20 text-textMuted hover:border-primary/50 hover:text-primary hover:bg-primary/5',
       ].join(' ')}
     >
-      #{tag.name}
+      {tag.name}
     </Link>
   );
 };

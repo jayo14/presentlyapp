@@ -86,7 +86,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     borderColor:
       'color-mix(in srgb, var(--outline-variant) 36%, transparent)',
     boxShadow:
-      '0 10px 28px color-mix(in srgb, var(--inverse-surface) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-container-highest) 34%, transparent)',
+      '0 1px 12px color-mix(in srgb, var(--inverse-surface) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-container-highest) 34%, transparent)',
     backdropFilter: 'blur(18px) saturate(120%)',
     WebkitBackdropFilter: 'blur(18px) saturate(120%)',
   };

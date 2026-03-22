@@ -9,6 +9,8 @@ import { PostHeader } from './PostHeader';
 import { RelatedPosts } from './RelatedPosts';
 import { TableOfContents } from './TableOfContents';
 import { TagBadge } from './TagBadge';
+import { LandingHeader } from '../LandingHeader';
+import { LandingFooter } from '../LandingFooter';
 
 const slugify = (value: string): string =>
   value
@@ -102,7 +104,7 @@ const ShareButtons: React.FC<{ slug: string; title: string }> = ({ slug, title }
         href={`https://x.com/intent/post?text=${encodedTitle}&url=${encodedUrl}`}
         target="_blank"
         rel="noreferrer"
-        className="rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300 hover:text-[#00FF94]"
+        className="rounded-full border border-outline/20 px-4 py-1.5 text-sm text-textMuted transition-all hover:border-primary/50 hover:text-primary hover:bg-primary/5"
       >
         Share on X
       </a>
@@ -110,13 +112,13 @@ const ShareButtons: React.FC<{ slug: string; title: string }> = ({ slug, title }
         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
         target="_blank"
         rel="noreferrer"
-        className="rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300 hover:text-[#00FF94]"
+        className="rounded-full border border-outline/20 px-4 py-1.5 text-sm text-textMuted transition-all hover:border-primary/50 hover:text-primary hover:bg-primary/5"
       >
         Share on LinkedIn
       </a>
       <button
         onClick={() => navigator.clipboard?.writeText(absolute)}
-        className="rounded-full border border-zinc-700 px-3 py-1 text-sm text-zinc-300 hover:text-[#00FF94]"
+        className="rounded-full border border-outline/20 px-4 py-1.5 text-sm text-textMuted transition-all hover:border-primary/50 hover:text-primary hover:bg-primary/5"
       >
         Copy link
       </button>
@@ -167,27 +169,41 @@ export const BlogPostPage: React.FC = () => {
   }, [post]);
 
   if (loading) {
-    return <div className="min-h-screen bg-[#0D1117] px-6 py-16 text-zinc-200">Loading post...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <p className="mt-4 text-textMuted">Loading post...</p>
+      </div>
+    );
+  }
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-[#0D1117] px-6 py-16 text-zinc-100">
-        <BlogSEO
-          title="Blog Post Not Found"
-          description="Requested article could not be found."
-          canonicalPath="/blog"
-        />
-        <h1 className="font-headline text-3xl font-bold">Article Not Found</h1>
-        <Link className="mt-4 inline-flex text-[#00FF94]" to="/blog">Back to Blog</Link>
+      <div className="min-h-screen bg-background">
+        <LandingHeader />
+        <div className="mx-auto max-w-7xl px-4 py-32 text-center">
+          <BlogSEO
+            title="Blog Post Not Found"
+            description="Requested article could not be found."
+            canonicalPath="/blog"
+          />
+          <h1 className="font-headline text-4xl font-bold text-text">Article Not Found</h1>
+          <p className="mt-4 text-textMuted">The post you are looking for doesn't exist or has been moved.</p>
+          <Link className="mt-8 inline-flex btn-presently-primary px-6 py-3 rounded-full" to="/blog">
+            Back to Blog
+          </Link>
+        </div>
+        <LandingFooter />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0D1117] text-zinc-100 relative selection:bg-[#00FF94]/30 selection:text-white overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-[#00FF94]/5 from-10% to-transparent to-100%" />
-      <div className="pointer-events-none absolute -left-40 top-40 h-96 w-96 rounded-full bg-[#00FF94]/5 blur-[120px]" />
+    <div className="min-h-screen bg-background text-text relative selection:bg-primaryContainer selection:text-primary overflow-hidden">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-primary/5 from-10% to-transparent to-100%" />
+      <div className="pointer-events-none absolute -left-40 top-40 h-96 w-96 rounded-full bg-primary/5 blur-[120px]" />
       
       {/* SEO: Per-article metadata and Article schema */}
       <BlogSEO
@@ -199,16 +215,18 @@ export const BlogPostPage: React.FC = () => {
         jsonLd={articleSchema || undefined}
       />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-10 md:px-6 lg:px-8">
+      <LandingHeader />
+
+      <main className="relative z-10 mx-auto max-w-7xl px-4 py-24 md:px-6 lg:px-8">
         <div className="mb-12">
           <PostHeader post={post} />
         </div>
 
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_300px]">
-          <article className="prose prose-invert max-w-none prose-headings:font-headline prose-headings:text-white prose-a:text-[#00FF94] hover:prose-a:underline prose-code:text-[#00FF94] prose-pre:bg-[#111826] prose-pre:border prose-pre:border-white/5 prose-img:rounded-3xl prose-img:shadow-2xl">
+          <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-headline prose-headings:text-text prose-a:text-primary hover:prose-a:underline prose-code:text-primary prose-pre:bg-surface prose-pre:border prose-pre:border-outline/10 prose-img:rounded-3xl prose-img:shadow-2xl">
             <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }} />
 
-            <div className="mt-12 flex flex-wrap gap-3 border-t border-white/10 pt-8">
+            <div className="mt-12 flex flex-wrap gap-3 border-t border-outline/10 pt-8">
               {post.tags.map((tag) => (
                 <TagBadge key={tag.slug} tag={tag} />
               ))}
@@ -224,8 +242,8 @@ export const BlogPostPage: React.FC = () => {
           </aside>
         </div>
 
-        <div className="mt-20 border-t border-white/5 pt-16">
-          <h3 className="mb-8 font-headline text-3xl font-bold text-white">Read Next</h3>
+        <div className="mt-20 border-t border-outline/10 pt-16">
+          <h3 className="mb-8 font-headline text-3xl font-bold text-text">Read Next</h3>
           <RelatedPosts currentSlug={post.slug} tags={post.tags.map((tag) => tag.slug)} />
         </div>
 
@@ -233,6 +251,8 @@ export const BlogPostPage: React.FC = () => {
           <NewsletterSignup source={post.slug} />
         </section>
       </main>
+
+      <LandingFooter />
     </div>
   );
 };
