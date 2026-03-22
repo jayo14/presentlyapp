@@ -57,6 +57,7 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),  # Push notifications, FCM
     path('analytics/', include('analytics.urls')),  # Real-time analytics, insights
     path('reports/', include('reports.urls')),  # PDF/Excel exports
+    path('blog/', include('blog.urls')),  # Blog posts, tags, categories, newsletter
     path('exam-clearance/', include('exam_clearance.urls')),  # Exam clearance management
     path('system/', include('system.urls')),  # System logs, stats, config
 ]
