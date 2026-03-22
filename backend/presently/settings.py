@@ -288,8 +288,11 @@ EMAIL_HOST_PASSWORD = (
 GMAIL_API_REFRESH_TOKEN = os.environ.get('GMAIL_API_REFRESH_TOKEN', '')
 USE_GMAIL_API_EMAIL_BACKEND = os.environ.get('USE_GMAIL_API_EMAIL_BACKEND', 'False') == 'True'
 
-# Choose backend: SMTP by default, optional Gmail API only when explicitly enabled.
-if USE_GMAIL_API_EMAIL_BACKEND and os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
+# Choose backend: console in development, SMTP by default in production.
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    print('INFO: DEBUG=True; using console email backend.')
+elif USE_GMAIL_API_EMAIL_BACKEND and os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
     EMAIL_BACKEND = 'presently.email_backend.GmailApiEmailBackend'
     print("INFO: Using Gmail API email backend.")
 elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
