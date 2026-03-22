@@ -80,6 +80,7 @@ const UserManagement = lazyWithRetry(() => import('./components/Admin/UserManage
 const CourseManagement = lazyWithRetry(() => import('./components/Admin/CourseManagement').then(module => ({ default: module.CourseManagement })));
 const VenueManagement = lazyWithRetry(() => import('./components/Admin/VenueManagement'));
 const DepartmentManagement = lazyWithRetry(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
+const BlogManagement = lazyWithRetry(() => import('./components/Admin/BlogManagement').then(module => ({ default: module.BlogManagement })));
 
 // Loading fallback component
 const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." />;
@@ -290,6 +291,7 @@ const AppContent: React.FC = () => {
               <Route path="users" element={<AdminRoute><UserManagement /></AdminRoute>} />
               <Route path="venues" element={<AdminRoute><VenueManagement /></AdminRoute>} />
               <Route path="departments" element={<AdminRoute><DepartmentManagement /></AdminRoute>} />
+              <Route path="blog" element={<AdminRoute><BlogManagement /></AdminRoute>} />
               <Route path="logs" element={<AdminRoute><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
 
               {/* Lecturer Specific Routes */}
