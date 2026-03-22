@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'analytics',
     'notifications',
     'reports',
+    'blog',
     'exam_clearance',
     'accounts',
     'system',
