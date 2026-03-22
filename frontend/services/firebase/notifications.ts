@@ -178,8 +178,8 @@ export const setupForegroundMessageHandler = (
       if (Notification.permission === 'granted') {
         new Notification(title || 'New Notification', {
           body: body || '',
-          icon: icon || '/icon-192.png',
-          badge: '/icon-192.png',
+          icon: icon || '/logo.png',
+          badge: '/logo.png',
           data: payload.data,
         });
       }
@@ -256,8 +256,8 @@ export const showTestNotification = () => {
   if (Notification.permission === 'granted') {
     new Notification('Test Notification', {
       body: 'This is a test notification from Presently',
-      icon: '/icon-192.png',
-      badge: '/icon-192.png',
+      icon: '/logo.png',
+      badge: '/logo.png',
       tag: 'test-notification',
     });
   }

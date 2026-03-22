@@ -5,12 +5,12 @@ export default ({ config }) => {
     slug: "presently-attendance-app",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "../frontend/public/logo.png",
     scheme: "rork-app",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     splash: {
-      image: "./assets/images/icon.png",
+      image: "../frontend/public/logo.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
     },
@@ -20,13 +20,13 @@ export default ({ config }) => {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/icon.png",
+        foregroundImage: "../frontend/public/logo.png",
         backgroundColor: "#ffffff",
       },
       package: "app.rork.presently_attendance_app",
     },
     web: {
-      favicon: "./assets/images/favicon.png",
+      favicon: "../frontend/public/logo.png",
     },
     plugins: [
       [
