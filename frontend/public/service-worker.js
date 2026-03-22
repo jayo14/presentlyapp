@@ -1,12 +1,11 @@
-const CACHE_NAME = 'presently-v6';
+const CACHE_NAME = 'presently-v7';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/offline.html',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/favicon-32x32.png',
+  '/logo.png',
+  '/favicon.ico',
 ];
 
 const resolveApiBaseUrl = () => {
@@ -46,6 +45,7 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
@@ -62,6 +62,11 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/src/') ||
     url.hostname === 'localhost' && url.port === '3000' && !url.pathname.match(/\.(png|jpg|jpeg|svg|gif|webp|woff|woff2|json|ico)$/)
   ) {
+    return;
+  }
+
+  // Avoid stale hashed bundles after deploys (fixes runtime chunk mismatches)
+  if (url.pathname.startsWith('/assets/')) {
     return;
   }
 
@@ -118,8 +123,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'Presently Notification';
   const options = {
     body: data.body || 'You have a new update.',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/logo.png',
+    badge: '/logo.png',
     data: { url: data.url || '/' }
   };
 
@@ -191,8 +196,8 @@ async function syncAttendanceData() {
     // Show notification to user
     self.registration.showNotification('Sync Complete', {
       body: `Synced ${pendingRecords.length} attendance record(s)`,
-      icon: '/icon-192.png',
-      badge: '/icon-192.png',
+      icon: '/logo.png',
+      badge: '/logo.png',
     });
   } catch (error) {
     console.error('[Service Worker] Sync failed:', error);
