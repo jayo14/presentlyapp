@@ -22,10 +22,6 @@ class BlogPostPagination(PageNumberPagination):
     page_size = 10
 
 
-class PostListView(generics.ListAPIView):
-    # ... (no change in implementation, just keeping it here for context if needed, but I'll use replace_file_content properly)
-    pass # (placeholder, I will replace the whole block)
-
 # --- PUBLIC VIEWS ---
 
 class PostListView(generics.ListAPIView):
