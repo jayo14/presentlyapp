@@ -240,7 +240,7 @@ export const BlogListPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="mt-8">
+        <section className="mt-16">
           {loading ? (
             <p className="text-textMuted">Loading blog posts...</p>
           ) : (
