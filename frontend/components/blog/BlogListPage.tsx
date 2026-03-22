@@ -8,6 +8,8 @@ import { BlogSEO } from './BlogSEO';
 import { NewsletterSignup } from './NewsletterSignup';
 import { PostCard } from './PostCard';
 import { TagBadge } from './TagBadge';
+import { LandingHeader } from '../LandingHeader';
+import { LandingFooter } from '../LandingFooter';
 
 export const BlogListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -87,10 +89,8 @@ export const BlogListPage: React.FC = () => {
     name: 'Blog | Presently',
     description: 'Attendance, EdTech, and building for Nigerian universities.',
     url: 'https://www.getpresently.com.ng/blog',
-  };
-
   return (
-    <div className="min-h-screen bg-[#0D1117] text-zinc-100">
+    <div className="min-h-screen bg-background text-text selection:bg-primaryContainer selection:text-primary">
       {/* SEO: Blog listing metadata and WebPage schema */}
       <BlogSEO
         title="Blog | Presently"
@@ -99,24 +99,26 @@ export const BlogListPage: React.FC = () => {
         jsonLd={webPageSchema}
       />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6 lg:px-8">
-        <section className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#101827]/40 p-8 md:p-16 backdrop-blur-xl">
-          <div className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full bg-[#00FF94]/20 blur-[120px]" />
-          <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-[#00FF94]/10 blur-[100px]" />
+      <LandingHeader />
+
+      <main className="mx-auto w-full max-w-7xl px-4 py-24 md:px-6 lg:px-8">
+        <section className="relative overflow-hidden rounded-[2.5rem] border border-outline/20 bg-surface/40 p-8 md:p-16 backdrop-blur-xl">
+          <div className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary/20 blur-[120px]" />
+          <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-primary/10 blur-[100px]" />
           
           <div className="relative z-10">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#00FF94]">Presently Editorial</p>
-            <h1 className="mt-4 font-headline text-5xl font-black tracking-tight text-white md:text-7xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Presently Editorial</p>
+            <h1 className="mt-4 font-headline text-5xl font-black tracking-tight text-text md:text-7xl">
               The Presently Blog
             </h1>
-            <p className="mt-6 max-w-2xl text-lg text-zinc-400">
+            <p className="mt-6 max-w-2xl text-lg text-textMuted">
               Insightful commentary on attendance, EdTech, and building resilient systems for Nigerian institutions.
             </p>
 
-            <div className="mt-8 flex max-w-xl items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm transition-all focus-within:border-[#00FF94]/50 focus-within:bg-white/10 focus-within:ring-4 focus-within:ring-[#00FF94]/10">
-              <Search size={20} className="text-zinc-400" />
+            <div className="mt-8 flex max-w-xl items-center gap-3 rounded-2xl border border-outline/20 bg-surface px-4 py-3 backdrop-blur-sm transition-all focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10">
+              <Search size={20} className="text-textMuted" />
               <input
-                className="w-full bg-transparent text-base text-white placeholder:text-zinc-500 focus:outline-none"
+                className="w-full bg-transparent text-base text-text placeholder:text-textMuted focus:outline-none"
                 placeholder="Search articles, guides, or updates..."
                 defaultValue={searchFilter}
                 onKeyDown={(event) => {
@@ -131,28 +133,28 @@ export const BlogListPage: React.FC = () => {
         </section>
 
         {featuredPost && (
-          <section className="mt-8 overflow-hidden rounded-3xl border border-zinc-800 bg-[#111827]">
+          <section className="mt-8 overflow-hidden rounded-3xl border border-outline/20 bg-surface">
             <div className="grid gap-0 lg:grid-cols-2">
               <div className="h-72 lg:h-full">
                 {featuredPost.cover_image ? (
                   <img src={featuredPost.cover_image} alt={featuredPost.title} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="h-full w-full bg-zinc-900" />
+                  <div className="h-full w-full bg-surfaceHigh" />
                 )}
               </div>
               <div className="space-y-4 p-6 md:p-8">
-                <span className="inline-flex rounded-full bg-[#00FF94] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#0D1117]">
+                <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary">
                   Featured
                 </span>
-                <h2 className="font-headline text-3xl font-bold text-white">{featuredPost.title}</h2>
-                <p className="text-zinc-300">{featuredPost.excerpt}</p>
+                <h2 className="font-headline text-3xl font-bold text-text">{featuredPost.title}</h2>
+                <p className="text-textMuted">{featuredPost.excerpt}</p>
                 <div className="flex flex-wrap gap-2">
                   {featuredPost.tags.map((tag) => (
                     <TagBadge key={tag.slug} tag={tag} active={tagFilter === tag.slug} />
                   ))}
                 </div>
-                <p className="text-sm text-zinc-400">{featuredPost.reading_time} min read</p>
-                <Link to={`/blog/${featuredPost.slug}`} className="inline-flex text-sm font-semibold text-[#00FF94] hover:opacity-80">
+                <p className="text-sm text-textMuted">{featuredPost.reading_time} min read</p>
+                <Link to={`/blog/${featuredPost.slug}`} className="inline-flex text-sm font-semibold text-primary hover:opacity-80">
                   Read article →
                 </Link>
               </div>
@@ -166,7 +168,7 @@ export const BlogListPage: React.FC = () => {
               <button
                 className={[
                   'rounded-full border px-3 py-1 text-sm transition-colors',
-                  !categoryFilter ? 'border-transparent bg-[#00FF94] text-[#0D1117]' : 'border-zinc-700 text-zinc-300 hover:border-[#00FF94]',
+                  !categoryFilter ? 'border-transparent bg-primary text-on-primary-fixed' : 'border-outline/20 text-textMuted hover:border-primary hover:text-primary',
                 ].join(' ')}
                 onClick={() => updateFilter('category', undefined)}
               >
@@ -178,8 +180,8 @@ export const BlogListPage: React.FC = () => {
                   className={[
                     'rounded-full border px-3 py-1 text-sm transition-colors',
                     categoryFilter === category.slug
-                      ? 'border-transparent bg-[#00FF94] text-[#0D1117]'
-                      : 'border-zinc-700 text-zinc-300 hover:border-[#00FF94]',
+                      ? 'border-transparent bg-primary text-on-primary-fixed'
+                      : 'border-outline/20 text-textMuted hover:border-primary hover:text-primary',
                   ].join(' ')}
                   onClick={() => updateFilter('category', category.slug)}
                 >
@@ -200,7 +202,7 @@ export const BlogListPage: React.FC = () => {
 
         <section className="mt-8">
           {loading ? (
-            <p className="text-zinc-400">Loading blog posts...</p>
+            <p className="text-textMuted">Loading blog posts...</p>
           ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
               {gridPosts.map((post) => (
@@ -210,7 +212,7 @@ export const BlogListPage: React.FC = () => {
           )}
 
           {!loading && !gridPosts.length && (
-            <p className="mt-6 text-zinc-400">No posts matched your filters.</p>
+            <p className="mt-6 text-textMuted">No posts matched your filters.</p>
           )}
 
           {canLoadMore && (
@@ -218,7 +220,7 @@ export const BlogListPage: React.FC = () => {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="rounded-full bg-[#00FF94] px-5 py-2 text-sm font-semibold text-[#0D1117] disabled:cursor-not-allowed disabled:opacity-70"
+                className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-on-primary-fixed disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {loadingMore ? 'Loading...' : 'Load more'}
               </button>
@@ -230,6 +232,8 @@ export const BlogListPage: React.FC = () => {
           <NewsletterSignup source="blog-list" />
         </section>
       </main>
+
+      <LandingFooter />
     </div>
   );
 };
