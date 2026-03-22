@@ -91,7 +91,7 @@ export const InstitutionFormPage: React.FC = () => {
   };
 
   // Real-time validation function
-  const validateField = (field: keyof Institution, value: any): string | undefined {
+  const validateField = (field: keyof Institution, value: any): string | undefined => {
     switch (field) {
       case 'full_name':
         if (!value || !value.trim()) return 'Institution name is required';

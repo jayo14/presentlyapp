@@ -315,9 +315,6 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
         </div>
       )}
 
-      
-        />
-      )}
     </div>
   );
 };
