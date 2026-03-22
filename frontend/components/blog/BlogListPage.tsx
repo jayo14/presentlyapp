@@ -170,7 +170,7 @@ export const BlogListPage: React.FC = () => {
               <button
                 className={[
                   'rounded-full border px-3 py-1 text-sm transition-colors',
-                  !categoryFilter ? 'border-transparent bg-primary text-on-primary-fixed' : 'border-outline/20 text-textMuted hover:border-primary hover:text-primary',
+                  !categoryFilter ? 'border-transparent bg-primary text-white' : 'border-outline/20 text-textMuted hover:border-primary hover:text-primary',
                 ].join(' ')}
                 onClick={() => updateFilter('category', undefined)}
               >

@@ -38,7 +38,7 @@ export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ source }) =>
   return (
     <div className="rounded-[2rem] border border-outline/10 bg-surface/40 backdrop-blur-md p-8 sm:p-12 relative overflow-hidden">
       <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-[80px]" />
-      
+
       <div className="relative z-10 max-w-2xl">
         <h3 className="font-headline text-3xl font-black text-text tracking-tight">Stay ahead of the curve</h3>
         <p className="mt-4 text-lg text-textMuted leading-relaxed">
@@ -58,7 +58,7 @@ export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ source }) =>
           <button
             type="submit"
             disabled={loading}
-            className="h-14 rounded-2xl bg-primary px-8 text-base font-bold text-on-primary-fixed hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 shadow-xl shadow-primary/20"
+            className="h-14 rounded-2xl bg-primary px-8 text-white font-bold text-on-primary-fixed hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 shadow-xl shadow-primary/20"
           >
             {success ? "You're subscribed!" : loading ? 'Joining...' : 'Join 2,000+ readers'}
           </button>
