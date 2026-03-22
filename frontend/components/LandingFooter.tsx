@@ -32,17 +32,7 @@ export const LandingFooter: React.FC = () => {
       >
         <div className="lg:col-span-2">
           <Logo className="mb-4" />
-          <div
-            className="font-headline"
-            style={{
-              fontWeight: 700,
-              fontSize: '1.25rem',
-              marginBottom: '1rem',
-              color: 'var(--on-surface)',
-            }}
-          >
-            Presently
-          </div>
+
           <p
             style={{
               fontSize: '0.875rem',
