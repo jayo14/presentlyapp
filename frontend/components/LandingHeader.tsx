@@ -158,11 +158,11 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden p-2.5 text-textMuted hover:text-primary transition-all rounded-xl border border-outline/10 bg-surfaceHigh/40 hover:bg-primary/5 hover:border-primary/30"
+          className="md:hidden flex p-2 text-text hover:text-primary transition-all rounded-xl border border-outline/20 bg-surface/50 backdrop-blur-md shadow-sm active:scale-95"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
         >
-          {isMenuOpen ? <X size={20} className="animate-in fade-in zoom-in duration-300" /> : <Menu size={20} className="animate-in fade-in zoom-in duration-300" />}
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
