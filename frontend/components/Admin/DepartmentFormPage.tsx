@@ -215,7 +215,7 @@ export const DepartmentFormPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white dark:bg-surfaceLow">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
         {/* Header */}
         <div className="flex flex-col gap-6">
@@ -291,7 +291,7 @@ export const DepartmentFormPage: React.FC = () => {
                     onChange={(e) => handleChange('name', e.target.value)}
                     onBlur={() => handleBlur('name')}
                     placeholder="e.g., Computer Science"
-                    className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
+                    className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
                       getFieldError('name') ? 'border-red-500 focus:border-red-500' : ''
                     } ${!getFieldError('name') && touched.name && formData.name ? 'border-green-500' : ''}`}
                     required
@@ -322,7 +322,7 @@ export const DepartmentFormPage: React.FC = () => {
                     onChange={(e) => handleChange('code', e.target.value.toUpperCase())}
                     onBlur={() => handleBlur('code')}
                     placeholder="e.g., CSC"
-                    className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
+                    className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
                       getFieldError('code') ? 'border-red-500 focus:border-red-500' : ''
                     } ${!getFieldError('code') && touched.code && formData.code ? 'border-green-500' : ''}`}
                     required
@@ -353,7 +353,7 @@ export const DepartmentFormPage: React.FC = () => {
                     onChange={(e) => handleChange('abbreviation', e.target.value)}
                     onBlur={() => handleBlur('abbreviation')}
                     placeholder="e.g., COMP SCI"
-                    className={`h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
+                    className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
                       getFieldError('abbreviation') ? 'border-red-500 focus:border-red-500' : ''
                     } ${!getFieldError('abbreviation') && touched.abbreviation && formData.abbreviation ? 'border-green-500' : ''}`}
                   />
@@ -380,7 +380,7 @@ export const DepartmentFormPage: React.FC = () => {
                   onChange={(e) => handleChange('description', e.target.value)}
                   placeholder="Brief description of the department's focus and programs"
                   rows={3}
-                  className="w-full px-4 py-3 bg-background text-text placeholder:text-textMuted border border-outline rounded-2xl text-sm focus:outline-none focus:border-primary transition-colors resize-none"
+                  className="w-full px-4 py-3 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border border-outline rounded-2xl text-sm focus:outline-none focus:border-primary transition-colors resize-none"
                 />
               </div>
               
@@ -396,7 +396,7 @@ export const DepartmentFormPage: React.FC = () => {
                   placeholder="e.g., 1995"
                   min="1800"
                   max={new Date().getFullYear() + 5}
-                  className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
+                  className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
                 />
               </div>
               
@@ -408,7 +408,7 @@ export const DepartmentFormPage: React.FC = () => {
                 <select
                   value={formData.accreditation_status || ''}
                   onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                  className="w-full h-12 px-4 bg-background text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors cursor-pointer"
+                  className="w-full h-12 px-4 bg-white dark:bg-surfaceLow text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors cursor-pointer"
                 >
                   <option value="ACCREDITED">✓ Fully Accredited</option>
                   <option value="PROVISIONAL">⏳ Provisional</option>
@@ -434,7 +434,7 @@ export const DepartmentFormPage: React.FC = () => {
                   value={formData.head_of_department_name || ''}
                   onChange={(e) => handleChange('head_of_department_name', e.target.value)}
                   placeholder="e.g., Dr. Alan Turing"
-                  className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
+                  className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
                 />
               </div>
               
@@ -448,7 +448,7 @@ export const DepartmentFormPage: React.FC = () => {
                     onChange={(e) => handleChange('head_of_department_email', e.target.value)}
                     onBlur={() => handleBlur('head_of_department_email')}
                     placeholder="hod@example.edu"
-                    className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
+                    className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
                       getFieldError('head_of_department_email') ? 'border-red-500 focus:border-red-500' : ''
                     } ${!getFieldError('head_of_department_email') && touched.head_of_department_email && formData.head_of_department_email ? 'border-green-500' : ''}`}
                   />
@@ -477,7 +477,7 @@ export const DepartmentFormPage: React.FC = () => {
                     onChange={(e) => handleChange('contact_email', e.target.value)}
                     onBlur={() => handleBlur('contact_email')}
                     placeholder="dept@example.edu"
-                    className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
+                    className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
                       getFieldError('contact_email') ? 'border-red-500 focus:border-red-500' : ''
                     } ${!getFieldError('contact_email') && touched.contact_email && formData.contact_email ? 'border-green-500' : ''}`}
                   />
@@ -505,7 +505,7 @@ export const DepartmentFormPage: React.FC = () => {
                     onChange={(e) => handleChange('contact_phone', e.target.value)}
                     onBlur={() => handleBlur('contact_phone')}
                     placeholder="+234 800 000 0000"
-                    className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
+                    className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
                       getFieldError('contact_phone') ? 'border-red-500 focus:border-red-500' : ''
                     } ${!getFieldError('contact_phone') && touched.contact_phone && formData.contact_phone ? 'border-green-500' : ''}`}
                   />
@@ -530,7 +530,7 @@ export const DepartmentFormPage: React.FC = () => {
                   value={formData.office_location || ''}
                   onChange={(e) => handleChange('office_location', e.target.value)}
                   placeholder="e.g., Block C, Room 101"
-                  className="h-12 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary"
+                  className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
                 />
               </div>
               
@@ -544,7 +544,7 @@ export const DepartmentFormPage: React.FC = () => {
                     onChange={(e) => handleChange('website_url', e.target.value)}
                     onBlur={() => handleBlur('website_url')}
                     placeholder="https://dept.university.edu"
-                    className={`h-12 pl-10 bg-background text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
+                    className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary transition-all ${
                       getFieldError('website_url') ? 'border-red-500 focus:border-red-500' : ''
                     } ${!getFieldError('website_url') && touched.website_url && formData.website_url ? 'border-green-500' : ''}`}
                   />
@@ -585,7 +585,7 @@ export const DepartmentFormPage: React.FC = () => {
           </section>
 
           {/* Mobile Action Buttons */}
-          <div className="flex flex-col gap-3 sm:hidden sticky bottom-4 bg-background/95 backdrop-blur-lg p-4 -mx-4 border-t border-outline rounded-t-2xl shadow-2xl">
+          <div className="flex flex-col gap-3 sm:hidden sticky bottom-4 bg-white dark:bg-surfaceLow/95 backdrop-blur-lg p-4 -mx-4 border-t border-outline rounded-t-2xl shadow-2xl">
              <Button 
                onClick={handleSubmit} 
                disabled={loading} 

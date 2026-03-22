@@ -14,20 +14,20 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props 
 }) => {
-  const baseStyles = "inline-flex items-center justify-center rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:pointer-events-none";
+  const baseStyles = "inline-flex items-center justify-center rounded-xl font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:pointer-events-none active:scale-95";
   
   const variants = {
-    primary: "bg-primary-container text-on-primary-fixed hover:bg-primary-fixed-dim shadow-md shadow-primary/20",
-    secondary: "bg-surface-container text-on-surface hover:bg-surface-container-high border-border border-outline-variant",
-    outline: "border-border border-primary text-primary hover:bg-primary/10",
-    ghost: "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high",
+    primary: "bg-primaryContainer text-text hover:bg-primary shadow-md shadow-primary/20",
+    secondary: "bg-surfaceContainer text-text hover:bg-surfaceHigh border border-outline/30",
+    outline: "bg-transparent border-2 border-primary text-primary hover:bg-primary/10",
+    ghost: "text-textMuted hover:text-text hover:bg-surfaceLow",
   };
 
   const sizes = {
-    sm: "h-8 px-3 text-sm",
-    md: "h-10 px-5 text-sm",
-    lg: "h-12 px-8 text-on-primary-fixedase",
-    icon: "h-9 w-9 p-0",
+    sm: "h-9 px-4 text-xs",
+    md: "h-11 px-6 text-sm",
+    lg: "h-14 px-8 text-base",
+    icon: "h-10 w-10 p-0 rounded-full",
   };
 
   return (
