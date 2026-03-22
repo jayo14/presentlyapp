@@ -103,87 +103,126 @@ export const BlogListPage: React.FC = () => {
 
       <LandingHeader />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-24 md:px-6 lg:px-8 mt-6">
-        <section className="relative overflow-hidden rounded-[2.5rem] border border-outline/20 bg-surface/40 p-8 md:p-16 backdrop-blur-xl">
-          <div className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary/20 blur-[120px]" />
-          <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-primary/10 blur-[100px]" />
+      <main className="mx-auto w-full max-w-7xl px-4 py-32 md:px-6 lg:px-8">
+        <section className="relative overflow-hidden rounded-[3rem] border border-outline/10 bg-surface/30 p-8 md:p-20 backdrop-blur-2xl">
+          {/* Animated/Dynamic Blobs */}
+          <div className="pointer-events-none absolute -right-20 -top-20 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px] animate-pulse" />
+          <div className="pointer-events-none absolute -bottom-40 -left-40 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[100px]" />
+          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-secondaryContiner/5 blur-[150px]" />
 
-          <div className="relative z-10">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Presently Editorial</p>
-            <h1 className="mt-4 font-headline text-5xl font-black tracking-tight text-text md:text-7xl">
-              The Presently Blog
+          <div className="relative z-10 text-center max-w-4xl mx-auto">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-primary mb-8">
+              <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+              Presently Editorial
+            </span>
+            <h1 className="font-headline text-6xl font-black tracking-tight text-text md:text-8xl lg:text-[7rem] leading-[0.9]">
+              The <span className="text-primary italic">Presently</span> Blog
             </h1>
-            <p className="mt-6 max-w-2xl text-lg text-textMuted">
-              Insightful commentary on attendance, EdTech, and building resilient systems for Nigerian institutions.
+            <p className="mt-8 text-lg md:text-xl text-textMuted leading-relaxed max-w-2xl mx-auto">
+              Deep dives into attendance tech, university modernization, and the future of education in Nigeria.
             </p>
 
-            <div className="mt-8 flex max-w-xl items-center gap-3 rounded-2xl border border-outline/20 bg-surface px-4 py-3 backdrop-blur-sm transition-all focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10">
-              <Search size={20} className="text-textMuted" />
-              <input
-                className="w-full bg-transparent text-base text-text placeholder:text-textMuted focus:outline-none"
-                placeholder="Search articles, guides, or updates..."
-                defaultValue={searchFilter}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    const target = event.target as HTMLInputElement;
-                    updateFilter('search', target.value.trim() || undefined);
-                  }
+            <div className="mt-12 flex flex-col sm:flex-row max-w-2xl mx-auto items-stretch gap-3">
+              <div className="flex-1 flex items-center gap-3 rounded-2xl border border-outline/20 bg-surface/60 px-5 py-4 backdrop-blur-sm transition-all focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10">
+                <Search size={20} className="text-textMuted" />
+                <input
+                  className="w-full bg-transparent text-base text-text placeholder:text-textMuted focus:outline-none"
+                  placeholder="Search articles, stories, or guides..."
+                  defaultValue={searchFilter}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      const target = event.target as HTMLInputElement;
+                      updateFilter('search', target.value.trim() || undefined);
+                    }
+                  }}
+                />
+              </div>
+              <button
+                className="btn-presently-primary rounded-2xl px-8 font-bold"
+                onClick={() => {
+                  const input = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
+                  if (input) updateFilter('search', input.value.trim() || undefined);
                 }}
-              />
+              >
+                Search
+              </button>
             </div>
           </div>
         </section>
 
         {featuredPost && (
-          <section className="mt-8 overflow-hidden rounded-3xl border border-outline/20 bg-surface">
+          <section className="mt-16 overflow-hidden rounded-[2.5rem] border border-outline/10 bg-surface/40 backdrop-blur-md group hover:border-primary/30 transition-all duration-500">
             <div className="grid gap-0 lg:grid-cols-2">
-              <div className="h-72 lg:h-full">
+              <div className="h-80 lg:h-full relative overflow-hidden">
                 {featuredPost.cover_image ? (
-                  <img src={featuredPost.cover_image} alt={featuredPost.title} className="h-full w-full object-cover" />
+                  <img src={featuredPost.cover_image} alt={featuredPost.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 ) : (
-                  <div className="h-full w-full bg-surfaceHigh" />
+                  <div className="h-full w-full bg-gradient-to-br from-surfaceHigh to-surface" />
                 )}
+                <div className="absolute inset-0 bg-gradient-to-r from-background/20 to-transparent" />
               </div>
-              <div className="space-y-4 p-6 md:p-8">
-                <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary">
-                  Featured
-                </span>
-                <h2 className="font-headline text-3xl font-bold text-text">{featuredPost.title}</h2>
-                <p className="text-textMuted">{featuredPost.excerpt}</p>
+              <div className="flex flex-col justify-center gap-6 p-8 md:p-12">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex rounded-full bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
+                    Featured Post
+                  </span>
+                  {featuredPost.category?.name && (
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-textMuted">
+                      {featuredPost.category.name}
+                    </span>
+                  )}
+                </div>
+                <h2 className="font-headline text-4xl md:text-5xl font-black text-text leading-tight group-hover:text-primary transition-colors duration-300">
+                  {featuredPost.title}
+                </h2>
+                <p className="text-lg text-textMuted leading-relaxed line-clamp-3">
+                  {featuredPost.excerpt}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {featuredPost.tags?.map((tag) => (
                     <TagBadge key={tag.slug} tag={tag} active={tagFilter === tag.slug} />
                   ))}
                 </div>
-                <p className="text-sm text-textMuted">{featuredPost.reading_time} min read</p>
-                <Link to={`/blog/${featuredPost.slug}`} className="inline-flex text-sm font-semibold text-primary hover:opacity-80">
-                  Read article →
-                </Link>
+                <div className="flex items-center justify-between pt-6 border-t border-outline/10 mt-2">
+                  <div className="flex items-center gap-3">
+                    <span className="h-10 w-10 flex items-center justify-center rounded-full bg-surfaceHigh text-text font-bold border border-outline/10">
+                      {featuredPost.author_name.slice(0, 1).toUpperCase()}
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-text">{featuredPost.author_name}</span>
+                      <span className="text-[11px] text-textMuted">{featuredPost.reading_time} min read</span>
+                    </div>
+                  </div>
+                  <Link to={`/blog/${featuredPost.slug}`} className="btn-presently-secondary !px-6 !py-3 rounded-xl text-sm font-bold">
+                    Continue reading
+                  </Link>
+                </div>
               </div>
             </div>
           </section>
         )}
 
-        <section className="mt-8 space-y-3">
-          <div className="overflow-x-auto pb-2">
-            <div className="flex min-w-max items-center gap-2">
+        <section className="mt-20 space-y-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <h3 className="font-headline text-2xl font-black text-text">Explore Categories</h3>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
               <button
                 className={[
-                  'rounded-full border px-3 py-1 text-sm transition-colors',
-                  !categoryFilter ? 'border-transparent bg-primary text-white' : 'border-outline/20 text-textMuted hover:border-primary hover:text-primary',
+                  'rounded-xl border px-5 py-2.5 text-sm font-bold transition-all duration-300 whitespace-nowrap',
+                  !categoryFilter ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105' : 'border-outline/10 text-textMuted hover:border-primary/50 hover:text-text hover:bg-surfaceHigh',
                 ].join(' ')}
                 onClick={() => updateFilter('category', undefined)}
               >
-                All categories
+                All Stories
               </button>
               {categories.map((category) => (
                 <button
                   key={category.slug}
                   className={[
-                    'rounded-full border px-3 py-1 text-sm transition-colors',
+                    'rounded-xl border px-5 py-2.5 text-sm font-bold transition-all duration-300 whitespace-nowrap',
                     categoryFilter === category.slug
-                      ? 'border-transparent bg-primary text-on-primary-fixed'
-                      : 'border-outline/20 text-textMuted hover:border-primary hover:text-primary',
+                      ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105'
+                      : 'border-outline/10 text-textMuted hover:border-primary/50 hover:text-text hover:bg-surfaceHigh',
                   ].join(' ')}
                   onClick={() => updateFilter('category', category.slug)}
                 >
@@ -193,12 +232,11 @@ export const BlogListPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto pb-2">
-            <div className="flex min-w-max items-center gap-2">
-              {tags.map((tag) => (
-                <TagBadge key={tag.slug} tag={tag} active={tagFilter === tag.slug} />
-              ))}
-            </div>
+          <div className="flex items-center gap-3 flex-wrap border-t border-outline/10 pt-8">
+            <span className="text-xs font-bold uppercase tracking-widest text-textMuted/60 mr-2">Top Tags:</span>
+            {tags.slice(0, 12).map((tag) => (
+              <TagBadge key={tag.slug} tag={tag} active={tagFilter === tag.slug} />
+            ))}
           </div>
         </section>
 
