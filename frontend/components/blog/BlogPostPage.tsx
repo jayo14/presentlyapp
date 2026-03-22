@@ -9,6 +9,7 @@ import { PostHeader } from './PostHeader';
 import { RelatedPosts } from './RelatedPosts';
 import { TableOfContents } from './TableOfContents';
 import { TagBadge } from './TagBadge';
+import { ShareButtons } from './ShareButtons';
 import { LandingHeader } from '../LandingHeader';
 import { LandingFooter } from '../LandingFooter';
 
@@ -93,38 +94,7 @@ const markdownToHtml = (content: string): string => {
   return html.join('\n');
 };
 
-const ShareButtons: React.FC<{ slug: string; title: string }> = ({ slug, title }) => {
-  const absolute = `https://www.getpresently.com.ng/blog/${slug}`;
-  const encodedTitle = encodeURIComponent(title);
-  const encodedUrl = encodeURIComponent(absolute);
-
-  return (
-    <div className="mt-8 flex flex-wrap items-center gap-3">
-      <a
-        href={`https://x.com/intent/post?text=${encodedTitle}&url=${encodedUrl}`}
-        target="_blank"
-        rel="noreferrer"
-        className="rounded-full border border-outline/20 px-4 py-1.5 text-sm text-textMuted transition-all hover:border-primary/50 hover:text-primary hover:bg-primary/5"
-      >
-        Share on X
-      </a>
-      <a
-        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
-        target="_blank"
-        rel="noreferrer"
-        className="rounded-full border border-outline/20 px-4 py-1.5 text-sm text-textMuted transition-all hover:border-primary/50 hover:text-primary hover:bg-primary/5"
-      >
-        Share on LinkedIn
-      </a>
-      <button
-        onClick={() => navigator.clipboard?.writeText(absolute)}
-        className="rounded-full border border-outline/20 px-4 py-1.5 text-sm text-textMuted transition-all hover:border-primary/50 hover:text-primary hover:bg-primary/5"
-      >
-        Copy link
-      </button>
-    </div>
-  );
-};
+// Remove local ShareButtons as we are importing it from components/blog/ShareButtons.tsx
 
 export const BlogPostPage: React.FC = () => {
   const { slug = '' } = useParams();
@@ -169,14 +139,12 @@ export const BlogPostPage: React.FC = () => {
   }, [post]);
 
   if (loading) {
-  if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <p className="mt-4 text-textMuted">Loading post...</p>
+        <p className="mt-4 text-textMuted text-lg font-medium">Coming presently...</p>
       </div>
     );
-  }
   }
 
   if (!post) {
