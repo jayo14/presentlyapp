@@ -1,9 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import rehypeHighlight from 'rehype-highlight';
-import rehypeSlug from 'rehype-slug';
-import remarkGfm from 'remark-gfm';
 
 import { getPostBySlug } from '../../src/lib/blog';
 import type { Post } from '../../src/types/blog';
@@ -21,6 +17,79 @@ const slugify = (value: string): string =>
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
+
+const escapeHtml = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+const markdownToHtml = (content: string): string => {
+  const lines = content.split('\n');
+  const html: string[] = [];
+  let inCode = false;
+  let inList = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+
+    if (line.startsWith('```')) {
+      if (!inCode) {
+        inCode = true;
+        html.push('<pre><code>');
+      } else {
+        inCode = false;
+        html.push('</code></pre>');
+      }
+      continue;
+    }
+
+    if (inCode) {
+      html.push(`${escapeHtml(line)}\n`);
+      continue;
+    }
+
+    if (/^###\s+/.test(line)) {
+      const text = line.replace(/^###\s+/, '').trim();
+      html.push(`<h3 id="${slugify(text)}">${escapeHtml(text)}</h3>`);
+      continue;
+    }
+
+    if (/^##\s+/.test(line)) {
+      const text = line.replace(/^##\s+/, '').trim();
+      html.push(`<h2 id="${slugify(text)}">${escapeHtml(text)}</h2>`);
+      continue;
+    }
+
+    if (/^[-*]\s+/.test(line)) {
+      if (!inList) {
+        inList = true;
+        html.push('<ul>');
+      }
+      html.push(`<li>${escapeHtml(line.replace(/^[-*]\s+/, '').trim())}</li>`);
+      continue;
+    }
+
+    if (inList) {
+      inList = false;
+      html.push('</ul>');
+    }
+
+    if (!line) {
+      html.push('');
+      continue;
+    }
+
+    html.push(`<p>${escapeHtml(line)}</p>`);
+  }
+
+  if (inList) html.push('</ul>');
+  if (inCode) html.push('</code></pre>');
+
+  return html.join('\n');
+};
 
 const ShareButtons: React.FC<{ slug: string; title: string }> = ({ slug, title }) => {
   const absolute = `https://www.getpresently.com.ng/blog/${slug}`;
@@ -132,22 +201,7 @@ export const BlogPostPage: React.FC = () => {
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
           <article className="prose prose-invert max-w-none prose-headings:font-headline prose-headings:text-white prose-a:text-[#00FF94] prose-code:text-[#00FF94]">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeSlug, rehypeHighlight]}
-              components={{
-                h2: ({ children }: { children?: React.ReactNode }) => {
-                  const text = String(children);
-                  return <h2 id={slugify(text)}>{children}</h2>;
-                },
-                h3: ({ children }: { children?: React.ReactNode }) => {
-                  const text = String(children);
-                  return <h3 id={slugify(text)}>{children}</h3>;
-                },
-              }}
-            >
-              {post.content}
-            </ReactMarkdown>
+            <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }} />
 
             <div className="mt-8 flex flex-wrap gap-2 border-t border-zinc-800 pt-5">
               {post.tags.map((tag) => (
