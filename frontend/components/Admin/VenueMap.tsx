@@ -435,6 +435,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   const flyToVenue = useCallback((venue: Venue) => {
     const map = mapRef.current;
     if (!map || !venue.latitude || !venue.longitude) return;
+    map.resize();
     map.flyTo({
       center: [Number(venue.longitude), Number(venue.latitude)],
       zoom: 17,
@@ -575,6 +576,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     map.on('load', () => {
       addSourcesAndLayers(map);
       renderVenueMarkers(map);
+      map.resize();
+      window.setTimeout(() => map.resize(), 180);
       setMapReady(true);
     });
 
@@ -661,10 +664,34 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     };
   }, [addSourcesAndLayers, clearVenueMarkers, renderVenueMarkers]);
 
+  // Keep map viewport in sync with container/layout changes
+  useEffect(() => {
+    const map = mapRef.current;
+    const container = mapContainerRef.current;
+    if (!map || !container || !mapReady) return;
+
+    const handleResize = () => map.resize();
+    const observer = new ResizeObserver(handleResize);
+    observer.observe(container);
+    window.addEventListener('resize', handleResize);
+
+    const rafId = window.requestAnimationFrame(handleResize);
+    const timeoutId = window.setTimeout(handleResize, 200);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', handleResize);
+      window.cancelAnimationFrame(rafId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [mapReady]);
+
   // Sync venue data to map
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
+
+    map.resize();
 
     const pSrc = map.getSource('venue-points') as maplibregl.GeoJSONSource | undefined;
     const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
@@ -693,6 +720,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       });
       if (!bounds.isEmpty()) {
         try {
+          map.resize();
           map.fitBounds(bounds, { padding: 60, maxZoom: 16 });
         } catch (error) {
           // If map cannot fit bounds (e.g., too small container), fall back to first venue
