@@ -16,7 +16,7 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
   if (!items.length) return null;
 
   return (
-    <div className="pointer-events-auto mx-auto flex h-16 items-end gap-3 rounded-[1.75rem] border border-light-border bg-white/90 px-3 py-2 shadow-2xl shadow-black/20 backdrop-blur-md dark:border-dark-border dark:bg-dark-surface/90">
+    <div className="pointer-events-auto mx-auto flex h-16 items-end gap-3 rounded-[1.75rem] border border-outline/30 bg-white/95 dark:bg-surface/95 px-3 py-2 shadow-2xl backdrop-blur-xl transition-colors duration-300">
       {items.map((item) => {
         const isActive = !!item.active;
 
@@ -25,25 +25,24 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
             key={item.id}
             type="button"
             onClick={item.onClick}
-            className="group flex flex-col items-center justify-end gap-1 min-w-[56px] py-1 outline-none"
+            className="group flex flex-col items-center justify-end gap-1 min-w-[56px] py-1 outline-none transition-all duration-200"
           >
             <div
               className={[
-                "flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-200",
-                "bg-transparent group-hover:bg-zinc-100/80 dark:group-hover:bg-zinc-800/80",
+                "flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300 ease-out",
                 isActive
-                  ? "scale-105 text-primary dark:text-dark-primary bg-zinc-100/80 dark:bg-zinc-800/80"
-                  : "text-light-text-tertiary dark:text-dark-text-tertiary",
+                  ? "scale-105 bg-surfaceContainer/50 text-text shadow-md"
+                  : "bg-transparent text-textMuted hover:bg-surfaceContainer/50 hover:text-text hover:scale-105",
               ].join(" ")}
             >
               {item.icon}
             </div>
             <span
               className={[
-                "text-[10px] font-medium transition-colors duration-200",
+                "text-[10px] font-semibold transition-colors duration-300 tracking-wide",
                 isActive
-                  ? "text-primary dark:text-dark-primary"
-                  : "text-light-text-tertiary dark:text-dark-text-tertiary",
+                  ? "text-text"
+                  : "text-textMuted group-hover:text-text",
               ].join(" ")}
             >
               {item.label}

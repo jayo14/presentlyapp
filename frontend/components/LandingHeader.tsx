@@ -21,7 +21,6 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 
   const navItems = [
     { label: 'Solutions', to: '/#solutions', anchorId: 'solutions', match: { pathname: '/', hash: '#solutions' } },
-    { label: 'Resources', to: '/#resources', anchorId: 'resources', match: { pathname: '/', hash: '#resources' } },
     { label: 'Pricing', to: '/#pricing', anchorId: 'pricing', match: { pathname: '/', hash: '#pricing' } },
     { label: 'Documentation', to: '/documentation', match: { pathname: '/documentation' } },
     { label: 'Volunteers', to: '/volunteers', match: { pathname: '/volunteers' } },
@@ -82,22 +81,22 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-cardackgroundlack/50 backdrop-blur-xl border-b border-white/5 py-6">
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+    <nav className="fixed top-0 w-full z-50 bg-background/80 dark:bg-background/90 backdrop-blur-xl border-b border-outline/10 py-4 md:py-6 transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
         <div className="cursor-pointer" onClick={() => navigate('/')}>
-          <Logo className="h-8 w-auto" />
+          <Logo className="h-7 w-auto sm:h-8" />
         </div>
         
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-textMuted">
+        <div className="hidden md:flex items-center gap-4 lg:gap-8 text-sm font-medium text-textMuted">
           {navItems.map((item) => {
             const active = isActive(item);
             return (
               <Link
                 key={item.label}
                 to={item.to}
-                className={`relative pb-1 transition-all duration-300 ease-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-primary/60 after:transition-all after:duration-300 after:ease-out hover:after:w-full ${
-                  active ? 'text-text' : 'text-muted-foreground hover:text-white'
+                className={`relative pb-1 transition-all duration-300 ease-out after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-primary/60 after:transition-all after:duration-300 after:ease-out hover:after:w-full whitespace-nowrap ${
+                  active ? 'text-text' : 'text-textMuted hover:text-text'
                 }`}
               >
                 {item.label}
@@ -111,17 +110,18 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               </Link>
             );
           })}
-          <div className="h-4 w-px bg-surface/10 mx-2" />
-          <Button variant="ghost" className="text-text hover:text-primary px-4" onClick={handleLogin}>Sign In</Button>
-          <Button className="bg-primary text-on-primary-fixedlack hover:bg-primary-dark px-6 font-bold" onClick={handleGetStarted}>Get Started</Button>
+          <div className="h-4 w-px bg-outline/20 mx-1" />
+          <Button variant="ghost" className="text-text hover:text-primary px-3 lg:px-4 text-sm" onClick={handleLogin}>Sign In</Button>
+          <Button className="bg-primary text-on-primary-fixed hover:opacity-90 px-4 lg:px-6 font-bold text-sm transition-opacity" onClick={handleGetStarted}>Get Started</Button>
         </div>
 
         {/* Mobile Menu Toggle */}
         <button 
-          className="md:hidden p-2 text-textMuted hover:text-text"
+          className="md:hidden p-2 text-textMuted hover:text-text transition-colors rounded-lg hover:bg-surfaceHigh"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
         >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
@@ -132,9 +132,10 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background border-b border-white/5 overflow-hidden"
+            transition={{ duration: 0.2 }}
+            className="md:hidden bg-background border-b border-outline/10 overflow-hidden"
           >
-            <div className="px-6 py-8 flex flex-col gap-6">
+            <div className="px-4 sm:px-6 py-6 sm:py-8 flex flex-col gap-4 sm:gap-6 max-h-[calc(100vh-80px)] overflow-y-auto">
               {navItems.map((item) => {
                 const active = isActive(item);
                 return (
@@ -142,20 +143,31 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
                     key={item.label}
                     to={item.to}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`rounded-lg px-2 py-1 text-lg font-medium transition-all duration-300 ease-out ${
+                    className={`rounded-xl px-4 py-3 text-base sm:text-lg font-medium transition-all duration-200 ${
                       active
-                        ? 'bg-white/10 text-white'
-                        : 'text-muted-foreground hover:bg-white/5 hover:text-white'
+                        ? 'bg-primaryContainer/20 text-primary border border-primary/20'
+                        : 'text-textMuted hover:bg-surfaceHigh hover:text-text'
                     }`}
                   >
                     {item.label}
                   </Link>
                 );
               })}
-              <hr className="border-white/5" />
-              <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full h-14 border-white/10 text-text" onClick={handleLogin}>Sign In</Button>
-                <Button className="w-full h-14 bg-primary text-on-primary-fixedlack font-bold" onClick={handleGetStarted}>Get Started</Button>
+              <hr className="border-outline/20 my-2" />
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <Button 
+                  variant="outline" 
+                  className="w-full h-12 sm:h-14 border-outline/20 text-text hover:bg-surfaceHigh text-base font-semibold" 
+                  onClick={handleLogin}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  className="w-full h-12 sm:h-14 bg-primary text-on-primary-fixed font-bold text-base hover:opacity-90 transition-opacity" 
+                  onClick={handleGetStarted}
+                >
+                  Get Started
+                </Button>
               </div>
             </div>
           </motion.div>

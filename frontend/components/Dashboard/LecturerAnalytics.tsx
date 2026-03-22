@@ -170,8 +170,8 @@ export const LecturerAnalytics: React.FC = () => {
             </div>
           </div>
           
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[300px] w-full min-h-[300px]">
+            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
               <BarChart data={dashboardData?.weekly_overview}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#3f3f46" opacity={0.1} />
                 <XAxis 
@@ -211,8 +211,8 @@ export const LecturerAnalytics: React.FC = () => {
           <h3 className="font-headline text-lg font-bold mb-1">Status Distribution</h3>
           <p className="text-sm text-textMuted mb-8">Overall student standing</p>
           
-          <div className="h-[250px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[250px] w-full relative min-h-[250px]">
+            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
               <PieChart>
                 <Pie
                   data={[

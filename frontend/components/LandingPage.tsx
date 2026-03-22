@@ -108,6 +108,7 @@ export const LandingPage: React.FC = () => {
       >
         {/* ── NAV ──────────────────────────────────────────────────────────── */}
         <nav
+          className="dark:bg-background/90 dark:border-outline/10"
           style={{
             position: 'fixed',
             top: 0,
@@ -126,8 +127,9 @@ export const LandingPage: React.FC = () => {
               alignItems: 'center',
               maxWidth: 1440,
               margin: '0 auto',
-              padding: '1rem 2rem',
+              padding: '0.75rem 1rem',
             }}
+            className="sm:px-6 md:px-8 md:py-4"
           >
 
             <Logo />
@@ -139,7 +141,6 @@ export const LandingPage: React.FC = () => {
             >
               {[
                 { label: 'Solutions', href: '#solutions', active: true },
-                { label: 'Resources', href: '#resources' },
                 { label: 'Pricing', href: '#pricing' },
                 { label: 'Documentation', href: '/documentation' },
                 { label: 'Volunteers', href: '/volunteers' },
@@ -167,11 +168,13 @@ export const LandingPage: React.FC = () => {
 
             {/* Auth buttons */}
             <div
-              style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}
+              className="hidden sm:flex mobile-hide"
+              style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
             >
               <Button
                 variant="ghost"
                 onClick={goLogin}
+                className="hidden md:inline-flex"
                 style={{
                   fontWeight: 600,
                   fontSize: '0.875rem',
@@ -182,7 +185,7 @@ export const LandingPage: React.FC = () => {
               </Button>
               <Button
                 onClick={goRegister}
-                className="btn-presently-primary"
+                className="btn-presently-primary text-sm md:text-base px-4 md:px-6"
               >
                 Get Started
               </Button>
@@ -190,13 +193,13 @@ export const LandingPage: React.FC = () => {
           </div>
         </nav>
 
-        <main style={{ paddingTop: '5.5rem' }}>
+        <main className="pt-20 sm:pt-24 md:pt-28">
           {/* ── HERO ───────────────────────────────────────────────────────── */}
           <section
             id="platform"
+            className="px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20 lg:py-24"
             style={{
               position: 'relative',
-              padding: '5rem 2rem 7rem',
               maxWidth: 1440,
               margin: '0 auto',
               overflow: 'visible',
@@ -220,17 +223,14 @@ export const LandingPage: React.FC = () => {
             />
 
             <div
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(12,1fr)',
-                gap: '2rem',
-                alignItems: 'center',
                 position: 'relative',
                 zIndex: 1,
               }}
             >
               {/* Copy */}
-              <div style={{ gridColumn: 'span 7' }}>
+              <div className="lg:col-span-7 text-center lg:text-left">
                 <Badge
                   variant="secondary"
                   style={{
@@ -250,14 +250,13 @@ export const LandingPage: React.FC = () => {
                 </Badge>
 
                 <h1
-                  className="font-headline"
+                  className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
                   style={{
-                    fontSize: 'clamp(3rem,7vw,5.5rem)',
                     lineHeight: 1.05,
                     fontWeight: 800,
                     letterSpacing: '-0.04em',
                     color: 'var(--on-surface)',
-                    marginBottom: '2rem',
+                    marginBottom: '1.5rem',
                   }}
                 >
                   Attendance, <br />
@@ -267,11 +266,11 @@ export const LandingPage: React.FC = () => {
                 </h1>
 
                 <p
+                  className="text-base sm:text-lg md:text-xl mx-auto lg:mx-0"
                   style={{
-                    fontSize: '1.2rem',
                     color: 'var(--on-surface-variant)',
                     maxWidth: 520,
-                    marginBottom: '2.5rem',
+                    marginBottom: '2rem',
                     lineHeight: 1.65,
                   }}
                 >
@@ -281,9 +280,8 @@ export const LandingPage: React.FC = () => {
                 </p>
 
                 <div
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start"
                   style={{
-                    display: 'flex',
-                    gap: '1rem',
                     flexWrap: 'wrap',
                   }}
                 >
@@ -310,7 +308,8 @@ export const LandingPage: React.FC = () => {
 
               {/* Hero card */}
               <div
-                style={{ gridColumn: 'span 5', position: 'relative' }}
+                className="lg:col-span-5 hidden lg:block"
+                style={{ position: 'relative' }}
               >
                 <div
                   style={{
@@ -583,17 +582,16 @@ export const LandingPage: React.FC = () => {
           {/* ── BENTO ──────────────────────────────────────────────────────── */}
           <section
             id="solutions"
+            className="px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20 lg:py-28"
             style={{
               background: 'var(--surface-container-low)',
-              padding: '8rem 2rem',
             }}
           >
             <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-              <div className="fade-up" style={{ marginBottom: '5rem' }}>
+              <div className="fade-up text-center lg:text-left" style={{ marginBottom: '3rem', marginBottom: 'clamp(2rem, 5vw, 5rem)' }}>
                 <h2
-                  className="font-headline"
+                  className="font-headline text-3xl sm:text-4xl md:text-5xl"
                   style={{
-                    fontSize: 'clamp(2rem,4vw,3.25rem)',
                     fontWeight: 700,
                     letterSpacing: '-0.03em',
                     color: 'var(--on-surface)',
@@ -605,10 +603,10 @@ export const LandingPage: React.FC = () => {
                   Sophisticated Oversight.
                 </h2>
                 <p
+                  className="text-base sm:text-lg md:text-xl mx-auto lg:mx-0"
                   style={{
                     color: 'var(--on-surface-variant)',
                     maxWidth: 600,
-                    fontSize: '1.1rem',
                     lineHeight: 1.65,
                   }}
                 >
@@ -618,22 +616,17 @@ export const LandingPage: React.FC = () => {
               </div>
 
               <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(12,1fr)',
-                  gap: '2rem',
-                }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8"
               >
                 {/* Analytics card */}
                 <div
-                  className="fade-up hover-lift"
+                  className="fade-up hover-lift lg:col-span-8"
                   style={{
-                    gridColumn: 'span 8',
                     background: 'var(--surface-container-lowest)',
-                    padding: '2.5rem',
-                    borderRadius: '2rem',
+                    padding: 'clamp(1.5rem, 4vw, 2.5rem)',
+                    borderRadius: '1.5rem',
                     border: '1px solid rgba(210,197,171,0.12)',
-                    height: 480,
+                    minHeight: '400px',
                     position: 'relative',
                     overflow: 'hidden',
                     display: 'flex',
@@ -749,13 +742,12 @@ export const LandingPage: React.FC = () => {
 
                 {/* Biometric card */}
                 <div
-                  className="fade-up hover-lift"
+                  className="fade-up hover-lift lg:col-span-4"
                   style={{
-                    gridColumn: 'span 4',
                     background: 'var(--primary)',
-                    padding: '2.5rem',
-                    borderRadius: '2rem',
-                    height: 480,
+                    padding: 'clamp(1.5rem, 4vw, 2.5rem)',
+                    borderRadius: '1.5rem',
+                    minHeight: '400px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',

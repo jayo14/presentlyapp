@@ -5,6 +5,6 @@ export const Logo: React.FC<{ className?: string }> = ({ className = "" }) => (
     <div className="w-8 h-8">
       <img src="/logo.png" alt="Presently Logo" className="w-full" />
     </div>
-    <span className="text-on-surface">Presently</span>
+    <span className="text-text dark:text-text transition-colors">Presently</span>
   </div>
 );
