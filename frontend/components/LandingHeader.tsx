@@ -80,8 +80,29 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     onLogin();
   };
 
+  const glassHeaderStyle: React.CSSProperties = {
+    background:
+      'color-mix(in srgb, var(--surface-container-low) 74%, transparent)',
+    borderColor:
+      'color-mix(in srgb, var(--outline-variant) 36%, transparent)',
+    boxShadow:
+      '0 10px 28px color-mix(in srgb, var(--inverse-surface) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-container-highest) 34%, transparent)',
+    backdropFilter: 'blur(18px) saturate(120%)',
+    WebkitBackdropFilter: 'blur(18px) saturate(120%)',
+  };
+
+  const glassMenuStyle: React.CSSProperties = {
+    background:
+      'color-mix(in srgb, var(--surface) 86%, transparent)',
+    borderColor:
+      'color-mix(in srgb, var(--outline-variant) 34%, transparent)',
+  };
+
   return (
-    <nav className="fixed top-0 w-full z-50 bg-background/80 dark:bg-background/90 backdrop-blur-xl border-b border-outline/10 py-4 md:py-6 transition-all">
+    <nav
+      className="fixed top-0 w-full z-50 border-b py-4 md:py-6 transition-all"
+      style={glassHeaderStyle}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
         <div className="cursor-pointer" onClick={() => navigate('/')}>
           <Logo className="h-7 w-auto sm:h-8" />
@@ -133,7 +154,8 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-background border-b border-outline/10 overflow-hidden"
+            className="md:hidden border-b overflow-hidden"
+            style={glassMenuStyle}
           >
             <div className="px-4 sm:px-6 py-6 sm:py-8 flex flex-col gap-4 sm:gap-6 max-h-[calc(100vh-80px)] overflow-y-auto">
               {navItems.map((item) => {
