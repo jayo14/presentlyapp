@@ -51,112 +51,54 @@ gsap.registerPlugin(ScrollTrigger);
 // ─── GSAP animations hook ─────────────────────────────────────────────────────────
 function useGSAPAnimations() {
   React.useEffect(() => {
-    // 1. Unified Reveal for fade-up elements with reduced blur
+    // Reveal animations for fade-up elements
     const fadeElements = document.querySelectorAll('.fade-up');
     fadeElements.forEach((el) => {
       gsap.fromTo(el, 
         { 
           opacity: 0, 
-          y: 60,
-          filter: 'blur(4px)' // Reduced blur from 10px to 4px
+          y: 40,
+          filter: 'blur(10px)'
         }, 
         {
           opacity: 1,
           y: 0,
           filter: 'blur(0px)',
-          duration: 1.5,
-          ease: 'power3.out',
+          duration: 1.2,
+          ease: 'power4.out',
           scrollTrigger: {
             trigger: el,
-            start: 'top 88%',
+            start: 'top 85%',
             toggleActions: 'play none none none'
           }
         }
       );
     });
 
-    // 2. Storytelling staggered reveal for text sections
-    const textSections = document.querySelectorAll('h1, h2, p');
-    textSections.forEach((section) => {
-       if (section.closest('.fade-up')) return; // Avoid double animation
-       gsap.from(section, {
-         opacity: 0,
-         x: -30,
-         duration: 1,
-         stagger: 0.2,
-         scrollTrigger: {
-           trigger: section,
-           start: 'top 90%',
-           toggleActions: 'play none none none'
-         }
-       });
-    });
-
-    // 3. Cinematic Side Reveals
-    const leftReveals = document.querySelectorAll('.reveal-left');
-    leftReveals.forEach((el) => {
-      gsap.fromTo(el, 
-        { opacity: 0, x: -100 }, 
-        {
-          opacity: 1,
-          x: 0,
-          duration: 1.2,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-          }
-        }
-      );
-    });
-
-    const rightReveals = document.querySelectorAll('.reveal-right');
-    rightReveals.forEach((el) => {
-      gsap.fromTo(el, 
-        { opacity: 0, x: 100 }, 
-        {
-          opacity: 1,
-          x: 0,
-          duration: 1.2,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-          }
-        }
-      );
-    });
-
-    // 4. Immersive Parallax for deeper background layers
+    // Parallax for background orbs
     const orbs = document.querySelectorAll('.orb-animate');
     orbs.forEach((orb) => {
       gsap.to(orb, {
-        y: -150,
-        x: 80,
-        scale: 1.1,
+        y: -100,
+        x: 50,
         scrollTrigger: {
           trigger: orb,
           start: 'top bottom',
           end: 'bottom top',
-          scrub: 2
+          scrub: 1.5
         }
       });
     });
 
-    // 4. Hero storytelling entry
-    const heroTl = gsap.timeline();
-    heroTl.from('.hero-card', {
-      scale: 0.85,
+    // Scaling animations for hero elements
+    gsap.from('.hero-card', {
+      scale: 0.9,
       opacity: 0,
-      rotateX: 15,
-      duration: 1.8,
+      rotateX: 10,
+      duration: 1.5,
+      delay: 0.2,
       ease: 'expo.out'
-    }).from('.hero-badge', {
-      opacity: 0,
-      y: 20,
-      duration: 1,
-      ease: 'power3.out'
-    }, "-=1.2");
+    });
 
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
@@ -275,7 +217,6 @@ export const LandingPage: React.FC = () => {
               <div className="lg:col-span-7 text-center lg:text-left">
                 <Badge
                   variant="secondary"
-                  className="hero-badge"
                   style={{
                     background: 'var(--surface-container-low)',
                     color: 'var(--primary)',
@@ -663,7 +604,7 @@ export const LandingPage: React.FC = () => {
               >
                 {/* Analytics card */}
                 <div
-                  className="reveal-left hover-lift col-span-1 md:col-span-12 lg:col-span-8"
+                  className="fade-up hover-lift col-span-1 md:col-span-12 lg:col-span-8"
                   style={{
                     background: 'var(--surface-container-lowest)',
                     padding: 'clamp(1.5rem, 4vw, 2.5rem)',
@@ -786,7 +727,7 @@ export const LandingPage: React.FC = () => {
 
                 {/* Biometric card */}
                 <div
-                  className="reveal-right hover-lift col-span-1 md:col-span-12 lg:col-span-4"
+                  className="fade-up hover-lift col-span-1 md:col-span-12 lg:col-span-4"
                   style={{
                     background: 'var(--primary)',
                     padding: 'clamp(1.5rem, 4vw, 2.5rem)',
