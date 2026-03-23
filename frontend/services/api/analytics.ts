@@ -35,27 +35,36 @@ export interface CourseAttendanceAnalytics {
 }
 
 export const analyticsApi = {
-  // Get lecturer dashboard analytics – try new summary endpoint, fall back to legacy
+  // Get lecturer dashboard analytics – prefer analytics endpoint, then fall back to summary endpoint
   getLecturerDashboard: async (): Promise<LecturerDashboardAnalytics> => {
     try {
-      const response = await apiClient.get('/institutions/dashboard/lecturer/');
-      const summary = response.data;
-      if (summary?.success && summary.data) {
-        return {
-          total_sessions: summary.data.stats?.todays_sessions ?? 0,
-          avg_attendance_percentage: 0,
-          active_sessions_count: summary.data.stats?.active_sessions ?? 0,
-          total_students: summary.data.stats?.total_students ?? 0,
-          weekly_overview: [],
-          // Attach raw data for components that need it
-          _raw: summary.data,
-        } as any;
-      }
+      const response = await apiClient.get('/analytics/dashboard/lecturer/');
+      return response.data;
     } catch {
-      // Fall through to legacy endpoint
+      // Fall through to alternate summary endpoint
     }
-    const response = await apiClient.get('/analytics/dashboard/lecturer/');
-    return response.data;
+
+    const response = await apiClient.get('/institutions/dashboard/lecturer/');
+    const summary = response.data;
+    if (summary?.success && summary.data) {
+      return {
+        total_sessions: summary.data.stats?.todays_sessions ?? 0,
+        avg_attendance_percentage: 0,
+        active_sessions_count: summary.data.stats?.active_sessions ?? 0,
+        total_students: summary.data.stats?.total_students ?? 0,
+        weekly_overview: [],
+        // Attach raw data for components that need it
+        _raw: summary.data,
+      } as any;
+    }
+
+    return {
+      total_sessions: 0,
+      avg_attendance_percentage: 0,
+      active_sessions_count: 0,
+      total_students: 0,
+      weekly_overview: [],
+    };
   },
 
   // Get course attendance analytics
