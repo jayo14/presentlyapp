@@ -100,6 +100,28 @@ class CheckInTests(TestCase):
         self.assertEqual(Attendance.objects.count(), 0)
 
     @patch('institutions.attendance_logic.verify_location')
+    def test_check_in_requires_active_course_enrollment(self, mock_verify):
+        mock_verify.return_value = (True, 10.0)
+
+        unenrolled_student = User.objects.create_user(
+            email="unenrolled@test.com",
+            password="password",
+            full_name="Unenrolled Student",
+            role=UserRole.STUDENT,
+        )
+
+        view = AttendanceSessionViewSet.as_view({'post': 'check_in'})
+        data = {'latitude': 10.0, 'longitude': 10.0, 'code': self.session.session_code}
+        request = self.factory.post(f'/api/sessions/{self.session.id}/check_in/', data)
+        force_authenticate(request, user=unenrolled_student)
+
+        response = view(request, pk=self.session.id)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn('not enrolled', response.data['error'].lower())
+        self.assertEqual(Attendance.objects.count(), 0)
+
+    @patch('institutions.attendance_logic.verify_location')
     def test_duplicate_check_in(self, mock_verify):
         mock_verify.return_value = (True, 10.0)
         # Create existing attendance
