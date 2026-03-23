@@ -2022,7 +2022,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 @ratelimit(key='user', rate='5/m', block=True)
 def public_check_in_view(request, session_code):
     """Public check-in endpoint with multi-sample verification"""
@@ -2044,6 +2044,12 @@ def public_check_in_view(request, session_code):
         })
     
     elif request.method == 'POST':
+        if not request.user.is_authenticated:
+            return Response({
+                'success': False,
+                'status': 'error',
+                'error': 'Authentication required to mark attendance'
+            }, status=status.HTTP_401_UNAUTHORIZED)
         return perform_attendance_check_in(request, session)
 
 class TimetableViewSet(viewsets.ModelViewSet):

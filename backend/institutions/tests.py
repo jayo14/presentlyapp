@@ -135,6 +135,25 @@ class CheckInTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Attendance.objects.count(), 1)
 
+    def test_public_check_in_get_allows_unauthenticated(self):
+        request = self.factory.get(f'/api/check-in/{self.session.session_code}/')
+        response = public_check_in_view(request, session_code=self.session.session_code)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['success'])
+        self.assertEqual(response.data['session']['session_code'], self.session.session_code)
+
+    def test_public_check_in_post_requires_authentication(self):
+        request = self.factory.post(
+            f'/api/check-in/{self.session.session_code}/',
+            {'latitude': 10.0, 'longitude': 10.0},
+            format='json'
+        )
+        response = public_check_in_view(request, session_code=self.session.session_code)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertFalse(response.data['success'])
+
     @patch('institutions.attendance_logic.verify_location')
     def test_check_in_multi_sample_stable(self, mock_verify):
         """Multi-sample stable window should succeed."""
