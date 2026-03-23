@@ -2,7 +2,7 @@ from django.utils import timezone
 from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
-from institutions.models import Attendance, AttendanceSession, UserRole
+from institutions.models import Attendance, AttendanceSession, UserRole, CourseEnrollment
 from attendance.models import AttendanceAttemptLog
 from accounts.models import UserDevice
 from .serializers import AttendanceSerializer
@@ -128,6 +128,17 @@ def perform_attendance_check_in(request, session):
 
     if request.user.role != UserRole.STUDENT:
         return Response({'success': False, 'status': 'error', 'error': 'Only students can check in'}, status=status.HTTP_403_FORBIDDEN)
+
+    if not CourseEnrollment.objects.filter(
+        student=request.user,
+        course=session.course,
+        is_active=True,
+    ).exists():
+        return Response({
+            'success': False,
+            'status': 'error',
+            'error': 'You are not enrolled in this course, so you cannot check in. Please enroll first.'
+        }, status=status.HTTP_403_FORBIDDEN)
 
     if not session.is_active:
         return Response({'success': False, 'status': 'error', 'error': 'Session is not active'}, status=status.HTTP_400_BAD_REQUEST)

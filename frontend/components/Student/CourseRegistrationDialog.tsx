@@ -10,13 +10,15 @@ import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 interface CourseRegistrationDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (enrolledCourseId?: number) => void;
+  initialCourseCode?: string;
 }
 
 export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> = ({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
+  initialCourseCode
 }) => {
   const [courses, setCourses] = useState<AvailableCourse[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<AvailableCourse[]>([]);
@@ -34,8 +36,11 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   useEffect(() => {
     if (isOpen) {
       loadAvailableCourses();
+      if (initialCourseCode) {
+        setInputCourseCode(initialCourseCode);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, initialCourseCode]);
 
   useEffect(() => {
     filterCourses();
@@ -97,7 +102,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         description: 'You have been enrolled in the course'
       });
       
-      onSuccess();
+      onSuccess(courseId);
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || 'Failed to enroll in course';
       setError(errorMsg);

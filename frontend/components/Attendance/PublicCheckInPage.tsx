@@ -3,10 +3,20 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, CheckCircle2, AlertCircle, Clock, BookOpen, Loader2, ArrowRight, UserPlus } from 'lucide-react';
 import { Button } from '../Button';
 import { useCurrentUser } from '../../hooks/useAuth';
-import { sessionApi, attendanceApi, courseApi } from '../../services/api/attendance';
+import { sessionApi, courseApi } from '../../services/api/attendance';
 import { toast } from 'sonner';
 import { geolocationService } from '../../services/geolocation';
 import { SEO } from '../SEO';
+
+const CHECKIN_INTENT_KEY = 'pending_checkin_intent';
+const AUTO_CHECKIN_KEY = 'pending_auto_checkin';
+
+type CheckInIntent = {
+  sessionCode: string;
+  courseId?: number;
+  autoCheckIn?: boolean;
+  createdAt: number;
+};
 
 export const PublicCheckInPage: React.FC = () => {
   const { sessionCode } = useParams<{ sessionCode: string }>();
@@ -28,6 +38,26 @@ export const PublicCheckInPage: React.FC = () => {
   const [showEnrollPrompt, setShowEnrollPrompt] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [autoEnrolling, setAutoEnrolling] = useState(false);
+  const [autoCheckInTriggered, setAutoCheckInTriggered] = useState(false);
+
+  const readIntent = (): CheckInIntent | null => {
+    try {
+      const raw = localStorage.getItem(CHECKIN_INTENT_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw) as CheckInIntent;
+    } catch {
+      return null;
+    }
+  };
+
+  const saveIntent = (payload: CheckInIntent) => {
+    localStorage.setItem(CHECKIN_INTENT_KEY, JSON.stringify(payload));
+  };
+
+  const clearIntent = () => {
+    localStorage.removeItem(CHECKIN_INTENT_KEY);
+    localStorage.removeItem(AUTO_CHECKIN_KEY);
+  };
 
   // 1. Fetch Session Details & Check Enrollment
   const fetchSessionData = useCallback(async () => {
@@ -36,6 +66,7 @@ export const PublicCheckInPage: React.FC = () => {
     // Check if user is logged in
     if (!user && !authLoading) {
       localStorage.setItem('pending_checkin', sessionCode);
+      saveIntent({ sessionCode, autoCheckIn: true, createdAt: Date.now() });
       toast.error('Please log in to mark attendance.');
       navigate(`/login?redirect_to=/check-in/${sessionCode}&message=Please log in to mark attendance.`, { replace: true });
       return;
@@ -65,6 +96,12 @@ export const PublicCheckInPage: React.FC = () => {
       if (!response.ok) throw new Error(data.error || 'Failed to fetch session');
       
       setSession(data.session);
+      saveIntent({
+        sessionCode,
+        courseId: data.session.course,
+        autoCheckIn: true,
+        createdAt: Date.now(),
+      });
 
       // Clear pending checkin if we've successfully reached the intended session
       if (localStorage.getItem('pending_checkin') === sessionCode) {
@@ -88,6 +125,7 @@ export const PublicCheckInPage: React.FC = () => {
           
           if (!enrolled) {
               setShowEnrollPrompt(true);
+              setError('You are not enrolled in this course, so you cannot check in yet. Enroll first to continue.');
           }
       } catch (err) {
           console.error('Error checking enrollment:', err);
@@ -138,6 +176,7 @@ export const PublicCheckInPage: React.FC = () => {
       
       setIsEnrolled(true);
       setShowEnrollPrompt(false);
+      setError(null);
       toast.success('Successfully enrolled in the course');
       
       // Proceed to check-in automatically
@@ -146,6 +185,27 @@ export const PublicCheckInPage: React.FC = () => {
       toast.error('Failed to auto-enroll. Please try again.');
       setAutoEnrolling(false);
     }
+  };
+
+  const openCourseRegistration = () => {
+    if (!session || !sessionCode) return;
+
+    saveIntent({
+      sessionCode,
+      courseId: session.course,
+      autoCheckIn: true,
+      createdAt: Date.now(),
+    });
+    localStorage.setItem(AUTO_CHECKIN_KEY, sessionCode);
+
+    const params = new URLSearchParams({
+      source: 'checkin',
+      sessionCode,
+      auto_checkin: '1',
+      courseId: String(session.course),
+      courseCode: session.course_code || '',
+    });
+    navigate(`/dashboard/courses?${params.toString()}`);
   };
 
   // 3. Perform Check-in (with Location Verification)
@@ -171,18 +231,39 @@ export const PublicCheckInPage: React.FC = () => {
       toast.success('Attendance marked successfully!', {
           description: `Status: ${result.status}`
       });
+        clearIntent();
       
       // Success - redirect to dashboard after a short delay
       setTimeout(() => navigate('/dashboard'), 2000);
       
     } catch (err: any) {
       const msg = err.response?.data?.error || err.message || 'Check-in failed';
+      if (msg.toLowerCase().includes('not enrolled')) {
+        setIsEnrolled(false);
+        setShowEnrollPrompt(true);
+      }
       setError(msg);
       toast.error('Check-in Failed', { description: msg });
     } finally {
       setCheckingIn(false);
     }
   };
+
+  useEffect(() => {
+    if (!sessionCode || !session || !user || !isEnrolled || checkingIn || autoCheckInTriggered) return;
+
+    const query = new URLSearchParams(location.search);
+    const shouldAutoFromQuery = query.get('auto_checkin') === '1';
+    const shouldAutoFromStorage = localStorage.getItem(AUTO_CHECKIN_KEY) === sessionCode;
+    const intent = readIntent();
+    const matchesIntent = intent?.sessionCode === sessionCode && intent?.autoCheckIn;
+
+    if (shouldAutoFromQuery || shouldAutoFromStorage || matchesIntent) {
+      setAutoCheckInTriggered(true);
+      setError(null);
+      void performCheckIn();
+    }
+  }, [sessionCode, session, user, isEnrolled, checkingIn, autoCheckInTriggered, location.search]);
 
   if (authLoading || loading) {
     return (
@@ -289,11 +370,14 @@ export const PublicCheckInPage: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <h3 className="font-headline font-bold text-text text-lg">Not Registered for Course</h3>
-                <p className="text-textMuted text-sm">You need to be registered for this course to mark attendance.</p>
+                <p className="text-textMuted text-sm">You are not enrolled in this course, so check-in is blocked until you enroll.</p>
               </div>
               <div className="pt-2 flex flex-col gap-2">
                 <Button className="w-full h-12" onClick={handleEnroll} isLoading={autoEnrolling}>
                   Register & Continue
+                </Button>
+                <Button className="w-full h-12" onClick={openCourseRegistration} variant="secondary" disabled={autoEnrolling}>
+                  Open Course Registration
                 </Button>
                 <p className="text-[10px] text-textMuted uppercase font-bold tracking-widest">
                   Auto-registering in {countdown} seconds...

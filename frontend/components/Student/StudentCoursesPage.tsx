@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BookOpen, Clock, MapPin, User, Users, Calendar, AlertCircle, Plus, Search, Filter, GraduationCap, TrendingUp, CheckCircle2, QrCode, Trash2 } from 'lucide-react';
 import { Button } from '../Button';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
@@ -6,21 +7,75 @@ import CourseRegistrationDialog from './CourseRegistrationDialog';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 
+const AUTO_CHECKIN_KEY = 'pending_auto_checkin';
+
+type CheckInRouteIntent = {
+  fromCheckIn: boolean;
+  sessionCode?: string;
+  autoCheckIn: boolean;
+  courseId?: number;
+  courseCode?: string;
+};
+
 interface StudentCoursesPageProps {
   userName?: string;
 }
 
 export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed'>('all');
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [droppingId, setDroppingId] = useState<number | null>(null);
+  const [checkInIntent, setCheckInIntent] = useState<CheckInRouteIntent>({
+    fromCheckIn: false,
+    autoCheckIn: false,
+  });
 
   useEffect(() => {
     loadCourses();
   }, []);
+
+  useEffect(() => {
+    const source = searchParams.get('source');
+    const sessionCode = searchParams.get('sessionCode') || undefined;
+    const autoCheckIn = searchParams.get('auto_checkin') === '1';
+    const rawCourseId = searchParams.get('courseId');
+    const courseCode = searchParams.get('courseCode') || undefined;
+    const courseId = rawCourseId ? Number(rawCourseId) : undefined;
+    const validCourseId = Number.isFinite(courseId) ? courseId : undefined;
+
+    if (source === 'checkin' && sessionCode) {
+      setCheckInIntent({
+        fromCheckIn: true,
+        sessionCode,
+        autoCheckIn,
+        courseId: validCourseId,
+        courseCode,
+      });
+      setIsRegistrationOpen(true);
+      toast.info('Register this course to continue attendance check-in.');
+    }
+  }, [searchParams]);
+
+  const handleRegistrationSuccess = async (enrolledCourseId?: number) => {
+    await loadCourses();
+
+    if (!checkInIntent.fromCheckIn || !checkInIntent.sessionCode || !checkInIntent.autoCheckIn) {
+      return;
+    }
+
+    if (checkInIntent.courseId && enrolledCourseId && checkInIntent.courseId !== enrolledCourseId) {
+      toast.info('Course enrolled. Enroll in the attendance course to auto continue check-in.');
+      return;
+    }
+
+    localStorage.setItem(AUTO_CHECKIN_KEY, checkInIntent.sessionCode);
+    navigate(`/check-in/${checkInIntent.sessionCode}?auto_checkin=1`, { replace: true });
+  };
 
   const loadCourses = async () => {
     try {
@@ -248,8 +303,9 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       </div>
 
       {/* Course Registration Dialog */}
-      <CourseRegistrationDialog onSuccess={() => loadCourses()}
+      <CourseRegistrationDialog onSuccess={handleRegistrationSuccess}
         isOpen={isRegistrationOpen}
+        initialCourseCode={checkInIntent.courseCode}
         onClose={() => {
           setIsRegistrationOpen(false);
           loadCourses();
@@ -421,8 +477,9 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         )}
 
         {/* Course Registration Dialog */}
-        <CourseRegistrationDialog onSuccess={() => loadCourses()}
+        <CourseRegistrationDialog onSuccess={handleRegistrationSuccess}
           isOpen={isRegistrationOpen}
+          initialCourseCode={checkInIntent.courseCode}
           onClose={() => {
             setIsRegistrationOpen(false);
             loadCourses(); // Reload courses after registration
