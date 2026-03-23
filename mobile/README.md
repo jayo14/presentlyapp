@@ -100,7 +100,7 @@ bun run start-web
 
 # Step 5: Start iOS preview
 # Option A (recommended):
-bun run start  # then press "i" in the terminal to open iOS Simulator
+bun run start  # LAN mode (stable), then press "i" in the terminal to open iOS Simulator
 # Option B (if supported by your environment):
 bun run start -- --ios
 ```
@@ -129,6 +129,7 @@ This project is built with the most popular native mobile cross-platform technic
 1. **iOS**: Download the [Rork app from the App Store](https://apps.apple.com/app/rork) or [Expo Go](https://apps.apple.com/app/expo-go/id982107779)
 2. **Android**: Download the [Expo Go app from Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
 3. Run `bun run start` and scan the QR code from your development server
+4. If your device is not on the same network, use `bun run start-tunnel`
 
 ### **In your browser**
 
@@ -352,7 +353,7 @@ For mobile apps, you'll configure your app's deep linking scheme in `app.json`.
 ### **App not loading on device?**
 
 1. Make sure your phone and computer are on the same WiFi network
-2. Try using tunnel mode: `bun start -- --tunnel`
+2. Try using tunnel mode: `bun run start-tunnel`
 3. Check if your firewall is blocking the connection
 
 ### **Build failing?**
