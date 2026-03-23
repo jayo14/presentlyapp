@@ -95,13 +95,16 @@ export default defineConfig(({ mode }) => {
           define: {
             global: 'globalThis',
           },
+          // Avoid emitting __name helper wrappers in prebundled deps.
+          keepNames: false,
         }
       },
       // Additional esbuild options
       esbuild: {
         // Handle class fields properly - use es2022 for native class field support
         target: 'es2022',
-        keepNames: true,
+        // keepNames can emit __name helpers that break in some optimized map chunks.
+        keepNames: false,
       },
     };
 });
