@@ -127,7 +127,12 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    import('jsqr').then(({ default: jsQR }) => {
+    import('jsqr').then((m) => {
+      const jsQR = m.default || (m as any);
+      if (typeof jsQR !== 'function') {
+        console.error('jsQR is not a function after dynamic import');
+        return;
+      }
       const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
       if (code && code.data) {
         let qrData = code.data;
@@ -139,7 +144,9 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         processAttendance(sessionCodeFromQR.toUpperCase());
         triggerHaptic(ImpactStyle.Heavy);
       }
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error('Failed to load jsqr:', err);
+    });
   };
 
   useEffect(() => {

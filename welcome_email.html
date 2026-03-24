@@ -1,69 +1,293 @@
-<body>
-<!-- !-- ==========================================
-     EMAIL 1: WELCOME EMAIL
-=========================================== --> 
-<!-- <p class="template-label">01 — Welcome Email</p> -->
-<div class="email-wrap">
-  <div class="gold-line"></div>
-  <div class="email-header">
-    <div class="brand-wordmark">Presently</div>
-    <div class="header-badge">Institutional Access Granted</div>
-  </div>
- 
-  <div class="welcome-hero">
-    <div class="welcome-tag">✦ Welcome to Presently</div>
-    <h1 class="welcome-h1">Welcome to the future of<br/>focus, <em>{{ user.full_name|default:"Student" }}</em></h1>
-    <p class="welcome-sub">Your university has partnered with us to provide a precision-grade attendance platform designed for academic excellence — no friction, no proxies.</p>
-  </div>
- 
-  <div class="welcome-body">
-    <p style="font-size:15px; color:var(--text-muted-dark); line-height:1.7; margin-bottom:8px;">We're thrilled to have you in the Presently ecosystem. Everything you need to stay on top of your attendance — and your academic record — is now at your fingertips.</p>
- 
-    <div class="welcome-steps">
-      <div class="step-card">
-        <div class="step-icon">📲</div>
-        <div class="step-num">Step 01</div>
-        <div class="step-title">Download</div>
-        <p class="step-desc">Get the Presently app and access your dashboard from anywhere on campus.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-icon">📍</div>
-        <div class="step-num">Step 02</div>
-        <div class="step-title">Mark Present</div>
-        <p class="step-desc">One tap, GPS-verified. Be marked present from inside the classroom.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-icon">📊</div>
-        <div class="step-num">Step 03</div>
-        <div class="step-title">Track Progress</div>
-        <p class="step-desc">Monitor attendance trends per course and stay ahead of thresholds.</p>
-      </div>
-    </div>
- 
-    <div class="welcome-cta">
-      <a class="btn-primary" href="{{ dashboard_url|default:'https://getpresently.com.ng/dashboard' }}">Go to Dashboard &nbsp;→</a>
-      <p>Secure login with university SSO required.</p>
-    </div>
- 
-    <div class="welcome-sig">
-      <div>
-        <div class="sig-name">The Presently Team</div>
-        <div class="sig-role">Empowering Academic Mastery</div>
-      </div>
-      <div style="font-size:22px; opacity:0.4">✦</div>
-    </div>
-  </div>
- 
-  <div class="email-footer">
-    <div class="footer-brand">Presently</div>
-    <div class="footer-links">
-      <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}">Support</a>
-      <a href="{{ privacy_url|default:'https://getpresently.com.ng/privacy' }}">Privacy Policy</a>
-      <a href="{{ institution_url|default:'#' }}">Institution Details</a>
-    </div>
-    <p class="footer-copy">© {% now "Y" %} Presently. All rights reserved.</p>
-  </div>
-  <div class="gold-line"></div>
-</div>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <title>Welcome to Presently</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style type="text/css">
+    /* Reset for email clients that do read <style> (Apple Mail, some mobile) */
+    body, table, td, p, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    /* Google Fonts fallback — most email clients ignore this but it helps Gmail web */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Outfit:wght@400;500;600&display=swap');
+  </style>
+</head>
+
+<!-- 
+  PRESENTLY — WELCOME EMAIL
+  Email-safe: 100% inline styles, table layout, no CSS variables,
+  no flexbox/grid, no pseudo-elements, no external CSS dependencies.
+  Compatible with: Gmail, Outlook 2007-2021, Apple Mail, Yahoo Mail,
+  Thunderbird, iOS Mail, Android Gmail.
+  
+  Template variables (Django/Jinja2):
+    {{ first_name }}         — Student first name
+    {{ dashboard_url }}      — Dashboard link
+    {{ support_url }}        — Support page URL
+    {{ privacy_url }}        — Privacy policy URL
+    {{ institution_url }}    — Institution details URL
+    {{ year }}               — Current year (default 2026)
+-->
+
+<body style="margin: 0; padding: 0; background-color: #0A0A0C; font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+
+  <!-- Email background wrapper -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #0A0A0C; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+
+        <!-- Outer email shell — 600px max -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background-color: #1b1b1d; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,202,13,0.14);">
+
+          <!-- ═══════════════════════════════════
+               TOP GOLD ACCENT LINE
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="padding: 0; line-height: 0; font-size: 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="33%" style="height: 2px; background-color: #1b1b1d; line-height: 2px; font-size: 2px;">&nbsp;</td>
+                  <td width="34%" style="height: 2px; background-color: #FFCA0D; line-height: 2px; font-size: 2px;">&nbsp;</td>
+                  <td width="33%" style="height: 2px; background-color: #1b1b1d; line-height: 2px; font-size: 2px;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════
+               HEADER — BRAND + BADGE
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="background-color: #131315; padding: 22px 40px; border-bottom: 1px solid rgba(255,202,13,0.12);">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <span style="font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 22px; font-weight: 900; color: #FFCA0D; letter-spacing: -0.5px; text-decoration: none;">Presently</span>
+                  </td>
+                  <td align="right" style="vertical-align: middle;">
+                    <span style="font-family: 'Outfit', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #FFCA0D; background-color: rgba(255,202,13,0.1); border: 1px solid rgba(255,202,13,0.22); padding: 5px 12px; border-radius: 100px; white-space: nowrap;">&#10022; Institutional Access Granted</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════
+               HERO SECTION
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="background-color: #18160F; padding: 52px 40px 44px 40px;">
+
+              <!-- Welcome pill badge -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="background-color: rgba(255,202,13,0.10); border: 1px solid rgba(255,202,13,0.22); border-radius: 100px; padding: 5px 14px;">
+                    <span style="font-family: 'Outfit', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #FFCA0D;">&#10022; Welcome to Presently</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Spacer -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr><td style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</td></tr>
+              </table>
+
+              <!-- H1 -->
+              <p style="margin: 0 0 14px 0; font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 34px; font-weight: 900; line-height: 1.12; letter-spacing: -1px; color: #F5F0E8;">
+                Welcome to the future of<br />focus, <span style="color: #FFCA0D; font-style: italic;">{{{ first_name }}}</span>
+              </p>
+
+              <!-- Subheading -->
+              <p style="margin: 0; font-family: 'Outfit', Arial, sans-serif; font-size: 15px; font-weight: 400; line-height: 1.7; color: #9A8F7A; max-width: 420px;">
+                Your university has partnered with us to provide a precision-grade attendance platform designed for academic excellence — no friction, no proxies.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Divider line under hero -->
+          <tr>
+            <td style="padding: 0; line-height: 0; font-size: 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="20%" style="height: 1px; background-color: #1b1b1d; line-height: 1px; font-size: 1px;">&nbsp;</td>
+                  <td width="60%" style="height: 1px; background-color: rgba(255,202,13,0.22); line-height: 1px; font-size: 1px;">&nbsp;</td>
+                  <td width="20%" style="height: 1px; background-color: #1b1b1d; line-height: 1px; font-size: 1px;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════
+               BODY CONTENT
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="background-color: #1b1b1d; padding: 40px 40px 8px 40px;">
+              <p style="margin: 0; font-family: 'Outfit', Arial, sans-serif; font-size: 15px; font-weight: 400; line-height: 1.75; color: #9A8F7A;">
+                We're thrilled to have you in the Presently ecosystem. Everything you need to stay on top of your attendance — and your academic record — is now at your fingertips.
+              </p>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════
+               3-STEP CARDS
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="background-color: #1b1b1d; padding: 28px 40px 0 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr valign="top">
+
+                  <!-- Step 1 -->
+                  <td width="31%" style="background-color: #242426; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px 18px;">
+                    <!-- Icon box -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="width: 38px; height: 38px; background-color: rgba(255,202,13,0.12); border-radius: 10px; text-align: center; vertical-align: middle; font-size: 18px; line-height: 38px;">📲</td>
+                      </tr>
+                    </table>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td style="height: 14px; line-height: 14px; font-size: 14px;">&nbsp;</td></tr>
+                    </table>
+                    <p style="margin: 0 0 3px 0; font-family: 'Outfit', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,202,13,0.65);">Step 01</p>
+                    <p style="margin: 0 0 6px 0; font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 14px; font-weight: 800; color: #F5F0E8;">Download</p>
+                    <p style="margin: 0; font-family: 'Outfit', Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 1.6; color: #9A8F7A;">Get the Presently app and access your dashboard from anywhere on campus.</p>
+                  </td>
+
+                  <!-- Gap -->
+                  <td width="3.5%" style="font-size: 0; line-height: 0;">&nbsp;</td>
+
+                  <!-- Step 2 -->
+                  <td width="31%" style="background-color: #242426; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px 18px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="width: 38px; height: 38px; background-color: rgba(255,202,13,0.12); border-radius: 10px; text-align: center; vertical-align: middle; font-size: 18px; line-height: 38px;">📍</td>
+                      </tr>
+                    </table>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td style="height: 14px; line-height: 14px; font-size: 14px;">&nbsp;</td></tr>
+                    </table>
+                    <p style="margin: 0 0 3px 0; font-family: 'Outfit', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,202,13,0.65);">Step 02</p>
+                    <p style="margin: 0 0 6px 0; font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 14px; font-weight: 800; color: #F5F0E8;">Mark Present</p>
+                    <p style="margin: 0; font-family: 'Outfit', Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 1.6; color: #9A8F7A;">One tap, GPS-verified. Be marked present from inside the classroom.</p>
+                  </td>
+
+                  <!-- Gap -->
+                  <td width="3.5%" style="font-size: 0; line-height: 0;">&nbsp;</td>
+
+                  <!-- Step 3 -->
+                  <td width="31%" style="background-color: #242426; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px 18px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="width: 38px; height: 38px; background-color: rgba(255,202,13,0.12); border-radius: 10px; text-align: center; vertical-align: middle; font-size: 18px; line-height: 38px;">📊</td>
+                      </tr>
+                    </table>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td style="height: 14px; line-height: 14px; font-size: 14px;">&nbsp;</td></tr>
+                    </table>
+                    <p style="margin: 0 0 3px 0; font-family: 'Outfit', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,202,13,0.65);">Step 03</p>
+                    <p style="margin: 0 0 6px 0; font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 14px; font-weight: 800; color: #F5F0E8;">Track Progress</p>
+                    <p style="margin: 0; font-family: 'Outfit', Arial, sans-serif; font-size: 12px; font-weight: 400; line-height: 1.6; color: #9A8F7A;">Monitor attendance trends per course and stay ahead of thresholds.</p>
+                  </td>
+
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════
+               CTA BUTTON
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="background-color: #1b1b1d; padding: 36px 40px 12px 40px; text-align: center;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                <tr>
+                  <td style="background-color: #FFCA0D; border-radius: 12px; text-align: center;">
+                    <a href="{{ dashboard_url|default:'https://getpresently.com.ng/dashboard' }}" target="_blank" style="display: inline-block; font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 15px; font-weight: 800; color: #241a00; text-decoration: none; padding: 16px 36px; letter-spacing: -0.2px; border-radius: 12px; white-space: nowrap;">Go to Dashboard &nbsp;&rarr;</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 14px 0 0 0; font-family: 'Outfit', Arial, sans-serif; font-size: 11px; font-weight: 400; color: #5C5448; letter-spacing: 0.3px;">Secure login with university SSO required.</p>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════
+               SIGNATURE
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="background-color: #1b1b1d; padding: 28px 40px 44px 40px;">
+              <!-- Divider -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="height: 1px; background-color: rgba(255,255,255,0.06); line-height: 1px; font-size: 1px;">&nbsp;</td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="padding-top: 24px;">
+                <tr>
+                  <td>
+                    <p style="margin: 0; font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 15px; font-weight: 700; color: #F5F0E8; font-style: italic;">The Presently Team</p>
+                    <p style="margin: 4px 0 0 0; font-family: 'Outfit', Arial, sans-serif; font-size: 12px; font-weight: 400; color: #5C5448;">Empowering Academic Mastery</p>
+                  </td>
+                  <td align="right" style="vertical-align: middle;">
+                    <span style="font-size: 22px; color: #5C5448; opacity: 0.5;">&#10022;</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════
+               FOOTER
+          ═══════════════════════════════════ -->
+          <tr>
+            <td style="background-color: #131315; border-top: 1px solid rgba(255,202,13,0.12); padding: 32px 40px 36px 40px; text-align: center;">
+              <p style="margin: 0 0 18px 0; font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-size: 16px; font-weight: 800; color: #FFCA0D; letter-spacing: -0.3px;">Presently</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom: 18px;">
+                <tr>
+                  <td style="padding: 0 14px; border-right: 1px solid #2C2A24;">
+                    <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}" style="font-family: 'Outfit', Arial, sans-serif; font-size: 12px; font-weight: 500; color: #5C5448; text-decoration: none; letter-spacing: 0.5px;">Support</a>
+                  </td>
+                  <td style="padding: 0 14px; border-right: 1px solid #2C2A24;">
+                    <a href="{{ privacy_url|default:'https://getpresently.com.ng/privacy' }}" style="font-family: 'Outfit', Arial, sans-serif; font-size: 12px; font-weight: 500; color: #5C5448; text-decoration: none; letter-spacing: 0.5px;">Privacy Policy</a>
+                  </td>
+                  <td style="padding: 0 14px;">
+                    <a href="{{ institution_url|default:'#' }}" style="font-family: 'Outfit', Arial, sans-serif; font-size: 12px; font-weight: 500; color: #5C5448; text-decoration: none; letter-spacing: 0.5px;">Institution Details</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0; font-family: 'Outfit', Arial, sans-serif; font-size: 11px; font-weight: 400; color: #3D3A34; line-height: 1.7;">&copy; {{ year|default:"2026" }} Presently University Systems. All rights reserved.</p>
+            </td>
+          </tr>
+
+          <!-- BOTTOM GOLD ACCENT LINE -->
+          <tr>
+            <td style="padding: 0; line-height: 0; font-size: 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="33%" style="height: 2px; background-color: #1b1b1d; line-height: 2px; font-size: 2px;">&nbsp;</td>
+                  <td width="34%" style="height: 2px; background-color: #FFCA0D; line-height: 2px; font-size: 2px;">&nbsp;</td>
+                  <td width="33%" style="height: 2px; background-color: #1b1b1d; line-height: 2px; font-size: 2px;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /email shell -->
+
+      </td>
+    </tr>
+  </table>
 
 </body>
+</html>
