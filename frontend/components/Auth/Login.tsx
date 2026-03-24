@@ -3,9 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLogin, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
-import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
-import { signInWithRedirect, getRedirectResult } from 'firebase/auth';
-import { LoadingScreen } from '../LoadingScreen';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export const Login: React.FC = () => {

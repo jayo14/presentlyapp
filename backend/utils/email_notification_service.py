@@ -183,12 +183,17 @@ class EmailNotificationService:
         payload: Dict[str, Any],
     ) -> bool:
         """Send bulk notifications to multiple users via email."""
-        # For bulk, we'll use a simple fallback for now but could be expanded to use a generic template
         results = [
             _send_smtp_email(
                 to_email=r.get("email", ""),
                 subject=f"Notification: {notification_type}",
-                html_content=f"<html><body style='font-family:Lexend,sans-serif;padding:32px;background:#fdfcf7;'><div style='background:white;padding:32px;border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'><h2 style='color:#0f172a;'>{notification_type}</h2><p style='color:#475569;'>{payload.get('message', '')}</p></div></body></html>",
+                template_name="emails/notification_generic.html",
+                context={
+                    "notification_type": notification_type,
+                    "message": payload.get("message", ""),
+                    "action_url": payload.get("action_url"),
+                    "action_text": payload.get("action_text"),
+                },
             )
             for r in recipients
         ]
