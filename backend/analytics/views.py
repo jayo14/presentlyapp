@@ -147,7 +147,7 @@ class StudentDashboardAnalyticsView(APIView):
                 'email': user.email,
                 'matric_number': user.matric_number,
                 'level': user.level,
-                'department': user.department,  # department is a CharField, not a ForeignKey
+                'department': user.department.name if hasattr(user.department, 'name') else user.department,
                 'college': user.college.name if user.college else None,
                 'institution': user.institution.full_name if user.institution else None,
             },
@@ -336,7 +336,7 @@ class CourseAttendanceAnalyticsView(APIView):
                 'id': str(student.id),
                 'name': student.full_name,
                 'matric': student.matric_number or 'N/A',
-                'department': student.department or 'N/A',
+                'department': student.department.name if hasattr(student.department, 'name') else (student.department or 'N/A'),
                 'level': student.level or 'N/A',
                 'attended': attended_count,
                 'total': total_sessions,
