@@ -20,33 +20,49 @@ def _send_smtp_email(
 ) -> bool:
     """Send an email using Resend API (or console in DEBUG)."""
     try:
-        if html_content is None:
+        # We need the HTML content if we're falling back to local send (DEBUG) 
+        # or if the template isn't mapped in RESEND_TEMPLATE_MAP
+        template_id = getattr(settings, 'RESEND_TEMPLATE_MAP', {}).get(template_name)
+        
+        # If no template_id is found, or we're in DEBUG mode, we must render locally
+        if html_content is None and (not template_id or settings.DEBUG):
             if not template_name:
                 raise ValueError("template_name is required when html_content is not provided")
             html_content = render_to_string(template_name, context or {})
 
-        text_content = strip_tags(html_content)
-
         if settings.DEBUG or not getattr(settings, 'RESEND_API_KEY', None):
             # For local testing, or if Resend is missing, just print to console
+            text_content = strip_tags(html_content) if html_content else "Check Resend Template Dashboard"
             message = EmailMultiAlternatives(
                 subject=subject,
                 body=text_content,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[to_email],
             )
-            message.attach_alternative(html_content, "text/html")
+            if html_content:
+                message.attach_alternative(html_content, "text/html")
             message.send(fail_silently=False)
             return True
         else:
             # Send using Resend API
             resend.api_key = settings.RESEND_API_KEY
-            r = resend.Emails.send({
+            payload = {
                 "from": settings.DEFAULT_FROM_EMAIL,
                 "to": to_email,
                 "subject": subject,
-                "html": html_content
-            })
+            }
+            
+            if template_id:
+                # Use Resend Templates API!
+                payload["template"] = {
+                    "id": template_id,
+                    "variables": context or {}
+                }
+            else:
+                # Fallback to local HTML payload
+                payload["html"] = html_content
+
+            r = resend.Emails.send(payload)
             logger.info("Resend email sent to %s, id: %s", to_email, r.get("id"))
             return True
 

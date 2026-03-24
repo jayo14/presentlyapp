@@ -1,0 +1,69 @@
+<body>
+<!-- !-- ==========================================
+     EMAIL 1: WELCOME EMAIL
+=========================================== --> 
+<!-- <p class="template-label">01 — Welcome Email</p> -->
+<div class="email-wrap">
+  <div class="gold-line"></div>
+  <div class="email-header">
+    <div class="brand-wordmark">Presently</div>
+    <div class="header-badge">Institutional Access Granted</div>
+  </div>
+ 
+  <div class="welcome-hero">
+    <div class="welcome-tag">✦ Welcome to Presently</div>
+    <h1 class="welcome-h1">Welcome to the future of<br/>focus, <em>{{ user.full_name|default:"Student" }}</em></h1>
+    <p class="welcome-sub">Your university has partnered with us to provide a precision-grade attendance platform designed for academic excellence — no friction, no proxies.</p>
+  </div>
+ 
+  <div class="welcome-body">
+    <p style="font-size:15px; color:var(--text-muted-dark); line-height:1.7; margin-bottom:8px;">We're thrilled to have you in the Presently ecosystem. Everything you need to stay on top of your attendance — and your academic record — is now at your fingertips.</p>
+ 
+    <div class="welcome-steps">
+      <div class="step-card">
+        <div class="step-icon">📲</div>
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Download</div>
+        <p class="step-desc">Get the Presently app and access your dashboard from anywhere on campus.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">📍</div>
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Mark Present</div>
+        <p class="step-desc">One tap, GPS-verified. Be marked present from inside the classroom.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">📊</div>
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Track Progress</div>
+        <p class="step-desc">Monitor attendance trends per course and stay ahead of thresholds.</p>
+      </div>
+    </div>
+ 
+    <div class="welcome-cta">
+      <a class="btn-primary" href="{{ dashboard_url|default:'https://getpresently.com.ng/dashboard' }}">Go to Dashboard &nbsp;→</a>
+      <p>Secure login with university SSO required.</p>
+    </div>
+ 
+    <div class="welcome-sig">
+      <div>
+        <div class="sig-name">The Presently Team</div>
+        <div class="sig-role">Empowering Academic Mastery</div>
+      </div>
+      <div style="font-size:22px; opacity:0.4">✦</div>
+    </div>
+  </div>
+ 
+  <div class="email-footer">
+    <div class="footer-brand">Presently</div>
+    <div class="footer-links">
+      <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}">Support</a>
+      <a href="{{ privacy_url|default:'https://getpresently.com.ng/privacy' }}">Privacy Policy</a>
+      <a href="{{ institution_url|default:'#' }}">Institution Details</a>
+    </div>
+    <p class="footer-copy">© {% now "Y" %} Presently. All rights reserved.</p>
+  </div>
+  <div class="gold-line"></div>
+</div>
+
+</body>

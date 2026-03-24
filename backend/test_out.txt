@@ -1,0 +1,7 @@
+Firebase: FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON: Expecting value: line 1 column 1 (char 0)
+INFO: DEBUG=True; using console email backend.
+Testing 'welcome_email' template using Resend API...
+Discovered Template UUID: 4fedf803-2b9b-480d-8f57-f9919276b90b
+
+Sending through Resend...
+Failed to send email via Resend: Template rendering failed. Your template may contain invalid syntax or unsupported expressions.
