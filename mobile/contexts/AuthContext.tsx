@@ -233,23 +233,56 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     try {
       try {
         const response: any = await api.auth.register(data);
-        const accessToken = getAccessToken(response);
-        const refreshToken = getRefreshToken(response);
-        if (accessToken) {
-          await storage.setAuthToken(accessToken);
-        }
-        if (refreshToken) {
-          await storage.setRefreshToken(refreshToken);
+
+        // Treat email verification as required by default for new registrations.
+        // Only skip it when the backend explicitly returns requires_email_verification: false.
+        const requiresVerification = response?.requires_email_verification !== false;
+
+        // Only persist tokens once the email has been verified (i.e., after the
+        // verify-email step). Do NOT store tokens here when verification is pending.
+        if (!requiresVerification) {
+          const accessToken = getAccessToken(response);
+          const refreshToken = getRefreshToken(response);
+          if (accessToken) {
+            await storage.setAuthToken(accessToken);
+          }
+          if (refreshToken) {
+            await storage.setRefreshToken(refreshToken);
+          }
         }
 
         const userData = response?.user;
         if (userData) {
           const newUser = mapApiUser(userData, data?.email || userData?.email || '');
-          const isVerified = !!newUser.emailVerified;
           await persistUser(newUser);
-          setIsAuthenticated(isVerified);
-          return { success: true, requiresVerification: !isVerified, user: newUser };
+          // isAuthenticated tracks email-verification status; onboarding is gated
+          // separately via user.onboardingCompleted in AuthGate.
+          setIsAuthenticated(!requiresVerification);
+          return { success: true, requiresVerification, user: newUser };
         }
+
+        // Some backends return no user object during registration (OTP-only flow).
+        // Persist a minimal stub so verify-email can look up the email via storage.
+        // The id is a temporary placeholder; it is replaced by the real user data
+        // once the backend returns a full profile after email verification.
+        if (requiresVerification) {
+          const tempUser: User = {
+            id: 'pending-verification',
+            fullName: data?.full_name || '',
+            email: data?.email || '',
+            role: 'student',
+            emailVerified: false,
+            onboardingCompleted: false,
+            matricNumber: '',
+            department: '',
+            level: '',
+            deviceId: '',
+            createdAt: new Date().toISOString(),
+          };
+          await persistUser(tempUser);
+          return { success: true, requiresVerification: true };
+        }
+
         return { success: false, error: extractErrorMessage(response) };
       } catch (apiError: any) {
         return { success: false, error: extractErrorMessage(apiError) };

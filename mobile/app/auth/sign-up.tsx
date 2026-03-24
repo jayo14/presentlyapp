@@ -69,8 +69,12 @@ export default function SignUpScreen() {
     });
     setLoading(false);
 
-    if (result.success && result.requiresVerification) {
-      router.push({ pathname: '/auth/verify-email', params: { mode: 'signup', step: 'otp' } });
+    if (result.success) {
+      if (result.requiresVerification) {
+        router.push({ pathname: '/auth/verify-email', params: { mode: 'signup', step: 'otp' } });
+      } else {
+        router.replace('/onboarding/role-selection');
+      }
     } else if (result.error) {
       Alert.alert('Error', result.error);
     }
