@@ -176,7 +176,7 @@ The unified Venue model now includes:
 **John A. Samuel (CodeGallantX)**
 - GitHub: https://github.com/codegallantx
 - Project: Presently - Smart Attendance Management System
-- Website: https://presentlyapp.vercel.app
+- Website: https://getpresently.com.ng
 
 ## Files Modified
 

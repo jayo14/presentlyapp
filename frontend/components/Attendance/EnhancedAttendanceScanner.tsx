@@ -99,7 +99,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
@@ -138,7 +138,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     }
 
     const video = videoRef.current;
-    
+
     // Ensure video is ready
     if (video.readyState !== video.HAVE_ENOUGH_DATA) {
       return;
@@ -152,7 +152,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
     const canvas = canvasRef.current;
     const context = contextRef.current;
-    
+
     if (!context) return;
 
     // Set canvas size to video size (only if changed)
@@ -166,7 +166,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
     // Get image data
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    
+
     // Try to decode QR code using jsQR library (we'll need to add this)
     try {
       // Import jsQR dynamically
@@ -179,12 +179,12 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           // Found QR code!
           const qrData = code.data;
           console.log('QR Code detected:', qrData);
-          
+
           // Extract session code from QR data
-          // Assuming QR contains URL like: https://presentlyapp.vercel.app/check-in/SESSIONCODE
+          // Assuming QR contains URL like: https://getpresently.com.ng/check-in/SESSIONCODE
           // Or just the session code directly
           let sessionCodeFromQR = qrData;
-          
+
           // If it's a URL, extract the session code
           if (qrData.includes('/check-in/')) {
             const match = qrData.match(/\/check-in\/([A-Z0-9]+)/i);
@@ -195,17 +195,17 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
             // If it's just a raw code, ensure it's uppercase
             sessionCodeFromQR = qrData.toUpperCase();
           }
-          
+
           // Stop scanning and process attendance
           if (scanIntervalRef.current) {
             window.clearInterval(scanIntervalRef.current);
             scanIntervalRef.current = null;
           }
           setIsScanning(false);
-          
+
           // Trigger haptic feedback
           triggerHaptic(ImpactStyle.Medium);
-          
+
           // Process the code
           processAttendance(sessionCodeFromQR);
         }
@@ -287,7 +287,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
       // This one call now handles the 15-step pipeline (Warm-up, Samples, IP-check, HW-check)
       const payload = await geolocationService.getAttendancePayload();
-      
+
       setLocationInfo(
         `High-precision lock acquired (±${payload.accuracy?.toFixed(1)}m)`
       );
@@ -301,16 +301,16 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
       if (attendanceResponse) {
         setStatus('success');
-        
+
         // Capture time of check-in
         const now = new Date();
-        const timeStr = now.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
+        const timeStr = now.toLocaleTimeString('en-US', {
+          hour: 'numeric',
           minute: '2-digit',
-          hour12: true 
+          hour12: true
         });
         setCheckInTime(timeStr);
-        
+
         // Extract actual course info from API response
         setAttendanceData({
           courseCode: attendanceResponse.course_code || (codeToVerify.length >= 6 ? codeToVerify.substring(0, 6).toUpperCase() : codeToVerify.toUpperCase()),
@@ -318,7 +318,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           location: attendanceResponse.venue_name || `Location (±${payload.accuracy?.toFixed(0)}m)`,
           sessionCode: codeToVerify
         });
-        
+
         setLocationInfo('✓ Attendance marked successfully!');
         await triggerHaptic(ImpactStyle.Heavy);
       } else {
@@ -410,7 +410,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           >
             <X className="w-5 h-5 text-text" />
           </button>
-          
+
           <div className="px-4 py-2 bg-surface/10 backdrop-blur-lg rounded-full text-text text-sm font-medium">
             Mark Attendance
           </div>
@@ -433,11 +433,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 role="tab"
                 aria-selected={mode === 'scan'}
                 aria-label="Scan QR code using camera"
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${
-                  mode === 'scan'
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${mode === 'scan'
                     ? 'bg-primary text-on-primary-fixedlack shadow-lg shadow-primary/50'
                     : 'bg-white/10 text-white hover:bg-white/20'
-                }`}
+                  }`}
               >
                 <Scan className="w-5 h-5" />
                 Scan QR
@@ -447,11 +446,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 role="tab"
                 aria-selected={mode === 'input'}
                 aria-label="Enter session code manually"
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${
-                  mode === 'input'
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${mode === 'input'
                     ? 'bg-primary text-on-primary-fixedlack shadow-lg shadow-primary/50'
                     : 'bg-white/10 text-white hover:bg-white/20'
-                }`}
+                  }`}
               >
                 <Keyboard className="w-5 h-5" />
                 Enter Code
@@ -464,13 +462,12 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`mb-4 p-4 rounded-2xl backdrop-blur-lg flex items-center gap-3 ${
-                status === 'success'
+              className={`mb-4 p-4 rounded-2xl backdrop-blur-lg flex items-center gap-3 ${status === 'success'
                   ? 'bg-green-500/20 border border-green-500/30'
                   : status === 'error'
-                  ? 'bg-red-500/20 border border-red-500/30'
-                  : 'bg-cardackgroundlue-500/20 border border-blue-500/30'
-              }`}
+                    ? 'bg-red-500/20 border border-red-500/30'
+                    : 'bg-cardackgroundlue-500/20 border border-blue-500/30'
+                }`}
             >
               {status === 'locating' && <MapPin className="w-5 h-5 text-on-primary-fixedlue-400 animate-pulse" />}
               {status === 'verifying' && <Loader2 className="w-5 h-5 text-on-primary-fixedlue-400 animate-spin" />}
@@ -535,7 +532,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
             {/* Enhanced Scanning Frame */}
             {isCameraActive && (
-              <div 
+              <div
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
                 role="status"
                 aria-label="QR code scanning area - position QR code within the frame"
@@ -547,50 +544,50 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 <div className="relative w-[85vw] h-[85vw] max-w-[400px] max-h-[400px]">
                   {/* Pulsing Background Ring */}
                   <div className="absolute inset-0 rounded-3xl border-outline border-white/20 pulse-ring" />
-                  
+
                   {/* Main Frame */}
                   <div className="absolute inset-0 rounded-3xl border-outline border-white/30 bg-surface/5 backdrop-blur-[2px] overflow-hidden">
                     {/* Corner Indicators - Animated */}
-                    <motion.div 
+                    <motion.div
                       className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary rounded-tl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{ 
+                      animate={{
                         borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-primary rounded-tr-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{ 
+                      animate={{
                         borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
                       }}
                       transition={{ duration: 2, repeat: Infinity, delay: 0.15 }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary rounded-bl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{ 
+                      animate={{
                         borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
                       }}
                       transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary rounded-br-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{ 
+                      animate={{
                         borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
                       }}
                       transition={{ duration: 2, repeat: Infinity, delay: 0.45 }}
                     />
-                    
+
                     {/* Animated Scanning Line */}
                     <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent scan-line-anim shadow-[0_0_20px_rgba(255,202,13,0.9)]" />
-                    
+
                     {/* Additional scanning effect - horizontal bars */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <motion.div 
+                      <motion.div
                         className="absolute left-0 right-0 h-8 bg-gradient-to-b from-primary/20 to-transparent blur-sm"
-                        animate={{ 
+                        animate={{
                           top: ['0%', '100%'],
                         }}
-                        transition={{ 
+                        transition={{
                           duration: 3,
                           repeat: Infinity,
                           ease: "linear"
@@ -607,12 +604,12 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
                 {/* Instruction Text with Animation */}
                 <div className="absolute bottom-32 left-0 right-0 text-center px-4">
-                  <motion.div 
+                  <motion.div
                     className="inline-block px-6 py-3 bg-cardackgroundlack/60 backdrop-blur-lg rounded-full"
-                    animate={{ 
+                    animate={{
                       scale: isScanning ? [1, 1.05, 1] : 1,
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: isScanning ? Infinity : 0,
                     }}
@@ -646,60 +643,60 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
             <div className="flex-1 overflow-y-auto no-scrollbar w-full px-6 flex flex-col justify-center min-h-[400px]">
               <div className="w-full max-w-md mx-auto py-8">
                 <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse shrink-0">
-                <Keyboard className="w-12 h-12 text-primary" />
-              </div>
+                  <Keyboard className="w-12 h-12 text-primary" />
+                </div>
 
-              <h3 className="font-headline text-3xl font-bold text-text text-center mb-3">Enter Session Code</h3>
-              <p className="text-text/60 text-center mb-12">
-                Type the 6-8 character code displayed on screen
-              </p>
+                <h3 className="font-headline text-3xl font-bold text-text text-center mb-3">Enter Session Code</h3>
+                <p className="text-text/60 text-center mb-12">
+                  Type the 6-8 character code displayed on screen
+                </p>
 
-              <div className="relative group">
-                <input
-                  type="text"
-                  value={sessionCode}
-                  onChange={handleCodeChange}
-                  maxLength={8}
-                  placeholder="XXXXXXXX"
-                  aria-label="Attendance Session Code"
-                  autoFocus
-                  className="w-full bg-surface/10 backdrop-blur-lg border-outline border-white/20 rounded-2xl px-6 py-6 text-center text-4xl font-mono tracking-[0.3em] uppercase text-text placeholder-white/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all mb-6"
-                />
-                
-                {/* Paste Button for Accessibility */}
-                <div className="flex justify-center mb-8 gap-3">
-                  <Button
-                    onClick={handlePaste}
-                    variant="secondary"
-                    className="bg-surface/10 hover:bg-surface/20 border-white/10 text-text rounded-xl py-3 flex items-center gap-2"
-                    aria-label="Paste session code from clipboard"
-                  >
-                    <Clipboard className="w-4 h-4" />
-                    Paste Code
-                  </Button>
-                  
-                  {sessionCode && (
+                <div className="relative group">
+                  <input
+                    type="text"
+                    value={sessionCode}
+                    onChange={handleCodeChange}
+                    maxLength={8}
+                    placeholder="XXXXXXXX"
+                    aria-label="Attendance Session Code"
+                    autoFocus
+                    className="w-full bg-surface/10 backdrop-blur-lg border-outline border-white/20 rounded-2xl px-6 py-6 text-center text-4xl font-mono tracking-[0.3em] uppercase text-text placeholder-white/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all mb-6"
+                  />
+
+                  {/* Paste Button for Accessibility */}
+                  <div className="flex justify-center mb-8 gap-3">
                     <Button
-                      onClick={() => setSessionCode('')}
+                      onClick={handlePaste}
                       variant="secondary"
                       className="bg-surface/10 hover:bg-surface/20 border-white/10 text-text rounded-xl py-3 flex items-center gap-2"
-                      aria-label="Clear session code"
+                      aria-label="Paste session code from clipboard"
                     >
-                      <RotateCcw className="w-4 h-4" />
-                      Clear
+                      <Clipboard className="w-4 h-4" />
+                      Paste Code
                     </Button>
-                  )}
-                </div>
-              </div>
 
-              <Button
-                onClick={handleSubmit}
-                disabled={sessionCode.length < 6}
-                className="w-full h-16 text-lg font-bold rounded-2xl"
-                aria-label="Verify session code and mark attendance"
-              >
-                Verify & Mark Attendance
-              </Button>
+                    {sessionCode && (
+                      <Button
+                        onClick={() => setSessionCode('')}
+                        variant="secondary"
+                        className="bg-surface/10 hover:bg-surface/20 border-white/10 text-text rounded-xl py-3 flex items-center gap-2"
+                        aria-label="Clear session code"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleSubmit}
+                  disabled={sessionCode.length < 6}
+                  className="w-full h-16 text-lg font-bold rounded-2xl"
+                  aria-label="Verify session code and mark attendance"
+                >
+                  Verify & Mark Attendance
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -750,7 +747,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ 
+                transition={{
                   type: "spring",
                   stiffness: 200,
                   damping: 15,
@@ -775,12 +772,12 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   const header = parts.length > 1 ? parts[0] + '.' : 'Verification Details:';
                   const remaining = parts.length > 1 ? parts.slice(1).join('.') : errorMsg;
                   const reasons = remaining.split(';').map(r => r.trim()).filter(Boolean);
-                  
+
                   return (
                     <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-left mb-6">
                       <p className="text-red-400 font-bold mb-3 flex items-center gap-2">
-                         <AlertTriangle className="w-4 h-4" />
-                         {header}
+                        <AlertTriangle className="w-4 h-4" />
+                        {header}
                       </p>
                       <div className="space-y-2.5">
                         {reasons.map((reason, idx) => (
@@ -827,7 +824,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   <RotateCcw className="w-5 h-5" />
                   Try Again
                 </button>
-                
+
                 <button
                   onClick={handleSwitchToManual}
                   className="w-full bg-surface/10 hover:bg-surface/20 text-text font-semibold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 border border-white/20"

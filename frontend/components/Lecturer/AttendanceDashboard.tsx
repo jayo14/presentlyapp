@@ -47,7 +47,7 @@ export const AttendanceDashboard: React.FC = () => {
     endTime: '12:00 PM',
     status: 'active',
     code: 'ABC123XY',
-    qrData: 'https://presentlyapp.vercel.app/check-in/ABC123XY'
+    qrData: 'https://getpresently.com.ng/check-in/ABC123XY'
   });
 
   const [students] = useState<Student[]>([
@@ -80,7 +80,7 @@ export const AttendanceDashboard: React.FC = () => {
     setSessionInfo(prev => ({
       ...prev,
       code: newCode,
-      qrData: `https://presentlyapp.vercel.app/check-in/${newCode}`
+      qrData: `https://getpresently.com.ng/check-in/${newCode}`
     }));
   };
 
@@ -109,8 +109,8 @@ export const AttendanceDashboard: React.FC = () => {
   const pendingCount = students.filter(s => s.status === 'pending').length;
   const attendanceRate = Math.round((presentCount / students.length) * 100);
 
-  const filteredStudents = filterStatus === 'all' 
-    ? students 
+  const filteredStudents = filterStatus === 'all'
+    ? students
     : students.filter(s => s.status === filterStatus);
 
   const getStatusColor = (status: string) => {
@@ -148,11 +148,10 @@ export const AttendanceDashboard: React.FC = () => {
               <h1 className="font-headline text-2xl md:text-3xl font-bold text-text-primary">
                 {sessionInfo.courseCode} - Live Session
               </h1>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${
-                sessionInfo.status === 'active' ? 'bg-green-500/10 text-green-600' :
-                sessionInfo.status === 'paused' ? 'bg-yellow-500/10 text-yellow-600' :
-                'bg-red-500/10 text-red-600'
-              }`}>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${sessionInfo.status === 'active' ? 'bg-green-500/10 text-green-600' :
+                  sessionInfo.status === 'paused' ? 'bg-yellow-500/10 text-yellow-600' :
+                    'bg-red-500/10 text-red-600'
+                }`}>
                 <Circle size={8} className={`fill-current ${sessionInfo.status === 'active' ? 'animate-pulse' : ''}`} />
                 {sessionInfo.status === 'active' ? 'Active' : sessionInfo.status === 'paused' ? 'Paused' : 'Ended'}
               </span>
@@ -215,11 +214,10 @@ export const AttendanceDashboard: React.FC = () => {
                 <button
                   key={status}
                   onClick={() => setFilterStatus(status as any)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize ${
-                    filterStatus === status
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize ${filterStatus === status
                       ? 'bg-primary text-white'
                       : 'bg-inputccent text-text-secondary'
-                  }`}
+                    }`}
                 >
                   {status}
                   {status !== 'all' && `(${status === 'present' ? presentCount : status === 'absent' ? absentCount : pendingCount})`}

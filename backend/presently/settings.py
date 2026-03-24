@@ -238,7 +238,7 @@ else:
         'http://127.0.0.1:3000',
         'https://www.getpresently.com.ng',
         'https://www.getpresently.com.ng',
-        'https://presentlyapp.vercel.app',
+        'https://getpresently.com.ng',
         FRONTEND_ORIGIN,
     ]
 
@@ -308,7 +308,7 @@ DEFAULT_FROM_EMAIL = raw_from_email if '<' in raw_from_email else f"Presently <{
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://presentlyapp.vercel.app')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://getpresently.com.ng')
 
 # Firebase Cloud Messaging (FCM) Configuration
 FCM_DJANGO_SETTINGS = {

@@ -19,7 +19,7 @@ The backend needs these env vars on Render (Settings > Environment):
 ```
 GOOGLE_CLIENT_ID=your_actual_google_client_id
 GOOGLE_CLIENT_SECRET=your_actual_google_client_secret
-FRONTEND_URL=https://presentlyapp.vercel.app
+FRONTEND_URL=https://getpresently.com.ng
 ```
 
 **If these are NOT set:** The backend will silently fail because:
@@ -39,7 +39,7 @@ Verify your app is correctly registered:
 4. Click your Web Application credential
 5. Verify **Authorized redirect URIs** includes:
    ```
-   https://presentlyapp.vercel.app/auth/callback
+   https://getpresently.com.ng/auth/callback
    ```
 
 ### 4. Test the Backend Endpoint Directly
@@ -51,7 +51,7 @@ curl -X POST https://presentlyapp.onrender.com/api/auth/google-callback/ \
   -H "Content-Type: application/json" \
   -d '{
     "code": "4/0AfrIepCF9Z3XnmrOsdbBOv09cCYM5oUiro0H39BEs2KqxG6b2Vj56958qdE8XRqsR1_SeA",
-    "redirect_uri": "https://presentlyapp.vercel.app/auth/callback"
+    "redirect_uri": "https://getpresently.com.ng/auth/callback"
   }'
 ```
 
@@ -99,6 +99,6 @@ The callback component is at: `/frontend/components/Auth/Callback.tsx`
 - [ ] Render backend has `GOOGLE_CLIENT_ID` env var set
 - [ ] Render backend has `GOOGLE_CLIENT_SECRET`env var set
 - [ ] Render service restarted after setting env vars
-- [ ] Google Cloud Console has `https://presentlyapp.vercel.app/auth/callback` registered
+- [ ] Google Cloud Console has `https://getpresently.com.ng/auth/callback` registered
 - [ ] Vercel frontend is rebuilt and deployed
 - [ ] Browser cache cleared (hard refresh)

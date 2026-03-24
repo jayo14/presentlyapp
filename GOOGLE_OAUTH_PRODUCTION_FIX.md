@@ -22,7 +22,7 @@ Go to: https://dashboard.render.com → Your Backend Service → Environment
 
 Ensure these are set:
 ```
-FRONTEND_URL = https://presentlyapp.vercel.app
+FRONTEND_URL = https://getpresently.com.ng
 GOOGLE_CLIENT_ID = [your actual Google Client ID]
 GOOGLE_CLIENT_SECRET = [your actual Google Client Secret]
 ```
@@ -43,7 +43,7 @@ After redeployment:
 
 ### 5. Test the Flow Again
 
-1. Visit `https://presentlyapp.vercel.app/login`
+1. Visit `https://getpresently.com.ng/login`
 2. Click "Sign in with Google"
 3. You should be redirected to callback with correct path: `/api/auth/google-callback/` (no duplicate)
 

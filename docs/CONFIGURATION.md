@@ -9,7 +9,7 @@ The frontend application is configured to work on multiple URLs:
 - **Alternative**: `http://127.0.0.1:3000`
 
 ### Production
-- **Live Site**: `https://presentlyapp.vercel.app`
+- **Live Site**: `https://getpresently.com.ng`
 
 ## Backend CORS Configuration
 
@@ -21,7 +21,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',      # Development frontend (Vite alternative)
     'http://127.0.0.1:3000',      # Development frontend (localhost alias)
     'http://127.0.0.1:5173',      # Development frontend (localhost alias)
-    'https://presentlyapp.vercel.app',  # Production frontend
+    'https://getpresently.com.ng',  # Production frontend
 ]
 ```
 
@@ -82,14 +82,14 @@ For production:
 ```env
 SECRET_KEY=your-secure-production-secret-key
 DEBUG=False
-FRONTEND_URL=https://presentlyapp.vercel.app
+FRONTEND_URL=https://getpresently.com.ng
 ```
 
 ## Deployment
 
 ### Frontend (Vercel)
 
-The frontend is deployed on Vercel at `https://presentlyapp.vercel.app`
+The frontend is deployed on Vercel at `https://getpresently.com.ng`
 
 Environment variables to set in Vercel:
 - `GEMINI_API_KEY`
@@ -98,7 +98,7 @@ Environment variables to set in Vercel:
 ### Backend
 
 When deploying the backend, ensure:
-1. Set `FRONTEND_URL=https://presentlyapp.vercel.app`
+1. Set `FRONTEND_URL=https://getpresently.com.ng`
 2. Update `ALLOWED_HOSTS` in `settings.py`
 3. Set `DEBUG=False`
 4. Configure production database
@@ -120,7 +120,7 @@ When deploying the backend, ensure:
 The application uses CORS to allow the frontend to communicate with the backend. The `CORS_ALLOWED_ORIGINS` setting in `backend/presently/settings.py` must include:
 
 1. Your development frontend URL (`http://localhost:3000`)
-2. Your production frontend URL (`https://presentlyapp.vercel.app`)
+2. Your production frontend URL (`https://getpresently.com.ng`)
 
 ## Testing the Configuration
 
@@ -142,7 +142,7 @@ The application uses CORS to allow the frontend to communicate with the backend.
 
 ### Production
 
-1. Frontend is automatically deployed to `https://presentlyapp.vercel.app` via Vercel
+1. Frontend is automatically deployed to `https://getpresently.com.ng` via Vercel
 2. Backend should be deployed to your production server
 3. Update environment variables accordingly
 
@@ -176,7 +176,7 @@ Don't forget to update CORS settings if you change ports!
 | Environment | Frontend URL | Backend URL |
 |-------------|-------------|-------------|
 | Development | http://localhost:3000 | http://localhost:8000 |
-| Production | https://presentlyapp.vercel.app | (Your backend URL) |
+| Production | https://getpresently.com.ng | (Your backend URL) |
 
 ---
 
