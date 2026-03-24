@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, BookOpen, Users, Check, Loader2, AlertCircle } from 'lucide-react';
-import { Button } from '../Button';
-import { Input } from '../Input';
+import { X, Search, BookOpen, Check, Loader2, AlertCircle, ChevronRight, LayoutGrid, Info } from 'lucide-react';
 import { studentApi, AvailableCourse } from '../../services/api/student';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface CourseRegistrationDialogProps {
   isOpen: boolean;
@@ -27,18 +24,12 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   const [searchTerm, setSearchTerm] = useState('');
   const [enrollingCourseId, setEnrollingCourseId] = useState<number | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<string>('all');
-  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
-  const [lastEnrolledCourse, setLastEnrolledCourse] = useState<string>('');
-  const [inputCourseCode, setInputCourseCode] = useState('');
-  
-  const { modalProps } = useModalAccessibility(isOpen, onClose);
+  const [enrolledIds, setEnrolledIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (isOpen) {
       loadAvailableCourses();
-      if (initialCourseCode) {
-        setInputCourseCode(initialCourseCode);
-      }
+      if (initialCourseCode) setSearchTerm(initialCourseCode);
     }
   }, [isOpen, initialCourseCode]);
 
@@ -52,12 +43,13 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
       setError(null);
       const data = await studentApi.getAvailableCourses();
       setCourses(data);
+      // Initialize enrolled set
+      const alreadyEnrolled = data.filter(c => !c.can_enroll).map(c => c.id);
+      setEnrolledIds(new Set(alreadyEnrolled));
     } catch (err: any) {
       const errorMsg = err.response?.data?.error || 'Failed to load available courses';
       setError(errorMsg);
-      toast.error('Load Error', {
-        description: errorMsg
-      });
+      toast.error('Connection Error', { description: errorMsg });
     } finally {
       setLoading(false);
     }
@@ -65,7 +57,6 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
 
   const filterCourses = () => {
     let filtered = courses;
-
     if (searchTerm) {
       filtered = filtered.filter(
         course =>
@@ -73,279 +64,160 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
           course.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     if (selectedSemester !== 'all') {
       filtered = filtered.filter(course => course.semester === selectedSemester);
     }
-
     setFilteredCourses(filtered);
   };
 
   const handleEnroll = async (courseId: number) => {
     try {
       setEnrollingCourseId(courseId);
-      setError(null);
       await studentApi.enrollInCourse(courseId);
       
-      const enrolledCourse = courses.find(c => c.id === courseId);
-      if (enrolledCourse) {
-        setLastEnrolledCourse(`${enrolledCourse.code} (${enrolledCourse.title})`);
-        setShowSuccessBanner(true);
-        setTimeout(() => setShowSuccessBanner(false), 5000); // Hide after 5 seconds
-      }
-      
-      setCourses(courses.map(c => 
-        c.id === courseId ? { ...c, can_enroll: false } : c
-      ));
-      
-      toast.success('Enrollment Successful', {
-        description: 'You have been enrolled in the course'
+      setEnrolledIds(prev => new Set([...Array.from(prev), courseId]));
+      toast.success('Course Enrolled', { 
+        description: 'Successfully added to your curriculum' 
       });
-      
       onSuccess(courseId);
     } catch (err: any) {
-      const errorMsg = err.response?.data?.error || 'Failed to enroll in course';
-      setError(errorMsg);
-      toast.error('Enrollment Failed', {
-        description: errorMsg
+      toast.error('Enrollment Failed', { 
+        description: err.response?.data?.error || 'Please try again later' 
       });
     } finally {
       setEnrollingCourseId(null);
     }
   };
 
-  const handleEnrollByCourseCode = () => {
-    const course = courses.find(c => c.code.toUpperCase() === inputCourseCode.toUpperCase());
-    if (course && course.can_enroll) {
-      handleEnroll(course.id);
-      setInputCourseCode('');
-    } else if (course && !course.can_enroll) {
-      toast.error('Already enrolled in this course');
-    } else {
-      toast.error('Course not found');
-    }
-  };
-
-  const semesters = Array.from(new Set(courses.map(c => c.semester).filter(Boolean)));
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6 bg-text/40 backdrop-blur-sm animate-in fade-in duration-300">
       <motion.div
-        {...modalProps}
-        aria-labelledby="reg-dialog-title"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-surface text-text border border-outline rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col outline-none"
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="bg-white dark:bg-surface w-full max-w-2xl h-[92vh] md:h-auto md:max-h-[85vh] rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
       >
-        <div className="flex items-center justify-between p-6 border-b border-outline">
-          <div>
-            <h2 id="reg-dialog-title" className="font-headline text-2xl font-bold text-text">Course Registration</h2>
-            <p className="text-sm text-textMuted mt-1">
-              Browse and enroll in available courses
-            </p>
+        {/* Header */}
+        <div className="px-8 pt-8 pb-4 flex flex-col gap-1 relative flex-shrink-0">
+          <div className="flex justify-between items-start">
+            <h2 className="text-3xl font-headline font-black text-text tracking-tight uppercase tracking-widest">Register Courses</h2>
+            <button 
+              onClick={onClose}
+              className="w-10 h-10 rounded-full bg-surfaceHigh/50 flex items-center justify-center text-textMuted hover:bg-surfaceHigh transition-colors"
+            >
+              <X size={20} strokeWidth={3} />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-surfaceLow hover:text-textMuted rounded-lg transition-colors"
-            aria-label="Close dialog"
-          >
-            <X className="w-6 h-6 text-textMuted" />
-          </button>
+          <p className="text-textMuted font-medium text-sm">Select the modules you wish to enroll in this semester</p>
         </div>
 
-        <div className="p-6 border-b border-outline space-y-4">
-          {/* Success Banner - matching Design 2 */}
-          {showSuccessBanner && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-4 bg-green-50 border border-green-500 rounded-xl flex items-start gap-3 relative"
-            >
-              <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                <Check className="w-4 h-4 text-text" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-headline text-green-800 font-bold text-sm mb-1">
-                  Course Added Successfully
-                </h3>
-                <p className="text-green-700 text-xs">
-                  {lastEnrolledCourse} has been added to your schedule.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowSuccessBanner(false)}
-                className="flex-shrink-0 text-green-600 hover:text-green-800"
-              >
-                <X size={18} />
-              </button>
-            </motion.div>
-          )}
-
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-
-          {/* Add via Code Section - matching Design 2 */}
-          <div className="space-y-3">
-            <h3 className="font-headline text-lg font-bold text-text">Add via Code</h3>
-            <p className="text-sm text-textMuted">
-              Enter the unique 6-digit code provided by your course instructor.
-            </p>
-            <div className="flex gap-3">
-              <Input
-                type="text"
-                placeholder="e.g. CS101"
-                value={inputCourseCode}
-                onChange={(e) => setInputCourseCode(e.target.value)}
-                className="flex-1"
-                maxLength={10}
-              />
-              <Button 
-                onClick={handleEnrollByCourseCode}
-                disabled={!inputCourseCode.trim()}
-                className="whitespace-nowrap"
-              >
-                Register Course →
-              </Button>
-            </div>
-          </div>
-
-          {/* OR Divider */}
-          <div className="relative flex items-center justify-center py-2">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-outline"></div>
-            </div>
-            <div className="relative px-4 bg-surface text-text">
-              <span className="text-sm font-medium text-textMuted uppercase">OR BROWSE</span>
-            </div>
-          </div>
-
-          {/* Browse Department Section - matching Design 2 */}
-          <div className="space-y-3">
-            <h3 className="font-headline text-lg font-bold text-text">Browse Department</h3>
-            <p className="text-sm text-textMuted">
-              Find open electives and major courses.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-textMuted" />
-                <Input
-                  type="text"
-                  placeholder="Search for departments..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-
-              <select
-                value={selectedSemester}
-                onChange={(e) => setSelectedSemester(e.target.value)}
-                className="px-4 py-2 bg-surfaceLow border border-outline rounded-lg text-text focus:outline-none focus:border-primary"
-            >
-              <option value="all">All Semesters</option>
-              {semesters.map(sem => (
-                <option key={sem} value={sem}>{sem}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-6">
-        {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-          ) : filteredCourses.length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-textMuted mx-auto mb-4" />
-              <p className="text-textMuted">No courses found</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {filteredCourses.map((course) => (
-                <div
-                  key={course.id}
-                  className="bg-surfaceLow border border-outline rounded-xl p-4 hover:border-primary/50 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
-                    <div className="flex-1 w-full">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">
-                          {course.code}
-                        </span>
-                        {course.semester && (
-                          <span className="px-2 py-1 bg-surfaceLow text-textMuted text-xs rounded">
-                            {course.semester}
-                          </span>
-                        )}
-                      </div>
-
-                      <h3 className="font-headline text-on-primary-fixedase sm:text-lg font-semibold text-text mb-1">
-                        {course.title}
-                      </h3>
-
-                      {course.description && (
-                        <p className="text-sm text-textMuted mb-3 line-clamp-2">
-                          {course.description}
-                        </p>
-                      )}
-
-                      <div className="flex items-center gap-3 text-xs sm:text-sm text-textMuted flex-wrap">
-                        {course.credit_units && (
-                          <div className="flex items-center gap-1">
-                            <BookOpen className="w-4 h-4" />
-                            <span>{course.credit_units} units</span>
-                          </div>
-                        )}
-                        {course.enrollment_count !== undefined && (
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            <span>{course.enrollment_count} enrolled</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="w-full sm:w-auto">
-                      {course.can_enroll ? (
-                        <Button
-                          onClick={() => handleEnroll(course.id)}
-                          disabled={enrollingCourseId === course.id}
-                          className="whitespace-nowrap w-full sm:w-auto"
-                        >
-                          {enrollingCourseId === course.id ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                              Enrolling...
-                            </>
-                          ) : (
-                            <>
-                              <Check className="w-4 h-4 mr-2" />
-                              Enroll
-                            </>
-                          )}
-                        </Button>
-                      ) : (
-                        <div className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
-                          <Check className="w-4 h-4" />
-                          Enrolled
-                        </div>
-                      )}
-                    </div>
-                  </div>
+        {/* Filters */}
+        <div className="px-8 py-4 space-y-4 flex-shrink-0">
+           <div className="space-y-2">
+             <label className="text-[10px] font-black text-textMuted uppercase tracking-widest ml-1">Browse Department</label>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="relative group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary transition-colors" size={18} />
+                  <input 
+                    type="text" 
+                    placeholder="Search e.g. CS101"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-surfaceLow/50 border border-outline/10 h-14 pl-12 pr-4 rounded-2xl text-sm font-bold focus:outline-none focus:border-primary/50 focus:bg-white transition-all"
+                  />
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="relative">
+                  <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={18} />
+                  <select 
+                    value={selectedSemester}
+                    onChange={(e) => setSelectedSemester(e.target.value)}
+                    className="w-full bg-surfaceLow/50 border border-outline/10 h-14 pl-12 pr-4 rounded-2xl text-sm font-bold focus:outline-none appearance-none cursor-pointer"
+                  >
+                    <option value="all">All Semesters</option>
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                  </select>
+                </div>
+             </div>
+           </div>
+        </div>
+
+        {/* Course List */}
+        <div className="flex-1 overflow-y-auto px-6 py-2 space-y-3 custom-scrollbar">
+           {loading ? (
+             <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-40">
+                <Loader2 size={32} className="animate-spin text-primary" />
+                <span className="text-xs font-black tracking-widest uppercase">Fetching Catalog...</span>
+             </div>
+           ) : filteredCourses.length > 0 ? (
+             filteredCourses.map(course => {
+               const isEnrolled = enrolledIds.has(course.id);
+               return (
+                 <motion.div 
+                   layout
+                   key={course.id}
+                   className={`p-5 rounded-[2rem] border transition-all flex items-center justify-between gap-4 group ${
+                     isEnrolled 
+                     ? 'bg-primary/5 border-primary/20' 
+                     : 'bg-white border-outline/10 hover:border-primary/30 shadow-sm'
+                   }`}
+                 >
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                         isEnrolled ? 'bg-primary text-white shadow-lg' : 'bg-surfaceLow text-textMuted group-hover:bg-primary/10 group-hover:text-primary'
+                       }`}>
+                          {isEnrolled ? <Check size={20} strokeWidth={3} /> : <BookOpen size={20} />}
+                       </div>
+                       <div className="min-w-0">
+                          <p className="text-[10px] font-black tracking-widest text-primary/70 uppercase mb-0.5">{course.code}</p>
+                          <h4 className="font-headline font-black text-text text-base tracking-tight truncate">{course.title}</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                             <span className="text-[10px] font-bold text-textMuted/60 flex items-center gap-1">
+                                <Info size={10} /> {course.credit_units} Units
+                             </span>
+                             {isEnrolled && (
+                               <span className="text-[10px] font-black text-primary uppercase tracking-tighter">Current Module</span>
+                             )}
+                          </div>
+                       </div>
+                    </div>
+                    {isEnrolled ? (
+                      <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black border border-primary/20">
+                         ADDED
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => handleEnroll(course.id)}
+                        disabled={enrollingCourseId === course.id}
+                        className="h-10 px-6 bg-text text-white text-xs font-black rounded-xl hover:bg-black active:scale-95 transition-all flex items-center justify-center"
+                      >
+                         {enrollingCourseId === course.id ? <Loader2 size={16} className="animate-spin" /> : 'ADD'}
+                      </button>
+                    )}
+                 </motion.div>
+               );
+             })
+           ) : (
+             <div className="py-20 flex flex-col items-center justify-center opacity-30 text-center px-8">
+                <Search size={48} className="mb-4" />
+                <p className="font-headline font-black text-lg">No modules found</p>
+                <p className="text-xs font-medium max-w-[200px] mt-1">Try adjusting your search criteria or filter.</p>
+             </div>
+           )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-8 border-t border-outline/5 bg-white/80 backdrop-blur-md flex-shrink-0">
+           <button 
+             onClick={onClose}
+             className="w-full bg-primary text-white h-16 rounded-[1.5rem] font-headline font-black text-lg shadow-[0_16px_32px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+           >
+              Submit Registration
+              <ChevronRight size={20} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
+           </button>
         </div>
       </motion.div>
     </div>
