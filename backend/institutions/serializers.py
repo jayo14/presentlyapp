@@ -207,6 +207,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     institution_name = serializers.CharField(source='institution.full_name', read_only=True)
     college_name = serializers.CharField(source='college.name', read_only=True)
+    department_name = serializers.CharField(source='department.name', read_only=True)
     name = serializers.CharField(source='full_name', read_only=True)  # Add 'name' field for frontend compatibility
     
     class Meta:
@@ -214,7 +215,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'email', 'full_name', 'name', 'role', 'avatar_url', 'onboarding_complete', 'signup_method',
             'institution', 'institution_name', 'college', 'college_name',
-            'phone_number', 'matric_number', 'department', 'level',
+            'phone_number', 'matric_number', 'department', 'department_name', 'level',
             'staff_id', 'courses', 'assigned_lecturer', 'signature_image',
             'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone',
             'created_at', 'updated_at'

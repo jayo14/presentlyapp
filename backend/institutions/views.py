@@ -1421,7 +1421,10 @@ class CourseViewSet(viewsets.ModelViewSet):
         queryset = Course.objects.filter(is_active=True)
         
         if request.user.department:
-            queryset = queryset.filter(department=request.user.department)
+            if isinstance(request.user.department, str):
+                queryset = queryset.filter(department__name=request.user.department)
+            else:
+                queryset = queryset.filter(department=request.user.department)
         
         if request.user.level:
             queryset = queryset.filter(level=request.user.level)
