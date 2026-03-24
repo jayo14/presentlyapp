@@ -30,36 +30,7 @@ export const Login: React.FC = () => {
     }
   }, [message]);
 
-  useEffect(() => {
-    if (hasHandledRedirect) return;
-
-    const handleRedirect = async () => {
-      const auth = getFirebaseAuth();
-      if (!auth) return;
-
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          setHasHandledRedirect(true);
-          const idToken = await result.user.getIdToken();
-          setIsRedirecting(true);
-          googleAuthMutation.mutate({ idToken, rememberMe }, {
-            onSuccess: () => {
-              toast.success('Login Successful');
-            },
-            onError: () => {
-              setIsRedirecting(false);
-              toast.error('Google Login Failed');
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Error getting redirect result', error);
-      }
-    };
-
-    handleRedirect();
-  }, [hasHandledRedirect, googleAuthMutation, rememberMe]);
+  // OAuth landing logic is now handled in the dedicated /auth/callback route
 
   useEffect(() => {
     if (!user || isLoading || isRedirecting) return;

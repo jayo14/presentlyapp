@@ -21,33 +21,7 @@ export const Register: React.FC = () => {
 
   const redirectTo = searchParams.get('redirect_to') || '/dashboard';
 
-  useEffect(() => {
-    const handleRedirect = async () => {
-      const auth = getFirebaseAuth();
-      if (!auth) return;
-
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          const idToken = await result.user.getIdToken();
-          setIsRedirecting(true);
-          googleAuthMutation.mutate({ idToken }, {
-            onSuccess: () => {
-              toast.success('Registration Successful');
-            },
-            onError: () => {
-              setIsRedirecting(false);
-              toast.error('Google Auth Failed');
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Error getting redirect result', error);
-      }
-    };
-
-    handleRedirect();
-  }, [googleAuthMutation]);
+  // OAuth callback is handled by the dedicated /auth/callback route
 
   useEffect(() => {
     if (user && !isLoading) {
@@ -75,27 +49,49 @@ export const Register: React.FC = () => {
     });
   };
 
-  const handleGoogleLogin = async () => {
-    const auth = getFirebaseAuth();
-    if (!auth) {
+  const handleGoogleLogin = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
       toast.error('Google Auth Error', {
-        description: 'Firebase is not configured properly.'
+        description: 'Google Client ID is not configured.'
       });
       return;
     }
 
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithRedirect(auth, provider);
-    } catch (error: any) {
-      if (error.code !== 'auth/popup-closed-by-user') {
-        console.error('Google Auth Popup Error:', error);
-        toast.error('Google Auth Error', {
-          description: error.message || 'Failed to open Google login popup.'
-        });
-      }
-    }
+    const redirectUri = `${window.location.origin}/auth/callback`;
+    const scope = 'email profile';
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
+    window.location.href = authUrl;
   };
+
+  const calculatePasswordStrength = (pwd: string) => {
+    if (!pwd) return 0;
+    let score = 0;
+    if (pwd.length >= 8) score += 25;
+    if (/[A-Z]/.test(pwd)) score += 25;
+    if (/[0-9]/.test(pwd)) score += 25;
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 25;
+    return score;
+  };
+
+  const getStrengthColor = (score: number) => {
+    if (score < 25) return 'bg-red-500';
+    if (score < 50) return 'bg-orange-500';
+    if (score < 75) return 'bg-yellow-500';
+    if (score < 100) return 'bg-lime-500';
+    return 'bg-green-500';
+  };
+
+  const getStrengthLabel = (score: number) => {
+    if (score === 0) return '';
+    if (score < 25) return 'Very Weak';
+    if (score < 50) return 'Weak';
+    if (score < 75) return 'Medium';
+    if (score < 100) return 'Strong';
+    return 'Very Strong';
+  };
+
+  const passwordStrength = calculatePasswordStrength(password);
 
   const handleAppleLogin = () => {
     toast.info('Apple Login', { description: 'Apple authentication is coming soon.' });
@@ -209,6 +205,31 @@ export const Register: React.FC = () => {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+                
+                {/* Password Strength Gauge */}
+                {password && (
+                  <div className="mt-3">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-textMuted">Password Strength</span>
+                      <span className={`text-[10px] font-bold ${getStrengthColor(passwordStrength).replace('bg-', 'text-')}`}>
+                        {getStrengthLabel(passwordStrength)}
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden flex gap-1">
+                      {[25, 50, 75, 100].map((step) => (
+                        <div 
+                          key={step}
+                          className={`h-full flex-1 transition-all duration-500 ${
+                            passwordStrength >= step ? getStrengthColor(passwordStrength) : 'bg-white/5'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-textMuted mt-2 leading-relaxed">
+                      Use 8+ characters with a mix of letters, numbers & symbols to avoid the "common password" error.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <p className="text-xs text-textMuted">
