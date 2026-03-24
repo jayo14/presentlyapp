@@ -1,16 +1,10 @@
-import React, { useState, useRef, useEffect, lazy, Suspense } from 'react';
-import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, X, Plus, MapPin, CheckCircle2, ChevronRight, Activity, Loader2, RefreshCw, User } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState, useEffect, lazy } from 'react';
+import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, Plus, MapPin, ChevronRight, Activity, Loader2, User } from 'lucide-react';
 import { SEO } from '../SEO';
-import { studentApi, StudentDashboardData, EnrolledCourse, TimetableEntry, StudentAnalytics } from '../../services/api/student';
+import { studentApi, StudentDashboardData } from '../../services/api/student';
 import { sessionApi } from '../../services/api/attendance';
-import { geolocationService } from '../../services/geolocation';
-import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
-const FindMyLocation = lazy(() => import('../Location/FindMyLocation').then(module => ({ default: module.FindMyLocation })));
 import EnhancedAttendanceScanner from '../Attendance/EnhancedAttendanceScanner';
-import { toast } from 'sonner';
-import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 import { useCurrentUser } from '../../hooks/useAuth';
 
 interface StudentDashboardProps {
@@ -22,77 +16,32 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const { data: currentUser } = useCurrentUser();
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [isWarningDismissed, setIsWarningDismissed] = useState(() => {
-    const dismissed = localStorage.getItem('attendanceWarningDismissed');
-    return dismissed === 'true';
-  });
-
+  
   const [dashboardData, setDashboardData] = useState<StudentDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
-  const [analyticsData, setAnalyticsData] = useState<StudentAnalytics | null>(null);
-
+  
   useEffect(() => {
     loadDashboardData();
     const interval = setInterval(() => { loadDashboardData(); }, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (view === 'timetable') loadTimetableData();
-  }, [view]);
-
-  useEffect(() => {
-    if (view === 'analytics') loadAnalyticsData();
-  }, [view]);
-
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       const data = await studentApi.getDashboard();
       setDashboardData(data);
-      setError(null);
     } catch (err: any) {
       console.error('Failed to load dashboard data:', err);
-      const errorMsg = err.response?.data?.error || 'Failed to load dashboard data';
-      setError(errorMsg);
-      toast.error('Dashboard Error', { description: errorMsg });
     } finally {
       setLoading(false);
     }
   };
 
-  const loadTimetableData = async () => {
-    try {
-      const data = await studentApi.getTimetable();
-      setTimetableData(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      console.error('Failed to load timetable data:', err);
-      setTimetableData([]);
-      toast.error('Timetable Error', { description: 'Failed to load your class timetable' });
-    }
-  };
-
-  const loadAnalyticsData = async () => {
-    try {
-      const data = await studentApi.getAnalytics();
-      setAnalyticsData(data);
-    } catch (err: any) {
-      console.error('Failed to load analytics data:', err);
-      toast.error('Analytics Error', { description: 'Failed to load your performance analytics' });
-    }
-  };
-
   // Derived data
   const enrolledCourses = dashboardData?.enrolled_courses || [];
-  const lowAttendanceCourses = enrolledCourses.filter(c => (c.attendance_percentage || 0) < 75);
   const avgAttendance = dashboardData?.attendance_stats?.average_attendance || 0;
   const nextClass = dashboardData?.next_class;
-  const recentActivity = dashboardData?.recent_activity || [];
-  const getActivityCourseCode = (activity: StudentDashboardData['recent_activity'][number]) => {
-    return activity.course_code || 'ACT';
-  };
 
   const displayAvatar = currentUser?.avatar_url;
   const displayInitials = userName
@@ -101,30 +50,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() || '')
     .join('') || 'U';
-
-  const handleDismissWarning = () => {
-    setIsWarningDismissed(true);
-    localStorage.setItem('attendanceWarningDismissed', 'true');
-  };
-
-  const handleRegistrationSuccess = () => {
-    setIsRegistrationOpen(false);
-    loadDashboardData();
-  };
-
-  const weeklyAttendanceData = [
-    { name: 'W1', attendance: 70 },
-    { name: 'W2', attendance: 85 },
-    { name: 'W3', attendance: 80 },
-    { name: 'W4', attendance: 90 },
-    { name: 'W5', attendance: avgAttendance },
-  ];
-
-  const attendanceStatusData = dashboardData?.attendance_stats ? [
-    { name: 'Present', value: dashboardData.attendance_stats.total_present, color: '#22c55e' },
-    { name: 'Late', value: dashboardData.attendance_stats.total_late, color: '#eab308' },
-    { name: 'Absent', value: dashboardData.attendance_stats.total_absent, color: '#ef4444' },
-  ] : [];
 
   const handleAttendanceCheckIn = async (code: string, location: any): Promise<any> => {
     try {
@@ -137,203 +62,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     }
   };
 
-  // ─── View: Timetable ──────────────────────────────────
-  if (view === 'timetable') {
+  if (loading && !dashboardData) {
     return (
-      <>
-        <SEO title="Class Timetable | Student Dashboard" description="View your weekly class schedule and registered courses on Presently." noIndex />
-        <div className="space-y-6 animate-in fade-in duration-300">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h2 className="font-headline text-xl font-semibold text-text">Class Timetable</h2>
-              <p className="text-sm text-textMuted mt-0.5">Your weekly class schedule.</p>
-            </div>
-            <button
-              onClick={() => setIsRegistrationOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
-            >
-              <Plus size={16} />
-              Register Courses
-            </button>
-          </div>
-
-          <div className="grid gap-4">
-            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
-              const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
-              const dayClasses = Array.isArray(timetableData)
-                ? timetableData.filter(t => t.day_of_week === dayUpper && t.is_active)
-                : [];
-
-              return (
-                <div key={day} className="bg-surface text-text border border-outline rounded-xl p-4">
-                  <h3 className="font-headline text-xs font-semibold text-primary uppercase tracking-wider mb-3">{day}</h3>
-                  <div className="space-y-2">
-                    {dayClasses.length > 0 ? (
-                      dayClasses.map((t) => (
-                        <div key={t.id} className="flex items-center gap-3 p-3 bg-surfaceLow/50 rounded-lg border border-outline">
-                          <div className="w-8 h-8 rounded-lg bg-surfaceHigh flex items-center justify-center text-textMuted">
-                            <Clock size={14} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-text">{t.course.course_code} – {t.course_name}</p>
-                            <p className="text-xs text-textMuted">{t.start_time} – {t.end_time}</p>
-                            {t.venue_name && <p className="text-xs text-textMuted">{t.venue_name}</p>}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-xs text-textMuted italic">No classes scheduled.</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <CourseRegistrationDialog
-            isOpen={isRegistrationOpen}
-            onClose={() => setIsRegistrationOpen(false)}
-            onSuccess={handleRegistrationSuccess}
-          />
-        </div>
-      </>
-    );
-  }
-
-  // ─── View: Analytics ───────────────────────────────────
-  if (view === 'analytics') {
-    return (
-      <>
-        <SEO title="Attendance Analytics | Student Dashboard" description="View your attendance analytics, course performance and weekly trends on Presently." noIndex />
-        <div className="space-y-6 animate-in fade-in duration-300">
-          {/* Header */}
-          <div>
-            <h2 className="font-headline text-xl font-semibold text-text">Performance Insights</h2>
-            <p className="text-sm text-textMuted mt-0.5">Track your attendance trends and statistics.</p>
-          </div>
-
-          {/* Location Map */}
-          <Suspense fallback={
-            <div className="h-[280px] w-full flex flex-col items-center justify-center bg-surface text-text border border-outline rounded-xl animate-pulse text-textMuted">
-              <Loader2 className="w-6 h-6 animate-spin mb-2 text-primary" />
-              <p className="text-sm">Loading Map...</p>
-            </div>
-          }>
-            <FindMyLocation className="shadow-sm" />
-          </Suspense>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Avg Attendance', value: `${avgAttendance}%`, color: 'text-foreground' },
-              { label: 'Present', value: dashboardData?.attendance_stats?.total_present || 0, color: 'text-emerald-600 dark:text-emerald-400' },
-              { label: 'Late', value: dashboardData?.attendance_stats?.total_late || 0, color: 'text-muted-foregroundmber-600 dark:text-muted-foregroundmber-400' },
-              { label: 'Absent', value: dashboardData?.attendance_stats?.total_absent || 0, color: 'text-red-600 dark:text-red-400' },
-            ].map((stat, i) => (
-              <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4">
-                <p className="text-xs text-textMuted uppercase tracking-wider font-medium">{stat.label}</p>
-                <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>{stat.value}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            {/* Donut Chart */}
-            <div className="md:col-span-5 bg-surface text-text border border-outline rounded-xl p-5">
-              <h3 className="font-headline text-sm font-semibold text-text mb-4">Status Breakdown</h3>
-              <div className="h-56 w-full relative" style={{ minHeight: '224px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={attendanceStatusData}
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={3}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {attendanceStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff', fontSize: '12px' }}
-                    />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={32}
-                      iconType="circle"
-                      formatter={(value) => <span className="text-textMuted text-xs ml-1">{value}</span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
-                  <div className="text-center">
-                    <p className="text-3xl font-semibold text-text">{avgAttendance}%</p>
-                    <p className="text-[10px] text-textMuted uppercase tracking-wider font-medium">Total</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Area Chart */}
-            <div className="md:col-span-7 bg-surface text-text border border-outline rounded-xl p-5">
-              <h3 className="font-headline text-sm font-semibold text-text mb-4">Weekly Attendance Trend</h3>
-              <div className="h-56 w-full" style={{ minHeight: '224px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weeklyAttendanceData}>
-                    <defs>
-                      <linearGradient id="colorAttendance" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" strokeOpacity={0.5} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 11 }} dy={8} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 11 }} domain={[0, 100]} width={28} />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff', fontSize: '12px' }}
-                      itemStyle={{ color: '#f59e0b' }}
-                    />
-                    <Area type="monotone" dataKey="attendance" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#colorAttendance)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Course Performance */}
-          <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-outline">
-              <h3 className="font-headline text-sm font-semibold text-text">Course Performance</h3>
-            </div>
-            <div className="divide-y divide-zinc-100">
-              {(analyticsData?.course_performance || []).map((course) => (
-                <div key={course.course_code} className="px-5 py-3.5 flex items-center gap-4 hover:bg-surfaceHigh hover:text-text/50 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-medium text-text">{course.course_code}</span>
-                      <span className={`text-sm font-semibold ${course.attendance_percentage >= 75 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                        {course.attendance_percentage}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-surfaceHigh h-1.5 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${course.attendance_percentage >= 75 ? 'bg-emerald-500' : 'bg-red-500'}`}
-                        style={{ width: `${course.attendance_percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="w-24 text-right">
-                    <p className="text-xs text-textMuted truncate">{course.course_name}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </>
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="text-sm font-bold text-textMuted uppercase tracking-widest animate-pulse">Initializing Mission Control...</p>
+      </div>
     );
   }
 
@@ -341,190 +75,160 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   return (
     <>
       <SEO title="Student Dashboard | Presently" description="Track your attendance, enrolled courses, upcoming classes and academic performance on Presently." noIndex />
-      <div className="space-y-6 animate-in fade-in duration-300">
-        {/* Greeting */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-textMuted font-medium">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-            <h1 className="font-headline text-xl font-semibold text-text mt-0.5">Hello, {userName.split(' ')[0]}</h1>
-          </div>
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-surfaceHigh border border-outline flex items-center justify-center">
-            {displayAvatar ? (
-              <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-xs font-bold text-textMuted">{displayInitials}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Mark Attendance CTA */}
-        <button
-          onClick={() => setIsAttendanceModalOpen(true)}
-          className="w-full relative overflow-hidden bg-primary text-on-primary-fixedlack rounded-xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all text-left flex items-center justify-between group"
-        >
-          <div className="relative z-10">
-            <span className="inline-flex items-center px-2 py-0.5 bg-cardackgroundlack/10 rounded text-[10px] font-semibold uppercase tracking-wider mb-2">
-              Action Required
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 max-w-4xl mx-auto">
+        
+        {/* MOBILE GREETING */}
+        <header className="flex md:hidden justify-between items-center mb-2 px-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-textMuted font-bold">
+              {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
             </span>
-            <h2 className="font-headline text-xl md:text-2xl font-bold leading-tight">Mark Attendance</h2>
-            <p className="text-sm text-on-primary-fixedlack/70 font-medium mt-0.5">Scan QR Code or Enter Session ID</p>
+            <h2 className="font-headline text-2xl font-black text-text tracking-tight mt-1">Hello, {userName.split(' ')[0]} 👋</h2>
           </div>
-          <div className="relative z-10 bg-surface/20 p-3.5 rounded-xl backdrop-blur-sm group-hover:bg-surface/30 transition-colors">
-            <QrCode size={36} className="text-on-primary-fixedlack" />
+          <div className="relative cursor-pointer" onClick={() => window.location.href='/dashboard/profile'}>
+             <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-surfaceHigh p-0.5 bg-white shadow-sm">
+               {displayAvatar ? (
+                 <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
+               ) : (
+                 <div className="w-full h-full flex items-center justify-center text-sm font-black text-primary bg-primary/5 rounded-xl">
+                   {displayInitials}
+                 </div>
+               )}
+             </div>
           </div>
-          <div className="absolute right-0 top-0 w-48 h-48 bg-surface/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        </button>
+        </header>
 
-        {/* Warning Banner */}
-        <AnimatePresence>
-          {lowAttendanceCourses.length > 0 && !isWarningDismissed && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="bg-red-50 border border-red-200 p-3.5 rounded-xl flex items-center gap-3"
-            >
-              <div className="bg-red-100 p-2 rounded-lg text-red-600 flex-shrink-0">
-                <AlertCircle size={16} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-red-700">Attendance Warning</p>
-                <p className="text-xs text-red-600 mt-0.5">
-                  Below 75% in: {lowAttendanceCourses.map(c => c.code).join(', ')}
-                </p>
-              </div>
-              <button
-                onClick={handleDismissWarning}
-                className="p-1.5 hover:bg-red-100 rounded-lg transition-colors flex-shrink-0"
-              >
-                <X size={16} className="text-red-600" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* HERO CTA CARD */}
+        <section className="relative px-2">
+          <div 
+            onClick={() => setIsAttendanceModalOpen(true)}
+            className="bg-white dark:bg-surfaceContainer/20 rounded-[2.5rem] p-7 shadow-[0_24px_48px_rgba(0,0,0,0.04)] border border-outline/10 overflow-hidden relative cursor-pointer active:scale-[0.98] transition-all hover:shadow-[0_32px_64px_rgba(0,0,0,0.08)] group"
+          >
+            <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-b from-primary to-primaryContainer"></div>
+            
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 relative z-10">
+              <div className="space-y-5">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-500/10 rounded-full border border-red-100 dark:border-red-500/20">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                  <span className="text-[10px] font-black tracking-[0.15em] text-red-600 dark:text-red-400 uppercase">Action Required</span>
+                </div>
+                
+                <div>
+                  <h3 className="text-4xl font-headline font-black text-text tracking-tight leading-none mb-3">Mark Attendance</h3>
+                  <p className="text-textMuted font-medium text-base flex items-center gap-2">
+                    <BookOpen size={18} className="text-primary/60" />
+                    {nextClass ? `${nextClass.course_code} — ${nextClass.course_name}` : 'Check for active sessions'}
+                  </p>
+                </div>
 
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Next Class */}
-          {nextClass ? (
-            <div className="bg-surface text-text p-5 rounded-xl relative overflow-hidden border border-outline">
-              <div className="relative z-10">
-                <p className="text-textMuted text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Clock size={12} className="text-primary" /> Up Next
-                </p>
-                <h3 className="font-headline text-lg font-semibold mb-3">{nextClass.course_name}</h3>
-                <div className="flex items-center gap-3">
-                  <div className="bg-surfaceHigh px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
-                    <Clock size={12} className="text-textMuted" /> {nextClass.start_time}
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2 text-primary font-bold text-xs bg-primary/5 px-4 py-2.5 rounded-2xl border border-primary/10">
+                    <MapPin size={16} />
+                    <span>{nextClass?.venue_name || 'Academic Block'}</span>
                   </div>
-                  <div className="bg-surfaceHigh px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
-                    <MapPin size={12} className="text-textMuted" /> {nextClass.venue_name}
+                  
+                  <div className="px-4 py-2.5 bg-surfaceHigh/40 rounded-2xl flex items-center gap-2 border border-outline/5">
+                    <Clock size={16} className="text-primary" />
+                    <span className="text-xs font-black tracking-tight text-text">Session active</span>
                   </div>
                 </div>
               </div>
-              <div className="absolute right-[-16px] bottom-[-16px] opacity-5">
-                <BookOpen size={120} />
-              </div>
-            </div>
-          ) : (
-            <div className="bg-surface text-text p-5 rounded-xl relative overflow-hidden border border-outline">
-              <div className="relative z-10">
-                <p className="text-textMuted text-[11px] font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Clock size={12} className="text-primary" /> Up Next
-                </p>
-                <h3 className="font-headline text-lg font-semibold mb-1">No Classes Scheduled</h3>
-                <p className="text-sm text-textMuted">You don't have any upcoming classes today.</p>
-              </div>
-            </div>
-          )}
 
-          {/* Stats + Register CTA */}
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="flex-1 bg-surface text-text border border-outline p-4 rounded-xl">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 mb-2">
-                  <TrendingUp size={16} />
-                </div>
-                <p className="text-2xl font-semibold text-text">{avgAttendance}%</p>
-                <p className="text-xs text-textMuted mt-0.5">Avg. Attendance</p>
-              </div>
-              <div className="flex-1 bg-surface text-text border border-outline p-4 rounded-xl">
-                <div className="w-8 h-8 rounded-lg bg-cardackgroundlue-50 flex items-center justify-center text-on-primary-fixedlue-600 mb-2">
-                  <BookOpen size={16} />
-                </div>
-                <p className="text-2xl font-semibold text-text">{enrolledCourses.length}</p>
-                <p className="text-xs text-textMuted mt-0.5">Active Courses</p>
+              <div className="bg-text text-white w-24 h-24 rounded-[2rem] shadow-2xl flex items-center justify-center group-hover:scale-105 transition-transform duration-500 self-center md:self-start">
+                 <QrCode size={40} strokeWidth={2.5} />
               </div>
             </div>
-            <button
-              onClick={() => setIsRegistrationOpen(true)}
-              className="w-full bg-surfaceLow border border-outline p-3.5 rounded-xl flex items-center justify-between hover:bg-surfaceHigh hover:text-text transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="bg-surfaceHigh p-2 rounded-lg">
-                  <Plus size={16} className="text-textMuted" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-text">Register Courses</p>
-                  <p className="text-xs text-textMuted">Manage your enrollment</p>
-                </div>
-              </div>
-              <ChevronRight size={16} className="text-textMuted" />
-            </button>
+
+            <div className="absolute -right-16 -top-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/10 transition-colors duration-700"></div>
           </div>
-        </div>
+        </section>
 
-        {/* Recent Activity */}
-        <div>
-          <h3 className="font-headline text-sm font-semibold text-text mb-3">Recent Activity</h3>
-          <div className="space-y-2">
-            {recentActivity.length === 0 ? (
-              <div className="bg-surface text-text border border-outline rounded-xl p-8 text-center">
-                <div className="w-12 h-12 bg-surfaceHigh rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Activity size={20} className="text-textMuted" />
+        {/* STATS GRID */}
+        <section className="grid grid-cols-2 gap-4 md:gap-6 px-2">
+          <div className="bg-white dark:bg-surfaceContainer/10 rounded-[2.5rem] p-8 border border-outline/10 shadow-sm hover:shadow-md transition-all group">
+            <div className="flex justify-between items-start mb-6">
+               <div className="p-4 bg-primaryContainer/20 rounded-2xl text-primary group-hover:scale-110 transition-transform">
+                  <Activity size={24} strokeWidth={2.5} />
+               </div>
+               <div className="flex items-center gap-1 text-emerald-500 font-black text-xs bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-full">
+                  <TrendingUp size={14} />
+                  <span>+4%</span>
+               </div>
+            </div>
+            <div>
+              <span className="text-5xl font-headline font-black text-text tracking-tighter">{avgAttendance}%</span>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted mt-3">Avg. Attendance</p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-surfaceContainer/10 rounded-[2.5rem] p-8 border border-outline/10 shadow-sm hover:shadow-md transition-all group cursor-pointer" onClick={() => window.location.href='/dashboard/courses'}>
+            <div className="flex justify-between items-start mb-6">
+               <div className="p-4 bg-secondaryContainer/20 rounded-2xl text-secondary group-hover:scale-110 transition-transform">
+                  <BookOpen size={24} strokeWidth={2.5} />
+               </div>
+               <button className="text-[10px] font-black text-primary underline underline-offset-4 decoration-2">VIEW ALL</button>
+            </div>
+            <div>
+              <span className="text-5xl font-headline font-black text-text tracking-tighter">{enrolledCourses.length}</span>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted mt-3">Active Courses</p>
+            </div>
+          </div>
+        </section>
+
+        {/* UP NEXT SECTION */}
+        <section className="space-y-6 px-2">
+          <div className="flex justify-between items-end px-2">
+            <h4 className="text-[11px] font-black tracking-[0.25em] text-textMuted uppercase opacity-60 font-headline">Mission Schedule</h4>
+            <button className="text-[11px] font-black text-primary hover:text-primaryContainer transition-colors" onClick={() => window.location.href='/dashboard/timetable'}>FULL TIMETABLE</button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {nextClass ? (
+              <div className="bg-white dark:bg-surfaceContainer/5 p-6 rounded-[2.5rem] flex items-center gap-6 shadow-sm border border-outline/5 hover:border-primary/30 transition-all cursor-pointer group">
+                <div className="w-16 h-16 rounded-2xl bg-surfaceContainer/50 flex items-center justify-center text-primary shadow-inner group-hover:bg-primary/10 transition-all duration-500">
+                  <Clock size={28} strokeWidth={2.5} />
                 </div>
-                <p className="text-sm text-textMuted font-medium">No recent activity</p>
-                <p className="text-xs text-textMuted mt-0.5">Your attendance records will appear here</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-black text-textMuted tracking-widest uppercase mb-1.5">{nextClass.start_time} — {nextClass.end_time}</p>
+                  <h5 className="font-headline font-black text-text text-xl tracking-tight truncate group-hover:text-primary transition-colors">
+                    {nextClass.course_code}: {nextClass.course_name}
+                  </h5>
+                  <div className="flex items-center gap-3 mt-1.5 text-[11px] font-bold text-textMuted/70">
+                     <span className="flex items-center gap-1.5"><MapPin size={14} /> {nextClass.venue_name}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-surfaceHigh/40 text-textMuted group-hover:bg-primary group-hover:text-white group-hover:translate-x-1 transition-all">
+                   <ChevronRight size={20} />
+                </div>
               </div>
             ) : (
-              recentActivity.slice(0, 8).map((activity, index) => {
-                const isPresent = activity.status === 'PRESENT';
-                const isLate = activity.status === 'LATE';
-                const statusColor = isPresent
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                  : isLate
-                  ? 'bg-inputmber-50 text-muted-foregroundmber-700 dark:bg-inputmber-500/10 dark:text-muted-foregroundmber-400'
-                  : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400';
-                const statusLabel = activity.status === 'PRESENT' ? 'Present'
-                  : activity.status === 'LATE' ? 'Late'
-                  : activity.status === 'EXCUSED' ? 'Excused'
-                  : 'Absent';
-
-                return (
-                  <div
-                    key={activity.id || `activity-${index}`}
-                    className="flex items-center justify-between p-3 bg-surface text-text border border-outline rounded-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-surfaceHigh flex items-center justify-center text-xs font-bold text-textMuted">
-                        {getActivityCourseCode(activity).substring(0, 2)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-text">{getActivityCourseCode(activity)}</p>
-                        <p className="text-xs text-textMuted">
-                          {new Date(activity.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-                    </div>
-                    <span className={`text-[11px] font-semibold px-2 py-1 rounded-md ${statusColor}`}>
-                      {statusLabel}
-                    </span>
-                  </div>
-                );
-              })
+              <div className="col-span-full py-20 flex flex-col items-center justify-center bg-surfaceHigh/10 rounded-[3rem] border-2 border-dashed border-outline/10 px-6 text-center">
+                 <div className="w-20 h-20 rounded-full bg-surfaceContainer flex items-center justify-center mb-6 opacity-40">
+                    <Calendar className="text-textMuted w-10 h-10" />
+                 </div>
+                 <h5 className="font-headline font-black text-text text-lg tracking-tight mb-2">Daily mission accomplished</h5>
+                 <p className="font-medium text-textMuted text-sm max-w-xs">No scheduled classes remaining for today. Enjoy your rest, commander.</p>
+                 <button className="mt-8 px-8 py-3 bg-white dark:bg-surface text-text font-black text-xs rounded-2xl border border-outline/20 shadow-sm hover:shadow-md transition-all active:scale-95" onClick={() => setIsRegistrationOpen(true)}>REGISTER NEW MODULES</button>
+              </div>
             )}
           </div>
-        </div>
+        </section>
+
+        {/* QUICK REGISTER CTA */}
+        <section className="px-2 pb-20">
+           <div 
+             onClick={() => setIsRegistrationOpen(true)}
+             className="bg-primary/[0.03] hover:bg-primary/[0.06] border-2 border-dashed border-primary/20 rounded-[3rem] p-10 flex flex-col items-center justify-center gap-6 transition-all group cursor-pointer"
+           >
+              <div className="w-16 h-16 rounded-full bg-white dark:bg-surface flex items-center justify-center text-primary shadow-[0_12px_24px_rgba(0,0,0,0.08)] group-hover:scale-110 group-hover:rotate-90 transition-all duration-500">
+                 <Plus size={32} strokeWidth={3} />
+              </div>
+              <div className="text-center">
+                 <h4 className="font-headline font-black text-text text-2xl tracking-tight">Add New Courses</h4>
+                 <p className="text-sm font-medium text-textMuted mt-1.5 max-w-xs mx-auto">Expand your academic curriculum by enrolling in more department modules.</p>
+              </div>
+           </div>
+        </section>
 
         {/* Modals */}
         <EnhancedAttendanceScanner
@@ -535,7 +239,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <CourseRegistrationDialog
           isOpen={isRegistrationOpen}
           onClose={() => setIsRegistrationOpen(false)}
-          onSuccess={handleRegistrationSuccess}
+          onSuccess={loadDashboardData}
         />
       </div>
     </>
