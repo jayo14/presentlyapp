@@ -151,33 +151,32 @@ body {
   <div class="top-bar"></div>
   <div class="logo-section">
     <div class="logo-container">
-      <div class="logo-icon">
-        <span class="material-symbols-outlined">person_add</span>
-      </div>
-      <div class="logo-title">Presently</div>
+      <img src="https://presentlyapp.vercel.app/logo.png" alt="Presently Logo" style="width: 50px; height: 50px; margin-bottom: 8px;">
+      <div style="font-weight: 800; font-size: 20px; letter-spacing: -0.02em; color: var(--slate-900);">Presently</div>
     </div>
   </div>
   <div class="content">
-    <div class="card">
-      <h2>You're Invited!</h2>
-      <p>
-        Hello <span class="highlight">{{ user_name }}</span>,<br><br>
-        <span class="highlight">{{ inviter_name }}</span> has invited you to join 
-        <span class="highlight">{{ institution_name }}</span> on Presently.
+    <div class="card" style="box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
+      <h2 style="margin: 0 0 16px 0; color: var(--slate-900);">You're Invited!</h2>
+      <p style="color: var(--slate-600); line-height: 1.6; margin-bottom: 32px;">
+        Hello <span class="highlight" style="font-weight: 600; color: #f2c10d;">{{ user_name }}</span>,<br><br>
+        <span class="highlight" style="font-weight: 600; color: #f2c10d;">{{ inviter_name }}</span> has invited you to join 
+        <strong>{{ institution_name }}</strong> on Presently.
       </p>
-      <div class="btn-container">
-        <a href="{{ invitation_link }}" class="btn">Accept Invitation</a>
+      
+      <div class="btn-container" style="margin: 32px 0;">
+        <a href="{{ invitation_link }}" class="btn" style="background: #f2c10d; color: #000000; padding: 18px 40px; border-radius: 16px; font-weight: 800; text-decoration: none; display: inline-block;">Accept Invitation</a>
       </div>
-      <p class="small-text">
-        If the button does not work, copy and paste this link:<br>
-        {{ invitation_link }}
-      </p>
-      <div class="divider"></div>
-      <p style="font-weight:600; color:var(--slate-900);">Team Presently</p>
+
+      <div class="divider" style="height: 1px; background: #f1f5f9; margin: 32px 0;"></div>
+      
+      <p style="font-size: 14px; color: #64748b; margin-bottom: 8px;">See you on the platform,</p>
+      <div style="font-weight: 800; font-size: 18px; color: #f2c10d;">Team Presently</div>
     </div>
   </div>
   <div class="footer">
-    <p>© 2024 Presently. Sent on behalf of {{ institution_name }}.</p>
+    <p style="font-weight: 600; color: #64748b; margin-bottom: 4px;">Smart Academic Management</p>
+    <p>© 2024 Presently &bull; Sent on behalf of {{ institution_name }}</p>
   </div>
 </div>
 </body>

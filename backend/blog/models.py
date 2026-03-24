@@ -69,6 +69,9 @@ class Post(models.Model):
         self.save(update_fields=['status', 'published_at', 'updated_at'])
 
 
+from django.template.loader import render_to_string
+
+
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
@@ -89,11 +92,18 @@ class NewsletterSubscriber(models.Model):
             return
 
         subject = "You're on the Presently waitlist 🎉"
+        
+        # HTML Content
+        html_message = render_to_string('emails/newsletter_welcome.html', {
+            'email': self.email,
+        })
+        
+        # Alternative text message
         message = (
             'Thanks for subscribing to Presently updates.\n\n'
-            'We are launching soon at LASUSTECH and will share product updates, '
+            'We are launching soon and will share product updates, '
             'attendance insights, and rollout news with you.\n\n'
-            'Read the latest updates on our blog: https://www.getpresently.com.ng/blog\n\n'
+            'Read the latest updates on our blog: https://presentlyapp.vercel.app/blog\n\n'
             'Presently Team'
         )
 
@@ -102,5 +112,6 @@ class NewsletterSubscriber(models.Model):
             message=message,
             from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@getpresently.com.ng'),
             recipient_list=[self.email],
+            html_message=html_message,
             fail_silently=True,
         )

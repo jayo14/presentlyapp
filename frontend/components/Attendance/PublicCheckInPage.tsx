@@ -67,8 +67,9 @@ export const PublicCheckInPage: React.FC = () => {
     if (!user && !authLoading) {
       localStorage.setItem('pending_checkin', sessionCode);
       saveIntent({ sessionCode, autoCheckIn: true, createdAt: Date.now() });
-      toast.error('Please log in to mark attendance.');
-      navigate(`/login?redirect_to=/check-in/${sessionCode}&message=Please log in to mark attendance.`, { replace: true });
+      
+      const loginUrl = `/login?redirect_to=${encodeURIComponent(`/check-in/${sessionCode}`)}&message=${encodeURIComponent('Please log in to mark attendance.')}`;
+      navigate(loginUrl, { replace: true });
       return;
     }
 
@@ -87,8 +88,14 @@ export const PublicCheckInPage: React.FC = () => {
       
       if (response.status === 401) {
           localStorage.setItem('pending_checkin', sessionCode);
-          toast.error('Please log in to mark attendance.');
-          navigate(`/login?redirect_to=/check-in/${sessionCode}&message=Please log in to mark attendance.`, { replace: true });
+          saveIntent({ sessionCode, autoCheckIn: true, createdAt: Date.now() });
+          const loginUrl = `/login?redirect_to=${encodeURIComponent(`/check-in/${sessionCode}`)}&message=${encodeURIComponent('Your session has expired. Please log in again.')}`;
+          navigate(loginUrl, { replace: true });
+          return;
+      }
+
+      if (response.status === 403) {
+          setError('You are not authorized to view this session. Check if you are logged in with the correct account.');
           return;
       }
 
@@ -238,12 +245,19 @@ export const PublicCheckInPage: React.FC = () => {
       
     } catch (err: any) {
       const msg = err.response?.data?.error || err.message || 'Check-in failed';
-      if (msg.toLowerCase().includes('not enrolled')) {
+      const status = err.response?.status;
+
+      if (status === 403 || msg.toLowerCase().includes('not enrolled')) {
         setIsEnrolled(false);
         setShowEnrollPrompt(true);
+        setError('Enrollment Required: You must be registered for this course to check in.');
+      } else if (status === 401) {
+        localStorage.setItem('pending_checkin', sessionCode);
+        navigate(`/login?redirect_to=${encodeURIComponent(`/check-in/${sessionCode}`)}&message=Session expired. Please log in.`);
+      } else {
+        setError(msg);
+        toast.error('Check-in Failed', { description: msg });
       }
-      setError(msg);
-      toast.error('Check-in Failed', { description: msg });
     } finally {
       setCheckingIn(false);
     }
@@ -258,7 +272,7 @@ export const PublicCheckInPage: React.FC = () => {
     const intent = readIntent();
     const matchesIntent = intent?.sessionCode === sessionCode && intent?.autoCheckIn;
 
-    if (shouldAutoFromQuery || shouldAutoFromStorage || matchesIntent) {
+    if (sessionCode && (shouldAutoFromQuery || shouldAutoFromStorage || matchesIntent)) {
       setAutoCheckInTriggered(true);
       setError(null);
       void performCheckIn();
