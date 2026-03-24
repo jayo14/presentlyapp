@@ -273,48 +273,27 @@ CORS_EXPOSE_HEADERS = [
     'authorization',
 ]
 
-# Email Configuration (Brevo SMTP-first)
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp-relay.brevo.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
-# Read EMAIL_HOST_USER from env only — do NOT fall back to a non-empty string default
-# so the SMTP credential check works correctly in production.
-_email_host_user = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_USER = _email_host_user  # May be empty; that's intentional.
-
-# Password: check multiple env var names used across environments / Render dashboard
-_email_host_password = (
-    os.environ.get('EMAIL_HOST_PASSWORD', '')
-    or os.environ.get('BREVO_SMTP_KEY', '')
-    or os.environ.get('BREVO_API_KEY', '')
-)
-EMAIL_HOST_PASSWORD = _email_host_password
+# Email Configuration (Resend)
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
 
 GMAIL_API_REFRESH_TOKEN = os.environ.get('GMAIL_API_REFRESH_TOKEN', '')
 USE_GMAIL_API_EMAIL_BACKEND = os.environ.get('USE_GMAIL_API_EMAIL_BACKEND', 'False') == 'True'
 
 # Determine which email backend to use.
-# Condition order: debug → Gmail API → SMTP (if both host + password are configured) → console fallback
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     print('INFO: DEBUG=True; using console email backend.')
 elif USE_GMAIL_API_EMAIL_BACKEND and os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
     EMAIL_BACKEND = 'presently.email_backend.GmailApiEmailBackend'
     print("INFO: Using Gmail API email backend.")
-elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    print(f"INFO: Using SMTP email backend ({EMAIL_HOST}:{EMAIL_PORT}) with user '{EMAIL_HOST_USER}'.")
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    missing = []
-    if not EMAIL_HOST_USER:
-        missing.append('EMAIL_HOST_USER')
-    if not EMAIL_HOST_PASSWORD:
-        missing.append('EMAIL_HOST_PASSWORD / BREVO_SMTP_KEY / BREVO_API_KEY')
-    print(f"WARNING: SMTP credentials missing ({', '.join(missing)}); falling back to console email backend.")
+    if RESEND_API_KEY:
+        print("INFO: Using Resend API for emails.")
+    else:
+        print("WARNING: RESEND_API_KEY missing; emails will fall back to console backend.")
 
-raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or _email_host_user or 'noreply@getpresently.com.ng'
+raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or 'onboarding@resend.dev'
 DEFAULT_FROM_EMAIL = raw_from_email if '<' in raw_from_email else f"Presently <{raw_from_email}>"
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 
