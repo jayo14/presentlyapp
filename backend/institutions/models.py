@@ -220,7 +220,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     # Student-specific fields
     matric_number = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    department = models.CharField(max_length=200, blank=True, null=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
     level = models.CharField(
         max_length=3, 
         blank=True, 
