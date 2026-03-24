@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-import { CheckCircle2, MapPin, Clock, ArrowLeft, Share2, Home } from 'lucide-react';
-import { Button } from '../Button';
+import React from 'react';
+import { Check, MapPin, Clock, ArrowLeft, Share2, Award, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -9,19 +8,15 @@ interface AttendanceSuccessPageProps {
   courseName?: string;
   location?: string;
   time?: string;
-  mapUrl?: string;
   onBackToHome?: () => void;
-  onShare?: () => void;
 }
 
 export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
-  courseCode = 'CS101',
-  courseName = 'Algorithm Design',
-  location = 'Hall A',
+  courseCode = 'CSC301',
+  courseName = 'Distributed Systems',
+  location = 'Main Auditorium · Block B',
   time = '10:05 AM',
-  mapUrl,
   onBackToHome,
-  onShare
 }) => {
   const navigate = useNavigate();
 
@@ -33,139 +28,130 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
     }
   };
 
-  const handleShare = () => {
-    if (onShare) {
-      onShare();
-    } else {
-      // Default share functionality
-      if (navigator.share) {
-        navigator.share({
-          title: 'Attendance Marked!',
-          text: `I just marked my attendance for ${courseCode} - ${courseName}`,
-        }).catch(() => {});
-      }
-    }
-  };
-
-  // Mobile Layout matching Design 5
   return (
-    <div className="min-h-screen bg-[#3A3A2F] text-text flex flex-col">
+    <div className="min-h-screen bg-[#111111] text-white flex flex-col font-sans overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+      
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-[#2A2A25]">
+      <header className="p-6 flex items-center justify-between relative z-10">
         <button 
           onClick={handleBackToHome}
-          className="p-2 hover:bg-surface/10 rounded-lg transition-colors"
+          className="w-12 h-12 flex items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 active:scale-95 transition-all"
         >
-          <ArrowLeft size={24} />
+          <ArrowLeft size={24} strokeWidth={2.5} />
         </button>
-        <h1 className="font-headline text-xl font-bold">Success</h1>
-        <div className="w-10"></div> {/* Spacer for centering */}
-      </div>
+        <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Verification Success</span>
+        <div className="w-12 h-12"></div>
+      </header>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
-        {/* Success Icon with Animation */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ 
-            type: "spring",
-            stiffness: 260,
-            damping: 20,
-            delay: 0.1
-          }}
-          className="mb-8"
-        >
-          <div className="relative">
-            {/* Outer rings */}
-            <div className="absolute inset-0 rounded-full bg-[#4A4A3F] opacity-20 animate-ping" style={{ animationDuration: '2s' }}></div>
-            <div className="absolute inset-0 rounded-full bg-[#4A4A3F] opacity-40"></div>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center p-8 relative z-10">
+        {/* Success Visual */}
+        <div className="relative mb-12">
+            <motion.div 
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", damping: 15, stiffness: 200 }}
+              className="w-32 h-32 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_60px_rgba(var(--primary-rgb),0.4)] relative z-20"
+            >
+               <Check size={64} strokeWidth={4} className="text-[#111111]" />
+            </motion.div>
             
-            {/* Inner circle */}
-            <div className="relative w-32 h-32 bg-[#FFD700] rounded-full flex items-center justify-center">
-              <CheckCircle2 size={64} className="text-[#3A3A2F]" strokeWidth={3} />
-            </div>
-          </div>
-        </motion.div>
+            {/* Animated Rings */}
+            <motion.div 
+              animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 bg-primary rounded-[2.5rem] z-10"
+            />
+            
+            {/* Floating Elements */}
+            <motion.div 
+              animate={{ y: [-10, 10, -10] }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="absolute -top-8 -right-8 w-12 h-12 bg-white/5 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10"
+            >
+               <Award size={24} className="text-primary" />
+            </motion.div>
+        </div>
 
-        {/* Success Message */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-center mb-8"
-        >
-          <h2 className="font-headline text-3xl font-bold mb-2">Attendance Marked!</h2>
-          <p className="text-[#FFD700] text-sm">You're all set for today's lecture.</p>
-        </motion.div>
+        {/* Text Details */}
+        <div className="text-center space-y-4 mb-12">
+          <motion.h2 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-4xl font-headline font-black tracking-tight"
+          >
+            Attendance<br/>Marked!
+          </motion.h2>
+          <motion.p 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-primary font-black text-xs uppercase tracking-[0.15em] flex items-center justify-center gap-2"
+          >
+             <Zap size={14} fill="currentColor" />
+             Mission Accomplished
+          </motion.p>
+        </div>
 
-        {/* Course Details Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        {/* Session Card */}
+        <motion.div 
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="w-full max-w-md bg-[#2A2A25] rounded-2xl p-6 mb-8"
+          className="w-full bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 space-y-6"
         >
-          {/* Verified Badge */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="px-3 py-1 bg-[#FFD700]/20 border border-[#FFD700] rounded-lg flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-[#FFD700]" />
-              <span className="text-[#FFD700] text-xs font-bold uppercase">Verified</span>
-            </div>
+          <div className="flex justify-between items-start">
+             <div>
+                <span className="text-[10px] font-black tracking-widest opacity-40 uppercase mb-1 block">Course Detail</span>
+                <h3 className="text-2xl font-headline font-black leading-tight">
+                  {courseCode}<br/>{courseName}
+                </h3>
+             </div>
+             <div className="px-4 py-2 bg-primary/10 rounded-xl border border-primary/20">
+                <span className="text-[10px] font-black text-primary">VERIFIED</span>
+             </div>
           </div>
 
-          {/* Course Info */}
-          <h3 className="font-headline text-xl font-bold mb-4">
-            {courseCode} - {courseName}
-          </h3>
-
-          {/* Location and Time */}
-          <div className="space-y-3 mb-4">
-            <div className="flex items-center gap-3 text-sm">
-              <MapPin size={18} className="text-textMuted" />
-              <span className="text-textMuted">Location: {location}</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <Clock size={18} className="text-textMuted" />
-              <span className="text-textMuted">Time: {time}</span>
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+             <div className="p-4 bg-white/5 rounded-2xl space-y-1">
+                <MapPin size={16} className="text-primary" />
+                <p className="text-[10px] font-bold opacity-40 uppercase">Venue</p>
+                <p className="text-xs font-black truncate">{location}</p>
+             </div>
+             <div className="p-4 bg-white/5 rounded-2xl space-y-1">
+                <Clock size={16} className="text-primary" />
+                <p className="text-[10px] font-bold opacity-40 uppercase">Timestamp</p>
+                <p className="text-xs font-black">{time}</p>
+             </div>
           </div>
-
-          {/* Map Preview */}
-          {mapUrl ? (
-            <div className="w-full h-32 bg-[#3A3A30] rounded-xl overflow-hidden">
-              <img src={mapUrl} alt="Location map" className="w-full h-full object-cover" />
-            </div>
-          ) : (
-            <div className="w-full h-32 bg-[#3A3A30] rounded-xl flex items-center justify-center">
-              <MapPin size={32} className="text-textMuted" />
-            </div>
-          )}
         </motion.div>
+      </main>
 
-        {/* Action Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="w-full max-w-md space-y-3"
-        >
-          <button
-            onClick={handleBackToHome}
-            className="w-full bg-[#FFD700] text-on-primary-fixedlack py-4 rounded-xl font-bold hover:bg-[#FFE44D] transition-colors"
-          >
-            Back to Home
-          </button>
-          
-          <button
-            onClick={handleShare}
-            className="w-full bg-[#2A2A25] text-text py-4 rounded-xl font-bold hover:bg-[#3A3A30] transition-colors flex items-center justify-center gap-2 border border-[#3A3A30]"
-          >
+      {/* Footer Actions */}
+      <footer className="p-8 space-y-4 relative z-10">
+         <motion.button 
+           initial={{ y: 20, opacity: 0 }}
+           animate={{ y: 0, opacity: 1 }}
+           transition={{ delay: 0.6 }}
+           onClick={handleBackToHome}
+           className="w-full h-16 bg-white text-[#111111] rounded-[1.5rem] font-headline font-black text-lg shadow-xl active:scale-[0.98] transition-all"
+         >
+            Close
+         </motion.button>
+         
+         <motion.button 
+           initial={{ y: 20, opacity: 0 }}
+           animate={{ y: 0, opacity: 1 }}
+           transition={{ delay: 0.7 }}
+           className="w-full h-16 bg-white/5 border border-white/10 rounded-[1.5rem] font-headline font-black text-lg flex items-center justify-center gap-3 hover:bg-white/10 transition-all"
+         >
             <Share2 size={20} />
-            Share Progress
-          </button>
-        </motion.div>
-      </div>
+            Share Proof
+         </motion.button>
+      </footer>
     </div>
   );
 };

@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BookOpen, Clock, MapPin, User, Users, Calendar, AlertCircle, Plus, Search, Filter, GraduationCap, TrendingUp, CheckCircle2, QrCode, Trash2 } from 'lucide-react';
+import { BookOpen, MapPin, User, GraduationCap, Plus, Search, CheckCircle2, QrCode, Trash2, ArrowLeft, MoreVertical, X, Award, Zap, Activity } from 'lucide-react';
 import { Button } from '../Button';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
 import CourseRegistrationDialog from './CourseRegistrationDialog';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AUTO_CHECKIN_KEY = 'pending_auto_checkin';
-
-type CheckInRouteIntent = {
-  fromCheckIn: boolean;
-  sessionCode?: string;
-  autoCheckIn: boolean;
-  courseId?: number;
-  courseCode?: string;
-};
 
 interface StudentCoursesPageProps {
   userName?: string;
@@ -27,55 +20,20 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed'>('all');
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [droppingId, setDroppingId] = useState<number | null>(null);
-  const [checkInIntent, setCheckInIntent] = useState<CheckInRouteIntent>({
-    fromCheckIn: false,
-    autoCheckIn: false,
-  });
+  const [checkInIntent, setCheckInIntent] = useState<any>({ fromCheckIn: false, autoCheckIn: false });
 
-  useEffect(() => {
-    loadCourses();
-  }, []);
+  useEffect(() => { loadCourses(); }, []);
 
   useEffect(() => {
     const source = searchParams.get('source');
     const sessionCode = searchParams.get('sessionCode') || undefined;
-    const autoCheckIn = searchParams.get('auto_checkin') === '1';
-    const rawCourseId = searchParams.get('courseId');
-    const courseCode = searchParams.get('courseCode') || undefined;
-    const courseId = rawCourseId ? Number(rawCourseId) : undefined;
-    const validCourseId = Number.isFinite(courseId) ? courseId : undefined;
-
     if (source === 'checkin' && sessionCode) {
-      setCheckInIntent({
-        fromCheckIn: true,
-        sessionCode,
-        autoCheckIn,
-        courseId: validCourseId,
-        courseCode,
-      });
+      setCheckInIntent({ fromCheckIn: true, sessionCode, autoCheckIn: searchParams.get('auto_checkin') === '1' });
       setIsRegistrationOpen(true);
-      toast.info('Register this course to continue attendance check-in.');
     }
   }, [searchParams]);
-
-  const handleRegistrationSuccess = async (enrolledCourseId?: number) => {
-    await loadCourses();
-
-    if (!checkInIntent.fromCheckIn || !checkInIntent.sessionCode || !checkInIntent.autoCheckIn) {
-      return;
-    }
-
-    if (checkInIntent.courseId && enrolledCourseId && checkInIntent.courseId !== enrolledCourseId) {
-      toast.info('Course enrolled. Enroll in the attendance course to auto continue check-in.');
-      return;
-    }
-
-    localStorage.setItem(AUTO_CHECKIN_KEY, checkInIntent.sessionCode);
-    navigate(`/check-in/${checkInIntent.sessionCode}?auto_checkin=1`, { replace: true });
-  };
 
   const loadCourses = async () => {
     try {
@@ -83,427 +41,176 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       const data = await studentApi.getDashboard();
       setCourses(data.enrolled_courses || []);
     } catch (error: any) {
-      console.error('Failed to load courses:', error);
-      toast.error('Failed to load courses', {
-        description: error.response?.data?.error || 'Please try again later'
-      });
+      toast.error('Sync Error', { description: 'Failed to retrieve academic portfolio' });
     } finally {
       setLoading(false);
     }
   };
 
   const handleDropCourse = async (course: EnrolledCourse) => {
-    if (!window.confirm(`Drop ${course.course_code} – ${course.course_name}? This will remove your enrollment.`)) {
-      return;
-    }
+    if (!window.confirm(`Disenroll from ${course.course_code}? This action is permanent.`)) return;
     try {
       setDroppingId(course.id);
       await studentApi.dropCourse(course.id);
-      toast.success('Course dropped', { description: `${course.course_code} has been removed from your schedule.` });
+      toast.success('Curriculum Updated', { description: `Removed ${course.course_code}` });
       await loadCourses();
     } catch (err: any) {
-      toast.error('Failed to drop course', {
-        description: err.response?.data?.error || 'Please try again later',
-      });
+      toast.error('Update Failed', { description: err.response?.data?.error || 'Please try again' });
     } finally {
       setDroppingId(null);
     }
   };
 
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.course_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.lecturer_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = filterStatus === 'all' || 
-                         (filterStatus === 'active' && !course.is_active === false) ||
-                         (filterStatus === 'completed' && course.is_active === false);
-    
-    return matchesSearch && matchesFilter;
-  });
-
-  const getAttendanceColor = (percentage: number) => {
-    if (percentage >= 75) return 'text-success dark:text-success-light';
-    if (percentage >= 60) return 'text-warning dark:text-warning-light';
-    return 'text-error dark:text-error-light';
-  };
-
-  const getAttendanceBgColor = (percentage: number) => {
-    if (percentage >= 75) return 'bg-success/10 dark:bg-success-light/10';
-    if (percentage >= 60) return 'bg-warning/10 dark:bg-warning-light/10';
-    return 'bg-error/10 dark:bg-error-light/10';
-  };
+  const filteredCourses = courses.filter(course => 
+    course.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.course_code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-light-background flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 border-input border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-light-text-textMuted">Loading your courses...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Accessing Archives...</p>
       </div>
     );
   }
 
-  // Mobile Layout (Design 4)
-  const mobileLayout = (
-    <div className="min-h-screen bg-light-background text-light-text pb-20">
-      {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-light-border">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => window.history.back()} 
-            className="p-2 hover:bg-light-surface rounded-full transition-colors"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          <h1 className="font-headline text-xl font-bold">My Courses</h1>
-        </div>
-      </div>
-
-      {/* Course Cards */}
-      <div className="p-4 space-y-4">
-        {filteredCourses.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface rounded-full mb-4">
-              <BookOpen size={32} className="text-light-text-tertiary" />
-            </div>
-            <h3 className="font-headline text-xl font-semibold mb-2">
-              {searchTerm ? 'No courses found' : 'No courses yet'}
-            </h3>
-            <p className="text-light-text-textMuted mb-6">
-              {searchTerm ? 'Try adjusting your search' : 'Start by registering for courses'}
-            </p>
-          </div>
-        ) : (
-          filteredCourses.map((course) => {
-            const attendance = course.attendance_percentage || 0;
-            const getStatusBadge = () => {
-              if (attendance >= 90) return { text: 'Excellent', bg: 'bg-success/10 dark:bg-success-light/10', color: 'text-success dark:text-success-light' };
-              if (attendance >= 75) return { text: 'Active', bg: 'bg-success/10 dark:bg-success-light/10', color: 'text-success dark:text-success-light' };
-              if (attendance >= 60) return { text: 'Warning', bg: 'bg-warning/10 dark:bg-warning-light/10', color: 'text-warning dark:text-warning-light' };
-              return { text: 'Low', bg: 'bg-error/10 dark:bg-error-light/10', color: 'text-error dark:text-error-light' };
-            };
-            
-            const status = getStatusBadge();
-            const getProgressColorClass = () => {
-              if (attendance >= 90) return 'bg-primary dark:bg-dark-primary';
-              if (attendance >= 75) return 'bg-success dark:bg-success-light';
-              if (attendance >= 60) return 'bg-warning dark:bg-warning-light';
-              return 'bg-error dark:bg-error-light';
-            };
-            
-            const getProgressTextClass = () => {
-              if (attendance >= 90) return 'text-primary dark:text-dark-primary';
-              if (attendance >= 75) return 'text-success dark:text-success-light';
-              if (attendance >= 60) return 'text-warning dark:text-warning-light';
-              return 'text-error dark:text-error-light';
-            };
-            
-            // Generate course thumbnail based on course name
-            const getCourseImage = (name: string) => {
-              const colors = [
-                'from-blue-500 to-cyan-500',
-                'from-purple-500 to-pink-500',
-                'from-green-500 to-emerald-500',
-                'from-orange-500 to-red-500',
-                'from-indigo-500 to-purple-500'
-              ];
-              const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-              const colorIndex = hash % colors.length;
-              return colors[colorIndex];
-            };
-            
-            return (
-              <div 
-                key={course.id}
-                className="bg-light-surface rounded-2xl overflow-hidden"
-              >
-                {/* Course Thumbnail */}
-                <div className={`h-24 bg-gradient-to-br ${getCourseImage(course.course_name)} relative flex items-center justify-center`}>
-                  <div className="absolute top-2 right-2">
-                    <span className={`px-2 py-1 ${status.bg} ${status.color} text-xs font-bold rounded-full`}>
-                      {status.text}
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Course Info */}
-                <div className="p-4">
-                  <h3 className="font-headline font-bold text-lg mb-1 truncate">{course.course_name}</h3>
-                  <p className="text-sm text-light-text-textMuted mb-3">
-                    {course.course_code} • {course.lecturer_name || 'Prof. Not Assigned'}
-                  </p>
-                  
-                  {/* Attendance Progress */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-light-text-tertiary">Attendance</span>
-                    <span className={`text-sm font-bold ${getProgressTextClass()}`}>
-                      {Math.round(attendance)}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-light-background rounded-full h-1.5">
-                    <div 
-                      className={`h-full rounded-full transition-all ${getProgressColorClass()}`}
-                      style={{ width: `${attendance}%` }}
-                    />
-                  </div>
-
-                  {/* Drop button */}
-                  <button
-                    onClick={() => handleDropCourse(course)}
-                    disabled={droppingId === course.id}
-                    className="mt-3 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-error border border-error/30 hover:bg-error/5 transition-colors disabled:opacity-50"
-                  >
-                    <Trash2 size={13} />
-                    {droppingId === course.id ? 'Dropping…' : 'Drop Course'}
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      {/* Floating Add Button */}
-      <button 
-        onClick={() => setIsRegistrationOpen(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-text shadow-lg hover:bg-primary-hover transition-colors"
-      >
-        <Plus size={28} />
-      </button>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-light-surface border-t border-light-border px-6 py-3 flex justify-between items-center">
-        <button className="flex flex-col items-center gap-1 text-light-text-tertiary">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span className="text-xs">Home</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-primary">
-          <GraduationCap size={24} />
-          <span className="text-xs">Courses</span>
-        </button>
-        <button 
-          className="w-14 h-14 -mt-7 bg-primary rounded-2xl flex items-center justify-center text-text hover:bg-primary-hover transition-colors"
-        >
-          <QrCode size={28} />
-        </button>
-        <button className="flex flex-col items-center gap-1 text-light-text-tertiary">
-          <TrendingUp size={24} />
-          <span className="text-xs">Analytics</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-light-text-tertiary">
-          <User size={24} />
-          <span className="text-xs">Profile</span>
-        </button>
-      </div>
-
-      {/* Course Registration Dialog */}
-      <CourseRegistrationDialog onSuccess={handleRegistrationSuccess}
-        isOpen={isRegistrationOpen}
-        initialCourseCode={checkInIntent.courseCode}
-        onClose={() => {
-          setIsRegistrationOpen(false);
-          loadCourses();
-        }}
-      />
-    </div>
-  );
-
-  // Desktop Layout (unchanged)
-  const desktopLayout = (
-    <div className="min-h-screen bg-light-background p-4 md:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-primary/10 rounded-xl">
-              <GraduationCap className="text-primary" size={28} />
-            </div>
-            <div>
-              <h1 className="font-headline text-3xl font-bold text-light-text">My Courses</h1>
-              <p className="text-light-text-textMuted">
-                {courses.length} {courses.length === 1 ? 'course' : 'courses'} enrolled
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Search and Filter Bar */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-light-text-tertiary" size={20} />
-            <input
-              type="text"
-              placeholder="Search courses, codes, or lecturers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-surface border border-light-border rounded-full text-light-text placeholder-light-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          
-          <div className="flex gap-2">
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="px-4 py-3 bg-surface border border-light-border rounded-full text-light-text focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All Courses</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-            </select>
-
-            <Button
-              onClick={() => setIsRegistrationOpen(true)}
-              className="flex items-center gap-2 whitespace-nowrap"
-            >
-              <Plus size={18} />
-              Add Course
-            </Button>
-          </div>
-        </div>
-
-        {/* Courses Grid */}
-        {filteredCourses.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-light-surface rounded-full mb-4">
-              <BookOpen className="text-light-text-tertiary" size={32} />
-            </div>
-            <h3 className="font-headline text-xl font-semibold text-light-text mb-2">
-              {searchTerm ? 'No courses found' : 'No courses yet'}
-            </h3>
-            <p className="text-light-text-textMuted mb-6">
-              {searchTerm ? 'Try adjusting your search or filters' : 'Start by registering for courses'}
-            </p>
-            {!searchTerm && (
-              <Button onClick={() => setIsRegistrationOpen(true)}>
-                <Plus size={18} className="mr-2" />
-                Register for Courses
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => (
-              <div
-                key={course.id}
-                className="bg-surface border border-light-border rounded-2xl p-6 hover:shadow-lg transition-shadow"
-              >
-                {/* Course Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="font-headline font-bold text-lg text-light-text mb-1 line-clamp-1">
-                      {course.course_name}
-                    </h3>
-                    <p className="text-sm text-primary font-semibold">
-                      {course.course_code}
-                    </p>
-                  </div>
-                  {course.is_active === false && (
-                    <div className="flex-shrink-0 ml-2">
-                      <CheckCircle2 className="text-success" size={24} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Lecturer Info */}
-                <div className="flex items-center gap-2 mb-4 text-sm text-light-text-textMuted">
-                  <User size={16} />
-                  <span className="line-clamp-1">{course.lecturer_name || 'Not assigned'}</span>
-                </div>
-
-                {/* Attendance Stats */}
-                <div className={`${getAttendanceBgColor(course.attendance_percentage)} rounded-xl p-4 mb-4`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-light-text">Attendance</span>
-                    <span className={`text-lg font-bold ${getAttendanceColor(course.attendance_percentage)}`}>
-                      {course.attendance_percentage}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-light-background rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all ${
-                        course.attendance_percentage >= 75
-                          ? 'bg-success dark:bg-success-light'
-                          : course.attendance_percentage >= 60
-                          ? 'bg-warning dark:bg-warning-light'
-                          : 'bg-error dark:bg-error-light'
-                      }`}
-                      style={{ width: `${course.attendance_percentage}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between mt-2 text-xs text-light-text-tertiary">
-                    <span>{course.sessions_attended} attended</span>
-                    <span>{course.total_sessions} total</span>
-                  </div>
-                </div>
-
-                {/* Course Details */}
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-light-text-textMuted">
-                    <Clock size={16} />
-                    <span>{course.credit_units || 0} credit hours</span>
-                  </div>
-                </div>
-
-                {/* Performance Indicator */}
-                {course.attendance_percentage < 75 && (
-                  <div className="mt-4 pt-4 border-t border-light-border">
-                    <div className="flex items-start gap-2 text-xs text-warning">
-                      <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-                      <span>Attendance below required 75%</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Drop Course */}
-                <div className="mt-4 pt-4 border-t border-light-border">
-                  <button
-                    onClick={() => handleDropCourse(course)}
-                    disabled={droppingId === course.id}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-error hover:underline disabled:opacity-50 transition-opacity"
-                  >
-                    <Trash2 size={13} />
-                    {droppingId === course.id ? 'Dropping…' : 'Drop Course'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Course Registration Dialog */}
-        <CourseRegistrationDialog onSuccess={handleRegistrationSuccess}
-          isOpen={isRegistrationOpen}
-          initialCourseCode={checkInIntent.courseCode}
-          onClose={() => {
-            setIsRegistrationOpen(false);
-            loadCourses(); // Reload courses after registration
-          }}
-        />
-      </div>
-    </div>
-  );
-
   return (
     <>
-      <SEO
-        title="My Courses | Student Dashboard"
-        description="View and manage your enrolled courses, attendance records and course details on Presently."
-        noIndex
-      />
-      {/* Mobile View */}
-      <div className="md:hidden">
-        {mobileLayout}
-      </div>
+      <SEO title="Academic Portfolio | Presently" description="Manage your registered modules and track academic progress." noIndex />
       
-      {/* Desktop View */}
-      <div className="hidden md:block">
-        {desktopLayout}
+      <div className="space-y-8 animate-in fade-in duration-700 max-w-4xl mx-auto pb-24">
+        
+        {/* HEADER SECTION */}
+        <header className="px-2 flex flex-col gap-1">
+           <div className="flex justify-between items-center">
+              <button 
+                onClick={() => navigate(-1)}
+                className="w-10 h-10 rounded-2xl bg-surfaceHigh/40 flex items-center justify-center text-textMuted active:scale-90 transition-all"
+              >
+                <ArrowLeft size={18} strokeWidth={2.5} />
+              </button>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Academic Portfolio</span>
+              <button className="w-10 h-10 rounded-2xl bg-surfaceHigh/40 flex items-center justify-center text-textMuted">
+                 <MoreVertical size={18} />
+              </button>
+           </div>
+           <div className="mt-6">
+              <h1 className="text-4xl font-headline font-black tracking-tight text-text">Modules</h1>
+              <p className="text-textMuted font-medium text-sm mt-1">{courses.length} Active Enrollments found</p>
+           </div>
+        </header>
+
+        {/* SEARCH BAR */}
+        <section className="px-2">
+           <div className="relative group">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary transition-colors" size={20} />
+              <input 
+                type="text" 
+                placeholder="Find a module..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-white dark:bg-surfaceContainer/20 border border-outline/10 h-16 pl-14 pr-6 rounded-[1.5rem] font-bold text-sm focus:outline-none focus:border-primary/50 shadow-sm transition-all"
+              />
+           </div>
+        </section>
+
+        {/* COURSE GRID */}
+        <section className="px-2 grid grid-cols-1 gap-4">
+          <AnimatePresence>
+            {filteredCourses.length > 0 ? (
+              filteredCourses.map((course, idx) => {
+                const attendance = course.attendance_percentage || 0;
+                return (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    key={course.id}
+                    className="bg-white dark:bg-surfaceContainer/10 rounded-[2.5rem] p-7 border border-outline/10 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
+                  >
+                     <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10"></div>
+                     
+                     <div className="flex justify-between items-start mb-6">
+                        <div className="w-14 h-14 rounded-2xl bg-surfaceHigh/50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500">
+                           <BookOpen size={24} strokeWidth={2.5} />
+                        </div>
+                        <button 
+                          onClick={() => handleDropCourse(course)}
+                          disabled={droppingId === course.id}
+                          className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                        >
+                           {droppingId === course.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                        </button>
+                     </div>
+
+                     <div className="space-y-1 mb-8">
+                        <p className="text-[10px] font-black tracking-widest text-primary/70 uppercase">{course.course_code}</p>
+                        <h3 className="text-2xl font-headline font-black text-text tracking-tight leading-tight">{course.course_name}</h3>
+                        <p className="text-textMuted font-bold text-xs flex items-center gap-2">
+                           <User size={14} className="opacity-40" />
+                           {course.lecturer_name || 'Prof. Unassigned'}
+                        </p>
+                     </div>
+
+                     <div className="space-y-4">
+                        <div className="flex justify-between items-end">
+                           <div className="flex items-center gap-2">
+                              <Activity size={16} className="text-emerald-500" />
+                              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Progress</span>
+                           </div>
+                           <span className={`text-xl font-headline font-black ${attendance >= 75 ? 'text-emerald-500' : 'text-amber-500 font-black'}`}>
+                              {Math.round(attendance)}%
+                           </span>
+                        </div>
+                        <div className="h-2.5 w-full bg-surfaceHigh/40 rounded-full overflow-hidden p-0.5">
+                           <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${attendance}%` }}
+                              transition={{ duration: 1, delay: 0.5 }}
+                              className={`h-full rounded-full ${attendance >= 75 ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.3)]'}`}
+                           />
+                        </div>
+                        <div className="flex justify-between text-[10px] font-black text-textMuted/40 uppercase tracking-tighter">
+                           <span>{course.sessions_attended} Sessions</span>
+                           <span>{course.total_sessions} Total</span>
+                        </div>
+                     </div>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="py-24 flex flex-col items-center justify-center bg-surfaceHigh/10 border-2 border-dashed border-outline/10 rounded-[3rem] text-center px-12">
+                 <div className="w-20 h-20 bg-surfaceHigh/40 rounded-full flex items-center justify-center opacity-40 mb-6">
+                    <GraduationCap size={40} />
+                 </div>
+                 <h4 className="text-2xl font-headline font-black text-text">No Modules Registered</h4>
+                 <p className="text-textMuted text-sm font-medium mt-2 max-w-[240px]">Expand your academic portfolio by enrolling in new department modules.</p>
+                 <button 
+                   onClick={() => setIsRegistrationOpen(true)}
+                   className="mt-8 px-10 py-4 bg-primary text-[#111111] font-headline font-black text-sm rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
+                 >
+                   Register Courses
+                 </button>
+              </div>
+            )}
+          </AnimatePresence>
+        </section>
+
+        {/* FLOATING ACTION BUTTON */}
+        <button 
+           onClick={() => setIsRegistrationOpen(true)}
+           className="fixed bottom-28 right-6 w-16 h-16 bg-primary text-[#111111] rounded-[1.5rem] shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center active:scale-90 transition-all z-[60]"
+        >
+           <Plus size={32} strokeWidth={3} />
+        </button>
+
+        <CourseRegistrationDialog 
+          onSuccess={loadCourses}
+          isOpen={isRegistrationOpen}
+          initialCourseCode={searchParams.get('courseCode') || undefined}
+          onClose={() => { setIsRegistrationOpen(false); loadCourses(); }}
+        />
       </div>
     </>
   );
