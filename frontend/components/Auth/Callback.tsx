@@ -69,8 +69,18 @@ export const AuthCallback: React.FC = () => {
           console.log('[Google OAuth] Redirecting to onboarding...');
           setTimeout(() => navigate('/onboarding', { replace: true }), 500);
         } else {
-          console.log('[Google OAuth] Redirecting to dashboard...');
-          setTimeout(() => navigate('/dashboard', { replace: true }), 500);
+          // Check for pending check-in
+          const pendingCheckIn = localStorage.getItem('pending_checkin');
+          console.log('[Google OAuth] Checking for pending check-in:', pendingCheckIn);
+          
+          if (pendingCheckIn) {
+            localStorage.removeItem('pending_checkin');
+            toast.info('Redirecting to check-in...');
+            setTimeout(() => navigate(`/check-in/${pendingCheckIn}`, { replace: true }), 500);
+          } else {
+            console.log('[Google OAuth] Redirecting to dashboard...');
+            setTimeout(() => navigate('/dashboard', { replace: true }), 500);
+          }
         }
       } else {
         throw new Error(response?.message || 'Authentication failed');

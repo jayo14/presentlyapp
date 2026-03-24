@@ -1,0 +1,106 @@
+<!-- Email: Newsletter Welcome -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<title>Welcome to Presently Newsletter</title>
+<style>
+:root {
+  --primary: #f2c10d;
+  --background-light: #fdfcf7;
+  --slate-900: #0f172a;
+  --slate-600: #475569;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Lexend", sans-serif;
+  background: var(--background-light);
+  -webkit-font-smoothing: antialiased;
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.top-bar {
+  height: 6px;
+  background: var(--primary);
+}
+.logo-section {
+  text-align: center;
+  padding: 48px 0 24px;
+}
+.content {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(242,193,13,0.1);
+  border: 1px solid rgba(242,193,13,0.1);
+}
+.card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: var(--slate-900);
+}
+.card p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--slate-600);
+  margin-bottom: 32px;
+}
+.btn {
+  background: var(--primary);
+  color: var(--slate-900);
+  padding: 18px 40px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 800;
+  display: inline-block;
+}
+.footer {
+  text-align: center;
+  padding: 48px 24px;
+}
+.footer p {
+  font-size: 11px;
+  color: #94a3b8;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="top-bar"></div>
+  <div class="logo-section">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <img src="https://presentlyapp.vercel.app/logo.png" alt="Presently Logo" style="width: 50px; height: 50px;">
+      <div style="font-weight: 800; font-size: 20px; color: #0f172a;">Presently</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h2>You're on the list! 🎉</h2>
+      <p>
+        Thanks for subscribing to Presently updates. 
+        We are launching soon across institutions and will share product updates, attendance insights, and rollout news directly with you.
+      </p>
+      <a href="https://presentlyapp.vercel.app/blog" class="btn">Read Our Blog</a>
+      <div style="height: 1px; background: #f1f5f9; margin: 32px 0;"></div>
+      <p style="font-size: 14px; margin-bottom: 0;">Excited to have you along,</p>
+      <div style="font-weight: 800; font-size: 18px; color: #f2c10d;">Team Presently</div>
+    </div>
+  </div>
+  <div class="footer">
+    <p>© 2024 Presently &bull; Smart Attendance for Modern Education</p>
+  </div>
+</div>
+</body>
+</html>
