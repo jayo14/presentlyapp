@@ -57,7 +57,7 @@ export default function AdminMoreScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.adminName, { color: colors.text }]}>{user?.fullName || 'System Administrator'}</Text>
-              <Text style={[styles.adminRole, { color: colors.textSecondary }]}>Global Access • {user?.email || 'admin@presently.app'}</Text>
+              <Text style={[styles.adminRole, { color: colors.textSecondary }]}>Global Access • {user?.email || 'admin@getpresently.com.ng'}</Text>
             </View>
           </View>
 

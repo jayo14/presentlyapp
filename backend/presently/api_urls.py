@@ -32,7 +32,7 @@ schema_view = get_schema_view(
       Use JWT tokens obtained from `/api/auth/login/` endpoint.
       Include in request headers: `Authorization: Bearer <token>`
       """,
-      contact=openapi.Contact(email="contact@presently.app"),
+      contact=openapi.Contact(email="contact@getpresently.com.ng"),
       license=openapi.License(name="Proprietary License"),
    ),
    public=True,

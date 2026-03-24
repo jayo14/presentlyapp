@@ -214,7 +214,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
           <p className="text-text-textMuted text-sm">
             Need help getting started?{' '}
             <button 
-              onClick={() => window.location.href = 'mailto:support@presently.app'}
+              onClick={() => window.location.href = 'mailto:support@getpresently.com.ng'}
               className="text-primary hover:underline font-medium"
             >
               Contact Support

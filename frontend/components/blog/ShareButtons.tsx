@@ -8,7 +8,7 @@ interface ShareButtonsProps {
 }
 
 export const ShareButtons: React.FC<ShareButtonsProps> = ({ slug, title, vertical = false }) => {
-  const url = `https://www.getpresently.com.ng/blog/${slug}`;
+  const url = `https://getpresently.com.ng/blog/${slug}`;
   
   const shareLinks = [
     {

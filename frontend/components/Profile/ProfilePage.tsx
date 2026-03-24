@@ -41,7 +41,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   
   const userName = user?.full_name || propUserName || 'Dr. Sarah Smith';
   const userAvatar = user?.avatar_url;
-  const userEmail = user?.email || 'user@presently.app';
+  const userEmail = user?.email || 'user@getpresently.com.ng';
   const userInitials = userName
     .split(' ')
     .filter(Boolean)
@@ -283,7 +283,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           {/* Help & Support */}
           <button 
-            onClick={() => window.location.href = 'mailto:support@presently.app'}
+            onClick={() => window.location.href = 'mailto:support@getpresently.com.ng'}
             className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-surfaceHigh transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
@@ -568,7 +568,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
           {/* Help & Support */}
           <button 
-            onClick={() => window.location.href = 'mailto:support@presently.app'}
+            onClick={() => window.location.href = 'mailto:support@getpresently.com.ng'}
             className="w-full bg-surface border border-outline rounded-2xl p-4 flex items-center hover:bg-surfaceLow hover:text-textMuted transition-all hover:shadow-md group"
           >
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4 group-hover:bg-primary/20 transition-colors">

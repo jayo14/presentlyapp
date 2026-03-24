@@ -88,7 +88,7 @@ export const BlogListPage: React.FC = () => {
     '@type': 'WebPage',
     name: 'Blog | Presently',
     description: 'Attendance, EdTech, and building for Nigerian universities.',
-    url: 'https://www.getpresently.com.ng/blog',
+    url: 'https://getpresently.com.ng/blog',
   };
 
   return (
