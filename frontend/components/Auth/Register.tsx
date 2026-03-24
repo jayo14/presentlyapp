@@ -3,9 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRegister, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
-import { getFirebaseAuth, GoogleAuthProvider } from '../../services/firebase/config';
-import { signInWithRedirect, getRedirectResult } from 'firebase/auth';
-import { Mail, Lock, User as UserIcon, ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, ArrowLeft, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +33,16 @@ export const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if password is too weak
+    const strength = calculatePasswordStrength(password);
+    if (strength < 50) {
+      toast.error('Weak Password', {
+        description: 'Please use a stronger password with at least 8 characters, letters, and numbers.'
+      });
+      return;
+    }
+
     registerMutation.mutate({ email, password, password2: password, full_name: name }, {
       onError: (error: any) => {
         toast.error('Registration Failed', {
@@ -66,12 +74,22 @@ export const Register: React.FC = () => {
 
   const calculatePasswordStrength = (pwd: string) => {
     if (!pwd) return 0;
+    
+    // Common passwords list (basic check)
+    const commonPasswords = ['password', '123456', '12345678', 'qwerty', 'admin', 'password123', 'Password123'];
+    if (commonPasswords.includes(pwd.toLowerCase())) return 10;
+    
     let score = 0;
     if (pwd.length >= 8) score += 25;
     if (/[A-Z]/.test(pwd)) score += 25;
     if (/[0-9]/.test(pwd)) score += 25;
     if (/[^A-Za-z0-9]/.test(pwd)) score += 25;
-    return score;
+    
+    // Pattern checks
+    if (/(.)\1{2,}/.test(pwd)) score -= 15; // Repeating characters (aaa)
+    if (pwd.length < 6) score = Math.min(score, 15);
+    
+    return Math.max(0, Math.min(100, score));
   };
 
   const getStrengthColor = (score: number) => {
@@ -84,6 +102,7 @@ export const Register: React.FC = () => {
 
   const getStrengthLabel = (score: number) => {
     if (score === 0) return '';
+    if (score <= 10) return 'Too Common / Poor';
     if (score < 25) return 'Very Weak';
     if (score < 50) return 'Weak';
     if (score < 75) return 'Medium';
