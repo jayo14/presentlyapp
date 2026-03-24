@@ -175,7 +175,7 @@ export const ForgotPassword: React.FC = () => {
                   Having trouble?{' '}
                   <button
                     type="button"
-                    onClick={() => window.open('mailto:support@presently.app', '_blank')}
+                    onClick={() => window.open('mailto:support@getpresently.com.ng', '_blank')}
                     className="text-primary font-semibold hover:underline"
                   >
                     Contact Support

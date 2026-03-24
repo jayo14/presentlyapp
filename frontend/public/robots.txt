@@ -4,4 +4,4 @@ Disallow: /dashboard
 Disallow: /api/
 Disallow: /auth/
 
-Sitemap: https://www.getpresently.com.ng/sitemap.xml
+Sitemap: https://getpresently.com.ng/sitemap.xml

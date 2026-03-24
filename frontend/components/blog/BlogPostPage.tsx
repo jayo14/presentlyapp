@@ -131,10 +131,10 @@ export const BlogPostPage: React.FC = () => {
       publisher: {
         '@type': 'Organization',
         name: 'Presently',
-        url: 'https://www.getpresently.com.ng',
+        url: 'https://getpresently.com.ng',
       },
       keywords: post.tags.map((tag) => tag.name),
-      mainEntityOfPage: `https://www.getpresently.com.ng/blog/${post.slug}`,
+      mainEntityOfPage: `https://getpresently.com.ng/blog/${post.slug}`,
     };
   }, [post]);
 

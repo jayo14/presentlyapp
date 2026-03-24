@@ -128,7 +128,7 @@ export default function AdminSettingsScreen() {
             <View style={[styles.inputWrapper, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f0f0f0', borderColor: colors.border }]}>
               <TextInput
                 style={[styles.input, { color: colors.text }]}
-                defaultValue="https://api.presently.app/v1"
+                defaultValue="https://api.getpresently.com.ng/v1"
                 placeholderTextColor={colors.textSecondary}
               />
             </View>

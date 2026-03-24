@@ -236,8 +236,6 @@ else:
     CORS_ALLOWED_ORIGINS = [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-        'https://www.getpresently.com.ng',
-        'https://www.getpresently.com.ng',
         'https://getpresently.com.ng',
         FRONTEND_ORIGIN,
     ]
@@ -303,7 +301,7 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     print("WARNING: SMTP credentials not found; using console email backend.")
 
-raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or os.environ.get('EMAIL_HOST_USER') or 'noreply@presently.app'
+raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or os.environ.get('EMAIL_HOST_USER') or 'noreply@getpresently.com.ng'
 DEFAULT_FROM_EMAIL = raw_from_email if '<' in raw_from_email else f"Presently <{raw_from_email}>"
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 

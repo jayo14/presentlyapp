@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { SitemapStream, streamToPromise } from 'sitemap';
 
-const siteUrl = process.env.VITE_SITE_URL || 'https://www.getpresently.com.ng';
+const siteUrl = process.env.VITE_SITE_URL || 'https://getpresently.com.ng';
 const publicDir = path.resolve(process.cwd(), 'public');
 
 const universities = [

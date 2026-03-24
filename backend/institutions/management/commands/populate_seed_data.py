@@ -318,7 +318,7 @@ class Command(BaseCommand):
         
         # Create superadmin
         superadmin, created = User.objects.get_or_create(
-            email='admin@presently.ng',
+            email='admin@getpresently.com.ng',
             defaults={
                 'full_name': 'System Administrator',
                 'matric_number': 'ADMIN001',

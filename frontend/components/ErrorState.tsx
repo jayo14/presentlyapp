@@ -58,7 +58,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
                             Dashboard
                         </Button>
                     )}
-                    <Button variant="secondary" className="flex-1" onClick={() => window.location.href = 'mailto:support@presently.app'}>
+                    <Button variant="secondary" className="flex-1" onClick={() => window.location.href = 'mailto:support@getpresently.com.ng'}>
                         <Mail size={18} className="mr-2" />
                         Support
                     </Button>

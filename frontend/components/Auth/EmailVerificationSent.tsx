@@ -155,7 +155,7 @@ export const EmailVerificationSent: React.FC = () => {
                 <HelpCircle size={16} />
                 <span>Having trouble?</span>
                 <button
-                  onClick={() => (window.location.href = 'mailto:support@presently.app')}
+                  onClick={() => (window.location.href = 'mailto:support@getpresently.com.ng')}
                   className="text-[#FFD700] font-medium hover:underline"
                 >
                   Contact Support
