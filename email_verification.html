@@ -1,0 +1,46 @@
+<!-- ==========================================
+     EMAIL 2: EMAIL VERIFICATION (OTP)
+=========================================== -->
+<p class="template-label">02 — Email Verification</p>
+<div class="email-wrap">
+  <div class="gold-line"></div>
+  <div class="email-header">
+    <div class="brand-wordmark">Presently</div>
+    <div style="font-size:11px; color:var(--text-dim-dark); font-weight:600; letter-spacing:0.08em; text-transform:uppercase;">🔒 Secure Server</div>
+  </div>
+ 
+  <div class="verify-hero">
+    <div class="verify-icon-wrap">🛡️</div>
+    <h1 class="verify-h1">Verify Your Identity</h1>
+    <p class="verify-sub">To protect your account, enter this high-security verification code in the app or browser.</p>
+  </div>
+ 
+  <div class="verify-body">
+    <div class="code-box">
+      <div class="code-label">Your Verification Code</div>
+      <div class="code-digits">{{ otp_code|default:"000 000" }}</div>
+      <div class="code-expiry">
+        <span>⏱</span> Expires in <span>{{ expiry_minutes|default:"10" }} minutes</span>
+      </div>
+    </div>
+ 
+    <div class="verify-cta">
+      <a class="btn-primary" href="{{ verify_url|default:'https://getpresently.com.ng/verify-email' }}">Verify Email →</a>
+    </div>
+ 
+    <div class="resend-row">
+      Didn't receive the code? <a href="{{ resend_url|default:'https://getpresently.com.ng/resend-verification' }}">Resend verification email</a>
+    </div>
+  </div>
+ 
+  <div class="email-footer">
+    <div class="footer-brand">Presently</div>
+    <div class="footer-links">
+      <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}">Support</a>
+      <a href="{{ privacy_url|default:'https://getpresently.com.ng/privacy' }}">Privacy Policy</a>
+      <a href="{{ institution_url|default:'#' }}">Institution Details</a>
+    </div>
+    <p class="footer-copy">© {% now "Y" %} Presently. All rights reserved.</p>
+  </div>
+  <div class="gold-line"></div>
+</div>

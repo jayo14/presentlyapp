@@ -1,106 +1,63 @@
-<!-- Email: Newsletter Welcome -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<title>Welcome to Presently Newsletter</title>
-<style>
-:root {
-  --primary: #f2c10d;
-  --background-light: #fdfcf7;
-  --slate-900: #0f172a;
-  --slate-600: #475569;
-}
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Lexend", sans-serif;
-  background: var(--background-light);
-  -webkit-font-smoothing: antialiased;
-}
-.wrapper {
-  display: flex;
-  flex-direction: column;
-}
-.top-bar {
-  height: 6px;
-  background: var(--primary);
-}
-.logo-section {
-  text-align: center;
-  padding: 48px 0 24px;
-}
-.content {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 16px 24px;
-}
-.card {
-  background: white;
-  border-radius: 24px;
-  padding: 40px;
-  text-align: center;
-  box-shadow: 0 25px 50px rgba(242,193,13,0.1);
-  border: 1px solid rgba(242,193,13,0.1);
-}
-.card h2 {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 24px;
-  color: var(--slate-900);
-}
-.card p {
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--slate-600);
-  margin-bottom: 32px;
-}
-.btn {
-  background: var(--primary);
-  color: var(--slate-900);
-  padding: 18px 40px;
-  border-radius: 16px;
-  text-decoration: none;
-  font-weight: 800;
-  display: inline-block;
-}
-.footer {
-  text-align: center;
-  padding: 48px 24px;
-}
-.footer p {
-  font-size: 11px;
-  color: #94a3b8;
-}
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <div class="top-bar"></div>
-  <div class="logo-section">
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-      <img src="https://getpresently.com.ng/logo.png" alt="Presently Logo" style="width: 50px; height: 50px;">
-      <div style="font-weight: 800; font-size: 20px; color: #0f172a;">Presently</div>
+<!-- ==========================================
+     EMAIL 6: NEWSLETTER WELCOME
+=========================================== -->
+<p class="template-label">06 — Newsletter Welcome</p>
+<div class="email-wrap">
+  <div class="gold-line"></div>
+  <div class="email-header">
+    <div class="brand-wordmark">Presently</div>
+    <div class="header-badge">Vol. 01 — The Inaugural Edition</div>
+  </div>
+ 
+  <div class="nl-hero">
+    <div class="nl-eyebrow">✦ The Presently Newsletter</div>
+    <h1 class="nl-h1">Stay Ahead<br/><em>of the Curve</em></h1>
+    <p class="nl-sub">Welcome to the inner circle, <strong>{{ user.full_name|default:"Educator" }}</strong>. Expect curated insights on EdTech, attendance innovation, and institutional strategy delivered straight to your inbox.</p>
+  </div>
+ 
+  <div class="nl-body">
+    <div class="nl-featured">
+      <div class="nl-featured-tag"><span>Primary Read</span></div>
+      <div class="nl-featured-content">
+        <div class="nl-featured-title">{{ primary_read_title|default:"Modernising Attendance Systems in Nigerian Universities" }}</div>
+        <p class="nl-featured-desc">{{ primary_read_desc|default:'Beyond the digital roll call: how GPS verification and decentralised identity are redefining what "being present" means in the modern lecture hall.' }}</p>
+        <a class="nl-read-more" href="{{ primary_read_url|default:'#' }}">Read Article →</a>
+      </div>
+    </div>
+ 
+    <div class="nl-pillars">
+      <div class="nl-pillar">
+        <div class="nl-pillar-icon">💡</div>
+        <div class="nl-pillar-title">Expert Tips</div>
+        <p class="nl-pillar-desc">Tactical advice on student engagement and attendance optimisation.</p>
+      </div>
+      <div class="nl-pillar">
+        <div class="nl-pillar-icon">🌍</div>
+        <div class="nl-pillar-title">EdTech News</div>
+        <p class="nl-pillar-desc">Legislative changes in educational data privacy and compliance.</p>
+      </div>
+      <div class="nl-pillar">
+        <div class="nl-pillar-icon">🚀</div>
+        <div class="nl-pillar-title">Product Updates</div>
+        <p class="nl-pillar-desc">First access to new integrations and features shipping in Presently.</p>
+      </div>
+    </div>
+ 
+    <div class="nl-cta-strip">
+      <div class="nl-cta-title">"Ready to dive in?"</div>
+      <p class="nl-cta-desc">Access the full archive of research papers and implementation guides on your institution dashboard.</p>
+      <a class="btn-primary" href="{{ dashboard_url|default:'https://getpresently.com.ng/dashboard' }}">Go to Dashboard</a>
     </div>
   </div>
-  <div class="content">
-    <div class="card">
-      <h2>You're on the list! 🎉</h2>
-      <p>
-        Thanks for subscribing to Presently updates. 
-        We are launching soon across institutions and will share product updates, attendance insights, and rollout news directly with you.
-      </p>
-      <a href="https://getpresently.com.ng/blog" class="btn">Read Our Blog</a>
-      <div style="height: 1px; background: #f1f5f9; margin: 32px 0;"></div>
-      <p style="font-size: 14px; margin-bottom: 0;">Excited to have you along,</p>
-      <div style="font-weight: 800; font-size: 18px; color: #f2c10d;">Team Presently</div>
+ 
+  <div class="email-footer">
+    <div class="footer-brand">Presently</div>
+    <div class="footer-links">
+      <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}">Support</a>
+      <a href="{{ privacy_url|default:'https://getpresently.com.ng/privacy' }}">Privacy Policy</a>
+      <a href="{{ institution_url|default:'#' }}">Institution Details</a>
     </div>
+    <p class="footer-copy">© {% now "Y" %} Presently. All rights reserved.<br/>Empowering academic excellence through intelligent design.</p>
   </div>
-  <div class="footer">
-    <p>© 2024 Presently &bull; Smart Attendance for Modern Education</p>
-  </div>
+  <div class="gold-line"></div>
 </div>
-</body>
-</html>

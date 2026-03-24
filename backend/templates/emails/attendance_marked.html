@@ -1,183 +1,64 @@
-<!-- Email: Attendance Marked Confirmation -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-<title>Attendance Confirmed - Presently</title>
-
-<style>
-:root {
-  --primary: #f2c10d;
-  --background-light: #fdfcf7;
-  --slate-900: #0f172a;
-  --slate-600: #475569;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Lexend", sans-serif;
-  background: var(--background-light);
-  -webkit-font-smoothing: antialiased;
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.top-bar {
-  height: 8px;
-  width: 100%;
-  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
-}
-
-.logo-section {
-  display: flex;
-  justify-content: center;
-  padding: 40px 0 24px;
-}
-
-.logo-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.content {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 16px 24px;
-}
-
-.card {
-  background: white;
-  border-radius: 20px;
-  padding: 32px;
-  text-align: center;
-  box-shadow: 0 15px 35px rgba(242,193,13,0.1);
-}
-
-.card h2 {
-  font-size: 26px;
-  font-weight: 800;
-  margin-bottom: 24px;
-}
-
-.success-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: #fdfaf0;
-  color: #d9ad0b;
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-}
-
-.info-box {
-  background: #fdfaf0;
-  padding: 24px;
-  border-radius: 16px;
-  margin: 24px 0;
-  text-align: left;
-  border: 1px solid rgba(242,193,13,0.2);
-}
-
-.info-item {
-  margin-bottom: 20px;
-}
-
-.info-item:last-child {
-  margin-bottom: 0;
-}
-
-.info-label {
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #9ca3af;
-  display: block;
-}
-
-.info-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--slate-900);
-}
-
-.footer {
-  text-align: center;
-  padding: 32px;
-  font-size: 12px;
-  color: #94a3b8;
-}
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <div class="top-bar"></div>
-  <div class="logo-section">
-    <div class="logo-container">
-      <img src="https://getpresently.com.ng/logo.png" alt="Presently Logo" style="width: 50px; height: 50px; margin-bottom: 8px;">
-      <div style="font-weight: 800; font-size: 20px; letter-spacing: -0.02em; color: var(--slate-900);">Presently</div>
-    </div>
+<!-- ==========================================
+     EMAIL 7: ATTENDANCE CONFIRMED
+=========================================== -->
+<p class="template-label">07 — Attendance Marked Successfully</p>
+<div class="email-wrap">
+  <div class="gold-line" style="background: linear-gradient(90deg, transparent, rgba(34,197,94,0.5), transparent);"></div>
+  <div class="email-header">
+    <div class="brand-wordmark">Presently</div>
+    <div class="header-badge live">✓ Attendance Confirmed</div>
   </div>
-  <div class="content">
-    <div class="card">
-      <div class="success-badge" style="background: #ecfdf5; color: #10b981; border: 1px solid #d1fae5;">Presence Successfully Logged</div>
-      <h2 style="margin-top: 0; color: var(--slate-900);">Attendance Confirmed</h2>
-      <p style="color: var(--slate-600); line-height: 1.6;">Hello <span style="font-weight:600; color: var(--slate-900);">{{ user_name }}</span>, your attendance has been successfully recorded and verified for the following session.</p>
-      
-      <div class="info-box" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 24px; padding: 28px;">
-        <div class="info-item">
-          <span class="info-label" style="color: #64748b; font-size: 10px; font-weight: 700;">COURSE & SESSION</span>
-          <span class="info-value" style="display: block; margin-top: 4px;">{{ course_code }}: {{ course_name }}</span>
-        </div>
-        <div style="height: 1px; background: #e2e8f0; margin: 16px 0;"></div>
-        <div class="info-item">
-          <span class="info-label" style="color: #64748b; font-size: 10px; font-weight: 700;">VERIFICATION STATUS</span>
-          <span class="info-value" style="display: block; margin-top: 4px; color: #10b981;">● {{ attendance_status }}</span>
-        </div>
-        <div style="height: 1px; background: #e2e8f0; margin: 16px 0;"></div>
-        <div class="info-item">
-          <span class="info-label" style="color: #64748b; font-size: 10px; font-weight: 700;">TIMESTAMP</span>
-          <span class="info-value" style="display: block; margin-top: 4px;">{{ check_in_time }}</span>
-        </div>
-      </div>
-
-      <div style="margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
-        <p style="font-size: 13px; color: #94a3b8; font-style: italic;">Keep up the good work! Consistency is the key to academic success.</p>
+ 
+  <div class="confirm-hero">
+    <div class="confirm-check">✅</div>
+    <h1 class="confirm-h1">You're Marked Present!</h1>
+    <p class="confirm-sub">Great job making it to class. Your presence has been successfully recorded and is now part of your academic record.</p>
+  </div>
+ 
+  <div class="confirm-body">
+    <div class="confirm-card">
+      <div class="confirm-card-header">Attendance Record</div>
+      <div class="info-grid">
+        <div class="info-cell"><div class="info-label">Course</div><div class="info-value">{{ course_code|default:"Course Session" }}</div></div>
+        <div class="info-cell"><div class="info-label">Status</div><div class="info-value" style="color:#4ADE80;">● {{ attendance_status|title|default:"Present" }}</div></div>
+        <div class="info-cell"><div class="info-label">Arrival Time</div><div class="info-value">{{ check_in_time|default:"Unknown Time" }}</div></div>
+        <div class="info-cell" style="border-bottom:none"><div class="info-label">Method</div><div class="info-value">📍 {{ verification_method|default:"GPS Verified" }}</div></div>
+        <div class="info-cell" style="border-right:none; border-bottom:none"><div class="info-label">Location</div><div class="info-value">{{ venue_name|default:"Designated Venue" }}</div></div>
       </div>
     </div>
+ 
+    <div class="streak-card">
+      <div class="streak-icon">🔥</div>
+      <div style="flex:1">
+        <div class="streak-count">{{ streak_count|default:"Current" }} Streak!</div>
+        <div class="streak-label">Keep the momentum going — you're on a roll.</div>
+        <div class="streak-bar"><div class="streak-bar-fill"></div></div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px;">
+          <span style="font-size:10px; color:var(--text-dim-dark);">Mon</span>
+          <span style="font-size:10px; color:var(--text-dim-dark);">Tue</span>
+          <span style="font-size:10px; color:var(--text-dim-dark);">Wed</span>
+          <span style="font-size:10px; color:var(--text-dim-dark);">Thu</span>
+          <span style="font-size:10px; color:var(--gold);">Fri ✦</span>
+          <span style="font-size:10px; color:var(--text-dim-dark);">Sat</span>
+          <span style="font-size:10px; color:var(--text-dim-dark);">Sun</span>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="confirm-actions">
+      <a class="btn-primary" href="{{ history_url|default:'https://getpresently.com.ng/dashboard' }}">View Attendance History →</a>
+      <p>Was there an issue? <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}">Report a discrepancy</a></p>
+    </div>
   </div>
-  <div class="footer">
-    <p style="font-weight: 600; color: #64748b; margin-bottom: 4px;">Presently Smart Attendance</p>
-    <p>Academic Productivity Platform &bull; Made with &hearts;</p>
+ 
+  <div class="email-footer">
+    <div class="footer-brand">Presently</div>
+    <div class="footer-links">
+      <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}">Support</a>
+      <a href="{{ privacy_url|default:'https://getpresently.com.ng/privacy' }}">Privacy Policy</a>
+      <a href="{{ institution_url|default:'#' }}">Institution Details</a>
+    </div>
+    <p class="footer-copy">© {% now "Y" %} Presently. All rights reserved.</p>
   </div>
+  <div class="gold-line" style="background: linear-gradient(90deg, transparent, rgba(34,197,94,0.5), transparent);"></div>
 </div>
-</body>
-</html>

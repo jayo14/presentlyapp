@@ -273,8 +273,19 @@ CORS_EXPOSE_HEADERS = [
     'authorization',
 ]
 
-# Email Configuration (Resend)
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+# Email Configuration# Resend API
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+
+# Resend Templates Integration Map
+RESEND_TEMPLATE_MAP = {
+    "emails/welcome_email.html": "4fedf803-2b9b-480d-8f57-f9919276b90b",
+    "emails/welcome_otp.html": "68c56ecb-1b03-4a58-82df-3f67fdb764a7",
+    "emails/new_device_alert.html": "6448d19b-9c97-4b3e-9271-788de81c782c",
+    "emails/password_reset.html": "57124568-95c4-420d-bbf5-149e46a47c6d",
+    "emails/attendance_session_created.html": "77951f07-aa7e-4bad-9159-c31d1cb0c0ac",
+    "emails/newsletter_welcome.html": "5799b664-9b3b-4eea-9f8c-a94adb1bcd68",
+    "emails/attendance_marked.html": "d7ca7188-fee1-4208-827d-999a2b25b367",
+}
 
 GMAIL_API_REFRESH_TOKEN = os.environ.get('GMAIL_API_REFRESH_TOKEN', '')
 USE_GMAIL_API_EMAIL_BACKEND = os.environ.get('USE_GMAIL_API_EMAIL_BACKEND', 'False') == 'True'

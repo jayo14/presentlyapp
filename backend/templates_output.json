@@ -1,0 +1,69 @@
+{
+  "object": "list",
+  "has_more": false,
+  "data": [
+    {
+      "id": "d7ca7188-fee1-4208-827d-999a2b25b367",
+      "name": "Attendance Confirmed",
+      "created_at": "2026-03-24 22:44:10.397805+00",
+      "updated_at": "2026-03-24 22:46:06.493+00",
+      "status": "published",
+      "published_at": "2026-03-24 22:46:06.471+00",
+      "alias": "attendance-confirmed"
+    },
+    {
+      "id": "5799b664-9b3b-4eea-9f8c-a94adb1bcd68",
+      "name": "Newsletter Welcome",
+      "created_at": "2026-03-24 22:41:06.846374+00",
+      "updated_at": "2026-03-24 22:44:04.714+00",
+      "status": "published",
+      "published_at": "2026-03-24 22:44:04.698+00",
+      "alias": "newsletter-welcome"
+    },
+    {
+      "id": "77951f07-aa7e-4bad-9159-c31d1cb0c0ac",
+      "name": "Attendance Portal Live",
+      "created_at": "2026-03-24 22:38:33.328738+00",
+      "updated_at": "2026-03-24 22:40:51.716+00",
+      "status": "published",
+      "published_at": "2026-03-24 22:40:51.701+00",
+      "alias": "attendance-portal-live"
+    },
+    {
+      "id": "57124568-95c4-420d-bbf5-149e46a47c6d",
+      "name": "Password Reset Request",
+      "created_at": "2026-03-24 22:36:00.347142+00",
+      "updated_at": "2026-03-24 22:38:15.749+00",
+      "status": "published",
+      "published_at": "2026-03-24 22:38:15.733+00",
+      "alias": "password-reset-request"
+    },
+    {
+      "id": "6448d19b-9c97-4b3e-9271-788de81c782c",
+      "name": "Security Alert Login",
+      "created_at": "2026-03-24 22:34:58.957988+00",
+      "updated_at": "2026-03-24 22:35:53.157+00",
+      "status": "published",
+      "published_at": "2026-03-24 22:35:53.133+00",
+      "alias": "security-alert-login"
+    },
+    {
+      "id": "68c56ecb-1b03-4a58-82df-3f67fdb764a7",
+      "name": "Email Verification Code",
+      "created_at": "2026-03-24 22:09:21.700982+00",
+      "updated_at": "2026-03-24 22:30:18.099+00",
+      "status": "published",
+      "published_at": "2026-03-24 22:30:18.079+00",
+      "alias": "email-verification-code"
+    },
+    {
+      "id": "4fedf803-2b9b-480d-8f57-f9919276b90b",
+      "name": "Welcome",
+      "created_at": "2026-03-24 21:21:20.741996+00",
+      "updated_at": "2026-03-24 22:30:47.065+00",
+      "status": "published",
+      "published_at": "2026-03-24 22:06:49.372+00",
+      "alias": "welcome"
+    }
+  ]
+}

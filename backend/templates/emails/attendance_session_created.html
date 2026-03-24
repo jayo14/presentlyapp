@@ -1,181 +1,59 @@
-<!-- Email: New Attendance Session -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-<title>New Attendance Session - Presently</title>
-
-<style>
-:root {
-  --primary: #f2c10d;
-  --background-light: #fdfcf7;
-  --slate-900: #0f172a;
-  --slate-600: #475569;
-  --slate-200: #e2e8f0;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Lexend", sans-serif;
-  background: var(--background-light);
-  -webkit-font-smoothing: antialiased;
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.top-bar {
-  height: 8px;
-  width: 100%;
-  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
-}
-
-.logo-section {
-  display: flex;
-  justify-content: center;
-  padding: 40px 0 24px;
-}
-
-.logo-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.content {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 16px 24px;
-}
-
-.card {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  text-align: center;
-  box-shadow: 0 15px 35px rgba(242,193,13,0.1);
-}
-
-.card h2 {
-  font-size: 26px;
-  font-weight: 800;
-  margin-bottom: 24px;
-}
-
-.info-box {
-  background: #fdfaf0;
-  padding: 24px;
-  border-radius: 16px;
-  margin: 24px 0;
-  text-align: left;
-  border: 1px solid rgba(242,193,13,0.2);
-}
-
-.info-item {
-  margin-bottom: 20px;
-}
-
-.info-item:last-child {
-  margin-bottom: 0;
-}
-
-.info-label {
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #9ca3af;
-  display: block;
-}
-
-.info-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--slate-900);
-}
-
-.btn {
-  background: var(--primary);
-  color: var(--slate-900);
-  padding: 16px 32px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: bold;
-  display: inline-block;
-  margin-top: 24px;
-}
-
-.footer {
-  text-align: center;
-  padding: 32px 0;
-  color: #94a3b8;
-  font-size: 12px;
-}
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <div class="top-bar"></div>
-  <div class="logo-section">
-    <div class="logo-container">
-      <img src="https://getpresently.com.ng/logo.png" alt="Presently Logo" style="width: 50px; height: 50px; margin-bottom: 8px;">
-      <div style="font-weight: 800; font-size: 20px; letter-spacing: -0.02em; color: var(--slate-900);">Presently</div>
+<!-- ==========================================
+     EMAIL 5: NEW ATTENDANCE SESSION LIVE
+=========================================== -->
+<p class="template-label">05 — Attendance Session Live</p>
+<div class="email-wrap">
+  <div class="gold-line"></div>
+  <div class="email-header">
+    <div class="brand-wordmark">Presently</div>
+    <div class="header-badge live">● Live Session</div>
+  </div>
+ 
+  <div class="session-hero">
+    <div class="session-eyebrow">Action Required</div>
+    <h1 class="session-h1">Session Live:<br/><span>{{ course_code }}</span></h1>
+    <p class="session-desc">{{ lecturer_name|default:"Your lecturer" }} has opened the attendance portal for the lecture. Mark your presence before the window closes.</p>
+  </div>
+ 
+  <div class="session-split">
+    <div class="session-info">
+      <div class="session-info-label">Course Intelligence</div>
+      <div class="session-info-row">
+        <div class="session-info-key">Course Name</div>
+        <div class="session-info-val">{{ course_name|default:"Course Session" }}</div>
+      </div>
+      <div class="session-info-row">
+        <div class="session-info-key">Lecturer</div>
+        <div class="session-info-val">{{ lecturer_name|default:"Course Lecturer" }}</div>
+      </div>
+      <div class="session-info-row" style="margin-bottom:0">
+        <div class="session-info-key">Room</div>
+        <div class="session-info-val">{{ venue_name|default:"Designated Venue" }}</div>
+      </div>
+    </div>
+    <div class="session-countdown">
+      <div>
+        <div class="countdown-label">Closes In</div>
+        <div class="countdown-num">10</div>
+        <div class="countdown-unit">Minutes</div>
+      </div>
+      <div class="countdown-warn">Portal closes at<br/>{{ end_time|default:"the end of the session" }}</div>
     </div>
   </div>
-  <div class="content">
-    <div class="card" style="box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
-      <h2 style="margin: 0 0 12px 0; color: var(--slate-900);">Session Started</h2>
-      <p style="color: var(--slate-600); line-height: 1.6; margin-bottom: 32px;">A new attendance session has been created for your course. Don't forget to check in!</p>
-      
-      <div class="info-box" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 24px; padding: 28px; text-align: left;">
-        <div class="info-item">
-          <span class="info-label" style="color: #64748b; font-size: 10px; font-weight: 700;">COURSE</span>
-          <span class="info-value" style="display: block; margin-top: 4px;">{{ course_code }} - {{ course_name }}</span>
-        </div>
-        <div style="height: 1px; background: #e2e8f0; margin: 16px 0;"></div>
-        <div class="info-item">
-          <span class="info-label" style="color: #64748b; font-size: 10px; font-weight: 700;">TIME</span>
-          <span class="info-value" style="display: block; margin-top: 4px;">{{ start_time }} - {{ end_time }}</span>
-        </div>
-        <div style="height: 1px; background: #e2e8f0; margin: 16px 0;"></div>
-        <div class="info-item">
-          <span class="info-label" style="color: #64748b; font-size: 10px; font-weight: 700;">VENUE</span>
-          <span class="info-value" style="display: block; margin-top: 4px;">{{ venue_name|default:"Main Hall / Online" }}</span>
-        </div>
-      </div>
-
-      <div style="margin-top: 32px;">
-        <a href="{{ dashboard_url }}" class="btn" style="background: #f2c10d; color: #000000; padding: 18px 40px; border-radius: 16px; font-weight: 800; text-decoration: none; display: inline-block;">View on Dashboard</a>
-      </div>
-      
-      <p style="margin-top:40px; font-size:13px; color:#94a3b8; font-style: italic;">Be present. Be counted.</p>
+ 
+  <div class="session-cta">
+    <a class="btn-primary full" href="{{ dashboard_url|default:'https://getpresently.com.ng/dashboard' }}">Mark Attendance Now →</a>
+    <p>You will be redirected to the Presently portal for GPS-location verification before your attendance is recorded.</p>
+  </div>
+ 
+  <div class="email-footer">
+    <div class="footer-brand">Presently</div>
+    <div class="footer-links">
+      <a href="{{ support_url|default:'https://getpresently.com.ng/support' }}">Support</a>
+      <a href="{{ privacy_url|default:'https://getpresently.com.ng/privacy' }}">Privacy Policy</a>
+      <a href="{{ institution_url|default:'#' }}">Institution Details</a>
     </div>
+    <p class="footer-copy">© {% now "Y" %} Presently. All rights reserved.<br/>This is an automated transactional email.</p>
   </div>
-  <div class="footer">
-    <p style="font-weight: 600; color: #64748b; margin-bottom: 4px;">Presently Smart Attendance</p>
-    <p>© 2024 Presently Academic Management &bull; Better Attendance, Better Results</p>
-  </div>
+  <div class="gold-line"></div>
 </div>
-</body>
-</html>

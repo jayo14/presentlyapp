@@ -1,47 +1,52 @@
 import os
-import django
 import sys
 
 # Append project dir so django finds settings
-sys.path.append(os.path.dirname(os.path.abspath(__line__ if '__line__' in locals() else __file__)))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'presently.settings')
+
+import django
 django.setup()
 
 import resend
 from django.conf import settings
 
 def test_email():
-    print("Testing email with settings:")
-    print("RESEND_API_KEY configured:", bool(getattr(settings, 'RESEND_API_KEY', None)))
-    print("DEFAULT_FROM_EMAIL:", settings.DEFAULT_FROM_EMAIL)
+    print("Testing 'welcome_email' template using Resend API...")
     
-    if settings.DEBUG or not getattr(settings, 'RESEND_API_KEY', None):
-        print("Using Django console mail since DEBUG=True or no RESEND_API_KEY...")
-        from django.core.mail import send_mail
-        try:
-            sent = send_mail(
-                subject='Presently App Email Test',
-                message='This is a test email sent from Presently via Console backend.',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=['getpresently.io@gmail.com', 'sayojami2007@gmail.com'],
-                fail_silently=False,
-            )
-            print(f"Success: send_mail returned {sent}")
-        except Exception as e:
-            print(f"Failed to send email via console backend: {e}")
-    else:
-        print("\nUsing Resend API...")
-        resend.api_key = settings.RESEND_API_KEY
-        try:
-            r = resend.Emails.send({
-              "from": settings.DEFAULT_FROM_EMAIL,
-              "to": "getpresently.io@gmail.com",
-              "subject": "Presently App Email Test (Resend)",
-              "html": "<p>This is a test email sent from Presently via <strong>Resend</strong>.</p>"
-            })
-            print(f"Success! Resend returned: {r}")
-        except Exception as e:
-            print(f"Failed to send email via Resend: {e}")
+    # Force Resend API to be used regardless of DEBUG setting
+    resend.api_key = settings.RESEND_API_KEY
+    
+    template_id = getattr(settings, 'RESEND_TEMPLATE_MAP', {}).get('emails/welcome_email.html')
+    
+    if not template_id:
+        print("Error: 'emails/welcome_email.html' is not mapped in RESEND_TEMPLATE_MAP.")
+        return
+        
+    print(f"Discovered Template UUID: {template_id}")
+    
+    payload = {
+        "from": settings.DEFAULT_FROM_EMAIL,
+        "to": "getpresently.io@gmail.com",
+        "subject": "✦ Welcome to Presently",
+        "template": {
+            "id": template_id,
+            "variables": {
+                "user": {
+                    "full_name": "Ayobami"
+                },
+                "dashboard_url": "https://getpresently.com.ng/dashboard",
+                "support_url": "https://getpresently.com.ng/support"
+            }
+        }
+    }
+    
+    try:
+        print("\nSending through Resend...")
+        response = resend.Emails.send(payload)
+        print(f"Success! Resend returned: {response}")
+    except Exception as e:
+        print(f"Failed to send email via Resend: {e}")
 
 if __name__ == '__main__':
     test_email()
