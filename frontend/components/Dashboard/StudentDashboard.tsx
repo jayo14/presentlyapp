@@ -3,7 +3,7 @@ import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, Plus, MapPi
 import { SEO } from '../SEO';
 import { studentApi, StudentDashboardData } from '../../services/api/student';
 import { sessionApi } from '../../services/api/attendance';
-import EnhancedAttendanceScanner from '../Attendance/EnhancedAttendanceScanner';
+import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScanner';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 import { useCurrentUser } from '../../hooks/useAuth';
 
@@ -189,7 +189,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                   <Clock size={28} strokeWidth={2.5} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-black text-textMuted tracking-widest uppercase mb-1.5">{nextClass.start_time} — {nextClass.end_time}</p>
+                  <p className="text-[10px] font-black text-textMuted tracking-widest uppercase mb-1.5">{nextClass.start_time} — {(nextClass as any).end_time ?? ''}</p>
                   <h5 className="font-headline font-black text-text text-xl tracking-tight truncate group-hover:text-primary transition-colors">
                     {nextClass.course_code}: {nextClass.course_name}
                   </h5>

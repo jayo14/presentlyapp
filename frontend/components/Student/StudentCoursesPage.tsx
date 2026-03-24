@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BookOpen, MapPin, User, GraduationCap, Plus, Search, CheckCircle2, QrCode, Trash2, ArrowLeft, MoreVertical, X, Award, Zap, Activity } from 'lucide-react';
-import { Button } from '../Button';
+import { BookOpen, User, GraduationCap, Plus, Search, Trash2, ArrowLeft, MoreVertical, Activity, Loader2 } from 'lucide-react';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
 import CourseRegistrationDialog from './CourseRegistrationDialog';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AUTO_CHECKIN_KEY = 'pending_auto_checkin';
 
 interface StudentCoursesPageProps {
   userName?: string;
