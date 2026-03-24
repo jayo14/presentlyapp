@@ -1,221 +1,370 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
-  Search, 
-  Filter, 
-  MoreVertical, 
-  Edit2, 
-  Trash2, 
-  Eye, 
-  Calendar,
-  CheckCircle,
-  Clock,
-  FileText,
-  Tag as TagIcon,
-  Users,
+  LayoutDashboard, 
+  FileText, 
+  Layers, 
+  Tag as TagIcon, 
+  Users, 
+  Settings,
+  ArrowLeft,
   ChevronRight,
-  ExternalLink
+  Loader2
 } from 'lucide-react';
-import { getAllPosts, getAllCategories, getAllTags } from '../../src/lib/blog';
-import type { Post, Category, Tag } from '../../src/types/blog';
-import { Button } from '../Button';
+import { toast } from 'sonner';
+
+import { 
+  adminGetAllPosts, 
+  getAllCategories, 
+  getAllTags, 
+  getAllSubscribers,
+  createPost,
+  updatePost,
+  deletePost,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  createTag,
+  updateTag,
+  deleteTag,
+  unsubscribeUser
+} from '../../src/lib/blog';
+
+import type { Post, Category, Tag, NewsletterSubscriber, PaginatedResponse } from '../../src/types/blog';
+
+import { BlogOverview } from './blog/BlogOverview';
+import { PostList } from './blog/PostList';
+import { PostEditor } from './blog/PostEditor';
+import { CategoryManager } from './blog/CategoryManager';
+import { TagManager } from './blog/TagManager';
+import { SubscriberManager } from './blog/SubscriberManager';
+
+type ViewType = 'overview' | 'posts' | 'categories' | 'tags' | 'subscribers' | 'editor';
 
 export const BlogManagement: React.FC = () => {
+  const [view, setView] = useState<ViewType>('overview');
+  const [prevView, setPrevView] = useState<ViewType>('overview');
+  const [loading, setLoading] = useState(true);
+  
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'posts' | 'categories' | 'subscribers'>('posts');
+  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
+  
+  const [totalPosts, setTotalPosts] = useState(0);
+  const [totalSubscribers, setTotalSubscribers] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+
+  // Stats for overview
+  const [stats, setStats] = useState({
+    totalPosts: 0,
+    publishedPosts: 0,
+    draftPosts: 0,
+    categoriesCount: 0,
+    tagsCount: 0,
+    subscribersCount: '0',
+  });
 
   useEffect(() => {
-    fetchData();
+    loadInitialData();
   }, []);
 
-  const fetchData = async () => {
+  const loadInitialData = async () => {
     setLoading(true);
     try {
-      const [allPosts, allCategories, allTags] = await Promise.all([
-        getAllPosts(),
+      const [postsRes, categoriesData, tagsData, subscribersRes] = await Promise.all([
+        adminGetAllPosts({ page: 1 }),
         getAllCategories(),
-        getAllTags()
+        getAllTags(),
+        getAllSubscribers(1)
       ]);
-      setPosts(allPosts);
-      setCategories(allCategories);
-      setTags(allTags);
+
+      setPosts(postsRes.results);
+      setTotalPosts(postsRes.count);
+      setCategories(categoriesData);
+      setTags(tagsData);
+      setSubscribers(subscribersRes.results);
+      setTotalSubscribers(subscribersRes.count);
+
+      // Calculate stats
+      setStats({
+        totalPosts: postsRes.count,
+        publishedPosts: postsRes.results.filter(p => p.status === 'published').length, // This is partial since it's just page 1
+        draftPosts: postsRes.results.filter(p => p.status === 'draft').length,
+        categoriesCount: categoriesData.length,
+        tagsCount: tagsData.length,
+        subscribersCount: subscribersRes.count > 1000 ? `${(subscribersRes.count / 1000).toFixed(1)}k` : subscribersRes.count.toString(),
+      });
     } catch (err) {
-      console.error('Failed to fetch blog data:', err);
+      console.error('Failed to load blog data:', err);
+      toast.error('Failed to load blog data');
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredPosts = posts.filter(post => 
-    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.author_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleFetchPosts = async (page: number, search?: string) => {
+    setLoading(true);
+    try {
+      const res = await adminGetAllPosts({ page, search });
+      setPosts(res.results);
+      setTotalPosts(res.count);
+      setCurrentPage(page);
+    } catch (err) {
+      toast.error('Failed to fetch posts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSavePost = async (data: Partial<Post>) => {
+    setLoading(true);
+    try {
+      if (editingPost) {
+        await updatePost(editingPost.slug, data);
+        toast.success('Post updated successfully');
+      } else {
+        await createPost(data);
+        toast.success('Post created successfully');
+      }
+      setView('posts');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to save post');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePost = async (slug: string) => {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    try {
+      await deletePost(slug);
+      toast.success('Post deleted');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to delete post');
+    }
+  };
+
+  // Category Actions
+  const handleCreateCategory = async (data: Partial<Category>) => {
+    try {
+      await createCategory(data);
+      toast.success('Category created');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to create category');
+    }
+  };
+
+  const handleUpdateCategory = async (slug: string, data: Partial<Category>) => {
+    try {
+      await updateCategory(slug, data);
+      toast.success('Category updated');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to update category');
+    }
+  };
+
+  const handleDeleteCategory = async (slug: string) => {
+    if (!confirm('Delete this category?')) return;
+    try {
+      await deleteCategory(slug);
+      toast.success('Category deleted');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to delete category');
+    }
+  };
+
+  // Tag Actions
+  const handleCreateTag = async (data: Partial<Tag>) => {
+    try {
+      await createTag(data);
+      toast.success('Tag created');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to create tag');
+    }
+  };
+
+  const handleUpdateTag = async (slug: string, data: Partial<Tag>) => {
+    try {
+      await updateTag(slug, data);
+      toast.success('Tag updated');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to update tag');
+    }
+  };
+
+  const handleDeleteTag = async (slug: string) => {
+    if (!confirm('Delete this tag?')) return;
+    try {
+      await deleteTag(slug);
+      toast.success('Tag deleted');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to delete tag');
+    }
+  };
+
+  const handleUnsubscribe = async (id: number) => {
+    if (!confirm('Unsubscribe this user?')) return;
+    try {
+      await unsubscribeUser(id);
+      toast.success('User unsubscribed');
+      loadInitialData();
+    } catch (err) {
+      toast.error('Failed to unsubscribe user');
+    }
+  };
+
+  const navItems = [
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'posts', label: 'Posts', icon: FileText },
+    { id: 'categories', label: 'Categories', icon: Layers },
+    { id: 'tags', label: 'Tags', icon: TagIcon },
+    { id: 'subscribers', label: 'Subscribers', icon: Users },
+  ];
+
+  if (view === 'editor') {
+    return (
+      <PostEditor 
+        post={editingPost}
+        categories={categories}
+        tags={tags}
+        onSave={(data) => handleSavePost({ ...data, status: 'draft' })}
+        onPublish={(data) => handleSavePost({ ...data, status: 'published' })}
+        onCancel={() => setView('posts')}
+      />
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="font-headline text-3xl font-black text-text tracking-tight">Blog management</h2>
-          <p className="text-textMuted">Publish, edit, and organize your platform's editorial content.</p>
+    <div className="flex flex-col gap-8 min-h-screen bg-[#FBFBFC]">
+      {/* Admin Blog Navigation */}
+      <div className="flex items-center justify-between border-b border-outline/10 bg-white/40 backdrop-blur-xl px-12 py-6 sticky top-0 z-40">
+        <div className="flex items-center gap-12">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+               <FileText size={20} />
+             </div>
+             <div>
+                <h1 className="text-xl font-headline font-black text-text tracking-tight">Editorial</h1>
+                <p className="text-[10px] uppercase font-bold text-textMuted tracking-widest opacity-60">Admin CMS v2.0</p>
+             </div>
+          </div>
+          <nav className="flex items-center gap-1 p-1.5 bg-surfaceHigh/40 rounded-2xl">
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => { setPrevView(view); setView(item.id as ViewType); }}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 ${
+                  view === item.id 
+                    ? 'bg-white shadow-xl shadow-primary/5 text-primary' 
+                    : 'text-textMuted hover:text-text hover:bg-white/40'
+                }`}
+              >
+                <item.icon size={16} />
+                {item.label}
+              </button>
+            ))}
+          </nav>
         </div>
-        <div className="flex gap-3">
-           <Button variant="outline" className="rounded-xl border-outline/20">
-             <Filter size={18} className="mr-2" />
-             Filters
-           </Button>
-           <Button className="rounded-xl bg-primary text-white shadow-xl shadow-primary/20">
-             <Plus size={18} className="mr-2" />
-             Create post
-           </Button>
+        <div className="flex items-center gap-4">
+           {view !== 'overview' && (
+             <button 
+               onClick={() => setView('overview')}
+               className="p-3 bg-white border border-outline/10 rounded-xl text-textMuted hover:text-primary transition-all hover:shadow-lg shadow-primary/5 group"
+             >
+               <ArrowLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
+             </button>
+           )}
+           <button 
+              onClick={() => { setEditingPost(null); setView('editor'); }}
+              className="px-8 py-3.5 bg-text text-white rounded-full font-black text-xs shadow-2xl hover:scale-102 transition-transform active:scale-95 flex items-center gap-2"
+           >
+             <Plus size={18} />
+             Create New
+           </button>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Total posts', value: posts.length, icon: FileText, color: 'text-primary' },
-          { label: 'Categories', value: categories.length, icon: TagIcon, color: 'text-blue-500' },
-          { label: 'Active tags', value: tags.length, icon: CheckCircle, color: 'text-green-500' },
-          { label: 'Subscribers', value: '2.5k', icon: Users, color: 'text-purple-500' },
-        ].map((stat, i) => (
-          <div key={i} className="p-6 rounded-[1.5rem] border border-outline/10 bg-surface/40 backdrop-blur-md">
-            <div className="flex items-center justify-between mb-2">
-              <stat.icon size={20} className={stat.color} />
-              <ChevronRight size={16} className="text-textMuted/40" />
-            </div>
-            <p className="text-2xl font-black text-text tracking-tight">{stat.value}</p>
-            <p className="text-xs font-bold uppercase tracking-widest text-textMuted/60">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Tabs / Filter Bar */}
-      <div className="flex items-center gap-1 p-1 bg-surfaceHigh/40 rounded-2xl w-fit">
-        {(['posts', 'categories', 'subscribers'] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold capitalize transition-all duration-300 ${
-              activeTab === tab ? 'bg-surface shadow-md text-primary' : 'text-textMuted hover:text-text'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Main Content Area */}
-      <div className="rounded-[2rem] border border-outline/10 bg-surface/40 backdrop-blur-md overflow-hidden">
-        <div className="p-6 border-b border-outline/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="relative max-w-md w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={18} />
-            <input 
-              type="text" 
-              placeholder={`Search ${activeTab}...`}
-              className="w-full h-11 pl-12 pr-4 rounded-xl border border-outline/20 bg-surfaceHigh/20 text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40 transition-all font-medium"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2">
-             <button className="h-11 px-4 rounded-xl border border-outline/20 text-sm font-bold text-textMuted hover:bg-surfaceHigh transition-colors">Export CSV</button>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="p-20 text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-textMuted animate-pulse">Gathering stories...</p>
+      {/* Main Viewport */}
+      <div className="px-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+        {loading && view !== 'editor' ? (
+          <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+             <div className="relative">
+                <Loader2 size={48} className="text-primary animate-spin" />
+                <div className="absolute inset-0 m-auto w-2 h-2 bg-primary rounded-full"></div>
+             </div>
+             <p className="text-sm font-black text-textMuted uppercase tracking-widest animate-pulse">Loading Editorial Data...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-surfaceHigh/30 border-b border-outline/10">
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.2em] text-textMuted/60">Title</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.2em] text-textMuted/60">Author</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.2em] text-textMuted/60">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.2em] text-textMuted/60">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-[0.2em] text-textMuted/60">Date</th>
-                  <th className="px-6 py-4 text-right"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-outline/5">
-                {filteredPosts.map((post) => (
-                  <tr key={post.slug} className="group hover:bg-primary/5 transition-colors duration-300">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-xl overflow-hidden bg-surfaceHigh flex-shrink-0 border border-outline/10">
-                          {post.cover_image ? (
-                            <img src={post.cover_image} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full bg-gradient-to-br from-surfaceHigh to-surface" />
-                          )}
-                        </div>
-                        <div>
-                           <p className="font-bold text-text mb-0.5 group-hover:text-primary transition-colors">{post.title}</p>
-                           <p className="text-xs text-textMuted line-clamp-1">{post.slug}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-surfaceHigh flex items-center justify-center text-[10px] font-bold text-textMuted border border-outline/10">
-                           {post.author_name.slice(0, 1).toUpperCase()}
-                        </div>
-                        <span className="text-sm font-medium text-text">{post.author_name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                       <span className="px-2.5 py-1 rounded-lg bg-surfaceHigh text-[11px] font-bold text-textMuted border border-outline/10">
-                         {post.category?.name || 'Uncategorized'}
-                       </span>
-                    </td>
-                    <td className="px-6 py-5">
-                       <div className="flex items-center gap-2">
-                         <div className={`h-2 w-2 rounded-full ${post.status === 'published' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-amber-500'}`} />
-                         <span className="text-xs font-bold uppercase tracking-wider text-textMuted capitalize">{post.status || 'Draft'}</span>
-                       </div>
-                    </td>
-                    <td className="px-6 py-5">
-                       <div className="flex flex-col">
-                          <span className="text-sm font-medium text-text">{new Date(post.published_at || '').toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</span>
-                          <span className="text-[10px] text-textMuted uppercase font-bold tracking-widest">{post.reading_time}m read</span>
-                       </div>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button className="p-2 rounded-lg hover:bg-surfaceHigh text-textMuted hover:text-primary" title="Edit Post">
-                            <Edit2 size={16} />
-                          </button>
-                          <button className="p-2 rounded-lg hover:bg-surfaceHigh text-textMuted hover:text-blue-500" title="View live">
-                            <ExternalLink size={16} />
-                          </button>
-                          <button className="p-2 rounded-lg hover:bg-surfaceHigh text-red-500/60 hover:text-red-500" title="Delete">
-                            <Trash2 size={16} />
-                          </button>
-                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+          <>
+            {view === 'overview' && (
+              <BlogOverview 
+                stats={stats}
+                recentPosts={posts.slice(0, 5)}
+                onViewAllPosts={() => setView('posts')}
+                onNewPost={() => { setEditingPost(null); setView('editor'); }}
+                onEditPost={(post) => { setEditingPost(post); setView('editor'); }}
+                onManageCategories={() => setView('categories')}
+                onViewSubscribers={() => setView('subscribers')}
+              />
+            )}
+            
+            {view === 'posts' && (
+              <PostList 
+                posts={posts}
+                totalPosts={totalPosts}
+                currentPage={currentPage}
+                onNewPost={() => { setEditingPost(null); setView('editor'); }}
+                onEditPost={(post) => { setEditingPost(post); setView('editor'); }}
+                onDeletePost={handleDeletePost}
+                onPreviewPost={(slug) => window.open(`/blog/${slug}`, '_blank')}
+                onDuplicatePost={(post) => { setEditingPost({ ...post, id: undefined, slug: `${post.slug}-copy` }); setView('editor'); }}
+                onSearch={(term) => handleFetchPosts(1, term)}
+                onFilterStatus={(status) => console.log('filter', status)}
+                onFilterCategory={(id) => console.log('filter cat', id)}
+                onSort={(sort) => console.log('sort', sort)}
+                onPageChange={(page) => handleFetchPosts(page)}
+              />
+            )}
 
-        {!loading && filteredPosts.length === 0 && (
-          <div className="p-20 text-center">
-            <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-surfaceHigh/50 mb-6">
-               <FileText size={32} className="text-textMuted/40" />
-            </div>
-            <h4 className="text-xl font-black text-text mb-2">No posts found</h4>
-            <p className="text-textMuted max-w-xs mx-auto">Try adjusting your filters or search term to find what you're looking for.</p>
-          </div>
+            {view === 'categories' && (
+              <CategoryManager 
+                categories={categories}
+                onCreate={handleCreateCategory}
+                onUpdate={handleUpdateCategory}
+                onDelete={handleDeleteCategory}
+              />
+            )}
+
+            {view === 'tags' && (
+              <TagManager 
+                tags={tags}
+                onCreate={handleCreateTag}
+                onUpdate={handleUpdateTag}
+                onDelete={handleDeleteTag}
+              />
+            )}
+
+            {view === 'subscribers' && (
+              <SubscriberManager 
+                subscribers={subscribers}
+                totalSubscribers={totalSubscribers}
+                currentPage={currentPage}
+                onUnsubscribe={handleUnsubscribe}
+                onSearch={(term) => console.log('search sub', term)}
+                onPageChange={(page) => console.log('page sub', page)}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

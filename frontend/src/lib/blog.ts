@@ -1,5 +1,5 @@
 import apiClient from '../../services/api/client';
-import type { Category, Post, Tag } from '../types/blog';
+import type { Category, Post, Tag, NewsletterSubscriber, PaginatedResponse } from '../types/blog';
 
 interface GetAllPostsOptions {
   category?: string;
@@ -67,4 +67,68 @@ export async function subscribeToNewsletter(
       'Unable to subscribe right now.';
     return { success: false, error: message };
   }
+}
+
+// --- ADMIN API ---
+
+export async function adminGetAllPosts(options: GetAllPostsOptions = {}): Promise<PaginatedResponse<Post>> {
+  const { category, tag, search, page = 1 } = options;
+  const params: Record<string, string | number> = { page };
+  if (category) params.category = category;
+  if (tag) params.tag = tag;
+  if (search) params.search = search;
+
+  const response = await apiClient.get('/blog/admin/posts/', { params });
+  return response.data;
+}
+
+export async function createPost(data: Partial<Post>): Promise<Post> {
+  const response = await apiClient.post('/blog/admin/posts/', data);
+  return response.data;
+}
+
+export async function updatePost(slug: string, data: Partial<Post>): Promise<Post> {
+  const response = await apiClient.patch(`/blog/admin/posts/${slug}/`, data);
+  return response.data;
+}
+
+export async function deletePost(slug: string): Promise<void> {
+  await apiClient.delete(`/blog/admin/posts/${slug}/`);
+}
+
+export async function createCategory(data: Partial<Category>): Promise<Category> {
+  const response = await apiClient.post('/blog/admin/categories/', data);
+  return response.data;
+}
+
+export async function updateCategory(slug: string, data: Partial<Category>): Promise<Category> {
+  const response = await apiClient.patch(`/blog/admin/categories/${slug}/`, data);
+  return response.data;
+}
+
+export async function deleteCategory(slug: string): Promise<void> {
+  await apiClient.delete(`/blog/admin/categories/${slug}/`);
+}
+
+export async function createTag(data: Partial<Tag>): Promise<Tag> {
+  const response = await apiClient.post('/blog/admin/tags/', data);
+  return response.data;
+}
+
+export async function updateTag(slug: string, data: Partial<Tag>): Promise<Tag> {
+  const response = await apiClient.patch(`/blog/admin/tags/${slug}/`, data);
+  return response.data;
+}
+
+export async function deleteTag(slug: string): Promise<void> {
+  await apiClient.delete(`/blog/admin/tags/${slug}/`);
+}
+
+export async function getAllSubscribers(page: number = 1): Promise<PaginatedResponse<NewsletterSubscriber>> {
+  const response = await apiClient.get('/blog/admin/subscribers/', { params: { page } });
+  return response.data;
+}
+
+export async function unsubscribeUser(id: number): Promise<void> {
+  await apiClient.patch(`/blog/admin/subscribers/${id}/`, { is_active: false });
 }

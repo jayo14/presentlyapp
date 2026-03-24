@@ -62,3 +62,10 @@ export interface MDXFrontmatter {
   seoDescription?: string;
   featured?: boolean;
 }
+export interface NewsletterSubscriber {
+  id: number;
+  email: string;
+  subscribed_at: string;
+  is_active: boolean;
+  source: string;
+}
