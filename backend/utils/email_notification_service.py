@@ -78,7 +78,7 @@ class EmailNotificationService:
         return _send_smtp_email(
             to_email=user_email,
             subject="Password Reset Verification Code - Presently",
-            template_name="emails/welcome_otp.html",
+            template_name="emails/password_reset_otp.html",
             context={"user": {"full_name": user_name}, "otp_code": otp_code},
         )
 
@@ -115,19 +115,65 @@ class EmailNotificationService:
         institution_name: str,
     ) -> bool:
         """Send user invitation email notification."""
-        invitation_html = (
-            "<html><body>"
-            f"<p>Hello {user_name},</p>"
-            f"<p>{inviter_name} invited you to join <strong>{institution_name}</strong> on Presently.</p>"
-            f"<p><a href=\"{invitation_link}\">Accept Invitation</a></p>"
-            "<p>If the button does not work, copy this link into your browser:</p>"
-            f"<p>{invitation_link}</p>"
-            "</body></html>"
-        )
         return _send_smtp_email(
             to_email=user_email,
             subject=f"You're Invited to Join {institution_name} on Presently",
-            html_content=invitation_html,
+            template_name="emails/user_invitation.html",
+            context={
+                "user_name": user_name,
+                "inviter_name": inviter_name,
+                "invitation_link": invitation_link,
+                "institution_name": institution_name,
+            },
+        )
+
+    @staticmethod
+    def send_attendance_session_created(
+        user_email: str,
+        user_name: str,
+        course_code: str,
+        course_name: str,
+        start_time: str,
+        end_time: str,
+        venue_name: str,
+    ) -> bool:
+        """Send attendance session created notification."""
+        return _send_smtp_email(
+            to_email=user_email,
+            subject=f"New Session Started: {course_code} - {course_name}",
+            template_name="emails/attendance_session_created.html",
+            context={
+                "user_name": user_name,
+                "course_code": course_code,
+                "course_name": course_name,
+                "start_time": start_time,
+                "end_time": end_time,
+                "venue_name": venue_name,
+                "dashboard_url": f"{settings.FRONTEND_URL}/dashboard",
+            },
+        )
+
+    @staticmethod
+    def send_attendance_marked(
+        user_email: str,
+        user_name: str,
+        course_code: str,
+        course_name: str,
+        attendance_status: str,
+        check_in_time: str,
+    ) -> bool:
+        """Send attendance marked confirmation notification."""
+        return _send_smtp_email(
+            to_email=user_email,
+            subject=f"Attendance Confirmed: {course_code}",
+            template_name="emails/attendance_marked.html",
+            context={
+                "user_name": user_name,
+                "course_code": course_code,
+                "course_name": course_name,
+                "attendance_status": attendance_status,
+                "check_in_time": check_in_time,
+            },
         )
 
     @staticmethod
@@ -137,11 +183,12 @@ class EmailNotificationService:
         payload: Dict[str, Any],
     ) -> bool:
         """Send bulk notifications to multiple users via email."""
+        # For bulk, we'll use a simple fallback for now but could be expanded to use a generic template
         results = [
             _send_smtp_email(
                 to_email=r.get("email", ""),
                 subject=f"Notification: {notification_type}",
-                html_content=f"<html><body><p>Notification {notification_type}</p><p>{payload}</p></body></html>",
+                html_content=f"<html><body style='font-family:Lexend,sans-serif;padding:32px;background:#fdfcf7;'><div style='background:white;padding:32px;border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);'><h2 style='color:#0f172a;'>{notification_type}</h2><p style='color:#475569;'>{payload.get('message', '')}</p></div></body></html>",
             )
             for r in recipients
         ]
@@ -185,3 +232,30 @@ def send_user_invitation(
         invitation_link,
         institution_name,
     )
+
+
+def send_attendance_session_created(
+    user_email: str,
+    user_name: str,
+    course_code: str,
+    course_name: str,
+    start_time: str,
+    end_time: str,
+    venue_name: str,
+) -> bool:
+    return EmailNotificationService.send_attendance_session_created(
+        user_email, user_name, course_code, course_name, start_time, end_time, venue_name
+    )
+
+
+def send_attendance_marked(
+    user_email: str,
+    user_name: str,
+    course_code: str,
+    course_name: str,
+    attendance_status: str,
+    check_in_time: str,
+) -> bool:
+    return EmailNotificationService.send_attendance_marked(
+        user_email, user_name, course_code, course_name, attendance_status, check_in_time
+    )

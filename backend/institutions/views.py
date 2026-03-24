@@ -1642,6 +1642,18 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                     data=notification.data,
                     notification_type=NotificationType.SESSION_STARTED
                 )
+
+                # Send email notification
+                from utils.email_notification_service import send_attendance_session_created
+                send_attendance_session_created(
+                    user_email=student.email,
+                    user_name=student.full_name,
+                    course_code=session.course.code,
+                    course_name=session.course.title,
+                    start_time=session.start_time.strftime('%I:%M %p'),
+                    end_time=session.end_time.strftime('%I:%M %p'),
+                    venue_name=session.venue.name if session.venue else "Main Hall"
+                )
                 
             logger.info(f"Sent notifications to {enrolled_students.count()} students for session {session.id}")
         except Exception as e:

@@ -322,6 +322,22 @@ def perform_attendance_check_in(request, session):
             verification_metadata={'flags': flags, 'is_mocked': is_mocked}
         )
 
+        # Send email confirmation
+        try:
+            from utils.email_notification_service import send_attendance_marked
+            send_attendance_marked(
+                user_email=request.user.email,
+                user_name=request.user.full_name,
+                course_code=session.course.code,
+                course_name=session.course.title,
+                attendance_status=status_value,
+                check_in_time=attendance.checked_in_at.strftime('%I:%M %p, %b %d %Y')
+            )
+        except Exception as e:
+            # Don't fail the check-in if email fails
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send attendance marked email: {e}")
+
         return Response({
             'success': True,
             'status': 'success',

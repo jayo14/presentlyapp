@@ -1,143 +1,212 @@
+<!-- Email: New Device Login Alert -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Presently - New Device Sign-in</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<title>New Device Detected - Presently</title>
+
+<style>
+:root {
+  --primary: #f2c10d;
+  --background-light: #fdfcf7;
+  --slate-900: #0f172a;
+  --slate-600: #475569;
+  --red-500: #ef4444;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Lexend", sans-serif;
+  background: var(--background-light);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.top-bar {
+  height: 8px;
+  width: 100%;
+  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
+}
+
+.logo-section {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0 24px;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.content {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(242,193,13,0.1);
+}
+
+.alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #fef2f2;
+  color: var(--red-500);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.card h2 {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.info-box {
+  background: #fdfaf0;
+  padding: 24px;
+  border-radius: 16px;
+  margin: 24px 0;
+  text-align: left;
+  border: 1px solid rgba(242,193,13,0.2);
+}
+
+.info-item {
+  margin-bottom: 20px;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  display: block;
+}
+
+.info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--slate-900);
+}
+
+.btn-group {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn {
+  background: var(--primary);
+  color: var(--slate-900);
+  padding: 16px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--red-500);
+  padding: 16px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  border: 1px solid var(--red-500);
+}
+
+.footer {
+  text-align: center;
+  padding: 32px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+</style>
 </head>
-<body style="margin:0; padding:0; background-color:#f8f8f5; font-family: Arial, Helvetica, sans-serif;">
+<body>
+<div class="wrapper">
+  <div class="top-bar"></div>
+  <div class="logo-section">
+    <div class="logo-container">
+      <div class="logo-icon"><span class="material-symbols-outlined">security</span></div>
+      <div style="font-weight: 700; font-size: 16px; letter-spacing: 0.2em; text-transform: uppercase;">Presently</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="alert-badge"><span class="material-symbols-outlined" style="font-size:16px;">warning</span> Security Alert</div>
+      <h2>New Device Login</h2>
+      <p>Hello <span style="font-weight:600;">{{ user_name }}</span>, we noticed a login to your account from a new device.</p>
+      
+      <div class="info-box">
+        <div class="info-item">
+          <span class="info-label">DEVICE</span>
+          <span class="info-value">{{ device_name }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">BROWSER / OS</span>
+          <span class="info-value">{{ browser }} / {{ os }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">IP ADDRESS</span>
+          <span class="info-value">{{ ip_address }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">TIME</span>
+          <span class="info-value">{{ login_time }}</span>
+        </div>
+      </div>
 
-  <!-- Top Gradient Bar -->
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-    <tr>
-      <td style="height:4px; background: linear-gradient(to right, #f2c10d, #ef4444, #f2c10d);"></td>
-    </tr>
-  </table>
-
-  <!-- Wrapper -->
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="padding:40px 20px;">
-    <tr>
-      <td align="center">
-
-        <!-- Card -->
-        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px; background-color:#ffffff; border-radius:16px; border:1px solid #e5e7eb;">
-          
-          <!-- Header -->
-          <tr>
-            <td align="center" style="padding:40px 20px 20px 20px;">
-              <div style="width:60px; height:60px; background-color:#f2c10d; border-radius:12px; display:inline-block; line-height:60px; font-size:28px; font-weight:bold; color:#0f172a;">
-                🎓
-              </div>
-              <p style="margin:15px 0 0 0; font-size:14px; font-weight:bold; letter-spacing:3px; text-transform:uppercase; color:#111827;">
-                Presently
-              </p>
-            </td>
-          </tr>
-
-          <!-- Title -->
-          <tr>
-            <td align="center" style="padding:10px 30px;">
-              <div style="width:60px; height:60px; background-color:#f3f4f6; border-radius:50%; line-height:60px; font-size:28px;">
-                ⚠️
-              </div>
-              <h2 style="margin:20px 0 10px 0; font-size:22px; color:#111827;">
-                New Device Sign-in
-              </h2>
-              <p style="margin:0; font-size:15px; color:#6b7280; line-height:1.6;">
-                We noticed a login from a new device. Please review the details below to ensure your account remains secure.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Device Info Box -->
-          <tr>
-            <td style="padding:30px;">
-              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f9fafb; border-radius:12px; padding:20px;">
-                
-                <tr>
-                  <td style="padding:10px 0;">
-                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">DEVICE</strong><br>
-                    <span style="font-size:15px; color:#111827;">{{ device_name|default:"Unknown Device" }}</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:10px 0;">
-                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">BROWSER</strong><br>
-                    <span style="font-size:15px; color:#111827;">{{ browser|default:"Unknown Browser" }}</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:10px 0;">
-                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">LOCATION</strong><br>
-                    <span style="font-size:15px; color:#111827;">{{ location|default:"Unknown Location" }}</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:10px 0;">
-                    <strong style="font-size:11px; color:#9ca3af; letter-spacing:1px;">TIME</strong><br>
-                    <span style="font-size:15px; color:#111827;">{{ time|default:"Just now" }}</span>
-                  </td>
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-
-          <!-- Buttons -->
-          <tr>
-            <td align="center" style="padding:10px 30px 40px 30px;">
-
-              <!-- Confirm Button -->
-              <table cellpadding="0" cellspacing="0" role="presentation">
-                <tr>
-                  <td align="center" bgcolor="#f2c10d" style="border-radius:10px;">
-                    <a href="{{ confirm_url }}"
-                       style="display:inline-block; padding:14px 28px; font-size:15px; font-weight:bold; color:#0f172a; text-decoration:none;">
-                      Yes, it was me
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <div style="height:15px;"></div>
-
-              <!-- Secure Button -->
-              <table cellpadding="0" cellspacing="0" role="presentation">
-                <tr>
-                  <td align="center" style="border:2px solid #ef4444; border-radius:10px;">
-                    <a href="{{ secure_url }}"
-                       style="display:inline-block; padding:14px 28px; font-size:15px; font-weight:bold; color:#ef4444; text-decoration:none;">
-                      No, Secure Account
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-            </td>
-          </tr>
-
-        </table>
-
-        <!-- Footer -->
-        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px; margin-top:30px;">
-          <tr>
-            <td align="center" style="font-size:12px; color:#9ca3af;">
-              <p style="margin:0;">Presently Support Team</p>
-              <p style="margin:5px 0 0 0; font-size:10px; letter-spacing:2px; text-transform:uppercase;">
-                University Attendance Management
-              </p>
-              <p style="margin:20px 0 0 0; font-size:10px; color:#d1d5db;">
-                © 2024 Presently. Sent to you for account security.
-              </p>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-  </table>
-
+      <div class="btn-group">
+        <a href="{{ dashboard_url }}" class="btn">Yes, it was me</a>
+        <a href="{{ secure_url }}" class="btn-outline">No, secure my account</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <p>Presently Account Security Team</p>
+  </div>
+</div>
 </body>
 </html>

@@ -1,0 +1,184 @@
+<!-- Email: User Invitation -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<title>You're Invited to Presently</title>
+
+<style>
+:root {
+  --primary: #f2c10d;
+  --background-light: #fdfcf7;
+  --slate-900: #0f172a;
+  --slate-600: #475569;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Lexend", sans-serif;
+  background: var(--background-light);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.top-bar {
+  height: 8px;
+  width: 100%;
+  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
+}
+
+.logo-section {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0 24px;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f2c10d 0%, #D4AF37 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 20px 25px rgba(242,193,13,0.3);
+}
+
+.logo-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--slate-900);
+}
+
+.content {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(242,193,13,0.1);
+  border: 1px solid rgba(242,193,13,0.1);
+}
+
+.card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: var(--slate-900);
+}
+
+.card p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--slate-600);
+  margin-bottom: 24px;
+}
+
+.highlight {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.btn-container {
+  margin: 32px 0;
+}
+
+.btn {
+  background: var(--primary);
+  color: var(--slate-900);
+  padding: 16px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  box-shadow: 0 10px 15px -3px rgba(242, 193, 13, 0.2);
+}
+
+.small-text {
+  font-size: 12px;
+  color: var(--slate-400);
+  word-break: break-all;
+}
+
+.divider {
+  width: 64px;
+  height: 1px;
+  background: var(--slate-200);
+  margin: 32px auto;
+}
+
+.footer {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.footer p {
+  font-size: 12px;
+  color: var(--slate-400);
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="top-bar"></div>
+  <div class="logo-section">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <span class="material-symbols-outlined">person_add</span>
+      </div>
+      <div class="logo-title">Presently</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h2>You're Invited!</h2>
+      <p>
+        Hello <span class="highlight">{{ user_name }}</span>,<br><br>
+        <span class="highlight">{{ inviter_name }}</span> has invited you to join 
+        <span class="highlight">{{ institution_name }}</span> on Presently.
+      </p>
+      <div class="btn-container">
+        <a href="{{ invitation_link }}" class="btn">Accept Invitation</a>
+      </div>
+      <p class="small-text">
+        If the button does not work, copy and paste this link:<br>
+        {{ invitation_link }}
+      </p>
+      <div class="divider"></div>
+      <p style="font-weight:600; color:var(--slate-900);">Team Presently</p>
+    </div>
+  </div>
+  <div class="footer">
+    <p>© 2024 Presently. Sent on behalf of {{ institution_name }}.</p>
+  </div>
+</div>
+</body>
+</html>
