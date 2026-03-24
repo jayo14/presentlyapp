@@ -315,9 +315,10 @@ FCM_DJANGO_SETTINGS = {
     "DELETE_INACTIVE_DEVICES": True,
 }
 
-# Firebase Admin SDK Configuration (for FCM)
-# Path to Firebase service account JSON file
-FIREBASE_SERVICE_ACCOUNT_PATH = os.environ.get('FIREBASE_SERVICE_ACCOUNT_PATH', 'serviceAccountKey.json')
+# Firebase Admin SDK: supports both a file path OR raw JSON content in an env var.
+# On Render (or any cloud host), set FIREBASE_SERVICE_ACCOUNT_JSON to the full JSON content.
+# Locally, you can use FIREBASE_SERVICE_ACCOUNT_PATH pointing to your serviceAccountKey.json.
+FIREBASE_SERVICE_ACCOUNT_PATH = os.environ.get('FIREBASE_SERVICE_ACCOUNT_PATH')  # None if not set
 
 # Google OAuth 2.0 Configuration
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
