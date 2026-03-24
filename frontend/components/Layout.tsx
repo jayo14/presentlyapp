@@ -11,6 +11,9 @@ import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
 import { Dock, DockItem } from '@/components/magicui/dock';
 import NotificationInbox from './NotificationInbox';
+import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
+import { sessionApi } from '../services/api/attendance';
+import { QrCode, TrendingUp } from 'lucide-react';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -92,6 +95,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   const [isAppInstalled, setIsAppInstalled] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -250,9 +254,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             label: 'Other',
             items: [
               { id: 'notifications', icon: Bell, label: 'Notifications' },
+              { id: 'profile', icon: User, label: 'Profile' },
             ],
           },
         ];
+    }
+  };
+
+  const handleGlobalCheckIn = async (code: string, location: any): Promise<any> => {
+    try {
+      const attendanceData = await sessionApi.checkInByCode(code, location);
+      return attendanceData;
+    } catch (err: any) {
+      console.error("Global check-in failed:", err);
+      throw new Error(err.response?.data?.error || err.message || "Attendance Failed");
     }
   };
 
@@ -383,7 +398,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center py-2 group relative">
+            <div className="flex items-center justify-center py-2 group relative" title={userName}>
               <div className="w-8 h-8 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0">
                 {displayAvatar ? (
                   <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
@@ -392,9 +407,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
                     {displayInitials}
                   </div>
                 )}
-              </div>
-              <div className="absolute left-full ml-2 px-2 py-1 bg-surface text-text text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
-                {userName}
               </div>
             </div>
           )}
@@ -407,11 +419,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           >
             <LogOut size={16} className="flex-shrink-0" />
             {!sidebarCollapsed && <span className="truncate">Sign out</span>}
-            {sidebarCollapsed && (
-              <div className="absolute left-full ml-2 px-2 py-1 bg-surface text-text text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
-                Sign out
-              </div>
-            )}
           </button>
         </div>
 
@@ -430,7 +437,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-cardackgroundlack/40 backdrop-blur-[2px] z-40 md:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -509,13 +516,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* MAIN CONTENT AREA  */}
       {/* ═══════════════════════════════════════════════════════ */}
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
-        {/* Top Navigation Bar — consistent across all pages */}
+        {/* Top Navigation Bar */}
         <header className="h-14 bg-surface text-text border-b border-outline flex items-center justify-between px-4 md:px-6 sticky top-0 z-20 flex-shrink-0">
-          {/* Left: Mobile hamburger + Page title */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-1.5 text-textMuted hover:text-textMuted rounded-lg hover:bg-surfaceLow hover:text-textMuted transition-colors"
+              className="md:hidden p-1.5 text-textMuted hover:text-textMuted rounded-lg hover:bg-surfaceLow transition-colors"
             >
               <Menu size={20} />
             </button>
@@ -524,10 +530,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             </h1>
           </div>
 
-          {/* Right: Actions  */}
           <div className="flex items-center gap-2">
             <NotificationInbox />
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0 cursor-pointer" onClick={() => handleNavClick('profile')}>
+            <div 
+              className="w-8 h-8 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0 cursor-pointer" 
+              onClick={() => handleNavClick('profile')}
+            >
               {displayAvatar ? (
                 <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
               ) : (
@@ -540,8 +548,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto bg-surfaceLow scroll-smooth">
-          <div className="max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8 pb-24 md:pb-8">
+        <main className="flex-1 overflow-y-auto bg-surfaceLow scroll-smooth pb-24 md:pb-8">
+          <div className="max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8">
             {children}
           </div>
         </main>
@@ -550,7 +558,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MOBILE BOTTOM NAV (Dock)  */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-3 left-3 right-3 z-50 pointer-events-none">
+      <div className="md:hidden fixed bottom-6 left-0 right-0 z-[100] pointer-events-none flex justify-center">
         <Dock
           items={[
             {
@@ -558,49 +566,45 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               label: 'Home',
               active: currentPage === 'dashboard',
               onClick: () => handleNavClick('dashboard'),
-              icon: <Home size={22} />,
+              icon: <Home size={22} strokeWidth={2.5} />,
             },
-            ...(userRole === UserRole.ADMIN
-              ? [{
-                id: 'users',
-                label: 'Users',
-                active: currentPage === 'users',
-                onClick: () => handleNavClick('users'),
-                icon: <Users size={22} />,
-              } as DockItem]
-              : [{
-                id: 'courses',
-                label: 'Courses',
-                active: currentPage === 'courses',
-                onClick: () => handleNavClick('courses'),
-                icon: <GraduationCap size={22} />,
-              } as DockItem]
-            ),
+            {
+              id: 'courses',
+              label: 'Portfolio',
+              active: currentPage === 'courses',
+              onClick: () => handleNavClick('courses'),
+              icon: <GraduationCap size={22} strokeWidth={2.5} />,
+            },
+            {
+              id: 'scanner',
+              label: '',
+              isAccent: true,
+              onClick: () => setIsScannerOpen(true),
+              icon: <QrCode size={28} strokeWidth={3} />,
+            },
             {
               id: 'analytics',
-              label: userRole === UserRole.ADMIN ? 'Logs' : 'Records',
-              active: currentPage === 'analytics' || currentPage === 'logs',
-              onClick: () => handleNavClick(userRole === UserRole.ADMIN ? 'logs' : 'analytics'),
-              icon: <BarChart3 size={22} />,
+              label: 'Charts',
+              active: currentPage === 'analytics',
+              onClick: () => handleNavClick('analytics'),
+              icon: <TrendingUp size={22} strokeWidth={2.5} />,
             },
-            userRole === UserRole.STUDENT
-              ? ({
-                id: 'notifications',
-                label: 'Alerts',
-                active: currentPage === 'notifications',
-                onClick: () => handleNavClick('notifications'),
-                icon: <Bell size={22} />,
-              } as DockItem)
-              : ({
-                id: 'profile',
-                label: 'Profile',
-                active: currentPage === 'profile',
-                onClick: () => handleNavClick('profile'),
-                icon: <User size={22} />,
-              } as DockItem),
+            {
+              id: 'profile',
+              label: 'Me',
+              active: currentPage === 'profile',
+              onClick: () => handleNavClick('profile'),
+              icon: <User size={22} strokeWidth={2.5} />,
+            },
           ]}
         />
       </div>
+
+      <EnhancedAttendanceScanner 
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onVerify={handleGlobalCheckIn}
+      />
     </div>
   );
 };

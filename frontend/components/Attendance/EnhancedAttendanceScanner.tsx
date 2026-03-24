@@ -1,21 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon, RotateCcw, Clipboard, Edit3 } from 'lucide-react';
+import { X, Keyboard, Scan, MapPin, CheckCircle, XCircle, AlertTriangle, Loader2, Camera as CameraIcon, RotateCcw, Clipboard, ChevronRight } from 'lucide-react';
 import { Button } from '../Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
 import { AttendanceSuccessPage } from './AttendanceSuccessPage';
+import { AttendanceFailurePage } from './AttendanceFailurePage';
 import { geolocationService } from '../../services/geolocation';
 
 interface EnhancedAttendanceScannerProps {
   isOpen: boolean;
   onClose: () => void;
-  onVerify: (code: string, location: any) => Promise<any>; // Changed to return attendance data
+  onVerify: (code: string, location: any) => Promise<any>;
 }
 
-type ScanMode = 'scan' | 'input';
+type ScanMode = 'idle' | 'scan' | 'input';
 type ScanStatus = 'idle' | 'locating' | 'verifying' | 'success' | 'error';
 
 interface AttendanceData {
@@ -30,76 +30,55 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   onClose,
   onVerify
 }) => {
-  const [mode, setMode] = useState<ScanMode>('scan');
+  const [mode, setMode] = useState<ScanMode>('idle');
   const [sessionCode, setSessionCode] = useState('');
   const [status, setStatus] = useState<ScanStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [locationInfo, setLocationInfo] = useState('');
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isCameraPermissionDenied, setIsCameraPermissionDenied] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
   const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(null);
   const [checkInTime, setCheckInTime] = useState<string>('');
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const scanIntervalRef = useRef<number | null>(null);
 
-  // Haptic feedback helper
   const triggerHaptic = async (style: ImpactStyle = ImpactStyle.Medium) => {
     if (Capacitor.isNativePlatform()) {
-      try {
-        await Haptics.impact({ style });
-      } catch (err) {
-        console.log('Haptics not available');
-      }
+      try { await Haptics.impact({ style }); } catch (err) {}
     }
   };
 
-  // Reset state on open
   useEffect(() => {
     if (isOpen) {
       setSessionCode('');
       setStatus('idle');
       setErrorMsg('');
       setLocationInfo('');
-      setMode('scan');
-      setIsCameraPermissionDenied(false);
+      setMode('idle');
       setAttendanceData(null);
-      setCheckInTime('');
     } else {
-      // Clean up camera when closing
       stopCamera();
     }
   }, [isOpen]);
 
-  // Camera Logic
   useEffect(() => {
     if (isOpen && mode === 'scan' && status === 'idle') {
       startCamera();
     } else {
       stopCamera();
     }
-
-    return () => {
-      stopCamera();
-    };
+    return () => stopCamera();
   }, [isOpen, mode, status]);
 
   const startCamera = async () => {
     try {
-      const constraints = {
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
-      };
-
+      const constraints = { video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
-
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
@@ -109,12 +88,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         };
       }
     } catch (err: any) {
-      console.error('Camera access error:', err);
       setIsCameraActive(false);
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
         setIsCameraPermissionDenied(true);
       }
-      toast.error('Camera access denied. Please enable camera permissions.');
+      toast.error('Camera access denied.');
     }
   };
 
@@ -128,724 +106,290 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       scanIntervalRef.current = null;
     }
     setIsCameraActive(false);
-    setIsScanning(false);
   };
 
-  // QR Code Scanner using canvas and image processing
   const scanQRCode = () => {
-    if (!videoRef.current || !isCameraActive || status !== 'idle') {
-      return;
-    }
-
+    if (!videoRef.current || !isCameraActive || status !== 'idle') return;
     const video = videoRef.current;
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
 
-    // Ensure video is ready
-    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
-      return;
-    }
-
-    // Create canvas and context once
     if (!canvasRef.current) {
       canvasRef.current = document.createElement('canvas');
       contextRef.current = canvasRef.current.getContext('2d', { willReadFrequently: true });
     }
-
     const canvas = canvasRef.current;
     const context = contextRef.current;
-
     if (!context) return;
-
-    // Set canvas size to video size (only if changed)
     if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
     }
-
-    // Draw current video frame to canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Get image data
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    // Try to decode QR code using jsQR library (we'll need to add this)
-    try {
-      // Import jsQR dynamically
-      import('jsqr').then(({ default: jsQR }) => {
-        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: 'dontInvert',
-        });
-
-        if (code && code.data) {
-          // Found QR code!
-          const qrData = code.data;
-          console.log('QR Code detected:', qrData);
-
-          // Extract session code from QR data
-          // Assuming QR contains URL like: https://getpresently.com.ng/check-in/SESSIONCODE
-          // Or just the session code directly
-          let sessionCodeFromQR = qrData;
-
-          // If it's a URL, extract the session code
-          if (qrData.includes('/check-in/')) {
-            const match = qrData.match(/\/check-in\/([A-Z0-9]+)/i);
-            if (match && match[1]) {
-              sessionCodeFromQR = match[1].toUpperCase();
-            }
-          } else {
-            // If it's just a raw code, ensure it's uppercase
-            sessionCodeFromQR = qrData.toUpperCase();
-          }
-
-          // Stop scanning and process attendance
-          if (scanIntervalRef.current) {
-            window.clearInterval(scanIntervalRef.current);
-            scanIntervalRef.current = null;
-          }
-          setIsScanning(false);
-
-          // Trigger haptic feedback
-          triggerHaptic(ImpactStyle.Medium);
-
-          // Process the code
-          processAttendance(sessionCodeFromQR);
+    import('jsqr').then(({ default: jsQR }) => {
+      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+      if (code && code.data) {
+        let qrData = code.data;
+        let sessionCodeFromQR = qrData;
+        if (qrData.includes('/check-in/')) {
+          const match = qrData.match(/\/check-in\/([A-Z0-9]+)/i);
+          if (match && match[1]) sessionCodeFromQR = match[1].toUpperCase();
         }
-      }).catch((err) => {
-        console.error('jsQR import error:', err);
-        // Fallback: show message to user
-        toast.error('QR scanner library not available. Please use manual entry.');
-        setMode('input');
-      });
-    } catch (err) {
-      console.error('QR scan error:', err);
-    }
+        processAttendance(sessionCodeFromQR.toUpperCase());
+        triggerHaptic(ImpactStyle.Heavy);
+      }
+    }).catch(() => {});
   };
 
-  // Start QR scanning loop when camera is active
   useEffect(() => {
     if (isCameraActive && mode === 'scan' && status === 'idle') {
-      setIsScanning(true);
-      // Scan every 250ms for faster QR code detection
-      scanIntervalRef.current = window.setInterval(() => {
-        scanQRCode();
-      }, 250);
-    } else {
-      if (scanIntervalRef.current) {
-        window.clearInterval(scanIntervalRef.current);
-        scanIntervalRef.current = null;
-      }
-      setIsScanning(false);
+      scanIntervalRef.current = window.setInterval(scanQRCode, 250);
     }
-
-    return () => {
-      if (scanIntervalRef.current) {
-        window.clearInterval(scanIntervalRef.current);
-        scanIntervalRef.current = null;
-      }
-    };
+    return () => { if (scanIntervalRef.current) window.clearInterval(scanIntervalRef.current); };
   }, [isCameraActive, mode, status]);
-
-  const handleModeSwitch = async (newMode: ScanMode) => {
-    await triggerHaptic(ImpactStyle.Light);
-    setMode(newMode);
-    setSessionCode('');
-    setErrorMsg('');
-  };
-
-  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
-    setSessionCode(val);
-  };
-
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      const cleanText = text.toUpperCase().trim().replace(/[^A-Z0-9]/g, '').slice(0, 8);
-      if (cleanText) {
-        setSessionCode(cleanText);
-        toast.success('Code pasted');
-        await triggerHaptic(ImpactStyle.Light);
-      }
-    } catch (err) {
-      console.error('Failed to paste:', err);
-      toast.error('Could not access clipboard');
-    }
-  };
 
   const processAttendance = async (codeToVerify: string) => {
     if (!codeToVerify || codeToVerify.length < 6) {
-      setErrorMsg('Please enter a valid session code (at least 6 characters)');
-      await triggerHaptic(ImpactStyle.Heavy);
+      setErrorMsg('Invalid session code');
+      setStatus('error');
       return;
     }
-
     try {
-      // Step 1: Integrated Anti-Cheat & Stabilized Location
       setStatus('locating');
-      setErrorMsg('');
-      setLocationInfo('Calibrating high-precision GPS...');
-      await triggerHaptic(ImpactStyle.Light);
-
-      // This one call now handles the 15-step pipeline (Warm-up, Samples, IP-check, HW-check)
       const payload = await geolocationService.getAttendancePayload();
-
-      setLocationInfo(
-        `High-precision lock acquired (±${payload.accuracy?.toFixed(1)}m)`
-      );
-
-      // Step 2: Verify attendance with the enriched payload
       setStatus('verifying');
-      setLocationInfo('Verifying session and security signals...');
-      await triggerHaptic(ImpactStyle.Light);
-
       const attendanceResponse = await onVerify(codeToVerify, payload);
-
       if (attendanceResponse) {
-        setStatus('success');
-
-        // Capture time of check-in
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        });
-        setCheckInTime(timeStr);
-
-        // Extract actual course info from API response
+        setCheckInTime(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
         setAttendanceData({
-          courseCode: attendanceResponse.course_code || (codeToVerify.length >= 6 ? codeToVerify.substring(0, 6).toUpperCase() : codeToVerify.toUpperCase()),
+          courseCode: attendanceResponse.course_code || codeToVerify,
           courseName: attendanceResponse.course_name || 'Course Session',
-          location: attendanceResponse.venue_name || `Location (±${payload.accuracy?.toFixed(0)}m)`,
+          location: attendanceResponse.venue_name || 'Verified Venue',
           sessionCode: codeToVerify
         });
-
-        setLocationInfo('✓ Attendance marked successfully!');
-        await triggerHaptic(ImpactStyle.Heavy);
-      } else {
-        throw new Error('Verification failed');
+        setStatus('success');
       }
     } catch (err: any) {
       setStatus('error');
-      // If the error contains a semicolon, it's a structured anti-cheat rejection
-      setErrorMsg(err.message || 'Failed to mark attendance. Please try again.');
-      setLocationInfo('');
-      await triggerHaptic(ImpactStyle.Heavy);
+      setErrorMsg(err.message || 'Verification Failed');
     }
-  };
-
-  const handleSubmit = () => {
-    processAttendance(sessionCode);
-  };
-
-  const handleRetry = async () => {
-    await triggerHaptic(ImpactStyle.Light);
-    setStatus('idle');
-    setErrorMsg('');
-    setLocationInfo('');
-    setSessionCode('');
-  };
-
-  const handleSwitchToManual = async () => {
-    await triggerHaptic(ImpactStyle.Light);
-    setStatus('idle');
-    setErrorMsg('');
-    setLocationInfo('');
-    setSessionCode('');
-    setMode('input');
   };
 
   if (!isOpen) return null;
 
-  // Show success page when attendance is successfully marked
   if (status === 'success' && attendanceData) {
     return (
-      <div className="fixed inset-0 z-[100]">
-        <AttendanceSuccessPage
-          courseCode={attendanceData.courseCode}
-          courseName={attendanceData.courseName}
-          location={attendanceData.location}
-          time={checkInTime}
-          onBackToHome={onClose}
-        />
-      </div>
+      <AttendanceSuccessPage
+        courseCode={attendanceData.courseCode}
+        courseName={attendanceData.courseName}
+        location={attendanceData.location}
+        time={checkInTime}
+        onBackToHome={onClose}
+      />
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <AttendanceFailurePage 
+        errorMsg={errorMsg}
+        onRetry={() => { setStatus('idle'); setMode('idle'); }}
+        onClose={onClose}
+      />
     );
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-cardackgroundlack">
-      {/* Scanning Animation Styles */}
-      <style>{`
-        @keyframes scan-line {
-          0% { transform: translateY(-100%); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(calc(100vh + 100%)); opacity: 0; }
-        }
-        .scan-line-anim {
-          animation: scan-line 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-        @keyframes pulse-ring {
-          0% { transform: scale(0.95); opacity: 0.5; }
-          50% { transform: scale(1.05); opacity: 0.8; }
-          100% { transform: scale(0.95); opacity: 0.5; }
-        }
-        .pulse-ring {
-          animation: pulse-ring 2s ease-in-out infinite;
-        }
-      `}</style>
+    <div className="fixed inset-0 z-[110] bg-[#111111] text-white flex flex-col font-sans overflow-hidden">
+      <header className="p-6 flex items-center justify-between relative z-10">
+        <button onClick={onClose} className="w-12 h-12 flex items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 active:scale-95 transition-all">
+          <X size={24} strokeWidth={2.5} />
+        </button>
+        <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Attendance Mission</span>
+        <div className="w-12 h-12"></div>
+      </header>
 
-      <AnimatePresence>
-        {/* Header Bar */}
-        <motion.div
-          key="header-bar"
-          initial={{ y: -100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -100, opacity: 0 }}
-          className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent"
-        >
-          <button
-            onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center bg-surface/10 hover:bg-surface/20 backdrop-blur-lg rounded-full transition-colors"
-            aria-label="Close scanner"
-          >
-            <X className="w-5 h-5 text-text" />
-          </button>
-
-          <div className="px-4 py-2 bg-surface/10 backdrop-blur-lg rounded-full text-text text-sm font-medium">
-            Mark Attendance
-          </div>
-
-          <div className="w-10 h-10" /> {/* Spacer for centering */}
-        </motion.div>
-
-        {/* Mode Switcher */}
-        <motion.div
-          key="mode-switcher"
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          className="absolute bottom-0 left-0 right-0 z-50 p-6 bg-gradient-to-t from-black via-black/95 to-transparent"
-        >
-          {status === 'idle' && (
-            <div className="flex gap-3 mb-4" role="tablist" aria-label="Scanner modes">
-              <button
-                onClick={() => handleModeSwitch('scan')}
-                role="tab"
-                aria-selected={mode === 'scan'}
-                aria-label="Scan QR code using camera"
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${mode === 'scan'
-                    ? 'bg-primary text-on-primary-fixedlack shadow-lg shadow-primary/50'
-                    : 'bg-white/10 text-white hover:bg-white/20'
-                  }`}
-              >
-                <Scan className="w-5 h-5" />
-                Scan QR
-              </button>
-              <button
-                onClick={() => handleModeSwitch('input')}
-                role="tab"
-                aria-selected={mode === 'input'}
-                aria-label="Enter session code manually"
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-all ${mode === 'input'
-                    ? 'bg-primary text-on-primary-fixedlack shadow-lg shadow-primary/50'
-                    : 'bg-white/10 text-white hover:bg-white/20'
-                  }`}
-              >
-                <Keyboard className="w-5 h-5" />
-                Enter Code
-              </button>
-            </div>
-          )}
-
-          {/* Location Info */}
-          {locationInfo && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`mb-4 p-4 rounded-2xl backdrop-blur-lg flex items-center gap-3 ${status === 'success'
-                  ? 'bg-green-500/20 border border-green-500/30'
-                  : status === 'error'
-                    ? 'bg-red-500/20 border border-red-500/30'
-                    : 'bg-cardackgroundlue-500/20 border border-blue-500/30'
-                }`}
+      <main className="flex-1 flex flex-col p-8 relative z-10">
+        <AnimatePresence mode="wait">
+          {mode === 'idle' && (
+            <motion.div 
+              key="idle"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="flex-1 flex flex-col justify-center space-y-12"
             >
-              {status === 'locating' && <MapPin className="w-5 h-5 text-on-primary-fixedlue-400 animate-pulse" />}
-              {status === 'verifying' && <Loader2 className="w-5 h-5 text-on-primary-fixedlue-400 animate-spin" />}
-              {status === 'success' && <CheckCircle className="w-5 h-5 text-green-400" />}
-              {status === 'error' && <XCircle className="w-5 h-5 text-red-400" />}
-              <p className="text-text text-sm flex-1">{locationInfo}</p>
-            </motion.div>
-          )}
-
-          {/* Error Message */}
-          {errorMsg && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-4 rounded-2xl bg-red-500/20 border border-red-500/30 backdrop-blur-lg flex items-center gap-3"
-            >
-              <AlertTriangle className="w-5 h-5 text-red-400" />
-              <p className="text-red-400 text-sm flex-1">{errorMsg}</p>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Main Content Area */}
-        {mode === 'scan' && status === 'idle' && (
-          <motion.div
-            key="scan-mode"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            {/* Camera Feed */}
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-
-            {!isCameraActive && !isCameraPermissionDenied && (
-              <div className="absolute inset-0 flex items-center justify-center bg-cardackgroundlack">
-                <div className="text-center">
-                  <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                  <p className="text-text/70">Starting camera...</p>
-                </div>
+              <div className="text-center space-y-4">
+                 <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-primary">
+                    <QrCode size={40} strokeWidth={2.5} />
+                 </div>
+                 <h2 className="text-4xl font-headline font-black tracking-tight">How will you<br/>check-in?</h2>
+                 <p className="text-white/40 font-medium">Position your device or enter the session key provided by your instructor.</p>
               </div>
-            )}
 
-            {isCameraPermissionDenied && (
-              <div className="absolute inset-0 flex items-center justify-center bg-cardackgroundlack p-8">
-                <div className="text-center">
-                  <CameraIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                  <h3 className="font-headline text-text text-xl font-bold mb-2">Camera Access Required</h3>
-                  <p className="text-text/70 mb-6">Please enable camera permissions to scan QR codes</p>
-                  <Button onClick={startCamera} className="mx-auto">
-                    Try Again
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Enhanced Scanning Frame */}
-            {isCameraActive && (
-              <div
-                className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                role="status"
-                aria-label="QR code scanning area - position QR code within the frame"
-              >
-                {/* Vignette Overlay */}
-                <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/30 to-black/60" />
-
-                {/* Scanning Frame */}
-                <div className="relative w-[85vw] h-[85vw] max-w-[400px] max-h-[400px]">
-                  {/* Pulsing Background Ring */}
-                  <div className="absolute inset-0 rounded-3xl border-outline border-white/20 pulse-ring" />
-
-                  {/* Main Frame */}
-                  <div className="absolute inset-0 rounded-3xl border-outline border-white/30 bg-surface/5 backdrop-blur-[2px] overflow-hidden">
-                    {/* Corner Indicators - Animated */}
-                    <motion.div
-                      className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary rounded-tl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{
-                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                    <motion.div
-                      className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-primary rounded-tr-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{
-                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity, delay: 0.15 }}
-                    />
-                    <motion.div
-                      className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary rounded-bl-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{
-                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
-                    />
-                    <motion.div
-                      className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary rounded-br-2xl shadow-[0_0_20px_rgba(255,202,13,0.6)]"
-                      animate={{
-                        borderColor: ['#FFCA0D', '#FFE44D', '#FFCA0D'],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity, delay: 0.45 }}
-                    />
-
-                    {/* Animated Scanning Line */}
-                    <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent scan-line-anim shadow-[0_0_20px_rgba(255,202,13,0.9)]" />
-
-                    {/* Additional scanning effect - horizontal bars */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <motion.div
-                        className="absolute left-0 right-0 h-8 bg-gradient-to-b from-primary/20 to-transparent blur-sm"
-                        animate={{
-                          top: ['0%', '100%'],
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          ease: "linear"
-                        }}
-                      />
+              <div className="space-y-4">
+                 <button 
+                   onClick={() => setMode('scan')}
+                   className="w-full h-24 bg-primary text-[#111111] rounded-[2rem] flex items-center justify-between px-8 group drop-shadow-2xl active:scale-98 transition-all"
+                 >
+                    <div className="flex items-center gap-5">
+                       <Scan size={32} strokeWidth={2.5} />
+                       <div className="text-left">
+                          <p className="text-lg font-headline font-black">Scan QR Code</p>
+                          <p className="text-xs font-bold opacity-60">Focus on the screen</p>
+                       </div>
                     </div>
-                  </div>
+                    <ChevronRight size={24} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
+                 </button>
 
-                  {/* Center Crosshair */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-8 h-8 border-outline border-primary/50 rounded-full" />
-                  </div>
-                </div>
-
-                {/* Instruction Text with Animation */}
-                <div className="absolute bottom-32 left-0 right-0 text-center px-4">
-                  <motion.div
-                    className="inline-block px-6 py-3 bg-cardackgroundlack/60 backdrop-blur-lg rounded-full"
-                    animate={{
-                      scale: isScanning ? [1, 1.05, 1] : 1,
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: isScanning ? Infinity : 0,
-                    }}
-                  >
-                    <p className="text-text font-medium flex items-center gap-2 justify-center">
-                      {isScanning && (
-                        <motion.span
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                        >
-                          <Loader2 className="w-4 h-4" />
-                        </motion.span>
-                      )}
-                      {isScanning ? 'Scanning for QR codes...' : 'Position QR code within the frame'}
-                    </p>
-                  </motion.div>
-                </div>
+                 <button 
+                   onClick={() => setMode('input')}
+                   className="w-full h-24 bg-white/5 border border-white/10 rounded-[2rem] flex items-center justify-between px-8 group active:scale-98 transition-all"
+                 >
+                    <div className="flex items-center gap-5">
+                       <Keyboard size={32} strokeWidth={2.5} className="text-primary" />
+                       <div className="text-left">
+                          <p className="text-lg font-headline font-black">Enter Code</p>
+                          <p className="text-xs font-bold opacity-40">Manual 6-digit entry</p>
+                       </div>
+                    </div>
+                    <ChevronRight size={24} strokeWidth={3} className="opacity-20 group-hover:translate-x-1 transition-transform" />
+                 </button>
               </div>
-            )}
-          </motion.div>
-        )}
+            </motion.div>
+          )}
 
-        {mode === 'input' && status === 'idle' && (
-          <motion.div
-            key="input-mode"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 flex flex-col pt-20 pb-32"
-          >
-            <div className="flex-1 overflow-y-auto no-scrollbar w-full px-6 flex flex-col justify-center min-h-[400px]">
-              <div className="w-full max-w-md mx-auto py-8">
-                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse shrink-0">
-                  <Keyboard className="w-12 h-12 text-primary" />
-                </div>
-
-                <h3 className="font-headline text-3xl font-bold text-text text-center mb-3">Enter Session Code</h3>
-                <p className="text-text/60 text-center mb-12">
-                  Type the 6-8 character code displayed on screen
-                </p>
-
-                <div className="relative group">
-                  <input
-                    type="text"
-                    value={sessionCode}
-                    onChange={handleCodeChange}
-                    maxLength={8}
-                    placeholder="XXXXXXXX"
-                    aria-label="Attendance Session Code"
-                    autoFocus
-                    className="w-full bg-surface/10 backdrop-blur-lg border-outline border-white/20 rounded-2xl px-6 py-6 text-center text-4xl font-mono tracking-[0.3em] uppercase text-text placeholder-white/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all mb-6"
-                  />
-
-                  {/* Paste Button for Accessibility */}
-                  <div className="flex justify-center mb-8 gap-3">
-                    <Button
-                      onClick={handlePaste}
-                      variant="secondary"
-                      className="bg-surface/10 hover:bg-surface/20 border-white/10 text-text rounded-xl py-3 flex items-center gap-2"
-                      aria-label="Paste session code from clipboard"
-                    >
-                      <Clipboard className="w-4 h-4" />
-                      Paste Code
-                    </Button>
-
-                    {sessionCode && (
-                      <Button
-                        onClick={() => setSessionCode('')}
-                        variant="secondary"
-                        className="bg-surface/10 hover:bg-surface/20 border-white/10 text-text rounded-xl py-3 flex items-center gap-2"
-                        aria-label="Clear session code"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                        Clear
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={sessionCode.length < 6}
-                  className="w-full h-16 text-lg font-bold rounded-2xl"
-                  aria-label="Verify session code and mark attendance"
-                >
-                  Verify & Mark Attendance
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Loading States */}
-        {(status === 'locating' || status === 'verifying') && (
-          <motion.div
-            key="loading-state"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 flex items-center justify-center bg-cardackgroundlack/90 backdrop-blur-lg z-[60]"
-          >
-            <div className="text-center px-8">
-              {status === 'locating' && (
-                <>
-                  <div className="w-24 h-24 bg-cardackgroundlue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-                    <MapPin className="w-12 h-12 text-on-primary-fixedlue-400" />
-                  </div>
-                  <h3 className="font-headline text-2xl font-bold text-text mb-2">Getting Location</h3>
-                  <p className="text-text/60">Please wait...</p>
-                </>
-              )}
-
-              {status === 'verifying' && (
-                <>
-                  <Loader2 className="w-24 h-24 text-primary animate-spin mx-auto mb-6" />
-                  <h3 className="font-headline text-2xl font-bold text-text mb-2">Verifying</h3>
-                  <p className="text-text/60">Checking your attendance...</p>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Dedicated Error Screen */}
-        {status === 'error' && (
-          <motion.div
-            key="error-state"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute inset-0 flex items-center justify-center bg-cardackgroundlack/95 backdrop-blur-lg p-6 z-[60]"
-          >
-            <div className="w-full max-w-md text-center">
-              {/* Error Icon */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 15,
-                  delay: 0.1
-                }}
-                className="mb-6"
-              >
-                <div className="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
-                  <XCircle className="w-16 h-16 text-red-400" />
-                </div>
-              </motion.div>
-
-              {/* Error Message */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <h3 className="font-headline text-2xl font-bold text-text mb-2">Verification Failed</h3>
-                {errorMsg && errorMsg.includes(';') ? (() => {
-                  const parts = errorMsg.split('.');
-                  const header = parts.length > 1 ? parts[0] + '.' : 'Verification Details:';
-                  const remaining = parts.length > 1 ? parts.slice(1).join('.') : errorMsg;
-                  const reasons = remaining.split(';').map(r => r.trim()).filter(Boolean);
-
-                  return (
-                    <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-left mb-6">
-                      <p className="text-red-400 font-bold mb-3 flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4" />
-                        {header}
-                      </p>
-                      <div className="space-y-2.5">
-                        {reasons.map((reason, idx) => (
-                          <div key={idx} className="flex items-start gap-2.5 text-red-300/80 text-sm leading-relaxed">
-                            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400/60 shrink-0" />
-                            <span>{reason}</span>
-                          </div>
-                        ))}
+          {mode === 'input' && (
+            <motion.div 
+              key="input"
+              initial={{ x: 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -100, opacity: 0 }}
+              className="flex-1 flex flex-col justify-center"
+            >
+              <div className="text-center space-y-8 mb-12">
+                 <h2 className="text-3xl font-headline font-black">Authentication Code</h2>
+                 <p className="text-white/40 text-sm">Enter the numeric code to proceed with check-in.</p>
+                 
+                 <div className="flex justify-center gap-3">
+                    {[0,1,2,3,4,5].map((i) => (
+                      <div key={i} className={`w-12 h-16 rounded-2xl border-2 flex items-center justify-center text-3xl font-black transition-all ${
+                        sessionCode.length > i ? 'border-primary bg-primary/5 text-primary' : 'border-white/10 bg-white/5 text-white/20'
+                      }`}>
+                         {sessionCode[i] || '0'}
                       </div>
-                    </div>
-                  );
-                })() : (
-                  <p className="text-red-400 text-on-primary-fixedase mb-8 px-4 leading-relaxed">{errorMsg || 'Unable to verify attendance'}</p>
-                )}
-              </motion.div>
+                    ))}
+                 </div>
+              </div>
 
-              {/* Helpful Tips */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-surface/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 mb-6 text-left"
+              <div className="grid grid-cols-3 gap-4">
+                 {[1,2,3,4,5,6,7,8,9].map(num => (
+                   <button 
+                     key={num} 
+                     onClick={() => setSessionCode(prev => (prev + num).slice(0,6))}
+                     className="h-16 rounded-2xl bg-white/5 hover:bg-white/10 font-headline font-black text-xl flex items-center justify-center active:scale-90 transition-all"
+                   >
+                     {num}
+                   </button>
+                 ))}
+                 <button onClick={() => setSessionCode('')} className="h-16 rounded-2xl bg-white/5 font-black text-xs uppercase opacity-40">Clear</button>
+                 <button 
+                    onClick={() => setSessionCode(prev => (prev + '0').slice(0,6))}
+                    className="h-16 rounded-2xl bg-white/5 font-headline font-black text-xl flex items-center justify-center"
+                 >
+                   0
+                 </button>
+                 <button 
+                    onClick={() => setSessionCode(prev => prev.slice(0, -1))}
+                    className="h-16 rounded-2xl bg-white/5 flex items-center justify-center text-primary"
+                 >
+                   <RotateCcw size={20} />
+                 </button>
+              </div>
+
+              <button 
+                 disabled={sessionCode.length < 6}
+                 onClick={() => processAttendance(sessionCode)}
+                 className="w-full h-20 bg-primary text-[#111111] rounded-[2.5rem] mt-12 font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all"
               >
-                <p className="text-text/80 text-sm font-semibold mb-2">💡 Troubleshooting Tips:</p>
-                <ul className="text-text/60 text-sm space-y-2">
-                  <li>• Make sure you're within the required range</li>
-                  <li>• Check if the session is still active</li>
-                  <li>• Ensure your location services are enabled</li>
-                  <li>• Try again with a stable internet connection</li>
-                </ul>
-              </motion.div>
-
-              {/* Action Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="space-y-3"
+                 Verify Attendance
+              </button>
+              
+              <button 
+                onClick={() => setMode('idle')}
+                className="mt-6 text-xs font-black uppercase tracking-widest opacity-40 text-center"
               >
-                <button
-                  onClick={handleRetry}
-                  className="w-full bg-primary hover:bg-primary/90 text-on-primary-fixedlack font-bold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
-                >
-                  <RotateCcw className="w-5 h-5" />
-                  Try Again
-                </button>
+                Go Back
+              </button>
+            </motion.div>
+          )}
 
-                <button
-                  onClick={handleSwitchToManual}
-                  className="w-full bg-surface/10 hover:bg-surface/20 text-text font-semibold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 border border-white/20"
-                >
-                  <Edit3 className="w-5 h-5" />
-                  Enter Code Manually
-                </button>
+          {mode === 'scan' && (
+            <motion.div 
+              key="scan"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 flex flex-col relative"
+            >
+               <div className="absolute inset-0 rounded-[3rem] overflow-hidden border border-white/10 bg-black">
+                  <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover opacity-60" />
+                  
+                  {/* Scanning Frame */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <div className="w-64 h-64 relative">
+                        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-xl transition-all" />
+                        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-xl transition-all" />
+                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-xl transition-all" />
+                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-xl transition-all" />
+                        
+                        {/* Scanning Line */}
+                        <motion.div 
+                           animate={{ top: ['0%', '100%'] }}
+                           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                           className="absolute left-2 right-2 h-1 bg-primary/40 shadow-[0_0_15px_rgba(var(--primary-rgb),1)]"
+                        />
+                     </div>
+                  </div>
+               </div>
 
-                <button
-                  onClick={onClose}
-                  className="w-full text-text/60 hover:text-text font-medium py-3 transition-colors"
-                >
-                  Cancel
-                </button>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+               <div className="absolute bottom-12 left-0 right-0 text-center px-12 space-y-4">
+                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-black/60 backdrop-blur-md rounded-full border border-white/10">
+                     <Loader2 size={16} className="animate-spin text-primary" />
+                     <span className="text-xs font-black uppercase tracking-widest">Targeting Session...</span>
+                  </div>
+                  <p className="text-white/40 text-sm">Align the QR code within the highlighted corners to automatically check-in.</p>
+               </div>
+               
+               <button 
+                 onClick={() => setMode('idle')}
+                 className="absolute top-4 right-4 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10"
+               >
+                  <Keyboard size={18} />
+               </button>
+            </motion.div>
+          )}
+
+          {(status === 'locating' || status === 'verifying') && (
+            <motion.div 
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="absolute inset-0 bg-[#111111]/95 backdrop-blur-xl z-50 flex flex-col items-center justify-center p-12 text-center"
+            >
+               <div className="relative mb-12">
+                  <Loader2 size={80} className="animate-spin text-primary opacity-20" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <MapPin size={32} className="text-primary animate-bounce" />
+                  </div>
+               </div>
+               <h3 className="text-3xl font-headline font-black mb-4">Establishing Secure Connection</h3>
+               <p className="text-white/40 text-sm leading-relaxed max-w-xs">{status === 'locating' ? 'Verifying spatial coordinates and biometric signals...' : 'Exchanging encryption keys with the institution core...'}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
     </div>
   );
 };
-
-export default EnhancedAttendanceScanner;
