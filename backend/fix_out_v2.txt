@@ -1,0 +1,4 @@
+Firebase: FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON: Expecting value: line 1 column 1 (char 0)
+INFO: DEBUG=True; using console email backend.
+Fixing template: 4fedf803-2b9b-480d-8f57-f9919276b90b
+Error: New variables "dashboard_url, support_url, privacy_url, institution_url" are used in the template body but are not defined in the variables list
