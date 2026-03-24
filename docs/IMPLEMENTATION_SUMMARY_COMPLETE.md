@@ -281,7 +281,7 @@ RESEND_API_KEY=re_your_api_key_here
 DEFAULT_FROM_EMAIL=noreply@presently.app
 
 # Frontend URL for email links
-FRONTEND_URL=https://presentlyapp.vercel.app
+FRONTEND_URL=https://getpresently.com.ng
 
 # Django Debug Mode
 DEBUG=False  # Set to False in production

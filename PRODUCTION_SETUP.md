@@ -21,7 +21,7 @@ VITE_NOVU_SECRET_KEY=4238deb1abb03644f880bf8b721a79c0
 Set these in your Render service environment (Environment tab):
 
 ```
-FRONTEND_URL=https://presentlyapp.vercel.app
+FRONTEND_URL=https://getpresently.com.ng
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 DEBUG=False
@@ -38,7 +38,7 @@ SECRET_KEY=your_secure_secret_key
 Your authorized redirect URIs in Google Cloud Console should include:
 
 ```
-https://presentlyapp.vercel.app/auth/callback
+https://getpresently.com.ng/auth/callback
 https://presentlyapp.onrender.com/auth/callback  (optional, for backend-direct testing)
 http://localhost:3000/auth/callback  (for local development)
 ```
@@ -66,7 +66,7 @@ http://localhost:3000/auth/callback  (for local development)
 
 ## 6. Testing the Flow
 
-1. Go to `https://presentlyapp.vercel.app/login`
+1. Go to `https://getpresently.com.ng/login`
 2. Click "Sign in with Google"
 3. Authorize your Google account
 4. You should be redirected and authenticated

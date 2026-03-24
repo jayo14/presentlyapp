@@ -150,7 +150,7 @@ const photoData = await CameraService.capturePhoto({
 
 **QR Code Formats Supported**:
 - Plain session code: `ZVHYVALV`
-- Full URL: `https://presentlyapp.vercel.app/check-in/ZVHYVALV`
+- Full URL: `https://getpresently.com.ng/check-in/ZVHYVALV`
 - Partial path: `/check-in/ZVHYVALV`
 
 **Required Setup**:

@@ -103,7 +103,7 @@ class NewsletterSubscriber(models.Model):
             'Thanks for subscribing to Presently updates.\n\n'
             'We are launching soon and will share product updates, '
             'attendance insights, and rollout news with you.\n\n'
-            'Read the latest updates on our blog: https://presentlyapp.vercel.app/blog\n\n'
+            'Read the latest updates on our blog: https://getpresently.com.ng/blog\n\n'
             'Presently Team'
         )
 
