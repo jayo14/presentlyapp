@@ -8,6 +8,7 @@ from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
 
+import resend
 
 def _send_smtp_email(
     *,
@@ -17,7 +18,7 @@ def _send_smtp_email(
     context: Optional[Dict[str, Any]] = None,
     html_content: Optional[str] = None,
 ) -> bool:
-    """Send an email using Django's SMTP backend."""
+    """Send an email using Resend API (or console in DEBUG)."""
     try:
         if html_content is None:
             if not template_name:
@@ -25,17 +26,32 @@ def _send_smtp_email(
             html_content = render_to_string(template_name, context or {})
 
         text_content = strip_tags(html_content)
-        message = EmailMultiAlternatives(
-            subject=subject,
-            body=text_content,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[to_email],
-        )
-        message.attach_alternative(html_content, "text/html")
-        message.send(fail_silently=False)
-        return True
+
+        if settings.DEBUG or not getattr(settings, 'RESEND_API_KEY', None):
+            # For local testing, or if Resend is missing, just print to console
+            message = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[to_email],
+            )
+            message.attach_alternative(html_content, "text/html")
+            message.send(fail_silently=False)
+            return True
+        else:
+            # Send using Resend API
+            resend.api_key = settings.RESEND_API_KEY
+            r = resend.Emails.send({
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": to_email,
+                "subject": subject,
+                "html": html_content
+            })
+            logger.info("Resend email sent to %s, id: %s", to_email, r.get("id"))
+            return True
+
     except Exception as exc:
-        logger.error("SMTP email failed for %s: %s", to_email, exc, exc_info=True)
+        logger.error("Email sending failed for %s: %s", to_email, exc, exc_info=True)
         return False
 
 
