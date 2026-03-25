@@ -559,6 +559,40 @@ def login_view(request):
     serializer = UserLoginSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         user = serializer.validated_data['user']
+
+        # Block full login for unverified users and trigger a fresh OTP send.
+        if not user.email_verified:
+            otp_send_failed = False
+            try:
+                EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
+                otp_obj = EmailVerificationOTP.create_otp(user)
+                send_verification_email(user, otp_obj.otp)
+                auth_logger.info("Unverified user login OTP sent: %s", user.email)
+            except Exception as exc:
+                otp_send_failed = True
+                logger.error(
+                    "Failed to send login verification OTP for %s: %s",
+                    user.email,
+                    str(exc),
+                    exc_info=True,
+                )
+
+            return Response({
+                'success': True,
+                'message': 'Email not verified. A verification code has been sent to your email.',
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'full_name': user.full_name,
+                    'role': user.role,
+                    'email_verified': user.email_verified,
+                    'onboarding_complete': user.onboarding_complete,
+                    'avatar_url': user.avatar_url,
+                },
+                'requires_email_verification': True,
+                'requires_onboarding': not user.onboarding_complete,
+                'otp_send_failed': otp_send_failed,
+            }, status=status.HTTP_200_OK)
         
         # Security: Device Tracking
         try:
@@ -657,6 +691,7 @@ def login_view(request):
                 'email': user.email,
                 'full_name': user.full_name,
                 'role': user.role,
+                'email_verified': user.email_verified,
                 'onboarding_complete': user.onboarding_complete,
                 'avatar_url': user.avatar_url
             },

@@ -189,6 +189,41 @@ class LoginTests(TestCase):
         self.assertEqual(response.data['user']['role'], UserRole.STUDENT)
         self.assertTrue(response.data['user']['onboarding_complete'])
 
+    @patch('institutions.views.send_verification_email')
+    def test_unverified_login_sends_otp_and_requires_verification(self, mock_send_verification_email):
+        """Unverified users should receive OTP and be routed to verification instead of full login."""
+        mock_send_verification_email.return_value = True
+        self.user.email_verified = False
+        self.user.save(update_fields=['email_verified'])
+
+        response = self.client.post('/api/auth/login/', {
+            'email': 'login@test.com',
+            'password': 'testpass123',
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['success'])
+        self.assertTrue(response.data['requires_email_verification'])
+        self.assertNotIn('tokens', response.data)
+        self.assertEqual(response.data['user']['email'], 'login@test.com')
+        mock_send_verification_email.assert_called_once()
+
+    @patch('institutions.views.send_verification_email')
+    def test_unverified_login_handles_otp_send_failure_gracefully(self, mock_send_verification_email):
+        """Login should still direct unverified users to OTP page when auto-send fails."""
+        mock_send_verification_email.side_effect = Exception('email provider down')
+        self.user.email_verified = False
+        self.user.save(update_fields=['email_verified'])
+
+        response = self.client.post('/api/auth/login/', {
+            'email': 'login@test.com',
+            'password': 'testpass123',
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['requires_email_verification'])
+        self.assertTrue(response.data['otp_send_failed'])
+
 
 class LogoutTests(TestCase):
     """Tests for the logout endpoint."""

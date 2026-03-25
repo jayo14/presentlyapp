@@ -12,7 +12,8 @@ class EmailTests(TestCase):
         self.user = User.objects.create_user(
             email="test@example.com",
             password="password123",
-            full_name="Test User"
+            full_name="Test User",
+            email_verified=True,
         )
         self.factory = APIRequestFactory()
 

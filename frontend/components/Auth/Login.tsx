@@ -74,7 +74,16 @@ export const Login: React.FC = () => {
 
         toast.error('Login Failed', { description: errorMessage });
       },
-      onSuccess: () => {
+      onSuccess: (response: any) => {
+        if (response?.requires_email_verification) {
+          toast.info('Verify Your Email', {
+            description: response?.otp_send_failed
+              ? 'Your email is not verified. We could not send a code automatically. Please use resend on the verification page.'
+              : 'Your email is not verified. A verification code has been sent to your email.'
+          });
+          return;
+        }
+
         toast.success('Login Successful', {
           description: 'Welcome back! Redirecting to dashboard...'
         });
