@@ -3,7 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import 'highlight.js/styles/github-dark.css';
+import { Check, Copy, Link2 } from 'lucide-react';
+import highlightLightCss from 'highlight.js/styles/github.css?url';
+import highlightDarkCss from 'highlight.js/styles/github-dark.css?url';
 
 import { getPostBySlug } from '../../src/lib/blog';
 import type { Post } from '../../src/types/blog';
@@ -44,6 +46,39 @@ export const BlogPostPage: React.FC = () => {
   const { slug = '' } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copiedCodeKey, setCopiedCodeKey] = useState('');
+
+  useEffect(() => {
+    const styleId = 'blog-highlight-theme';
+    let linkElement = document.getElementById(styleId) as HTMLLinkElement | null;
+
+    if (!linkElement) {
+      linkElement = document.createElement('link');
+      linkElement.id = styleId;
+      linkElement.rel = 'stylesheet';
+      document.head.appendChild(linkElement);
+    }
+
+    const applyTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      const nextHref = isDark ? highlightDarkCss : highlightLightCss;
+      if (linkElement && linkElement.href !== nextHref) {
+        linkElement.href = nextHref;
+      }
+    };
+
+    applyTheme();
+
+    const observer = new MutationObserver(applyTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -112,6 +147,18 @@ export const BlogPostPage: React.FC = () => {
     );
   }
 
+  const handleCopyCode = async (key: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedCodeKey(key);
+      window.setTimeout(() => {
+        setCopiedCodeKey((currentKey) => (currentKey === key ? '' : currentKey));
+      }, 1800);
+    } catch {
+      setCopiedCodeKey('');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-text relative selection:bg-primaryContainer selection:text-primary overflow-hidden">
       {/* Decorative Blobs */}
@@ -158,19 +205,60 @@ export const BlogPostPage: React.FC = () => {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
+                  h1: ({ children, ...props }: any) => {
+                    const id = slugify(extractNodeText(children));
+                    return (
+                      <h1
+                        id={id}
+                        className="group scroll-mt-32 mt-16 mb-8 flex items-center gap-2 font-headline text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-text"
+                        {...props}
+                      >
+                        <span className="flex-1">{children}</span>
+                        <a
+                          href={`#${id}`}
+                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary"
+                          aria-label="Copy section link"
+                        >
+                          <Link2 size={20} />
+                        </a>
+                      </h1>
+                    );
+                  },
                   h2: ({ children, ...props }: any) => {
                     const id = slugify(extractNodeText(children));
                     return (
-                      <h2 id={id} className="scroll-mt-32 mt-14 mb-6 border-b border-outline/10 pb-3" {...props}>
-                        {children}
+                      <h2
+                        id={id}
+                        className="group scroll-mt-32 mt-14 mb-6 flex items-center gap-2 border-b border-outline/10 pb-3 font-headline text-3xl md:text-4xl font-black tracking-tight text-text"
+                        {...props}
+                      >
+                        <span className="flex-1">{children}</span>
+                        <a
+                          href={`#${id}`}
+                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary"
+                          aria-label="Copy section link"
+                        >
+                          <Link2 size={18} />
+                        </a>
                       </h2>
                     );
                   },
                   h3: ({ children, ...props }: any) => {
                     const id = slugify(extractNodeText(children));
                     return (
-                      <h3 id={id} className="scroll-mt-32 mt-10 mb-4" {...props}>
-                        {children}
+                      <h3
+                        id={id}
+                        className="group scroll-mt-32 mt-10 mb-4 flex items-center gap-2 font-headline text-2xl md:text-3xl font-extrabold tracking-tight text-text"
+                        {...props}
+                      >
+                        <span className="flex-1">{children}</span>
+                        <a
+                          href={`#${id}`}
+                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary"
+                          aria-label="Copy section link"
+                        >
+                          <Link2 size={16} />
+                        </a>
                       </h3>
                     );
                   },
@@ -265,9 +353,50 @@ export const BlogPostPage: React.FC = () => {
                     );
                   },
                   pre: ({ children, ...props }: any) => (
-                    <div className="my-8 overflow-hidden rounded-2xl border border-outline/20 bg-[#0d1117] shadow-xl">
+                    <div className="my-8 overflow-hidden rounded-2xl border border-outline/20 bg-white dark:bg-[#0d1117] shadow-xl">
                       <div className="flex items-center justify-between border-b border-white/10 px-4 py-2">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Code</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted">Code</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const codeElement = Array.isArray(children) ? children[0] : children;
+                            const rawCode = React.isValidElement<any>(codeElement)
+                              ? String(codeElement.props?.children ?? '').replace(/\n$/, '')
+                              : String(children ?? '');
+                            const codeClassName = React.isValidElement<any>(codeElement)
+                              ? String(codeElement.props?.className ?? '')
+                              : '';
+                            const language = codeClassName.replace('language-', '') || 'text';
+                            const key = `${language}:${rawCode.slice(0, 60)}`;
+                            void handleCopyCode(key, rawCode);
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-outline/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-textMuted hover:text-text hover:bg-surfaceHigh/40 transition-colors"
+                        >
+                          {(() => {
+                            const codeElement = Array.isArray(children) ? children[0] : children;
+                            const rawCode = React.isValidElement<any>(codeElement)
+                              ? String(codeElement.props?.children ?? '').replace(/\n$/, '')
+                              : String(children ?? '');
+                            const codeClassName = React.isValidElement<any>(codeElement)
+                              ? String(codeElement.props?.className ?? '')
+                              : '';
+                            const language = codeClassName.replace('language-', '') || 'text';
+                            const key = `${language}:${rawCode.slice(0, 60)}`;
+                            const copied = copiedCodeKey === key;
+
+                            return copied ? (
+                              <>
+                                <Check size={12} />
+                                Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy size={12} />
+                                Copy
+                              </>
+                            );
+                          })()}
+                        </button>
                       </div>
                       <pre className="overflow-x-auto p-5 text-sm" {...props}>
                         {children}
