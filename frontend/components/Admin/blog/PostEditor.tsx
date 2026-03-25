@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { 
   X, 
   Save, 
@@ -22,9 +22,12 @@ import {
   CheckCircle2,
   Trash2,
   Plus,
-  Send
+  Send,
+  Upload,
+  Loader2
 } from 'lucide-react';
 import { Button } from '../../Button';
+import { uploadBlogImage } from '../../../src/lib/blog';
 import type { Post, Category, Tag } from '../../../src/types/blog';
 
 interface PostEditorProps {
@@ -44,7 +47,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
   onPublish,
   onCancel
 }) => {
-  const [formData, setFormData] = useState<Partial<Post>>({
+  const getInitialFormData = (value?: Post | null): Partial<Post> => ({
     title: '',
     slug: '',
     excerpt: '',
@@ -58,16 +61,87 @@ export const PostEditor: React.FC<PostEditorProps> = ({
     reading_time: 5,
     seo_title: '',
     seo_description: '',
-    ...post
+    ...value
   });
+
+  const [formData, setFormData] = useState<Partial<Post>>(getInitialFormData(post));
+
+  const [isCoverDragActive, setIsCoverDragActive] = useState(false);
+  const [isAvatarDragActive, setIsAvatarDragActive] = useState(false);
+  const [isCoverUploading, setIsCoverUploading] = useState(false);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+
+  const coverInputRef = useRef<HTMLInputElement | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [seoExpanded, setSeoExpanded] = useState(true);
 
   useEffect(() => {
-    if (post) {
-      setFormData({ ...post });
-    }
+    setFormData(getInitialFormData(post));
   }, [post]);
+
+  const validateImage = (file: File): string | null => {
+    if (!file.type.startsWith('image/')) {
+      return 'Please select a valid image file.';
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return 'Image size must be less than 5MB.';
+    }
+    return null;
+  };
+
+  const uploadImageForField = async (file: File, field: 'cover_image' | 'author_avatar') => {
+    const validationError = validateImage(file);
+    if (validationError) {
+      setUploadError(validationError);
+      return;
+    }
+
+    setUploadError('');
+    if (field === 'cover_image') {
+      setIsCoverUploading(true);
+    } else {
+      setIsAvatarUploading(true);
+    }
+
+    try {
+      const imageUrl = await uploadBlogImage(file);
+      setFormData(prev => ({ ...prev, [field]: imageUrl }));
+    } catch (error: any) {
+      setUploadError(error?.message || 'Failed to upload image.');
+    } finally {
+      if (field === 'cover_image') {
+        setIsCoverUploading(false);
+      } else {
+        setIsAvatarUploading(false);
+      }
+    }
+  };
+
+  const handleFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'cover_image' | 'author_avatar'
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadImageForField(file, field);
+    e.target.value = '';
+  };
+
+  const handleImageDrop = async (
+    e: React.DragEvent<HTMLDivElement>,
+    field: 'cover_image' | 'author_avatar'
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCoverDragActive(false);
+    setIsAvatarDragActive(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await uploadImageForField(file, field);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -160,15 +234,39 @@ export const PostEditor: React.FC<PostEditorProps> = ({
           {/* Left Column: Editor (70%) */}
           <section className="w-[70%] space-y-8">
             {/* Cover Image Upload Zone */}
-            <div className="relative group h-[240px] w-full rounded-[2rem] overflow-hidden border-2 border-dashed border-outline/20 hover:border-primary/40 transition-all duration-300">
+            <div
+              className={`relative group h-[240px] w-full rounded-[2rem] overflow-hidden border-2 border-dashed transition-all duration-300 ${isCoverDragActive ? 'border-primary/70 bg-primary/5' : 'border-outline/20 hover:border-primary/40'}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsCoverDragActive(true);
+              }}
+              onDragLeave={() => setIsCoverDragActive(false)}
+              onDrop={(e) => {
+                void handleImageDrop(e, 'cover_image');
+              }}
+            >
               {formData.cover_image ? (
                 <>
                   <img className="w-full h-full object-cover" src={formData.cover_image} alt="" />
                   <div className="absolute inset-0 bg-text/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button className="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl text-sm font-black text-text flex items-center gap-2 shadow-2xl">
-                      <X size={18} />
-                      Remove image
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => coverInputRef.current?.click()}
+                        className="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl text-sm font-black text-text flex items-center gap-2 shadow-2xl"
+                      >
+                        {isCoverUploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+                        Replace image
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, cover_image: '' }))}
+                        className="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl text-sm font-black text-text flex items-center gap-2 shadow-2xl"
+                      >
+                        <X size={18} />
+                        Remove image
+                      </button>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -178,18 +276,38 @@ export const PostEditor: React.FC<PostEditorProps> = ({
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-black text-text">Select a cover image</p>
-                    <p className="text-xs text-textMuted font-medium">PNG, JPG or WebP (Max 5MB)</p>
+                    <p className="text-xs text-textMuted font-medium">Drag and drop, paste URL, or upload image (Max 5MB)</p>
                   </div>
-                  <input 
-                    type="url" 
-                    placeholder="Enter image URL..."
-                    name="cover_image"
-                    value={formData.cover_image}
-                    onChange={handleChange}
-                    className="w-64 bg-white border-outline/20 rounded-xl px-4 py-2 text-xs focus:ring-4 focus:ring-primary/10"
-                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => coverInputRef.current?.click()}
+                      className="px-4 py-2 rounded-xl bg-text text-white text-xs font-black flex items-center gap-2"
+                    >
+                      {isCoverUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                      Upload image
+                    </button>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-textMuted">or</span>
+                    <input 
+                      type="url" 
+                      placeholder="Enter image URL..."
+                      name="cover_image"
+                      value={formData.cover_image}
+                      onChange={handleChange}
+                      className="w-64 bg-white border-outline/20 rounded-xl px-4 py-2 text-xs focus:ring-4 focus:ring-primary/10"
+                    />
+                  </div>
                 </div>
               )}
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  void handleFileChange(e, 'cover_image');
+                }}
+              />
             </div>
 
             {/* Title & Excerpt */}
@@ -295,13 +413,51 @@ export const PostEditor: React.FC<PostEditorProps> = ({
                 </div>
                 <div className="group">
                   <label className="block text-[10px] font-black text-textMuted/60 mb-2 group-focus-within:text-primary transition-colors transition-colors uppercase tracking-widest">Avatar URL</label>
-                  <input 
-                    type="text" 
-                    name="author_avatar"
-                    value={formData.author_avatar}
-                    onChange={handleChange}
-                    className="w-full bg-surfaceHigh/20 border-none rounded-xl px-4 py-3 text-sm font-bold text-text focus:ring-4 focus:ring-primary/10 transition-all" 
-                    placeholder="https://..."
+                  <div
+                    className={`rounded-2xl border-2 border-dashed p-4 bg-surfaceHigh/20 transition-colors ${isAvatarDragActive ? 'border-primary/60' : 'border-outline/20'}`}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsAvatarDragActive(true);
+                    }}
+                    onDragLeave={() => setIsAvatarDragActive(false)}
+                    onDrop={(e) => {
+                      void handleImageDrop(e, 'author_avatar');
+                    }}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      {formData.author_avatar ? (
+                        <img src={formData.author_avatar} alt="Author avatar" className="w-12 h-12 rounded-full object-cover border border-outline/20" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center border border-outline/20 text-textMuted">
+                          <User size={18} />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => avatarInputRef.current?.click()}
+                        className="px-4 py-2 rounded-xl bg-white text-xs font-black text-text border border-outline/20 flex items-center gap-2"
+                      >
+                        {isAvatarUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                        Upload avatar
+                      </button>
+                    </div>
+                    <input 
+                      type="text" 
+                      name="author_avatar"
+                      value={formData.author_avatar}
+                      onChange={handleChange}
+                      className="w-full bg-white border-outline/20 rounded-xl px-4 py-3 text-sm font-bold text-text focus:ring-4 focus:ring-primary/10 transition-all" 
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      void handleFileChange(e, 'author_avatar');
+                    }}
                   />
                 </div>
               </div>
@@ -409,6 +565,13 @@ export const PostEditor: React.FC<PostEditorProps> = ({
             </div>
           </aside>
         </div>
+        {uploadError && (
+          <div className="max-w-[1400px] mx-auto px-12 pb-6">
+            <div className="rounded-xl border border-error/20 bg-error/5 px-4 py-3 text-sm font-semibold text-error">
+              {uploadError}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

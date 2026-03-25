@@ -82,6 +82,28 @@ export async function adminGetAllPosts(options: GetAllPostsOptions = {}): Promis
   return response.data;
 }
 
+export async function adminGetPostBySlug(slug: string): Promise<Post> {
+  const response = await apiClient.get(`/blog/admin/posts/${slug}/`);
+  return response.data;
+}
+
+export async function uploadBlogImage(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('avatar', file);
+
+  const response = await apiClient.post('/auth/upload-avatar/', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  if (!response.data?.success || !response.data?.avatar_url) {
+    throw new Error(response.data?.error || 'Image upload failed');
+  }
+
+  return response.data.avatar_url as string;
+}
+
 export async function createPost(data: Partial<Post>): Promise<Post> {
   const response = await apiClient.post('/blog/admin/posts/', data);
   return response.data;
