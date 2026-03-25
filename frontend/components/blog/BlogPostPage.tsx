@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 
 import { getPostBySlug } from '../../src/lib/blog';
 import type { Post } from '../../src/types/blog';
@@ -154,23 +156,124 @@ export const BlogPostPage: React.FC = () => {
             ">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeHighlight]}
                 components={{
-                  h2: ({ children, ...props }) => {
+                  h2: ({ children, ...props }: any) => {
                     const id = slugify(extractNodeText(children));
                     return (
-                      <h2 id={id} {...props}>
+                      <h2 id={id} className="scroll-mt-32 mt-14 mb-6 border-b border-outline/10 pb-3" {...props}>
                         {children}
                       </h2>
                     );
                   },
-                  h3: ({ children, ...props }) => {
+                  h3: ({ children, ...props }: any) => {
                     const id = slugify(extractNodeText(children));
                     return (
-                      <h3 id={id} {...props}>
+                      <h3 id={id} className="scroll-mt-32 mt-10 mb-4" {...props}>
                         {children}
                       </h3>
                     );
                   },
+                  p: ({ children, ...props }: any) => (
+                    <p className="mb-6 leading-8 text-[1.06rem] text-textMuted" {...props}>
+                      {children}
+                    </p>
+                  ),
+                  a: ({ href, children, ...props }: any) => {
+                    const isExternal = !!href && /^https?:\/\//i.test(href);
+                    return (
+                      <a
+                        href={href}
+                        {...props}
+                        target={isExternal ? '_blank' : undefined}
+                        rel={isExternal ? 'noopener noreferrer' : undefined}
+                        className="font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary"
+                      >
+                        {children}
+                      </a>
+                    );
+                  },
+                  ul: ({ children, ...props }: any) => (
+                    <ul className="my-6 list-disc space-y-3 pl-6 marker:text-primary" {...props}>
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children, ...props }: any) => (
+                    <ol className="my-6 list-decimal space-y-3 pl-6 marker:font-bold marker:text-primary" {...props}>
+                      {children}
+                    </ol>
+                  ),
+                  li: ({ children, ...props }: any) => (
+                    <li className="pl-1 text-textMuted" {...props}>
+                      {children}
+                    </li>
+                  ),
+                  blockquote: ({ children, ...props }: any) => (
+                    <blockquote
+                      className="my-8 rounded-2xl border-l-4 border-primary bg-surfaceHigh/40 px-6 py-5 text-[1.05rem] italic text-text"
+                      {...props}
+                    >
+                      {children}
+                    </blockquote>
+                  ),
+                  table: ({ children, ...props }: any) => (
+                    <div className="my-8 overflow-x-auto rounded-2xl border border-outline/10">
+                      <table className="w-full border-collapse bg-surface/30 text-sm" {...props}>
+                        {children}
+                      </table>
+                    </div>
+                  ),
+                  thead: ({ children, ...props }: any) => (
+                    <thead className="bg-surfaceHigh/60" {...props}>
+                      {children}
+                    </thead>
+                  ),
+                  th: ({ children, ...props }: any) => (
+                    <th className="border-b border-outline/10 px-4 py-3 text-left font-black uppercase tracking-wide text-xs text-text" {...props}>
+                      {children}
+                    </th>
+                  ),
+                  td: ({ children, ...props }: any) => (
+                    <td className="border-b border-outline/5 px-4 py-3 align-top text-textMuted" {...props}>
+                      {children}
+                    </td>
+                  ),
+                  img: ({ alt, ...props }: any) => (
+                    <img
+                      alt={alt || 'Blog media'}
+                      loading="lazy"
+                      className="my-10 w-full rounded-[2rem] border border-outline/10 shadow-2xl"
+                      {...props}
+                    />
+                  ),
+                  hr: (props: any) => <hr className="my-12 border-outline/10" {...props} />,
+                  code: ({ className, children, ...props }: any) => {
+                    const isInline = !className;
+                    if (isInline) {
+                      return (
+                        <code className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[0.9em] text-primary" {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+
+                    const language = className.replace('language-', '') || 'text';
+                    return (
+                      <code className={`${className} block text-sm leading-6`} data-language={language} {...props}>
+                        {children}
+                      </code>
+                    );
+                  },
+                  pre: ({ children, ...props }: any) => (
+                    <div className="my-8 overflow-hidden rounded-2xl border border-outline/20 bg-[#0d1117] shadow-xl">
+                      <div className="flex items-center justify-between border-b border-white/10 px-4 py-2">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Code</span>
+                      </div>
+                      <pre className="overflow-x-auto p-5 text-sm" {...props}>
+                        {children}
+                      </pre>
+                    </div>
+                  ),
                 }}
               >
                 {post.content}
