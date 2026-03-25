@@ -146,14 +146,39 @@ const DashboardHome: React.FC = () => {
 // Admin Route Guard
 const AdminRoute: React.FC<{ children: React.ReactNode; requiredPermission?: string }> = ({ children, requiredPermission }) => {
     const { data: user, isLoading } = useCurrentUser();
+  const location = useLocation();
     
     if (isLoading) return <LoadingFallback />;
-    if (!user || user.role !== UserRole.ADMIN) return <Navigate to="/unauthorized" replace />;
+    if (!user || user.role !== UserRole.ADMIN) {
+      return (
+        <Navigate
+          to="/unauthorized"
+          state={{
+            message: 'This admin page is restricted to administrator accounts.',
+            requiredRole: [UserRole.ADMIN],
+            attemptedPath: location.pathname,
+          }}
+          replace
+        />
+      );
+    }
 
     if (requiredPermission) {
       const perms = user.permissions;
       const hasRequired = Array.isArray(perms) ? perms.includes(requiredPermission) : true;
-      if (!hasRequired) return <Navigate to="/unauthorized" replace />;
+      if (!hasRequired) {
+        return (
+          <Navigate
+            to="/unauthorized"
+            state={{
+              message: 'Your account does not have permission to access this admin page.',
+              requiredPermission,
+              attemptedPath: location.pathname,
+            }}
+            replace
+          />
+        );
+      }
     }
 
     return <>{children}</>;
@@ -162,9 +187,22 @@ const AdminRoute: React.FC<{ children: React.ReactNode; requiredPermission?: str
 // Lecturer Route Guard
 const LecturerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { data: user, isLoading } = useCurrentUser();
+  const location = useLocation();
     
     if (isLoading) return <LoadingFallback />;
-    if (!user || user.role !== UserRole.LECTURER) return <Navigate to="/unauthorized" replace />;
+    if (!user || user.role !== UserRole.LECTURER) {
+      return (
+        <Navigate
+          to="/unauthorized"
+          state={{
+            message: 'This page is available only to lecturers.',
+            requiredRole: [UserRole.LECTURER],
+            attemptedPath: location.pathname,
+          }}
+          replace
+        />
+      );
+    }
 
     return <>{children}</>;
 };
@@ -172,9 +210,22 @@ const LecturerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 // Class Rep Route Guard
 const ClassRepRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { data: user, isLoading } = useCurrentUser();
+  const location = useLocation();
     
     if (isLoading) return <LoadingFallback />;
-    if (!user || (user.role !== UserRole.CLASS_REP && user.role !== UserRole.ADMIN)) return <Navigate to="/unauthorized" replace />;
+    if (!user || (user.role !== UserRole.CLASS_REP && user.role !== UserRole.ADMIN)) {
+      return (
+        <Navigate
+          to="/unauthorized"
+          state={{
+            message: 'This page is available only to class representatives.',
+            requiredRole: [UserRole.CLASS_REP, UserRole.ADMIN],
+            attemptedPath: location.pathname,
+          }}
+          replace
+        />
+      );
+    }
 
     return <>{children}</>;
 };
@@ -280,7 +331,17 @@ const AppContent: React.FC = () => {
                       <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="analytics" /></LecturerRoute>
                   ) : user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
                       <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="analytics" /></ProtectedRoute>
-                  ) : <Navigate to="/unauthorized" replace />
+                  ) : (
+                    <Navigate
+                      to="/unauthorized"
+                      state={{
+                        message: 'You cannot view analytics for this role.',
+                        requiredRole: [UserRole.STUDENT, UserRole.CLASS_REP, UserRole.LECTURER],
+                        attemptedPath: '/dashboard/analytics',
+                      }}
+                      replace
+                    />
+                  )
               } />
 
               <Route path="courses" element={
@@ -290,7 +351,17 @@ const AppContent: React.FC = () => {
                       <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="courses" /></LecturerRoute>
                   ) : user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
                       <ProtectedRoute><StudentCoursesPage userName={user?.full_name || ''} /></ProtectedRoute>
-                  ) : <Navigate to="/unauthorized" replace />
+                  ) : (
+                    <Navigate
+                      to="/unauthorized"
+                      state={{
+                        message: 'You cannot view courses for this role.',
+                        requiredRole: [UserRole.STUDENT, UserRole.CLASS_REP, UserRole.LECTURER, UserRole.ADMIN],
+                        attemptedPath: '/dashboard/courses',
+                      }}
+                      replace
+                    />
+                  )
               } />
 
               <Route path="sessions/new" element={
@@ -304,7 +375,17 @@ const AppContent: React.FC = () => {
                       <ClassRepRoute><ClassRepDashboard userName={user.full_name} view="timetable" /></ClassRepRoute>
                   ) : user?.role === UserRole.STUDENT ? (
                       <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="timetable" /></ProtectedRoute>
-                  ) : <Navigate to="/unauthorized" replace />
+                  ) : (
+                    <Navigate
+                      to="/unauthorized"
+                      state={{
+                        message: 'You cannot view timetable for this role.',
+                        requiredRole: [UserRole.STUDENT, UserRole.CLASS_REP, UserRole.LECTURER],
+                        attemptedPath: '/dashboard/timetable',
+                      }}
+                      replace
+                    />
+                  )
               } />
 
               {/* Admin Specific Routes */}

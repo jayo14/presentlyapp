@@ -5,6 +5,8 @@ import { UserRole } from '../types';
 interface LocationState {
   message?: string;
   requiredRole?: UserRole[];
+  attemptedPath?: string;
+  requiredPermission?: string;
 }
 
 /**
@@ -52,6 +54,20 @@ export const UnauthorizedPage: React.FC = () => {
             <p className="text-sm font-medium text-muted-foregroundmber-500">
               {state.requiredRole.join(' or ')}
             </p>
+          </div>
+        )}
+
+        {state?.requiredPermission && (
+          <div className="mb-6 p-4 bg-surface/50 border border-outline rounded-lg">
+            <p className="text-sm text-textMuted mb-2">Required permission:</p>
+            <p className="text-sm font-medium text-text">{state.requiredPermission}</p>
+          </div>
+        )}
+
+        {state?.attemptedPath && (
+          <div className="mb-6 p-4 bg-surface/50 border border-outline rounded-lg">
+            <p className="text-sm text-textMuted mb-2">Page:</p>
+            <p className="text-sm font-medium text-text">{state.attemptedPath}</p>
           </div>
         )}
 

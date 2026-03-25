@@ -32,7 +32,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    return (
+      <Navigate
+        to="/unauthorized"
+        state={{
+          message: 'You do not have the required role to view this page.',
+          requiredRole: allowedRoles,
+          attemptedPath: location.pathname,
+        }}
+        replace
+      />
+    );
   }
 
   if (requireEmailVerified && !user.email_verified) {

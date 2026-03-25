@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import secrets
 
 from django.conf import settings
@@ -32,6 +33,9 @@ from institutions.serializers import (
     StaffRoleSerializer,
 )
 from utils.email import send_welcome_email
+from utils.email import send_staff_access_invitation_email
+
+logger = logging.getLogger(__name__)
 
 
 def _admin_or_staff_manager(user) -> bool:
@@ -54,6 +58,33 @@ def _upsert_user_permissions(user: User, selected_codes: list[str], actor: User)
                 'allowed': perm.codename in selected_set,
                 'created_by': actor,
             },
+        )
+
+
+def _send_staff_invite_email(invitation: StaffInvitation, invite_link: str) -> None:
+    inviter_name = invitation.invited_by.full_name if invitation.invited_by else 'Administrator'
+    role_name = invitation.role.name if invitation.role else 'Staff Member'
+    expires_hours = int(getattr(settings, 'STAFF_INVITE_EXPIRY_HOURS', 48))
+
+    try:
+        send_staff_access_invitation_email(
+            to=invitation.email,
+            first_name=invitation.full_name.split(' ')[0],
+            inviter_name=inviter_name,
+            role_name=role_name,
+            invitation_url=invite_link,
+            expires_in_hours=expires_hours,
+        )
+    except Exception:
+        logger.warning(
+            'Falling back to welcome template for staff invitation email',
+            exc_info=True,
+            extra={'email': invitation.email},
+        )
+        send_welcome_email(
+            to=invitation.email,
+            first_name=invitation.full_name.split(' ')[0],
+            dashboard_url=invite_link,
         )
 
 
@@ -172,11 +203,7 @@ def staff_invite_view(request):
     )
 
     invite_link = f"{settings.FRONTEND_URL}/accept-invite?token={invite_token}"
-    send_welcome_email(
-        to=invitation.email,
-        first_name=invitation.full_name.split(' ')[0],
-        dashboard_url=invite_link,
-    )
+    _send_staff_invite_email(invitation, invite_link)
 
     return Response(
         {
@@ -208,11 +235,7 @@ def staff_resend_invite_view(request, invitation_id: int):
     invitation.save(update_fields=['token_hash', 'status', 'expires_at', 'updated_at'])
 
     invite_link = f"{settings.FRONTEND_URL}/accept-invite?token={invite_token}"
-    send_welcome_email(
-        to=invitation.email,
-        first_name=invitation.full_name.split(' ')[0],
-        dashboard_url=invite_link,
-    )
+    _send_staff_invite_email(invitation, invite_link)
 
     return Response({'success': True, 'message': 'Invitation resent successfully.'})
 
