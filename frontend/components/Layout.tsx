@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
+import { hasPermissionCode } from '../services/rbac';
 import { Dock, DockItem } from '@/components/magicui/dock';
 import NotificationInbox from './NotificationInbox';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
@@ -170,6 +171,17 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   };
 
   const getNavGroups = () => {
+    const effectivePermissions = currentUser?.permissions;
+    const canAccess = (permission: string | null) => {
+      if (!permission) {
+        return true;
+      }
+      if (!userRole) {
+        return false;
+      }
+      return hasPermissionCode(userRole, effectivePermissions, permission);
+    };
+
     switch (userRole) {
       case UserRole.ADMIN:
         return [
@@ -182,21 +194,21 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           {
             label: 'Management',
             items: [
-              { id: 'users', icon: Users, label: 'Users' },
-              { id: 'institutions', icon: Building2, label: 'Institutions' },
-              { id: 'courses', icon: BookOpen, label: 'Courses' },
-              { id: 'venues', icon: Map, label: 'Venues & Maps' },
-              { id: 'blog', icon: FileText, label: 'Blog management' },
-            ],
+              { id: 'users', icon: Users, label: 'Users', permission: 'system.users.manage' },
+              { id: 'institutions', icon: Building2, label: 'Institutions', permission: 'system.settings.manage' },
+              { id: 'courses', icon: BookOpen, label: 'Courses', permission: 'courses.view' },
+              { id: 'venues', icon: Map, label: 'Venues & Maps', permission: 'venues.view' },
+              { id: 'blog', icon: FileText, label: 'Blog management', permission: 'blog.view' },
+            ].filter((item) => canAccess(item.permission)),
           },
           {
             label: 'System',
             items: [
-              { id: 'logs', icon: ShieldAlert, label: 'Audit Logs' },
-              { id: 'notifications', icon: Bell, label: 'Notifications' },
-            ],
+              { id: 'logs', icon: ShieldAlert, label: 'Audit Logs', permission: 'system.analytics.view' },
+              { id: 'notifications', icon: Bell, label: 'Notifications', permission: null },
+            ].filter((item) => canAccess(item.permission)),
           },
-        ];
+        ].filter((group) => group.items.length > 0);
       case UserRole.LECTURER:
         return [
           {

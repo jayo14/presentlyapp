@@ -66,6 +66,7 @@ export interface UserProfile {
   total_sessions_count?: number;
   attendance_rate?: number;
   completed_courses_count?: number;
+  permissions?: string[];
 }
 
 export interface AuthResponse {
@@ -79,6 +80,7 @@ export interface AuthResponse {
     onboarding_complete: boolean;
     email_verified?: boolean;
     avatar_url?: string;
+    permissions?: string[];
   };
   tokens?: {
     access: string;
