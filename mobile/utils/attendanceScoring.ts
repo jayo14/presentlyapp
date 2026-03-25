@@ -19,6 +19,7 @@ import { LocationPayload } from '../hooks/useLocationVerification';
 /** Backend-supplied description of the current attendance session. */
 export interface SessionConfig {
   sessionId: string;
+  sessionCode: string; // Added for check-in identification
   lecturerCoordinates: { lat: number; lng: number };
   /** Radius within which a student is considered "in range" (e.g. 50 m). */
   allowedRadiusMeters: number;
