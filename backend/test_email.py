@@ -26,7 +26,7 @@ def test_template_email():
     
     payload = {
         "from": settings.DEFAULT_FROM_EMAIL,
-        "to": "getpresently.io@gmail.com",
+        "to": "johnayobami77@proton.me",
         "subject": "✦ Welcome to Presently (REST Revert)",
         "template": {
             "id": template_id,
