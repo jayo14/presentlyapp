@@ -8,110 +8,118 @@ from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
 
-import resend
+import requests
 
-def _send_smtp_email(
+def _send_resend_template_email(
     *,
     to_email: str,
     subject: str,
-    template_name: Optional[str] = None,
-    context: Optional[Dict[str, Any]] = None,
-    html_content: Optional[str] = None,
+    template_name: str,
+    variables: Optional[Dict[str, Any]] = None,
 ) -> bool:
-    """Send an email using Resend API (or console in DEBUG)."""
+    """Send an email using Resend API directly (ensuring template support)."""
     try:
-        # We need the HTML content if we're falling back to local send (DEBUG) 
-        # or if the template isn't mapped in RESEND_TEMPLATE_MAP
         template_id = getattr(settings, 'RESEND_TEMPLATE_MAP', {}).get(template_name)
-        
-        # If no template_id is found, or we're in DEBUG mode, we must render locally
-        if html_content is None and (not template_id or settings.DEBUG):
-            if not template_name:
-                raise ValueError("template_name is required when html_content is not provided")
-            html_content = render_to_string(template_name, context or {})
+        api_key = getattr(settings, 'RESEND_API_KEY', None)
 
-        if settings.DEBUG or not getattr(settings, 'RESEND_API_KEY', None):
-            # For local testing, or if Resend is missing, just print to console
-            text_content = strip_tags(html_content) if html_content else "Check Resend Template Dashboard"
+        if settings.DEBUG or not api_key:
+            logger.info("DEBUG: Email to %s via template %s", to_email, template_id or template_name)
             message = EmailMultiAlternatives(
                 subject=subject,
-                body=text_content,
+                body=f"E-mail to {to_email} via Resend Template: {template_id or template_name}\nVars: {variables}",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[to_email],
             )
-            if html_content:
-                message.attach_alternative(html_content, "text/html")
             message.send(fail_silently=False)
             return True
-        else:
-            # Send using Resend API
-            resend.api_key = settings.RESEND_API_KEY
-            payload = {
-                "from": settings.DEFAULT_FROM_EMAIL,
-                "to": to_email,
-                "subject": subject,
-            }
-            
-            if template_id:
-                # Use Resend Templates API!
-                payload["template"] = {
-                    "id": template_id,
-                    "variables": context or {}
-                }
-            else:
-                # Fallback to local HTML payload
-                payload["html"] = html_content
 
-            r = resend.Emails.send(payload)
-            logger.info("Resend email sent to %s, id: %s", to_email, r.get("id"))
+        # Call Resend REST API directly to ensure template_id support
+        url = "https://api.resend.com/emails"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "from": settings.DEFAULT_FROM_EMAIL,
+            "to": to_email,
+            "subject": subject,
+            "template": {
+                "id": template_id,
+                "variables": variables or {}
+            }
+        }
+
+        response = requests.post(url, headers=headers, json=payload)
+        
+        if response.status_code in [200, 201, 202]:
+            logger.info("Resend Template email sent to %s, res: %s", to_email, response.json())
             return True
+        else:
+            logger.error("Resend API error (%s): %s", response.status_code, response.text)
+            return False
 
     except Exception as exc:
-        logger.error("Email sending failed for %s: %s", to_email, exc, exc_info=True)
+        logger.error("Template sending failed for %s: %s", to_email, exc, exc_info=True)
         return False
 
 
 class EmailNotificationService:
-    """Service for sending email notifications via SMTP."""
+    """Service for sending email notifications solely via Resend Hosted Templates."""
 
     @staticmethod
     def send_email_verification_otp(user_id: str, user_email: str, user_name: str, otp_code: str) -> bool:
-        """Send email verification OTP notification."""
-        return _send_smtp_email(
+        """Send email verification OTP notification using Resend Template."""
+        return _send_resend_template_email(
             to_email=user_email,
             subject="Welcome to Presently - Verify Your Email",
             template_name="emails/welcome_otp.html",
-            context={"user": {"full_name": user_name}, "otp_code": otp_code},
+            variables={
+                "first_name": user_name.split(' ')[0], 
+                "otp_code": otp_code,
+                "expiry_minutes": "10",
+                "verify_url": f"{settings.FRONTEND_URL}/verify-email"
+            },
         )
 
     @staticmethod
     def send_otp_resend(user_id: str, user_email: str, user_name: str, otp_code: str) -> bool:
-        """Send OTP resend notification."""
-        return _send_smtp_email(
+        """Send OTP resend notification using Resend Template."""
+        return _send_resend_template_email(
             to_email=user_email,
             subject="Your New Verification Code - Presently",
             template_name="emails/welcome_otp.html",
-            context={"user": {"full_name": user_name}, "otp_code": otp_code},
+            variables={
+                "first_name": user_name.split(' ')[0], 
+                "otp_code": otp_code,
+                "expiry_minutes": "10",
+                "resend_url": f"{settings.FRONTEND_URL}/resend-otp"
+            },
         )
 
     @staticmethod
     def send_password_reset(user_id: str, user_email: str, user_name: str, reset_link: str) -> bool:
-        """Send password reset email notification."""
-        return _send_smtp_email(
+        """Send password reset email notification using Resend Template."""
+        return _send_resend_template_email(
             to_email=user_email,
             subject="Password Reset Request - Presently",
             template_name="emails/password_reset.html",
-            context={"user": {"full_name": user_name}, "reset_link": reset_link},
+            variables={
+                "first_name": user_name.split(' ')[0], 
+                "reset_link": reset_link
+            },
         )
 
     @staticmethod
     def send_password_reset_otp(user_id: str, user_email: str, user_name: str, otp_code: str) -> bool:
-        """Send password reset OTP verification notification."""
-        return _send_smtp_email(
+        """Send password reset OTP notification using Resend Template."""
+        return _send_resend_template_email(
             to_email=user_email,
             subject="Password Reset Verification Code - Presently",
             template_name="emails/password_reset_otp.html",
-            context={"user": {"full_name": user_name}, "otp_code": otp_code},
+            variables={
+                "first_name": user_name.split(' ')[0], 
+                "otp_code": otp_code
+            },
         )
 
     @staticmethod
@@ -122,40 +130,18 @@ class EmailNotificationService:
         device_info: Dict[str, Any],
         ip_address: str,
     ) -> bool:
-        """Send new device login alert notification."""
-        return _send_smtp_email(
+        """Send new device login alert using Resend Template."""
+        return _send_resend_template_email(
             to_email=user_email,
             subject="New Login Detected - Presently",
             template_name="emails/new_device_alert.html",
-            context={
-                "user": {"full_name": user_name},
-                "device_type": device_info.get("device_type", "Unknown"),
-                "device_name": device_info.get("device_name", "Unknown"),
+            variables={
+                "first_name": user_name.split(' ')[0],
+                "device_name": device_info.get("device_name", "Unknown Device"),
                 "browser": device_info.get("browser", "Unknown"),
                 "os": device_info.get("os", "Unknown"),
                 "ip_address": ip_address,
-                "login_time": device_info.get("login_time", ""),
-            },
-        )
-
-    @staticmethod
-    def send_user_invitation(
-        user_email: str,
-        user_name: str,
-        inviter_name: str,
-        invitation_link: str,
-        institution_name: str,
-    ) -> bool:
-        """Send user invitation email notification."""
-        return _send_smtp_email(
-            to_email=user_email,
-            subject=f"You're Invited to Join {institution_name} on Presently",
-            template_name="emails/user_invitation.html",
-            context={
-                "user_name": user_name,
-                "inviter_name": inviter_name,
-                "invitation_link": invitation_link,
-                "institution_name": institution_name,
+                "login_time": device_info.get("login_time", "Just now"),
             },
         )
 
@@ -169,13 +155,13 @@ class EmailNotificationService:
         end_time: str,
         venue_name: str,
     ) -> bool:
-        """Send attendance session created notification."""
-        return _send_smtp_email(
+        """Send attendance session created alert using Resend Template."""
+        return _send_resend_template_email(
             to_email=user_email,
-            subject=f"New Session Started: {course_code} - {course_name}",
+            subject=f"New Session Started: {course_code}",
             template_name="emails/attendance_session_created.html",
-            context={
-                "user_name": user_name,
+            variables={
+                "first_name": user_name.split(' ')[0],
                 "course_code": course_code,
                 "course_name": course_name,
                 "start_time": start_time,
@@ -194,17 +180,18 @@ class EmailNotificationService:
         attendance_status: str,
         check_in_time: str,
     ) -> bool:
-        """Send attendance marked confirmation notification."""
-        return _send_smtp_email(
+        """Send attendance marked confirmation using Resend Template."""
+        return _send_resend_template_email(
             to_email=user_email,
             subject=f"Attendance Confirmed: {course_code}",
             template_name="emails/attendance_marked.html",
-            context={
-                "user_name": user_name,
+            variables={
+                "first_name": user_name.split(' ')[0],
                 "course_code": course_code,
                 "course_name": course_name,
                 "attendance_status": attendance_status,
                 "check_in_time": check_in_time,
+                "dashboard_url": f"{settings.FRONTEND_URL}/dashboard",
             },
         )
 
@@ -214,13 +201,15 @@ class EmailNotificationService:
         recipients: List[Dict[str, str]],
         payload: Dict[str, Any],
     ) -> bool:
-        """Send bulk notifications to multiple users via email."""
+        """Bulk sending using Resend Templates."""
+        # Note: Resend bulk API is better for production, but for now we loop
         results = [
-            _send_smtp_email(
+            _send_resend_template_email(
                 to_email=r.get("email", ""),
                 subject=f"Notification: {notification_type}",
                 template_name="emails/notification_generic.html",
-                context={
+                variables={
+                    "first_name": r.get("name", "Student").split(' ')[0],
                     "notification_type": notification_type,
                     "message": payload.get("message", ""),
                     "action_url": payload.get("action_url"),
@@ -230,6 +219,27 @@ class EmailNotificationService:
             for r in recipients
         ]
         return all(results)
+
+    @staticmethod
+    def send_user_invitation(
+        user_email: str,
+        user_name: str,
+        inviter_name: str,
+        invitation_link: str,
+        institution_name: str,
+    ) -> bool:
+        """Send user invitation email notification using Resend Template."""
+        return _send_resend_template_email(
+            to_email=user_email,
+            subject=f"You're Invited to Join {institution_name} on Presently",
+            template_name="emails/user_invitation.html",
+            variables={
+                "first_name": user_name.split(' ')[0],
+                "inviter_name": inviter_name,
+                "invitation_link": invitation_link,
+                "institution_name": institution_name,
+            },
+        )
 
     @staticmethod
     def is_available() -> bool:
@@ -295,4 +305,4 @@ def send_attendance_marked(
 ) -> bool:
     return EmailNotificationService.send_attendance_marked(
         user_email, user_name, course_code, course_name, attendance_status, check_in_time
-    )
+    )

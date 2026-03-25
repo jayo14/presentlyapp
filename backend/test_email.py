@@ -1,52 +1,49 @@
 import os
+import django
 import sys
+import requests
+import json
 
 # Append project dir so django finds settings
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'presently.settings')
-
-import django
 django.setup()
 
-import resend
 from django.conf import settings
 
-def test_email():
-    print("Testing 'welcome_email' template using Resend API...")
-    
-    # Force Resend API to be used regardless of DEBUG setting
-    resend.api_key = settings.RESEND_API_KEY
-    
+def test_template_email():
     template_id = getattr(settings, 'RESEND_TEMPLATE_MAP', {}).get('emails/welcome_email.html')
+    api_key = settings.RESEND_API_KEY
     
-    if not template_id:
-        print("Error: 'emails/welcome_email.html' is not mapped in RESEND_TEMPLATE_MAP.")
-        return
-        
     print(f"Discovered Template UUID: {template_id}")
+    print("Testing via Direct REST API call...")
+    
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
     
     payload = {
         "from": settings.DEFAULT_FROM_EMAIL,
         "to": "getpresently.io@gmail.com",
-        "subject": "✦ Welcome to Presently",
+        "subject": "✦ Welcome to Presently (REST Revert)",
         "template": {
             "id": template_id,
             "variables": {
-                "user": {
-                    "full_name": "Ayobami"
-                },
+                "first_name": "Ayobami",
+                "otp_code": "123456",
                 "dashboard_url": "https://getpresently.com.ng/dashboard",
                 "support_url": "https://getpresently.com.ng/support"
             }
         }
     }
     
-    try:
-        print("\nSending through Resend...")
-        response = resend.Emails.send(payload)
-        print(f"Success! Resend returned: {response}")
-    except Exception as e:
-        print(f"Failed to send email via Resend: {e}")
+    print(f"Sending payload to {url}...")
+    response = requests.post(url, headers=headers, json=payload)
+    
+    print(f"Status: {response.status_code}")
+    print(f"Response: {response.text}")
 
-if __name__ == '__main__':
-    test_email()
+if __name__ == "__main__":
+    test_template_email()
