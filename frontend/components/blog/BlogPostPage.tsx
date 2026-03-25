@@ -227,7 +227,7 @@ export const BlogPostPage: React.FC = () => {
                     return (
                       <h1
                         id={id}
-                        className="group scroll-mt-28 sm:scroll-mt-32 mt-10 sm:mt-14 md:mt-16 mb-4 sm:mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center gap-2 font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-text"
+                        className="group scroll-mt-28 sm:scroll-mt-32 mt-10 sm:mt-14 md:mt-16 mb-4 sm:mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center gap-2 font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-text break-words"
                         {...props}
                       >
                         <span className="flex-1">{children}</span>
@@ -246,7 +246,7 @@ export const BlogPostPage: React.FC = () => {
                     return (
                       <h2
                         id={id}
-                        className="group scroll-mt-28 sm:scroll-mt-32 mt-8 sm:mt-12 md:mt-14 mb-4 sm:mb-5 md:mb-6 flex flex-col sm:flex-row sm:items-center gap-2 border-b border-outline/10 pb-2 sm:pb-3 font-headline text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-text"
+                        className="group scroll-mt-28 sm:scroll-mt-32 mt-8 sm:mt-12 md:mt-14 mb-4 sm:mb-5 md:mb-6 flex flex-col sm:flex-row sm:items-center gap-2 border-b border-outline/10 pb-2 sm:pb-3 font-headline text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-text break-words"
                         {...props}
                       >
                         <span className="flex-1">{children}</span>
@@ -265,7 +265,7 @@ export const BlogPostPage: React.FC = () => {
                     return (
                       <h3
                         id={id}
-                        className="group scroll-mt-28 sm:scroll-mt-32 mt-6 sm:mt-8 md:mt-10 mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center gap-2 font-headline text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-text"
+                        className="group scroll-mt-28 sm:scroll-mt-32 mt-6 sm:mt-8 md:mt-10 mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center gap-2 font-headline text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-text break-words"
                         {...props}
                       >
                         <span className="flex-1">{children}</span>
@@ -280,7 +280,7 @@ export const BlogPostPage: React.FC = () => {
                     );
                   },
                   p: ({ children, ...props }: any) => (
-                    <p className="mb-4 sm:mb-5 md:mb-6 leading-7 sm:leading-8 text-[1.02rem] sm:text-[1.06rem] text-textMuted" {...props}>
+                    <p className="mb-4 sm:mb-5 md:mb-6 leading-7 sm:leading-8 text-[1.02rem] sm:text-[1.06rem] text-textMuted break-words" {...props}>
                       {children}
                     </p>
                   ),
@@ -292,7 +292,7 @@ export const BlogPostPage: React.FC = () => {
                         {...props}
                         target={isExternal ? '_blank' : undefined}
                         rel={isExternal ? 'noopener noreferrer' : undefined}
-                        className="font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary"
+                        className="font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary break-words"
                       >
                         {children}
                       </a>
@@ -309,13 +309,13 @@ export const BlogPostPage: React.FC = () => {
                     </ol>
                   ),
                   li: ({ children, ...props }: any) => (
-                    <li className="pl-1 text-textMuted" {...props}>
+                    <li className="pl-1 text-textMuted break-words" {...props}>
                       {children}
                     </li>
                   ),
                   blockquote: ({ children, ...props }: any) => (
                     <blockquote
-                      className="my-6 sm:my-8 rounded-xl sm:rounded-2xl border-l-4 border-primary bg-surfaceHigh/40 px-4 sm:px-6 py-4 sm:py-5 text-[1.02rem] sm:text-[1.05rem] italic text-text"
+                      className="my-6 sm:my-8 rounded-xl sm:rounded-2xl border-l-4 border-primary bg-surfaceHigh/40 px-4 sm:px-6 py-4 sm:py-5 text-[1.02rem] sm:text-[1.05rem] italic text-text break-words"
                       {...props}
                     >
                       {children}
@@ -334,12 +334,12 @@ export const BlogPostPage: React.FC = () => {
                     </thead>
                   ),
                   th: ({ children, ...props }: any) => (
-                    <th className="border-b border-outline/10 px-3 sm:px-4 py-2 sm:py-3 text-left font-black uppercase tracking-wide text-[8px] sm:text-xs text-text" {...props}>
+                    <th className="border-b border-outline/10 px-3 sm:px-4 py-2 sm:py-3 text-left font-black uppercase tracking-wide text-[8px] sm:text-xs text-text break-words" {...props}>
                       {children}
                     </th>
                   ),
                   td: ({ children, ...props }: any) => (
-                    <td className="border-b border-outline/5 px-3 sm:px-4 py-2 sm:py-3 align-top text-textMuted" {...props}>
+                    <td className="border-b border-outline/5 px-3 sm:px-4 py-2 sm:py-3 align-top text-textMuted break-words" {...props}>
                       {children}
                     </td>
                   ),
@@ -356,7 +356,7 @@ export const BlogPostPage: React.FC = () => {
                     const isInline = !className;
                     if (isInline) {
                       return (
-                        <code className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[0.9em] text-primary" {...props}>
+                        <code className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[0.9em] text-primary break-words inline-block max-w-full" {...props}>
                           {children}
                         </code>
                       );
@@ -415,7 +415,7 @@ export const BlogPostPage: React.FC = () => {
                           })()}
                         </button>
                       </div>
-                      <pre className="overflow-x-auto p-3 sm:p-5 text-xs sm:text-sm leading-relaxed" {...props}>
+                      <pre className="overflow-x-auto p-3 sm:p-5 text-xs sm:text-sm leading-relaxed break-words whitespace-pre-wrap word-break-break-word" {...props}>
                         {children}
                       </pre>
                     </div>
