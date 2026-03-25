@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, ClipboardPaste, Loader2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SEO } from '../SEO';
 import { useVerifyEmailOTP, useResendEmailVerification } from '../../hooks/useAuth';
@@ -74,6 +74,23 @@ export const OTPVerification: React.FC = () => {
     inputRefs.current[nextIndex]?.focus();
   };
 
+  const handlePasteFromClipboard = async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      const digits = clipboardText.replace(/\D/g, '').slice(0, 6);
+      if (!digits) return;
+
+      const newOtp = ['', '', '', '', '', ''];
+      for (let i = 0; i < digits.length; i += 1) {
+        newOtp[i] = digits[i];
+      }
+      setOtp(newOtp);
+      inputRefs.current[Math.min(digits.length, 5)]?.focus();
+    } catch {
+      // Clipboard API may be blocked by browser permissions.
+    }
+  };
+
   const handleVerify = () => {
     const otpCode = otp.join('');
     if (otpCode.length === 6 && email) {
@@ -119,9 +136,9 @@ export const OTPVerification: React.FC = () => {
         <ArrowLeft size={20} />
       </button>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md rounded-2xl border border-outline bg-surface shadow-xl p-6 md:p-8">
         {/* Header */}
-        <div className="mb-12 text-center">
+        <div className="mb-10 text-center">
           <h1 className="font-headline text-4xl font-bold text-text mb-4">
             Verify your {email ? 'email' : 'phone number'}
           </h1>
@@ -130,7 +147,7 @@ export const OTPVerification: React.FC = () => {
         </div>
 
         {/* OTP Inputs */}
-        <div className="flex gap-3 justify-center mb-8" onPaste={handlePaste}>
+        <div className="flex gap-3 justify-center mb-4" onPaste={handlePaste}>
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -142,13 +159,24 @@ export const OTPVerification: React.FC = () => {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className={[
-                'w-12 h-14 text-center text-2xl font-bold bg-surfaceHigh rounded-xl text-text',
+                'w-12 h-14 text-center text-2xl font-bold bg-card rounded-xl text-text',
                 'border-outline transition-all focus:outline-none focus:ring-2 focus:ring-primary',
                 digit ? 'border-primary' : 'border-outline focus:border-primary',
               ].join(' ')}
               aria-label={`OTP digit ${index + 1}`}
             />
           ))}
+        </div>
+
+        <div className="flex justify-center mb-8">
+          <button
+            type="button"
+            onClick={handlePasteFromClipboard}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-card text-text hover:bg-surfaceHigh transition-colors"
+          >
+            <ClipboardPaste size={16} />
+            Paste code
+          </button>
         </div>
 
         {/* Timer */}
@@ -174,8 +202,8 @@ export const OTPVerification: React.FC = () => {
 
         {/* Error Display */}
         {verifyMutation.isError && (
-          <div className="p-3 bg-red-500/10 border border-red-500 rounded-lg mb-4">
-            <p className="text-sm text-red-400 text-center">
+          <div className="p-3 bg-red-100 dark:bg-red-950/40 border border-red-500 rounded-lg mb-4">
+            <p className="text-sm text-red-700 dark:text-red-300 text-center">
               Invalid code. Please try again.
             </p>
           </div>

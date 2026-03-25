@@ -213,7 +213,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'full_name', 'name', 'role', 'avatar_url', 'onboarding_complete', 'signup_method',
+            'id', 'email', 'full_name', 'name', 'role', 'avatar_url', 'email_verified', 'onboarding_complete', 'signup_method',
             'institution', 'institution_name', 'college', 'college_name',
             'phone_number', 'matric_number', 'department', 'department_name', 'level',
             'staff_id', 'courses', 'assigned_lecturer', 'signature_image',

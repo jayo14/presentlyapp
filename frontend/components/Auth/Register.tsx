@@ -23,7 +23,9 @@ export const Register: React.FC = () => {
 
   useEffect(() => {
     if (user && !isLoading) {
-      if (!user.onboarding_complete) {
+      if (!user.email_verified) {
+        navigate(`/otp-verification?email=${encodeURIComponent(user.email)}`, { replace: true });
+      } else if (!user.onboarding_complete) {
         navigate('/onboarding', { replace: true });
       } else {
         navigate(redirectTo, { replace: true });

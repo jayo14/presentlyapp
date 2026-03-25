@@ -27,7 +27,9 @@ export const useRegister = () => {
     onSuccess: (response: AuthResponse) => {
       if (response.success && response.user) {
         queryClient.setQueryData(queryKeys.currentUser, response.user);
-        if (response.requires_onboarding) {
+        if (response.requires_email_verification || !response.user.email_verified) {
+          navigate(`/otp-verification?email=${encodeURIComponent(response.user.email)}`);
+        } else if (response.requires_onboarding) {
           navigate('/onboarding');
         } else {
           navigate('/dashboard');
@@ -46,10 +48,13 @@ export const useLogin = () => {
     mutationFn: (data: LoginData) => authApi.login(data),
     onSuccess: (response: AuthResponse) => {
       if (response.success && response.user) {
-        queryClient.setQueryData(queryKeys.currentUser, response.user);
+        const user = response.user;
+        queryClient.setQueryData(queryKeys.currentUser, user);
         // Small delay to show loading state during navigation
         setTimeout(() => {
-          if (response.requires_onboarding) {
+          if (response.requires_email_verification || !user.email_verified) {
+            navigate(`/otp-verification?email=${encodeURIComponent(user.email)}`);
+          } else if (response.requires_onboarding) {
             navigate('/onboarding');
           } else {
             navigate('/dashboard');
@@ -71,7 +76,9 @@ export const useGoogleAuth = () => {
     onSuccess: (response: AuthResponse) => {
       if (response.success && response.user) {
         queryClient.setQueryData(queryKeys.currentUser, response.user);
-        if (response.requires_onboarding) {
+        if (response.requires_email_verification || !response.user.email_verified) {
+          navigate(`/otp-verification?email=${encodeURIComponent(response.user.email)}`, { replace: true });
+        } else if (response.requires_onboarding) {
           navigate('/onboarding', { replace: true });
         } else {
           navigate('/dashboard', { replace: true });
@@ -167,7 +174,9 @@ export const useVerifyEmailOTP = () => {
         queryClient.setQueryData(queryKeys.currentUser, response.user);
         
         // Navigate based on onboarding status
-        if (response.requires_onboarding) {
+        if (response.requires_email_verification || !response.user.email_verified) {
+          navigate(`/otp-verification?email=${encodeURIComponent(response.user.email)}`);
+        } else if (response.requires_onboarding) {
           navigate('/onboarding');
         } else {
           navigate('/dashboard');
