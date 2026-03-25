@@ -11,6 +11,17 @@ from .views import (
     CourseViewSet, CourseEnrollmentViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet,
     VenueViewSet, TimetableViewSet, student_dashboard_summary, lecturer_dashboard_summary, dashboard_venues_head
 )
+from .staff_views import (
+    staff_accept_invite_view,
+    staff_invitations_view,
+    staff_invite_view,
+    staff_permissions_catalog_view,
+    staff_profiles_view,
+    staff_resend_invite_view,
+    staff_revoke_invite_view,
+    staff_roles_view,
+    staff_update_view,
+)
 
 # Create router for ViewSets
 router = DefaultRouter()
@@ -55,6 +66,17 @@ urlpatterns = [
     path('dashboard/student/', student_dashboard_summary, name='student-dashboard-summary'),
     path('dashboard/lecturer/', lecturer_dashboard_summary, name='lecturer-dashboard-summary'),
     path('dashboard/venues/', dashboard_venues_head, name='dashboard-venues-head'),
+
+    # Staff management & RBAC endpoints
+    path('rbac/permissions/', staff_permissions_catalog_view, name='rbac-permissions-catalog'),
+    path('rbac/roles/', staff_roles_view, name='rbac-roles'),
+    path('staff/', staff_profiles_view, name='staff-profiles'),
+    path('staff/<uuid:user_id>/', staff_update_view, name='staff-update'),
+    path('staff/invitations/', staff_invitations_view, name='staff-invitations'),
+    path('staff/invitations/invite/', staff_invite_view, name='staff-invite'),
+    path('staff/invitations/<int:invitation_id>/resend/', staff_resend_invite_view, name='staff-invite-resend'),
+    path('staff/invitations/<int:invitation_id>/revoke/', staff_revoke_invite_view, name='staff-invite-revoke'),
+    path('auth/staff-invitations/accept/', staff_accept_invite_view, name='staff-accept-invite'),
     
     # Include router URLs
     path('', include(router.urls)),

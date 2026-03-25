@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
-    Attendance, UserRole, Venue, Timetable, AuditLog
+    Attendance, UserRole, Venue, Timetable, AuditLog,
+    RBACPermission, StaffRole, RolePermission, StaffProfile, UserPermission, StaffInvitation
 )
 
 
@@ -209,6 +210,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     college_name = serializers.CharField(source='college.name', read_only=True)
     department_name = serializers.CharField(source='department.name', read_only=True)
     name = serializers.CharField(source='full_name', read_only=True)  # Add 'name' field for frontend compatibility
+    permissions = serializers.SerializerMethodField()
     
     class Meta:
         model = User
@@ -217,10 +219,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'institution', 'institution_name', 'college', 'college_name',
             'phone_number', 'matric_number', 'department', 'department_name', 'level',
             'staff_id', 'courses', 'assigned_lecturer', 'signature_image',
-            'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone',
+            'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone', 'permissions',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'email', 'created_at', 'updated_at']
+
+    def get_permissions(self, obj):
+        from .rbac import get_user_effective_permissions
+
+        return get_user_effective_permissions(obj)
 
 
 class OnboardingSerializer(serializers.ModelSerializer):
@@ -527,3 +534,64 @@ class AuditLogSerializer(serializers.ModelSerializer):
         model = AuditLog
         fields = '__all__'
         read_only_fields = ['timestamp']
+            'enabled_by_default', 'created_at', 'updated_at'
+        ]
+
+
+class StaffRoleSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = StaffRole
+        fields = ['id', 'name', 'slug', 'description', 'is_system', 'is_active', 'permissions']
+
+    def get_permissions(self, obj):
+        return list(
+            obj.role_permissions.select_related('permission').values_list('permission__codename', flat=True)
+        )
+
+
+class StaffProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.UUIDField(source='user.id', read_only=True)
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    role_name = serializers.CharField(source='role.name', read_only=True)
+    role_slug = serializers.CharField(source='role.slug', read_only=True)
+    last_active = serializers.DateTimeField(source='last_active_at', read_only=True)
+
+    class Meta:
+        model = StaffProfile
+        fields = [
+            'id', 'user_id', 'full_name', 'email', 'status', 'role', 'role_name', 'role_slug',
+            'invited_at', 'invitation_accepted_at', 'last_active', 'deactivated_at',
+            'created_at', 'updated_at'
+        ]
+
+
+class StaffInvitationSerializer(serializers.ModelSerializer):
+    role_name = serializers.CharField(source='role.name', read_only=True)
+
+    class Meta:
+        model = StaffInvitation
+        fields = [
+            'id', 'email', 'full_name', 'role', 'role_name', 'custom_permissions', 'status', 'expires_at',
+            'accepted_at', 'revoked_at', 'created_at', 'updated_at'
+        ]
+
+
+class StaffInviteRequestSerializer(serializers.Serializer):
+    full_name = serializers.CharField(max_length=200)
+    email = serializers.EmailField()
+    role_id = serializers.IntegerField(required=False, allow_null=True)
+    permissions = serializers.ListField(child=serializers.CharField(), required=False)
+
+
+class StaffAcceptInviteSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=256)
+    password = serializers.CharField(min_length=8, max_length=128)
+
+
+class StaffPermissionUpdateSerializer(serializers.Serializer):
+    role_id = serializers.IntegerField(required=False, allow_null=True)
+    permissions = serializers.ListField(child=serializers.CharField(), required=False)
+    status = serializers.ChoiceField(choices=StaffProfile.STATUS_CHOICES, required=False)

@@ -206,6 +206,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     profile_image = models.URLField(max_length=500, blank=True, null=True, help_text="User's profile picture URL")
     cover_image = models.URLField(max_length=500, blank=True, null=True, help_text="User's cover/banner image URL")
     onboarding_complete = models.BooleanField(default=False)
+    invited_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='invited_users')
     
     # Email verification
     email_verified = models.BooleanField(default=False)
@@ -819,3 +820,153 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.user.email if self.user else 'System'} - {self.action} - {self.timestamp}"
+
+
+class RBACPermission(models.Model):
+    """Atomic permission with a scalable resource.action codename."""
+    codename = models.CharField(max_length=120, unique=True)  # e.g. venues.create
+    name = models.CharField(max_length=200)
+    group = models.CharField(max_length=120)
+    description = models.TextField(blank=True)
+    is_dangerous = models.BooleanField(default=False)
+    enabled_by_default = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'rbac_permissions'
+        indexes = [
+            models.Index(fields=['codename']),
+            models.Index(fields=['group']),
+        ]
+        ordering = ['group', 'codename']
+
+    def __str__(self):
+        return self.codename
+
+
+class StaffRole(models.Model):
+    """Role template that bundles default permissions for staff members."""
+    name = models.CharField(max_length=120, unique=True)
+    slug = models.SlugField(max_length=140, unique=True)
+    description = models.TextField(blank=True)
+    is_system = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'staff_roles'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class RolePermission(models.Model):
+    """Through model for role -> permission mappings."""
+    role = models.ForeignKey(StaffRole, on_delete=models.CASCADE, related_name='role_permissions')
+    permission = models.ForeignKey(RBACPermission, on_delete=models.CASCADE, related_name='role_permissions')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'role_permissions'
+        unique_together = [['role', 'permission']]
+        indexes = [
+            models.Index(fields=['role']),
+            models.Index(fields=['permission']),
+        ]
+
+
+class StaffProfile(models.Model):
+    """Staff-specific status and role assignment for users."""
+    STATUS_PENDING = 'PENDING'
+    STATUS_ACTIVE = 'ACTIVE'
+    STATUS_SUSPENDED = 'SUSPENDED'
+    STATUS_REVOKED = 'REVOKED'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_ACTIVE, 'Active'),
+        (STATUS_SUSPENDED, 'Suspended'),
+        (STATUS_REVOKED, 'Revoked'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='staff_profile')
+    role = models.ForeignKey(StaffRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='staff_profiles')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    invited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='staff_invited_profiles')
+    invited_at = models.DateTimeField(null=True, blank=True)
+    invitation_accepted_at = models.DateTimeField(null=True, blank=True)
+    last_active_at = models.DateTimeField(null=True, blank=True)
+    deactivated_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'staff_profiles'
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['role']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} ({self.status})"
+
+
+class UserPermission(models.Model):
+    """Direct per-user permission override. allowed=False explicitly denies."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rbac_user_permissions')
+    permission = models.ForeignKey(RBACPermission, on_delete=models.CASCADE, related_name='user_overrides')
+    allowed = models.BooleanField(default=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='permission_changes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'user_permissions'
+        unique_together = [['user', 'permission']]
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['permission']),
+            models.Index(fields=['allowed']),
+        ]
+
+
+class StaffInvitation(models.Model):
+    """Tokenized invitation flow for staff onboarding."""
+    STATUS_PENDING = 'PENDING'
+    STATUS_ACCEPTED = 'ACCEPTED'
+    STATUS_REVOKED = 'REVOKED'
+    STATUS_EXPIRED = 'EXPIRED'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_ACCEPTED, 'Accepted'),
+        (STATUS_REVOKED, 'Revoked'),
+        (STATUS_EXPIRED, 'Expired'),
+    ]
+
+    email = models.EmailField()
+    full_name = models.CharField(max_length=200)
+    role = models.ForeignKey(StaffRole, on_delete=models.SET_NULL, null=True, blank=True, related_name='invitations')
+    custom_permissions = models.JSONField(blank=True, null=True)
+    token_hash = models.CharField(max_length=128, unique=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    invited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='staff_invitations_sent')
+    invited_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='staff_invitations_received')
+    expires_at = models.DateTimeField()
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'staff_invitations'
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['status']),
+            models.Index(fields=['expires_at']),
+        ]
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.email} ({self.status})"
