@@ -9,6 +9,9 @@ from accounts.models import UserDevice
 from .serializers import AttendanceSerializer
 from .geolocation_utils import verify_location, calculate_distance
 from utils.email import send_attendance_confirmed_email
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Anti-spoofing thresholds (must match frontend constants)
 _MAX_ACCURACY_METERS = 40.0
@@ -104,6 +107,29 @@ def perform_attendance_check_in(request, session):
     """
     Standardized attendance check-in logic with weighted confidence score system.
     """
+    # ========== PHASE 1: DEBUG LOGGING ==========
+    logger.warning("=== CHECK-IN DEBUG ===")
+    logger.warning(f"REQUEST USER: {request.user}")
+    logger.warning(f"IS AUTHENTICATED: {request.user.is_authenticated}")
+    logger.warning(f"AUTH HEADER: {request.META.get('HTTP_AUTHORIZATION', 'MISSING')}")
+    logger.warning(f"USER ROLE: {getattr(request.user, 'role', 'NO ROLE ATTR')}")
+    logger.warning(f"USER ID: {request.user.id if request.user.is_authenticated else 'N/A'}")
+    logger.warning(f"USER EMAIL: {getattr(request.user, 'email', 'NO EMAIL ATTR')}")
+    logger.warning(f"SESSION CODE: {session.session_code}")
+    logger.warning(f"SESSION COURSE: {session.course}")
+    
+    # Check enrollment status
+    is_enrolled = False
+    if request.user.is_authenticated:
+        is_enrolled = CourseEnrollment.objects.filter(
+            student=request.user,
+            course=session.course,
+            is_active=True,
+        ).exists()
+    logger.warning(f"IS ENROLLED: {is_enrolled}")
+    logger.warning("=== END DEBUG ===")
+    # ========== END DEBUG LOGGING ==========
+    
     data = request.data
     samples = data.get('samples', [])
     visitor_id = data.get('visitorId') or data.get('visitor_id')
@@ -130,14 +156,51 @@ def perform_attendance_check_in(request, session):
 
     is_superuser = getattr(request.user, 'is_superuser', False)
 
+    # PHASE 2: Log role checking
+    logger.warning("=== PERMISSION CHECK: ROLE ===")
+    logger.warning(f"IS_SUPERUSER: {is_superuser}")
+    user_role = getattr(request.user, 'role', None)
+    logger.warning(f"USER_ROLE: {user_role}")
+    logger.warning(f"ROLE == STUDENT: {user_role == UserRole.STUDENT if user_role else 'N/A'}")
+    logger.warning(f"CHECK PASSES: {is_superuser or user_role == UserRole.STUDENT}")
+    logger.warning("=== END ROLE CHECK ===")
+
     if not is_superuser and request.user.role != UserRole.STUDENT:
+        logger.error("BLOCKING: User is neither superuser nor student")
         return Response({'success': False, 'status': 'error', 'error': 'Only students can check in'}, status=status.HTTP_403_FORBIDDEN)
+
+    # PHASE 2: Log enrollment checking
+    logger.warning("=== PERMISSION CHECK: ENROLLMENT ===")
+    if is_superuser:
+        logger.warning("SUPERUSER BYPASS: Skipping enrollment check")
+    else:
+        enrollment_query = CourseEnrollment.objects.filter(
+            student=request.user,
+            course=session.course,
+            is_active=True,
+        )
+        is_enrolled = enrollment_query.exists()
+        enrollment_count = enrollment_query.count()
+        
+        logger.warning(f"STUDENT: {request.user}")
+        logger.warning(f"COURSE: {session.course} (ID: {session.course.id})")
+        logger.warning(f"ENROLLMENT EXISTS: {is_enrolled}")
+        logger.warning(f"ENROLLMENT COUNT: {enrollment_count}")
+        
+        if not is_enrolled:
+            # Debug: Show all enrollments for this student
+            all_enrollments = CourseEnrollment.objects.filter(student=request.user)
+            logger.error(f"BLOCKING: Student not enrolled. Total enrollments: {all_enrollments.count()}")
+            for enroll in all_enrollments[:5]:  # Show first 5
+                logger.error(f"  - Enrolled in: {enroll.course} (Active: {enroll.is_active})")
+    logger.warning("=== END ENROLLMENT CHECK ===")
 
     if not is_superuser and not CourseEnrollment.objects.filter(
         student=request.user,
         course=session.course,
         is_active=True,
     ).exists():
+        logger.error("BLOCKING: Enrollment check failed - returning 403")
         return Response({
             'success': False,
             'status': 'error',
