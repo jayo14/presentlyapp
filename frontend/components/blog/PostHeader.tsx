@@ -33,10 +33,10 @@ export const PostHeader: React.FC<PostHeaderProps> = ({ post }) => {
           </span>
         )}
 
-        <h1 className="font-headline text-3xl sm:text-5xl md:text-6xl font-black leading-tight text-text tracking-tight">
+        <h1 className="font-headline text-3xl sm:text-5xl md:text-6xl font-black leading-tight text-text tracking-tight break-words">
           {post.title}
         </h1>
-        <p className="max-w-3xl text-base sm:text-lg md:text-xl text-textMuted leading-relaxed">
+        <p className="max-w-3xl text-base sm:text-lg md:text-xl text-textMuted leading-relaxed break-words">
           {post.excerpt}
         </p>
 
