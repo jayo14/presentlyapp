@@ -51,6 +51,31 @@ from .geolocation_utils import verify_location, calculate_distance
 auth_logger = logging.getLogger('auth_events')
 logger = logging.getLogger(__name__)
 
+
+def _safe_payload_summary(payload, max_preview: int = 500) -> dict:
+    """Return a bounded summary for request payload logging."""
+    summary = {
+        'type': type(payload).__name__,
+        'keys': [],
+        'size_hint': 0,
+        'preview': '',
+        'truncated': False,
+    }
+    try:
+        if hasattr(payload, 'keys'):
+            keys = list(payload.keys())
+            summary['keys'] = keys[:30]
+            summary['size_hint'] = len(keys)
+        rendered = str(payload)
+        if len(rendered) > max_preview:
+            summary['preview'] = rendered[:max_preview]
+            summary['truncated'] = True
+        else:
+            summary['preview'] = rendered
+    except Exception as exc:
+        summary['preview'] = f'unavailable:{exc.__class__.__name__}'
+    return summary
+
 # Configure Cloudinary once at module load using settings
 _cloudinary_configured = False
 
@@ -678,7 +703,7 @@ def login_view(request):
                 auth_logger.info(f"Bot user agent detected for user {user.email}: {user_agent}")
         except Exception as e:
             # Don't block login on tracking error
-            print(f"Device tracking error: {e}")
+            logger.warning("Device tracking error", extra={'error': str(e), 'email': user.email})
             
         tokens = get_tokens_for_user(user)
         return Response({
@@ -1191,7 +1216,25 @@ class VenueViewSet(viewsets.ModelViewSet):
         return [IsAdminUser()]
 
     def create(self, request, *args, **kwargs):
-        logger.info(f"Creating venue with data: {request.data}")
+        payload_summary = _safe_payload_summary(request.data)
+        if payload_summary['truncated']:
+            logger.warning(
+                "Large venue payload detected",
+                extra={
+                    'keys': payload_summary['keys'],
+                    'size_hint': payload_summary['size_hint'],
+                    'preview': payload_summary['preview'],
+                },
+            )
+        else:
+            logger.info(
+                "Creating venue",
+                extra={
+                    'keys': payload_summary['keys'],
+                    'size_hint': payload_summary['size_hint'],
+                    'preview': payload_summary['preview'],
+                },
+            )
         try:
             return super().create(request, *args, **kwargs)
         except Exception as e:
