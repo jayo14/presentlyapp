@@ -152,27 +152,13 @@ class EmailHelperTests(SimpleTestCase):
     RESEND_TEMPLATES={
         "welcome": "tmpl_welcome",
     },
-    EMAIL_SEND_ASYNC=True,
 )
-class EmailDispatchFallbackTests(SimpleTestCase):
+class EmailDispatchTests(SimpleTestCase):
     @patch("utils.email.send_template_email")
-    @patch("institutions.tasks.send_template_email_task.delay")
-    def test_falls_back_to_sync_when_celery_unavailable(self, mock_delay, mock_send_template_email):
-        mock_delay.side_effect = Exception("Error 111 connecting to localhost:6379. Connection refused.")
+    def test_dispatch_sends_synchronously(self, mock_send_template_email):
         mock_send_template_email.return_value = {"id": "email_sync"}
 
         result = email_utils.send_welcome_email("ayobamidayo2007@gmail.com", "John", "https://app/dashboard")
 
         self.assertEqual(result, {"id": "email_sync"})
-        self.assertTrue(mock_send_template_email.called)
-
-    @override_settings(EMAIL_SEND_ASYNC=False)
-    @patch("utils.email.send_template_email")
-    @patch("institutions.tasks.send_template_email_task.delay")
-    def test_sync_mode_skips_celery(self, mock_delay, mock_send_template_email):
-        mock_send_template_email.return_value = {"id": "email_sync"}
-
-        result = email_utils.send_welcome_email("ayobamidayo2007@gmail.com", "John", "https://app/dashboard")
-
-        self.assertEqual(result, {"id": "email_sync"})
-        mock_delay.assert_not_called()
+        mock_send_template_email.assert_called_once()

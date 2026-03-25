@@ -76,43 +76,13 @@ def _dispatch_template_email(
     subject: str | None = None,
     from_email: str | None = None,
 ) -> dict:
-    if not getattr(settings, "EMAIL_SEND_ASYNC", True):
-        return send_template_email(
-            template_key=template_key,
-            to=to,
-            variables=variables,
-            subject=subject,
-            from_email=from_email,
-        )
-
-    from institutions.tasks import send_template_email_task
-
-    try:
-        task_result = send_template_email_task.delay(
-            template_key=template_key,
-            to=to,
-            variables=variables,
-            subject=subject,
-            from_email=from_email,
-        )
-        return {
-            "queued": True,
-            "task_id": task_result.id,
-            "template_key": template_key,
-        }
-    except Exception as exc:
-        logger.warning(
-            "Celery queue unavailable for email dispatch; falling back to synchronous send",
-            exc_info=True,
-            extra={"template_key": template_key, "error": str(exc)},
-        )
-        return send_template_email(
-            template_key=template_key,
-            to=to,
-            variables=variables,
-            subject=subject,
-            from_email=from_email,
-        )
+    return send_template_email(
+        template_key=template_key,
+        to=to,
+        variables=variables,
+        subject=subject,
+        from_email=from_email,
+    )
 
 
 def send_welcome_email(to: str, first_name: str, dashboard_url: str) -> dict:
