@@ -1796,7 +1796,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                     session_time=session.start_time.strftime('%I:%M %p'),
                     minutes_remaining=max(int((session.end_time - timezone.now()).total_seconds() // 60), 0),
                     closes_at=session.end_time.strftime('%I:%M %p'),
-                    mark_url=f"{settings.FRONTEND_URL}/attendance/{session.session_code}",
+                    mark_url=f"{settings.FRONTEND_URL}/check-in/{session.session_code}",
                 )
                 
             logger.info(f"Sent notifications to {enrolled_students.count()} students for session {session.id}")
