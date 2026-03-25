@@ -143,11 +143,17 @@ const DashboardHome: React.FC = () => {
 };
 
 // Admin Route Guard
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AdminRoute: React.FC<{ children: React.ReactNode; requiredPermission?: string }> = ({ children, requiredPermission }) => {
     const { data: user, isLoading } = useCurrentUser();
     
     if (isLoading) return <LoadingFallback />;
     if (!user || user.role !== UserRole.ADMIN) return <Navigate to="/unauthorized" replace />;
+
+    if (requiredPermission) {
+      const perms = user.permissions;
+      const hasRequired = Array.isArray(perms) ? perms.includes(requiredPermission) : true;
+      if (!hasRequired) return <Navigate to="/unauthorized" replace />;
+    }
 
     return <>{children}</>;
 };
@@ -301,20 +307,20 @@ const AppContent: React.FC = () => {
               } />
 
               {/* Admin Specific Routes */}
-              <Route path="institutions" element={<AdminRoute><InstitutionManagement /></AdminRoute>} />
-              <Route path="institutions/new" element={<AdminRoute><InstitutionFormPage /></AdminRoute>} />
-              <Route path="institutions/:id" element={<AdminRoute><InstitutionManagement /></AdminRoute>} />
-              <Route path="institutions/:id/edit" element={<AdminRoute><InstitutionFormPage /></AdminRoute>} />
-              <Route path="institutions/:id/colleges/new" element={<AdminRoute><CollegeFormPage /></AdminRoute>} />
-              <Route path="institutions/:id/colleges/:collegeId" element={<AdminRoute><InstitutionManagement /></AdminRoute>} />
-              <Route path="institutions/:id/colleges/:collegeId/edit" element={<AdminRoute><CollegeFormPage /></AdminRoute>} />
-              <Route path="institutions/:id/colleges/:collegeId/departments/new" element={<AdminRoute><DepartmentFormPage /></AdminRoute>} />
-              <Route path="institutions/:id/colleges/:collegeId/departments/:deptId/edit" element={<AdminRoute><DepartmentFormPage /></AdminRoute>} />
-              <Route path="users" element={<AdminRoute><UserManagement /></AdminRoute>} />
-              <Route path="venues" element={<AdminRoute><VenueManagement /></AdminRoute>} />
-              <Route path="departments" element={<AdminRoute><DepartmentManagement /></AdminRoute>} />
-              <Route path="blog" element={<AdminRoute><BlogManagement /></AdminRoute>} />
-              <Route path="logs" element={<AdminRoute><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
+              <Route path="institutions" element={<AdminRoute requiredPermission="system.settings.manage"><InstitutionManagement /></AdminRoute>} />
+              <Route path="institutions/new" element={<AdminRoute requiredPermission="system.settings.manage"><InstitutionFormPage /></AdminRoute>} />
+              <Route path="institutions/:id" element={<AdminRoute requiredPermission="system.settings.manage"><InstitutionManagement /></AdminRoute>} />
+              <Route path="institutions/:id/edit" element={<AdminRoute requiredPermission="system.settings.manage"><InstitutionFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/new" element={<AdminRoute requiredPermission="system.settings.manage"><CollegeFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId" element={<AdminRoute requiredPermission="system.settings.manage"><InstitutionManagement /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId/edit" element={<AdminRoute requiredPermission="system.settings.manage"><CollegeFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId/departments/new" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentFormPage /></AdminRoute>} />
+              <Route path="institutions/:id/colleges/:collegeId/departments/:deptId/edit" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentFormPage /></AdminRoute>} />
+              <Route path="users" element={<AdminRoute requiredPermission="system.users.manage"><UserManagement /></AdminRoute>} />
+              <Route path="venues" element={<AdminRoute requiredPermission="venues.view"><VenueManagement /></AdminRoute>} />
+              <Route path="departments" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentManagement /></AdminRoute>} />
+              <Route path="blog" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
+              <Route path="logs" element={<AdminRoute requiredPermission="system.analytics.view"><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
 
               {/* Lecturer Specific Routes */}
               <Route path="reports" element={<LecturerRoute><LecturerDashboard userName={user?.full_name || ''} userProfile={user} view="reports" /></LecturerRoute>} />

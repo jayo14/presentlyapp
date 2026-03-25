@@ -58,8 +58,8 @@ export const rolePermissions = {
  * Check if a user has a specific permission
  */
 export function hasPermission(role: UserRole, permission: keyof typeof rolePermissions[UserRole]): boolean {
-  const permissions = rolePermissions[role];
-  return (permissions[permission as any] as boolean) ?? false;
+  const permissions = rolePermissions[role] as Record<string, boolean>;
+  return Boolean(permissions[String(permission)]);
 }
 
 /**
@@ -172,3 +172,29 @@ export function isValidRoleTransition(fromRole: UserRole, toRole: UserRole): boo
 
   return validTransitions[fromRole].includes(toRole);
 }
+
+/**
+ * Check if a backend codename permission is granted for a user.
+ * If permissions are not available yet and user is ADMIN, keep legacy full access behavior.
+ */
+export function hasPermissionCode(role: UserRole, permissions: string[] | undefined, codename: string): boolean {
+  if (Array.isArray(permissions)) {
+    return permissions.includes(codename);
+  }
+  return role === UserRole.ADMIN;
+}
+
+/**
+ * Map dashboard sections to backend permission codenames.
+ */
+export const dashboardSectionPermissions: Record<string, string | null> = {
+  users: 'system.users.manage',
+  institutions: 'system.settings.manage',
+  courses: 'courses.view',
+  venues: 'venues.view',
+  blog: 'blog.view',
+  logs: 'system.analytics.view',
+  notifications: null,
+  profile: null,
+  settings: null,
+};
