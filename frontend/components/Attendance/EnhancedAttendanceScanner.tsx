@@ -39,6 +39,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const [isCameraPermissionDenied, setIsCameraPermissionDenied] = useState(false);
   const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(null);
   const [checkInTime, setCheckInTime] = useState<string>('');
+  const [autoSwitchToQr, setAutoSwitchToQr] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -52,6 +53,28 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     }
   };
 
+  const sanitizeSessionCode = (value: string) =>
+    value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+
+  const handleSessionCodeChange = (value: string) => {
+    setSessionCode(sanitizeSessionCode(value));
+  };
+
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const normalized = sanitizeSessionCode(text);
+      if (!normalized) {
+        toast.error('Clipboard does not contain a valid session code.');
+        return;
+      }
+      setSessionCode(normalized);
+      toast.success('Session code pasted.');
+    } catch {
+      toast.error('Unable to access clipboard.');
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       setSessionCode('');
@@ -60,10 +83,17 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setLocationInfo('');
       setMode('idle');
       setAttendanceData(null);
+      setAutoSwitchToQr(false);
     } else {
       stopCamera();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (mode === 'input' && autoSwitchToQr) {
+      setMode('scan');
+    }
+  }, [mode, autoSwitchToQr]);
 
   useEffect(() => {
     if (isOpen && mode === 'scan' && status === 'idle') {
@@ -157,8 +187,9 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   }, [isCameraActive, mode, status]);
 
   const processAttendance = async (codeToVerify: string) => {
-    if (!codeToVerify || codeToVerify.length < 6) {
-      setErrorMsg('Invalid session code');
+    const normalizedCode = sanitizeSessionCode(codeToVerify);
+    if (normalizedCode.length !== 8) {
+      setErrorMsg('Session code must be exactly 8 alphanumeric characters.');
       setStatus('error');
       return;
     }
@@ -166,14 +197,14 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setStatus('locating');
       const payload = await geolocationService.getAttendancePayload();
       setStatus('verifying');
-      const attendanceResponse = await onVerify(codeToVerify, payload);
+      const attendanceResponse = await onVerify(normalizedCode, payload);
       if (attendanceResponse) {
         setCheckInTime(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
         setAttendanceData({
-          courseCode: attendanceResponse.course_code || codeToVerify,
+          courseCode: attendanceResponse.course_code || normalizedCode,
           courseName: attendanceResponse.course_name || 'Course Session',
           location: attendanceResponse.venue_name || 'Verified Venue',
-          sessionCode: codeToVerify
+          sessionCode: normalizedCode
         });
         setStatus('success');
       }
@@ -258,7 +289,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                        <Keyboard size={32} strokeWidth={2.5} className="text-primary" />
                        <div className="text-left">
                           <p className="text-lg font-headline font-black">Enter Code</p>
-                          <p className="text-xs font-bold opacity-40">Manual 6-digit entry</p>
+                              <p className="text-xs font-bold opacity-40">Manual 8-character entry</p>
                        </div>
                     </div>
                     <ChevronRight size={24} strokeWidth={3} className="opacity-20 group-hover:translate-x-1 transition-transform" />
@@ -277,46 +308,56 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
             >
               <div className="text-center space-y-8 mb-12">
                  <h2 className="text-3xl font-headline font-black">Authentication Code</h2>
-                 <p className="text-white/40 text-sm">Enter the numeric code to proceed with check-in.</p>
-                 
-                 <div className="flex justify-center gap-3">
-                    {[0,1,2,3,4,5].map((i) => (
-                      <div key={i} className={`w-12 h-16 rounded-2xl border-2 flex items-center justify-center text-3xl font-black transition-all ${
-                        sessionCode.length > i ? 'border-primary bg-primary/5 text-primary' : 'border-white/10 bg-white/5 text-white/20'
-                      }`}>
-                         {sessionCode[i] || '0'}
-                      </div>
-                    ))}
-                 </div>
+                 <p className="text-white/40 text-sm">Enter your 8-character session code (A-Z, 0-9).</p>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                 {[1,2,3,4,5,6,7,8,9].map(num => (
-                   <button 
-                     key={num} 
-                     onClick={() => setSessionCode(prev => (prev + num).slice(0,6))}
-                     className="h-16 rounded-2xl bg-white/5 hover:bg-white/10 font-headline font-black text-xl flex items-center justify-center active:scale-90 transition-all"
+              <div className="space-y-4">
+                 <input
+                   value={sessionCode}
+                   onChange={(event) => handleSessionCodeChange(event.target.value)}
+                   inputMode="text"
+                   autoCapitalize="characters"
+                   autoCorrect="off"
+                   autoComplete="off"
+                   maxLength={8}
+                   placeholder="AB12CD34"
+                   className="w-full h-16 rounded-2xl border border-white/20 bg-white/5 px-5 text-center text-2xl font-black tracking-[0.25em] text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary"
+                 />
+
+                 <div className="grid grid-cols-2 gap-3">
+                   <button
+                     type="button"
+                     onClick={handlePasteFromClipboard}
+                     className="h-12 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
                    >
-                     {num}
+                     <Clipboard size={16} />
+                     Paste
                    </button>
-                 ))}
-                 <button onClick={() => setSessionCode('')} className="h-16 rounded-2xl bg-white/5 font-black text-xs uppercase opacity-40">Clear</button>
-                 <button 
-                    onClick={() => setSessionCode(prev => (prev + '0').slice(0,6))}
-                    className="h-16 rounded-2xl bg-white/5 font-headline font-black text-xl flex items-center justify-center"
+                   <button
+                     type="button"
+                     onClick={() => setSessionCode('')}
+                     className="h-12 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-black uppercase tracking-wider transition-all"
+                   >
+                     Clear
+                   </button>
+                 </div>
+
+                 <button
+                   type="button"
+                   onClick={() => {
+                     setAutoSwitchToQr((prev) => !prev);
+                   }}
+                   className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 px-4 flex items-center justify-between text-sm"
                  >
-                   0
-                 </button>
-                 <button 
-                    onClick={() => setSessionCode(prev => prev.slice(0, -1))}
-                    className="h-16 rounded-2xl bg-white/5 flex items-center justify-center text-primary"
-                 >
-                   <RotateCcw size={20} />
+                   <span className="font-bold text-white/80">Auto-switch to QR scanner</span>
+                   <span className={`inline-flex h-7 w-14 rounded-full p-1 transition-colors ${autoSwitchToQr ? 'bg-primary' : 'bg-white/20'}`}>
+                     <span className={`h-5 w-5 rounded-full bg-white transition-transform ${autoSwitchToQr ? 'translate-x-7' : 'translate-x-0'}`} />
+                   </span>
                  </button>
               </div>
 
               <button 
-                 disabled={sessionCode.length < 6}
+                 disabled={sessionCode.length !== 8}
                  onClick={() => processAttendance(sessionCode)}
                  className="w-full h-20 bg-primary text-[#111111] rounded-[2.5rem] mt-12 font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all"
               >
@@ -370,8 +411,9 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                </div>
                
                <button 
-                 onClick={() => setMode('idle')}
+                 onClick={() => setMode('input')}
                  className="absolute top-4 right-4 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10"
+                 aria-label="Switch to session code input"
                >
                   <Keyboard size={18} />
                </button>
