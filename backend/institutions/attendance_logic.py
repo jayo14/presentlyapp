@@ -1,5 +1,6 @@
 from django.utils import timezone
 from django.db import transaction
+from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from institutions.models import Attendance, AttendanceSession, UserRole, CourseEnrollment
@@ -7,6 +8,7 @@ from attendance.models import AttendanceAttemptLog
 from accounts.models import UserDevice
 from .serializers import AttendanceSerializer
 from .geolocation_utils import verify_location, calculate_distance
+from utils.email import send_attendance_confirmed_email
 
 # Anti-spoofing thresholds (must match frontend constants)
 _MAX_ACCURACY_METERS = 40.0
@@ -324,14 +326,19 @@ def perform_attendance_check_in(request, session):
 
         # Send email confirmation
         try:
-            from utils.email_notification_service import send_attendance_marked
-            send_attendance_marked(
-                user_email=request.user.email,
-                user_name=request.user.full_name,
+            send_attendance_confirmed_email(
+                to=request.user.email,
+                first_name=request.user.full_name.split(' ')[0],
                 course_code=session.course.code,
                 course_name=session.course.title,
-                attendance_status=status_value,
-                check_in_time=attendance.checked_in_at.strftime('%I:%M %p, %b %d %Y')
+                arrival_time=attendance.checked_in_at.strftime('%I:%M %p, %b %d %Y'),
+                check_in_method='QR Check-in',
+                location_label=session.venue.name if session.venue else 'Campus Venue',
+                streak_label='Attendance consistency',
+                streak_message='Keep it up. Your attendance record is improving.',
+                streak_percent=85,
+                history_url=f"{settings.FRONTEND_URL}/attendance/history",
+                report_url=f"{settings.FRONTEND_URL}/attendance/report",
             )
         except Exception as e:
             # Don't fail the check-in if email fails

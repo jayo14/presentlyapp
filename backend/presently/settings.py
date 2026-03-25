@@ -273,18 +273,29 @@ CORS_EXPOSE_HEADERS = [
     'authorization',
 ]
 
-# Email Configuration# Resend API
+# Email Configuration (Resend API)
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
-# Resend Templates Integration Map
+# Resend hosted template IDs by logical key.
+RESEND_TEMPLATES = {
+    "welcome":              os.environ.get("RESEND_TEMPLATE_WELCOME",              "4fedf803-2b9b-480d-8f57-f9919276b90b"),
+    "verify_email":         os.environ.get("RESEND_TEMPLATE_VERIFY_EMAIL",         "68c56ecb-1b03-4a58-82df-3f67fdb764a7"),
+    "login_alert":          os.environ.get("RESEND_TEMPLATE_LOGIN_ALERT",          "6448d19b-9c97-4b3e-9271-788de81c782c"),
+    "reset_password":       os.environ.get("RESEND_TEMPLATE_RESET_PASSWORD",       "57124568-95c4-420d-bbf5-149e46a47c6d"),
+    "session_live":         os.environ.get("RESEND_TEMPLATE_SESSION_LIVE",         "77951f07-aa7e-4bad-9159-c31d1cb0c0ac"),
+    "newsletter_welcome":   os.environ.get("RESEND_TEMPLATE_NEWSLETTER_WELCOME",   "5799b664-9b3b-4eea-9f8c-a94adb1bcd68"),
+    "attendance_confirmed": os.environ.get("RESEND_TEMPLATE_ATTENDANCE_CONFIRMED", "d7ca7188-fee1-4208-827d-999a2b25b367"),
+}
+
+# Compatibility map for legacy call sites/scripts.
 RESEND_TEMPLATE_MAP = {
-    "emails/welcome_email.html": "4fedf803-2b9b-480d-8f57-f9919276b90b",
-    "emails/welcome_otp.html": "68c56ecb-1b03-4a58-82df-3f67fdb764a7",
-    "emails/new_device_alert.html": "6448d19b-9c97-4b3e-9271-788de81c782c",
-    "emails/password_reset.html": "57124568-95c4-420d-bbf5-149e46a47c6d",
-    "emails/attendance_session_created.html": "77951f07-aa7e-4bad-9159-c31d1cb0c0ac",
-    "emails/newsletter_welcome.html": "5799b664-9b3b-4eea-9f8c-a94adb1bcd68",
-    "emails/attendance_marked.html": "d7ca7188-fee1-4208-827d-999a2b25b367",
+    "emails/welcome_email.html": RESEND_TEMPLATES["welcome"],
+    "emails/welcome_otp.html": RESEND_TEMPLATES["verify_email"],
+    "emails/new_device_alert.html": RESEND_TEMPLATES["login_alert"],
+    "emails/password_reset.html": RESEND_TEMPLATES["reset_password"],
+    "emails/attendance_session_created.html": RESEND_TEMPLATES["session_live"],
+    "emails/newsletter_welcome.html": RESEND_TEMPLATES["newsletter_welcome"],
+    "emails/attendance_marked.html": RESEND_TEMPLATES["attendance_confirmed"],
 }
 
 GMAIL_API_REFRESH_TOKEN = os.environ.get('GMAIL_API_REFRESH_TOKEN', '')
@@ -304,12 +315,15 @@ else:
     else:
         print("WARNING: RESEND_API_KEY missing; emails will fall back to console backend.")
 
-raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or 'onboarding@resend.dev'
+raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or 'Presently <noreply@getpresently.com.ng>'
 DEFAULT_FROM_EMAIL = raw_from_email if '<' in raw_from_email else f"Presently <{raw_from_email}>"
 EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://getpresently.com.ng')
+SUPPORT_URL = os.environ.get('SUPPORT_URL', f'{FRONTEND_URL}/support')
+PRIVACY_URL = os.environ.get('PRIVACY_URL', f'{FRONTEND_URL}/privacy')
+INSTITUTION_URL = os.environ.get('INSTITUTION_URL', FRONTEND_URL)
 
 # Firebase Cloud Messaging (FCM) Configuration
 FCM_DJANGO_SETTINGS = {

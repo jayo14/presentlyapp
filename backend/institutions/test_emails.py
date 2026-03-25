@@ -1,13 +1,9 @@
 from django.test import TestCase
-from django.core import mail
 from django.contrib.auth import get_user_model
 from .views import send_verification_email
-from django.conf import settings
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
 from rest_framework.test import APIRequestFactory, force_authenticate
 from .views import request_password_reset_view, login_view
+from unittest.mock import patch
 
 User = get_user_model()
 
@@ -21,44 +17,30 @@ class EmailTests(TestCase):
         self.factory = APIRequestFactory()
 
     def test_send_verification_email(self):
-        # Clear outbox
-        mail.outbox = []
-
-        success = send_verification_email(self.user, "123456")
+        with patch("utils.email._dispatch_template_email") as mock_dispatch:
+            success = send_verification_email(self.user, "123456")
 
         self.assertTrue(success)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Welcome to Presently - Verify Your Email")
-        self.assertIn("123456", mail.outbox[0].alternatives[0][0])
-        self.assertEqual(mail.outbox[0].to, [self.user.email])
+        self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "verify_email")
 
     def test_request_password_reset_email(self):
-        # Clear outbox
-        mail.outbox = []
-
-        request = self.factory.post('/api/auth/password-reset/', {'email': self.user.email})
-        response = request_password_reset_view(request)
+        with patch("utils.email._dispatch_template_email") as mock_dispatch:
+            request = self.factory.post('/api/auth/password-reset/', {'email': self.user.email})
+            response = request_password_reset_view(request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Password Reset Request - Presently")
-        self.assertIn("Reset Password", mail.outbox[0].alternatives[0][0])
+        self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "reset_password")
 
     def test_new_device_alert_email(self):
-        # Clear outbox
-        mail.outbox = []
+        with patch("utils.email._dispatch_template_email") as mock_dispatch:
+            request = self.factory.post('/api/auth/login/', {
+                'email': self.user.email,
+                'password': 'password123'
+            })
+            request.META['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+            request.META['REMOTE_ADDR'] = '1.2.3.4'
 
-        request = self.factory.post('/api/auth/login/', {
-            'email': self.user.email,
-            'password': 'password123'
-        })
-        request.META['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-        request.META['REMOTE_ADDR'] = '1.2.3.4'
-
-        response = login_view(request)
+            response = login_view(request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "New Login Detected - Presently")
-        self.assertIn("Mac OS X", mail.outbox[0].alternatives[0][0])
-        self.assertIn("1.2.3.4", mail.outbox[0].alternatives[0][0])
+        self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "login_alert")

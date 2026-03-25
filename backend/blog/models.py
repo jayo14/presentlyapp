@@ -1,7 +1,6 @@
-from django.conf import settings
-from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
+from utils.email import send_newsletter_welcome_email
 
 
 class Tag(models.Model):
@@ -68,10 +67,6 @@ class Post(models.Model):
             self.published_at = timezone.now()
         self.save(update_fields=['status', 'published_at', 'updated_at'])
 
-
-from django.template.loader import render_to_string
-
-
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
@@ -91,27 +86,14 @@ class NewsletterSubscriber(models.Model):
         if not is_new:
             return
 
-        subject = "You're on the Presently waitlist 🎉"
-        
-        # HTML Content
-        html_message = render_to_string('emails/newsletter_welcome.html', {
-            'email': self.email,
-        })
-        
-        # Alternative text message
-        message = (
-            'Thanks for subscribing to Presently updates.\n\n'
-            'We are launching soon and will share product updates, '
-            'attendance insights, and rollout news with you.\n\n'
-            'Read the latest updates on our blog: https://getpresently.com.ng/blog\n\n'
-            'Presently Team'
-        )
-
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@getpresently.com.ng'),
-            recipient_list=[self.email],
-            html_message=html_message,
-            fail_silently=True,
+        first_name = self.email.split("@")[0]
+        send_newsletter_welcome_email(
+            to=self.email,
+            first_name=first_name,
+            edition_label="Launch Updates",
+            featured_title="Presently Product Updates",
+            featured_excerpt="Thanks for subscribing. We will share attendance insights and rollout news.",
+            featured_url="https://getpresently.com.ng/blog",
+            dashboard_url="https://getpresently.com.ng/dashboard",
+            unsubscribe_url="https://getpresently.com.ng/unsubscribe",
         )
