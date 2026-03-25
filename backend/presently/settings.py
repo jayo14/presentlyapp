@@ -349,6 +349,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+EMAIL_SEND_ASYNC = os.environ.get('EMAIL_SEND_ASYNC', 'True') == 'True'
 
 # Report Generation Settings
 REPORTS_DIR = BASE_DIR / 'reports'
