@@ -3,10 +3,13 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from rest_framework import generics, status, viewsets
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from institutions.models import UserRole
+from institutions.rbac import user_has_permission
 
 from .models import Category, NewsletterSubscriber, Post, Tag
 from .serializers import (
@@ -20,6 +23,19 @@ from .serializers import (
 
 class BlogPostPagination(PageNumberPagination):
     page_size = 10
+
+
+class RequireBlogPermission(BasePermission):
+    def __init__(self, codename: str):
+        self.codename = codename
+
+    def has_permission(self, request, view):
+        user = request.user
+        return bool(
+            user
+            and user.is_authenticated
+            and (user.role == UserRole.ADMIN or user_has_permission(user, self.codename))
+        )
 
 
 # --- PUBLIC VIEWS ---
@@ -122,9 +138,19 @@ class NewsletterSubscribeView(APIView):
 # --- ADMIN VIEWS ---
 
 class AdminPostViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Post.objects.all().order_by('-created_at')
     lookup_field = 'slug'
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [RequireBlogPermission('blog.view')]
+        if self.action == 'create':
+            return [RequireBlogPermission('blog.create')]
+        if self.action in ['update', 'partial_update']:
+            return [RequireBlogPermission('blog.edit')]
+        if self.action == 'destroy':
+            return [RequireBlogPermission('blog.delete')]
+        return [IsAuthenticated()]
     
     def get_serializer_class(self):
         if self.action in ['list']:
@@ -133,20 +159,48 @@ class AdminPostViewSet(viewsets.ModelViewSet):
 
 
 class AdminCategoryViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Category.objects.all().order_by('name')
     serializer_class = CategorySerializer
     lookup_field = 'slug'
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [RequireBlogPermission('blog.view')]
+        if self.action == 'create':
+            return [RequireBlogPermission('blog.create')]
+        if self.action in ['update', 'partial_update']:
+            return [RequireBlogPermission('blog.edit')]
+        if self.action == 'destroy':
+            return [RequireBlogPermission('blog.delete')]
+        return [IsAuthenticated()]
+
 
 class AdminTagViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Tag.objects.all().order_by('name')
     serializer_class = TagSerializer
     lookup_field = 'slug'
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [RequireBlogPermission('blog.view')]
+        if self.action == 'create':
+            return [RequireBlogPermission('blog.create')]
+        if self.action in ['update', 'partial_update']:
+            return [RequireBlogPermission('blog.edit')]
+        if self.action == 'destroy':
+            return [RequireBlogPermission('blog.delete')]
+        return [IsAuthenticated()]
+
 
 class AdminSubscriberViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = NewsletterSubscriber.objects.all().order_by('-subscribed_at')
     serializer_class = NewsletterSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [RequireBlogPermission('blog.view')]
+        if self.action in ['update', 'partial_update']:
+            return [RequireBlogPermission('blog.edit')]
+        if self.action == 'destroy':
+            return [RequireBlogPermission('blog.delete')]
+        return [RequireBlogPermission('blog.create')]

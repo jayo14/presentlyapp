@@ -1050,7 +1050,7 @@ class InstitutionViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
-        return [IsAdminUser()]
+        return [RequireRBACPermission('system.settings.manage')]
     
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -1070,7 +1070,7 @@ class CollegeViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
-        return [IsAdminUser()]
+        return [RequireRBACPermission('system.settings.manage')]
     
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -1114,7 +1114,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
-        return [IsAdminUser()]
+        return [RequireRBACPermission('system.settings.manage')]
     
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
