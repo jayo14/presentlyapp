@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 from django.conf import settings
 
 from utils.email import (
+    send_staff_access_invitation_email,
     send_attendance_confirmed_email,
     send_login_alert_email,
     send_newsletter_welcome_email,

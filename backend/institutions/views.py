@@ -36,6 +36,7 @@ from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
     Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable
 )
+from .rbac import user_has_permission
 from accounts.models import UserDevice
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
@@ -1025,6 +1026,21 @@ class IsLecturerOrAdmin(permissions.BasePermission):
         return request.user and request.user.is_authenticated and request.user.role in [UserRole.LECTURER, UserRole.ADMIN]
 
 
+class RequireRBACPermission(permissions.BasePermission):
+    """Permission class that enforces resource.action RBAC checks."""
+
+    def __init__(self, permission_codename: str):
+        self.permission_codename = permission_codename
+
+    def has_permission(self, request, view):
+        user = request.user
+        return bool(
+            user
+            and user.is_authenticated
+            and (user.role == UserRole.ADMIN or user_has_permission(user, self.permission_codename))
+        )
+
+
 # ViewSets
 class InstitutionViewSet(viewsets.ModelViewSet):
     """ViewSet for Institution CRUD"""
@@ -1127,6 +1143,12 @@ class VenueViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
+        if self.action == 'create':
+            return [RequireRBACPermission('venues.create')]
+        if self.action in ['update', 'partial_update']:
+            return [RequireRBACPermission('venues.edit')]
+        if self.action == 'destroy':
+            return [RequireRBACPermission('venues.delete')]
         return [IsAdminUser()]
 
     def create(self, request, *args, **kwargs):
@@ -1903,6 +1925,13 @@ class UserViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(college_id=college_id)
         
         return queryset
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [RequireRBACPermission('system.users.manage')]
+        if self.action in ['invite_user']:
+            return [RequireRBACPermission('system.staff.manage')]
+        return [RequireRBACPermission('system.users.manage')]
     
     def update(self, request, *args, **kwargs):
         """Override update to prevent users from changing their own role"""
