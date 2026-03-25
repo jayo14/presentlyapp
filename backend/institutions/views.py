@@ -23,7 +23,13 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 from user_agents import parse
 from presently.firebase_config import initialize_firebase
-from utils.email_notification_service import EmailNotificationService
+from utils.email import (
+    send_login_alert_email,
+    send_reset_password_email,
+    send_session_live_email,
+    send_verify_email,
+    send_welcome_email,
+)
 
 from .attendance_logic import perform_attendance_check_in
 from .models import (
@@ -383,16 +389,16 @@ def register_view(request):
 # Add these views to institutions/views.py after the register_view
 
 def send_verification_email(user, otp_code):
-    """Send OTP verification email via SMTP email service."""
+    """Queue OTP verification email with a Resend hosted template."""
     try:
-        success = EmailNotificationService.send_email_verification_otp(
-            user_id=str(user.id),
-            user_email=user.email,
-            user_name=user.full_name,
-            otp_code=otp_code
+        send_verify_email(
+            to=user.email,
+            first_name=user.full_name.split(' ')[0],
+            otp_code=otp_code,
+            expiry_minutes=10,
+            verify_url=f"{settings.FRONTEND_URL}/verify-email",
+            resend_url=f"{settings.FRONTEND_URL}/resend-otp",
         )
-        if not success:
-            raise Exception("Failed to send verification email")
         return True
     except Exception as e:
         logger.error(f"Failed to send verification email to {user.email}: {str(e)}", exc_info=True)
@@ -428,11 +434,13 @@ def send_verification_otp_view(request):
         
         # Send OTP email via internal email service
         try:
-            EmailNotificationService.send_otp_resend(
-                user_id=str(user.id),
-                user_email=user.email,
-                user_name=user.full_name,
-                otp_code=otp_obj.otp
+            send_verify_email(
+                to=user.email,
+                first_name=user.full_name.split(' ')[0],
+                otp_code=otp_obj.otp,
+                expiry_minutes=10,
+                verify_url=f"{settings.FRONTEND_URL}/verify-email",
+                resend_url=f"{settings.FRONTEND_URL}/resend-otp",
             )
         except Exception as e:
             logger.error(f"Failed to send OTP email: {str(e)}")
@@ -619,12 +627,16 @@ def login_view(request):
                         'login_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')
                     }
                     
-                    EmailNotificationService.send_new_device_alert(
-                        user_id=str(user.id),
-                        user_email=user.email,
-                        user_name=user.full_name,
-                        device_info=device_info,
-                        ip_address=ip_address
+                    send_login_alert_email(
+                        to=user.email,
+                        first_name=user.full_name.split(' ')[0],
+                        device_name=device_info.get('device_name', 'Unknown Device'),
+                        browser_name=device_info.get('browser', 'Unknown Browser'),
+                        login_location=ip_address,
+                        login_time=device_info.get('login_time', timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')),
+                        ip_address=ip_address,
+                        confirm_url=f"{settings.FRONTEND_URL}/security/devices",
+                        secure_url=f"{settings.FRONTEND_URL}/security",
                     )
             else:
                 # Log bot access but don't track or send alerts
@@ -879,19 +891,15 @@ def request_password_reset_view(request):
         reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
         # Send password reset email via internal email service
-        email_sent = EmailNotificationService.send_password_reset(
-            user_id=str(user.id),
-            user_email=user.email,
-            user_name=user.full_name,
-            reset_link=reset_link
+        send_reset_password_email(
+            to=user.email,
+            first_name=user.full_name.split(' ')[0],
+            reset_url=reset_link,
+            expiry_minutes=30,
+            request_ip=request.META.get('REMOTE_ADDR', ''),
+            request_browser=request.META.get('HTTP_USER_AGENT', ''),
+            request_location=request.META.get('REMOTE_ADDR', ''),
         )
-
-        if not email_sent:
-            logger.error("Password reset delivery failed for %s", email)
-            return Response({
-                'success': False,
-                'error': 'Failed to send password reset email'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         logger.info(f"Password reset email sent to {email}")
 
@@ -1647,15 +1655,17 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 )
 
                 # Send email notification
-                from utils.email_notification_service import send_attendance_session_created
-                send_attendance_session_created(
-                    user_email=student.email,
-                    user_name=student.full_name,
+                send_session_live_email(
+                    to=student.email,
+                    first_name=student.full_name.split(' ')[0],
                     course_code=session.course.code,
                     course_name=session.course.title,
-                    start_time=session.start_time.strftime('%I:%M %p'),
-                    end_time=session.end_time.strftime('%I:%M %p'),
-                    venue_name=session.venue.name if session.venue else "Main Hall"
+                    lecturer_name=session.course.lecturer.full_name if session.course.lecturer else "Lecturer",
+                    room_location=session.venue.name if session.venue else "Main Hall",
+                    session_time=session.start_time.strftime('%I:%M %p'),
+                    minutes_remaining=max(int((session.end_time - timezone.now()).total_seconds() // 60), 0),
+                    closes_at=session.end_time.strftime('%I:%M %p'),
+                    mark_url=f"{settings.FRONTEND_URL}/attendance/{session.session_code}",
                 )
                 
             logger.info(f"Sent notifications to {enrolled_students.count()} students for session {session.id}")
@@ -2012,13 +2022,11 @@ class UserViewSet(viewsets.ModelViewSet):
         # Create invitation link
         invite_link = f"{settings.FRONTEND_URL}/accept-invite?uid={uid}&token={token}"
         
-        # Send invitation email via internal email service
-        EmailNotificationService.send_user_invitation(
-            user_email=user.email,
-            user_name=user.full_name,
-            inviter_name=request.user.full_name,
-            invitation_link=invite_link,
-            institution_name=settings.SITE_NAME or 'Presently'
+        # Send invitation using the welcome template path.
+        send_welcome_email(
+            to=user.email,
+            first_name=user.full_name.split(' ')[0],
+            dashboard_url=invite_link,
         )
         
         logger.info(f"User invited: {user.email} by {request.user.email}")
