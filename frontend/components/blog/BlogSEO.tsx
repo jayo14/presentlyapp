@@ -5,6 +5,7 @@ import { SEO } from '../SEO';
 interface BlogSEOProps {
   title: string;
   description: string;
+  keywords?: string;
   canonicalPath: string;
   type?: 'website' | 'article';
   image?: string;
@@ -14,6 +15,7 @@ interface BlogSEOProps {
 export const BlogSEO: React.FC<BlogSEOProps> = ({
   title,
   description,
+  keywords,
   canonicalPath,
   type = 'website',
   image,
@@ -24,6 +26,7 @@ export const BlogSEO: React.FC<BlogSEOProps> = ({
     <SEO
       title={title}
       description={description}
+      keywords={keywords}
       canonicalPath={canonicalPath}
       type={type}
       image={image}
