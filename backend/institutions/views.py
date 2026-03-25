@@ -1029,14 +1029,18 @@ class IsLecturerOrAdmin(permissions.BasePermission):
 class RequireRBACPermission(permissions.BasePermission):
     """Permission class that enforces resource.action RBAC checks."""
 
-    def __init__(self, permission_codename: str):
+    def __init__(self, permission_codename: str, allow_lecturer: bool = False):
         self.permission_codename = permission_codename
+        self.allow_lecturer = allow_lecturer
 
     def has_permission(self, request, view):
         user = request.user
+        if not user or not user.is_authenticated:
+            return False
+        if self.allow_lecturer and user.role == UserRole.LECTURER:
+            return True
         return bool(
             user
-            and user.is_authenticated
             and (user.role == UserRole.ADMIN or user_has_permission(user, self.permission_codename))
         )
 
@@ -1241,9 +1245,17 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'available', 'enrolled_students', 'search', 'register', 'drop']:
+        if self.action in ['list', 'retrieve', 'available', 'search', 'register', 'drop']:
             return [IsAuthenticated()]
-        return [IsLecturerOrAdmin()]
+        if self.action == 'enrolled_students':
+            return [RequireRBACPermission('courses.view', allow_lecturer=True)]
+        if self.action == 'create':
+            return [RequireRBACPermission('courses.create', allow_lecturer=True)]
+        if self.action in ['update', 'partial_update']:
+            return [RequireRBACPermission('courses.edit', allow_lecturer=True)]
+        if self.action == 'destroy':
+            return [RequireRBACPermission('courses.delete', allow_lecturer=True)]
+        return [IsAuthenticated()]
     
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -1629,7 +1641,15 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'check_in']:
             return [IsAuthenticated()]
-        return [IsLecturerOrAdmin()]
+        if self.action == 'create':
+            return [RequireRBACPermission('sessions.create', allow_lecturer=True)]
+        if self.action in ['update', 'partial_update']:
+            return [RequireRBACPermission('sessions.edit', allow_lecturer=True)]
+        if self.action == 'destroy':
+            return [RequireRBACPermission('sessions.delete', allow_lecturer=True)]
+        if self.action in ['end', 'manual_mark']:
+            return [RequireRBACPermission('attendance.modify', allow_lecturer=True)]
+        return [IsAuthenticated()]
     def perform_create(self, serializer):
         """Create session and notify enrolled students"""
         session = serializer.save()
@@ -1744,6 +1764,9 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     def manual_mark(self, request, pk=None):
         """Lecturer manually marks a student present"""
         session = self.get_object()
+        if request.user.role != UserRole.ADMIN and session.course.lecturer != request.user:
+            return Response({'success': False, 'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
         student_id = request.data.get('student_id')
         status_choice = request.data.get('status', 'PRESENT')
         reason = request.data.get('reason', 'Manual override by lecturer')
@@ -1783,6 +1806,13 @@ class AttendanceViewSet(viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [RequireRBACPermission('attendance.modify')]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         queryset = Attendance.objects.all().order_by('-checked_in_at')
@@ -2109,6 +2139,15 @@ class TimetableViewSet(viewsets.ModelViewSet):
     queryset = Timetable.objects.filter(is_active=True)
     serializer_class = TimetableSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'student', 'lecturer']:
+            return [IsAuthenticated()]
+        if self.action == 'create':
+            return [RequireRBACPermission('courses.edit', allow_lecturer=True)]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [RequireRBACPermission('courses.edit', allow_lecturer=True)]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         user = self.request.user
