@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import { getPostBySlug } from '../../src/lib/blog';
 import type { Post } from '../../src/types/blog';
@@ -21,77 +23,17 @@ const slugify = (value: string): string =>
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
 
-const escapeHtml = (value: string): string =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-
-const markdownToHtml = (content: string): string => {
-  const lines = content.split('\n');
-  const html: string[] = [];
-  let inCode = false;
-  let inList = false;
-
-  for (const rawLine of lines) {
-    const line = rawLine.trimEnd();
-
-    if (line.startsWith('```')) {
-      if (!inCode) {
-        inCode = true;
-        html.push('<pre><code>');
-      } else {
-        inCode = false;
-        html.push('</code></pre>');
-      }
-      continue;
-    }
-
-    if (inCode) {
-      html.push(`${escapeHtml(line)}\n`);
-      continue;
-    }
-
-    if (/^###\s+/.test(line)) {
-      const text = line.replace(/^###\s+/, '').trim();
-      html.push(`<h3 id="${slugify(text)}">${escapeHtml(text)}</h3>`);
-      continue;
-    }
-
-    if (/^##\s+/.test(line)) {
-      const text = line.replace(/^##\s+/, '').trim();
-      html.push(`<h2 id="${slugify(text)}">${escapeHtml(text)}</h2>`);
-      continue;
-    }
-
-    if (/^[-*]\s+/.test(line)) {
-      if (!inList) {
-        inList = true;
-        html.push('<ul>');
-      }
-      html.push(`<li>${escapeHtml(line.replace(/^[-*]\s+/, '').trim())}</li>`);
-      continue;
-    }
-
-    if (inList) {
-      inList = false;
-      html.push('</ul>');
-    }
-
-    if (!line) {
-      html.push('');
-      continue;
-    }
-
-    html.push(`<p>${escapeHtml(line)}</p>`);
+const extractNodeText = (node: React.ReactNode): string => {
+  if (typeof node === 'string' || typeof node === 'number') {
+    return String(node);
   }
-
-  if (inList) html.push('</ul>');
-  if (inCode) html.push('</code></pre>');
-
-  return html.join('\n');
+  if (Array.isArray(node)) {
+    return node.map(extractNodeText).join(' ');
+  }
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return extractNodeText(node.props.children);
+  }
+  return '';
 };
 
 // Remove local ShareButtons as we are importing it from components/blog/ShareButtons.tsx
@@ -210,7 +152,29 @@ export const BlogPostPage: React.FC = () => {
               prose-img:rounded-[2.5rem] prose-img:shadow-2xl prose-img:border prose-img:border-outline/10
               prose-blockquote:border-l-primary prose-blockquote:bg-surfaceHigh/40 prose-blockquote:py-2 prose-blockquote:rounded-r-2xl
             ">
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(post.content) }} />
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  h2: ({ children, ...props }) => {
+                    const id = slugify(extractNodeText(children));
+                    return (
+                      <h2 id={id} {...props}>
+                        {children}
+                      </h2>
+                    );
+                  },
+                  h3: ({ children, ...props }) => {
+                    const id = slugify(extractNodeText(children));
+                    return (
+                      <h3 id={id} {...props}>
+                        {children}
+                      </h3>
+                    );
+                  },
+                }}
+              >
+                {post.content}
+              </ReactMarkdown>
 
               <div className="mt-16 flex flex-wrap gap-3 border-t border-outline/10 pt-10">
                 <span className="text-xs font-bold uppercase tracking-widest text-textMuted mr-2 self-center">Tags:</span>

@@ -147,14 +147,34 @@ export const BlogManagement: React.FC = () => {
     }
   };
 
+  const buildPostPayload = (data: Partial<Post>) => {
+    return {
+      title: data.title,
+      slug: data.slug,
+      excerpt: data.excerpt,
+      content: data.content,
+      cover_image: data.cover_image || '',
+      author_name: data.author_name,
+      author_avatar: data.author_avatar || '',
+      status: data.status,
+      is_featured: data.is_featured ?? false,
+      reading_time: data.reading_time ?? 5,
+      seo_title: data.seo_title || '',
+      seo_description: data.seo_description || '',
+      category_id: data.category?.id ?? null,
+      tag_ids: (data.tags || []).map((tag) => tag.id).filter((id): id is number => typeof id === 'number'),
+    };
+  };
+
   const handleSavePost = async (data: Partial<Post>) => {
     setLoading(true);
     try {
+      const payload = buildPostPayload(data);
       if (editingPost) {
-        await updatePost(editingPost.slug, data);
+        await updatePost(editingPost.slug, payload);
         toast.success('Post updated successfully');
       } else {
-        await createPost(data);
+        await createPost(payload);
         toast.success('Post created successfully');
       }
       setView('posts');
