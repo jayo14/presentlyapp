@@ -588,6 +588,8 @@ class PasswordChangeSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+
+
 class AuditLogSerializer(serializers.ModelSerializer):
     """Serializer for AuditLog model"""
     user_email = serializers.EmailField(source='user.email', read_only=True)
@@ -596,6 +598,13 @@ class AuditLogSerializer(serializers.ModelSerializer):
         model = AuditLog
         fields = '__all__'
         read_only_fields = ['timestamp']
+
+
+class RBACPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RBACPermission
+        fields = [
+            'id', 'codename', 'name', 'group', 'description', 'is_dangerous',
             'enabled_by_default', 'created_at', 'updated_at'
         ]
 
