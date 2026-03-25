@@ -4,6 +4,7 @@ import { useLogin, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { LoadingScreen } from '../LoadingScreen';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -105,7 +106,7 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cardackgroundackground text-text flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative">
       <SEO
         title="Login | Presently"
         description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
@@ -216,9 +217,9 @@ export const Login: React.FC = () => {
           </form>
 
           <div className="flex items-center gap-4 my-8">
-            <div className="h-px bg-cardackgroundorder flex-1" />
+            <div className="h-px bg-outline flex-1" />
             <span className="text-xs text-textMuted uppercase font-bold tracking-wide">Or continue with</span>
-            <div className="h-px bg-cardackgroundorder flex-1" />
+            <div className="h-px bg-outline flex-1" />
           </div>
 
           {/* OAuth Buttons */}
