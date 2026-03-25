@@ -37,14 +37,14 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({ slug, title, vertica
   };
 
   return (
-    <div className={`flex ${vertical ? 'flex-col' : 'flex-row items-center'} gap-3`}>
+    <div className={`flex ${vertical ? 'flex-col' : 'flex-row items-center flex-wrap'} gap-2 sm:gap-3`}>
       {shareLinks.map((link) => (
         <a
           key={link.name}
           href={link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className={`group flex h-10 w-10 items-center justify-center rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 ${link.color}`}
+          className={`group flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 ${link.color} shrink-0`}
           title={`Share on ${link.name}`}
         >
           {link.icon}
@@ -52,7 +52,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({ slug, title, vertica
       ))}
       <button
         onClick={copyToClipboard}
-        className="group flex h-10 w-10 items-center justify-center rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 hover:text-primary hover:bg-primary/10"
+        className="group flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 hover:text-primary hover:bg-primary/10 shrink-0"
         title="Copy link"
       >
         <LinkIcon size={18} />

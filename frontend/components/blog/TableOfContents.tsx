@@ -34,22 +34,22 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => 
   if (!headings.length) return null;
 
   return (
-    <div className="rounded-2xl border border-outline/10 bg-surface/40 backdrop-blur-md p-6">
-      <h3 className="font-headline text-xs font-bold uppercase tracking-[0.2em] text-textMuted mb-6">In this article</h3>
-      <ul className="space-y-4">
+    <div className="rounded-xl sm:rounded-2xl border border-outline/10 bg-surface/40 backdrop-blur-md p-4 sm:p-6">
+      <h3 className="font-headline text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-textMuted mb-4 sm:mb-6">In this article</h3>
+      <ul className="space-y-3 sm:space-y-4">
         {headings.map((heading) => (
-          <li key={heading.id} style={{ paddingLeft: heading.level === 3 ? '1rem' : '0' }}>
+          <li key={heading.id} style={{ paddingLeft: heading.level === 3 ? '0.75rem' : '0' }}>
             <a
               href={`#${heading.id}`}
               className={[
-                'block text-sm transition-all duration-300 relative',
+                'block text-xs sm:text-sm transition-all duration-300 relative line-clamp-2',
                 activeId === heading.id 
                   ? 'text-primary font-bold translate-x-1' 
                   : 'text-textMuted hover:text-text hover:translate-x-1',
               ].join(' ')}
             >
               {activeId === heading.id && (
-                <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary/40" />
+                <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary/40" />
               )}
               {heading.text}
             </a>
