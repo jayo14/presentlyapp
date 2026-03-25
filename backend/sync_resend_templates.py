@@ -49,6 +49,12 @@ def convert_to_handlebars(html):
 
     html = re.sub(r'\{\{(.*?)\}\}', strip_unsupported, html, flags=re.DOTALL)
     
+    # 6. STRIP style block to test if CSS is the issue
+    html = re.sub(r'<style.*?>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
+
+    # 7. STRIP HTML comments
+    html = re.sub(r'<!--.*?-->', '', html, flags=re.DOTALL)
+    
     return html
 
 def push_templates():
