@@ -114,6 +114,8 @@ export default function StudentLayout() {
       <Tabs.Screen name="attendance-success" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
+      <Tabs.Screen name="timetable" options={{ href: null }} />
+      <Tabs.Screen name="exam-clearance" options={{ href: null }} />
       <Tabs.Screen name="courses/register" options={{ href: null }} />
       <Tabs.Screen name="courses/search" options={{ href: null }} />
       <Tabs.Screen name="courses/success" options={{ href: null }} />

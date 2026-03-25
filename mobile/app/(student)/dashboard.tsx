@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAttendance } from '@/contexts/AttendanceContext';
-import { Bell, QrCode, Check, X, BookOpen } from 'lucide-react-native';
+import { Bell, QrCode, Check, X, BookOpen, Calendar, ShieldCheck, User, LayoutGrid, Clock, ChevronRight } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import Svg, { Circle } from 'react-native-svg';
 import { useState, useEffect, useRef } from 'react';
@@ -16,7 +16,9 @@ const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => 
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
   return R * 2 * Math.asin(Math.sqrt(a));
 };
 
@@ -52,7 +54,7 @@ export default function StudentDashboard() {
           timeInterval: 5000, 
           distanceInterval: 5 
         },
-        (position) => {
+        (position: Location.LocationObject) => {
           // Filter bad readings (Step 2)
           if (position.coords.accuracy && position.coords.accuracy > 50) return;
           
@@ -168,15 +170,29 @@ export default function StudentDashboard() {
                 </View>
             </ImageBackground>
         </View>
-        ) : (
-          <View style={styles.section}>
-            <View style={[styles.liveCard, { backgroundColor: isDark ? '#231e0f' : '#F9FAFB', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0', padding: 32, alignItems: 'center' }]}>
-              <BookOpen size={48} color={colors.textSecondary} opacity={0.5} />
-              <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 16, marginBottom: 4, textAlign: 'center' }]}>No Active Sessions</Text>
-              <Text style={{ color: colors.textSecondary, textAlign: 'center' }}>{`You don't have any ongoing lectures at the moment.`}</Text>
+        {/* Quick Actions */}
+        <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
+            <View style={styles.quickActionsGrid}>
+                {[
+                    { id: 'timetable', icon: <Calendar color="#f9c406" size={24} />, label: 'Timetable', route: '/(student)/timetable' },
+                    { id: 'clearance', icon: <ShieldCheck color="#10B981" size={24} />, label: 'Exams', route: '/(student)/exam-clearance' },
+                    { id: 'notifications', icon: <Bell color="#3B82F6" size={24} />, label: 'Alerts', route: '/(student)/notifications' },
+                    { id: 'profile', icon: <User color="#A78BFA" size={24} />, label: 'Profile', route: '/(student)/profile' }
+                ].map((action) => (
+                    <TouchableOpacity 
+                        key={action.id}
+                        style={[styles.actionBtn, { backgroundColor: isDark ? '#352e18' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}
+                        onPress={() => router.push(action.route as any)}
+                    >
+                        <View style={[styles.actionIconBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
+                            {action.icon}
+                        </View>
+                        <Text style={[styles.actionLabel, { color: colors.text }]}>{action.label}</Text>
+                    </TouchableOpacity>
+                ))}
             </View>
-          </View>
-        )}
+        </View>
 
         {/* Attendance Summary */}
         <View style={styles.section}>
@@ -245,7 +261,7 @@ export default function StudentDashboard() {
             </View>
 
             <View style={styles.activityList}>
-                {history.slice(0, 3).map((record) => (
+                {history.slice(0, 3).map((record: any) => (
                     <View key={record.id} style={[styles.activityItem, { backgroundColor: isDark ? '#352e18' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
                         <View style={styles.activityLeft}>
                             <View style={[styles.activityIcon, { backgroundColor: record.status === 'PRESENT' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)' }]}>
@@ -559,6 +575,31 @@ const styles = StyleSheet.create({
   rangeBadgeText: {
     color: '#FFFFFF',
     fontSize: 11,
+    fontFamily: Fonts.lexend.bold,
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  actionBtn: {
+    width: (width - 44) / 2, // 2 columns minus gap and padding
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+    gap: 10,
+  },
+  actionIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionLabel: {
+    fontSize: 13,
     fontFamily: Fonts.lexend.bold,
   },
 });

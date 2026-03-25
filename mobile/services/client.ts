@@ -1,9 +1,11 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_CONFIG, API_ENDPOINTS } from '@/constants/api';
 import { storage } from '@/utils/storage';
+import { router } from 'expo-router';
 
 interface RetryConfig extends InternalAxiosRequestConfig {
   _retryCount?: number;
+  _noRetry?: boolean;
 }
 
 class ApiClient {
@@ -48,6 +50,7 @@ class ApiClient {
         if (!originalRequest) return Promise.reject(error);
 
         const status = error.response?.status;
+        const errorData = error.response?.data as any;
 
         // 1. Handle Token Refresh (401)
         if (status === 401 && !originalRequest.url?.includes(API_ENDPOINTS.AUTH.REFRESH_TOKEN)) {
@@ -66,17 +69,22 @@ class ApiClient {
           const refresh = await storage.getRefreshToken();
           if (!refresh) {
             this.isRefreshing = false;
-            // TODO: Redirect to login if possible, or trigger logout event
+            await this.handleUnauthorized();
             return Promise.reject(error);
           }
 
           try {
             const response = await axios.post(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.REFRESH_TOKEN}`, { refresh });
             const accessToken = response.data?.access || response.data?.access_token;
+            const newRefreshToken = response.data?.refresh || response.data?.refresh_token;
 
             if (!accessToken) throw new Error('Refresh failed');
 
             await storage.setAuthToken(accessToken);
+            if (newRefreshToken) {
+              await storage.setRefreshToken(newRefreshToken);
+            }
+            
             this.processQueue(null, accessToken);
             this.isRefreshing = false;
 
@@ -85,13 +93,16 @@ class ApiClient {
           } catch (refreshError) {
             this.processQueue(refreshError, null);
             this.isRefreshing = false;
+            await this.handleUnauthorized();
             return Promise.reject(refreshError);
           }
         }
 
         // 2. Exponential Backoff Retry for transient errors (500, 502, 503, 504, or Network Error)
         const isTransientError = !status || (status >= 500 && status <= 504);
-        if (isTransientError && (originalRequest._retryCount || 0) < this.maxRetries) {
+        const shouldRetry = isTransientError && !originalRequest._noRetry && (originalRequest._retryCount || 0) < this.maxRetries;
+        
+        if (shouldRetry) {
           originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
           const delay = Math.pow(2, originalRequest._retryCount) * 1000;
 
@@ -100,13 +111,21 @@ class ApiClient {
           });
         }
 
-        // 3. Structured Error Surfaces
-        if (status === 403) {
-            console.error('[API] Permission Denied: You do not have access to this resource.');
+        // 3. Structured Error Mapping
+        if (status === 400) {
+           const message = errorData?.detail || errorData?.message || 'Bad Request';
+           console.error(`[API] 400: ${message}`);
+        } else if (status === 403) {
+            console.error('[API] 403: Permission Denied');
         } else if (status === 404) {
-            console.error('[API] Not Found: The requested resource does not exist.');
+            console.error('[API] 404: Not Found');
+        } else if (status === 429) {
+            const retryAfter = error.response?.headers['retry-after'] || '60';
+            console.error(`[API] 429: Too many requests. Retry after ${retryAfter}s`);
         } else if (status >= 500) {
-            console.error('[API] Server Error: Our systems are experiencing issues. Please try again later.');
+            console.error('[API] 500+: Server Error');
+        } else if (!status) {
+            console.error('[API] Network Error / Timeout');
         }
 
         return Promise.reject(error);
@@ -114,8 +133,18 @@ class ApiClient {
     );
   }
 
-  async get<T>(url: string, params?: any): Promise<T> {
-    const response = await this.client.get<T>(url, { params });
+  private async handleUnauthorized() {
+    await storage.clearAll();
+    // Redirect to login if we have a router available
+    try {
+      router.replace('/(auth)/login');
+    } catch (e) {
+      console.warn('Failed to redirect to login:', e);
+    }
+  }
+
+  async get<T>(url: string, params?: any, config?: any): Promise<T> {
+    const response = await this.client.get<T>(url, { params, ...config });
     return response.data;
   }
 
@@ -124,18 +153,18 @@ class ApiClient {
     return response.data;
   }
 
-  async put<T>(url: string, data?: any): Promise<T> {
-    const response = await this.client.put<T>(url, data);
+  async put<T>(url: string, data?: any, config?: any): Promise<T> {
+    const response = await this.client.put<T>(url, data, config);
     return response.data;
   }
 
-  async patch<T>(url: string, data?: any): Promise<T> {
-    const response = await this.client.patch<T>(url, data);
+  async patch<T>(url: string, data?: any, config?: any): Promise<T> {
+    const response = await this.client.patch<T>(url, data, config);
     return response.data;
   }
 
-  async delete<T>(url: string): Promise<T> {
-    const response = await this.client.delete<T>(url);
+  async delete<T>(url: string, config?: any): Promise<T> {
+    const response = await this.client.delete<T>(url, config);
     return response.data;
   }
 }
