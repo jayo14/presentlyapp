@@ -7,7 +7,7 @@ from utils import email as email_utils
 
 @override_settings(
     RESEND_API_KEY="re_test",
-    DEFAULT_FROM_EMAIL="Presently <noreply@getpresently.com.ng>",
+    DEFAULT_FROM_EMAIL="noreply@getpresently.com.ng",
     FRONTEND_URL="https://getpresently.com.ng",
     SUPPORT_URL="https://getpresently.com.ng/support",
     PRIVACY_URL="https://getpresently.com.ng/privacy",
@@ -29,12 +29,12 @@ class SendTemplateEmailTests(SimpleTestCase):
 
         email_utils.send_template_email(
             template_key="welcome",
-            to="johnayobami77@proton.me",
+            to="ayobamidayo2007@gmail.com",
             variables={"first_name": "John"},
         )
 
         payload = mock_send.call_args[0][0]
-        self.assertEqual(payload["to"], ["johnayobami77@proton.me"])
+        self.assertEqual(payload["to"], ["ayobamidayo2007@gmail.com"])
 
     def test_invalid_template_key_raises_value_error(self):
         with self.assertRaises(ValueError):
@@ -50,7 +50,7 @@ class SendTemplateEmailTests(SimpleTestCase):
 
         email_utils.send_template_email(
             template_key="welcome",
-            to="johnayobami77@proton.me",
+            to="ayobamidayo2007@gmail.com",
             variables={"first_name": "John"},
         )
 
@@ -75,16 +75,16 @@ class SendTemplateEmailTests(SimpleTestCase):
 class EmailHelperTests(SimpleTestCase):
     @patch("utils.email._dispatch_template_email")
     def test_send_welcome_email(self, mock_dispatch):
-        email_utils.send_welcome_email("johnayobami77@proton.me", "John", "https://app/dashboard")
+        email_utils.send_welcome_email("ayobamidayo2007@gmail.com", "John", "https://app/dashboard")
         mock_dispatch.assert_called_once_with(
             template_key="welcome",
-            to="johnayobami77@proton.me",
+            to="ayobamidayo2007@gmail.com",
             variables={"first_name": "John", "dashboard_url": "https://app/dashboard"},
         )
 
     @patch("utils.email._dispatch_template_email")
     def test_send_verify_email(self, mock_dispatch):
-        email_utils.send_verify_email("johnayobami77@proton.me", "John", "123456", 10, "v", "r")
+        email_utils.send_verify_email("ayobamidayo2007@gmail.com", "John", "123456", 10, "v", "r")
         self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "verify_email")
         self.assertEqual(
             mock_dispatch.call_args.kwargs["variables"],
@@ -99,28 +99,28 @@ class EmailHelperTests(SimpleTestCase):
 
     @patch("utils.email._dispatch_template_email")
     def test_send_login_alert_email(self, mock_dispatch):
-        email_utils.send_login_alert_email("johnayobami77@proton.me", "John", "d", "b", "l", "t", "ip", "c", "s")
+        email_utils.send_login_alert_email("ayobamidayo2007@gmail.com", "John", "d", "b", "l", "t", "ip", "c", "s")
         self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "login_alert")
 
     @patch("utils.email._dispatch_template_email")
     def test_send_reset_password_email(self, mock_dispatch):
-        email_utils.send_reset_password_email("johnayobami77@proton.me", "John", "u", 30, "ip", "browser", "loc")
+        email_utils.send_reset_password_email("ayobamidayo2007@gmail.com", "John", "u", 30, "ip", "browser", "loc")
         self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "reset_password")
 
     @patch("utils.email._dispatch_template_email")
     def test_send_session_live_email(self, mock_dispatch):
-        email_utils.send_session_live_email(["johnayobami77@proton.me"], "John", "CSC101", "Course", "Lecturer", "Hall", "10:00", 20, "10:20", "m")
+        email_utils.send_session_live_email(["ayobamidayo2007@gmail.com"], "John", "CSC101", "Course", "Lecturer", "Hall", "10:00", 20, "10:20", "m")
         self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "session_live")
 
     @patch("utils.email._dispatch_template_email")
     def test_send_newsletter_welcome_email(self, mock_dispatch):
-        email_utils.send_newsletter_welcome_email("johnayobami77@proton.me", "John", "E1", "T", "E", "u", "d", "un")
+        email_utils.send_newsletter_welcome_email("ayobamidayo2007@gmail.com", "John", "E1", "T", "E", "u", "d", "un")
         self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "newsletter_welcome")
 
     @patch("utils.email._dispatch_template_email")
     def test_send_attendance_confirmed_email(self, mock_dispatch):
         email_utils.send_attendance_confirmed_email(
-            "johnayobami77@proton.me",
+            "ayobamidayo2007@gmail.com",
             "John",
             "CSC101",
             "Course",
@@ -149,7 +149,7 @@ class EmailDispatchFallbackTests(SimpleTestCase):
         mock_delay.side_effect = Exception("Error 111 connecting to localhost:6379. Connection refused.")
         mock_send_template_email.return_value = {"id": "email_sync"}
 
-        result = email_utils.send_welcome_email("sayojami2007@gmail.com", "John", "https://app/dashboard")
+        result = email_utils.send_welcome_email("ayobamidayo2007@gmail.com", "John", "https://app/dashboard")
 
         self.assertEqual(result, {"id": "email_sync"})
         self.assertTrue(mock_send_template_email.called)
@@ -160,7 +160,7 @@ class EmailDispatchFallbackTests(SimpleTestCase):
     def test_sync_mode_skips_celery(self, mock_delay, mock_send_template_email):
         mock_send_template_email.return_value = {"id": "email_sync"}
 
-        result = email_utils.send_welcome_email("sayojami2007@gmail.com", "John", "https://app/dashboard")
+        result = email_utils.send_welcome_email("ayobamidayo2007@gmail.com", "John", "https://app/dashboard")
 
         self.assertEqual(result, {"id": "email_sync"})
         mock_delay.assert_not_called()
