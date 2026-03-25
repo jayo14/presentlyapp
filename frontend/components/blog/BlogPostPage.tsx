@@ -160,11 +160,13 @@ export const BlogPostPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-text relative selection:bg-primaryContainer selection:text-primary overflow-hidden">
+    <div className="min-h-screen bg-background text-text relative selection:bg-primaryContainer selection:text-primary">
       {/* Decorative Blobs */}
-      <div className="pointer-events-none absolute -right-20 top-20 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
-      <div className="pointer-events-none absolute -left-40 top-1/2 h-[700px] w-[700px] rounded-full bg-primary/5 blur-[150px]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-primary/5 from-10% to-transparent to-100%" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -right-20 top-20 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
+        <div className="absolute -left-40 top-1/2 h-[700px] w-[700px] rounded-full bg-primary/5 blur-[150px]" />
+        <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-primary/5 from-10% to-transparent to-100%" />
+      </div>
       
       {/* SEO: Per-article metadata and Article schema */}
       <BlogSEO
@@ -186,8 +188,10 @@ export const BlogPostPage: React.FC = () => {
         <div className="grid gap-16 lg:grid-cols-[1fr_320px]">
           <div className="relative">
             {/* Social Share Sidebar (Desktop Only) */}
-            <div className="hidden xl:block absolute -left-20 top-0 sticky top-40 space-y-4">
-              <ShareButtons vertical slug={post.slug} title={post.title} />
+            <div className="hidden xl:block absolute -left-20 top-0 pointer-events-none">
+              <div className="sticky top-40 space-y-4 pointer-events-auto">
+                <ShareButtons vertical slug={post.slug} title={post.title} />
+              </div>
             </div>
 
             <article className="prose prose-lg dark:prose-invert max-w-none 
