@@ -40,6 +40,20 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        source='category',
+        queryset=Category.objects.all(),
+        required=False,
+        allow_null=True,
+        write_only=True,
+    )
+    tag_ids = serializers.PrimaryKeyRelatedField(
+        source='tags',
+        queryset=Tag.objects.all(),
+        many=True,
+        required=False,
+        write_only=True,
+    )
 
     class Meta:
         model = Post
@@ -54,6 +68,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'author_avatar',
             'category',
             'tags',
+            'category_id',
+            'tag_ids',
             'status',
             'is_featured',
             'reading_time',
@@ -64,6 +80,20 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'seo_title',
             'seo_description',
         ]
+
+    def create(self, validated_data):
+        tags = validated_data.pop('tags', None)
+        post = super().create(validated_data)
+        if tags is not None:
+            post.tags.set(tags)
+        return post
+
+    def update(self, instance, validated_data):
+        tags = validated_data.pop('tags', None)
+        post = super().update(instance, validated_data)
+        if tags is not None:
+            post.tags.set(tags)
+        return post
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
