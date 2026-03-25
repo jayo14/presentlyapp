@@ -72,6 +72,26 @@ class SendTemplateEmailTests(SimpleTestCase):
         self.assertEqual(params["privacy_url"], "https://getpresently.com.ng/privacy")
         self.assertEqual(params["institution_url"], "https://getpresently.com.ng")
 
+    @patch("utils.email.resend.Emails.send")
+    def test_retries_with_compat_template_payload(self, mock_send):
+        mock_send.side_effect = [
+            Exception("Missing `html` or `text` field."),
+            {"id": "email_compat"},
+        ]
+
+        result = email_utils.send_template_email(
+            template_key="welcome",
+            to="ayobamidayo2007@gmail.com",
+            variables={"first_name": "John"},
+        )
+
+        self.assertEqual(result, {"id": "email_compat"})
+        self.assertEqual(mock_send.call_count, 2)
+        compat_payload = mock_send.call_args_list[1][0][0]
+        self.assertIn("template", compat_payload)
+        self.assertEqual(compat_payload["template"]["id"], "tmpl_welcome")
+        self.assertIn("variables", compat_payload["template"])
+
 
 @override_settings(
     RESEND_TEMPLATES={

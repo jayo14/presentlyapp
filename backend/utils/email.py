@@ -60,7 +60,32 @@ def send_template_email(
             extra={"template_key": template_key, "to": recipients},
         )
         return response
-    except Exception:
+    except Exception as exc:
+        # Some Resend SDK/API versions require template payload under "template"
+        # instead of top-level "template_id"/"params".
+        if "Missing `html` or `text` field" in str(exc):
+            compat_payload: dict[str, Any] = {
+                "from": from_email or settings.DEFAULT_FROM_EMAIL,
+                "to": recipients,
+                "template": {
+                    "id": template_id,
+                    "variables": params,
+                },
+            }
+            if subject:
+                compat_payload["subject"] = subject
+
+            logger.warning(
+                "Retrying Resend send with compatibility template payload",
+                extra={"template_key": template_key, "to": recipients},
+            )
+            response = resend.Emails.send(compat_payload)
+            logger.info(
+                "Resend template email sent (compat mode)",
+                extra={"template_key": template_key, "to": recipients},
+            )
+            return response
+
         logger.error(
             "Failed to send Resend template email",
             exc_info=True,
