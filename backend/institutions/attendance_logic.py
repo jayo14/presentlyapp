@@ -128,10 +128,12 @@ def perform_attendance_check_in(request, session):
             'reason': 'Location data is required'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.user.role != UserRole.STUDENT:
+    is_superuser = getattr(request.user, 'is_superuser', False)
+
+    if not is_superuser and request.user.role != UserRole.STUDENT:
         return Response({'success': False, 'status': 'error', 'error': 'Only students can check in'}, status=status.HTTP_403_FORBIDDEN)
 
-    if not CourseEnrollment.objects.filter(
+    if not is_superuser and not CourseEnrollment.objects.filter(
         student=request.user,
         course=session.course,
         is_active=True,
