@@ -4,26 +4,26 @@ from django.core.cache import cache
 from .models import FeatureFlag
 
 
-def _cache_key(key: str) -> str:
-    return f"feature_flag:{key}"
+def _cache_key(key: str, value_type: str) -> str:
+    return f"feature_flag:{value_type}:{key}"
 
 
 def get_feature_flag(key: str, default: bool = False) -> bool:
-    cached = cache.get(_cache_key(key))
+    cached = cache.get(_cache_key(key, 'bool'))
     if cached is not None:
         return bool(cached)
 
     try:
         flag = FeatureFlag.objects.filter(key=key).only('enabled').first()
         value = flag.enabled if flag is not None else bool(default)
-        cache.set(_cache_key(key), value, timeout=60)
+        cache.set(_cache_key(key, 'bool'), value, timeout=60)
         return bool(value)
     except Exception:
         return bool(default)
 
 
 def get_feature_int(key: str, default: int) -> int:
-    cached = cache.get(_cache_key(key))
+    cached = cache.get(_cache_key(key, 'int'))
     if cached is not None:
         try:
             return int(cached)
@@ -33,7 +33,7 @@ def get_feature_int(key: str, default: int) -> int:
     try:
         flag = FeatureFlag.objects.filter(key=key).only('int_value').first()
         value = int(flag.int_value) if flag and flag.int_value is not None else int(default)
-        cache.set(_cache_key(key), value, timeout=60)
+        cache.set(_cache_key(key, 'int'), value, timeout=60)
         return value
     except Exception:
         return int(default)

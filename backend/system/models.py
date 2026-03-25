@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.cache import cache
 from institutions.models import User
 
 
@@ -19,6 +20,17 @@ class FeatureFlag(models.Model):
 
     def __str__(self):
         return f"{self.key} ({'on' if self.enabled else 'off'})"
+
+    def save(self, *args, **kwargs):
+        result = super().save(*args, **kwargs)
+        cache.delete(f"feature_flag:bool:{self.key}")
+        cache.delete(f"feature_flag:int:{self.key}")
+        return result
+
+    def delete(self, *args, **kwargs):
+        cache.delete(f"feature_flag:bool:{self.key}")
+        cache.delete(f"feature_flag:int:{self.key}")
+        return super().delete(*args, **kwargs)
 
 class SystemLog(models.Model):
     EVENT_TYPES = (
