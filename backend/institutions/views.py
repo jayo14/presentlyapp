@@ -1077,13 +1077,21 @@ def verify_reset_token_view(request):
 class IsAdminUser(permissions.BasePermission):
     """Allow only admin users"""
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == UserRole.ADMIN
+        return (
+            request.user
+            and request.user.is_authenticated
+            and (getattr(request.user, 'is_superuser', False) or request.user.role == UserRole.ADMIN)
+        )
 
 
 class IsLecturerOrAdmin(permissions.BasePermission):
     """Allow lecturers and admins"""
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role in [UserRole.LECTURER, UserRole.ADMIN]
+        return (
+            request.user
+            and request.user.is_authenticated
+            and (getattr(request.user, 'is_superuser', False) or request.user.role in [UserRole.LECTURER, UserRole.ADMIN])
+        )
 
 
 class RequireRBACPermission(permissions.BasePermission):
@@ -1097,6 +1105,9 @@ class RequireRBACPermission(permissions.BasePermission):
         user = request.user
         if not user or not user.is_authenticated:
             return False
+        # Super admins bypass all permission checks
+        if getattr(user, 'is_superuser', False):
+            return True
         if self.allow_lecturer and user.role == UserRole.LECTURER:
             return True
         return bool(
