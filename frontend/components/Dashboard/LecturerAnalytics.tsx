@@ -73,7 +73,7 @@ export const LecturerAnalytics: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 border-input border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         <p className="text-textMuted animate-pulse">Gathering insights...</p>
       </div>
     );
@@ -113,7 +113,7 @@ export const LecturerAnalytics: React.FC = () => {
 
         <div className="bg-surface text-text border border-outline p-6 rounded-2xl shadow-sm">
           <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500 rounded-xl">
+            <div className="p-3 bg-blue-500/10 text-blue-500 rounded-xl">
               <Calendar size={24} />
             </div>
             <div>

@@ -140,7 +140,7 @@ export const UserManagement: React.FC = () => {
       case UserRole.ADMIN:
         return 'bg-purple-500/10 text-purple-500 border-purple-500/30';
       case UserRole.LECTURER:
-        return 'bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500 border-blue-500/30';
+        return 'bg-blue-500/10 text-blue-500 border-blue-500/30';
       case UserRole.CLASS_REP:
         return 'bg-green-500/10 text-green-500 border-green-500/30';
       default:
@@ -447,7 +447,7 @@ export const UserManagement: React.FC = () => {
 
       {/* User Details Modal */}
       {showModal && selectedUser && (
-        <div className="fixed inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div 
             {...modalProps}
             aria-labelledby="user-details-title"

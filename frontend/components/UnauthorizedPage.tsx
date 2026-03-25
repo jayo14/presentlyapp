@@ -19,7 +19,7 @@ export const UnauthorizedPage: React.FC = () => {
   const state = location.state as LocationState;
 
   return (
-    <div className="min-h-screen bg-cardackgroundackground flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         {/* Error Icon */}
         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-full inline-flex items-center justify-center w-20 h-20">

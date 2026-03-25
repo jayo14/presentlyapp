@@ -329,7 +329,7 @@ export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
                 </span>
                 {dept.accreditation_status && (
                   <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
-                    dept.accreditation_status === 'ACCREDITED' ? 'bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500' : 'bg-yellow-500/10 text-yellow-500'
+                    dept.accreditation_status === 'ACCREDITED' ? 'bg-blue-500/10 text-blue-500' : 'bg-yellow-500/10 text-yellow-500'
                   }`}>
                     {dept.accreditation_status}
                   </span>

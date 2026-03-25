@@ -726,7 +726,7 @@ export const Onboarding: React.FC = () => {
       <div className="flex flex-col items-center mb-8 gap-4">
         <div className="relative group cursor-pointer">
            <div
-             className="w-28 h-28 rounded-full bg-surfaceLow overflow-hidden border-input border-outline ring-2 ring-outline group-hover:ring-primary transition-all"
+             className="w-28 h-28 rounded-full bg-surfaceLow overflow-hidden border-2 border-outline ring-2 ring-outline group-hover:ring-primary transition-all"
              aria-hidden="true"
            >
               {state.pendingImage ? (
@@ -793,15 +793,15 @@ export const Onboarding: React.FC = () => {
     <div className="space-y-6">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-headline text-xl font-bold text-text-primary">
+          <h2 className="font-headline text-xl font-bold text-primary">
             Institutional Details
           </h2>
-          <span className="text-on-primary-fixedase font-semibold text-text-primary">
+          <span className="text-base font-semibold text-primary">
             3 of 3
           </span>
         </div>
 
-        <h3 className="font-headline text-3xl md:text-4xl font-black text-text-primary mb-3">
+        <h3 className="font-headline text-3xl md:text-4xl font-black text-primary mb-3">
           Link your Institution
         </h3>
         <p className="text-sm text-textMuted">
@@ -814,7 +814,7 @@ export const Onboarding: React.FC = () => {
         <div>
           <label
             htmlFor="institution-select"
-            className="block text-on-primary-fixedase font-semibold text-text-primary mb-2"
+            className="block text-base font-semibold text-primary mb-2"
           >
             Select University
           </label>
@@ -831,7 +831,7 @@ export const Onboarding: React.FC = () => {
                 }}
                 aria-required="true"
                 aria-label="Select your university or institution"
-                className="w-full bg-surface border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
+                className="w-full bg-surface border border-[#E0E0E0] text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
               >
                 <option value="">Select your institution</option>
                 {state.institutions.map(inst => (
@@ -880,7 +880,7 @@ export const Onboarding: React.FC = () => {
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             <label
               htmlFor="college-select"
-              className="block text-on-primary-fixedase font-semibold text-text-primary mb-2"
+              className="block text-base font-semibold text-primary mb-2"
             >
               Select Faculty
             </label>
@@ -899,7 +899,7 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your faculty or college"
                   aria-disabled={state.colleges.length === 0}
-                  className="w-full bg-surface border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-surface border border-[#E0E0E0] text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select college/faculty</option>
                   {state.colleges.map(col => (
@@ -925,7 +925,7 @@ export const Onboarding: React.FC = () => {
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             <label
               htmlFor="department-select"
-              className="block text-on-primary-fixedase font-semibold text-text-primary mb-2"
+              className="block text-base font-semibold text-primary mb-2"
             >
               Select Department
             </label>
@@ -944,7 +944,7 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your department"
                   aria-disabled={state.departments.length === 0}
-                  className="w-full bg-surface border border-[#E0E0E0] text-text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-surface border border-[#E0E0E0] text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Select department</option>
                   {state.departments.map(dept => (
@@ -1283,7 +1283,7 @@ export const Onboarding: React.FC = () => {
                 </button>
               )}
               <button
-                className="flex-1 py-5 bg-[#FDB913] hover:bg-[#E5A912] text-on-primary-fixedlack font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
+                className="flex-1 py-5 bg-[#FDB913] hover:bg-[#E5A912] text-black font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
                 onClick={handleNext}
                 disabled={(state.step === 1 && !state.selectedRole) || (state.pendingImage !== null) || completeOnboardingMutation.isPending}
                 aria-busy={completeOnboardingMutation.isPending}

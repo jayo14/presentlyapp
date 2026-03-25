@@ -297,7 +297,7 @@ export const InstitutionManagement: React.FC = () => {
                   
                   <div className="flex flex-wrap gap-2 pt-1">
                     {inst.institution_type && (
-                       <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500 border border-blue-500/20 uppercase tracking-wide">
+                       <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-wide">
                         {inst.institution_type}
                       </span>
                     )}

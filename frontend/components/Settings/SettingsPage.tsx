@@ -117,7 +117,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <User size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-base text-left">
               Edit Profile
             </span>
             <ChevronRight size={20} className="text-textMuted" />
@@ -131,7 +131,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Phone size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-base text-left">
               Change Phone Number
             </span>
             <ChevronRight size={20} className="text-textMuted" />
@@ -145,7 +145,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Bell size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-base text-left">
               Notification Preferences
             </span>
             <ChevronRight size={20} className="text-textMuted" />
@@ -163,7 +163,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Moon size={22} className="text-primary" />
             </div>
-            <span className="text-text font-medium text-on-primary-fixedase">
+            <span className="text-text font-medium text-base">
               Dark Mode
             </span>
           </div>
@@ -186,7 +186,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Lock size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-base text-left">
               Two-Factor Authentication
             </span>
             <ChevronRight size={20} className="text-textMuted" />
@@ -200,7 +200,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
               <Database size={22} className="text-primary" />
             </div>
-            <span className="flex-1 text-text font-medium text-on-primary-fixedase text-left">
+            <span className="flex-1 text-text font-medium text-base text-left">
               Data Export Preferences
             </span>
             <ChevronRight size={20} className="text-textMuted" />
@@ -493,7 +493,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                 </div>
             </button>
             <button className="flex items-center gap-4 p-4 bg-surface text-text border border-outline rounded-xl hover:bg-surfaceLow hover:text-textMuted transition-colors text-left shadow-sm">
-                <div className="bg-cardackgroundlue-500/10 p-3 rounded-full text-on-primary-fixedlue-500">
+                <div className="bg-blue-500/10 p-3 rounded-full text-blue-500">
                     <FileText size={20} />
                 </div>
                 <div>
@@ -514,7 +514,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
 
       {/* Report Issue Modal */}
       {isReportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cardackgroundlack/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div 
                 {...reportModalProps}
                 aria-labelledby="report-title"

@@ -377,7 +377,7 @@ export const PublicCheckInPage: React.FC = () => {
                 <div className="flex justify-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary relative">
                     <UserPlus size={32} />
-                    <div className="absolute -top-1 -right-1 bg-primary text-on-primary-fixedlack text-xs font-black w-6 h-6 rounded-full flex items-center justify-center border-outline border-black">
+                    <div className="absolute -top-1 -right-1 bg-primary text-black text-xs font-black w-6 h-6 rounded-full flex items-center justify-center border-outline border-black">
                       {countdown}
                     </div>
                   </div>
@@ -412,7 +412,7 @@ export const PublicCheckInPage: React.FC = () => {
                   </div>
 
                   <div className="p-4 rounded-2xl bg-surface/50 border border-outline flex items-start gap-4">
-                    <div className="p-2 rounded-lg bg-cardackgroundlue-500/10 text-on-primary-fixedlue-500">
+                    <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
                       <CheckCircle2 size={20} />
                     </div>
                     <div>

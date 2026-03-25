@@ -221,7 +221,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                 ) : logs.map(log => (
                   <tr key={log.id} className="hover:bg-surfaceHigh hover:text-text/50 transition-colors">
                     <td className="px-4 py-3">
-                      {log.level === 'info' && <Info size={16} className="text-on-primary-fixedlue-500" />}
+                      {log.level === 'info' && <Info size={16} className="text-blue-500" />}
                       {log.level === 'warning' && <AlertTriangle size={16} className="text-muted-foregroundmber-500" />}
                       {log.level === 'error' && <XCircle size={16} className="text-red-500" />}
                       {log.level === 'success' && <CheckCircle size={16} className="text-emerald-500" />}
@@ -275,7 +275,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
 
   // Default Admin Dashboard Overview
   const statCards = [
-    { label: "Total Users", value: systemStats.total_users.toLocaleString(), icon: Users, color: "text-on-primary-fixedlue-600 dark:text-on-primary-fixedlue-400", bg: "bg-cardackgroundlue-50 dark:bg-cardackgroundlue-500/10" },
+    { label: "Total Users", value: systemStats.total_users.toLocaleString(), icon: Users, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10" },
     { label: "Active Venues", value: systemStats.active_venues.toString(), icon: MapIcon, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
     { label: "Total Sessions", value: systemStats.total_sessions.toLocaleString(), icon: Activity, color: "text-muted-foregroundmber-600 dark:text-muted-foregroundmber-400", bg: "bg-inputmber-50 dark:bg-inputmber-500/10" },
     { label: "Security Alerts", value: systemStats.security_alerts.toString(), icon: ShieldAlert, color: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-500/10" },

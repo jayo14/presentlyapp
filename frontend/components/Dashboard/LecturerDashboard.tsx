@@ -266,7 +266,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <button
             onClick={() => navigate('/dashboard/sessions/new')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
           >
             <Plus size={16} />
             New Session
@@ -277,8 +277,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-surface text-text border border-outline rounded-xl p-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-cardackgroundlue-50 flex items-center justify-center">
-                <BookOpen size={18} className="text-on-primary-fixedlue-600" />
+              <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                <BookOpen size={18} className="text-blue-600" />
               </div>
             </div>
             <p className="text-2xl font-semibold text-text">{courses.length}</p>
@@ -321,11 +321,11 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
               <div className="w-14 h-14 bg-surfaceHigh rounded-full flex items-center justify-center mx-auto mb-4">
                 <Calendar className="text-textMuted" size={24} />
               </div>
-              <h4 className="font-headline text-on-primary-fixedase font-semibold text-text mb-1">No sessions recorded</h4>
+              <h4 className="font-headline text-base font-semibold text-text mb-1">No sessions recorded</h4>
               <p className="text-sm text-textMuted mb-6 max-w-xs mx-auto">Start taking attendance for your courses to see sessions here.</p>
               <button
                 onClick={() => navigate('/dashboard/sessions/new')}
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Create Your First Session
               </button>
@@ -381,7 +381,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             e.stopPropagation();
                             navigate(`/dashboard/reports?courseId=${session.course}&sessionId=${session.id}`);
                           }}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-primary text-text rounded-lg hover:bg-primary hover:text-on-primary-fixedlack transition-colors"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-primary text-text rounded-lg hover:bg-primary hover:text-black transition-colors"
                         >
                           <FileText size={13} />
                           Report
@@ -419,7 +419,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
         {/* Delete Confirmation */}
         {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-cardackgroundlack/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <div
               {...deleteModalProps}
               aria-labelledby="delete-title"
@@ -430,7 +430,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                   <Trash2 size={20} />
                 </div>
                 <div>
-                  <h3 id="delete-title" className="font-headline text-on-primary-fixedase font-semibold text-text">Delete Session?</h3>
+                  <h3 id="delete-title" className="font-headline text-base font-semibold text-text">Delete Session?</h3>
                   <p className="text-sm text-textMuted mt-0.5">This action cannot be undone.</p>
                 </div>
               </div>

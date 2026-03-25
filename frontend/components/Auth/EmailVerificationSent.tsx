@@ -91,7 +91,7 @@ export const EmailVerificationSent: React.FC = () => {
           </div>
 
           <h2 className="font-headline text-2xl font-bold text-text mb-3">Verify your Email</h2>
-          <p className="text-[#a1a1aa] text-on-primary-fixedase leading-relaxed max-w-xl mb-4">
+          <p className="text-[#a1a1aa] text-base leading-relaxed max-w-xl mb-4">
             We've sent a verification link to your university email address.
             Please click the link to confirm your account and access Presently.
           </p>

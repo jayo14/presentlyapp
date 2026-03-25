@@ -73,7 +73,7 @@ export const SessionsPage: React.FC = () => {
           </div>
           <button
             onClick={() => navigate('/dashboard/sessions/new')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
           >
             <Plus size={16} />
             New Session
@@ -120,14 +120,14 @@ export const SessionsPage: React.FC = () => {
             <div className="w-14 h-14 bg-surfaceHigh rounded-full flex items-center justify-center mx-auto mb-4">
               <Calendar className="text-textMuted" size={24} />
             </div>
-            <h3 className="font-headline text-on-primary-fixedase font-semibold text-text mb-1">No sessions found</h3>
+            <h3 className="font-headline text-base font-semibold text-text mb-1">No sessions found</h3>
             <p className="text-sm text-textMuted mb-6 max-w-sm mx-auto">
               {searchTerm ? `No sessions matching "${searchTerm}"` : "You haven't created any attendance sessions yet."}
             </p>
             {!searchTerm && (
               <button
                 onClick={() => navigate('/dashboard/sessions/new')}
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Create Your First Session
               </button>
@@ -207,7 +207,7 @@ export const SessionsPage: React.FC = () => {
 
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-cardackgroundlack/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <div
               {...deleteModalProps}
               aria-labelledby="delete-session-title"
@@ -218,7 +218,7 @@ export const SessionsPage: React.FC = () => {
                   <Trash2 size={24} />
                 </div>
                 <div>
-                  <h3 id="delete-session-title" className="font-headline text-on-primary-fixedase font-semibold text-text">Delete Session?</h3>
+                  <h3 id="delete-session-title" className="font-headline text-base font-semibold text-text">Delete Session?</h3>
                   <p className="text-sm text-textMuted mt-1.5 leading-relaxed">
                     This will permanently remove the session and all associated records.
                   </p>
