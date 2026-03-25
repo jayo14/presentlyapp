@@ -2,6 +2,13 @@ import secrets
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
+from system.feature_flags import (
+    default_strict_venue_validation_enabled,
+    default_venue_max_boundary_points,
+    default_venue_max_payload_chars,
+    get_feature_flag,
+    get_feature_int,
+)
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
     Attendance, UserRole, Venue, Timetable, AuditLog,
@@ -149,16 +156,54 @@ class VenueSerializer(serializers.ModelSerializer):
             ret['boundary_coordinates'] = instance.boundary
         return ret
 
+    def _strict_venue_limits(self):
+        strict_enabled = get_feature_flag(
+            'strict_venue_payload_validation',
+            default=default_strict_venue_validation_enabled(),
+        )
+        max_points = get_feature_int(
+            'venue_max_boundary_points',
+            default=default_venue_max_boundary_points(),
+        )
+        max_payload_chars = get_feature_int(
+            'venue_max_payload_chars',
+            default=default_venue_max_payload_chars(),
+        )
+        return strict_enabled, max_points, max_payload_chars
+
     def validate(self, attrs):
         # No GIS conversion needed
         latitude = attrs.get('latitude')
         longitude = attrs.get('longitude')
         boundary_coords = attrs.get('boundary_coordinates')
+        strict_enabled, max_points, max_payload_chars = self._strict_venue_limits()
         
         if (latitude is not None and longitude is None) or (latitude is None and longitude is not None):
             raise serializers.ValidationError({"latitude": "Both latitude and longitude must be provided together."})
             
         if boundary_coords is not None and len(boundary_coords) > 0:
+            if strict_enabled and len(boundary_coords) > max_points:
+                raise serializers.ValidationError(
+                    {
+                        'boundary_coordinates': (
+                            f'Boundary has {len(boundary_coords)} points, which exceeds '
+                            f'the configured limit of {max_points}.'
+                        )
+                    }
+                )
+
+            if strict_enabled:
+                estimated_chars = len(boundary_coords) * 24
+                if estimated_chars > max_payload_chars:
+                    raise serializers.ValidationError(
+                        {
+                            'boundary_coordinates': (
+                                'Boundary payload is too large for configured limits. '
+                                f'Estimated size {estimated_chars} chars exceeds {max_payload_chars}.'
+                            )
+                        }
+                    )
+
             if not isinstance(boundary_coords, list):
                 raise serializers.ValidationError({"boundary_coordinates": "Boundary must be an array of coordinate pairs."})
             
@@ -179,6 +224,23 @@ class VenueSerializer(serializers.ModelSerializer):
     def validate_boundary_coordinates(self, value):
         """Validate that boundary coordinates are properly formatted if provided"""
         if value is not None and len(value) > 0:
+            strict_enabled, max_points, max_payload_chars = self._strict_venue_limits()
+
+            if strict_enabled and len(value) > max_points:
+                raise serializers.ValidationError(
+                    f"Boundary has {len(value)} points, which exceeds the configured limit of {max_points}."
+                )
+
+            if strict_enabled:
+                estimated_chars = len(value) * 24
+                if estimated_chars > max_payload_chars:
+                    raise serializers.ValidationError(
+                        (
+                            'Boundary payload is too large for configured limits. '
+                            f'Estimated size {estimated_chars} chars exceeds {max_payload_chars}.'
+                        )
+                    )
+
             if not isinstance(value, list):
                 raise serializers.ValidationError("Boundary coordinates must be an array")
             

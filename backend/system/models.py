@@ -2,6 +2,24 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from institutions.models import User
 
+
+class FeatureFlag(models.Model):
+    """Runtime feature flags and thresholds editable from Django admin."""
+
+    key = models.CharField(max_length=120, unique=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    enabled = models.BooleanField(default=False)
+    int_value = models.PositiveIntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['key']
+
+    def __str__(self):
+        return f"{self.key} ({'on' if self.enabled else 'off'})"
+
 class SystemLog(models.Model):
     EVENT_TYPES = (
         ('AUTH', 'Authentication'),

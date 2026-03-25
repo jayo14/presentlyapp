@@ -371,6 +371,11 @@ LOCATION_FIELD = {
     'provider.google.map.type': 'ROADMAP',
 }
 
+# Feature-flagged safety limits for large venue boundary payloads.
+STRICT_VENUE_PAYLOAD_VALIDATION_DEFAULT = os.environ.get('STRICT_VENUE_PAYLOAD_VALIDATION_DEFAULT', 'False') == 'True'
+VENUE_MAX_BOUNDARY_POINTS_DEFAULT = int(os.environ.get('VENUE_MAX_BOUNDARY_POINTS_DEFAULT', '500'))
+VENUE_MAX_PAYLOAD_CHARS_DEFAULT = int(os.environ.get('VENUE_MAX_PAYLOAD_CHARS_DEFAULT', '50000'))
+
 # Django Unfold Admin Configuration
 UNFOLD = {
     "SITE_TITLE": "Presently Admin",
@@ -493,6 +498,11 @@ UNFOLD = {
                         "title": "User Devices",
                         "icon": "devices",
                         "link": lambda request: "/admin/accounts/userdevice/",
+                    },
+                    {
+                        "title": "Feature Flags",
+                        "icon": "toggle_on",
+                        "link": lambda request: "/admin/system/featureflag/",
                     },
                 ],
             },
