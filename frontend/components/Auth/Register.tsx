@@ -122,7 +122,7 @@ export const Register: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cardackgroundackground">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 size={40} className="animate-spin text-primary" />
           <p className="text-textMuted">Loading</p>
@@ -132,7 +132,7 @@ export const Register: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cardackgroundackground flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative">
       <SEO
         title="Register | Presently"
         description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
@@ -177,7 +177,7 @@ export const Register: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-surfaceContainer border border-outline text-text rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                 </div>
               </div>
@@ -196,7 +196,7 @@ export const Register: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-surfaceContainer border border-outline text-text rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                 </div>
               </div>
@@ -215,7 +215,7 @@ export const Register: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-12 bg-surfaceContainer border border-outline text-text rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   />
                   <button
                     type="button"
@@ -278,9 +278,9 @@ export const Register: React.FC = () => {
           </form>
 
           <div className="flex items-center gap-4 my-8">
-            <div className="h-px bg-cardackgroundorder flex-1" />
+            <div className="h-px bg-outline flex-1" />
             <span className="text-xs text-textMuted uppercase font-bold tracking-wide">Or sign up with</span>
-            <div className="h-px bg-cardackgroundorder flex-1" />
+            <div className="h-px bg-outline flex-1" />
           </div>
 
           <div className="flex justify-center gap-6 mb-4">

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Loader, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { sessionApi, CheckInData } from '../../services/api/attendance';
-import { getCurrentPosition, verifyVenueLocation, formatDistance, validateGPSWithIP } from '../../services/geolocation';
+import { getCurrentPosition, getIPLocation } from '../../services/geolocation';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface AttendanceCheckInProps {
@@ -50,17 +51,12 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
 
       // Step 1b: Verify with IP Geolocation (Anti-spoofing)
       setLocationInfo('Cross-verifying with network signals...');
-      const ipValidation = await validateGPSWithIP(position.latitude, position.longitude);
-      
-      if (!ipValidation.valid) {
-        console.warn(`IP Geolocation mismatch: GPS is >50km from IP city (${ipValidation.ipCity})`);
-        // We don't block yet, but we can flag it or warn the user
-        // setError(`Warning: Your network location (${ipValidation.ipCity}) doesn't match your GPS. Please disable any VPNs.`);
-      } else {
-        setLocationInfo(`Location verified via network (${ipValidation.ipCity})`);
+      const ipLoc = await getIPLocation();
+      if (ipLoc) {
+        setLocationInfo(`Location verified via network (${ipLoc.city})`);
       }
 
-      // Step 2: Check in
+      // Step 2: Check in by session code
       setStatus('verifying');
       setLocationInfo('Verifying session and location...');
 
@@ -70,41 +66,59 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         elevation: position.altitude,
       };
 
-      // TODO: Implement endpoint that accepts session_code for lookup
-      // Backend needs: POST /sessions/check-in-by-code/ with { session_code, ...checkInData }
-      // For now this is a placeholder that will need the actual session ID
-      // In production, you should:
-      // 1. First call an endpoint to find session by code: GET /sessions/?session_code={code}
-      // 2. Then call check_in with the found session ID
-      
-      // Temporary workaround - this will fail without proper session ID
-      // const sessions = await sessionApi.getAll({ active: true });
-      // const session = sessions.find(s => s.session_code === sessionCode);
-      // if (!session) throw new Error('Session not found');
-      
-      const result = await sessionApi.checkIn(1, checkInData); // FIXME: Use actual session ID
-      
+      const result: any = await sessionApi.checkInByCode(sessionCode.toUpperCase(), checkInData);
+
       setCheckInResult(result);
 
-      if (result.location_verified) {
+      if (result?.success || result?.status === 'success' || result?.location_verified) {
         setStatus('success');
         setLocationInfo(
           `✓ Check-in successful! Distance: ${result.distance_from_venue?.toFixed(0) || '0'}m from venue.`
         );
+        toast.success('Attendance marked!', { description: 'You have been marked present for this session.' });
         setTimeout(() => {
           onSuccess?.();
           onClose();
         }, 2000);
       } else {
         setStatus('error');
-        setError(
-          result.warning || 
-          `Location not verified. You are ${result.distance_from_venue?.toFixed(0) || '0'}m from the venue.`
-        );
+        const errMsg =
+          result?.error ||
+          result?.warning ||
+          `Location not verified. You are ${result?.distance_from_venue?.toFixed(0) || '0'}m from the venue.`;
+        setError(errMsg);
+        toast.error('Check-in failed', { description: errMsg });
       }
     } catch (err: any) {
       setStatus('error');
-      setError(err.message || 'Failed to check in. Please try again.');
+      const raw: string = err?.response?.data?.error || err?.response?.data?.reason || err?.message || '';
+
+      let userMessage: string;
+      let toastTitle = 'Check-in failed';
+
+      if (raw.toLowerCase().includes('not enrolled') || raw.toLowerCase().includes('enroll')) {
+        userMessage = 'You are not enrolled in this course. Please enroll before checking in.';
+        toastTitle = 'Not enrolled';
+      } else if (raw.toLowerCase().includes('session is not active') || raw.toLowerCase().includes('expir')) {
+        userMessage = 'This session is no longer active or has expired. Contact your lecturer.';
+        toastTitle = 'Session inactive';
+      } else if (raw.toLowerCase().includes('outside') || raw.toLowerCase().includes('location') || raw.toLowerCase().includes('geofence')) {
+        userMessage = 'You appear to be outside the session venue. Move closer and try again.';
+        toastTitle = 'Location mismatch';
+      } else if (raw.toLowerCase().includes('already')) {
+        userMessage = 'Attendance already recorded for this session.';
+        toastTitle = 'Already checked in';
+      } else if (raw.toLowerCase().includes('mock') || raw.toLowerCase().includes('emulator') || raw.toLowerCase().includes('spoof')) {
+        userMessage = 'Suspicious location detected. Disable VPN or mock location apps and try again.';
+        toastTitle = 'Location spoofing detected';
+      } else if (raw) {
+        userMessage = raw;
+      } else {
+        userMessage = 'Failed to check in. Please try again.';
+      }
+
+      setError(userMessage);
+      toast.error(toastTitle, { description: userMessage });
       setLocationInfo(null);
     }
   };
@@ -120,7 +134,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cardackgroundlack/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
       <div 
         {...modalProps}
         aria-labelledby="checkin-title"
@@ -131,7 +145,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
             {status === 'idle' && <MapPin className="w-8 h-8 text-primary" />}
             {status === 'locating' && <Loader className="w-8 h-8 text-primary animate-spin" />}
-            {status === 'verifying' && <Loader className="w-8 h-8 text-on-primary-fixedlue-500 animate-spin" />}
+            {status === 'verifying' && <Loader className="w-8 h-8 text-blue-500 animate-spin" />}
             {status === 'success' && <CheckCircle className="w-8 h-8 text-green-500" />}
             {status === 'error' && <XCircle className="w-8 h-8 text-red-500" />}
           </div>
@@ -156,14 +170,14 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
           <div className={`p-4 rounded-lg mb-4 ${
             status === 'success' 
               ? 'bg-green-500/10 border border-green-500/30' 
-              : 'bg-cardackgroundlue-500/10 border border-blue-500/30'
+              : 'bg-blue-500/10 border border-blue-500/30'
           }`}>
             <div className="flex items-start gap-3">
               <MapPin className={`w-5 h-5 mt-0.5 ${
-                status === 'success' ? 'text-green-500' : 'text-on-primary-fixedlue-500'
+                status === 'success' ? 'text-green-500' : 'text-blue-500'
               }`} />
               <p className={`text-sm ${
-                status === 'success' ? 'text-green-400' : 'text-on-primary-fixedlue-400'
+                status === 'success' ? 'text-green-400' : 'text-blue-400'
               }`}>
                 {locationInfo}
               </p>

@@ -7,6 +7,15 @@ import { Input } from '../Input';
 import { SEO } from '../SEO';
 import { staffApi, StaffInvitation, StaffProfile, StaffRole } from '../../services/api/staff';
 
+const STATUS_BADGE: Record<string, string> = {
+  ACTIVE: 'bg-green-500/15 text-green-600 dark:text-green-400',
+  PENDING: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+  SUSPENDED: 'bg-red-500/15 text-red-600 dark:text-red-400',
+  REVOKED: 'bg-red-500/15 text-red-600 dark:text-red-400',
+  ACCEPTED: 'bg-green-500/15 text-green-600 dark:text-green-400',
+  EXPIRED: 'bg-surface text-textMuted',
+};
+
 export const StaffManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -131,6 +140,7 @@ export const StaffManagement: React.FC = () => {
         </Button>
       </div>
 
+      {/* Invite Form */}
       <form onSubmit={handleInvite} className="bg-surface border border-outline rounded-lg p-4 space-y-4">
         <h3 className="text-base font-semibold text-text flex items-center gap-2">
           <Users className="w-4 h-4" /> Invite New Staff
@@ -193,65 +203,109 @@ export const StaffManagement: React.FC = () => {
         </div>
       </form>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <div className="bg-surface border border-outline rounded-lg p-4">
-          <h3 className="text-base font-semibold text-text mb-3">Active Staff</h3>
-          <div className="space-y-2 max-h-[420px] overflow-auto">
-            {profiles.map((profile) => (
-              <div key={profile.user.id} className="flex items-center justify-between p-3 rounded-md border border-outline/60">
-                <div>
-                  <p className="text-sm font-medium text-text">{profile.user.full_name}</p>
-                  <p className="text-xs text-textMuted">{profile.user.email}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-textMuted">{profile.role?.name || 'No role'}</p>
-                  <p className="text-xs text-text">{profile.status}</p>
-                </div>
-              </div>
-            ))}
-            {profiles.length === 0 ? <p className="text-sm text-textMuted">No staff profiles yet.</p> : null}
-          </div>
+      {/* Staff Data Table */}
+      <div className="bg-surface border border-outline rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-outline">
+          <h3 className="text-base font-semibold text-text">Active Staff</h3>
+          <p className="text-xs text-textMuted mt-0.5">{profiles.length} member{profiles.length !== 1 ? 's' : ''}</p>
         </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-outline bg-surfaceHigh">
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Name</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Email</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Role</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {profiles.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-textMuted text-sm">
+                    No staff members yet.
+                  </td>
+                </tr>
+              ) : (
+                profiles.map((profile) => (
+                  <tr key={profile.user.id} className="border-b border-outline/50 last:border-0 hover:bg-surfaceHigh/50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-text">{profile.user.full_name}</td>
+                    <td className="px-4 py-3 text-textMuted">{profile.user.email}</td>
+                    <td className="px-4 py-3 text-textMuted">{profile.role?.name ?? <span className="italic text-textMuted/60">No role</span>}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[profile.status] ?? 'bg-surface text-textMuted'}`}>
+                        {profile.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-        <div className="bg-surface border border-outline rounded-lg p-4">
-          <h3 className="text-base font-semibold text-text mb-3">Invitations</h3>
-          <div className="space-y-2 max-h-[420px] overflow-auto">
-            {invitations.map((invitation) => (
-              <div key={invitation.id} className="p-3 rounded-md border border-outline/60">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-text">{invitation.full_name}</p>
-                    <p className="text-xs text-textMuted">{invitation.email}</p>
-                    <p className="text-xs text-textMuted">Role: {invitation.role?.name || 'Custom'}</p>
-                  </div>
-                  <span className="text-xs px-2 py-1 rounded bg-surfaceHigh text-text">{invitation.status}</span>
-                </div>
-
-                <div className="flex items-center gap-2 mt-3">
-                  <Button
-                    variant="secondary"
-                    className="text-xs"
-                    onClick={() => void handleResend(invitation.id)}
-                    disabled={invitation.status !== 'PENDING'}
-                  >
-                    Resend
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    className="text-xs"
-                    onClick={() => void handleRevoke(invitation.id)}
-                    disabled={invitation.status !== 'PENDING'}
-                  >
-                    Revoke
-                  </Button>
-                  {invitation.status === 'ACCEPTED' ? (
-                    <span className="text-xs text-emerald-500 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Accepted</span>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-            {invitations.length === 0 ? <p className="text-sm text-textMuted">No invitations found.</p> : null}
-          </div>
+      {/* Invitations Table */}
+      <div className="bg-surface border border-outline rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-outline">
+          <h3 className="text-base font-semibold text-text">Invitations</h3>
+          <p className="text-xs text-textMuted mt-0.5">{invitations.length} total</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-outline bg-surfaceHigh">
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Name</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Email</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Role</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invitations.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-textMuted text-sm">
+                    No invitations found.
+                  </td>
+                </tr>
+              ) : (
+                invitations.map((invitation) => (
+                  <tr key={invitation.id} className="border-b border-outline/50 last:border-0 hover:bg-surfaceHigh/50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-text">{invitation.full_name}</td>
+                    <td className="px-4 py-3 text-textMuted">{invitation.email}</td>
+                    <td className="px-4 py-3 text-textMuted">{invitation.role?.name ?? <span className="italic text-textMuted/60">Custom</span>}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[invitation.status] ?? 'bg-surface text-textMuted'}`}>
+                        {invitation.status === 'ACCEPTED' && <CheckCircle2 className="w-3 h-3" />}
+                        {invitation.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="secondary"
+                          className="text-xs py-1 px-2 h-auto"
+                          onClick={() => void handleResend(invitation.id)}
+                          disabled={invitation.status !== 'PENDING'}
+                        >
+                          Resend
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          className="text-xs py-1 px-2 h-auto"
+                          onClick={() => void handleRevoke(invitation.id)}
+                          disabled={invitation.status !== 'PENDING'}
+                        >
+                          Revoke
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -147,7 +147,7 @@ export const OTPVerification: React.FC = () => {
         </div>
 
         {/* OTP Inputs */}
-        <div className="flex gap-3 justify-center mb-4" onPaste={handlePaste}>
+        <div className="flex flex-wrap gap-2 justify-center mb-4" onPaste={handlePaste}>
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -159,8 +159,9 @@ export const OTPVerification: React.FC = () => {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               className={[
-                'w-12 h-14 text-center text-2xl font-bold bg-card rounded-xl text-text',
-                'border-outline transition-all focus:outline-none focus:ring-2 focus:ring-primary',
+                'w-11 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold',
+                'bg-surfaceContainer border text-text rounded-xl',
+                'transition-all focus:outline-none focus:ring-2 focus:ring-primary',
                 digit ? 'border-primary' : 'border-outline focus:border-primary',
               ].join(' ')}
               aria-label={`OTP digit ${index + 1}`}
