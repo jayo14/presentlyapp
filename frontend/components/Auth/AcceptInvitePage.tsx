@@ -23,6 +23,12 @@ export const AcceptInvitePage: React.FC = () => {
     if (!token) {
       setPageState('error');
       setErrorMessage('No invitation token found. Please use the link from your invitation email.');
+      return;
+    }
+    // Basic sanity check: tokens are URL-safe base64 strings (alphanumeric + - and _)
+    if (token.length < 20 || !/^[\w-]+$/.test(token)) {
+      setPageState('error');
+      setErrorMessage('Invalid invitation token format. Please use the original link from your invitation email.');
     }
   }, [token]);
 
