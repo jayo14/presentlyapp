@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 
 import { 
   adminGetAllPosts, 
+  adminGetPostBySlug,
   getAllCategories, 
   getAllTags, 
   getAllSubscribers,
@@ -113,6 +114,34 @@ export const BlogManagement: React.FC = () => {
       setCurrentPage(page);
     } catch (err) {
       toast.error('Failed to fetch posts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditPost = async (post: Post) => {
+    setLoading(true);
+    try {
+      const fullPost = await adminGetPostBySlug(post.slug);
+      setEditingPost(fullPost);
+      setView('editor');
+    } catch (err) {
+      toast.error('Failed to load full post details. Using preview data.');
+      setEditingPost(post);
+      setView('editor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDuplicatePost = async (post: Post) => {
+    setLoading(true);
+    try {
+      const fullPost = await adminGetPostBySlug(post.slug);
+      setEditingPost({ ...fullPost, id: undefined, slug: `${fullPost.slug}-copy` });
+      setView('editor');
+    } catch (err) {
+      toast.error('Failed to duplicate post');
     } finally {
       setLoading(false);
     }
@@ -296,7 +325,7 @@ export const BlogManagement: React.FC = () => {
 
       {/* Main Viewport */}
       <div className="px-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
-        {loading && view !== 'editor' ? (
+        {loading ? (
           <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
              <div className="relative">
                 <Loader2 size={48} className="text-primary animate-spin" />
@@ -312,7 +341,7 @@ export const BlogManagement: React.FC = () => {
                 recentPosts={posts.slice(0, 5)}
                 onViewAllPosts={() => setView('posts')}
                 onNewPost={() => { setEditingPost(null); setView('editor'); }}
-                onEditPost={(post) => { setEditingPost(post); setView('editor'); }}
+                onEditPost={(post) => { void handleEditPost(post); }}
                 onManageCategories={() => setView('categories')}
                 onViewSubscribers={() => setView('subscribers')}
               />
@@ -324,10 +353,10 @@ export const BlogManagement: React.FC = () => {
                 totalPosts={totalPosts}
                 currentPage={currentPage}
                 onNewPost={() => { setEditingPost(null); setView('editor'); }}
-                onEditPost={(post) => { setEditingPost(post); setView('editor'); }}
+                onEditPost={(post) => { void handleEditPost(post); }}
                 onDeletePost={handleDeletePost}
                 onPreviewPost={(slug) => window.open(`/blog/${slug}`, '_blank')}
-                onDuplicatePost={(post) => { setEditingPost({ ...post, id: undefined, slug: `${post.slug}-copy` }); setView('editor'); }}
+                onDuplicatePost={(post) => { void handleDuplicatePost(post); }}
                 onSearch={(term) => handleFetchPosts(1, term)}
                 onFilterStatus={(status) => console.log('filter', status)}
                 onFilterCategory={(id) => console.log('filter cat', id)}
