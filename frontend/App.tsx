@@ -81,6 +81,7 @@ const CourseManagement = lazyWithRetry(() => import('./components/Admin/CourseMa
 const VenueManagement = lazyWithRetry(() => import('./components/Admin/VenueManagement'));
 const DepartmentManagement = lazyWithRetry(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
 const BlogManagement = lazyWithRetry(() => import('./components/Admin/BlogManagement').then(module => ({ default: module.BlogManagement })));
+const StaffManagement = lazyWithRetry(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
 
 // Loading fallback component
 const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." />;
@@ -317,6 +318,7 @@ const AppContent: React.FC = () => {
               <Route path="institutions/:id/colleges/:collegeId/departments/new" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentFormPage /></AdminRoute>} />
               <Route path="institutions/:id/colleges/:collegeId/departments/:deptId/edit" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentFormPage /></AdminRoute>} />
               <Route path="users" element={<AdminRoute requiredPermission="system.users.manage"><UserManagement /></AdminRoute>} />
+              <Route path="staff" element={<AdminRoute requiredPermission="system.staff.manage"><StaffManagement /></AdminRoute>} />
               <Route path="venues" element={<AdminRoute requiredPermission="venues.view"><VenueManagement /></AdminRoute>} />
               <Route path="departments" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentManagement /></AdminRoute>} />
               <Route path="blog" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />

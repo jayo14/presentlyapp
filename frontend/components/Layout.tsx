@@ -195,6 +195,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             label: 'Management',
             items: [
               { id: 'users', icon: Users, label: 'Users', permission: 'system.users.manage' },
+              { id: 'staff', icon: ShieldAlert, label: 'Staff', permission: 'system.staff.manage' },
               { id: 'institutions', icon: Building2, label: 'Institutions', permission: 'system.settings.manage' },
               { id: 'courses', icon: BookOpen, label: 'Courses', permission: 'courses.view' },
               { id: 'venues', icon: Map, label: 'Venues & Maps', permission: 'venues.view' },
