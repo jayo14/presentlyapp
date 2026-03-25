@@ -147,6 +147,17 @@ export const BlogPostPage: React.FC = () => {
     );
   }
 
+  const resolvedSeoTitle = (post.seo_title || '').trim() || post.title;
+  const resolvedSeoDescription = (post.seo_description || '').trim() || post.excerpt;
+  const resolvedSeoKeywords = [
+    ...post.tags.map((tag) => tag.name),
+    post.category?.name,
+    post.author_name,
+    'presently blog',
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   const handleCopyCode = async (key: string, value: string) => {
     try {
       await navigator.clipboard.writeText(value);
@@ -170,11 +181,12 @@ export const BlogPostPage: React.FC = () => {
       
       {/* SEO: Per-article metadata and Article schema */}
       <BlogSEO
-        title={post.seo_title || post.title}
-        description={post.seo_description || post.excerpt}
+        title={resolvedSeoTitle}
+        description={resolvedSeoDescription}
+        keywords={resolvedSeoKeywords}
         canonicalPath={`/blog/${post.slug}`}
         type="article"
-        image={post.cover_image}
+        image={post.cover_image || undefined}
         jsonLd={articleSchema || undefined}
       />
 

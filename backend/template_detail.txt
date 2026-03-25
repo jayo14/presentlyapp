@@ -1,3 +1,0 @@
-Firebase: FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON: Expecting value: line 1 column 1 (char 0)
-INFO: DEBUG=True; using console email backend.
-Error: 'charmap' codec can't encode character '\u2726' in position 34226: character maps to <undefined>
