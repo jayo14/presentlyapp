@@ -94,4 +94,9 @@ export const staffApi = {
     const response = await apiClient.patch(`/staff/${userId}/`, payload);
     return response.data;
   },
+
+  acceptInvitation: async (payload: { token: string; password: string }) => {
+    const response = await apiClient.post('/auth/staff-invitations/accept/', payload);
+    return response.data as { success: boolean; message: string };
+  },
 };

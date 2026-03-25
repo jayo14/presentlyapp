@@ -82,6 +82,7 @@ const VenueManagement = lazyWithRetry(() => import('./components/Admin/VenueMana
 const DepartmentManagement = lazyWithRetry(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
 const BlogManagement = lazyWithRetry(() => import('./components/Admin/BlogManagement').then(module => ({ default: module.BlogManagement })));
 const StaffManagement = lazyWithRetry(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
+const AcceptInvitePage = lazyWithRetry(() => import('./components/Auth/AcceptInvitePage').then(module => ({ default: module.AcceptInvitePage })));
 
 // Loading fallback component
 const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." />;
@@ -301,6 +302,7 @@ const AppContent: React.FC = () => {
           <Route path="/email-verification" element={<EmailVerificationSent />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/check-in/:sessionCode" element={<Suspense fallback={<LoadingFallback />}><PublicCheckInPage /></Suspense>} />
+          <Route path="/accept-invite" element={<Suspense fallback={<LoadingFallback />}><AcceptInvitePage /></Suspense>} />
           
           <Route
             path="/onboarding"
