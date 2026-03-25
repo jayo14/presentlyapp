@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -107,7 +108,7 @@ def staff_profiles_view(request):
         qs = qs.filter(status=status_filter)
 
     if search:
-        qs = qs.filter(user__full_name__icontains=search) | qs.filter(user__email__icontains=search)
+        qs = qs.filter(Q(user__full_name__icontains=search) | Q(user__email__icontains=search))
 
     paginator = Paginator(qs, page_size)
     current_page = paginator.get_page(page)
