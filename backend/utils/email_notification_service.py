@@ -155,10 +155,13 @@ class EmailNotificationService:
         invitation_link: str,
         institution_name: str,
     ) -> bool:
-        send_welcome_email(
+        send_staff_access_invitation_email(
             to=user_email,
             first_name=user_name.split(" ")[0],
-            dashboard_url=invitation_link,
+            inviter_name=inviter_name or institution_name or "Administrator",
+            role_name="Staff Member",
+            invitation_url=invitation_link,
+            expires_in_hours=48,
         )
         return True
 

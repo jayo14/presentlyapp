@@ -32,6 +32,7 @@ from utils import email as email_utils
         "session_live": "tmpl_session",
         "newsletter_welcome": "tmpl_newsletter",
         "attendance_confirmed": "tmpl_attendance",
+        "staff_access_invitation": "tmpl_staff_invite",
     },
 )
 class SendTemplateEmailTests(SimpleTestCase):
@@ -102,6 +103,7 @@ class SendTemplateEmailTests(SimpleTestCase):
         "session_live": "tmpl_session",
         "newsletter_welcome": "tmpl_newsletter",
         "attendance_confirmed": "tmpl_attendance",
+        "staff_access_invitation": "tmpl_staff_invite",
     }
 )
 class EmailHelperTests(SimpleTestCase):
@@ -166,6 +168,30 @@ class EmailHelperTests(SimpleTestCase):
             "r",
         )
         self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "attendance_confirmed")
+
+    @patch("utils.email._dispatch_template_email")
+    def test_send_staff_access_invitation_email(self, mock_dispatch):
+        email_utils.send_staff_access_invitation_email(
+            "staff@example.com",
+            "Ada",
+            "Admin User",
+            "Manager",
+            "https://app/accept-invite?token=abc",
+            48,
+        )
+        self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "staff_access_invitation")
+        self.assertEqual(
+            mock_dispatch.call_args.kwargs["variables"],
+            {
+                "first_name": "Ada",
+                "inviter_name": "Admin User",
+                "role_name": "Manager",
+                "invitation_url": "https://app/accept-invite?token=abc",
+                "invite_url": "https://app/accept-invite?token=abc",
+                "dashboard_url": "https://app/accept-invite?token=abc",
+                "expires_in_hours": 48,
+            },
+        )
 
 
 @override_settings(

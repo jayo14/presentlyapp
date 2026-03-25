@@ -277,3 +277,26 @@ def send_attendance_confirmed_email(
             "report_url": report_url,
         },
     )
+
+
+def send_staff_access_invitation_email(
+    to: str,
+    first_name: str,
+    inviter_name: str,
+    role_name: str,
+    invitation_url: str,
+    expires_in_hours: int,
+) -> dict:
+    return _dispatch_template_email(
+        template_key="staff_access_invitation",
+        to=to,
+        variables={
+            "first_name": first_name,
+            "inviter_name": inviter_name,
+            "role_name": role_name,
+            "invitation_url": invitation_url,
+            "invite_url": invitation_url,
+            "dashboard_url": invitation_url,
+            "expires_in_hours": expires_in_hours,
+        },
+    )
