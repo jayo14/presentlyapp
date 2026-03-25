@@ -31,7 +31,10 @@ class IsLecturer(BasePermission):
         return bool(
             request.user
             and request.user.is_authenticated
-            and getattr(request.user, 'role', None) in ('LECTURER', 'ADMIN')
+            and (
+                getattr(request.user, 'is_superuser', False)
+                or getattr(request.user, 'role', None) in ('LECTURER', 'ADMIN')
+            )
         )
 
 

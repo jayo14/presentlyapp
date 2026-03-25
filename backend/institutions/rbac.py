@@ -112,6 +112,10 @@ def get_user_effective_permissions(user) -> List[str]:
     if not user or not user.is_authenticated:
         return []
 
+    # Super admins have unrestricted access to all permissions.
+    if getattr(user, 'is_superuser', False):
+        return sorted(RBACPermission.objects.values_list("codename", flat=True))
+
     base_codes = set()
 
     if hasattr(user, "staff_profile") and user.staff_profile and user.staff_profile.role_id:
