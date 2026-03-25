@@ -50,7 +50,7 @@ export const staffApi = {
     const response = await apiClient.get('/rbac/permissions/');
     return response.data as {
       success: boolean;
-      groups: Record<string, Array<{ codename: string; name: string; dangerous: boolean; enabled: boolean }>;
+      groups: Record<string, Array<{ codename: string; name: string; dangerous: boolean; enabled: boolean }>>;
       permissions: RBACPermission[];
       roles: StaffRole[];
     };
