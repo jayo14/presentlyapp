@@ -195,17 +195,19 @@ def perform_attendance_check_in(request, session):
                 logger.error(f"  - Enrolled in: {enroll.course} (Active: {enroll.is_active})")
     logger.warning("=== END ENROLLMENT CHECK ===")
 
-    if not is_superuser and not CourseEnrollment.objects.filter(
-        student=request.user,
-        course=session.course,
-        is_active=True,
-    ).exists():
-        logger.error("BLOCKING: Enrollment check failed - returning 403")
-        return Response({
-            'success': False,
-            'status': 'error',
-            'error': 'You are not enrolled in this course, so you cannot check in. Please enroll first.'
-        }, status=status.HTTP_403_FORBIDDEN)
+    if not is_superuser:
+        enrollment, created = CourseEnrollment.objects.get_or_create(
+            student=request.user,
+            course=session.course,
+            defaults={'is_active': True, 'enrolled_at': timezone.now()}
+        )
+        if not enrollment.is_active:
+            # Re-activate dropped enrollment
+            enrollment.is_active = True
+            enrollment.save(update_fields=['is_active'])
+            logger.info(
+                f"Re-activated enrollment for {request.user.email} in {session.course.code}"
+            )
 
     if not session.is_active:
         return Response({'success': False, 'status': 'error', 'error': 'Session is not active'}, status=status.HTTP_400_BAD_REQUEST)

@@ -147,8 +147,18 @@ export const sessionApi = {
 
   // Check in by session code (student only)
   checkInByCode: async (code: string, data: CheckInData): Promise<Attendance> => {
-    const response = await apiClient.post(`/check-in/${code}/`, data);
-    return response.data.attendance || response.data;
+    try {
+      const response = await apiClient.post(`/check-in/${code}/`, data);
+      return response.data.attendance || response.data;
+    } catch (error: any) {
+      // Only retry on 5xx (server errors), never on 4xx (client errors including 403/429)
+      if (error.response && error.response.status >= 400 && error.response.status < 500) {
+        // Do not retry — show the error to the user
+        const data = error.response.data;
+        throw new Error(data.error || data.reason || 'Check-in failed');
+      }
+      throw error;
+    }
   },
 
   // End a session (lecturer/admin only)

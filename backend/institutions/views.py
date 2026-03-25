@@ -12,6 +12,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
 from django_ratelimit.decorators import ratelimit
+from django_ratelimit.core import is_ratelimited
 import secrets
 import logging
 import os
@@ -2194,9 +2195,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
-@ratelimit(key='user', rate='5/m', block=True)
 def public_check_in_view(request, session_code):
-    """Public check-in endpoint with multi-sample verification"""
+    """Public check-in endpoint with multi-sample GPS verification."""
     try:
         # Normalize code to uppercase to avoid case-sensitivity issues
         session_code = session_code.upper()
@@ -2208,6 +2208,7 @@ def public_check_in_view(request, session_code):
         }, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
+        # GET is public — no auth needed, no rate limit
         serializer = AttendanceSessionSerializer(session)
         return Response({
             'success': True,
@@ -2215,12 +2216,30 @@ def public_check_in_view(request, session_code):
         })
     
     elif request.method == 'POST':
+        # Auth check happens FIRST, before any rate-limiting
         if not request.user.is_authenticated:
             return Response({
                 'success': False,
                 'status': 'error',
                 'error': 'Authentication required to mark attendance'
             }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Rate-limit AFTER auth — now request.user is the real authenticated user
+        # key='user_or_ip' falls back to IP for anonymous (won't happen here, but safe)
+        ratelimited = is_ratelimited(
+            request,
+            group='check_in_post',
+            key='user_or_ip',
+            rate='5/m',
+            increment=True,
+        )
+        if ratelimited:
+            return Response({
+                'success': False,
+                'status': 'error',
+                'error': 'Too many check-in attempts. Please wait a moment and try again.'
+            }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
         return perform_attendance_check_in(request, session)
 
 class TimetableViewSet(viewsets.ModelViewSet):
