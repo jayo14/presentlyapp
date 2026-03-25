@@ -240,96 +240,102 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
   return (
     <div className="fixed inset-0 z-[110] bg-background text-foreground flex flex-col font-sans overflow-hidden transition-colors duration-500">
-      <header className="p-6 flex items-center justify-between relative z-20">
+      {/* Floating Header */}
+      <header className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-[120] pointer-events-none">
         <button
           onClick={onClose}
-          className="w-12 h-12 flex items-center justify-center bg-surface/80 backdrop-blur-xl rounded-2xl border border-border shadow-sm active:scale-95 transition-all text-foreground"
+          className="w-12 h-12 pointer-events-auto flex items-center justify-center bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/10 dark:border-border shadow-2xl active:scale-95 transition-all text-white"
         >
           <X size={24} strokeWidth={2.5} />
         </button>
+        
         <div className="flex flex-col items-center">
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Attendance Mission</span>
-          <div className="flex gap-1">
-            <div className={`w-1 h-1 rounded-full ${mode === 'scan' ? 'bg-primary' : 'bg-muted'}`} />
-            <div className={`w-1 h-1 rounded-full ${mode === 'input' ? 'bg-primary' : 'bg-muted'}`} />
+          <div className="px-4 py-1.5 bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-full border border-white/10 dark:border-border flex items-center gap-2">
+            <div className={`w-1.5 h-1.5 rounded-full ${mode === 'scan' ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+              {mode === 'scan' ? 'Scanner Mode' : 'Keyboard Mode'}
+            </span>
           </div>
         </div>
+
         <button
           onClick={() => setMode(mode === 'scan' ? 'input' : 'scan')}
-          className="w-12 h-12 flex items-center justify-center bg-surface/80 backdrop-blur-xl rounded-2xl border border-border shadow-sm active:scale-95 transition-all text-foreground"
+          className="w-12 h-12 pointer-events-auto flex items-center justify-center bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/10 dark:border-border shadow-2xl active:scale-95 transition-all text-white"
           aria-label={mode === 'scan' ? "Switch to keyboard" : "Switch to scanner"}
         >
           {mode === 'scan' ? <Keyboard size={24} strokeWidth={2.5} /> : <Scan size={24} strokeWidth={2.5} />}
         </button>
       </header>
 
-      <main className="flex-1 flex flex-col relative overflow-hidden">
+      <main className="flex-1 flex flex-col relative overflow-hidden bg-black">
         <AnimatePresence mode="wait">
           {mode === 'input' && (
             <motion.div
               key="input"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="flex-1 flex flex-col justify-center p-8 max-w-md mx-auto w-full"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              className="absolute inset-0 z-[115] bg-background flex flex-col justify-center p-8 transition-colors duration-500"
             >
-              <div className="text-center space-y-3 mb-12">
-                <h2 className="text-4xl font-headline font-black tracking-tight text-foreground">Mission Key</h2>
-                <p className="text-muted-foreground font-medium">Enter the 8-character unique session code assigned to your current lecture.</p>
-              </div>
+              <div className="max-w-md mx-auto w-full flex flex-col h-full items-center justify-center">
+                <div className="text-center space-y-3 mb-12">
+                  <h2 className="text-4xl font-headline font-black tracking-tight text-foreground">Mission Key</h2>
+                  <p className="text-muted-foreground font-medium">Enter the 8-character unique session code assigned to your current lecture.</p>
+                </div>
 
-              <div className="space-y-6">
-                <div className="relative group">
-                  <input
-                    value={sessionCode}
-                    onChange={(event) => handleSessionCodeChange(event.target.value)}
-                    inputMode="text"
-                    autoCapitalize="characters"
-                    autoCorrect="off"
-                    autoComplete="off"
-                    maxLength={8}
-                    placeholder="••••••••"
-                    className="w-full h-24 rounded-3xl border-2 border-border bg-surface px-5 text-center text-4xl font-black tracking-[0.2em] text-foreground placeholder:text-muted-foreground/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-inner"
-                    autoFocus
-                  />
-                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex gap-2">
-                    {[...Array(8)].map((_, i) => (
-                      <div key={i} className={`w-2 h-0.5 rounded-full transition-colors ${sessionCode.length > i ? 'bg-primary' : 'bg-muted'}`} />
-                    ))}
+                <div className="w-full space-y-6">
+                  <div className="relative group">
+                    <input
+                      value={sessionCode}
+                      onChange={(event) => handleSessionCodeChange(event.target.value)}
+                      inputMode="text"
+                      autoCapitalize="characters"
+                      autoCorrect="off"
+                      autoComplete="off"
+                      maxLength={8}
+                      placeholder="••••••••"
+                      className="w-full h-24 rounded-3xl border-2 border-border bg-surface px-5 text-center text-4xl font-black tracking-[0.2em] text-foreground placeholder:text-muted-foreground/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-inner"
+                      autoFocus
+                    />
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex gap-2">
+                      {[...Array(8)].map((_, i) => (
+                        <div key={i} className={`w-2 h-0.5 rounded-full transition-colors ${sessionCode.length > i ? 'bg-primary' : 'bg-muted'}`} />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={handlePasteFromClipboard}
+                      className="h-14 rounded-2xl bg-surface hover:bg-muted/50 border border-border text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all text-foreground"
+                    >
+                      <Clipboard size={18} className="text-primary" />
+                      Paste
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSessionCode('')}
+                      className="h-14 rounded-2xl bg-surface hover:bg-muted/50 border border-border text-sm font-black uppercase tracking-wider transition-all text-foreground"
+                    >
+                      Clear
+                    </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="w-full mt-12 mb-8">
                   <button
-                    type="button"
-                    onClick={handlePasteFromClipboard}
-                    className="h-14 rounded-2xl bg-surface hover:bg-muted/50 border border-border text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all text-foreground"
+                    disabled={sessionCode.length !== 8}
+                    onClick={() => processAttendance(sessionCode)}
+                    className="w-full h-20 bg-primary text-on-primary-fixed rounded-[2.5rem] font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all active:scale-95"
                   >
-                    <Clipboard size={18} className="text-primary" />
-                    Paste
+                    Validate Mission Key
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setSessionCode('')}
-                    className="h-14 rounded-2xl bg-surface hover:bg-muted/50 border border-border text-sm font-black uppercase tracking-wider transition-all text-foreground"
-                  >
-                    Clear
-                  </button>
+
+                  <p className="mt-6 text-center text-xs font-bold text-muted-foreground opacity-60">
+                    By checking in, you confirm your physical presence in the lecture hall.
+                  </p>
                 </div>
-              </div>
-
-              <div className="mt-auto pt-12 pb-8">
-                <button
-                  disabled={sessionCode.length !== 8}
-                  onClick={() => processAttendance(sessionCode)}
-                  className="w-full h-20 bg-primary text-on-primary-fixed rounded-[2.5rem] font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all active:scale-95"
-                >
-                  Validate Mission Key
-                </button>
-
-                <p className="mt-6 text-center text-xs font-bold text-muted-foreground opacity-60">
-                  By checking in, you confirm your physical presence in the lecture hall.
-                </p>
               </div>
             </motion.div>
           )}
@@ -342,49 +348,60 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               exit={{ opacity: 0 }}
               className="flex-1 flex flex-col relative"
             >
-              {/* Full-width scanner with organic rounded corners */}
-              <div className="absolute inset-0 mx-4 mb-32 mt-4 rounded-[4rem] overflow-hidden border-2 border-border shadow-2xl bg-black transition-all">
-                <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover opacity-80" />
+              {/* Immersive Camera View */}
+              <div className="absolute inset-0 overflow-hidden bg-black">
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  className="w-full h-full object-cover opacity-90 transition-opacity duration-1000" 
+                />
+                
+                {/* Advanced Scanning UI */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  {/* The Scanning Frame (Larger for better range) */}
+                  <div className="relative w-[85vw] h-[85vw] max-w-sm max-h-sm">
+                    {/* Corners */}
+                    <div className="absolute top-0 left-0 w-20 h-20 border-t-[8px] border-l-[8px] border-primary rounded-tl-[3rem] shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)]" />
+                    <div className="absolute top-0 right-0 w-20 h-20 border-t-[8px] border-r-[8px] border-primary rounded-tr-[3rem] shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)]" />
+                    <div className="absolute bottom-0 left-0 w-20 h-20 border-b-[8px] border-l-[8px] border-primary rounded-bl-[3rem] shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)]" />
+                    <div className="absolute bottom-0 right-0 w-20 h-20 border-b-[8px] border-r-[8px] border-primary rounded-br-[3rem] shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)]" />
 
-                {/* Improved Scanning Frame - Priority focused */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/5">
-                  <div className="w-[75vw] h-[75vw] max-w-sm max-h-sm relative">
-                    {/* Dynamic Corners */}
-                    <div className="absolute top-0 left-0 w-16 h-16 border-t-[6px] border-l-[6px] border-primary rounded-tl-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
-                    <div className="absolute top-0 right-0 w-16 h-16 border-t-[6px] border-r-[6px] border-primary rounded-tr-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
-                    <div className="absolute bottom-0 left-0 w-16 h-16 border-b-[6px] border-l-[6px] border-primary rounded-bl-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
-                    <div className="absolute bottom-0 right-0 w-16 h-16 border-b-[6px] border-r-[6px] border-primary rounded-br-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
-
-                    {/* High-speed Scanning Beam */}
+                    {/* Scanning Line */}
                     <motion.div
-                      animate={{ top: ['0%', '100%', '0%'] }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute left-4 right-4 h-1.5 bg-primary/60 blur-[1px] shadow-[0_0_25px_rgba(var(--primary-rgb),1)] z-10"
+                      animate={{ top: ['5%', '95%', '5%'] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute left-8 right-8 h-1 bg-primary/80 blur-[0.5px] shadow-[0_0_30px_rgba(var(--primary-rgb),1)] z-10 rounded-full"
                     />
 
-                    {/* Centered Guide */}
+                    {/* Center Helper Icon */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                      <QrCode size={120} strokeWidth={1} className="text-white" />
+                      <QrCode size={180} strokeWidth={0.5} className="text-white" />
+                    </div>
+                  </div>
+
+                  {/* Status Indicator Bar */}
+                  <div className="mt-16 text-center">
+                    <h3 className="text-xl font-headline font-black text-white drop-shadow-lg mb-2">Center QR Code</h3>
+                    <div className="flex items-center gap-3 justify-center">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Scanning environment...</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Top Context Indicator */}
-                <div className="absolute top-10 left-0 right-0 flex justify-center">
-                  <div className="px-5 py-2.5 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),1)]" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white">Neural Scan Active</span>
-                  </div>
-                </div>
+                {/* Bottom Gradient Overlay for readability */}
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent flex flex-col items-center justify-center p-8 space-y-4">
-                <div className="text-center">
-                  <h3 className="text-lg font-headline font-black text-foreground">Position QR Code</h3>
-                  <p className="text-muted-foreground text-xs font-medium">Capture the attendance code displayed by your lecturer.</p>
+              {/* Mobile-Friendly Bottom Sheet Style Indicator */}
+              <div className="absolute bottom-10 left-0 right-0 px-8 pointer-events-none">
+                <div className="max-w-xs mx-auto p-4 bg-white/5 backdrop-blur-3xl rounded-[2rem] border border-white/10 text-center">
+                  <p className="text-[11px] font-bold text-white/80 leading-relaxed">
+                    Verification is instantaneous once the code is identified within the frame.
+                  </p>
                 </div>
-
-                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" />
               </div>
             </motion.div>
           )}
@@ -394,7 +411,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="absolute inset-0 bg-background/95 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center p-12 text-center"
+              className="absolute inset-0 bg-background/95 backdrop-blur-2xl z-[150] flex flex-col items-center justify-center p-12 text-center"
             >
               <div className="relative mb-12">
                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
@@ -409,11 +426,14 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 </div>
               </div>
               <h3 className="text-4xl font-headline font-black mb-4 text-foreground tracking-tight">Syncing Mission Data</h3>
-              <p className="text-muted-foreground font-medium leading-relaxed max-w-xs">{status === 'locating' ? 'Calibrating geospatial context and proximity anchors...' : 'Authorizing check-in with institutional attendance ledger...'}</p>
+              <p className="text-muted-foreground font-medium leading-relaxed max-w-xs">
+                {status === 'locating' ? 'Calibrating geospatial context and proximity anchors...' : 'Authorising check-in with institutional attendance ledger...'}
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
     </div>
   );
+
 };
