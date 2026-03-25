@@ -65,7 +65,7 @@ export const DocumentationPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-cardackgroundlack text-textMuted font-sans selection:bg-primary selection:text-on-primary-fixedlack">
+    <div className="min-h-screen bg-black text-textMuted font-sans selection:bg-primary selection:text-black">
       {/* SEO: Page metadata for documentation route. */}
       <SEO
         title="Documentation"
@@ -92,7 +92,7 @@ export const DocumentationPage: React.FC = () => {
           </div>
           <div className="flex gap-3">
              <Button variant="outline" className="border-outline text-textMuted">Read Knowledge Base</Button>
-             <Button className="bg-primary text-on-primary-fixedlack">Contact Support</Button>
+             <Button className="bg-primary text-black">Contact Support</Button>
           </div>
         </div>
 
@@ -118,12 +118,12 @@ export const DocumentationPage: React.FC = () => {
                   alt={`${video.title} - Presently GPS attendance documentation for Nigerian universities`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80"
                 />
-                <div className="absolute inset-0 bg-cardackgroundlack/40 group-hover:bg-cardackgroundlack/20 transition-colors flex items-center justify-center">
-                   <div className="w-12 h-12 bg-primary text-on-primary-fixedlack rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-300">
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                   <div className="w-12 h-12 bg-primary text-black rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-300">
                       <Play fill="currentColor" size={20} />
                    </div>
                 </div>
-                <div className="absolute bottom-3 right-3 bg-cardackgroundlack/80 px-2 py-1 rounded text-xs font-mono">
+                <div className="absolute bottom-3 right-3 bg-black/80 px-2 py-1 rounded text-xs font-mono">
                   {video.duration}
                 </div>
               </div>

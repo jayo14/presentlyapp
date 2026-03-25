@@ -11,6 +11,7 @@ import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
 import { hasPermissionCode } from '../services/rbac';
 import { Dock, DockItem } from '@/components/magicui/dock';
+import { motion, AnimatePresence } from 'framer-motion';
 import NotificationInbox from './NotificationInbox';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
 import { sessionApi } from '../services/api/attendance';

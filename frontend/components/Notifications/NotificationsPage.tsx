@@ -203,7 +203,7 @@ export const NotificationsPage: React.FC = () => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-headline font-semibold text-text text-on-primary-fixedase leading-tight">
+                  <h3 className="font-headline font-semibold text-text text-base leading-tight">
                     {notification.title}
                   </h3>
                   {!notification.is_read && (
@@ -246,15 +246,15 @@ export const NotificationsPage: React.FC = () => {
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-surface rounded-lg transition-colors"
           >
-            <ArrowLeft size={24} className="text-text-primary" />
+            <ArrowLeft size={24} className="text-primary" />
           </button>
           <div>
-            <h1 className="font-headline text-2xl font-bold text-text-primary flex items-center gap-2">
+            <h1 className="font-headline text-2xl font-bold text-primary flex items-center gap-2">
               <Bell size={28} className="text-primary" />
               Notifications
             </h1>
             {unreadCount > 0 && (
-              <p className="text-sm text-text-textMuted">{unreadCount} unread</p>
+              <p className="text-sm text-textMuted">{unreadCount} unread</p>
             )}
           </div>
         </div>
@@ -263,7 +263,7 @@ export const NotificationsPage: React.FC = () => {
           className="p-2 hover:bg-surface rounded-lg transition-colors"
           aria-label="Notification Settings"
         >
-          <Settings size={24} className="text-text-textMuted hover:text-primary transition-colors" />
+          <Settings size={24} className="text-textMuted hover:text-primary transition-colors" />
         </button>
       </div>
 
@@ -282,7 +282,7 @@ export const NotificationsPage: React.FC = () => {
               className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                 activeTab === tab.id 
                   ? 'bg-primary text-white shadow-md' 
-                  : 'bg-surface dark:bg-zinc-900 text-text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
+                  : 'bg-surface dark:bg-zinc-900 text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
               }`}
             >
               {tab.label}
@@ -311,7 +311,7 @@ export const NotificationsPage: React.FC = () => {
               >
                 {selectedNotifications.length === filteredNotifications.length ? 'Deselect All' : 'Select All'}
               </button>
-              <span className="text-text-textMuted text-sm">
+              <span className="text-textMuted text-sm">
                 {selectedNotifications.length} selected
               </span>
             </>
@@ -406,15 +406,15 @@ export const NotificationsPage: React.FC = () => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-headline font-semibold text-text-primary text-on-primary-fixedase leading-tight">
+                  <h3 className="font-headline font-semibold text-primary text-base leading-tight">
                     {notification.title}
                   </h3>
-                  <span className="text-text-textMuted text-xs whitespace-nowrap">
+                  <span className="text-textMuted text-xs whitespace-nowrap">
                     {formatTimeAgo(notification.created_at)}
                   </span>
                 </div>
                 {notification.message && (
-                  <p className="text-text-textMuted text-sm leading-relaxed line-clamp-2 mb-2">
+                  <p className="text-textMuted text-sm leading-relaxed line-clamp-2 mb-2">
                     {notification.message}
                   </p>
                 )}
@@ -438,9 +438,9 @@ export const NotificationsPage: React.FC = () => {
           ))
         ) : (
           <div className="text-center py-20 bg-surface rounded-2xl border border-outline">
-            <Bell size={48} className="mx-auto text-text-textMuted mb-4" />
-            <h3 className="font-headline text-lg font-semibold text-text-primary mb-2">No notifications</h3>
-            <p className="text-text-textMuted">You're all caught up!</p>
+            <Bell size={48} className="mx-auto text-textMuted mb-4" />
+            <h3 className="font-headline text-lg font-semibold text-primary mb-2">No notifications</h3>
+            <p className="text-textMuted">You're all caught up!</p>
           </div>
         )}
       </div>

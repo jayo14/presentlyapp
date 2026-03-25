@@ -174,7 +174,7 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
               <button
                 onClick={handleEnableNotifications}
                 disabled={isLoading}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-on-primary-fixedlack font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>

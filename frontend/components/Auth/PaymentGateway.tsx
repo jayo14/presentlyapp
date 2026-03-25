@@ -67,7 +67,7 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-cardackgroundlack/90 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
       <motion.div 
         {...modalProps}
         aria-labelledby="payment-title"
@@ -137,21 +137,21 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                         <button 
                             type="button" 
                             onClick={() => setPaymentMethod('card')}
-                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'card' ? 'bg-white text-on-primary-fixedlack shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'card' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
                         >
                             <CreditCard size={16} /> Card
                         </button>
                         <button 
                             type="button" 
                             onClick={() => setPaymentMethod('transfer')}
-                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'transfer' ? 'bg-white text-on-primary-fixedlack shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'transfer' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
                         >
                             <Smartphone size={16} /> Transfer
                         </button>
                          <button 
                             type="button" 
                             onClick={() => setPaymentMethod('ussd')}
-                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'ussd' ? 'bg-white text-on-primary-fixedlack shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'ussd' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
                         >
                             <Globe size={16} /> USSD
                         </button>
@@ -249,7 +249,7 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                                         <p className="text-[10px] uppercase tracking-wider text-textMuted font-semibold mb-1">Account Number</p>
                                         <p className="text-2xl font-mono font-bold text-primary tracking-widest">1012345678</p>
                                     </div>
-                                    <div className="bg-surfaceHigh p-2 rounded-lg group-hover:bg-primary group-hover:text-on-primary-fixedlack transition-colors">
+                                    <div className="bg-surfaceHigh p-2 rounded-lg group-hover:bg-primary group-hover:text-black transition-colors">
                                         <Copy size={20} />
                                     </div>
                                 </div>
@@ -298,8 +298,8 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
             {step === 'processing' && (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
                     <div className="relative">
-                        <div className="w-24 h-24 border-input border-outline rounded-full"></div>
-                        <div className="w-24 h-24 border-input border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                        <div className="w-24 h-24 border-2 border-outline rounded-full"></div>
+                        <div className="w-24 h-24 border-2 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
                         <Lock className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-textMuted" size={24} />
                     </div>
                     <div>
@@ -321,7 +321,7 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                         animate={{ scale: 1 }} 
                         className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(34,197,94,0.4)]"
                     >
-                        <CheckCircle2 size={48} className="text-on-primary-fixedlack" />
+                        <CheckCircle2 size={48} className="text-black" />
                     </motion.div>
                     <div>
                         <h3 className="font-headline text-2xl font-bold text-text mb-2">Payment Successful!</h3>

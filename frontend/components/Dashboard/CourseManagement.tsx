@@ -258,7 +258,7 @@ export const CourseManagement: React.FC<CourseManagementProps> = ({ userInstitut
                 {/* Hierarchy Section */}
                 <div className="bg-surface text-text border border-outline rounded-xl p-6 shadow-sm space-y-6">
                     <div className="flex items-center gap-3 border-b border-outline pb-4">
-                        <div className="bg-cardackgroundlue-500/10 p-2 rounded-lg text-on-primary-fixedlue-500">
+                        <div className="bg-blue-500/10 p-2 rounded-lg text-blue-500">
                             <MapPin size={20} />
                         </div>
                         <div>

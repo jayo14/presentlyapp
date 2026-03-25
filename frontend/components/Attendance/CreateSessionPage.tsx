@@ -205,7 +205,7 @@ export const CreateSessionPage: React.FC = () => {
             onClick={() => { setDuration(mins.toString()); setDurationUnit('minutes'); }}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 duration === mins.toString() && durationUnit === 'minutes'
-                ? 'bg-primary text-on-primary-fixedlack ring-2 ring-primary/20' 
+                ? 'bg-primary text-black ring-2 ring-primary/20' 
                 : 'bg-inputccent text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700'
             }`}
         >
@@ -247,7 +247,7 @@ export const CreateSessionPage: React.FC = () => {
                         <select
                             value={selectedCourse}
                             onChange={(e) => setSelectedCourse(e.target.value)}
-                            className="w-full bg-surface border border-outline rounded-xl p-4 text-text text-on-primary-fixedase outline-none appearance-none pr-10"
+                            className="w-full bg-surface border border-outline rounded-xl p-4 text-text text-base outline-none appearance-none pr-10"
                             required
                         >
                             <option value="">Search course...</option>
@@ -266,7 +266,7 @@ export const CreateSessionPage: React.FC = () => {
                         <select
                             value={selectedVenue}
                             onChange={(e) => setSelectedVenue(e.target.value)}
-                            className="w-full bg-surface border border-outline rounded-xl p-4 text-text text-on-primary-fixedase outline-none appearance-none pr-10"
+                            className="w-full bg-surface border border-outline rounded-xl p-4 text-text text-base outline-none appearance-none pr-10"
                             required
                         >
                             <option value="">Select location</option>
@@ -369,7 +369,7 @@ export const CreateSessionPage: React.FC = () => {
                 <button 
                     type="submit"
                     disabled={loading || !selectedCourse || !selectedVenue}
-                    className="w-full bg-primary hover:bg-primary/90 text-on-primary-fixedlack font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Creating...' : 'Create Session'}
                 </button>
@@ -513,7 +513,7 @@ export const CreateSessionPage: React.FC = () => {
                                                                 <p className="text-xs opacity-70 font-mono mt-0.5">{dept.code}</p>
                                                             </div>
                                                             {isSelected && (
-                                                                <div className="bg-primary text-on-primary-fixedlack rounded-full p-0.5">
+                                                                <div className="bg-primary text-black rounded-full p-0.5">
                                                                     <Check size={12} strokeWidth={3} />
                                                                 </div>
                                                             )}
@@ -546,7 +546,7 @@ export const CreateSessionPage: React.FC = () => {
                             <select
                                 value={selectedCourse}
                                 onChange={(e) => setSelectedCourse(e.target.value)}
-                                className="w-full bg-surfaceLow border border-outline rounded-xl p-4 text-on-primary-fixedase outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50 transition-all"
+                                className="w-full bg-surfaceLow border border-outline rounded-xl p-4 text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50 transition-all"
                                 disabled={selectedDepartments.length === 0}
                                 required
                             >

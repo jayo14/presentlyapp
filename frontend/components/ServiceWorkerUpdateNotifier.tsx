@@ -112,7 +112,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleUpdate}
-                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-on-primary-fixedlack text-sm font-medium rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-black text-sm font-medium rounded-lg transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Update Now</span>

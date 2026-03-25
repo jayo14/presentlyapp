@@ -19,15 +19,15 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className={`space-y-2 ${className}`}>
       {showLabel && (
         <div className="flex justify-between items-center text-sm">
-          <span className="text-text-textMuted font-medium">
+          <span className="text-textMuted font-medium">
             Step {current} of {total}
           </span>
-          <span className="text-text-tertiary">
+          <span className="text-tertiary">
             {Math.round(percentage)}%
           </span>
         </div>
       )}
-      <div className="h-2 bg-cardackgroundackground-tertiary rounded-full overflow-hidden">
+      <div className="h-2 bg-background-tertiary rounded-full overflow-hidden">
         <div
           className="h-full bg-primary transition-all duration-300 ease-out"
           style={{ width: `${percentage}%` }}

@@ -123,7 +123,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                     </button>
                     <button
                       onClick={() => setIsTimetableModalOpen(true)}
-                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors"
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
                     >
                         <Plus size={14} />
                         Add Class
@@ -187,14 +187,14 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
 
             {/* Manual Entry Modal */}
             {isTimetableModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-cardackgroundlack/60 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                     <div
                         {...manualEntryProps}
                         aria-labelledby="manual-entry-title"
                         className="bg-surface text-text border border-outline rounded-xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95 outline-none"
                     >
                         <div className="mb-5 flex justify-between items-center">
-                            <h3 id="manual-entry-title" className="font-headline text-on-primary-fixedase font-semibold text-text">Add Timetable Entry</h3>
+                            <h3 id="manual-entry-title" className="font-headline text-base font-semibold text-text">Add Timetable Entry</h3>
                             <button onClick={() => setIsTimetableModalOpen(false)} aria-label="Close dialog" className="p-1 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors">
                                 <X size={18} />
                             </button>
@@ -256,7 +256,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                             </div>
                             <div className="pt-2 flex gap-3">
                                 <button type="button" onClick={() => setIsTimetableModalOpen(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-textMuted bg-surfaceHigh rounded-lg hover:bg-surfaceHigh transition-colors">Cancel</button>
-                                <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors">Add Class</button>
+                                <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">Add Class</button>
                             </div>
                         </form>
                     </div>
@@ -265,7 +265,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
 
             {/* AI Scan Modal */}
             {isAiScanOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-cardackgroundlack/60 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                     <div
                         {...aiScanProps}
                         aria-labelledby="ai-scan-title"
@@ -280,7 +280,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                             <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 text-primary">
                                 <Sparkles size={28} />
                             </div>
-                            <h3 id="ai-scan-title" className="font-headline text-on-primary-fixedase font-semibold text-text mb-1">Scan Timetable</h3>
+                            <h3 id="ai-scan-title" className="font-headline text-base font-semibold text-text mb-1">Scan Timetable</h3>
                             <p className="text-sm text-textMuted">Upload a photo of your class schedule, and AI will extract the details.</p>
                         </div>
 
@@ -336,7 +336,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                           className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                         />
                       </div>
-                      <button className="px-4 py-2 text-sm font-medium bg-primary text-on-primary-fixedlack rounded-lg hover:bg-primary/90 transition-colors">
+                      <button className="px-4 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
                         Search
                       </button>
                   </div>

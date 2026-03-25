@@ -210,7 +210,7 @@ export const InstitutionFormPage: React.FC = () => {
   if (fetching) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 border-input border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         <p className="text-textMuted animate-pulse">Loading institution data...</p>
       </div>
     );

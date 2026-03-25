@@ -368,7 +368,7 @@ export const VenueManagement: React.FC = () => {
             <div className="absolute inset-0 bg-surface border border-outline rounded-lg overflow-hidden flex flex-col items-center justify-center gap-4">
               <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse"></div>
               <div className="relative z-10 flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-full border-input border-primary/20 border-t-primary animate-spin"></div>
+                <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin"></div>
                 <div className="text-textMuted font-medium animate-pulse">Initializing Map Engine...</div>
               </div>
             </div>
@@ -513,7 +513,7 @@ export const VenueManagement: React.FC = () => {
       {/* Venue Modal */}
       {showModal && (
         <Suspense fallback={
-          <div className="fixed inset-0 bg-cardackgroundlack/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <Loader className="w-8 h-8 animate-spin text-primary" />
           </div>
         }>

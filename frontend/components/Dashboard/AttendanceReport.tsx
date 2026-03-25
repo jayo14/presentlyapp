@@ -375,7 +375,7 @@ export const AttendanceReport: React.FC = () => {
                                 onClick={() => handleServerExport('csv')}
                                 className="w-full px-4 py-2.5 text-left text-sm font-medium text-textMuted hover:bg-surfaceHigh hover:text-text flex items-center gap-3 transition-colors"
                             >
-                                <Download size={16} className="text-on-primary-fixedlue-500" />
+                                <Download size={16} className="text-blue-500" />
                                 CSV (Server)
                             </button>
                             <button 
@@ -453,7 +453,7 @@ export const AttendanceReport: React.FC = () => {
                     placeholder="Search by student name or matric number..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 bg-cardackgroundackground text-text border border-outline rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm"
+                    className="w-full pl-9 pr-4 py-2.5 bg-background text-text border border-outline rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm"
                 />
             </div>
 
@@ -610,7 +610,7 @@ export const AttendanceReport: React.FC = () => {
 
       {/* Manual Mark Modal */}
       {showManualMarkModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-cardackgroundlack/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
             <div className="bg-surface text-text border border-outline rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-4">

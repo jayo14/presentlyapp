@@ -79,11 +79,11 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-cardackgroundlack/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
       <div 
         {...modalProps}
         aria-labelledby="dialog-title"
-        className="bg-cardackgroundackground text-text border border-outline rounded-3xl w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] outline-none relative overflow-hidden"
+        className="bg-background text-text border border-outline rounded-3xl w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] outline-none relative overflow-hidden"
       >
         {/* End Session Confirmation Overlay */}
         {showEndConfirmation && (

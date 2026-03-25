@@ -117,7 +117,7 @@ export const AuthCallback: React.FC = () => {
       <div className="max-w-md w-full text-center">
         <div className="inline-flex items-center justify-center">
           <div className="relative w-16 h-16">
-            <div className="absolute inset-0 rounded-full border-input border-[#FFD700] border-t-transparent animate-spin"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-[#FFD700] border-t-transparent animate-spin"></div>
           </div>
         </div>
         <p className="mt-6 text-lg font-medium">{message}</p>
@@ -132,7 +132,7 @@ export const AuthCallback: React.FC = () => {
         {errorMessage && (
           <button
             onClick={() => navigate('/login', { replace: true })}
-            className="mt-6 px-4 py-2 bg-[#FFD700] text-on-primary-fixedlack rounded-lg font-medium hover:bg-yellow-400 transition"
+            className="mt-6 px-4 py-2 bg-[#FFD700] text-black rounded-lg font-medium hover:bg-yellow-400 transition"
           >
             Return to Login
           </button>

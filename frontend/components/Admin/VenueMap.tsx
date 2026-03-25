@@ -1013,7 +1013,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           <button
             onClick={() => setMapType('road')}
             className={`p-2 transition-colors flex items-center justify-center ${mapType === 'road'
-              ? 'bg-primary text-on-primary-fixedlack'
+              ? 'bg-primary text-black'
               : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
               }`}
             title="Road Map"
@@ -1023,7 +1023,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           <button
             onClick={() => setMapType('satellite')}
             className={`p-2 transition-colors flex items-center justify-center ${mapType === 'satellite'
-              ? 'bg-primary text-on-primary-fixedlack'
+              ? 'bg-primary text-black'
               : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
               }`}
             title="Satellite View"
@@ -1033,7 +1033,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           <button
             onClick={() => setShowUserLocation(!showUserLocation)}
             className={`p-2 transition-colors flex items-center justify-center ${showUserLocation
-              ? 'bg-cardackgroundlue-500 text-white'
+              ? 'bg-blue-500 text-white'
               : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
               }`}
             title={showUserLocation ? "Stop Tracking Location" : "Find My Location"}
@@ -1054,7 +1054,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       {/* Drawing mode badge */}
       {drawingMode && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
-          <span className="bg-primary text-on-primary-fixedlack text-xs font-semibold px-4 py-2 rounded-full shadow-lg animate-pulse flex items-center gap-2">
+          <span className="bg-primary text-black text-xs font-semibold px-4 py-2 rounded-full shadow-lg animate-pulse flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>

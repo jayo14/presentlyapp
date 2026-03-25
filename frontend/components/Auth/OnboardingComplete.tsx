@@ -127,12 +127,12 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
           </div>
 
           {/* Header */}
-          <h1 className="font-headline text-3xl md:text-4xl font-bold text-text-primary mb-4 flex items-center justify-center gap-3">
+          <h1 className="font-headline text-3xl md:text-4xl font-bold text-primary mb-4 flex items-center justify-center gap-3">
             You're all set, {userName}! 🎉
           </h1>
 
           {/* Message */}
-          <p className="text-lg text-text-textMuted mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-textMuted mb-8 max-w-2xl mx-auto leading-relaxed">
             Your profile is ready. Welcome to a seamless attendance experience with Presently.
           </p>
 
@@ -140,7 +140,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
           <div className="bg-surfaceLow/50 border border-outline rounded-2xl p-6 mb-8 text-left">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp size={20} className="text-primary" />
-              <h3 className="font-headline text-lg font-semibold text-text-primary">Quick Tips to Get Started</h3>
+              <h3 className="font-headline text-lg font-semibold text-primary">Quick Tips to Get Started</h3>
             </div>
             
             <div className="space-y-4">
@@ -153,11 +153,11 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
                     <tip.icon size={20} className="text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-text-primary text-sm mb-1">{tip.title}</p>
-                    <p className="text-text-textMuted text-xs leading-relaxed">{tip.desc}</p>
+                    <p className="font-medium text-primary text-sm mb-1">{tip.title}</p>
+                    <p className="text-textMuted text-xs leading-relaxed">{tip.desc}</p>
                   </div>
                   {tip.action && (
-                    <ArrowRight size={18} className="text-text-textMuted flex-shrink-0 mt-1" />
+                    <ArrowRight size={18} className="text-textMuted flex-shrink-0 mt-1" />
                   )}
                 </div>
               ))}
@@ -189,7 +189,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
 
           {/* Auto-redirect Countdown */}
           {autoRedirect && countdown > 0 && (
-            <div className="mt-6 text-text-textMuted text-sm">
+            <div className="mt-6 text-textMuted text-sm">
               <p>Entering dashboard in {countdown}s...</p>
               <button 
                 onClick={handleCancelRedirect}
@@ -203,15 +203,15 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
 
         {/* Profile Preview Card */}
         <div className="bg-surface/50 backdrop-blur-sm border border-outline rounded-2xl p-6 text-center">
-          <p className="text-text-textMuted text-sm mb-2">Your Role</p>
-          <p className="text-text-primary font-semibold text-lg capitalize">
+          <p className="text-textMuted text-sm mb-2">Your Role</p>
+          <p className="text-primary font-semibold text-lg capitalize">
             {userRole.replace('_', ' ')}
           </p>
         </div>
 
         {/* Help Text */}
         <div className="mt-8 text-center">
-          <p className="text-text-textMuted text-sm">
+          <p className="text-textMuted text-sm">
             Need help getting started?{' '}
             <button 
               onClick={() => window.location.href = 'mailto:support@getpresently.com.ng'}
