@@ -174,9 +174,9 @@ export const BlogPostPage: React.FC = () => {
     <div className="min-h-screen bg-background text-text relative selection:bg-primaryContainer selection:text-primary">
       {/* Decorative Blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -right-20 top-20 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
-        <div className="absolute -left-40 top-1/2 h-[700px] w-[700px] rounded-full bg-primary/5 blur-[150px]" />
-        <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-primary/5 from-10% to-transparent to-100%" />
+        <div className="absolute -right-32 -top-32 sm:right-auto sm:top-20 h-[300px] sm:h-[400px] md:h-[600px] w-[300px] sm:w-[400px] md:w-[600px] rounded-full bg-primary/10 blur-[80px] sm:blur-[100px] md:blur-[120px] animate-pulse" />
+        <div className="absolute -left-40 top-1/2 h-[350px] sm:h-[500px] md:h-[700px] w-[350px] sm:w-[500px] md:w-[700px] rounded-full bg-primary/5 blur-[100px] sm:blur-[120px] md:blur-[150px]" />
+        <div className="absolute inset-x-0 top-0 h-[400px] sm:h-[600px] bg-gradient-to-b from-primary/5 from-10% to-transparent to-100%" />
       </div>
       
       {/* SEO: Per-article metadata and Article schema */}
@@ -192,12 +192,12 @@ export const BlogPostPage: React.FC = () => {
 
       <LandingHeader />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-32 md:px-6 lg:px-8">
-        <div className="mb-16">
+      <main className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:py-32 lg:px-8">
+        <div className="mb-8 sm:mb-12 md:mb-16">
           <PostHeader post={post} />
         </div>
 
-        <div className="grid gap-16 lg:grid-cols-[1fr_320px]">
+        <div className="grid gap-8 sm:gap-12 md:gap-16 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_320px]">
           <div className="relative">
             {/* Social Share Sidebar (Desktop Only) */}
             <div className="hidden xl:block absolute -left-20 top-0 pointer-events-none">
@@ -206,10 +206,11 @@ export const BlogPostPage: React.FC = () => {
               </div>
             </div>
 
-            <article className="prose prose-lg dark:prose-invert max-w-none 
+            <article className="prose prose-sm sm:prose-base md:prose-lg dark:prose-invert max-w-none 
               prose-headings:font-headline prose-headings:text-text prose-headings:tracking-tight
-              prose-h1:text-5xl prose-h1:font-black
-              prose-h2:text-4xl prose-h2:font-extrabold
+              prose-h1:text-3xl sm:text-4xl md:text-5xl lg:text-6xl prose-h1:font-black
+              prose-h2:text-2xl sm:text-3xl md:text-4xl prose-h2:font-extrabold
+              prose-h3:text-xl sm:text-2xl prose-h3:font-extrabold
               prose-p:text-textMuted prose-p:leading-relaxed
               prose-a:text-primary prose-a:font-bold hover:prose-a:underline 
               prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1.5 prose-code:rounded
@@ -226,16 +227,16 @@ export const BlogPostPage: React.FC = () => {
                     return (
                       <h1
                         id={id}
-                        className="group scroll-mt-32 mt-16 mb-8 flex items-center gap-2 font-headline text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-text"
+                        className="group scroll-mt-28 sm:scroll-mt-32 mt-10 sm:mt-14 md:mt-16 mb-4 sm:mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center gap-2 font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-text"
                         {...props}
                       >
                         <span className="flex-1">{children}</span>
                         <a
                           href={`#${id}`}
-                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary"
+                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary shrink-0"
                           aria-label="Copy section link"
                         >
-                          <Link2 size={20} />
+                          <Link2 size={18} className="sm:size-20" />
                         </a>
                       </h1>
                     );
@@ -245,16 +246,16 @@ export const BlogPostPage: React.FC = () => {
                     return (
                       <h2
                         id={id}
-                        className="group scroll-mt-32 mt-14 mb-6 flex items-center gap-2 border-b border-outline/10 pb-3 font-headline text-3xl md:text-4xl font-black tracking-tight text-text"
+                        className="group scroll-mt-28 sm:scroll-mt-32 mt-8 sm:mt-12 md:mt-14 mb-4 sm:mb-5 md:mb-6 flex flex-col sm:flex-row sm:items-center gap-2 border-b border-outline/10 pb-2 sm:pb-3 font-headline text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-text"
                         {...props}
                       >
                         <span className="flex-1">{children}</span>
                         <a
                           href={`#${id}`}
-                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary"
+                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary shrink-0"
                           aria-label="Copy section link"
                         >
-                          <Link2 size={18} />
+                          <Link2 size={16} className="sm:size-18" />
                         </a>
                       </h2>
                     );
@@ -264,22 +265,22 @@ export const BlogPostPage: React.FC = () => {
                     return (
                       <h3
                         id={id}
-                        className="group scroll-mt-32 mt-10 mb-4 flex items-center gap-2 font-headline text-2xl md:text-3xl font-extrabold tracking-tight text-text"
+                        className="group scroll-mt-28 sm:scroll-mt-32 mt-6 sm:mt-8 md:mt-10 mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center gap-2 font-headline text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-text"
                         {...props}
                       >
                         <span className="flex-1">{children}</span>
                         <a
                           href={`#${id}`}
-                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary"
+                          className="opacity-0 transition-opacity text-textMuted group-hover:opacity-100 hover:text-primary shrink-0"
                           aria-label="Copy section link"
                         >
-                          <Link2 size={16} />
+                          <Link2 size={14} className="sm:size-16" />
                         </a>
                       </h3>
                     );
                   },
                   p: ({ children, ...props }: any) => (
-                    <p className="mb-6 leading-8 text-[1.06rem] text-textMuted" {...props}>
+                    <p className="mb-4 sm:mb-5 md:mb-6 leading-7 sm:leading-8 text-[1.02rem] sm:text-[1.06rem] text-textMuted" {...props}>
                       {children}
                     </p>
                   ),
@@ -298,12 +299,12 @@ export const BlogPostPage: React.FC = () => {
                     );
                   },
                   ul: ({ children, ...props }: any) => (
-                    <ul className="my-6 list-disc space-y-3 pl-6 marker:text-primary" {...props}>
+                    <ul className="my-4 sm:my-5 md:my-6 list-disc space-y-2 sm:space-y-3 pl-5 sm:pl-6 marker:text-primary" {...props}>
                       {children}
                     </ul>
                   ),
                   ol: ({ children, ...props }: any) => (
-                    <ol className="my-6 list-decimal space-y-3 pl-6 marker:font-bold marker:text-primary" {...props}>
+                    <ol className="my-4 sm:my-5 md:my-6 list-decimal space-y-2 sm:space-y-3 pl-5 sm:pl-6 marker:font-bold marker:text-primary" {...props}>
                       {children}
                     </ol>
                   ),
@@ -314,15 +315,15 @@ export const BlogPostPage: React.FC = () => {
                   ),
                   blockquote: ({ children, ...props }: any) => (
                     <blockquote
-                      className="my-8 rounded-2xl border-l-4 border-primary bg-surfaceHigh/40 px-6 py-5 text-[1.05rem] italic text-text"
+                      className="my-6 sm:my-8 rounded-xl sm:rounded-2xl border-l-4 border-primary bg-surfaceHigh/40 px-4 sm:px-6 py-4 sm:py-5 text-[1.02rem] sm:text-[1.05rem] italic text-text"
                       {...props}
                     >
                       {children}
                     </blockquote>
                   ),
                   table: ({ children, ...props }: any) => (
-                    <div className="my-8 overflow-x-auto rounded-2xl border border-outline/10">
-                      <table className="w-full border-collapse bg-surface/30 text-sm" {...props}>
+                    <div className="my-6 sm:my-8 overflow-x-auto rounded-lg sm:rounded-2xl border border-outline/10">
+                      <table className="w-full border-collapse bg-surface/30 text-xs sm:text-sm" {...props}>
                         {children}
                       </table>
                     </div>
@@ -333,12 +334,12 @@ export const BlogPostPage: React.FC = () => {
                     </thead>
                   ),
                   th: ({ children, ...props }: any) => (
-                    <th className="border-b border-outline/10 px-4 py-3 text-left font-black uppercase tracking-wide text-xs text-text" {...props}>
+                    <th className="border-b border-outline/10 px-3 sm:px-4 py-2 sm:py-3 text-left font-black uppercase tracking-wide text-[8px] sm:text-xs text-text" {...props}>
                       {children}
                     </th>
                   ),
                   td: ({ children, ...props }: any) => (
-                    <td className="border-b border-outline/5 px-4 py-3 align-top text-textMuted" {...props}>
+                    <td className="border-b border-outline/5 px-3 sm:px-4 py-2 sm:py-3 align-top text-textMuted" {...props}>
                       {children}
                     </td>
                   ),
@@ -346,11 +347,11 @@ export const BlogPostPage: React.FC = () => {
                     <img
                       alt={alt || 'Blog media'}
                       loading="lazy"
-                      className="my-10 w-full rounded-[2rem] border border-outline/10 shadow-2xl"
+                      className="my-6 sm:my-8 md:my-10 w-full rounded-xl sm:rounded-2xl border border-outline/10 shadow-lg sm:shadow-xl md:shadow-2xl"
                       {...props}
                     />
                   ),
-                  hr: (props: any) => <hr className="my-12 border-outline/10" {...props} />,
+                  hr: (props: any) => <hr className="my-8 sm:my-10 md:my-12 border-outline/10" {...props} />,
                   code: ({ className, children, ...props }: any) => {
                     const isInline = !className;
                     if (isInline) {
@@ -369,9 +370,9 @@ export const BlogPostPage: React.FC = () => {
                     );
                   },
                   pre: ({ children, ...props }: any) => (
-                    <div className="my-8 overflow-hidden rounded-2xl border border-outline/20 bg-white dark:bg-[#0d1117] shadow-xl">
-                      <div className="flex items-center justify-between border-b border-white/10 px-4 py-2">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted">Code</span>
+                    <div className="my-6 sm:my-8 overflow-hidden rounded-lg sm:rounded-2xl border border-outline/20 bg-white dark:bg-[#0d1117] shadow-lg sm:shadow-xl">
+                      <div className="flex items-center justify-between border-b border-white/10 px-3 sm:px-4 py-2">
+                        <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-textMuted">Code</span>
                         <button
                           type="button"
                           onClick={() => {
@@ -386,7 +387,7 @@ export const BlogPostPage: React.FC = () => {
                             const key = `${language}:${rawCode.slice(0, 60)}`;
                             void handleCopyCode(key, rawCode);
                           }}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-outline/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-textMuted hover:text-text hover:bg-surfaceHigh/40 transition-colors"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-outline/20 px-2 sm:px-2.5 py-1 text-[8px] sm:text-[10px] font-bold uppercase tracking-tighter sm:tracking-wider text-textMuted hover:text-text hover:bg-surfaceHigh/40 transition-colors shrink-0"
                         >
                           {(() => {
                             const codeElement = Array.isArray(children) ? children[0] : children;
@@ -403,18 +404,18 @@ export const BlogPostPage: React.FC = () => {
                             return copied ? (
                               <>
                                 <Check size={12} />
-                                Copied
+                                <span className="hidden sm:inline">Copied</span>
                               </>
                             ) : (
                               <>
                                 <Copy size={12} />
-                                Copy
+                                <span className="hidden sm:inline">Copy</span>
                               </>
                             );
                           })()}
                         </button>
                       </div>
-                      <pre className="overflow-x-auto p-5 text-sm" {...props}>
+                      <pre className="overflow-x-auto p-3 sm:p-5 text-xs sm:text-sm leading-relaxed" {...props}>
                         {children}
                       </pre>
                     </div>
@@ -424,35 +425,35 @@ export const BlogPostPage: React.FC = () => {
                 {post.content}
               </ReactMarkdown>
 
-              <div className="mt-16 flex flex-wrap gap-3 border-t border-outline/10 pt-10">
-                <span className="text-xs font-bold uppercase tracking-widest text-textMuted mr-2 self-center">Tags:</span>
+              <div className="mt-8 sm:mt-12 md:mt-16 flex flex-wrap gap-2 sm:gap-3 border-t border-outline/10 pt-6 sm:pt-8 md:pt-10">
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-textMuted mr-1 sm:mr-2 self-center">Tags:</span>
                 {post.tags.map((tag) => (
                   <TagBadge key={tag.slug} tag={tag} />
                 ))}
               </div>
 
-              <div className="mt-12 xl:hidden">
+              <div className="mt-8 sm:hidden">
                 <ShareButtons slug={post.slug} title={post.title} />
               </div>
             </article>
           </div>
 
-          <aside className="hidden lg:block">
-            <div className="sticky top-40 space-y-8">
+          <aside className="hidden md:block">
+            <div className="sticky top-32 sm:top-40 space-y-6 sm:space-y-8">
               <TableOfContents content={post.content} />
               
-              <div className="rounded-[2rem] border border-outline/10 bg-surface/40 backdrop-blur-md p-8">
-                <h4 className="font-headline text-lg font-bold text-text mb-4">About the Author</h4>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="h-14 w-14 rounded-full bg-surfaceHigh flex items-center justify-center font-black text-xl text-text border border-outline/10">
+              <div className="rounded-xl sm:rounded-2xl border border-outline/10 bg-surface/40 backdrop-blur-md p-6 sm:p-8">
+                <h4 className="font-headline text-base sm:text-lg font-bold text-text mb-4">About the Author</h4>
+                <div className="flex items-center gap-3 sm:gap-4 mb-4">
+                  <div className="h-12 sm:h-14 w-12 sm:w-14 rounded-full bg-surfaceHigh flex items-center justify-center font-black text-lg sm:text-xl text-text border border-outline/10 shrink-0">
                     {post.author_name.slice(0, 1).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-bold text-text">{post.author_name}</p>
-                    <p className="text-xs text-textMuted">Presently Contributor</p>
+                    <p className="font-bold text-text text-sm sm:text-base">{post.author_name}</p>
+                    <p className="text-[11px] sm:text-xs text-textMuted">Presently Contributor</p>
                   </div>
                 </div>
-                <p className="text-sm text-textMuted leading-relaxed">
+                <p className="text-xs sm:text-sm text-textMuted leading-relaxed">
                   Passionate about the intersection of education and technology in modern Nigeria.
                 </p>
               </div>
@@ -460,15 +461,15 @@ export const BlogPostPage: React.FC = () => {
           </aside>
         </div>
 
-        <div className="mt-32 border-t border-outline/10 pt-20">
-          <div className="flex items-center justify-between mb-12">
-            <h3 className="font-headline text-4xl font-black text-text tracking-tight">Read Next</h3>
-            <Link to="/blog" className="text-primary font-bold hover:underline">View all articles →</Link>
+        <div className="mt-16 sm:mt-24 md:mt-32 border-t border-outline/10 pt-12 sm:pt-16 md:pt-20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-12">
+            <h3 className="font-headline text-3xl sm:text-4xl font-black text-text tracking-tight">Read Next</h3>
+            <Link to="/blog" className="text-primary font-bold hover:underline text-sm sm:text-base">View all articles →</Link>
           </div>
           <RelatedPosts currentSlug={post.slug} tags={post.tags.map((tag) => tag.slug)} />
         </div>
 
-        <section className="mt-32">
+        <section className="mt-16 sm:mt-24 md:mt-32">
           <NewsletterSignup source={post.slug} />
         </section>
       </main>
