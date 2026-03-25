@@ -42,13 +42,19 @@ const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onCl
       group relative w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} 
       px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150
       ${isActive
-        ? 'bg-surfaceLow text-text'
+        ? 'bg-surfaceLow text-text shadow-[0_1px_2px_rgba(0,0,0,0.05)] shadow-zinc-200/50 dark:shadow-none'
         : 'text-textMuted hover:text-text hover:bg-surfaceLow'
       }
     `}
     title={collapsed ? label : undefined}
   >
-    <Icon size={16} className={`flex-shrink-0 ${isActive ? 'text-foreground' : 'text-muted-foreground group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}`} />
+    {isActive && (
+      <motion.div 
+        layoutId="active-indicator"
+        className="absolute left-0 w-1 h-4 bg-primary rounded-r-full"
+      />
+    )}
+    <Icon size={16} className={`flex-shrink-0 ${isActive ? 'text-primary' : 'text-textMuted group-hover:text-text'}`} />
     {!collapsed && <span className="truncate">{label}</span>}
     {!collapsed && badge && (
       <span className="ml-auto text-[10px] font-semibold bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded-md">
@@ -499,9 +505,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         </nav>
 
         {/* Mobile Sidebar Footer */}
-        <div className="border-t border-outline p-3 space-y-2 flex-shrink-0">
-          <div className="flex items-center gap-3 px-3 py-2.5 bg-surfaceLow/50 rounded-xl">
-            <div className="w-9 h-9 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0">
+        <div className="border-t border-outline/10 p-4 space-y-4 flex-shrink-0 bg-surfaceLow/30">
+          <div className="flex items-center gap-3 px-3 py-3 bg-surface rounded-2xl border border-outline/5 shadow-sm">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-surfaceLow border border-outline flex-shrink-0">
               {displayAvatar ? (
                 <img src={displayAvatar} alt="User avatar" className="w-full h-full object-cover" />
               ) : (
@@ -511,15 +517,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               )}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-semibold text-text truncate">{userName}</p>
-              <p className="text-xs text-textMuted truncate capitalize">{userRole?.toLowerCase().replace('_', ' ')}</p>
+              <p className="text-sm font-bold text-text truncate leading-tight">{userName}</p>
+              <p className="text-[11px] text-textMuted truncate capitalize leading-tight font-medium">{userRole?.toLowerCase().replace('_', ' ')}</p>
             </div>
           </div>
           <button
             onClick={onLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 h-12 rounded-xl text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-400/10 transition-colors border border-red-500/10"
           >
-            <LogOut size={16} />
+            <LogOut size={14} />
             Sign out
           </button>
         </div>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BookOpen, User, GraduationCap, Plus, Search, Trash2, ArrowLeft, MoreVertical, Activity, Loader2 } from 'lucide-react';
+import { BookOpen, User, GraduationCap, Plus, Search, Trash2, ArrowLeft, MoreVertical, Activity, Loader2, BookMarked } from 'lucide-react';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
 import CourseRegistrationDialog from './CourseRegistrationDialog';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SkeletonCourseGrid } from '../Skeleton';
+import { ConfirmationDialog } from '../ConfirmationDialog';
 
 
 interface StudentCoursesPageProps {
@@ -20,6 +22,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
   const [searchTerm, setSearchTerm] = useState('');
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [droppingId, setDroppingId] = useState<number | null>(null);
+  const [courseToDrop, setCourseToDrop] = useState<EnrolledCourse | null>(null);
   const [checkInIntent, setCheckInIntent] = useState<any>({ fromCheckIn: false, autoCheckIn: false });
 
   useEffect(() => { loadCourses(); }, []);
@@ -45,12 +48,13 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
     }
   };
 
-  const handleDropCourse = async (course: EnrolledCourse) => {
-    if (!window.confirm(`Disenroll from ${course.course_code}? This action is permanent.`)) return;
+  const handleDropCourse = async () => {
+    if (!courseToDrop) return;
     try {
-      setDroppingId(course.id);
-      await studentApi.dropCourse(course.id);
-      toast.success('Curriculum Updated', { description: `Removed ${course.course_code}` });
+      setDroppingId(courseToDrop.id);
+      await studentApi.dropCourse(courseToDrop.id);
+      toast.success('Curriculum Updated', { description: `Removed ${courseToDrop.course_code}` });
+      setCourseToDrop(null);
       await loadCourses();
     } catch (err: any) {
       toast.error('Update Failed', { description: err.response?.data?.error || 'Please try again' });
@@ -64,13 +68,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
     course.course_code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Accessing Archives...</p>
-      </div>
-    );
+  if (loading && courses.length === 0) {
+    return <SkeletonCourseGrid />;
   }
 
   return (
@@ -134,7 +133,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                            <BookOpen size={24} strokeWidth={2.5} />
                         </div>
                         <button 
-                          onClick={() => handleDropCourse(course)}
+                          onClick={() => setCourseToDrop(course)}
                           disabled={droppingId === course.id}
                           className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
                         >
@@ -178,12 +177,12 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 );
               })
             ) : (
-              <div className="py-24 flex flex-col items-center justify-center bg-surfaceHigh/10 border-2 border-dashed border-outline/10 rounded-[3rem] text-center px-12">
-                 <div className="w-20 h-20 bg-surfaceHigh/40 rounded-full flex items-center justify-center opacity-40 mb-6">
-                    <GraduationCap size={40} />
+              <div className="py-24 flex flex-col items-center justify-center bg-surfaceHigh/20 border-2 border-dashed border-outline/20 rounded-[3rem] text-center px-12">
+                 <div className="w-20 h-20 bg-surfaceHigh/40 rounded-full flex items-center justify-center mb-6 text-textMuted/40">
+                    <BookMarked size={40} />
                  </div>
                  <h4 className="text-2xl font-headline font-black text-text">No Modules Registered</h4>
-                 <p className="text-textMuted text-sm font-medium mt-2 max-w-[240px]">Expand your academic portfolio by enrolling in new department modules.</p>
+                 <p className="text-textMuted/80 text-sm font-medium mt-2 max-w-[240px]">Expand your academic portfolio by enrolling in new department modules.</p>
                  <button 
                    onClick={() => setIsRegistrationOpen(true)}
                    className="mt-8 px-10 py-4 bg-primary text-[#111111] font-headline font-black text-sm rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
@@ -208,6 +207,17 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
           isOpen={isRegistrationOpen}
           initialCourseCode={searchParams.get('courseCode') || undefined}
           onClose={() => { setIsRegistrationOpen(false); loadCourses(); }}
+        />
+
+        <ConfirmationDialog 
+          isOpen={!!courseToDrop}
+          onClose={() => setCourseToDrop(null)}
+          onConfirm={handleDropCourse}
+          isLoading={!!droppingId}
+          variant="danger"
+          title="Disenroll Module"
+          description={`Are you sure you want to remove ${courseToDrop?.course_code} from your portfolio? This will permanentely delete your local attendance records for this module.`}
+          confirmText="Drop Course"
         />
       </div>
     </>

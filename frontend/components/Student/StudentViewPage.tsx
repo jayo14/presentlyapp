@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Calendar, Clock, CheckCircle, XCircle, AlertCircle, TrendingUp, 
-  BookOpen, MapPin, User, Filter, ChevronRight, Loader, FileText,
-  Award, Target
+  BookOpen, MapPin, User, Filter, ChevronRight, Loader2, FileText,
+  Award, Target, RefreshCw
 } from 'lucide-react';
+import { SkeletonStudentDashboard } from '../Skeleton';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../Button';
 
@@ -175,11 +176,7 @@ export const StudentViewPage: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <div className="max-w-6xl mx-auto flex items-center justify-center h-64">
-        <Loader className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <SkeletonStudentDashboard />;
   }
 
   return (
@@ -203,7 +200,7 @@ export const StudentViewPage: React.FC = () => {
               <TrendingUp size={20} className="text-primary" />
             </div>
             <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-text-primary">{overallAttendance}%</span>
+              <span className="text-3xl font-black text-text tracking-tight">{overallAttendance}%</span>
             </div>
             <div className="mt-2 h-2 bg-surfaceLow rounded-full overflow-hidden">
               <div 
@@ -302,7 +299,7 @@ export const StudentViewPage: React.FC = () => {
                         {course.attendancePercentage}%
                       </span>
                     </div>
-                    <h3 className="font-headline text-text-primary font-semibold text-on-primary-fixedase mb-1">
+                    <h3 className="font-headline text-text font-black text-lg tracking-tight mb-1">
                       {course.name}
                     </h3>
                     <p className="text-text-textMuted text-sm flex items-center gap-1">
@@ -374,7 +371,7 @@ export const StudentViewPage: React.FC = () => {
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <span className="text-primary font-bold text-sm">{session.courseCode}</span>
-                  <h3 className="font-headline text-text-primary font-semibold text-on-primary-fixedase mt-1">
+                  <h3 className="font-headline text-text font-black text-lg tracking-tight mt-1">
                     {session.courseName}
                   </h3>
                 </div>

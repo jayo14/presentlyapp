@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy } from 'react';
-import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, Plus, MapPin, ChevronRight, Activity, Loader2, User } from 'lucide-react';
+import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, Plus, MapPin, ChevronRight, Activity, Loader2, User, RefreshCw } from 'lucide-react';
+import { SkeletonStudentDashboard } from '../Skeleton';
 import { SEO } from '../SEO';
 import { studentApi, StudentDashboardData } from '../../services/api/student';
 import { sessionApi } from '../../services/api/attendance';
@@ -63,10 +64,26 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   };
 
   if (loading && !dashboardData) {
+    return <SkeletonStudentDashboard />;
+  }
+
+  if (!dashboardData) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        <p className="text-sm font-bold text-textMuted uppercase tracking-widest animate-pulse">Initializing Mission Control...</p>
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-6 px-4 text-center">
+        <div className="w-20 h-20 bg-surfaceHigh/50 rounded-full flex items-center justify-center text-textMuted/60 mb-2">
+            <AlertCircle size={40} />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-2xl font-headline font-black text-text">Data Unavailable</h3>
+          <p className="text-sm font-medium text-textMuted max-w-xs">We couldn't retrieve your academic data. Please check your connection and try again.</p>
+        </div>
+        <button 
+          onClick={loadDashboardData}
+          className="flex items-center gap-2 px-8 py-3 bg-primary text-[#111111] font-headline font-black text-sm rounded-2xl shadow-xl active:scale-95 transition-all"
+        >
+          <RefreshCw size={16} />
+          Retry Sync
+        </button>
       </div>
     );
   }
@@ -178,7 +195,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         {/* UP NEXT SECTION */}
         <section className="space-y-6 px-2">
           <div className="flex justify-between items-end px-2">
-            <h4 className="text-[11px] font-black tracking-[0.25em] text-textMuted uppercase opacity-60 font-headline">Mission Schedule</h4>
+            <h4 className="text-[11px] font-black tracking-[0.25em] text-textMuted/80 uppercase font-headline">Mission Schedule</h4>
             <button className="text-[11px] font-black text-primary hover:text-primaryContainer transition-colors" onClick={() => window.location.href='/dashboard/timetable'}>FULL TIMETABLE</button>
           </div>
           
@@ -202,13 +219,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 </div>
               </div>
             ) : (
-              <div className="col-span-full py-20 flex flex-col items-center justify-center bg-surfaceHigh/10 rounded-[3rem] border-2 border-dashed border-outline/10 px-6 text-center">
-                 <div className="w-20 h-20 rounded-full bg-surfaceContainer flex items-center justify-center mb-6 opacity-40">
-                    <Calendar className="text-textMuted w-10 h-10" />
+              <div className="col-span-full py-20 flex flex-col items-center justify-center bg-surfaceHigh/20 rounded-[3rem] border-2 border-dashed border-outline/20 px-6 text-center">
+                 <div className="w-20 h-20 rounded-full bg-surfaceContainer flex items-center justify-center mb-6 text-textMuted/40">
+                    <Calendar className="w-10 h-10" />
                  </div>
                  <h5 className="font-headline font-black text-text text-lg tracking-tight mb-2">Daily mission accomplished</h5>
-                 <p className="font-medium text-textMuted text-sm max-w-xs">No scheduled classes remaining for today. Enjoy your rest, commander.</p>
-                 <button className="mt-8 px-8 py-3 bg-white dark:bg-surface text-text font-black text-xs rounded-2xl border border-outline/20 shadow-sm hover:shadow-md transition-all active:scale-95" onClick={() => setIsRegistrationOpen(true)}>REGISTER NEW MODULES</button>
+                 <p className="font-medium text-textMuted/80 text-sm max-w-xs">No scheduled classes remaining for today. Enjoy your rest, commander.</p>
+                 <button className="mt-8 px-8 py-3 bg-white dark:bg-surface text-text font-black text-xs rounded-2xl border border-outline/30 shadow-sm hover:shadow-md transition-all active:scale-95" onClick={() => setIsRegistrationOpen(true)}>REGISTER NEW MODULES</button>
               </div>
             )}
           </div>

@@ -100,6 +100,9 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="bg-white dark:bg-surface w-full max-w-2xl h-[92vh] md:h-auto md:max-h-[85vh] rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
       >
+        {/* Mobile Drag Handle */}
+        <div className="w-12 h-1.5 bg-outline/20 rounded-full mx-auto mt-4 md:hidden" />
+
         {/* Header */}
         <div className="px-8 pt-8 pb-4 flex flex-col gap-1 relative flex-shrink-0">
           <div className="flex justify-between items-start">
@@ -148,9 +151,9 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         {/* Course List */}
         <div className="flex-1 overflow-y-auto px-6 py-2 space-y-3 custom-scrollbar">
            {loading ? (
-             <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-40">
+             <div className="flex flex-col items-center justify-center py-20 gap-4 text-textMuted/60">
                 <Loader2 size={32} className="animate-spin text-primary" />
-                <span className="text-xs font-black tracking-widest uppercase">Fetching Catalog...</span>
+                <span className="text-[10px] font-black tracking-[0.2em] uppercase">Syncing Curriculum...</span>
              </div>
            ) : filteredCourses.length > 0 ? (
              filteredCourses.map(course => {
@@ -201,10 +204,10 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                );
              })
            ) : (
-             <div className="py-20 flex flex-col items-center justify-center opacity-30 text-center px-8">
-                <Search size={48} className="mb-4" />
-                <p className="font-headline font-black text-lg">No modules found</p>
-                <p className="text-xs font-medium max-w-[200px] mt-1">Try adjusting your search criteria or filter.</p>
+             <div className="py-20 flex flex-col items-center justify-center text-textMuted/40 text-center px-8">
+                <Search size={48} className="mb-4 text-textMuted/20" />
+                <p className="font-headline font-black text-lg text-textMuted/60">No modules found</p>
+                <p className="text-xs font-medium max-w-[200px] mt-1 text-textMuted/40">Try adjusting your search criteria or filter.</p>
              </div>
            )}
         </div>
