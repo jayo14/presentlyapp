@@ -174,6 +174,7 @@ const ClassRepRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: user, isLoading, isError } = useCurrentUser();
   const [loadTimeout, setLoadTimeout] = useState(false);
 
@@ -189,11 +190,25 @@ const AppContent: React.FC = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (!isLoading && user && !user.onboarding_complete) {
-      console.log('[AppContent] Redirecting to onboarding');
-      navigate('/onboarding', { replace: true });
+    if (isLoading || !user) return;
+
+    const authFlowRoutes = ['/otp-verification', '/email-verification', '/verify-email'];
+    const onAuthFlowRoute = authFlowRoutes.some((route) => location.pathname.startsWith(route));
+
+    if (!user.email_verified && !onAuthFlowRoute) {
+      navigate(`/otp-verification?email=${encodeURIComponent(user.email)}`, { replace: true });
+      return;
     }
-  }, [user, isLoading, navigate]);
+
+    if (user.email_verified && !user.onboarding_complete && location.pathname !== '/onboarding') {
+      navigate('/onboarding', { replace: true });
+      return;
+    }
+
+    if (user.email_verified && user.onboarding_complete && location.pathname === '/onboarding') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, isLoading, navigate, location.pathname]);
 
   if (isLoading && !loadTimeout) {
     return <LoadingFallback />;
@@ -232,13 +247,20 @@ const AppContent: React.FC = () => {
           <Route
             path="/onboarding"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireEmailVerified>
                 <Onboarding />
               </ProtectedRoute>
             }
           />
           
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute requireEmailVerified requireOnboardingComplete>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
               <Route index element={<DashboardHome />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="sessions" element={<SessionsPage />} />

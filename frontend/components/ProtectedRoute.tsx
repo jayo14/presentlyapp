@@ -6,9 +6,16 @@ import { useCurrentUser } from '../hooks/useAuth';
 interface ProtectedRouteProps {
   children: React.ReactElement;
   allowedRoles?: UserRole[];
+  requireEmailVerified?: boolean;
+  requireOnboardingComplete?: boolean;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles,
+  requireEmailVerified = false,
+  requireOnboardingComplete = false,
+}) => {
   const { data: user, isLoading } = useCurrentUser();
   const location = useLocation();
 
@@ -26,6 +33,20 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/unauthorized" replace />;
+  }
+
+  if (requireEmailVerified && !user.email_verified) {
+    return (
+      <Navigate
+        to={`/otp-verification?email=${encodeURIComponent(user.email)}`}
+        state={{ from: location }}
+        replace
+      />
+    );
+  }
+
+  if (requireOnboardingComplete && !user.onboarding_complete) {
+    return <Navigate to="/onboarding" state={{ from: location }} replace />;
   }
 
   return children;

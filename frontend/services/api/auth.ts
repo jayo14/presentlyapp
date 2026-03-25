@@ -40,6 +40,7 @@ export interface UserProfile {
   role: UserRole;
   avatar_url?: string;
   onboarding_complete: boolean;
+  email_verified?: boolean;
   is_verified?: boolean;
   institution?: number;
   institution_name?: string;
@@ -76,6 +77,7 @@ export interface AuthResponse {
     full_name: string;
     role: UserRole;
     onboarding_complete: boolean;
+    email_verified?: boolean;
     avatar_url?: string;
   };
   tokens?: {
@@ -83,6 +85,7 @@ export interface AuthResponse {
     refresh: string;
   };
   requires_onboarding?: boolean;
+  requires_email_verification?: boolean;
   errors?: any;
 }
 

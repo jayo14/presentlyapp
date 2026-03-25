@@ -37,7 +37,9 @@ export const Login: React.FC = () => {
     const pendingCheckIn = localStorage.getItem('pending_checkin');
     const explicitRedirect = searchParams.get('redirect_to');
 
-    if (!user.onboarding_complete) {
+    if (!user.email_verified) {
+      navigate(`/otp-verification?email=${encodeURIComponent(user.email)}`, { replace: true });
+    } else if (!user.onboarding_complete) {
       navigate('/onboarding', { replace: true });
     } else if (explicitRedirect) {
       navigate(explicitRedirect, { replace: true });
