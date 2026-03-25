@@ -29,7 +29,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white flex flex-col font-sans overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans overflow-hidden transition-colors duration-500">
       {/* Background Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
       
@@ -37,11 +37,11 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
       <header className="p-6 flex items-center justify-between relative z-10">
         <button 
           onClick={handleBackToHome}
-          className="w-12 h-12 flex items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 active:scale-95 transition-all"
+          className="w-12 h-12 flex items-center justify-center bg-surface/80 backdrop-blur-xl rounded-2xl border border-border active:scale-95 transition-all text-foreground"
         >
           <ArrowLeft size={24} strokeWidth={2.5} />
         </button>
-        <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Verification Success</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Verification Success</span>
         <div className="w-12 h-12"></div>
       </header>
 
@@ -55,7 +55,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
               transition={{ type: "spring", damping: 15, stiffness: 200 }}
               className="w-32 h-32 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_60px_rgba(var(--primary-rgb),0.4)] relative z-20"
             >
-               <Check size={64} strokeWidth={4} className="text-[#111111]" />
+               <Check size={64} strokeWidth={4} className="text-on-primary-fixed" />
             </motion.div>
             
             {/* Animated Rings */}
@@ -69,14 +69,14 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
             <motion.div 
               animate={{ y: [-10, 10, -10] }}
               transition={{ duration: 4, repeat: Infinity }}
-              className="absolute -top-8 -right-8 w-12 h-12 bg-white/5 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10"
+              className="absolute -top-8 -right-8 w-12 h-12 bg-surface/80 backdrop-blur-md rounded-2xl flex items-center justify-center border border-border"
             >
                <Award size={24} className="text-primary" />
             </motion.div>
         </div>
 
         {/* Text Details */}
-        <div className="text-center space-y-4 mb-12">
+        <div className="text-center space-y-4 mb-12 text-foreground">
           <motion.h2 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -101,12 +101,12 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="w-full bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 space-y-6"
+          className="w-full bg-surface/80 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-border space-y-6"
         >
           <div className="flex justify-between items-start">
              <div>
-                <span className="text-[10px] font-black tracking-widest opacity-40 uppercase mb-1 block">Course Detail</span>
-                <h3 className="text-2xl font-headline font-black leading-tight">
+                <span className="text-[10px] font-black tracking-widest text-muted-foreground/40 uppercase mb-1 block">Course Detail</span>
+                <h3 className="text-2xl font-headline font-black leading-tight text-foreground">
                   {courseCode}<br/>{courseName}
                 </h3>
              </div>
@@ -116,15 +116,15 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-             <div className="p-4 bg-white/5 rounded-2xl space-y-1">
+             <div className="p-4 bg-muted/10 rounded-2xl space-y-1">
                 <MapPin size={16} className="text-primary" />
-                <p className="text-[10px] font-bold opacity-40 uppercase">Venue</p>
-                <p className="text-xs font-black truncate">{location}</p>
+                <p className="text-[10px] font-bold text-muted-foreground/40 uppercase">Venue</p>
+                <p className="text-xs font-black truncate text-foreground">{location}</p>
              </div>
-             <div className="p-4 bg-white/5 rounded-2xl space-y-1">
+             <div className="p-4 bg-muted/10 rounded-2xl space-y-1">
                 <Clock size={16} className="text-primary" />
-                <p className="text-[10px] font-bold opacity-40 uppercase">Timestamp</p>
-                <p className="text-xs font-black">{time}</p>
+                <p className="text-[10px] font-bold text-muted-foreground/40 uppercase">Timestamp</p>
+                <p className="text-xs font-black text-foreground">{time}</p>
              </div>
           </div>
         </motion.div>
@@ -137,7 +137,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
            animate={{ y: 0, opacity: 1 }}
            transition={{ delay: 0.6 }}
            onClick={handleBackToHome}
-           className="w-full h-16 bg-white text-[#111111] rounded-[1.5rem] font-headline font-black text-lg shadow-xl active:scale-[0.98] transition-all"
+           className="w-full h-16 bg-primary text-on-primary-fixed rounded-[1.5rem] font-headline font-black text-lg shadow-xl active:scale-[0.98] transition-all"
          >
             Close
          </motion.button>
@@ -146,9 +146,9 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
            initial={{ y: 20, opacity: 0 }}
            animate={{ y: 0, opacity: 1 }}
            transition={{ delay: 0.7 }}
-           className="w-full h-16 bg-white/5 border border-white/10 rounded-[1.5rem] font-headline font-black text-lg flex items-center justify-center gap-3 hover:bg-white/10 transition-all"
+           className="w-full h-16 bg-surface/80 border border-border rounded-[1.5rem] font-headline font-black text-lg flex items-center justify-center gap-3 hover:bg-muted/50 transition-all text-foreground"
          >
-            <Share2 size={20} />
+            <Share2 size={20} className="text-primary" />
             Share Proof
          </motion.button>
       </footer>

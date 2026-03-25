@@ -30,7 +30,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   onClose,
   onVerify
 }) => {
-  const [mode, setMode] = useState<ScanMode>('idle');
+  const [mode, setMode] = useState<ScanMode>('scan');
   const [sessionCode, setSessionCode] = useState('');
   const [status, setStatus] = useState<ScanStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -40,7 +40,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(null);
   const [checkInTime, setCheckInTime] = useState<string>('');
   const [autoSwitchToQr, setAutoSwitchToQr] = useState(false);
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -49,7 +49,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
   const triggerHaptic = async (style: ImpactStyle = ImpactStyle.Medium) => {
     if (Capacitor.isNativePlatform()) {
-      try { await Haptics.impact({ style }); } catch (err) {}
+      try { await Haptics.impact({ style }); } catch (err) { }
     }
   };
 
@@ -81,7 +81,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setStatus('idle');
       setErrorMsg('');
       setLocationInfo('');
-      setMode('idle');
+      setMode('scan');
       setAttendanceData(null);
       setAutoSwitchToQr(false);
     } else {
@@ -230,7 +230,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
   if (status === 'error') {
     return (
-      <AttendanceFailurePage 
+      <AttendanceFailurePage
         errorMsg={errorMsg}
         onRetry={() => { setStatus('idle'); setMode('idle'); }}
         onClose={onClose}
@@ -239,202 +239,177 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   }
 
   return (
-    <div className="fixed inset-0 z-[110] bg-[#111111] text-white flex flex-col font-sans overflow-hidden">
-      <header className="p-6 flex items-center justify-between relative z-10">
-        <button onClick={onClose} className="w-12 h-12 flex items-center justify-center bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 active:scale-95 transition-all">
+    <div className="fixed inset-0 z-[110] bg-background text-foreground flex flex-col font-sans overflow-hidden transition-colors duration-500">
+      <header className="p-6 flex items-center justify-between relative z-20">
+        <button
+          onClick={onClose}
+          className="w-12 h-12 flex items-center justify-center bg-surface/80 backdrop-blur-xl rounded-2xl border border-border shadow-sm active:scale-95 transition-all text-foreground"
+        >
           <X size={24} strokeWidth={2.5} />
         </button>
-        <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Attendance Mission</span>
-        <div className="w-12 h-12"></div>
+        <div className="flex flex-col items-center">
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Attendance Mission</span>
+          <div className="flex gap-1">
+            <div className={`w-1 h-1 rounded-full ${mode === 'scan' ? 'bg-primary' : 'bg-muted'}`} />
+            <div className={`w-1 h-1 rounded-full ${mode === 'input' ? 'bg-primary' : 'bg-muted'}`} />
+          </div>
+        </div>
+        <button
+          onClick={() => setMode(mode === 'scan' ? 'input' : 'scan')}
+          className="w-12 h-12 flex items-center justify-center bg-surface/80 backdrop-blur-xl rounded-2xl border border-border shadow-sm active:scale-95 transition-all text-foreground"
+          aria-label={mode === 'scan' ? "Switch to keyboard" : "Switch to scanner"}
+        >
+          {mode === 'scan' ? <Keyboard size={24} strokeWidth={2.5} /> : <Scan size={24} strokeWidth={2.5} />}
+        </button>
       </header>
 
-      <main className="flex-1 flex flex-col p-8 relative z-10">
+      <main className="flex-1 flex flex-col relative overflow-hidden">
         <AnimatePresence mode="wait">
-          {mode === 'idle' && (
-            <motion.div 
-              key="idle"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex-1 flex flex-col justify-center space-y-12"
-            >
-              <div className="text-center space-y-4">
-                 <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-primary">
-                    <QrCode size={40} strokeWidth={2.5} />
-                 </div>
-                 <h2 className="text-4xl font-headline font-black tracking-tight">How will you<br/>check-in?</h2>
-                 <p className="text-white/40 font-medium">Position your device or enter the session key provided by your instructor.</p>
-              </div>
-
-              <div className="space-y-4">
-                 <button 
-                   onClick={() => setMode('scan')}
-                   className="w-full h-24 bg-primary text-[#111111] rounded-[2rem] flex items-center justify-between px-8 group drop-shadow-2xl active:scale-98 transition-all"
-                 >
-                    <div className="flex items-center gap-5">
-                       <Scan size={32} strokeWidth={2.5} />
-                       <div className="text-left">
-                          <p className="text-lg font-headline font-black">Scan QR Code</p>
-                          <p className="text-xs font-bold opacity-60">Focus on the screen</p>
-                       </div>
-                    </div>
-                    <ChevronRight size={24} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
-                 </button>
-
-                 <button 
-                   onClick={() => setMode('input')}
-                   className="w-full h-24 bg-white/5 border border-white/10 rounded-[2rem] flex items-center justify-between px-8 group active:scale-98 transition-all"
-                 >
-                    <div className="flex items-center gap-5">
-                       <Keyboard size={32} strokeWidth={2.5} className="text-primary" />
-                       <div className="text-left">
-                          <p className="text-lg font-headline font-black">Enter Code</p>
-                              <p className="text-xs font-bold opacity-40">Manual 8-character entry</p>
-                       </div>
-                    </div>
-                    <ChevronRight size={24} strokeWidth={3} className="opacity-20 group-hover:translate-x-1 transition-transform" />
-                 </button>
-              </div>
-            </motion.div>
-          )}
-
           {mode === 'input' && (
-            <motion.div 
+            <motion.div
               key="input"
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -100, opacity: 0 }}
-              className="flex-1 flex flex-col justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex-1 flex flex-col justify-center p-8 max-w-md mx-auto w-full"
             >
-              <div className="text-center space-y-8 mb-12">
-                 <h2 className="text-3xl font-headline font-black">Authentication Code</h2>
-                 <p className="text-white/40 text-sm">Enter your 8-character session code (A-Z, 0-9).</p>
+              <div className="text-center space-y-3 mb-12">
+                <h2 className="text-4xl font-headline font-black tracking-tight text-foreground">Mission Key</h2>
+                <p className="text-muted-foreground font-medium">Enter the 8-character unique session code assigned to your current lecture.</p>
               </div>
 
-              <div className="space-y-4">
-                 <input
-                   value={sessionCode}
-                   onChange={(event) => handleSessionCodeChange(event.target.value)}
-                   inputMode="text"
-                   autoCapitalize="characters"
-                   autoCorrect="off"
-                   autoComplete="off"
-                   maxLength={8}
-                   placeholder="AB12CD34"
-                   className="w-full h-16 rounded-2xl border border-white/20 bg-white/5 px-5 text-center text-2xl font-black tracking-[0.25em] text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary"
-                 />
+              <div className="space-y-6">
+                <div className="relative group">
+                  <input
+                    value={sessionCode}
+                    onChange={(event) => handleSessionCodeChange(event.target.value)}
+                    inputMode="text"
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    maxLength={8}
+                    placeholder="••••••••"
+                    className="w-full h-24 rounded-3xl border-2 border-border bg-surface px-5 text-center text-4xl font-black tracking-[0.2em] text-foreground placeholder:text-muted-foreground/20 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-inner"
+                    autoFocus
+                  />
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex gap-2">
+                    {[...Array(8)].map((_, i) => (
+                      <div key={i} className={`w-2 h-0.5 rounded-full transition-colors ${sessionCode.length > i ? 'bg-primary' : 'bg-muted'}`} />
+                    ))}
+                  </div>
+                </div>
 
-                 <div className="grid grid-cols-2 gap-3">
-                   <button
-                     type="button"
-                     onClick={handlePasteFromClipboard}
-                     className="h-12 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
-                   >
-                     <Clipboard size={16} />
-                     Paste
-                   </button>
-                   <button
-                     type="button"
-                     onClick={() => setSessionCode('')}
-                     className="h-12 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-black uppercase tracking-wider transition-all"
-                   >
-                     Clear
-                   </button>
-                 </div>
-
-                 <button
-                   type="button"
-                   onClick={() => {
-                     setAutoSwitchToQr((prev) => !prev);
-                   }}
-                   className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 px-4 flex items-center justify-between text-sm"
-                 >
-                   <span className="font-bold text-white/80">Auto-switch to QR scanner</span>
-                   <span className={`inline-flex h-7 w-14 rounded-full p-1 transition-colors ${autoSwitchToQr ? 'bg-primary' : 'bg-white/20'}`}>
-                     <span className={`h-5 w-5 rounded-full bg-white transition-transform ${autoSwitchToQr ? 'translate-x-7' : 'translate-x-0'}`} />
-                   </span>
-                 </button>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={handlePasteFromClipboard}
+                    className="h-14 rounded-2xl bg-surface hover:bg-muted/50 border border-border text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all text-foreground"
+                  >
+                    <Clipboard size={18} className="text-primary" />
+                    Paste
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSessionCode('')}
+                    className="h-14 rounded-2xl bg-surface hover:bg-muted/50 border border-border text-sm font-black uppercase tracking-wider transition-all text-foreground"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
 
-              <button 
-                 disabled={sessionCode.length !== 8}
-                 onClick={() => processAttendance(sessionCode)}
-                 className="w-full h-20 bg-primary text-[#111111] rounded-[2.5rem] mt-12 font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all"
-              >
-                 Verify Attendance
-              </button>
-              
-              <button 
-                onClick={() => setMode('idle')}
-                className="mt-6 text-xs font-black uppercase tracking-widest opacity-40 text-center"
-              >
-                Go Back
-              </button>
+              <div className="mt-auto pt-12 pb-8">
+                <button
+                  disabled={sessionCode.length !== 8}
+                  onClick={() => processAttendance(sessionCode)}
+                  className="w-full h-20 bg-primary text-on-primary-fixed rounded-[2.5rem] font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all active:scale-95"
+                >
+                  Validate Mission Key
+                </button>
+
+                <p className="mt-6 text-center text-xs font-bold text-muted-foreground opacity-60">
+                  By checking in, you confirm your physical presence in the lecture hall.
+                </p>
+              </div>
             </motion.div>
           )}
 
           {mode === 'scan' && (
-            <motion.div 
+            <motion.div
               key="scan"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex-1 flex flex-col relative"
             >
-               <div className="absolute inset-0 rounded-[3rem] overflow-hidden border border-white/10 bg-black">
-                  <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover opacity-60" />
-                  
-                  {/* Scanning Frame */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                     <div className="w-64 h-64 relative">
-                        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-xl transition-all" />
-                        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-xl transition-all" />
-                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-xl transition-all" />
-                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-xl transition-all" />
-                        
-                        {/* Scanning Line */}
-                        <motion.div 
-                           animate={{ top: ['0%', '100%'] }}
-                           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                           className="absolute left-2 right-2 h-1 bg-primary/40 shadow-[0_0_15px_rgba(var(--primary-rgb),1)]"
-                        />
-                     </div>
-                  </div>
-               </div>
+              {/* Full-width scanner with organic rounded corners */}
+              <div className="absolute inset-0 mx-4 mb-32 mt-4 rounded-[4rem] overflow-hidden border-2 border-border shadow-2xl bg-black transition-all">
+                <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover opacity-80" />
 
-               <div className="absolute bottom-12 left-0 right-0 text-center px-12 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-black/60 backdrop-blur-md rounded-full border border-white/10">
-                     <Loader2 size={16} className="animate-spin text-primary" />
-                     <span className="text-xs font-black uppercase tracking-widest">Targeting Session...</span>
+                {/* Improved Scanning Frame - Priority focused */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/5">
+                  <div className="w-[75vw] h-[75vw] max-w-sm max-h-sm relative">
+                    {/* Dynamic Corners */}
+                    <div className="absolute top-0 left-0 w-16 h-16 border-t-[6px] border-l-[6px] border-primary rounded-tl-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
+                    <div className="absolute top-0 right-0 w-16 h-16 border-t-[6px] border-r-[6px] border-primary rounded-tr-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
+                    <div className="absolute bottom-0 left-0 w-16 h-16 border-b-[6px] border-l-[6px] border-primary rounded-bl-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
+                    <div className="absolute bottom-0 right-0 w-16 h-16 border-b-[6px] border-r-[6px] border-primary rounded-br-3xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" />
+
+                    {/* High-speed Scanning Beam */}
+                    <motion.div
+                      animate={{ top: ['0%', '100%', '0%'] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute left-4 right-4 h-1.5 bg-primary/60 blur-[1px] shadow-[0_0_25px_rgba(var(--primary-rgb),1)] z-10"
+                    />
+
+                    {/* Centered Guide */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                      <QrCode size={120} strokeWidth={1} className="text-white" />
+                    </div>
                   </div>
-                  <p className="text-white/40 text-sm">Align the QR code within the highlighted corners to automatically check-in.</p>
-               </div>
-               
-               <button 
-                 onClick={() => setMode('input')}
-                 className="absolute top-4 right-4 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10"
-                 aria-label="Switch to session code input"
-               >
-                  <Keyboard size={18} />
-               </button>
+                </div>
+
+                {/* Top Context Indicator */}
+                <div className="absolute top-10 left-0 right-0 flex justify-center">
+                  <div className="px-5 py-2.5 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),1)]" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white">Neural Scan Active</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent flex flex-col items-center justify-center p-8 space-y-4">
+                <div className="text-center">
+                  <h3 className="text-lg font-headline font-black text-foreground">Position QR Code</h3>
+                  <p className="text-muted-foreground text-xs font-medium">Capture the attendance code displayed by your lecturer.</p>
+                </div>
+
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" />
+              </div>
             </motion.div>
           )}
 
           {(status === 'locating' || status === 'verifying') && (
-            <motion.div 
+            <motion.div
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="absolute inset-0 bg-[#111111]/95 backdrop-blur-xl z-50 flex flex-col items-center justify-center p-12 text-center"
+              className="absolute inset-0 bg-background/95 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center p-12 text-center"
             >
-               <div className="relative mb-12">
-                  <Loader2 size={80} className="animate-spin text-primary opacity-20" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                     <MapPin size={32} className="text-primary animate-bounce" />
-                  </div>
-               </div>
-               <h3 className="text-3xl font-headline font-black mb-4">Establishing Secure Connection</h3>
-               <p className="text-white/40 text-sm leading-relaxed max-w-xs">{status === 'locating' ? 'Verifying spatial coordinates and biometric signals...' : 'Exchanging encryption keys with the institution core...'}</p>
+              <div className="relative mb-12">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+                <Loader2 size={100} className="animate-spin text-primary opacity-20" />
+                <div className="absolute inset-0 flex items-center justify-center group">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <MapPin size={48} className="text-primary" />
+                  </motion.div>
+                </div>
+              </div>
+              <h3 className="text-4xl font-headline font-black mb-4 text-foreground tracking-tight">Syncing Mission Data</h3>
+              <p className="text-muted-foreground font-medium leading-relaxed max-w-xs">{status === 'locating' ? 'Calibrating geospatial context and proximity anchors...' : 'Authorizing check-in with institutional attendance ledger...'}</p>
             </motion.div>
           )}
         </AnimatePresence>
