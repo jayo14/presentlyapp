@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { gsap } from 'gsap';
 import { Play, FileText, HelpCircle, ArrowLeft, CheckCircle2, ShieldCheck, Book, Shield, Zap, Search, ChevronRight, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
@@ -41,27 +40,7 @@ export const DocumentationPage: React.FC = () => {
   const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (gridRef.current) {
-      gsap.fromTo(
-        gridRef.current.children,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.1,
-          duration: 0.8,
-          ease: "power3.out"
-        }
-      );
-    }
-
-    if (headerRef.current) {
-      gsap.fromTo(
-        headerRef.current,
-        { opacity: 0, x: -20 },
-        { opacity: 1, x: 0, duration: 1, ease: "power2.out" }
-      );
-    }
+    // Animations removed for performance
   }, []);
 
   return (
@@ -75,7 +54,7 @@ export const DocumentationPage: React.FC = () => {
       <LandingHeader />
 
       <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
-        <div ref={headerRef} className="mb-16">
+        <div className="mb-16">
           <h1 className="font-headline text-4xl md:text-6xl font-bold mb-6 tracking-tight">
             Documentation & <span className="text-primary">Resources</span>
           </h1>
@@ -103,8 +82,7 @@ export const DocumentationPage: React.FC = () => {
         </h2>
 
         <div
-          ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-1000"
         >
           {videos.map((video, idx) => (
             <motion.div
