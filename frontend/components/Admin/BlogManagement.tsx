@@ -335,7 +335,7 @@ export const BlogManagement: React.FC = () => {
            )}
            <button 
               onClick={() => { setEditingPost(null); setView('editor'); }}
-              className="px-8 py-3.5 bg-text text-white rounded-full font-black text-xs shadow-2xl hover:scale-102 transition-transform active:scale-95 flex items-center gap-2"
+              className="px-8 py-3.5 bg-text text-background rounded-full font-black text-xs shadow-2xl hover:scale-102 transition-transform active:scale-95 flex items-center gap-2"
            >
              <Plus size={18} />
              Create New

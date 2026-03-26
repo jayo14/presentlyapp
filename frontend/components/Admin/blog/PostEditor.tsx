@@ -222,7 +222,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
           </Button>
           <Button 
             onClick={() => onPublish(formData)}
-            className="px-8 py-2 bg-gradient-to-r from-primary to-primary/80 text-white font-black rounded-xl shadow-lg shadow-primary/20"
+            className="px-8 py-2 bg-gradient-to-r from-primary to-primary/80 text-background font-black rounded-xl shadow-lg shadow-primary/20"
           >
             Publish
           </Button>
@@ -282,7 +282,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
                     <button
                       type="button"
                       onClick={() => coverInputRef.current?.click()}
-                      className="px-4 py-2 rounded-xl bg-text text-white text-xs font-black flex items-center gap-2"
+                      className="px-4 py-2 rounded-xl bg-text text-background text-xs font-black flex items-center gap-2"
                     >
                       {isCoverUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                       Upload image

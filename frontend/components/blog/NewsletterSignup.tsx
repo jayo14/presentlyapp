@@ -65,7 +65,7 @@ export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ source }) =>
           <button
             type="submit"
             disabled={loading}
-            className="h-12 sm:h-16 rounded-xl sm:rounded-2xl bg-primary px-6 sm:px-10 text-sm sm:text-base font-black text-white hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 shadow-lg sm:shadow-2xl shadow-primary/30 shrink-0"
+            className="h-12 sm:h-16 rounded-xl sm:rounded-2xl bg-primary px-6 sm:px-10 text-sm sm:text-base font-black text-background hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 shadow-lg sm:shadow-2xl shadow-primary/30 shrink-0"
           >
             {success ? "You're subscribed!" : loading ? 'Joining...' : 'Subscribe Now'}
           </button>

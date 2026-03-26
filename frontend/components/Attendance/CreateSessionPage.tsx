@@ -206,7 +206,7 @@ export const CreateSessionPage: React.FC = () => {
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 duration === mins.toString() && durationUnit === 'minutes'
                 ? 'bg-primary text-black ring-2 ring-primary/20' 
-                : 'bg-inputccent text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                : 'bg-inputccent text-muted-foreground hover:bg-zinc-200 dark:hover:bg-surfaceHigh'
             }`}
         >
             {label}
@@ -297,7 +297,7 @@ export const CreateSessionPage: React.FC = () => {
                             </div>
                             <div 
                                 onClick={() => setQrCodeEnabled(!qrCodeEnabled)}
-                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${qrCodeEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
+                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${qrCodeEnabled ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}
                             >
                                 <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
                             </div>
@@ -313,7 +313,7 @@ export const CreateSessionPage: React.FC = () => {
                             </div>
                             <div 
                                 onClick={() => setDigitCodeEnabled(!digitCodeEnabled)}
-                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${digitCodeEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
+                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${digitCodeEnabled ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}
                             >
                                 <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
                             </div>
@@ -329,7 +329,7 @@ export const CreateSessionPage: React.FC = () => {
                             </div>
                             <div 
                                 onClick={() => setGpsEnabled(!gpsEnabled)}
-                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${gpsEnabled ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}
+                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${gpsEnabled ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}
                             >
                                 <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
                             </div>
@@ -504,7 +504,7 @@ export const CreateSessionPage: React.FC = () => {
                                                         className={`cursor-pointer p-3 rounded-xl border transition-all relative group ${
                                                             isSelected
                                                             ? 'bg-primary/10 border-primary shadow-sm' 
-                                                            : 'bg-zinc-50 dark:bg-zinc-950 border-border hover:border-zinc-300 dark:hover:border-zinc-700'
+                                                            : 'bg-zinc-50 dark:bg-zinc-950 border-border hover:border-zinc-300 dark:hover:border-outline'
                                                         }`}
                                                     >
                                                         <div className="flex justify-between items-start">

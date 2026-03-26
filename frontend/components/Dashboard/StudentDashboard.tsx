@@ -151,7 +151,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 </div>
               </div>
 
-              <div className="bg-text text-white w-24 h-24 rounded-[2rem] shadow-2xl flex items-center justify-center group-hover:scale-105 transition-transform duration-500 self-center md:self-start">
+              <div className="bg-text text-background w-24 h-24 rounded-[2rem] shadow-2xl flex items-center justify-center group-hover:scale-105 transition-transform duration-500 self-center md:self-start">
                  <QrCode size={40} strokeWidth={2.5} />
               </div>
             </div>
@@ -214,7 +214,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                      <span className="flex items-center gap-1.5"><MapPin size={14} /> {nextClass.venue_name}</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-surfaceHigh/40 text-textMuted group-hover:bg-primary group-hover:text-white group-hover:translate-x-1 transition-all">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-surfaceHigh/40 text-textMuted group-hover:bg-primary group-hover:text-background group-hover:translate-x-1 transition-all">
                    <ChevronRight size={20} />
                 </div>
               </div>

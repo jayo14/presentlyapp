@@ -61,7 +61,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
             <Download size={18} />
             Export CSV
           </Button>
-          <Button className="bg-text text-white px-8 py-3 rounded-full font-black flex items-center gap-2 shadow-2xl hover:scale-102 transition-transform">
+          <Button className="bg-text text-background px-8 py-3 rounded-full font-black flex items-center gap-2 shadow-2xl hover:scale-102 transition-transform">
             <Send size={18} />
             Mass Update
           </Button>
@@ -75,7 +75,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Total Community</p>
-              <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white duration-500">
+              <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-background duration-500">
                 <Users size={20} />
               </div>
             </div>
@@ -97,7 +97,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Open Rate</p>
-              <div className="p-2 bg-primary/5 rounded-xl text-primary transition-colors group-hover:bg-primary group-hover:text-white duration-500">
+              <div className="p-2 bg-primary/5 rounded-xl text-primary transition-colors group-hover:bg-primary group-hover:text-background duration-500">
                 <Activity size={20} />
               </div>
             </div>
@@ -114,7 +114,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Status: Active</p>
-              <div className="p-2 bg-blue-50 rounded-xl text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white duration-500">
+              <div className="p-2 bg-blue-50 rounded-xl text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-background duration-500">
                 <CheckCircle2 size={20} />
               </div>
             </div>
@@ -131,7 +131,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Status: Inactive</p>
-              <div className="p-2 bg-rose-50 rounded-xl text-rose-600 transition-colors group-hover:bg-rose-600 group-hover:text-white duration-500">
+              <div className="p-2 bg-rose-50 rounded-xl text-rose-600 transition-colors group-hover:bg-rose-600 group-hover:text-background duration-500">
                 <XCircle size={20} />
               </div>
             </div>
@@ -258,7 +258,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
              <button 
                disabled={currentPage >= Math.ceil(totalSubscribers / 10)}
                onClick={() => onPageChange(currentPage + 1)}
-               className="flex items-center gap-2 px-8 py-3 rounded-full bg-text text-white text-xs font-black shadow-xl disabled:opacity-30 disabled:cursor-not-allowed hover:bg-text/90 transition-colors"
+               className="flex items-center gap-2 px-8 py-3 rounded-full bg-text text-background text-xs font-black shadow-xl disabled:opacity-30 disabled:cursor-not-allowed hover:bg-text/90 transition-colors"
              >
                Next <ChevronRight size={16} />
              </button>

@@ -65,7 +65,7 @@ export const DocumentationPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-textMuted font-sans selection:bg-primary selection:text-black">
+    <div className="min-h-screen bg-surface text-textMuted font-sans selection:bg-primary selection:text-black">
       {/* SEO: Page metadata for documentation route. */}
       <SEO
         title="Documentation"

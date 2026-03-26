@@ -18,7 +18,7 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
   if (!items.length) return null;
 
   return (
-    <div className="pointer-events-auto mx-auto flex h-20 items-center justify-around gap-1 rounded-[2.5rem] border border-outline/10 bg-white/95 dark:bg-[#1A1A1A]/95 px-4 shadow-[0_32px_64px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-all duration-500 max-w-sm">
+    <div className="pointer-events-auto mx-auto flex h-20 items-center justify-around gap-1 rounded-[2.5rem] border border-outline/10 bg-surface/95 dark:bg-surface/95 px-4 shadow-[0_32px_64px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-all duration-500 max-w-sm">
       {items.map((item) => {
         const isActive = !!item.active;
         const isAccent = !!item.isAccent;
@@ -34,7 +34,7 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
               className={`
                 flex items-center justify-center rounded-2xl transition-all duration-500 ease-out
                 ${isAccent 
-                  ? "h-16 w-16 bg-[#111111] dark:bg-primary text-white dark:text-[#111111] shadow-[0_12px_24px_rgba(0,0,0,0.2)] group-hover:bg-black group-hover:scale-105" 
+                  ? "h-16 w-16 bg-primary text-background shadow-[0_12px_24px_rgba(0,0,0,0.2)] group-hover:scale-105" 
                   : `h-10 w-10 ${isActive ? 'bg-primary/10 text-primary' : 'bg-transparent text-textMuted group-hover:bg-surfaceHigh/50 group-hover:text-text'}`
                 }
               `}

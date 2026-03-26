@@ -144,7 +144,7 @@ export const UserManagement: React.FC = () => {
       case UserRole.CLASS_REP:
         return 'bg-green-500/10 text-green-500 border-green-500/30';
       default:
-        return 'bg-zinc-700 text-muted-foreground border-zinc-600';
+        return 'bg-surfaceHigh text-muted-foreground border-zinc-600';
     }
   };
 
@@ -332,8 +332,8 @@ export const UserManagement: React.FC = () => {
                           onClick={() => setShowActionsMenu(showActionsMenu === user.id ? null : user.id)}
                           className={`p-2 rounded-lg transition-all ${
                             showActionsMenu === user.id 
-                              ? 'bg-primary text-white' 
-                              : 'text-muted-foreground hover:text-white hover:bg-zinc-700'
+                              ? 'bg-primary text-background' 
+                              : 'text-muted-foreground hover:text-background hover:bg-surfaceHigh'
                           }`}
                           title="More Actions"
                         >

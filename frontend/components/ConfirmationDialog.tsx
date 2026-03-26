@@ -35,8 +35,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   const getConfirmButtonClasses = () => {
     switch (variant) {
-      case 'danger': return 'bg-red-500 text-white hover:bg-red-600 shadow-red-500/20';
-      case 'warning': return 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-500/20';
+      case 'danger': return 'bg-red-500 text-background hover:bg-red-600 shadow-red-500/20';
+      case 'warning': return 'bg-amber-500 text-background hover:bg-amber-600 shadow-amber-500/20';
       default: return 'bg-primary text-[#111111] hover:bg-primary/90 shadow-primary/20';
     }
   };

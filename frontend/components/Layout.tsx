@@ -12,6 +12,7 @@ import { useCurrentUser } from '../hooks/useAuth';
 import { hasPermissionCode } from '../services/rbac';
 import { Dock, DockItem } from '@/components/magicui/dock';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from './ThemeProvider';
 import NotificationInbox from './NotificationInbox';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
 import { sessionApi } from '../services/api/attendance';
@@ -95,10 +96,8 @@ if (typeof window !== 'undefined') {
 
 export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
   const { data: currentUser } = useCurrentUser();
-  const [isDark, setIsDark] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme === 'dark';
-  });
+  const { resolvedTheme, setTheme, theme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [installPrompt, setInstallPrompt] = useState<any>(deferredPromptEvent);
   const [isAppInstalled, setIsAppInstalled] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -120,15 +119,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   }, [navigate, setCurrentPage]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const shouldBeDark = savedTheme === 'dark';
-    setIsDark(shouldBeDark);
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-
     const checkIfInstalled = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
         (window.navigator as any).standalone ||
@@ -167,14 +157,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   };
 
   const toggleTheme = () => {
-    const newIsDark = !isDark;
-    setIsDark(newIsDark);
-    localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
-    if (newIsDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    setTheme(isDark ? 'light' : 'dark');
   };
 
   const getNavGroups = () => {

@@ -16,6 +16,7 @@ import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { useNavigate } from 'react-router-dom';
 import { SEO } from '../SEO';
+import { useTheme } from '../ThemeProvider';
 
 interface SettingsPageProps {
   userRole?: UserRole;
@@ -37,7 +38,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
   const { modalProps: reportModalProps } = useModalAccessibility(isReportModalOpen, () => setIsReportModalOpen(false));
   
   // Preference States - Initialize from user data when available
-  const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
+  const { resolvedTheme, setTheme } = useTheme();
+  const darkMode = resolvedTheme === 'dark';
   const [emailNotifs, setEmailNotifs] = useState(user?.notifications_enabled ?? true);
   const [pushNotifs, setPushNotifs] = useState(user?.notifications_enabled ?? false);
   const [locationAccess, setLocationAccess] = useState(user?.location_enabled ?? true);
@@ -45,12 +47,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
   const [reminderBeforeClass, setReminderBeforeClass] = useState(true);
 
   const toggleDarkMode = (checked: boolean) => {
-    setDarkMode(checked);
-    if (checked) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    setTheme(checked ? 'dark' : 'light');
   };
 
   const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,7 +164,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
               Dark Mode
             </span>
           </div>
-          <div className={`w-12 h-6 rounded-full p-1 flex transition-colors ${darkMode ? 'bg-primary justify-end' : 'bg-zinc-700 justify-start'}`}>
+          <div className={`w-12 h-6 rounded-full p-1 flex transition-colors ${darkMode ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}>
             <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
           </div>
         </div>

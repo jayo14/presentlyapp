@@ -682,7 +682,7 @@ export const Onboarding: React.FC = () => {
                 }`}
             >
               <div className="flex items-start gap-4 mb-3">
-                <div className={`p-3 rounded-xl transition-colors ${state.selectedRole === role.id ? 'bg-primary text-white' : 'bg-zinc-200 text-zinc-700 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                <div className={`p-3 rounded-xl transition-colors ${state.selectedRole === role.id ? 'bg-primary text-background' : 'bg-zinc-200 text-zinc-700 group-hover:bg-primary/10 group-hover:text-primary'}`}>
                   <role.icon size={28} />
                 </div>
                 <div className="flex-1">
@@ -1103,7 +1103,7 @@ export const Onboarding: React.FC = () => {
                             )}
                         </div>
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
-                            isSelected ? 'bg-primary border-primary text-white' : 'border-zinc-400 bg-transparent'
+                            isSelected ? 'bg-primary border-primary text-background' : 'border-zinc-400 bg-transparent'
                         }`} aria-hidden="true">
                             {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
                         </div>
@@ -1171,7 +1171,7 @@ export const Onboarding: React.FC = () => {
                     }`}
             >
                 <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-white' : 'bg-zinc-300 text-zinc-700'}`} aria-hidden="true">
+                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-background' : 'bg-zinc-300 text-zinc-700'}`} aria-hidden="true">
                         <item.icon size={20} />
                     </div>
                     <div className="text-left">

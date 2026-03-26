@@ -215,7 +215,7 @@ export const AttendanceDashboard: React.FC = () => {
                   key={status}
                   onClick={() => setFilterStatus(status as any)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize ${filterStatus === status
-                      ? 'bg-primary text-white'
+                      ? 'bg-primary text-background'
                       : 'bg-inputccent text-secondary'
                     }`}
                 >
