@@ -67,6 +67,24 @@ export interface CheckInData {
   latitude?: number;
   longitude?: number;
   elevation?: number;
+  accuracy?: number;
+  samples?: Array<{
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    timestamp: number;
+    isMock?: boolean;
+  }>;
+  visitorId?: string;
+  deviceId?: string;
+  webglRenderer?: string;
+  motionDetected?: boolean;
+  ipCity?: string;
+  ipLocation?: { latitude: number; longitude: number };
+  sampleCount?: number;
+  isStaticGPS?: boolean;
+  isDesktop?: boolean;
+  isMock?: boolean;
   location_verified?: boolean;
 }
 
