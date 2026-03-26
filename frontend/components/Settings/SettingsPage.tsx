@@ -175,18 +175,31 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
         <h2 className="font-headline text-text text-lg font-semibold mb-4">Privacy & Security</h2>
         
         <div className="space-y-3">
+          {/* Managed Devices */}
+          <button 
+            onClick={() => navigate('/dashboard/security')}
+            className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-surfaceHigh transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
+              <Shield size={22} className="text-primary" />
+            </div>
+            <span className="flex-1 text-text font-medium text-base text-left">
+              Recognized Devices
+            </span>
+            <ChevronRight size={20} className="text-textMuted" />
+          </button>
+
           {/* Two-Factor Authentication */}
           <button 
             onClick={() => {/* Handle 2FA */}}
             className="w-full bg-surface rounded-2xl p-4 flex items-center hover:bg-surfaceHigh transition-colors"
           >
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mr-4">
-              <Lock size={22} className="text-primary" />
+            <div className="w-12 h-12 rounded-xl bg-zinc-400/10 flex items-center justify-center mr-4">
+              <Lock size={22} className="text-zinc-400" />
             </div>
-            <span className="flex-1 text-text font-medium text-base text-left">
-              Two-Factor Authentication
+            <span className="flex-1 text-textMuted font-medium text-base text-left">
+              Two-Factor Auth (Coming Soon)
             </span>
-            <ChevronRight size={20} className="text-textMuted" />
           </button>
 
           {/* Data Export Preferences */}
@@ -453,9 +466,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                 <div className="flex items-center justify-between">
                      <div>
                         <p className="text-sm font-medium text-text">Active Sessions</p>
-                        <p className="text-xs text-textMuted">Manage devices logged into your account.</p>
-                    </div>
-                    <Button variant="outline" size="sm">View All</Button>
+                    <p className="text-xs text-textMuted">Monitor and manage recognized devices.</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/dashboard/security')}
+                >
+                  Manage
+                </Button>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-surfaceLow rounded-lg">
                     <Laptop size={18} className="text-textMuted" />

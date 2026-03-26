@@ -176,6 +176,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             label: 'General',
             items: [
               { id: 'dashboard', icon: Home, label: 'Overview' },
+              { id: 'security', icon: ShieldAlert, label: 'Security & Devices' },
             ],
           },
           {
@@ -274,9 +275,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
   const navGroups = getNavGroups();
   const allNavItems = navGroups.flatMap(g => g.items);
 
-  // Common items (settings, profile) for all roles
+  // Common items (settings, profile, security) for all roles
   const commonItems = [
     { id: 'profile', icon: User, label: 'Profile' },
+    { id: 'security', icon: ShieldAlert, label: 'Security' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
 
