@@ -32,7 +32,6 @@ from institutions.serializers import (
     StaffProfileSerializer,
     StaffRoleSerializer,
 )
-from utils.email import send_welcome_email
 from utils.email import send_staff_access_invitation_email
 
 logger = logging.getLogger(__name__)
@@ -76,16 +75,14 @@ def _send_staff_invite_email(invitation: StaffInvitation, invite_link: str) -> N
             expires_in_hours=expires_hours,
         )
     except Exception:
-        logger.warning(
-            'Falling back to welcome template for staff invitation email',
+        logger.error(
+            'Failed to send staff invitation email — invitation created but email NOT sent',
             exc_info=True,
             extra={'email': invitation.email},
         )
-        send_welcome_email(
-            to=invitation.email,
-            first_name=invitation.full_name.split(' ')[0],
-            dashboard_url=invite_link,
-        )
+        # Do not fall back to the welcome email — the invitation record is already saved.
+        # The admin can resend the invite from the dashboard.
+        return
 
 
 @api_view(['GET'])

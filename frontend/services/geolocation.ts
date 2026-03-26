@@ -157,7 +157,11 @@ export const getStabilizedPosition = async (): Promise<{
 
       if (isStatic) {
         if (IS_DEV) console.warn('[Anti-Cheat] STATIC GPS SIGNAL DETECTED');
-        reject(new Error('Static GPS signal detected. Secure environment required.'));
+        resolve({
+          position: stabilized,
+          isStatic: true,
+          samplesCollected: validSamples.length,
+        });
         return;
       }
 
@@ -328,9 +332,9 @@ export const getAttendancePayload = async (): Promise<any> => {
     throw new Error('EMULATOR_DETECTED; Attendance must be marked using a physical mobile device.');
   }
 
-  if (isDesktop && !motionDetected) {
-    throw new Error('DESKTOP_DETECTION; Attendance must be marked using a mobile device.');
-  }
+  // Desktop users are flagged but not blocked — backend scoring handles the penalty
+  const desktopPenalty = isDesktop && !motionDetected;
+  if (IS_DEV && desktopPenalty) console.warn('[Anti-Cheat] Desktop user with no motion detected — flagged but allowed');
 
   // Final Payload Construction (Step 12)
   return {
@@ -338,7 +342,7 @@ export const getAttendancePayload = async (): Promise<any> => {
     longitude: position.longitude,
     accuracy: position.accuracy,
     timestamp: position.timestamp,
-    deviceFingerprint: visitorId,
+    visitorId,
     webglRenderer: renderer,
     ipLocation: ipLoc ? { latitude: ipLoc.latitude, longitude: ipLoc.longitude } : undefined,
     ipCity: ipLoc?.city,
