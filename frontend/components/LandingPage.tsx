@@ -43,66 +43,7 @@ import { LandingHeader } from './LandingHeader';
 // ─── Global Styles ────────────────────────────────────────────────────────────
 // The app relies on the global index.css loaded at the root.
 
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
-
-// ─── GSAP animations hook ─────────────────────────────────────────────────────────
-function useGSAPAnimations() {
-  React.useEffect(() => {
-    // Reveal animations for fade-up elements
-    const fadeElements = document.querySelectorAll('.fade-up');
-    fadeElements.forEach((el) => {
-      gsap.fromTo(el, 
-        { 
-          opacity: 0, 
-          y: 40,
-        }, 
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none none'
-          }
-        }
-      );
-    });
-
-    // Parallax for background orbs
-    const orbs = document.querySelectorAll('.orb-animate');
-    orbs.forEach((orb) => {
-      gsap.to(orb, {
-        y: -100,
-        x: 50,
-        scrollTrigger: {
-          trigger: orb,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5
-        }
-      });
-    });
-
-    // Scaling animations for hero elements
-    gsap.from('.hero-card', {
-      scale: 0.9,
-      opacity: 0,
-      rotateX: 10,
-      duration: 1.5,
-      delay: 0.2,
-      ease: 'expo.out'
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
-    };
-  }, []);
-}
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const TESTIMONIALS = [
@@ -138,7 +79,7 @@ const PERFORMANCE_AVATARS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  useGSAPAnimations();
+  useScrollReveal('.fade-up');
   const { theme, setTheme } = useTheme();
 
   const softwareSchema = {

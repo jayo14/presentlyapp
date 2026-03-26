@@ -10,7 +10,7 @@ import {
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
 import { hasPermissionCode } from '../services/rbac';
-import { Dock, DockItem } from '@/components/magicui/dock';
+import { Dock } from '@/components/magicui/dock';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from './ThemeProvider';
 import NotificationInbox from './NotificationInbox';
@@ -564,41 +564,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       <div className="md:hidden fixed bottom-6 left-0 right-0 z-[100] pointer-events-none flex justify-center">
         <Dock
           items={[
-            {
-              id: 'dashboard',
-              label: 'Home',
-              active: currentPage === 'dashboard',
-              onClick: () => handleNavClick('dashboard'),
-              icon: <Home size={22} strokeWidth={2.5} />,
-            },
-            {
-              id: 'courses',
-              label: 'Portfolio',
-              active: currentPage === 'courses',
-              onClick: () => handleNavClick('courses'),
-              icon: <GraduationCap size={22} strokeWidth={2.5} />,
-            },
-            {
-              id: 'scanner',
-              label: '',
-              isAccent: true,
-              onClick: () => setIsScannerOpen(true),
-              icon: <QrCode size={28} strokeWidth={3} />,
-            },
-            {
-              id: 'analytics',
-              label: 'Charts',
-              active: currentPage === 'analytics',
-              onClick: () => handleNavClick('analytics'),
-              icon: <TrendingUp size={22} strokeWidth={2.5} />,
-            },
-            {
-              id: 'profile',
-              label: 'Me',
-              active: currentPage === 'profile',
-              onClick: () => handleNavClick('profile'),
-              icon: <User size={22} strokeWidth={2.5} />,
-            },
+            { id: 'dashboard', label: 'Home', active: currentPage === 'dashboard', onClick: () => handleNavClick('dashboard'), icon: <Home size={20} strokeWidth={2} /> },
+            { id: 'courses', label: 'Courses', active: currentPage === 'courses', onClick: () => handleNavClick('courses'), icon: <GraduationCap size={20} strokeWidth={2} /> },
+            { id: 'scanner', label: '', isAccent: true, onClick: () => setIsScannerOpen(true), icon: <QrCode size={24} strokeWidth={2.5} /> },
+            { id: 'analytics', label: 'Stats', active: currentPage === 'analytics', onClick: () => handleNavClick('analytics'), icon: <TrendingUp size={20} strokeWidth={2} /> },
+            { id: 'profile', label: 'Me', active: currentPage === 'profile', onClick: () => handleNavClick('profile'), icon: <User size={20} strokeWidth={2} /> },
           ]}
         />
       </div>
