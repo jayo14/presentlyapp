@@ -285,7 +285,7 @@ RESEND_TEMPLATES = {
     "session_live":         os.environ.get("RESEND_TEMPLATE_SESSION_LIVE",         "77951f07-aa7e-4bad-9159-c31d1cb0c0ac"),
     "newsletter_welcome":   os.environ.get("RESEND_TEMPLATE_NEWSLETTER_WELCOME",   "5799b664-9b3b-4eea-9f8c-a94adb1bcd68"),
     "attendance_confirmed": os.environ.get("RESEND_TEMPLATE_ATTENDANCE_CONFIRMED", "d7ca7188-fee1-4208-827d-999a2b25b367"),
-    "staff_access_invitation": os.environ.get("RESEND_TEMPLATE_STAFF_ACCESS_INVITATION", "19e8c6e6-58af-480c-aa62-21973af096640"),
+    "staff_access_invitation": os.environ.get("RESEND_TEMPLATE_STAFF_ACCESS_INVITATION", "19e8c6e6-58af-480c-aa62-21973af09664"),
 }
 
 # Compatibility map for legacy call sites/scripts.

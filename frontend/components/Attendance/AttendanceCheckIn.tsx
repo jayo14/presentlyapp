@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { sessionApi, CheckInData } from '../../services/api/attendance';
-import { getCurrentPosition, getIPLocation } from '../../services/geolocation';
+import { getCurrentPosition, getAttendancePayload, getIPLocation } from '../../services/geolocation';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface AttendanceCheckInProps {
@@ -37,34 +37,63 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
     }
 
     try {
-      // Step 1: Get location
+      // Step 1: Get full anti-cheat payload; fall back to basic position if pipeline fails
       setStatus('locating');
       setError(null);
       setLocationInfo('Getting your location...');
 
-      const position = await getCurrentPosition();
-      
-      setLocationInfo(
-        `Location found: ${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}` +
-        (position.altitude ? ` @ ${position.altitude.toFixed(0)}m elevation` : '')
-      );
+      let checkInData: CheckInData;
+      try {
+        const payload = await getAttendancePayload();
+        setLocationInfo(
+          `Location found: ${payload.latitude.toFixed(6)}, ${payload.longitude.toFixed(6)}`
+        );
+        checkInData = {
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+          accuracy: payload.accuracy,
+          visitorId: payload.visitorId,
+          webglRenderer: payload.webglRenderer,
+          ipCity: payload.ipCity,
+          ipLocation: payload.ipLocation,
+          motionDetected: payload.motionDetected,
+          sampleCount: payload.sampleCount,
+          isStaticGPS: payload.isStaticGPS,
+          isDesktop: payload.isDesktop,
+        };
+      } catch {
+        // Full pipeline failed — fall back to basic position
+        const position = await getCurrentPosition();
+        setLocationInfo(
+          `Location found: ${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}` +
+          (position.altitude ? ` @ ${position.altitude.toFixed(0)}m elevation` : '')
+        );
 
-      // Step 1b: Verify with IP Geolocation (Anti-spoofing)
-      setLocationInfo('Cross-verifying with network signals...');
-      const ipLoc = await getIPLocation();
-      if (ipLoc) {
-        setLocationInfo(`Location verified via network (${ipLoc.city})`);
+        // Step 1b: Verify with IP Geolocation (Anti-spoofing)
+        setLocationInfo('Cross-verifying with network signals...');
+        const ipLoc = await getIPLocation();
+        if (ipLoc) {
+          setLocationInfo(`Location verified via network (${ipLoc.city})`);
+        }
+
+        checkInData = {
+          latitude: position.latitude,
+          longitude: position.longitude,
+          elevation: position.altitude,
+          ipCity: ipLoc?.city,
+          ipLocation: ipLoc ? { latitude: ipLoc.latitude, longitude: ipLoc.longitude } : undefined,
+          samples: [{
+            latitude: position.latitude,
+            longitude: position.longitude,
+            accuracy: position.accuracy,
+            timestamp: position.timestamp,
+          }],
+        };
       }
 
       // Step 2: Check in by session code
       setStatus('verifying');
       setLocationInfo('Verifying session and location...');
-
-      const checkInData: CheckInData = {
-        latitude: position.latitude,
-        longitude: position.longitude,
-        elevation: position.altitude,
-      };
 
       const result: any = await sessionApi.checkInByCode(sessionCode.toUpperCase(), checkInData);
 

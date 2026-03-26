@@ -3,9 +3,9 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, CheckCircle2, AlertCircle, Clock, BookOpen, Loader2, ArrowRight, UserPlus } from 'lucide-react';
 import { Button } from '../Button';
 import { useCurrentUser } from '../../hooks/useAuth';
-import { sessionApi, courseApi } from '../../services/api/attendance';
+import { sessionApi, courseApi, type CheckInData } from '../../services/api/attendance';
 import { toast } from 'sonner';
-import { geolocationService } from '../../services/geolocation';
+import { geolocationService, getAttendancePayload } from '../../services/geolocation';
 import { SEO } from '../SEO';
 
 const CHECKIN_INTENT_KEY = 'pending_checkin_intent';
@@ -223,15 +223,38 @@ export const PublicCheckInPage: React.FC = () => {
       setCheckingIn(true);
       setError(null);
 
-      // Get current position
-      const position = await geolocationService.getCurrentPosition();
-
-      const checkInData = {
-        code: sessionCode,
-        latitude: position.latitude,
-        longitude: position.longitude,
-        elevation: position.altitude || undefined
-      };
+      // Collect full anti-cheat payload; fall back to basic position if pipeline fails
+      let checkInData: CheckInData;
+      try {
+        const payload = await getAttendancePayload();
+        checkInData = {
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+          accuracy: payload.accuracy,
+          visitorId: payload.visitorId,
+          webglRenderer: payload.webglRenderer,
+          ipCity: payload.ipCity,
+          ipLocation: payload.ipLocation,
+          motionDetected: payload.motionDetected,
+          sampleCount: payload.sampleCount,
+          isStaticGPS: payload.isStaticGPS,
+          isDesktop: payload.isDesktop,
+        };
+      } catch {
+        // Full pipeline failed (e.g. GPS timeout) — fall back to basic position
+        const position = await geolocationService.getCurrentPosition();
+        checkInData = {
+          latitude: position.latitude,
+          longitude: position.longitude,
+          accuracy: position.accuracy,
+          samples: [{
+            latitude: position.latitude,
+            longitude: position.longitude,
+            accuracy: position.accuracy,
+            timestamp: position.timestamp,
+          }],
+        };
+      }
 
       const result = await sessionApi.checkIn(session.id, checkInData);
 
