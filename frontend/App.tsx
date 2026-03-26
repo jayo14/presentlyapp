@@ -71,6 +71,7 @@ const SettingsPage = lazyWithRetry(() => import('./components/Settings/SettingsP
 const NotFound = lazyWithRetry(() => import('./components/NotFound').then(module => ({ default: module.NotFound })));
 const UnauthorizedPage = lazyWithRetry(() => import('./components/UnauthorizedPage').then(module => ({ default: module.UnauthorizedPage })));
 const ProtectedRoute = lazyWithRetry(() => import('./components/ProtectedRoute').then(module => ({ default: module.ProtectedRoute })));
+const DevicesPage = lazyWithRetry(() => import('./components/Security/DevicesPage').then(module => ({ default: module.DevicesPage })));
 
 // Admin Components
 const InstitutionManagement = lazyWithRetry(() => import('./components/Admin/InstitutionManagement').then(module => ({ default: module.InstitutionManagement })));
@@ -327,6 +328,7 @@ const AppContent: React.FC = () => {
               <Route path="sessions" element={<SessionsPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="security" element={<DevicesPage />} />
               
               {/* Common Routes with RBAC */}
               <Route path="analytics" element={
