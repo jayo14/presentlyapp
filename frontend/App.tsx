@@ -13,15 +13,10 @@ import { Loader2 } from 'lucide-react';
 import { ThemeProvider } from './components/ThemeProvider';
 
 // Eager load critical components for initial page
-import LandingPage from './components/EnhancedLandingPage';
 import { Login } from './components/Auth/Login';
 import { Register } from './components/Auth/Register';
 import { Layout } from './components/Layout';
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
-import { DocumentationPage } from './components/DocumentationPage';
-import { VolunteersPage } from './components/VolunteersPage';
-import { FeaturesPage } from './components/FeaturesPage';
-import { HowItWorksPage } from './components/HowItWorksPage';
 import { UniversitiesPage } from './components/universities/UniversitiesPage';
 import { UniversityLandingPage } from './components/universities/UniversityLandingPage';
 import { BlogListPage } from './components/blog/BlogListPage';
@@ -50,6 +45,11 @@ const lazyWithRetry = (componentImport: () => Promise<any>) =>
     }
   });
 
+const LandingPage = lazyWithRetry(() => import('./components/EnhancedLandingPage').then(m => ({ default: m.default || m })));
+const DocumentationPage = lazyWithRetry(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
+const VolunteersPage = lazyWithRetry(() => import('./components/VolunteersPage').then(m => ({ default: m.VolunteersPage })));
+const FeaturesPage = lazyWithRetry(() => import('./components/FeaturesPage').then(m => ({ default: m.FeaturesPage })));
+const HowItWorksPage = lazyWithRetry(() => import('./components/HowItWorksPage').then(m => ({ default: m.HowItWorksPage })));
 const Onboarding = lazyWithRetry(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
 const EmailVerificationSent = lazyWithRetry(() => import('./components/Auth/EmailVerificationSent').then(module => ({ default: module.EmailVerificationSent })));
 const VerifyEmail = lazyWithRetry(() => import('./components/Auth/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
