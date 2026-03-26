@@ -143,49 +143,56 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
             </div>
 
             {/* Spillover badge */}
-            <div
-              className="glass-panel editorial-shadow mobile-hide"
-              style={{
-                position: 'absolute',
-                bottom: -32,
-                left: -32,
-                padding: '1.25rem 1.5rem',
-                borderRadius: '1.25rem',
-                border: '1px solid rgba(210,197,171,0.18)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                zIndex: 3,
-                cursor: 'default',
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '0.75rem',
-                  background: 'var(--primary-container)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <BadgeCheck size={22} color="#241a00" />
-              </div>
-              <div>
-                <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>Accuracy Rank</p>
-                <p
-                  className="font-headline"
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  className="glass-panel editorial-shadow mobile-hide"
                   style={{
-                    fontSize: '1.1rem',
-                    fontWeight: 900,
-                    color: 'var(--primary)',
+                    position: 'absolute',
+                    bottom: -32,
+                    left: -32,
+                    padding: '1.25rem 1.5rem',
+                    borderRadius: '1.25rem',
+                    border: '1px solid rgba(210,197,171,0.18)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    zIndex: 3,
+                    cursor: 'default',
                   }}
                 >
-                  Global #1
-                </p>
-              </div>
-            </div>
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: '0.75rem',
+                      background: 'var(--primary-container)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <BadgeCheck size={22} color="#241a00" />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>Accuracy Rank</p>
+                    <p
+                      className="font-headline"
+                      style={{
+                        fontSize: '1.1rem',
+                        fontWeight: 900,
+                        color: 'var(--primary)',
+                      }}
+                    >
+                      Global #1
+                    </p>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                Verified by independent audit bodies
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>
