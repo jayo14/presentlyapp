@@ -151,15 +151,38 @@
 
   .status-dot { animation: status-pulse 2s ease-in-out infinite; }
 
-  .fade-up {
-    opacity:0;
-    transform:translateY(32px);
-    transition:opacity 0.7s ease, transform 0.7s ease;
+  /* Replaces GSAP fade-up animations — uses IntersectionObserver via CSS @keyframes */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(32px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  .fade-up.visible { opacity:1; transform:translateY(0); }
-  .fade-up:nth-child(2){transition-delay:0.1s}
-  .fade-up:nth-child(3){transition-delay:0.2s}
-  .fade-up:nth-child(4){transition-delay:0.3s}
+
+  /* Applied by JS IntersectionObserver (see below) or directly as initial state */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  .fade-up.in-view {
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Orb parallax — CSS-only, no JS needed */
+  .orb-animate {
+    transition: transform 0.1s linear;
+    will-change: transform;
+  }
+
+  /* Hero card entrance */
+  .hero-card {
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  }
 
   /* ── shadcn Button overrides so our design tokens bleed through ── */
   .btn-presently-primary {
