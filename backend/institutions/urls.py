@@ -22,6 +22,12 @@ from .staff_views import (
     staff_roles_view,
     staff_update_view,
 )
+from accounts.views import (
+    list_devices_view,
+    update_device_view,
+    revoke_device_view,
+    login_activity_view,
+)
 
 # Create router for ViewSets
 router = DefaultRouter()
@@ -78,6 +84,12 @@ urlpatterns = [
     path('staff/invitations/<int:invitation_id>/revoke/', staff_revoke_invite_view, name='staff-invite-revoke'),
     path('auth/staff-invitations/accept/', staff_accept_invite_view, name='staff-accept-invite'),
     
+    # Security — device management & login activity
+    path('security/devices/', list_devices_view, name='security-devices-list'),
+    path('security/devices/<int:device_id>/', update_device_view, name='security-device-update'),
+    path('security/devices/<int:device_id>/revoke/', revoke_device_view, name='security-device-revoke'),
+    path('security/activity/', login_activity_view, name='security-login-activity'),
+
     # Include router URLs
     path('', include(router.urls)),
 ]

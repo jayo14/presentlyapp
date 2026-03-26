@@ -31,6 +31,7 @@ from utils.email import (
     send_verify_email,
     send_welcome_email,
 )
+from utils.ip_geo import get_ip_geo_data, build_device_fingerprint, calculate_travel_speed_kmh
 
 from .attendance_logic import perform_attendance_check_in
 from .models import (
@@ -38,7 +39,7 @@ from .models import (
     Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable
 )
 from .rbac import user_has_permission
-from accounts.models import UserDevice
+from accounts.models import UserDevice, LoginAttemptLog
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
@@ -52,6 +53,9 @@ from .geolocation_utils import verify_location, calculate_distance
 auth_logger = logging.getLogger('auth_events')
 logger = logging.getLogger(__name__)
 
+# Speed threshold for impossible-travel detection (km/h).
+# Fastest commercial flight is ~900 km/h; we add a buffer for edge cases.
+_IMPOSSIBLE_TRAVEL_SPEED_KMH = 1000
 
 def _safe_payload_summary(payload, max_preview: int = 500) -> dict:
     """Return a bounded summary for request payload logging."""
@@ -581,137 +585,110 @@ def verify_email_otp_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    """User login"""
+    """User login with device recognition, GeoIP, rate limiting, and anomaly detection."""
+
+    # ------------------------------------------------------------------ #
+    # 1. Rate limiting – 10 attempts per minute per IP                    #
+    # ------------------------------------------------------------------ #
+    ratelimited = is_ratelimited(
+        request,
+        group='login_post',
+        key='ip',
+        rate='10/m',
+        increment=True,
+    )
+    if ratelimited:
+        ip_addr = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip() \
+            or request.META.get('REMOTE_ADDR', '0.0.0.0')
+        LoginAttemptLog.objects.create(
+            email_attempted=request.data.get('email', ''),
+            ip_address=ip_addr,
+            user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            status=LoginAttemptLog.STATUS_BLOCKED,
+            reason=LoginAttemptLog.REASON_RATE_LIMITED,
+            is_suspicious=True,
+        )
+        return Response(
+            {'success': False, 'error': 'Too many login attempts. Please try again later.', 'code': 'RATE_LIMITED'},
+            status=status.HTTP_429_TOO_MANY_REQUESTS,
+        )
+
+    # ------------------------------------------------------------------ #
+    # 2. Validate credentials                                              #
+    # ------------------------------------------------------------------ #
     serializer = UserLoginSerializer(data=request.data, context={'request': request})
-    if serializer.is_valid():
-        user = serializer.validated_data['user']
 
-        # Block full login for unverified users and trigger a fresh OTP send.
-        if not user.email_verified:
-            otp_send_failed = False
-            try:
-                EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
-                otp_obj = EmailVerificationOTP.create_otp(user)
-                send_verification_email(user, otp_obj.otp)
-                auth_logger.info("Unverified user login OTP sent: %s", user.email)
-            except Exception as exc:
-                otp_send_failed = True
-                logger.error(
-                    "Failed to send login verification OTP for %s: %s",
-                    user.email,
-                    str(exc),
-                    exc_info=True,
-                )
+    # Resolve client IP early so we can use it in attempt logging
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip_address = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
 
-            return Response({
-                'success': True,
-                'message': 'Email not verified. A verification code has been sent to your email.',
-                'user': {
-                    'id': str(user.id),
-                    'email': user.email,
-                    'full_name': user.full_name,
-                    'role': user.role,
-                    'email_verified': user.email_verified,
-                    'onboarding_complete': user.onboarding_complete,
-                    'avatar_url': user.avatar_url,
-                },
-                'requires_email_verification': True,
-                'requires_onboarding': not user.onboarding_complete,
-                'otp_send_failed': otp_send_failed,
-            }, status=status.HTTP_200_OK)
-        
-        # Security: Device Tracking
-        try:
-            # Constants
-            UNKNOWN = "Unknown"
-            
-            user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown Device')
-            # Handle proxy headers for IP
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-            if x_forwarded_for:
-                ip_address = x_forwarded_for.split(',')[0]
+    user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown Device')
+
+    if not serializer.is_valid():
+        # Log failed attempt
+        LoginAttemptLog.objects.create(
+            email_attempted=request.data.get('email', ''),
+            ip_address=ip_address,
+            user_agent=user_agent,
+            status=LoginAttemptLog.STATUS_FAILED,
+            reason=LoginAttemptLog.REASON_INVALID_CREDENTIALS,
+        )
+
+        error_message = 'Login failed'
+        if serializer.errors:
+            if 'non_field_errors' in serializer.errors:
+                error_message = serializer.errors['non_field_errors'][0]
             else:
-                ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
-            
-            # Parse user agent for detailed information
-            parsed_ua = parse(user_agent)
-            
-            # Extract detailed device information
-            browser_name = parsed_ua.browser.family
-            browser_version = parsed_ua.browser.version_string
-            os_name = parsed_ua.os.family
-            os_version = parsed_ua.os.version_string
-            device_brand = parsed_ua.device.brand or UNKNOWN
-            device_model = parsed_ua.device.model or UNKNOWN
-            
-            # Determine device category
-            if parsed_ua.is_bot:
-                device_category = "Bot"
-            elif parsed_ua.is_mobile:
-                device_category = "Mobile Device"
-            elif parsed_ua.is_tablet:
-                device_category = "Tablet"
-            elif parsed_ua.is_pc:
-                device_category = "Desktop/Laptop"
-            else:
-                device_category = "Unknown Device"
-            
-            # Create a more descriptive device name
-            if parsed_ua.is_mobile or parsed_ua.is_tablet:
-                if device_brand != UNKNOWN and device_model != UNKNOWN:
-                    device_name = f"{device_brand} {device_model}"
-                else:
-                    device_name = f"{device_category} ({os_name})"
-            else:
-                device_name = f"{device_category} ({os_name})"
-                
-            # Check if device exists (skip bot tracking)
-            if not parsed_ua.is_bot:
-                device, created = UserDevice.objects.get_or_create(
-                    user=user,
-                    ip_address=ip_address,
-                    user_agent=user_agent,
-                    defaults={'device_name': device_name}
-                )
-                
-                if not created:
-                    # Update last login
-                    device.last_login = timezone.now()
-                    device.save()
-                else:
-                    # New device detected - send security alert email
-                    device_info = {
-                        'device_type': device_category,
-                        'device_name': device_name,
-                        'browser': f"{browser_name} {browser_version}",
-                        'os': f"{os_name} {os_version}",
-                        'login_time': timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')
-                    }
-                    
-                    send_login_alert_email(
-                        to=user.email,
-                        first_name=user.full_name.split(' ')[0],
-                        device_name=device_info.get('device_name', 'Unknown Device'),
-                        browser_name=device_info.get('browser', 'Unknown Browser'),
-                        login_location=ip_address,
-                        login_time=device_info.get('login_time', timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')),
-                        ip_address=ip_address,
-                        confirm_url=f"{settings.FRONTEND_URL}/security/devices",
-                        secure_url=f"{settings.FRONTEND_URL}/security",
-                    )
-            else:
-                # Log bot access but don't track or send alerts
-                auth_logger.info(f"Bot user agent detected for user {user.email}: {user_agent}")
-        except Exception as e:
-            # Don't block login on tracking error
-            logger.warning("Device tracking error", extra={'error': str(e), 'email': user.email})
-            
-        tokens = get_tokens_for_user(user)
+                field = next(iter(serializer.errors))
+                error_detail = serializer.errors[field]
+                if isinstance(error_detail, list):
+                    error_detail = error_detail[0]
+                error_message = f"{field}: {error_detail}"
+
         return Response({
-            'access': tokens['access'],
-            'refresh': tokens['refresh'],
+            'success': False,
+            'error': error_message,
+            'errors': serializer.errors,
+            'code': 'LOGIN_FAILED',
+            'message': error_message,
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    user = serializer.validated_data['user']
+
+    # ------------------------------------------------------------------ #
+    # 3. Block unverified users – send fresh OTP                          #
+    # ------------------------------------------------------------------ #
+    if not user.email_verified:
+        otp_send_failed = False
+        try:
+            EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
+            otp_obj = EmailVerificationOTP.create_otp(user)
+            send_verification_email(user, otp_obj.otp)
+            auth_logger.info("Unverified user login OTP sent: %s", user.email)
+        except Exception as exc:
+            otp_send_failed = True
+            logger.error(
+                "Failed to send login verification OTP for %s: %s",
+                user.email,
+                str(exc),
+                exc_info=True,
+            )
+
+        LoginAttemptLog.objects.create(
+            user=user,
+            email_attempted=user.email,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            status=LoginAttemptLog.STATUS_BLOCKED,
+            reason=LoginAttemptLog.REASON_UNVERIFIED_EMAIL,
+        )
+
+        return Response({
             'success': True,
-            'message': 'Login successful',
+            'message': 'Email not verified. A verification code has been sent to your email.',
             'user': {
                 'id': str(user.id),
                 'email': user.email,
@@ -719,31 +696,212 @@ def login_view(request):
                 'role': user.role,
                 'email_verified': user.email_verified,
                 'onboarding_complete': user.onboarding_complete,
-                'avatar_url': user.avatar_url
+                'avatar_url': user.avatar_url,
             },
-            'tokens': tokens,
-            'requires_email_verification': not user.email_verified,
-            'requires_onboarding': not user.onboarding_complete
+            'requires_email_verification': True,
+            'requires_onboarding': not user.onboarding_complete,
+            'otp_send_failed': otp_send_failed,
         }, status=status.HTTP_200_OK)
-    # Consistent error format
-    error_message = 'Login failed'
-    if serializer.errors:
-        if 'non_field_errors' in serializer.errors:
-            error_message = serializer.errors['non_field_errors'][0]
-        else:
-            field = next(iter(serializer.errors))
-            error_detail = serializer.errors[field]
-            if isinstance(error_detail, list):
-                error_detail = error_detail[0]
-            error_message = f"{field}: {error_detail}"
 
+    # ------------------------------------------------------------------ #
+    # 4. Device tracking, GeoIP, anomaly detection                        #
+    # ------------------------------------------------------------------ #
+    try:
+        UNKNOWN = "Unknown"
+
+        # Parse user-agent
+        parsed_ua = parse(user_agent)
+
+        browser_name = parsed_ua.browser.family
+        browser_version = parsed_ua.browser.version_string
+        os_name = parsed_ua.os.family
+        os_version = parsed_ua.os.version_string
+        device_brand = parsed_ua.device.brand or UNKNOWN
+        device_model = parsed_ua.device.model or UNKNOWN
+
+        # Determine device category
+        if parsed_ua.is_bot:
+            device_category = "Bot"
+        elif parsed_ua.is_mobile:
+            device_category = "Mobile Device"
+        elif parsed_ua.is_tablet:
+            device_category = "Tablet"
+        elif parsed_ua.is_pc:
+            device_category = "Desktop/Laptop"
+        else:
+            device_category = "Unknown Device"
+
+        # Build human-readable device name
+        if parsed_ua.is_mobile or parsed_ua.is_tablet:
+            if device_brand != UNKNOWN and device_model != UNKNOWN:
+                device_name = f"{device_brand} {device_model}"
+            else:
+                device_name = f"{device_category} ({os_name})"
+        else:
+            device_name = f"{device_category} ({os_name})"
+
+        # Compute a stable device fingerprint (coarse: browser+OS+category)
+        fingerprint = build_device_fingerprint(user_agent, browser_name, os_name, device_category)
+
+        if not parsed_ua.is_bot:
+            # Fetch GeoIP data (non-blocking; empty dict on failure)
+            geo = get_ip_geo_data(ip_address)
+            geo_country = geo.get('country', '')
+            geo_city = geo.get('city', '')
+            geo_timezone = geo.get('timezone', '')
+            geo_isp = geo.get('isp', '')
+            geo_lat = geo.get('latitude')
+            geo_lon = geo.get('longitude')
+
+            # ---- Determine if this is a known device ---- #
+            # Strategy: match by fingerprint first, then fall back to same IP
+            existing_device = (
+                UserDevice.objects.filter(user=user, device_fingerprint=fingerprint).first()
+                or UserDevice.objects.filter(user=user, ip_address=ip_address).first()
+            )
+
+            # ---- Detect anomalies ---- #
+            send_alert = False
+            alert_reason = LoginAttemptLog.REASON_NORMAL
+            is_suspicious = False
+
+            if existing_device is None:
+                # Brand new device
+                send_alert = True
+                alert_reason = LoginAttemptLog.REASON_NEW_DEVICE
+            else:
+                # Known device – check for location anomalies
+                prev_country = existing_device.geo_country
+                prev_lat = existing_device.geo_latitude
+                prev_lon = existing_device.geo_longitude
+                prev_seen = existing_device.last_seen_at
+
+                # Country change → alert
+                if geo_country and prev_country and geo_country != prev_country:
+                    send_alert = True
+                    alert_reason = LoginAttemptLog.REASON_SUSPICIOUS_LOCATION
+
+                # Impossible travel check
+                if prev_lat and prev_lon and geo_lat and geo_lon and prev_seen:
+                    elapsed = (timezone.now() - prev_seen).total_seconds()
+                    speed = calculate_travel_speed_kmh(prev_lat, prev_lon, geo_lat, geo_lon, elapsed)
+                    if speed is not None and speed > _IMPOSSIBLE_TRAVEL_SPEED_KMH:
+                        send_alert = True
+                        is_suspicious = True
+                        alert_reason = LoginAttemptLog.REASON_IMPOSSIBLE_TRAVEL
+                        auth_logger.warning(
+                            "Impossible travel detected for %s: %.0f km/h from %s to %s",
+                            user.email,
+                            speed,
+                            prev_country or existing_device.ip_address,
+                            geo_country or ip_address,
+                        )
+
+            # ---- Upsert device record ---- #
+            if existing_device is None:
+                device = UserDevice.objects.create(
+                    user=user,
+                    device_name=device_name,
+                    user_agent=user_agent,
+                    ip_address=ip_address,
+                    device_fingerprint=fingerprint,
+                    geo_country=geo_country,
+                    geo_city=geo_city,
+                    geo_timezone=geo_timezone,
+                    geo_isp=geo_isp,
+                    geo_latitude=geo_lat,
+                    geo_longitude=geo_lon,
+                    last_seen_at=timezone.now(),
+                )
+            else:
+                # Update geo + last seen for the existing record
+                existing_device.ip_address = ip_address
+                existing_device.device_fingerprint = fingerprint
+                existing_device.geo_country = geo_country
+                existing_device.geo_city = geo_city
+                existing_device.geo_timezone = geo_timezone
+                existing_device.geo_isp = geo_isp
+                existing_device.geo_latitude = geo_lat
+                existing_device.geo_longitude = geo_lon
+                existing_device.last_seen_at = timezone.now()
+                existing_device.save(update_fields=[
+                    'ip_address', 'device_fingerprint',
+                    'geo_country', 'geo_city', 'geo_timezone', 'geo_isp',
+                    'geo_latitude', 'geo_longitude', 'last_seen_at',
+                ])
+                device = existing_device
+
+            # ---- Send alert email if needed ---- #
+            if send_alert:
+                try:
+                    send_login_alert_email(
+                        to=user.email,
+                        first_name=user.full_name.split(' ')[0],
+                        device_name=device_name,
+                        browser_name=f"{browser_name} {browser_version}",
+                        login_location=f"{geo_city}, {geo_country}".strip(', ') or ip_address,
+                        login_time=timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC'),
+                        ip_address=ip_address,
+                        confirm_url=f"{settings.FRONTEND_URL}/security/devices",
+                        secure_url=f"{settings.FRONTEND_URL}/security",
+                    )
+                except Exception as email_exc:
+                    logger.warning("Login alert email failed for %s: %s", user.email, email_exc)
+
+            # ---- Log the successful attempt ---- #
+            LoginAttemptLog.objects.create(
+                user=user,
+                email_attempted=user.email,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                status=LoginAttemptLog.STATUS_SUCCESS,
+                reason=alert_reason,
+                geo_country=geo_country,
+                geo_city=geo_city,
+                is_suspicious=is_suspicious,
+                extra_data={
+                    'device_id': device.id,
+                    'device_name': device_name,
+                    'browser': f"{browser_name} {browser_version}",
+                    'os': f"{os_name} {os_version}",
+                },
+            )
+        else:
+            # Bot login – log but don't track or alert
+            auth_logger.info("Bot user agent on login for %s: %s", user.email, user_agent)
+            LoginAttemptLog.objects.create(
+                user=user,
+                email_attempted=user.email,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                status=LoginAttemptLog.STATUS_SUCCESS,
+                reason=LoginAttemptLog.REASON_NORMAL,
+            )
+
+    except Exception as e:
+        # Never block a successful login because of tracking errors
+        logger.warning("Device tracking error for %s: %s", user.email, str(e), exc_info=True)
+
+    tokens = get_tokens_for_user(user)
     return Response({
-        'success': False,
-        'error': error_message,
-        'errors': serializer.errors,
-        'code': 'LOGIN_FAILED',
-        'message': error_message
-    }, status=status.HTTP_400_BAD_REQUEST)
+        'access': tokens['access'],
+        'refresh': tokens['refresh'],
+        'success': True,
+        'message': 'Login successful',
+        'user': {
+            'id': str(user.id),
+            'email': user.email,
+            'full_name': user.full_name,
+            'role': user.role,
+            'email_verified': user.email_verified,
+            'onboarding_complete': user.onboarding_complete,
+            'avatar_url': user.avatar_url,
+        },
+        'tokens': tokens,
+        'requires_email_verification': not user.email_verified,
+        'requires_onboarding': not user.onboarding_complete,
+    }, status=status.HTTP_200_OK)
+
 
 
 @api_view(['POST'])
