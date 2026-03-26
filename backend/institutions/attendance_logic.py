@@ -217,6 +217,17 @@ def perform_attendance_check_in(request, session):
     ip_address = request.META.get('REMOTE_ADDR')
     user_agent = request.META.get('HTTP_USER_AGENT', '')
 
+    # Determine whether the session has valid venue coordinates
+    _lat = location_data.get('latitude')
+    _lng = location_data.get('longitude')
+    venue_coords_valid = (
+        _lat is not None
+        and _lng is not None
+        and not (float(_lat) == 0.0 and float(_lng) == 0.0)
+    )
+
+    is_desktop = data.get('isDesktop') or data.get('is_desktop') or False
+
     # --- Confidence Score System ---
     score: int = 0
     flags: list[str] = []
@@ -227,22 +238,28 @@ def perform_attendance_check_in(request, session):
     if avg_acc <= 10: score += 20
     elif avg_acc <= 20: score += 15
     elif avg_acc <= 40: score += 10
+    elif avg_acc <= 100 and is_desktop: score += 5  # Wi-Fi triangulation on desktop
     else: flags.append(f"Low accuracy ({avg_acc:.1f}m)")
 
     # 2. Geofence Signal (30 points)
     is_inside_any = False
     min_dist = 999999
-    for sample in samples:
-        is_inside, dist = verify_location(
-            float(sample.get('latitude')), float(sample.get('longitude')), None,
-            location_data['latitude'], location_data['longitude'], None,
-            location_data['boundary'], location_data['radius']
-        )
-        if is_inside: is_inside_any = True
-        min_dist = min(min_dist, dist)
-    
-    if is_inside_any: score += 30
-    else: flags.append(f"Outside area ({min_dist:.1f}m away)")
+    if not venue_coords_valid:
+        # No venue coordinates configured — cannot verify geofence, award partial points
+        score += 15
+        flags.append("Venue coordinates not configured — geofence skipped")
+    else:
+        for sample in samples:
+            is_inside, dist = verify_location(
+                float(sample.get('latitude')), float(sample.get('longitude')), None,
+                location_data['latitude'], location_data['longitude'], None,
+                location_data['boundary'], location_data['radius']
+            )
+            if is_inside: is_inside_any = True
+            min_dist = min(min_dist, dist)
+
+        if is_inside_any: score += 30
+        else: flags.append(f"Outside area ({min_dist:.1f}m away)")
 
     # 3. Device/Integrity Signal (10 points)
     if visitor_id:
@@ -261,6 +278,10 @@ def perform_attendance_check_in(request, session):
     # Give points if motion sensor detected physical movement during sampling
     if motion_detected:
         score += 10
+    elif is_desktop:
+        # Desktop users cannot provide motion sensor data — partial credit, no penalty
+        score += 5
+        flags.append("Desktop device — motion sensor unavailable")
     else:
         flags.append("No physical movement detected (static device)")
 
@@ -300,7 +321,11 @@ def perform_attendance_check_in(request, session):
         flags.append("Emulator detected (hardware renderer)")
 
     # Rejection logic: Hard reject only if very low confidence
-    if score < _FLAG_THRESHOLD:
+    # Desktop users get lower thresholds since they cannot provide motion/GPS signals
+    effective_flag_threshold = 35 if is_desktop else _FLAG_THRESHOLD
+    effective_trust_threshold = 65 if is_desktop else _TRUST_THRESHOLD
+
+    if score < effective_flag_threshold:
         rejected_reason = "; ".join(flags) or "Low confidence score"
         with transaction.atomic():
             AttendanceAttemptLog.objects.create(
@@ -348,7 +373,7 @@ def perform_attendance_check_in(request, session):
             device_id=device_id,
             webgl_renderer=webgl_renderer,
             trust_score=score,
-            rejected_reason=None if score >= _TRUST_THRESHOLD else "; ".join(flags),
+            rejected_reason=None if score >= effective_trust_threshold else "; ".join(flags),
             ip_address=ip_address,
             user_agent=user_agent
         )
@@ -373,7 +398,7 @@ def perform_attendance_check_in(request, session):
         grace_period = timezone.timedelta(minutes=15)
         status_value = 'PRESENT'
         
-        if score < _TRUST_THRESHOLD:
+        if score < effective_trust_threshold:
             status_value = 'FLAGGED'
         elif now > session.start_time + grace_period:
             status_value = 'LATE'
