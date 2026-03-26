@@ -10,6 +10,7 @@ import { Toaster } from 'sonner';
 import { offlineSyncManager } from './src/utils/offlineSync';
 import { OfflineIndicator } from './src/components/OfflineIndicator';
 import { Loader2 } from 'lucide-react';
+import { ThemeProvider } from './components/ThemeProvider';
 
 // Eager load critical components for initial page
 import LandingPage from './components/EnhancedLandingPage';
@@ -479,14 +480,16 @@ const App: React.FC = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <OfflineIndicator />
-        <Toaster position="top-right" richColors closeButton />
-        <ServiceWorkerUpdateNotifier />
-        <AppContent />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="system">
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <OfflineIndicator />
+          <Toaster position="top-right" richColors closeButton />
+          <ServiceWorkerUpdateNotifier />
+          <AppContent />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 };
 
