@@ -64,8 +64,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   };
 
   if (loading && !dashboardData) {
-    return <SkeletonStudentDashboard />;
-  }
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto animate-pulse">
+      {/* Greeting skeleton */}
+      <div className="h-10 bg-surfaceContainer rounded-lg w-64" />
+      {/* Metric cards skeleton */}
+      <div className="grid grid-cols-2 gap-3">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-surfaceContainer rounded-xl" />
+        ))}
+      </div>
+      {/* Course list skeleton */}
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-16 bg-surfaceContainer rounded-xl" />
+        ))}
+      </div>
+    </div>
+  )
+}
 
   if (!dashboardData) {
     return (

@@ -40,32 +40,29 @@ interface NavItemProps {
 const NavItem: React.FC<NavItemProps> = ({ id, icon: Icon, label, isActive, onClick, collapsed = false, badge }) => (
   <button
     onClick={() => onClick(id)}
-    className={`
-      group relative w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} 
-      px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150
-      ${isActive
-        ? 'bg-surfaceLow text-text shadow-[0_1px_2px_rgba(0,0,0,0.05)] shadow-zinc-200/50 dark:shadow-none'
+    className={`group relative w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-medium transition-colors duration-150 ${
+      collapsed ? 'justify-center' : 'gap-3'
+    } ${
+      isActive
+        ? 'bg-surface text-text font-semibold'
         : 'text-textMuted hover:text-text hover:bg-surfaceLow'
-      }
-    `}
+    }`}
     title={collapsed ? label : undefined}
   >
-    {isActive && (
-      <motion.div 
-        layoutId="active-indicator"
-        className="absolute left-0 w-1 h-4 bg-primary rounded-r-full"
-      />
-    )}
-    <Icon size={16} className={`flex-shrink-0 ${isActive ? 'text-primary' : 'text-textMuted group-hover:text-text'}`} />
+    <Icon
+      size={16}
+      className={`flex-shrink-0 ${
+        isActive ? 'text-primary' : 'text-textMuted group-hover:text-text'
+      }`}
+    />
     {!collapsed && <span className="truncate">{label}</span>}
     {!collapsed && badge && (
-      <span className="ml-auto text-[10px] font-semibold bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded-md">
+      <span className="ml-auto text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-md">
         {badge}
       </span>
     )}
-    {/* Tooltip for collapsed state */}
     {collapsed && (
-      <div className="absolute left-full ml-2 px-2 py-1 bg-surface text-text text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
+      <div className="absolute left-full ml-2 px-2 py-1 bg-surface border border-outline text-text text-xs font-medium rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 pointer-events-none">
         {label}
       </div>
     )}
@@ -372,7 +369,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           </button>
 
           {/* Install App */}
-          {installPrompt && (
+          {installPrompt && !isAppInstalled && (
             <button
               onClick={handleInstallClick}
               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-lg text-[13px] font-medium text-primary hover:bg-primary/5 transition-all`}
@@ -440,7 +437,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 md:hidden"
+          className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
