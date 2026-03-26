@@ -209,7 +209,7 @@ export const BlogListPage: React.FC = () => {
               <button
                 className={[
                   'rounded-xl border px-5 py-2.5 text-sm font-bold transition-all duration-300 whitespace-nowrap',
-                  !categoryFilter ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105' : 'border-outline/10 text-textMuted hover:border-primary/50 hover:text-text hover:bg-surfaceHigh',
+                  !categoryFilter ? 'bg-primary text-background border-primary shadow-lg shadow-primary/20 scale-105' : 'border-outline/10 text-textMuted hover:border-primary/50 hover:text-text hover:bg-surfaceHigh',
                 ].join(' ')}
                 onClick={() => updateFilter('category', undefined)}
               >
@@ -221,7 +221,7 @@ export const BlogListPage: React.FC = () => {
                   className={[
                     'rounded-xl border px-5 py-2.5 text-sm font-bold transition-all duration-300 whitespace-nowrap',
                     categoryFilter === category.slug
-                      ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105'
+                      ? 'bg-primary text-background border-primary shadow-lg shadow-primary/20 scale-105'
                       : 'border-outline/10 text-textMuted hover:border-primary/50 hover:text-text hover:bg-surfaceHigh',
                   ].join(' ')}
                   onClick={() => updateFilter('category', category.slug)}

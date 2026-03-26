@@ -308,7 +308,7 @@ export const InstitutionManagement: React.FC = () => {
                           ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                           : inst.accreditation_status === 'PROVISIONAL'
                           ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                          : 'bg-zinc-800 text-muted-foreground border-zinc-700'
+                          : 'bg-zinc-800 text-muted-foreground border-outline'
                       }`}>
                         {inst.accreditation_status}
                       </span>
@@ -317,7 +317,7 @@ export const InstitutionManagement: React.FC = () => {
                     <span className={`px-2 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wide ml-auto ${
                       inst.is_active 
                         ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
-                        : 'bg-zinc-800 text-muted-foreground border-zinc-700'
+                        : 'bg-zinc-800 text-muted-foreground border-outline'
                     }`}>
                       {inst.is_active ? 'Active' : 'Inactive'}
                     </span>

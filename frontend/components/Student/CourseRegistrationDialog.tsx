@@ -170,7 +170,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                  >
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                         isEnrolled ? 'bg-primary text-white shadow-lg' : 'bg-surfaceLow text-textMuted group-hover:bg-primary/10 group-hover:text-primary'
+                         isEnrolled ? 'bg-primary text-background shadow-lg' : 'bg-surfaceLow text-textMuted group-hover:bg-primary/10 group-hover:text-primary'
                        }`}>
                           {isEnrolled ? <Check size={20} strokeWidth={3} /> : <BookOpen size={20} />}
                        </div>
@@ -195,7 +195,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                       <button 
                         onClick={() => handleEnroll(course.id)}
                         disabled={enrollingCourseId === course.id}
-                        className="h-10 px-6 bg-text text-white text-xs font-black rounded-xl hover:bg-black active:scale-95 transition-all flex items-center justify-center"
+                        className="h-10 px-6 bg-text text-background text-xs font-black rounded-xl hover:bg-surface active:scale-95 transition-all flex items-center justify-center"
                       >
                          {enrollingCourseId === course.id ? <Loader2 size={16} className="animate-spin" /> : 'ADD'}
                       </button>
@@ -216,7 +216,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         <div className="p-8 border-t border-outline/5 bg-white/80 backdrop-blur-md flex-shrink-0">
            <button 
              onClick={onClose}
-             className="w-full bg-primary text-white h-16 rounded-[1.5rem] font-headline font-black text-lg shadow-[0_16px_32px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+             className="w-full bg-primary text-background h-16 rounded-[1.5rem] font-headline font-black text-lg shadow-[0_16px_32px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
            >
               Submit Registration
               <ChevronRight size={20} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />

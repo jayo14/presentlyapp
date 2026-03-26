@@ -19,7 +19,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   onHome
 }) => {
   return (
-    <div className="min-h-screen bg-black text-text flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-surface text-text flex flex-col items-center justify-center p-6 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 z-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#333 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
         <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>

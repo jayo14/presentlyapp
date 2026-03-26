@@ -245,8 +245,8 @@ export const VenueManagement: React.FC = () => {
               onClick={() => setViewMode('map')}
               className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                 viewMode === 'map' 
-                  ? 'bg-primary text-white' 
-                  : 'text-muted-foreground hover:text-white'
+                  ? 'bg-primary text-background' 
+                  : 'text-muted-foreground hover:text-background'
               }`}
             >
               <MapIcon className="w-4 h-4" />
@@ -255,8 +255,8 @@ export const VenueManagement: React.FC = () => {
               onClick={() => setViewMode('grid')}
               className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                 viewMode === 'grid' 
-                  ? 'bg-primary text-white' 
-                  : 'text-muted-foreground hover:text-white'
+                  ? 'bg-primary text-background' 
+                  : 'text-muted-foreground hover:text-background'
               }`}
             >
               <Grid className="w-4 h-4" />
@@ -465,7 +465,7 @@ export const VenueManagement: React.FC = () => {
                 <span className={`px-2 py-1 rounded text-xs ${
                   venue.is_active 
                     ? 'bg-green-500/10 text-green-500' 
-                    : 'bg-zinc-700 text-muted-foreground'
+                    : 'bg-surfaceHigh text-muted-foreground'
                 }`}>
                   {venue.is_active ? 'Active' : 'Inactive'}
                 </span>

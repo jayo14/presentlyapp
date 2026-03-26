@@ -137,21 +137,21 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ role, onSuccess,
                         <button 
                             type="button" 
                             onClick={() => setPaymentMethod('card')}
-                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'card' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'card' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-surfaceHigh'}`}
                         >
                             <CreditCard size={16} /> Card
                         </button>
                         <button 
                             type="button" 
                             onClick={() => setPaymentMethod('transfer')}
-                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'transfer' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'transfer' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-surfaceHigh'}`}
                         >
                             <Smartphone size={16} /> Transfer
                         </button>
                          <button 
                             type="button" 
                             onClick={() => setPaymentMethod('ussd')}
-                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'ussd' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-zinc-700'}`}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${paymentMethod === 'ussd' ? 'bg-white text-black shadow-lg shadow-white/10 ring-2 ring-white' : 'bg-zinc-800 text-muted-foreground hover:bg-surfaceHigh'}`}
                         >
                             <Globe size={16} /> USSD
                         </button>

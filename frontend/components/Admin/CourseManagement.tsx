@@ -365,7 +365,7 @@ export const CourseManagement: React.FC = () => {
                 <span className={`px-2 py-1 rounded text-xs ${
                   course.is_active 
                     ? 'bg-green-500/10 text-green-500' 
-                    : 'bg-zinc-700 text-muted-foreground'
+                    : 'bg-surfaceHigh text-muted-foreground'
                 }`}>
                   {course.is_active ? 'Active' : 'Inactive'}
                 </span>

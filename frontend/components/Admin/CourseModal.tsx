@@ -297,7 +297,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
                             className={`flex flex-col text-left px-3 py-2 rounded-lg text-sm transition-all border-border ${
                               Array.isArray(formData.department) && formData.department.includes(dept.id)
                                 ? 'bg-primary/10 border-primary text-primary shadow-sm'
-                                : 'bg-transparent border-zinc-800 text-muted-foreground hover:border-zinc-700 hover:text-zinc-300'
+                                : 'bg-transparent border-zinc-800 text-muted-foreground hover:border-outline hover:text-zinc-300'
                             }`}
                           >
                             <div className="font-bold truncate">{dept.name}</div>

@@ -281,7 +281,7 @@ export const NotificationsPage: React.FC = () => {
               onClick={() => setActiveTab(tab.id as TabType)}
               className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                 activeTab === tab.id 
-                  ? 'bg-primary text-white shadow-md' 
+                  ? 'bg-primary text-background shadow-md' 
                   : 'bg-surface dark:bg-zinc-900 text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
               }`}
             >
@@ -290,7 +290,7 @@ export const NotificationsPage: React.FC = () => {
                 <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
                   activeTab === tab.id 
                     ? 'bg-white/20' 
-                    : 'bg-zinc-200 dark:bg-zinc-700'
+                    : 'bg-zinc-200 dark:bg-surfaceHigh'
                 }`}>
                   {tab.count}
                 </span>

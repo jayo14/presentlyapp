@@ -244,7 +244,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       <header className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-[120] pointer-events-none">
         <button
           onClick={onClose}
-          className="w-12 h-12 pointer-events-auto flex items-center justify-center bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/10 dark:border-border shadow-2xl active:scale-95 transition-all text-white"
+          className="w-12 h-12 pointer-events-auto flex items-center justify-center bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/10 dark:border-border shadow-2xl active:scale-95 transition-all text-background"
         >
           <X size={24} strokeWidth={2.5} />
         </button>
@@ -252,7 +252,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         <div className="flex flex-col items-center">
           <div className="px-4 py-1.5 bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-full border border-white/10 dark:border-border flex items-center gap-2">
             <div className={`w-1.5 h-1.5 rounded-full ${mode === 'scan' ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-background">
               {mode === 'scan' ? 'Scanner Mode' : 'Keyboard Mode'}
             </span>
           </div>
@@ -260,14 +260,14 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
         <button
           onClick={() => setMode(mode === 'scan' ? 'input' : 'scan')}
-          className="w-12 h-12 pointer-events-auto flex items-center justify-center bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/10 dark:border-border shadow-2xl active:scale-95 transition-all text-white"
+          className="w-12 h-12 pointer-events-auto flex items-center justify-center bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/10 dark:border-border shadow-2xl active:scale-95 transition-all text-background"
           aria-label={mode === 'scan' ? "Switch to keyboard" : "Switch to scanner"}
         >
           {mode === 'scan' ? <Keyboard size={24} strokeWidth={2.5} /> : <Scan size={24} strokeWidth={2.5} />}
         </button>
       </header>
 
-      <main className="flex-1 flex flex-col relative overflow-hidden bg-black">
+      <main className="flex-1 flex flex-col relative overflow-hidden bg-surface">
         <AnimatePresence mode="wait">
           {mode === 'input' && (
             <motion.div
@@ -349,7 +349,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               className="flex-1 flex flex-col relative"
             >
               {/* Immersive Camera View */}
-              <div className="absolute inset-0 overflow-hidden bg-black">
+              <div className="absolute inset-0 overflow-hidden bg-surface">
                 <video 
                   ref={videoRef} 
                   autoPlay 
@@ -377,16 +377,16 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
                     {/* Center Helper Icon */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                      <QrCode size={180} strokeWidth={0.5} className="text-white" />
+                      <QrCode size={180} strokeWidth={0.5} className="text-background" />
                     </div>
                   </div>
 
                   {/* Status Indicator Bar */}
                   <div className="mt-16 text-center">
-                    <h3 className="text-xl font-headline font-black text-white drop-shadow-lg mb-2">Center QR Code</h3>
+                    <h3 className="text-xl font-headline font-black text-background drop-shadow-lg mb-2">Center QR Code</h3>
                     <div className="flex items-center gap-3 justify-center">
                       <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Scanning environment...</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-background/60">Scanning environment...</span>
                     </div>
                   </div>
                 </div>
@@ -398,7 +398,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               {/* Mobile-Friendly Bottom Sheet Style Indicator */}
               <div className="absolute bottom-10 left-0 right-0 px-8 pointer-events-none">
                 <div className="max-w-xs mx-auto p-4 bg-white/5 backdrop-blur-3xl rounded-[2rem] border border-white/10 text-center">
-                  <p className="text-[11px] font-bold text-white/80 leading-relaxed">
+                  <p className="text-[11px] font-bold text-background/80 leading-relaxed">
                     Verification is instantaneous once the code is identified within the frame.
                   </p>
                 </div>

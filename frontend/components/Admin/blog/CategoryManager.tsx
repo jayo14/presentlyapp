@@ -71,7 +71,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
         </div>
         <Button 
           onClick={() => { setIsAdding(true); setEditingCategory(null); setFormData({ name: '', slug: '', description: '' }); }}
-          className="bg-primary text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+          className="bg-primary text-background px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
         >
           <FolderPlus size={20} />
           New Category
@@ -118,51 +118,51 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
         {/* Right Column: Add/Edit Form (4 cols) */}
         <div className="lg:col-span-4 sticky top-24">
           {(isAdding || editingCategory) ? (
-            <div className="bg-text p-8 rounded-[2rem] text-white shadow-2xl space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="bg-text p-8 rounded-[2rem] text-background shadow-2xl space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="flex justify-between items-center border-b border-white/10 pb-6">
                 <h3 className="text-2xl font-headline font-black tracking-tight">{editingCategory ? 'Edit Category' : 'New Category'}</h3>
-                <button onClick={() => { setIsAdding(false); setEditingCategory(null); }} className="text-white/40 hover:text-white transition-colors"><X size={24} /></button>
+                <button onClick={() => { setIsAdding(false); setEditingCategory(null); }} className="text-background/40 hover:text-background transition-colors"><X size={24} /></button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Category Name</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-background/40">Category Name</label>
                   <input 
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-white placeholder:text-white/20 transition-all font-medium" 
+                    className="w-full bg-white/10 border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium" 
                     placeholder="e.g. Technology" 
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase tracking-widest text-white/40">URL Slug</label>
+                   <label className="text-[10px] font-black uppercase tracking-widest text-background/40">URL Slug</label>
                    <div className="relative">
-                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 font-bold text-sm">/</span>
+                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-background/20 font-bold text-sm">/</span>
                      <input 
                        name="slug"
                        value={formData.slug}
                        onChange={handleChange}
-                       className="w-full bg-white/10 border-white/10 rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-white placeholder:text-white/20 transition-all font-medium" 
+                       className="w-full bg-white/10 border-white/10 rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium" 
                        placeholder="technology"
                        required
                      />
                    </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Description</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-background/40">Description</label>
                   <textarea 
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-white placeholder:text-white/20 transition-all font-medium resize-none leading-relaxed h-32" 
+                    className="w-full bg-white/10 border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium resize-none leading-relaxed h-32" 
                     placeholder="What topics will this category cover?" 
                   />
                 </div>
                 <Button 
                   type="submit"
-                  className="w-full bg-primary py-5 rounded-2xl text-sm font-black text-white hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 mt-4"
+                  className="w-full bg-primary py-5 rounded-2xl text-sm font-black text-background hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 mt-4"
                 >
                   {editingCategory ? 'Update Category' : 'Create Category'}
                 </Button>

@@ -135,7 +135,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                         <button 
                           onClick={() => setCourseToDrop(course)}
                           disabled={droppingId === course.id}
-                          className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                          className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-background transition-all active:scale-90"
                         >
                            {droppingId === course.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                         </button>

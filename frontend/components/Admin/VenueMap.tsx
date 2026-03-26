@@ -374,7 +374,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           closeOnClick: false,
           offset: [0, -20],
           className: 'venue-tooltip'
-        }).setHTML(`<div class="px-2 py-1 text-xs font-bold bg-zinc-900 text-white rounded shadow-lg">${venue.name}</div>`);
+        }).setHTML(`<div class="px-2 py-1 text-xs font-bold bg-zinc-900 text-background rounded shadow-lg">${venue.name}</div>`);
 
         pin.addEventListener('mouseenter', () => {
           if (!drawingModeRef.current) {
@@ -1033,7 +1033,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           <button
             onClick={() => setShowUserLocation(!showUserLocation)}
             className={`p-2 transition-colors flex items-center justify-center ${showUserLocation
-              ? 'bg-blue-500 text-white'
+              ? 'bg-blue-500 text-background'
               : 'text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
               }`}
             title={showUserLocation ? "Stop Tracking Location" : "Find My Location"}

@@ -119,7 +119,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
       <div className="flex flex-wrap gap-4">
         <Button 
           onClick={onNewPost}
-          className="bg-gradient-to-br from-primary to-primary/80 text-white px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+          className="bg-gradient-to-br from-primary to-primary/80 text-background px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
         >
           <Plus size={18} />
           New Post
@@ -273,13 +273,13 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
             </ul>
           </div>
           {/* Small Promotional/Help Card */}
-          <div className="bg-primary p-8 rounded-[2rem] text-white relative overflow-hidden shadow-lg shadow-primary/20">
+          <div className="bg-primary p-8 rounded-[2rem] text-background relative overflow-hidden shadow-lg shadow-primary/20">
             <div className="relative z-10">
               <h4 className="font-headline text-2xl font-black mb-2 tracking-tight">Editorial Tip</h4>
               <p className="text-sm opacity-90 leading-relaxed mb-6 font-medium">Posts with more than 3 internal links tend to rank 24% higher in local search results.</p>
               <button className="text-[10px] font-bold uppercase tracking-widest py-3 px-6 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-colors">Learn more</button>
             </div>
-            <TrendingUp size={120} className="absolute -bottom-8 -right-8 text-white/5 select-none" />
+            <TrendingUp size={120} className="absolute -bottom-8 -right-8 text-background/5 select-none" />
           </div>
         </div>
       </div>

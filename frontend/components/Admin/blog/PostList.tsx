@@ -81,7 +81,7 @@ export const PostList: React.FC<PostListProps> = ({
         </div>
         <Button 
           onClick={onNewPost}
-          className="bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+          className="bg-gradient-to-r from-primary to-primary/80 text-background px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
         >
           <Plus size={20} />
           New Post
@@ -253,11 +253,11 @@ export const PostList: React.FC<PostListProps> = ({
 
       {/* Bulk Action Bar (Floating) */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-[600px] bg-text shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-white rounded-full px-8 py-5 flex items-center justify-between z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-[600px] bg-text shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-background rounded-full px-8 py-5 flex items-center justify-between z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className="flex items-center gap-6">
             <div className="flex flex-col">
               <span className="text-sm font-black tracking-tight">{selectedIds.length} posts selected</span>
-              <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest">Multi-edit mode</span>
+              <span className="text-[10px] text-background/50 font-bold uppercase tracking-widest">Multi-edit mode</span>
             </div>
             <div className="h-8 w-[1px] bg-white/20"></div>
             <div className="flex gap-3">
@@ -266,7 +266,7 @@ export const PostList: React.FC<PostListProps> = ({
               <button className="bg-error hover:bg-error/80 px-4 py-2 rounded-xl text-xs font-black transition-colors shadow-lg shadow-error/20">Delete</button>
             </div>
           </div>
-          <button onClick={() => setSelectedIds([])} className="p-2 text-white/40 hover:text-white transition-colors">
+          <button onClick={() => setSelectedIds([])} className="p-2 text-background/40 hover:text-background transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -290,7 +290,7 @@ export const PostList: React.FC<PostListProps> = ({
               key={i}
               onClick={() => onPageChange(i + 1)}
               className={`w-11 h-11 flex items-center justify-center rounded-full text-sm font-black transition-all ${
-                currentPage === i + 1 ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110' : 'text-text hover:bg-surfaceHigh'
+                currentPage === i + 1 ? 'bg-primary text-background shadow-lg shadow-primary/20 scale-110' : 'text-text hover:bg-surfaceHigh'
               }`}
             >
               {i + 1}

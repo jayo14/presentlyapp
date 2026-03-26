@@ -51,7 +51,7 @@ export const AttendanceFailurePage: React.FC<AttendanceFailurePageProps> = ({
               transition={{ type: "spring", damping: 15, stiffness: 200 }}
               className="w-32 h-32 bg-red-600 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_60px_rgba(220,38,38,0.4)] relative z-20"
             >
-               <X size={64} strokeWidth={4} className="text-white" />
+               <X size={64} strokeWidth={4} className="text-background" />
             </motion.div>
             
             {/* Animated Rings */}

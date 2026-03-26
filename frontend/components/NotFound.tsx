@@ -7,7 +7,7 @@ import { SEO } from './SEO';
 
 export const NotFound: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   return (
-    <div className="min-h-screen bg-black text-text flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-surface text-text flex flex-col items-center justify-center p-6 relative overflow-hidden">
                 {/* SEO: Prevent indexing of not-found page. */}
                 <SEO
                     title="Page Not Found"

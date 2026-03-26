@@ -92,7 +92,7 @@ export const TagManager: React.FC<TagManagerProps> = ({
               <div 
                 key={tag.id} 
                 className={`group flex items-center gap-4 px-6 py-3 rounded-2xl border transition-all duration-300 transform hover:scale-105 cursor-pointer ${
-                  editingTag?.id === tag.id ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'bg-surfaceHigh/20 border-outline/10 text-text hover:bg-surfaceHigh/50 hover:border-primary/20'
+                  editingTag?.id === tag.id ? 'bg-primary border-primary text-background shadow-xl shadow-primary/20' : 'bg-surfaceHigh/20 border-outline/10 text-text hover:bg-surfaceHigh/50 hover:border-primary/20'
                 }`}
                 onClick={() => handleEdit(tag)}
               >
@@ -101,11 +101,11 @@ export const TagManager: React.FC<TagManagerProps> = ({
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-black tracking-tight">{tag.name}</span>
-                  <span className={`text-[9px] font-bold uppercase tracking-widest ${editingTag?.id === tag.id ? 'text-white/60' : 'text-textMuted/40'}`}>/{tag.slug}</span>
+                  <span className={`text-[9px] font-bold uppercase tracking-widest ${editingTag?.id === tag.id ? 'text-background/60' : 'text-textMuted/40'}`}>/{tag.slug}</span>
                 </div>
                 <button 
                   onClick={(e) => { e.stopPropagation(); onDelete(tag.slug); }}
-                  className={`p-1 rounded-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 ${editingTag?.id === tag.id ? 'text-white' : 'text-error'}`}
+                  className={`p-1 rounded-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 ${editingTag?.id === tag.id ? 'text-background' : 'text-error'}`}
                 >
                   <X size={14} />
                 </button>
@@ -129,33 +129,33 @@ export const TagManager: React.FC<TagManagerProps> = ({
         {/* Right Column: Manage Side (4 cols) */}
         <div className="lg:col-span-4 space-y-8">
           {(isAdding || editingTag) ? (
-            <div className="bg-text p-10 rounded-[3rem] text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
+            <div className="bg-text p-10 rounded-[3rem] text-background shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
                <div className="relative z-10 space-y-8">
                  <div className="flex justify-between items-center mb-8 pb-6 border-b border-white/10">
                    <h3 className="text-2xl font-headline font-black tracking-tight">{editingTag ? 'Modify Tag' : 'New Tag'}</h3>
-                   <button onClick={() => { setIsAdding(false); setEditingTag(null); }} className="text-white/40 hover:text-white transition-colors"><X size={24} /></button>
+                   <button onClick={() => { setIsAdding(false); setEditingTag(null); }} className="text-background/40 hover:text-background transition-colors"><X size={24} /></button>
                  </div>
                  <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="space-y-2 group">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/40 group-focus-within:text-white transition-colors">Tag Name</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-background/40 group-focus-within:text-background transition-colors">Tag Name</label>
                       <input 
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-white placeholder:text-white/10 transition-all font-medium" 
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/10 transition-all font-medium" 
                         placeholder="e.g. Artificial Intelligence" 
                         required
                       />
                     </div>
                     <div className="space-y-2 group">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/40 group-focus-within:text-white transition-colors">Permanent Link</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-background/40 group-focus-within:text-background transition-colors">Permanent Link</label>
                       <div className="relative">
-                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 font-bold text-sm">#</span>
+                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-background/20 font-bold text-sm">#</span>
                         <input 
                           name="slug"
                           value={formData.slug}
                           onChange={handleChange}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-white placeholder:text-white/10 transition-all font-medium" 
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/10 transition-all font-medium" 
                           placeholder="ai-trends" 
                           required
                         />

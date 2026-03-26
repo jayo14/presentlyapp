@@ -38,7 +38,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60" />
           {post.category?.name && (
-            <span className="absolute left-4 sm:left-6 top-4 sm:top-6 rounded-lg sm:rounded-xl bg-primary/90 backdrop-blur-md px-3 sm:px-4 py-1 sm:py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white shadow-lg sm:shadow-xl shadow-primary/20 transition-transform duration-500 group-hover:scale-105">
+            <span className="absolute left-4 sm:left-6 top-4 sm:top-6 rounded-lg sm:rounded-xl bg-primary/90 backdrop-blur-md px-3 sm:px-4 py-1 sm:py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-background shadow-lg sm:shadow-xl shadow-primary/20 transition-transform duration-500 group-hover:scale-105">
               {post.category.name}
             </span>
           )}
