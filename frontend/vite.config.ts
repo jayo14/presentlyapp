@@ -29,37 +29,27 @@ export default defineConfig(({ mode }) => {
         // Enable code splitting with careful control over chunks
         rollupOptions: {
           output: {
-            manualChunks(id) {
-              // Group React and animation libs together to avoid circular chunk dependencies.
-              if (
-                id.includes('node_modules/react/') ||
-                id.includes('node_modules/react-dom/') ||
-                id.includes('node_modules/framer-motion/') ||
-                id.includes('node_modules/next-themes/')
-              ) {
-                return 'vendor-react';
-              }
-              if (id.includes('node_modules/maplibre-gl')) {
-                return 'maplibre';
-              }
-              if (id.includes('node_modules/@mapbox/')) {
-                return 'mapbox-draw';
-              }
-              if (id.includes('node_modules/react-router')) {
-                return 'react-router';
-              }
-              if (id.includes('node_modules/@tanstack/')) {
-                return 'query-core';
-              }
-            },
+            manualChunks: {
+              'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+              'vendor-query': ['@tanstack/react-query'],
+              'vendor-ui': ['lucide-react', 'sonner', 'class-variance-authority', 'tailwind-merge', 'clsx'],
+              'vendor-map': ['maplibre-gl'],
+              'vendor-charts': ['recharts'],
+              'chunk-admin': ['./components/Admin/AdminDashboard'],
+              'chunk-auth': ['./components/Auth/Login', './components/Auth/Register', './components/Auth/Onboarding']
+            }
           },
         },
         // Optimize chunk size
-        chunkSizeWarningLimit: 1500,
-        // Terser with passes:2 + safari10 mangle was corrupting internal variable
-        // references inside these map libraries, causing "ReferenceError: e is not defined".
-        // Minification is currently disabled to ensure map components render properly.
-        minify: false,
+        chunkSizeWarningLimit: 600,
+        // Terser with specific configurations
+        minify: 'terser',
+        terserOptions: {
+          compress: {
+            drop_console: true,
+            drop_debugger: true,
+          },
+        },
         // Source maps for debugging (disable in production for performance)
         sourcemap: mode !== 'production',
         // Target modern browsers for smaller bundle size
