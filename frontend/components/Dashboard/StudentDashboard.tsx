@@ -112,12 +112,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 max-w-4xl mx-auto">
         
         {/* MOBILE GREETING */}
-        <header className="flex md:hidden justify-between items-center mb-2 px-2">
+        <header className="flex md:hidden justify-between items-center mb-6 px-4">
           <div className="flex flex-col">
             <span className="text-[10px] uppercase tracking-[0.2em] text-textMuted font-bold">
               {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
             </span>
-            <h2 className="font-headline text-2xl font-black text-text tracking-tight mt-1">Hello, {userName.split(' ')[0]} 👋</h2>
+            <h2 className="font-headline text-2xl font-bold text-text tracking-tight mt-1">Hello, {userName.split(' ')[0]} 👋</h2>
           </div>
           <div className="relative cursor-pointer" onClick={() => window.location.href='/dashboard/profile'}>
              <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-surfaceHigh p-0.5 bg-white shadow-sm">
@@ -190,8 +190,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                </div>
             </div>
             <div>
-              <span className="text-5xl font-headline font-black text-text tracking-tighter">{avgAttendance}%</span>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted mt-3">Avg. Attendance</p>
+              <span className="text-2xl font-semibold text-text tracking-tight">{avgAttendance}%</span>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted mt-1">Avg. Attendance</p>
             </div>
           </div>
 
@@ -203,8 +203,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                <button className="text-[10px] font-black text-primary underline underline-offset-4 decoration-2">VIEW ALL</button>
             </div>
             <div>
-              <span className="text-5xl font-headline font-black text-text tracking-tighter">{enrolledCourses.length}</span>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted mt-3">Active Courses</p>
+              <span className="text-2xl font-semibold text-text tracking-tight">{enrolledCourses.length}</span>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted mt-1">Active Courses</p>
             </div>
           </div>
         </section>

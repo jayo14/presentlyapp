@@ -444,6 +444,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
       {/* MOBILE SIDEBAR */}
       <div className={`fixed inset-y-0 left-0 w-[280px] bg-surface/70 backdrop-blur-[60px] text-foreground z-50 transform transition-transform duration-250 ease-out md:hidden flex flex-col border-r border-outline/20 shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Drag Handle */}
+        <div className="w-10 h-1 bg-outline/40 rounded-full mx-auto mt-2 mb-4" />
+        
         {/* Mobile Sidebar Header */}
         <div className="h-14 flex justify-between items-center px-4 border-b border-outline flex-shrink-0">
           <Logo className="text-text" />

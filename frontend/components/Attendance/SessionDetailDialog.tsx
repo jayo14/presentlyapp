@@ -79,11 +79,11 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       <div 
         {...modalProps}
         aria-labelledby="dialog-title"
-        className="bg-background text-text border border-outline rounded-3xl w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] outline-none relative overflow-hidden"
+        className="bg-background text-text border border-outline rounded-3xl w-[calc(100vw-32px)] sm:max-w-lg shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] outline-none relative overflow-hidden"
       >
         {/* End Session Confirmation Overlay */}
         {showEndConfirmation && (
@@ -129,8 +129,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
             </h3>
             <p className="text-xs sm:text-sm text-textMuted mt-1 truncate">{session.course_name} ({session.course_code})</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-surfaceLow rounded-full transition-colors flex-shrink-0" aria-label="Close dialog">
-            <X size={20} />
+          <button 
+            onClick={onClose} 
+            className="absolute top-4 right-4 p-1.5 rounded-md text-textMuted hover:text-text hover:bg-surfaceHigh transition-colors" 
+            aria-label="Close"
+          >
+            <X size={16} />
           </button>
         </div>
 

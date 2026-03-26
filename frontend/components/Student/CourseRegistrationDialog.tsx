@@ -92,13 +92,13 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6 bg-text/40 backdrop-blur-sm animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
       <motion.div
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="bg-white dark:bg-surface w-full max-w-2xl h-[92vh] md:h-auto md:max-h-[85vh] rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
+        className="bg-white dark:bg-surface w-[calc(100vw-32px)] sm:max-w-lg h-[92vh] md:h-auto md:max-h-[85vh] rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
       >
         {/* Mobile Drag Handle */}
         <div className="w-12 h-1.5 bg-outline/20 rounded-full mx-auto mt-4 md:hidden" />
@@ -109,7 +109,8 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
             <h2 className="text-3xl font-headline font-black text-text tracking-tight uppercase tracking-widest">Register Courses</h2>
             <button 
               onClick={onClose}
-              className="w-10 h-10 rounded-full bg-surfaceHigh/50 flex items-center justify-center text-textMuted hover:bg-surfaceHigh transition-colors"
+              className="absolute top-8 right-8 w-10 h-10 rounded-full bg-surfaceHigh/50 flex items-center justify-center text-textMuted hover:text-text hover:bg-surfaceHigh transition-colors"
+              aria-label="Close"
             >
               <X size={20} strokeWidth={3} />
             </button>
