@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
               'vendor-ui': ['lucide-react', 'sonner', 'class-variance-authority', 'tailwind-merge', 'clsx'],
               'vendor-map': ['maplibre-gl'],
               'vendor-charts': ['recharts'],
-              'chunk-admin': ['./components/Admin/AdminDashboard'],
+              'chunk-admin': ['./components/Dashboard/AdminDashboard'],
               'chunk-auth': ['./components/Auth/Login', './components/Auth/Register', './components/Auth/Onboarding']
             }
           },
