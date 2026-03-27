@@ -30,9 +30,8 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           output: {
             manualChunks: {
-              'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+              'vendor-core': ['react', 'react-dom', 'react-router-dom', 'lucide-react', 'sonner', 'class-variance-authority', 'tailwind-merge', 'clsx'],
               'vendor-query': ['@tanstack/react-query'],
-              'vendor-ui': ['lucide-react', 'sonner', 'class-variance-authority', 'tailwind-merge', 'clsx'],
               'vendor-map': ['maplibre-gl'],
               'vendor-charts': ['recharts'],
               'chunk-admin': ['./components/Dashboard/AdminDashboard'],
@@ -74,7 +73,6 @@ export default defineConfig(({ mode }) => {
           'lucide-react',
           'maplibre-gl',
           '@mapbox/mapbox-gl-draw',
-          'react-icons',
           'framer-motion',
           'next-themes',
           'react-helmet-async',
