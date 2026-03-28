@@ -255,7 +255,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             label: 'Other',
             items: [
               { id: 'notifications', icon: Bell, label: 'Notifications' },
-              { id: 'profile', icon: User, label: 'Profile' },
             ],
           },
         ];
@@ -277,7 +276,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
 
   // Common items (settings, profile, security) for all roles
   const commonItems = [
-    { id: 'profile', icon: User, label: 'Profile' },
     { id: 'security', icon: ShieldAlert, label: 'Security' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
