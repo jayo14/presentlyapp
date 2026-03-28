@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ArrowLeft, Share2, Settings, Bell, HelpCircle, LogOut, ChevronRight, Loader,
   BookOpen, Calendar, PlusCircle, Edit, User, Mail, Phone, MapPin, Award, TrendingUp,
-  Clock, CheckCircle, Camera, FileText, Upload
+  Clock, CheckCircle, Camera, FileText, Upload, Building2
 } from 'lucide-react';
 import { dashboardApi } from '../../services/api/dashboard';
 import { useNavigate } from 'react-router-dom';
@@ -50,8 +50,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     .join('') || 'U';
   const userRole = user?.role || propUserRole || UserRole.STUDENT;
   const userRoleDisplay = userRole === UserRole.LECTURER 
-    ? 'Senior Lecturer - Computer Science' 
-    : user?.department || 'Computer Science';
+    ? `Senior Lecturer - ${user?.department_name || 'Academic'}` 
+    : user?.department_name || user?.department || 'Computer Science';
   
   // Mock stats - in real app, these would come from API
   const stats = {
@@ -234,14 +234,25 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
             </div>
           )}
-          {user?.department && (
+          {user?.department_name && (
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <MapPin size={18} className="text-primary" />
               </div>
               <div className="flex-1">
                 <p className="text-xs text-textMuted">Department</p>
-                <p className="text-sm text-text font-medium">{user.department}</p>
+                <p className="text-sm text-text font-medium">{user.department_name}</p>
+              </div>
+            </div>
+          )}
+          {user?.college_name && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Building2 size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-textMuted">College</p>
+                <p className="text-sm text-text font-medium">{user.college_name}</p>
               </div>
             </div>
           )}
@@ -490,14 +501,25 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
             </div>
           )}
-          {user?.department && (
+          {user?.department_name && (
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <MapPin size={18} className="text-primary" />
               </div>
               <div className="flex-1">
                 <p className="text-xs text-textMuted">Department</p>
-                <p className="text-sm text-primary font-medium">{user.department}</p>
+                <p className="text-sm text-primary font-medium">{user.department_name}</p>
+              </div>
+            </div>
+          )}
+          {user?.college_name && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Building2 size={18} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-textMuted">College</p>
+                <p className="text-sm text-primary font-medium">{user.college_name}</p>
               </div>
             </div>
           )}

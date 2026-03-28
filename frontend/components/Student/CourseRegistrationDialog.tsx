@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, BookOpen, Check, Loader2, AlertCircle, ChevronRight, LayoutGrid, Info } from 'lucide-react';
+import { X, Search, BookOpen, Check, Loader2, AlertCircle, ChevronRight, GraduationCap, LayoutGrid, Info, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { studentApi, AvailableCourse } from '../../services/api/student';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -43,7 +43,6 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
       setError(null);
       const data = await studentApi.getAvailableCourses();
       setCourses(data);
-      // Initialize enrolled set
       const alreadyEnrolled = data.filter(c => !c.can_enroll).map(c => c.id);
       setEnrolledIds(new Set(alreadyEnrolled));
     } catch (err: any) {
