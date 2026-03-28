@@ -1,0 +1,2 @@
+INFO: DEBUG=True; using console email backend.
+System check identified no issues (0 silenced).
