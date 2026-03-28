@@ -217,57 +217,76 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
         {/* UP NEXT SECTION */}
         <section className="space-y-6 px-2">
-          <div className="flex justify-between items-end px-2">
-            <h4 className="text-[11px] font-black tracking-[0.25em] text-textMuted/80 uppercase font-headline">Mission Schedule</h4>
+          <div className="flex justify-between items-end px-4">
+            <h4 className="text-[11px] font-black tracking-[0.25em] text-textMuted/60 uppercase font-headline">Intelligence Feed / Today</h4>
             <button className="text-[11px] font-black text-primary hover:text-primaryContainer transition-colors" onClick={() => window.location.href='/dashboard/timetable'}>FULL TIMETABLE</button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {nextClass ? (
-              <div className="bg-white dark:bg-surfaceContainer/5 p-6 rounded-[2.5rem] flex items-center gap-6 shadow-sm border border-outline/5 hover:border-primary/30 transition-all cursor-pointer group">
-                <div className="w-16 h-16 rounded-2xl bg-surfaceContainer/50 flex items-center justify-center text-primary shadow-inner group-hover:bg-primary/10 transition-all duration-500">
-                  <Clock size={28} strokeWidth={2.5} />
+              <div className="bg-white dark:bg-surface border border-outline/10 p-8 rounded-[3rem] flex items-center gap-8 shadow-sm hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors duration-700" />
+                <div className="w-20 h-20 rounded-[2rem] bg-surfaceLow flex items-center justify-center text-primary shadow-inner group-hover:scale-110 transition-transform duration-500 flex-shrink-0">
+                  <Clock size={32} strokeWidth={2.5} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-black text-textMuted tracking-widest uppercase mb-1.5">{nextClass.start_time} — {(nextClass as any).end_time ?? ''}</p>
-                  <h5 className="font-headline font-black text-text text-xl tracking-tight truncate group-hover:text-primary transition-colors">
+                <div className="flex-1 min-w-0 flex flex-col gap-1">
+                  <div className="flex items-center gap-3">
+                    <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black tracking-widest uppercase rounded-full border border-primary/20">Active Now</span>
+                    <p className="text-[10px] font-black text-textMuted tracking-widest uppercase">{nextClass.start_time} — START</p>
+                  </div>
+                  <h5 className="font-headline font-black text-text text-2xl tracking-tighter truncate group-hover:text-primary transition-colors">
                     {nextClass.course_code}: {nextClass.course_name}
                   </h5>
-                  <div className="flex items-center gap-3 mt-1.5 text-[11px] font-bold text-textMuted/70">
-                     <span className="flex items-center gap-1.5"><MapPin size={14} /> {nextClass.venue_name}</span>
+                  <div className="flex items-center gap-4 mt-1 text-xs font-bold text-textMuted/60">
+                     <span className="flex items-center gap-2"><MapPin size={16} className="text-primary/60" /> {nextClass.venue_name}</span>
+                     <span className="flex items-center gap-2 text-textMuted/40">Reference: CS-{nextClass.id}</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-surfaceHigh/40 text-textMuted group-hover:bg-primary group-hover:text-background group-hover:translate-x-1 transition-all">
-                   <ChevronRight size={20} />
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-surfaceHigh/40 text-textMuted group-hover:bg-primary group-hover:text-background group-hover:translate-x-1 transition-all">
+                   <ChevronRight size={24} />
                 </div>
               </div>
             ) : (
-              <div className="col-span-full py-20 flex flex-col items-center justify-center bg-surfaceHigh/20 rounded-[3rem] border-2 border-dashed border-outline/20 px-6 text-center">
-                 <div className="w-20 h-20 rounded-full bg-surfaceContainer flex items-center justify-center mb-6 text-textMuted/40">
-                    <Calendar className="w-10 h-10" />
+              <div className="py-16 flex flex-col items-center justify-center bg-surfaceLow/30 rounded-[3rem] border-2 border-dashed border-outline/10 px-8 text-center animate-in fade-in zoom-in duration-1000">
+                 <div className="w-24 h-24 rounded-full bg-surfaceContainer/50 flex items-center justify-center mb-6 text-primary shadow-inner">
+                    <CheckCircle2 className="w-12 h-12" />
                  </div>
-                 <h5 className="font-headline font-black text-text text-lg tracking-tight mb-2">Daily mission accomplished</h5>
-                 <p className="font-medium text-textMuted/80 text-sm max-w-xs">No scheduled classes remaining for today. Enjoy your rest, commander.</p>
-                 <button className="mt-8 px-8 py-3 bg-white dark:bg-surface text-text font-black text-xs rounded-2xl border border-outline/30 shadow-sm hover:shadow-md transition-all active:scale-95" onClick={() => setIsRegistrationOpen(true)}>REGISTER NEW MODULES</button>
+                 <h5 className="font-headline font-black text-text text-2xl tracking-tight mb-3">Today's Missions Accomplished</h5>
+                 <p className="font-medium text-textMuted/80 text-base max-w-sm mx-auto leading-relaxed">You've successfully addressed all scheduled sessions for today. Enjoy your downtime, commander.</p>
+                 
+                 <div className="mt-10 p-6 bg-white dark:bg-surface rounded-[2.5rem] border border-outline/10 w-full max-w-md flex items-center justify-between gap-4">
+                    <div className="text-left">
+                       <p className="text-[10px] font-black text-primary uppercase tracking-widest">Expansion Protocol</p>
+                       <p className="text-sm font-bold text-text">Register New Curriculum</p>
+                    </div>
+                    <button 
+                      onClick={() => setIsRegistrationOpen(true)}
+                      className="h-14 px-8 bg-text text-background font-black text-xs rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/10"
+                    >
+                      ENROLL NOW
+                    </button>
+                 </div>
               </div>
             )}
+            
+            {/* Marked Sessions / Today's History */}
+            {dashboardData.recent_activity.filter(a => a.type === 'attendance').slice(0, 2).map(activity => (
+              <div key={activity.id} className="bg-surfaceLow/20 border border-outline/5 p-6 rounded-[2.5rem] flex items-center gap-6 opacity-60 hover:opacity-100 transition-opacity">
+                 <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center text-green-500">
+                    <CheckCircle2 size={24} />
+                 </div>
+                 <div className="flex-1">
+                    <p className="text-[10px] font-black text-textMuted tracking-widest uppercase mb-1">Session Marked • {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    <h5 className="font-headline font-bold text-text text-lg tracking-tight">
+                      {activity.course_code}: {activity.course_name}
+                    </h5>
+                 </div>
+                 <div className="px-4 py-1.5 bg-green-500/10 text-green-500 rounded-full text-[10px] font-black uppercase tracking-widest">
+                    Present
+                 </div>
+              </div>
+            ))}
           </div>
-        </section>
-
-        {/* QUICK REGISTER CTA */}
-        <section className="px-2 pb-20">
-           <div 
-             onClick={() => setIsRegistrationOpen(true)}
-             className="bg-primary/[0.03] hover:bg-primary/[0.06] border-2 border-dashed border-primary/20 rounded-[3rem] p-10 flex flex-col items-center justify-center gap-6 transition-all group cursor-pointer"
-           >
-              <div className="w-16 h-16 rounded-full bg-white dark:bg-surface flex items-center justify-center text-primary shadow-[0_12px_24px_rgba(0,0,0,0.08)] group-hover:scale-110 group-hover:rotate-90 transition-all duration-500">
-                 <Plus size={32} strokeWidth={3} />
-              </div>
-              <div className="text-center">
-                 <h4 className="font-headline font-black text-text text-2xl tracking-tight">Add New Courses</h4>
-                 <p className="text-sm font-medium text-textMuted mt-1.5 max-w-xs mx-auto">Expand your academic curriculum by enrolling in more department modules.</p>
-              </div>
-           </div>
         </section>
 
         {/* Modals */}
