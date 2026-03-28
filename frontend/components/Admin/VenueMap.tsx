@@ -600,10 +600,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     const map = new maplibregl.Map({
       container: container,
-      style: `https://tiles.basemaps.cartocdn.com/gl/${mapType === 'road' ? 'voyager-gl-style' : 'positron-gl-style'}/style.json`,
+      style: mapType === 'satellite' ? SATELLITE_STYLE : ROAD_STYLE,
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
-      trackResize: true,
     });
 
     map.addControl(new maplibregl.NavigationControl(), 'top-left');
@@ -993,11 +992,10 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className="relative w-full h-full min-h-inherit bg-zinc-50 dark:bg-zinc-950 overflow-hidden group">
+    <div className="relative w-full h-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden group">
       <div 
         ref={mapContainerRef} 
         className="absolute inset-0 w-full h-full" 
-        style={{ position: 'absolute', inset: 0 }} 
       />
 
       {/* Real-time Compass UI Overlay */}
