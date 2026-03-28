@@ -578,9 +578,7 @@ def verify_email_otp_view(request):
             'error': 'User not found'
         }, status=status.HTTP_404_NOT_FOUND)
 
-                )
- 
-            return Response({
+
 
 def calculate_travel_speed(lat1, lon1, time1, lat2, lon2, time2):
     """Calculate speed in km/h between two points in time"""
