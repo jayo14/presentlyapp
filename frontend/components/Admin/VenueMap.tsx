@@ -588,16 +588,22 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       });
     }
   }, []);
-
   // Initialise map once
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    const container = mapContainerRef.current;
+    if (!container) return;
+
+    // Force container sizing on init
+    if (container.clientHeight === 0) {
+      container.style.height = '100%';
+    }
 
     const map = new maplibregl.Map({
-      container: mapContainerRef.current,
-      style: ROAD_STYLE,
+      container: container,
+      style: `https://tiles.basemaps.cartocdn.com/gl/${mapType === 'road' ? 'voyager-gl-style' : 'positron-gl-style'}/style.json`,
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
+      trackResize: true,
     });
 
     map.addControl(new maplibregl.NavigationControl(), 'top-left');
@@ -987,8 +993,12 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className="relative w-full h-full min-h-[400px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group">
-      <div ref={mapContainerRef} className="absolute inset-0" />
+    <div className="relative w-full h-full min-h-inherit bg-zinc-50 dark:bg-zinc-950 overflow-hidden group">
+      <div 
+        ref={mapContainerRef} 
+        className="absolute inset-0 w-full h-full" 
+        style={{ position: 'absolute', inset: 0 }} 
+      />
 
       {/* Real-time Compass UI Overlay */}
       {showCompass && heading !== null && (
@@ -1208,6 +1218,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
         .user-location-marker {
           position: relative;
+        }
+        /* Enforce MapLibre canvas size */
+        canvas.maplibregl-canvas {
+          position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
         }
         .user-accuracy-circle {
           background-color: rgba(168, 85, 247, 0.15);
