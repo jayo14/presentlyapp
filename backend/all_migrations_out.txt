@@ -1,0 +1,100 @@
+INFO: DEBUG=True; using console email backend.
+accounts
+ [X] 0001_initial
+ [X] 0002_alter_userdevice_unique_together_and_more
+ [X] 0003_remove_userdevice_user_device_user_id_f2bc4d_idx_and_more
+admin
+ [X] 0001_initial
+ [X] 0002_logentry_remove_auto_add
+ [X] 0003_logentry_add_action_flag_choices
+analytics
+ (no migrations)
+attendance
+ [X] 0001_initial
+ [X] 0002_add_drift_avg_to_attemptlog
+ [X] 0003_attendanceattemptlog_device_id_and_more
+ [X] 0004_attendanceattemptlog_ip_city_and_more
+ [X] 0005_add_submission_and_record_models
+auth
+ [X] 0001_initial
+ [X] 0002_alter_permission_name_max_length
+ [X] 0003_alter_user_email_max_length
+ [X] 0004_alter_user_username_opts
+ [X] 0005_alter_user_last_login_null
+ [X] 0006_require_contenttypes_0002
+ [X] 0007_alter_validators_add_error_messages
+ [X] 0008_alter_user_username_max_length
+ [X] 0009_alter_user_last_name_max_length
+ [X] 0010_alter_group_name_max_length
+ [X] 0011_update_proxy_permissions
+ [X] 0012_alter_user_first_name_max_length
+blog
+ [X] 0001_initial
+contenttypes
+ [X] 0001_initial
+ [X] 0002_remove_content_type_name
+exam_clearance
+ [X] 0001_initial
+fcm_django
+ [X] 0001_initial
+ [X] 0002_auto_20160808_1645
+ [X] 0003_auto_20170313_1314
+ [X] 0004_auto_20181128_1642
+ [X] 0005_auto_20170808_1145
+ [X] 0006_auto_20210802_1140
+ [X] 0007_auto_20211001_1440
+ [X] 0008_auto_20211224_1205
+ [X] 0009_alter_fcmdevice_user
+ [X] 0010_unique_registration_id
+ [X] 0011_fcmdevice_fcm_django_registration_id_user_id_idx
+institutions
+ [X] 0001_initial
+ [X] 0002_user_email_verified_user_email_verified_at_and_more
+ [X] 0003_create_groups
+ [X] 0004_attendancesession_description_and_more
+ [X] 0005_attendance_distance_from_venue_attendance_elevation_and_more
+ [X] 0006_courseenrollment_alter_user_options_and_more
+ [X] 0007_remove_course_courses_departm_7bab3f_idx_and_more
+ [X] 0008_alter_attendance_distance_from_venue
+ [X] 0009_user_cover_image_user_profile_image
+ [X] 0010_convert_gis_to_regular_fields
+ [X] 0011_sync_model_state
+ [X] 0012_user_signup_method
+ [X] 0013_auditlog
+ [X] 0014_attendance_accuracy_attendancesession_accuracy
+ [X] 0015_alter_attendancesession_qr_code_url_and_more
+ [X] 0016_add_venue_display_fields
+ [X] 0017_alter_attendance_status
+ [X] 0018_attendance_trust_score_and_more
+ [X] 0019_user_signature_image
+ [X] 0020_attendancesession_invalidation_reason_and_more
+ [X] 0021_add_gps_validation_fields_to_session
+ [X] 0022_seed_lasustech_colleges
+ [X] 0023_seed_lasustech_departments
+ [X] 0024_alter_user_department
+ [X] 0025_fix_department_column_sql
+ [X] 0026_ensure_department_fk
+ [X] 0027_rbac_staff_management
+ [X] 0028_rename_rbac_permis_codename_4ade64_idx_rbac_permis_codenam_64fe17_idx_and_more
+notifications
+ [X] 0001_initial
+reports
+ [X] 0001_initial
+sessions
+ [X] 0001_initial
+system
+ [X] 0001_initial
+ [X] 0002_featureflag
+token_blacklist
+ [X] 0001_initial
+ [X] 0002_outstandingtoken_jti_hex
+ [X] 0003_auto_20171017_2007
+ [X] 0004_auto_20171017_2013
+ [X] 0005_remove_outstandingtoken_jti
+ [X] 0006_auto_20171017_2113
+ [X] 0007_auto_20171017_2214
+ [X] 0008_migrate_to_bigautofield
+ [X] 0010_fix_migrate_to_bigautofield
+ [X] 0011_linearizes_history
+ [X] 0012_alter_outstandingtoken_user
+ [X] 0013_alter_blacklistedtoken_options_and_more
