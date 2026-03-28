@@ -243,7 +243,14 @@ else:
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://*.app.github.dev",
+    "https://getpresently.com.ng",
+    "https://www.getpresently.com.ng",
 ]
+
+# Security Settings for Proxy (Render)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 
 CORS_ALLOWED_METHODS = [
     'DELETE',
