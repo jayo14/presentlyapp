@@ -4,9 +4,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChevronLeft, Mail, CheckCircle, MailCheck } from 'lucide-react-native';
+import { ChevronLeft, Mail, CheckCircle, MailCheck, ClipboardPaste as ClipboardIcon } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { Button } from '@/components/Button';
+import * as Clipboard from 'expo-clipboard';
+
 
 export default function VerifyEmailScreen() {
   const router = useRouter();
@@ -60,6 +62,26 @@ export default function VerifyEmailScreen() {
 
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePaste = async () => {
+    try {
+      const clipboardContent = await Clipboard.getStringAsync();
+      const pastedData = clipboardContent.replace(/\D/g, '').slice(0, 6);
+      if (pastedData.length > 0) {
+        const newOtp = [...otp];
+        pastedData.split('').forEach((digit, i) => {
+          if (i < 6) newOtp[i] = digit;
+        });
+        setOtp(newOtp);
+        const nextIndex = Math.min(pastedData.length, 5);
+        inputRefs.current[nextIndex]?.focus();
+      } else {
+        Alert.alert('Invalid Code', 'No valid numbers found in clipboard.');
+      }
+    } catch (e) {
+      console.log('Paste error', e);
     }
   };
 
@@ -158,6 +180,15 @@ export default function VerifyEmailScreen() {
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           We sent a code to your registered device.
         </Text>
+
+        <TouchableOpacity 
+          style={[styles.pasteButton, { backgroundColor: colors.surfaceHigh }]} 
+          onPress={handlePaste}
+          activeOpacity={0.7}
+        >
+          <ClipboardIcon size={16} color={colors.text} />
+          <Text style={[styles.pasteButtonText, { color: colors.text }]}>Paste Code</Text>
+        </TouchableOpacity>
 
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
@@ -320,6 +351,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 40,
     opacity: 0.6,
+  },
+  pasteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginBottom: 24,
+  },
+  pasteButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.lexend.medium,
   },
   otpContainer: {
     flexDirection: 'row',
