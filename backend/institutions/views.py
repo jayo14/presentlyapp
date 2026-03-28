@@ -597,8 +597,6 @@ def calculate_travel_speed(lat1, lon1, time1, lat2, lon2, time2):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
-@ratelimit(key='post:email', rate='5/m', method='POST', block=True)
 def login_view(request):
     """User login with device recognition and anomaly detection"""
     serializer = UserLoginSerializer(data=request.data, context={'request': request})
