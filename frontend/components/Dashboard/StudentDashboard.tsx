@@ -1,5 +1,10 @@
-import React, { useState, useEffect, lazy } from 'react';
-import { QrCode, BookOpen, Clock, AlertCircle, TrendingUp, Calendar, Plus, MapPin, ChevronRight, Activity, Loader2, User, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  QrCode, BookOpen, Clock, AlertCircle, TrendingUp, 
+  Calendar, Plus, MapPin, ChevronRight, Activity, 
+  Loader2, User, RefreshCw, CheckCircle2, Search,
+  GraduationCap, LayoutGrid, Timer, BellRing
+} from 'lucide-react';
 import { SkeletonStudentDashboard } from '../Skeleton';
 import { SEO } from '../SEO';
 import { studentApi, StudentDashboardData } from '../../services/api/student';
@@ -7,6 +12,7 @@ import { sessionApi } from '../../services/api/attendance';
 import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScanner';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 import { useCurrentUser } from '../../hooks/useAuth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface StudentDashboardProps {
   userName: string;

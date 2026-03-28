@@ -50,6 +50,7 @@ export interface UserProfile {
   phone?: string;
   matric_number?: string;
   department?: string;
+  department_name?: string;
   level?: string;
   staff_id?: string;
   courses?: string;

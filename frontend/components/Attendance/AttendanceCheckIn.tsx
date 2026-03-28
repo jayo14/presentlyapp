@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Loader, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Loader2, CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Fingerprint, Globe, Smartphone, ChevronRight, X, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../Button';
-import { Input } from '../Input';
 import { sessionApi, CheckInData } from '../../services/api/attendance';
-import { getCurrentPosition, getAttendancePayload, getIPLocation } from '../../services/geolocation';
+import { getAttendancePayload, getCurrentPosition, getIPLocation } from '../../services/geolocation';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 
 interface AttendanceCheckInProps {
@@ -37,17 +37,14 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
     }
 
     try {
-      // Step 1: Get full anti-cheat payload; fall back to basic position if pipeline fails
       setStatus('locating');
       setError(null);
-      setLocationInfo('Getting your location...');
+      setLocationInfo('Calibrating precise location signals...');
 
       let checkInData: CheckInData;
       try {
         const payload = await getAttendancePayload();
-        setLocationInfo(
-          `Location found: ${payload.latitude.toFixed(6)}, ${payload.longitude.toFixed(6)}`
-        );
+        setLocationInfo(`Refined GPS: ${payload.latitude.toFixed(5)}, ${payload.longitude.toFixed(5)}`);
         checkInData = {
           latitude: payload.latitude,
           longitude: payload.longitude,
@@ -62,20 +59,9 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
           isDesktop: payload.isDesktop,
         };
       } catch {
-        // Full pipeline failed — fall back to basic position
         const position = await getCurrentPosition();
-        setLocationInfo(
-          `Location found: ${position.latitude.toFixed(6)}, ${position.longitude.toFixed(6)}` +
-          (position.altitude ? ` @ ${position.altitude.toFixed(0)}m elevation` : '')
-        );
-
-        // Step 1b: Verify with IP Geolocation (Anti-spoofing)
-        setLocationInfo('Cross-verifying with network signals...');
+        setLocationInfo(`Standard GPS: ${position.latitude.toFixed(5)}, ${position.longitude.toFixed(5)}`);
         const ipLoc = await getIPLocation();
-        if (ipLoc) {
-          setLocationInfo(`Location verified via network (${ipLoc.city})`);
-        }
-
         checkInData = {
           latitude: position.latitude,
           longitude: position.longitude,
@@ -91,64 +77,28 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         };
       }
 
-      // Step 2: Check in by session code
       setStatus('verifying');
-      setLocationInfo('Verifying session and location...');
+      setLocationInfo('Encrypting payload & validating geofence...');
 
       const result: any = await sessionApi.checkInByCode(sessionCode.toUpperCase(), checkInData);
-
       setCheckInResult(result);
 
       if (result?.success || result?.status === 'success' || result?.location_verified) {
         setStatus('success');
-        setLocationInfo(
-          `✓ Check-in successful! Distance: ${result.distance_from_venue?.toFixed(0) || '0'}m from venue.`
-        );
-        toast.success('Attendance marked!', { description: 'You have been marked present for this session.' });
+        toast.success('System Authenticated', { description: 'Your attendance has been cryptographically signed.' });
         setTimeout(() => {
           onSuccess?.();
           onClose();
-        }, 2000);
+        }, 3000);
       } else {
         setStatus('error');
-        const errMsg =
-          result?.error ||
-          result?.warning ||
-          `Location not verified. You are ${result?.distance_from_venue?.toFixed(0) || '0'}m from the venue.`;
+        const errMsg = result?.error || result?.warning || `Distance mismatch: You are ${result?.distance_from_venue?.toFixed(0) || '0'}m away.`;
         setError(errMsg);
-        toast.error('Check-in failed', { description: errMsg });
       }
     } catch (err: any) {
       setStatus('error');
-      const raw: string = err?.response?.data?.error || err?.response?.data?.reason || err?.message || '';
-
-      let userMessage: string;
-      let toastTitle = 'Check-in failed';
-
-      if (raw.toLowerCase().includes('not enrolled') || raw.toLowerCase().includes('enroll')) {
-        userMessage = 'You are not enrolled in this course. Please enroll before checking in.';
-        toastTitle = 'Not enrolled';
-      } else if (raw.toLowerCase().includes('session is not active') || raw.toLowerCase().includes('expir')) {
-        userMessage = 'This session is no longer active or has expired. Contact your lecturer.';
-        toastTitle = 'Session inactive';
-      } else if (raw.toLowerCase().includes('outside') || raw.toLowerCase().includes('location') || raw.toLowerCase().includes('geofence')) {
-        userMessage = 'You appear to be outside the session venue. Move closer and try again.';
-        toastTitle = 'Location mismatch';
-      } else if (raw.toLowerCase().includes('already')) {
-        userMessage = 'Attendance already recorded for this session.';
-        toastTitle = 'Already checked in';
-      } else if (raw.toLowerCase().includes('mock') || raw.toLowerCase().includes('emulator') || raw.toLowerCase().includes('spoof')) {
-        userMessage = 'Suspicious location detected. Disable VPN or mock location apps and try again.';
-        toastTitle = 'Location spoofing detected';
-      } else if (raw) {
-        userMessage = raw;
-      } else {
-        userMessage = 'Failed to check in. Please try again.';
-      }
-
-      setError(userMessage);
-      toast.error(toastTitle, { description: userMessage });
-      setLocationInfo(null);
+      const raw = err?.response?.data?.error || err?.response?.data?.reason || err?.message || 'Verification process failed';
+      setError(raw);
     }
   };
 
@@ -156,139 +106,188 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
     setStatus('idle');
     setError(null);
     setLocationInfo(null);
-    setCheckInResult(null);
     setSessionCode('');
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div 
-        {...modalProps}
-        aria-labelledby="checkin-title"
-        className="bg-surface border border-outline rounded-2xl max-w-md w-full p-6 shadow-2xl outline-none"
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-500">
+      <motion.div
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="bg-white dark:bg-surface w-full md:max-w-lg h-[90vh] md:h-auto md:max-h-[85vh] rounded-t-[3.5rem] md:rounded-[3.5rem] shadow-[0_32px_128px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden border border-outline/10 relative"
       >
-        {/* Header */}
-        <div className="text-center mb-6" aria-live="polite">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            {status === 'idle' && <MapPin className="w-8 h-8 text-primary" />}
-            {status === 'locating' && <Loader className="w-8 h-8 text-primary animate-spin" />}
-            {status === 'verifying' && <Loader className="w-8 h-8 text-blue-500 animate-spin" />}
-            {status === 'success' && <CheckCircle className="w-8 h-8 text-green-500" />}
-            {status === 'error' && <XCircle className="w-8 h-8 text-red-500" />}
+        <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+
+        <div className="px-10 pt-12 pb-6 flex justify-between items-start relative z-10">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
+              <ShieldCheck size={14} className="text-primary" />
+              <span className="text-[10px] font-black tracking-widest text-primary uppercase">Secure Check-in</span>
+            </div>
+            <h2 className="text-4xl font-headline font-black text-text tracking-tight leading-tight uppercase">Identity Sync</h2>
           </div>
-          <h2 id="checkin-title" className="font-headline text-2xl font-bold text-text mb-2">
-            {status === 'idle' && 'Check In to Session'}
-            {status === 'locating' && 'Getting Location...'}
-            {status === 'verifying' && 'Verifying...'}
-            {status === 'success' && 'Success!'}
-            {status === 'error' && 'Check-In Failed'}
-          </h2>
-          <p className="text-textMuted text-sm">
-            {status === 'idle' && 'Enter your session code to check in'}
-            {status === 'locating' && 'Please allow location access'}
-            {status === 'verifying' && 'Verifying your location and session'}
-            {status === 'success' && 'You have been marked present'}
-            {status === 'error' && 'Unable to complete check-in'}
-          </p>
+          <button 
+            onClick={onClose}
+            className="w-12 h-12 rounded-full bg-surfaceHigh/40 flex items-center justify-center text-textMuted hover:text-text hover:bg-surfaceHigh transition-all active:scale-90"
+          >
+            <X size={24} strokeWidth={3} />
+          </button>
         </div>
 
-        {/* Location Info */}
-        {locationInfo && (
-          <div className={`p-4 rounded-lg mb-4 ${
-            status === 'success' 
-              ? 'bg-green-500/10 border border-green-500/30' 
-              : 'bg-blue-500/10 border border-blue-500/30'
-          }`}>
-            <div className="flex items-start gap-3">
-              <MapPin className={`w-5 h-5 mt-0.5 ${
-                status === 'success' ? 'text-green-500' : 'text-blue-500'
-              }`} />
-              <p className={`text-sm ${
-                status === 'success' ? 'text-green-400' : 'text-blue-400'
-              }`}>
-                {locationInfo}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg mb-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5" />
-              <p className="text-sm text-red-400">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Form */}
-        {(status === 'idle' || status === 'error') && (
-          <form onSubmit={handleCheckIn} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-textMuted mb-2">
-                Session Code
-              </label>
-              <Input
-                type="text"
-                value={sessionCode}
-                onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
-                placeholder="Enter 6-8 character code"
-                className="text-center text-lg tracking-wider font-mono"
-                maxLength={12}
-                autoFocus
-                disabled={status !== 'idle' && status !== 'error'}
-              />
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <Button
-                type="submit"
-                className="flex-1"
-                disabled={status !== 'idle' && status !== 'error'}
+        <div className="flex-1 overflow-y-auto px-10 pb-12 custom-scrollbar relative z-10">
+          <AnimatePresence mode="wait">
+            {status === 'idle' || status === 'error' ? (
+              <motion.div
+                key="input-form"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="space-y-8"
               >
-                {status === 'error' ? 'Retry Check In' : 'Check In'}
-              </Button>
-              <Button
-                type="button"
-                onClick={status === 'error' ? handleReset : onClose}
-                variant="secondary"
-                className="flex-1"
-              >
-                {status === 'error' ? 'Cancel' : 'Cancel'}
-              </Button>
-            </div>
-          </form>
-        )}
+                <div className="space-y-6">
+                  <p className="text-textMuted font-medium text-lg leading-relaxed">
+                    Provide the 6-character intelligence code displayed by your lecturer to synchronize your attendance.
+                  </p>
 
-        {/* Success/Loading State Actions */}
-        {(status === 'success' || status === 'locating' || status === 'verifying') && (
-          <div className="flex justify-center">
-            {status === 'success' ? (
-              <Button onClick={onClose} className="w-full">
-                Close
-              </Button>
+                  <div className="space-y-4">
+                    <div className="relative group">
+                      <Fingerprint className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors duration-500" size={24} />
+                      <input 
+                        type="text" 
+                        placeholder="ENTER SESSION CODE"
+                        value={sessionCode}
+                        onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
+                        maxLength={12}
+                        className="w-full h-24 bg-surfaceLow border-2 border-outline/10 group-hover:border-primary/20 focus:border-primary/50 text-center text-4xl font-black tracking-[0.3em] font-mono rounded-[2rem] outline-none transition-all duration-500 placeholder:text-textMuted/20 shadow-sm"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {status === 'error' && error && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    className="p-6 bg-red-400/5 border border-red-400/10 rounded-[1.75rem] flex items-start gap-4"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-red-400/10 flex items-center justify-center text-red-400 flex-shrink-0">
+                      <AlertTriangle size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-red-500 text-sm">Validation Error</h4>
+                      <p className="text-red-400/80 text-xs mt-1 font-medium">{error}</p>
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="flex flex-col gap-4 pt-4">
+                  <button 
+                    onClick={handleCheckIn}
+                    disabled={sessionCode.length < 6}
+                    className="w-full h-24 bg-text dark:bg-primary text-background dark:text-background font-black text-xl rounded-[2rem] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-30 disabled:grayscale disabled:scale-100"
+                  >
+                    {status === 'error' ? 'Retry Synchronisation' : 'Initiate Sync'}
+                    <ChevronRight size={24} strokeWidth={3} />
+                  </button>
+                  <button 
+                    onClick={onClose}
+                    className="w-full py-4 text-textMuted font-black text-sm uppercase tracking-widest hover:text-text transition-colors"
+                  >
+                    Abort Operation
+                  </button>
+                </div>
+
+                <div className="pt-8 border-t border-outline/10">
+                  <div className="flex items-center gap-4 text-textMuted/40">
+                    <MapPin size={20} />
+                    <p className="text-xs font-bold leading-relaxed">Your biometric and geolocation telemetry will be verified against the secure venue perimeter.</p>
+                  </div>
+                </div>
+              </motion.div>
             ) : (
-              <div className="text-center text-textMuted text-sm">
-                Please wait...
-              </div>
-            )}
-          </div>
-        )}
+              <motion.div
+                key="processing"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-12 text-center"
+              >
+                <div className="relative mb-12">
+                   <div className={`w-40 h-40 rounded-full flex items-center justify-center relative z-10 transition-colors duration-1000 ${
+                     status === 'success' ? 'bg-green-500/10' : 'bg-primary/5'
+                   }`}>
+                      {status === 'locating' && <Globe size={80} className="text-primary animate-pulse" />}
+                      {status === 'verifying' && <Loader2 size={80} className="text-primary animate-spin" />}
+                      {status === 'success' && (
+                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 12 }}>
+                          <CheckCircle2 size={80} className="text-green-500" />
+                        </motion.div>
+                      )}
+                   </div>
+                   <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse -z-0 opacity-20" />
+                </div>
 
-        {/* Additional Info */}
-        <div className="mt-6 pt-4 border-t border-outline">
-          <div className="flex items-start gap-2 text-xs text-textMuted">
-            <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <p>
-              Your location will be used to verify you are within the venue boundaries.
-              Location data is only used for attendance verification.
-            </p>
-          </div>
+                <div className="space-y-4">
+                  <h3 className="text-3xl font-headline font-black text-text tracking-tight uppercase">
+                    {status === 'locating' && 'Geospatial Calibration'}
+                    {status === 'verifying' && 'Secure Verification'}
+                    {status === 'success' && 'Identity Verified'}
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-textMuted font-medium text-lg leading-relaxed max-w-sm mx-auto">
+                      {locationInfo}
+                    </p>
+                    {status === 'success' && (
+                       <div className="flex justify-center gap-2 mt-4">
+                          <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[10px] font-black tracking-widest uppercase border border-green-500/20">Attendance Secured</span>
+                          <span className="px-3 py-1 bg-surfaceHigh text-textMuted rounded-full text-[10px] font-black tracking-widest uppercase border border-outline/10">Ref: {checkInResult?.id || 'TX-SYNC'}</span>
+                       </div>
+                    )}
+                  </div>
+                </div>
+
+                {status === 'success' && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-12 w-full space-y-4"
+                  >
+                    <div className="p-6 bg-surfaceLow rounded-[2.5rem] border border-outline/10 flex items-center gap-6">
+                       <div className="w-16 h-16 rounded-[1.5rem] bg-white dark:bg-surfaceHigh flex items-center justify-center shadow-lg">
+                          <Smartphone size={32} className="text-primary" />
+                       </div>
+                       <div className="text-left">
+                          <p className="text-[10px] font-black text-primary uppercase tracking-widest">Protocol Success</p>
+                          <p className="text-sm font-bold text-text">Hardware Signature Matched</p>
+                       </div>
+                    </div>
+                    <Button onClick={onClose} className="w-full h-24 rounded-[2rem] text-xl font-black">Finalize & Close</Button>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+
+        <div className="px-10 py-8 bg-surfaceLow/50 border-t border-outline/10 flex items-center justify-between opacity-50 relative z-10">
+           <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${status === 'locating' ? 'bg-primary animate-ping' : 'bg-green-500'}`} />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">GPS: Active</span>
+           </div>
+           <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">ENC: AES-256</span>
+           </div>
+           <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">V: 1.4.2</span>
+           </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

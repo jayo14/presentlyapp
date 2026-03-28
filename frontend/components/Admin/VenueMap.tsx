@@ -140,7 +140,11 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   const [showUserLocation, setShowUserLocation] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
 
-  // Real-time user location tracking
+  const [heading, setHeading] = useState<number | null>(null);
+  const [showCompass, setShowCompass] = useState(false);
+  const [compassPermission, setCompassPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
+
+  // Real-time user location and orientation tracking
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady || !showUserLocation) {
@@ -162,6 +166,39 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     let innerIpMarker: maplibregl.Marker | null = null;
     const samples: { lat: number; lng: number; acc: number }[] = [];
     const SAMPLE_SIZE = 5;
+
+    // Orientation tracking
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      // Use webkitCompassHeading if available (iOS), otherwise alpha (Android)
+      const compass = (e as any).webkitCompassHeading || (e.alpha ? 360 - e.alpha : null);
+      if (compass !== null) {
+        setHeading(compass);
+        setShowCompass(true);
+        if (userMarkerRef.current) {
+          const el = userMarkerRef.current.getElement();
+          const glow = el.querySelector('.user-direction-glow') as HTMLElement;
+          if (glow) {
+            glow.style.transform = `rotate(${compass}deg)`;
+            glow.style.opacity = '1';
+          }
+        }
+      }
+    };
+
+    if (window.DeviceOrientationEvent) {
+      // For iOS 13+ we need permission
+      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+        (DeviceOrientationEvent as any).requestPermission()
+          .then((state: string) => {
+            if (state === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation);
+            }
+          })
+          .catch(console.error);
+      } else {
+        window.addEventListener('deviceorientation', handleOrientation);
+      }
+    }
 
     const onSuccess = (position: GeolocationPosition) => {
       const { latitude, longitude, accuracy } = position.coords;
@@ -220,6 +257,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         el.className = 'user-location-marker';
         el.innerHTML = `
           <div class="user-location-container">
+            <div class="user-direction-glow"></div>
             <div class="user-location-label">
               ${samples.length < SAMPLE_SIZE && !isIPFallback ? '<span class="calibrating-text">Calibrating...</span>' : isIPFallback ? '<span class="text-indigo-400">Network Location</span>' : 'You'} 
               <span class="accuracy-badge">±${Math.round(finalAcc)}m</span>
@@ -949,8 +987,47 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden">
-      <div ref={mapContainerRef} className="w-full h-full" style={{ position: 'absolute', inset: 0 }} />
+    <div className="relative w-full h-full min-h-[400px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group">
+      <div ref={mapContainerRef} className="absolute inset-0" />
+
+      {/* Real-time Compass UI Overlay */}
+      {showCompass && heading !== null && (
+        <div className="absolute top-6 right-6 z-20 flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-500">
+           <div className="relative w-28 h-28 bg-black/60 backdrop-blur-md rounded-full border-2 border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
+              {/* Compass Ring */}
+              <div 
+                className="absolute inset-0 transition-transform duration-300 ease-out"
+                style={{ transform: `rotate(${-heading}deg)` }}
+              >
+                 {[0, 90, 180, 270].map(deg => (
+                   <div key={deg} className="absolute inset-0 flex flex-col items-center" style={{ transform: `rotate(${deg}deg)` }}>
+                      <span className={`mt-2 text-[10px] font-black ${deg === 0 ? 'text-primary' : 'text-white/40'}`}>
+                        {deg === 0 ? 'N' : deg === 90 ? 'E' : deg === 180 ? 'S' : 'W'}
+                      </span>
+                      <div className={`w-0.5 h-2 ${deg % 90 === 0 ? 'bg-primary/60' : 'bg-white/20'}`} />
+                   </div>
+                 ))}
+                 {Array.from({ length: 12 }).map((_, i) => (
+                   <div key={i} className="absolute inset-0 flex flex-col items-center" style={{ transform: `rotate(${i * 30}deg)` }}>
+                      <div className="w-[1px] h-1.5 bg-white/10" />
+                   </div>
+                 ))}
+              </div>
+              
+              {/* Fixed Direction Pointer */}
+              <div className="relative z-10 flex flex-col items-center">
+                 <div className="w-1 h-8 bg-gradient-to-t from-primary to-primary/40 rounded-full shadow-[0_0_15px_rgba(255,215,0,0.5)]" />
+                 <div className="mt-1 text-[14px] font-black text-white font-mono tracking-tighter">
+                   {Math.round(heading)}°
+                 </div>
+              </div>
+           </div>
+           
+           <div className="px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/5 text-[8px] font-black text-white/60 tracking-[0.2em] uppercase">
+             Live Telemetry
+           </div>
+        </div>
+      )}
 
       {/* Search bar (top-left, above nav controls) */}
       <div className="absolute top-4 left-14 z-10 w-56 md:w-72">
@@ -1147,6 +1224,34 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           align-items: center;
           position: relative;
         }
+        .user-direction-glow {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          border-left: 25px solid transparent;
+          border-right: 25px solid transparent;
+          border-bottom: 60px solid rgba(255, 215, 0, 0.2);
+          margin-left: -25px;
+          margin-top: -85px;
+          transform-origin: 50% 85px;
+          pointer-events: none;
+          z-index: 1;
+          opacity: 0;
+          filter: blur(12px) drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+          transition: transform 0.1s ease-out;
+        }
+        .user-direction-glow::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -2px;
+          width: 4px;
+          height: 40px;
+          background: linear-gradient(to top, rgba(255,215,0,0.4), transparent);
+          filter: blur(2px);
+        }
         .user-location-label {
           background-color: #a855f7;
           color: white;
@@ -1184,9 +1289,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           height: 14px;
           background-color: #a855f7;
           border: 2px solid white;
-          border-radius: 2px;
-          transform: rotate(45deg);
-          box-shadow: 0 0 4px rgba(0,0,0,0.3);
+          border-radius: 999px;
+          box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
           z-index: 2;
         }
         .marker-pulse {

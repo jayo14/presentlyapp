@@ -11,6 +11,7 @@ import { analyticsApi, CourseAttendanceAnalytics, StudentAnalytics } from '../..
 import { dashboardApi } from '../../services/api/dashboard';
 import { Course as CourseType } from '../../types';
 import { toast } from 'sonner';
+import { Sheet } from '../Sheet';
 
 export const AttendanceReport: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -608,67 +609,66 @@ export const AttendanceReport: React.FC = () => {
           </>
       )}
 
-      {/* Manual Mark Modal */}
-      {showManualMarkModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-            <div className="bg-surface text-text border border-outline rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
-                <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary transition-transform hover:scale-110">
-                            <UserPlus size={24} />
-                        </div>
-                        <div>
-                            <h3 className="font-headline text-xl font-black text-text tracking-tight">Manual Mark</h3>
-                            <p className="text-xs text-textMuted font-medium">Mark student as present for this session</p>
-                        </div>
-                    </div>
-                    <button 
-                      onClick={() => setShowManualMarkModal(false)}
-                      className="p-2 hover:bg-surfaceHigh hover:text-text rounded-xl text-textMuted transition-colors"
-                    >
-                      <X size={20} />
-                    </button>
-                </div>
+      {/* Manual Mark Sheet */}
+      <Sheet
+        isOpen={showManualMarkModal}
+        onClose={() => setShowManualMarkModal(false)}
+        title="Manual Override"
+        description="Authenticate and mark student attendance manually for this session."
+        side="bottom"
+      >
+        <form onSubmit={handleManualMark} className="space-y-8 pb-12">
+            <div className="space-y-4">
+               <div className="flex items-center gap-4 p-6 bg-primary/5 border border-primary/10 rounded-[2.5rem]">
+                  <div className="w-16 h-16 rounded-[1.75rem] bg-white dark:bg-surfaceLow flex items-center justify-center text-primary shadow-xl">
+                      <UserPlus size={32} />
+                  </div>
+                  <div>
+                      <h4 className="font-black text-text text-xl tracking-tight">Access Grant</h4>
+                      <p className="text-textMuted font-medium text-xs">Direct database entry for missing telemetry records.</p>
+                  </div>
+               </div>
 
-                <form onSubmit={handleManualMark} className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-textMuted px-1">Student Matric Number</label>
-                        <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={18} />
-                            <input 
-                                autoFocus
-                                type="text" 
-                                value={manualMatric}
-                                onChange={(e) => setManualMatric(e.target.value.toUpperCase())}
-                                placeholder="e.g. CSC/2019/001"
-                                className="w-full bg-surfaceLow border border-outline rounded-[1.25rem] pl-12 pr-4 py-4 text-text font-bold focus:ring-4 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                        <Button 
-                            type="button" 
-                            variant="secondary" 
-                            className="flex-1 h-14 rounded-2xl text-xs font-black uppercase tracking-widest"
-                            onClick={() => setShowManualMarkModal(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button 
-                            type="submit" 
-                            variant="primary" 
-                            className="flex-[2] h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20"
-                            disabled={markingManual}
-                        >
-                            {markingManual ? 'Marking...' : 'Mark Present'}
-                        </Button>
-                    </div>
-                </form>
+               <div className="space-y-2 px-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-textMuted/40">Student Matric Record Identifier</label>
+                  <div className="relative group">
+                      <User className="absolute left-6 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary transition-colors" size={24} />
+                      <input 
+                          autoFocus
+                          type="text" 
+                          value={manualMatric}
+                          onChange={(e) => setManualMatric(e.target.value.toUpperCase())}
+                          placeholder="CSC/2019/001"
+                          className="w-full h-24 bg-surfaceLow border-2 border-outline/10 group-hover:border-primary/20 focus:border-primary/50 rounded-[2.5rem] pl-16 pr-8 text-3xl font-black tracking-widest font-mono outline-none transition-all shadow-inner"
+                          required
+                      />
+                  </div>
+               </div>
             </div>
-        </div>
-      )}
+
+            <div className="flex flex-col sm:flex-row gap-4">
+                <button 
+                    type="button" 
+                    className="flex-1 h-20 rounded-[2rem] bg-surfaceHigh text-textMuted font-black text-sm uppercase tracking-widest hover:text-text transition-colors"
+                    onClick={() => setShowManualMarkModal(false)}
+                >
+                    Abort Grant
+                </button>
+                <button 
+                    type="submit" 
+                    disabled={markingManual || !manualMatric}
+                    className="flex-[2] h-20 bg-primary text-background font-black text-xl rounded-[2.5rem] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30 disabled:grayscale disabled:scale-100 flex items-center justify-center gap-3"
+                >
+                    {markingManual ? (
+                       <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 border-4 border-background/20 border-t-background rounded-full animate-spin" />
+                          <span>Authorizing...</span>
+                       </div>
+                    ) : 'Grant Attendance'}
+                </button>
+            </div>
+        </form>
+      </Sheet>
     </div>
   );
 };

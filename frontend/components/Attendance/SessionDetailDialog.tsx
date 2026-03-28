@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { X, Clock, Users, MapPin, ExternalLink, Copy, CheckCircle2, AlertTriangle, Timer, Power } from 'lucide-react';
+import { X, Clock, Users, MapPin, Copy, CheckCircle2, AlertTriangle, Timer, Power, Share2, QrCode } from 'lucide-react';
 import { Button } from '../Button';
 import { QRCodeSVG } from 'qrcode.react';
 import { AttendanceSession, sessionApi } from '../../services/api/attendance';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SessionDetailDialogProps {
   session: AttendanceSession;
@@ -13,15 +14,13 @@ interface SessionDetailDialogProps {
 }
 
 export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ session, onClose, onSessionEnded }) => {
-  const [timeLeft, setTimeTimeout] = useState<string>('');
+  const [timeLeft, setTimeLeft] = useState<string>('');
   const [isEnding, setIsEnding] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
+  const [showEndConfirmation, setShowEndConfirmation] = useState(false);
   
   const { modalProps } = useModalAccessibility(true, onClose);
 
-  const [showEndConfirmation, setShowEndConfirmation] = useState(false);
-
-  // Link for the session
   const sessionUrl = `${window.location.origin}/check-in/${session.session_code}`;
 
   useEffect(() => {
@@ -31,7 +30,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
       const difference = endTime - now;
 
       if (difference <= 0 || !session.is_active) {
-        setTimeTimeout('00:00:00');
+        setTimeLeft('00:00:00');
         if (!isExpired && session.is_active && onSessionEnded) {
             onSessionEnded();
         }
@@ -43,7 +42,7 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
       const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-      setTimeTimeout(
+      setTimeLeft(
         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
       );
     };
@@ -52,22 +51,18 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
-  }, [session]);
+  }, [session, isExpired, onSessionEnded]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(sessionUrl);
     toast.success('Link copied to clipboard');
   };
 
-  const handleEndSession = () => {
-    setShowEndConfirmation(true);
-  };
-
   const confirmEndSession = async () => {
     try {
       setIsEnding(true);
       await sessionApi.end(session.id);
-      toast.success('Session ended successfully');
+      toast.success('Session terminated');
       if (onSessionEnded) onSessionEnded();
       onClose();
     } catch (err) {
@@ -79,187 +74,157 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-      <div 
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl animate-in fade-in duration-500">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+        className="bg-white dark:bg-surface w-full max-w-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-outline/10 overflow-hidden relative"
         {...modalProps}
-        aria-labelledby="dialog-title"
-        className="bg-background text-text border border-outline rounded-3xl w-[calc(100vw-32px)] sm:max-w-lg shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] outline-none relative overflow-hidden"
       >
-        {/* End Session Confirmation Overlay */}
-        {showEndConfirmation && (
-          <div className="absolute inset-0 z-50 bg-surface/95 backdrop-blur-sm flex items-center justify-center p-8 animate-in fade-in duration-200">
-            <div className="max-w-sm w-full text-center space-y-6">
-              <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle size={40} />
+        {/* End Session Overlay */}
+        <AnimatePresence>
+          {showEndConfirmation && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[110] bg-red-600/95 backdrop-blur-md flex items-center justify-center p-12 text-center"
+            >
+              <div className="space-y-8 max-w-sm">
+                 <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <AlertTriangle size={48} className="text-white" />
+                 </div>
+                 <h3 className="text-4xl font-headline font-black text-white tracking-tight">Terminate Session?</h3>
+                 <p className="text-white/80 font-medium text-lg">This will immediately block all incoming attendance synchronizations.</p>
+                 <div className="flex flex-col gap-4">
+                    <button 
+                      onClick={confirmEndSession}
+                      disabled={isEnding}
+                      className="w-full h-16 bg-white text-red-600 font-black rounded-2xl text-xl hover:scale-105 active:scale-95 transition-all shadow-xl"
+                    >
+                      {isEnding ? 'Terminating...' : 'Confirm Termination'}
+                    </button>
+                    <button 
+                      onClick={() => setShowEndConfirmation(false)}
+                      className="text-white/60 font-black text-sm uppercase tracking-widest hover:text-white transition-colors"
+                    >
+                      Cancel Operation
+                    </button>
+                 </div>
               </div>
-              <div>
-                <h3 className="font-headline text-2xl font-bold text-text mb-2">End Session?</h3>
-                <p className="text-textMuted text-sm">
-                  Are you sure you want to end this session early? Students will no longer be able to check in.
-                </p>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <Button 
-                  variant="secondary" 
-                  className="flex-1 h-12 rounded-xl"
-                  onClick={() => setShowEndConfirmation(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  className="flex-1 h-12 rounded-xl bg-red-600 hover:bg-red-700 text-text border-none"
-                  onClick={confirmEndSession}
-                  isLoading={isEnding}
-                >
-                  Confirm End
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-outline flex justify-between items-center bg-surfaceLow/50 flex-shrink-0">
-          <div className="min-w-0 pr-4">
-            <h3 id="dialog-title" className="font-headline text-lg sm:text-xl font-bold text-text flex items-center gap-2">
-              <span className="p-1.5 bg-primary/10 rounded-lg text-primary flex-shrink-0">
-                <Timer size={20} />
-              </span>
-              <span className="truncate">Session Details</span>
-            </h3>
-            <p className="text-xs sm:text-sm text-textMuted mt-1 truncate">{session.course_name} ({session.course_code})</p>
-          </div>
-          <button 
-            onClick={onClose} 
-            className="absolute top-4 right-4 p-1.5 rounded-md text-textMuted hover:text-text hover:bg-surfaceHigh transition-colors" 
-            aria-label="Close"
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="overflow-y-auto flex-1 custom-scrollbar">
-          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-100">
-            {/* Left Side: QR Code */}
-            <div className="p-6 sm:p-8 flex flex-col items-center justify-center bg-surfaceLow/30">
-              <div className="bg-surface p-3 sm:p-4 rounded-2xl shadow-lg border border-outline mb-6 w-full max-w-[240px] aspect-square flex items-center justify-center">
-                <QRCodeSVG value={sessionUrl} size={200} level="H" includeMargin className="w-full h-full" />
-              </div>
-              <div className="text-center space-y-3 group relative w-full">
-                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-textMuted flex items-center justify-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                  Session Code
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+        <div className="flex flex-col md:flex-row h-full">
+          {/* Left Side: QR & Identity (Dark side) */}
+          <div className="w-full md:w-[45%] bg-zinc-900 p-10 flex flex-col items-center justify-center relative overflow-hidden">
+             {/* Background Mesh */}
+             <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #FFD700 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+             
+             <div className="relative z-10 w-full flex flex-col items-center">
+                <div className="bg-white p-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(255,215,0,0.15)] mb-8 w-full max-w-[240px] aspect-square flex items-center justify-center border-4 border-primary/20">
+                  <QRCodeSVG value={sessionUrl} size={180} level="H" includeMargin />
                 </div>
                 
-                <div className="relative">
-                  {/* Animated Background Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 rounded-2xl blur-xl animate-pulse"></div>
-                  
-                  {/* Code Container */}
-                  <div 
-                    className="relative bg-gradient-to-br from-zinc-900 to-black border-outline border-primary/20 rounded-2xl p-4 sm:p-6 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:scale-[1.02] active:scale-[0.98] group/code"
-                    onClick={() => {
-                      navigator.clipboard.writeText(session.session_code);
-                      toast.success('Code copied to clipboard');
-                    }}
-                    title="Click to copy code"
-                  >
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-5 rounded-2xl" style={{ backgroundImage: 'url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=)' }}></div>
-                    
-                    {/* Code Display */}
-                    <div className="relative flex items-center justify-center gap-3">
-                      <div className="text-2xl sm:text-4xl font-black text-primary font-mono tracking-wider break-all select-all">
-                        {session.session_code}
+                <div className="space-y-2 text-center w-full">
+                   <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Identity Hub</div>
+                   <div 
+                     onClick={() => {
+                       navigator.clipboard.writeText(session.session_code);
+                       toast.success('Code Synchronized');
+                     }}
+                     className="bg-black/40 border border-white/5 rounded-2xl p-6 cursor-pointer hover:border-primary/30 transition-all group group-active:scale-95"
+                   >
+                      <div className="text-4xl font-black text-white font-mono tracking-widest group-hover:text-primary transition-colors">{session.session_code}</div>
+                      <div className="text-[10px] text-white/40 mt-2 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                        <Copy size={12} /> Click to Sync
                       </div>
-                      <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center opacity-0 group-hover/code:opacity-100 transition-all duration-300 transform group-hover/code:rotate-12">
-                        <Copy size={16} className="sm:w-5 sm:h-5 text-primary" />
+                   </div>
+                </div>
+             </div>
+          </div>
+
+          {/* Right Side: Telemetry & Actions */}
+          <div className="flex-1 p-10 flex flex-col relative">
+             <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 rounded-full bg-surfaceHigh/50 flex items-center justify-center text-textMuted hover:text-text hover:rotate-90 transition-all duration-500">
+                <X size={20} strokeWidth={3} />
+             </button>
+
+             <div className="mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 mb-3">
+                   <Timer size={14} className="text-primary" />
+                   <span className="text-[10px] font-black tracking-widest text-primary uppercase">Live Monitoring</span>
+                </div>
+                <h3 className="text-3xl font-headline font-black text-text tracking-tight uppercase truncate">{session.course_code}</h3>
+                <p className="text-textMuted font-medium truncate">{session.course_name}</p>
+             </div>
+
+             <div className="space-y-6 flex-1">
+                {/* Countdown */}
+                <div className="bg-surfaceLow border border-outline/10 rounded-3xl p-6 relative overflow-hidden">
+                   <div className="relative z-10">
+                      <p className="text-[10px] font-black text-textMuted uppercase tracking-widest mb-1">Time to Auto-Close</p>
+                      <div className={`text-5xl font-black font-mono tracking-tighter ${isExpired ? 'text-red-500' : 'text-text'}`}>
+                        {timeLeft}
                       </div>
-                    </div>
-                    
-                    {/* Copy Hint */}
-                    <div className="mt-3 text-[10px] sm:text-xs text-textMuted font-medium opacity-0 group-hover/code:opacity-100 transition-opacity duration-300">
-                      Click to copy
-                    </div>
-                  </div>
+                   </div>
+                   <Clock className="absolute top-1/2 -right-4 -translate-y-1/2 text-text opacity-[0.03] w-32 h-32 rotate-12" />
                 </div>
-                
-                {/* QR Alternative Text */}
-                <div className="text-[10px] text-textMuted pt-2">
-                  Students can scan QR or enter this code
-                </div>
-              </div>
-            </div>
 
-            {/* Right Side: Stats & Info */}
-            <div className="p-6 sm:p-8 space-y-6 sm:space-y-8">
-              {/* Countdown */}
-              <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-outline text-center relative overflow-hidden">
-                <div className="relative z-10">
-                    <div className="text-[10px] sm:text-xs uppercase tracking-wider text-textMuted font-bold mb-1">Time Remaining</div>
-                    <div className={`text-3xl sm:text-4xl font-mono font-bold tracking-tighter ${isExpired ? 'text-red-500' : 'text-primary'}`}>
-                      {timeLeft}
-                    </div>
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="bg-surfaceLow border border-outline/10 rounded-3xl p-5">
+                      <div className="flex items-center gap-2 text-primary mb-2">
+                         <Users size={16} />
+                         <span className="text-[10px] font-black uppercase tracking-widest">Registered</span>
+                      </div>
+                      <div className="text-3xl font-black">{session.attendee_count || 0}</div>
+                   </div>
+                   <div className="bg-surfaceLow border border-outline/10 rounded-3xl p-5">
+                      <div className="flex items-center gap-2 text-primary mb-2">
+                         <MapPin size={16} />
+                         <span className="text-[10px] font-black uppercase tracking-widest">Radius</span>
+                      </div>
+                      <div className="text-3xl font-black">{session.location_radius}m</div>
+                   </div>
                 </div>
-                {/* Background pattern */}
-                <div className="absolute top-0 right-0 -mr-4 -mt-4 opacity-5 text-text pointer-events-none">
-                    <Clock size={100} />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                <div className="p-3 sm:p-4 rounded-2xl bg-surfaceLow border border-outline">
-                  <div className="text-textMuted mb-1 flex items-center gap-1.5">
-                    <Users size={14} className="flex-shrink-0" /> 
-                    <span className="text-[10px] font-bold uppercase truncate">Students</span>
-                  </div>
-                  <div className="text-lg sm:text-xl font-bold">{session.attendee_count || 0}</div>
+                {/* URL Share */}
+                <div className="space-y-3">
+                   <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black text-textMuted uppercase tracking-widest">Access Endpoint</span>
+                      <button onClick={handleCopyLink} className="text-primary hover:text-primary/80 transition-colors">
+                        <Share2 size={16} />
+                      </button>
+                   </div>
+                   <div className="bg-surfaceHigh/30 px-5 py-3 rounded-2xl border border-outline/10 text-xs font-mono text-textMuted truncate">
+                      {sessionUrl}
+                   </div>
                 </div>
-                <div className="p-3 sm:p-4 rounded-2xl bg-surfaceLow border border-outline">
-                  <div className="text-textMuted mb-1 flex items-center gap-1.5">
-                    <MapPin size={14} className="flex-shrink-0" /> 
-                    <span className="text-[10px] font-bold uppercase truncate">Radius</span>
-                  </div>
-                  <div className="text-lg sm:text-xl font-bold">{session.location_radius}m</div>
-                </div>
-              </div>
+             </div>
 
-              <div className="space-y-3">
-                <div className="text-[10px] sm:text-xs font-bold text-textMuted uppercase tracking-wide">Share Link</div>
-                <div className="flex gap-2">
-                  <div className="flex-1 bg-surfaceLow px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium truncate text-textMuted border border-outline">
-                    {sessionUrl}
-                  </div>
-                  <Button variant="secondary" size="icon" className="flex-shrink-0" onClick={handleCopyLink} title="Copy Link">
-                    <Copy size={18} />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="pt-2 sm:pt-4 flex flex-col gap-3">
+             <div className="mt-10 flex flex-col gap-3">
                 {session.is_active && !isExpired ? (
-                  <Button 
-                      className="w-full bg-red-600 hover:bg-red-700 text-text border-none h-11 sm:h-12 rounded-xl text-sm"
-                      onClick={handleEndSession}
-                      isLoading={isEnding}
+                  <button 
+                    onClick={() => setShowEndConfirmation(true)}
+                    className="w-full h-16 bg-red-600/10 hover:bg-red-600 text-red-600 hover:text-white border border-red-600/20 font-black rounded-2xl transition-all flex items-center justify-center gap-3 active:scale-95"
                   >
-                      <Power size={18} className="mr-2 flex-shrink-0" /> 
-                      <span className="truncate">End Session Early</span>
-                  </Button>
+                    <Power size={20} /> Terminate Protocol
+                  </button>
                 ) : (
-                  <div className="flex items-center justify-center gap-2 p-3 bg-surfaceLow rounded-xl text-textMuted font-bold text-sm">
-                      <AlertTriangle size={18} className="flex-shrink-0" /> Session Ended
+                  <div className="w-full h-16 bg-surfaceLow rounded-2xl flex items-center justify-center gap-3 text-textMuted font-black uppercase tracking-widest border border-outline/5 grayscale">
+                    <AlertTriangle size={20} /> Protocol Inactive
                   </div>
                 )}
-                <Button variant="secondary" className="w-full h-11 sm:h-12 rounded-xl text-sm" onClick={onClose}>
-                  Close Details
+                <Button variant="secondary" onClick={onClose} className="w-full h-16 rounded-2xl text-lg font-black bg-surfaceHigh hover:bg-surfaceHigh/80">
+                   Return to Hub
                 </Button>
-              </div>
-            </div>
+             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

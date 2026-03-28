@@ -1,8 +1,11 @@
 import React from 'react';
+import { motion, HTMLMotionProps } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg' | 'icon';
+type OmittedProps = 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag' | 'style';
+interface ButtonProps extends Omit<HTMLMotionProps<"button">, OmittedProps> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'premium';
+  size?: 'sm' | 'md' | 'lg' | 'icon' | 'huge';
   isLoading?: boolean;
 }
 
@@ -12,37 +15,51 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'md', 
   isLoading = false,
   className = '',
+  disabled,
   ...props 
 }) => {
-  const baseStyles = "inline-flex items-center justify-center rounded-xl font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:pointer-events-none active:scale-95";
+  const baseStyles = "relative inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none disabled:grayscale overflow-hidden group";
   
   const variants = {
-    primary: "bg-primaryContainer text-text hover:bg-primary shadow-md shadow-primary/20",
-    secondary: "bg-surfaceContainer text-text hover:bg-surfaceHigh border border-outline/30",
-    outline: "bg-transparent border-2 border-primary text-primary hover:bg-primary/10",
-    ghost: "text-textMuted hover:text-text hover:bg-surfaceLow",
+    primary: "bg-primary text-black shadow-[0_8px_32px_rgba(255,215,0,0.25)] hover:shadow-[0_12px_48px_rgba(255,215,0,0.4)] rounded-2xl",
+    secondary: "bg-surfaceHigh text-text border border-outline/10 hover:border-primary/30 rounded-2xl",
+    outline: "bg-transparent border-2 border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/50 rounded-2xl",
+    ghost: "text-textMuted hover:text-text hover:bg-surfaceLow rounded-xl",
+    premium: "bg-black dark:bg-white text-white dark:text-black shadow-2xl rounded-[1.75rem] hover:scale-[1.02] active:scale-95"
   };
 
   const sizes = {
-    sm: "h-9 px-4 text-xs",
-    md: "h-11 px-6 text-sm",
-    lg: "h-14 px-8 text-base",
-    icon: "h-10 w-10 p-0 rounded-full",
+    sm: "h-10 px-4 text-xs tracking-wider uppercase",
+    md: "h-13 px-8 text-sm tracking-wide uppercase",
+    lg: "h-16 px-10 text-base tracking-widest uppercase",
+    huge: "h-24 px-12 text-xl font-black tracking-[0.2em] uppercase",
+    icon: "h-12 w-12 p-0 rounded-full",
   };
 
   return (
-    <button 
+    <motion.button 
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
-      disabled={isLoading || props.disabled}
+      disabled={isLoading || disabled}
       {...props}
     >
-      {isLoading ? (
-        <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-      ) : null}
-      {children}
-    </button>
+      {/* Glint effect for premium/primary variants */}
+      {(variant === 'primary' || variant === 'premium') && (
+        <div className="absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+           <div className="absolute -inset-x-20 top-0 bottom-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out skew-x-[25deg]" />
+        </div>
+      )}
+
+      <span className={`inline-flex items-center gap-2 ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity`}>
+        {children}
+      </span>
+
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Loader2 className="w-5 h-5 animate-spin" />
+        </div>
+      )}
+    </motion.button>
   );
 };
