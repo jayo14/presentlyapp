@@ -765,10 +765,25 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       if (!bounds.isEmpty()) {
         try {
           map.resize();
-          map.fitBounds(bounds, { padding: 60, maxZoom: 16 });
+          const canvas = map.getCanvas();
+          if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
+            // Check if bounds have any area
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
+            const isPoint = sw.lng === ne.lng && sw.lat === ne.lat;
+
+            if (isPoint) {
+              map.flyTo({ center: sw, zoom: 16 });
+            } else {
+              // Adjust padding based on container size
+              const minDim = Math.min(canvas.clientWidth, canvas.clientHeight);
+              const padding = minDim < 200 ? 20 : 60;
+              map.fitBounds(bounds, { padding, maxZoom: 16 });
+            }
+          }
         } catch (error) {
-          // If map cannot fit bounds (e.g., too small container), fall back to first venue
-          const firstVenue = venues.find(v => v.latitude && v.longitude);
+          // Fallback to first venue if fitBounds fails
+          const firstVenue = venues.find((v) => v.latitude && v.longitude);
           if (firstVenue) {
             map.flyTo({
               center: [Number(firstVenue.longitude), Number(firstVenue.latitude)],

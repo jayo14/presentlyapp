@@ -323,8 +323,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
           </button>
         </div>
         <div className="p-5">
-          <div className="h-64 w-full min-h-[256px]">
-            <ResponsiveContainer width="100%" height="100%" minHeight={256}>
+          <div className="h-64 w-full min-h-[256px] relative">
+            <ResponsiveContainer width="100%" height="100%" minHeight={256} minWidth={0}>
               <AreaChart data={activityData}>
                 <defs>
                   <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
