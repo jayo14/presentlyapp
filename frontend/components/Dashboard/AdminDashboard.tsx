@@ -282,7 +282,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   ];
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="h-full overflow-y-auto space-y-6 animate-in fade-in duration-300">
       <SEO title="Admin Dashboard | Presently" description="System overview and health check for Presently administrators." />
 
       {/* Header */}

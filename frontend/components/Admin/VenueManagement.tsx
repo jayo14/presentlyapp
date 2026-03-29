@@ -363,7 +363,7 @@ export const VenueManagement: React.FC = () => {
 
       {/* Map or Grid View */}
       {viewMode === 'map' ? (
-        <div className="flex-1 h-[calc(100vh-280px)] min-h-[500px] md:min-h-[600px] bg-surface border border-outline rounded-lg overflow-hidden relative flex flex-col">
+        <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-surface border border-outline rounded-lg overflow-hidden relative flex flex-col h-full">
           <Suspense fallback={
             <div className="absolute inset-0 bg-surface border border-outline rounded-lg overflow-hidden flex flex-col items-center justify-center gap-4">
               <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse"></div>

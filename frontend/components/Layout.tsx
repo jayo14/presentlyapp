@@ -551,8 +551,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto bg-surfaceLow scroll-smooth pb-24 md:pb-8">
-          <div className="max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-hidden bg-surfaceLow scroll-smooth pb-24 md:pb-8 flex flex-col">
+          <div className="flex-1 w-full max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8 h-full flex flex-col">
             {children}
           </div>
         </main>
