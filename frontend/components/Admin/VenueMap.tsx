@@ -993,10 +993,10 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className="relative w-full h-full min-h-[400px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group">
+    <div className="relative flex-1 w-full h-full min-h-[400px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col">
       <div 
         ref={mapContainerRef} 
-        className="absolute inset-0 w-full h-full" 
+        className="absolute inset-0 w-full h-full z-0" 
       />
 
       {/* Real-time Compass UI Overlay */}
