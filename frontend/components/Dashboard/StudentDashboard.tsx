@@ -115,7 +115,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   return (
     <>
       <SEO title="Student Dashboard | Presently" description="Track your attendance, enrolled courses, upcoming classes and academic performance on Presently." noIndex />
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 max-w-4xl mx-auto">
+      <div className="h-full overflow-y-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 max-w-4xl mx-auto pb-20">
         
         {/* MOBILE GREETING */}
         <header className="flex md:hidden justify-between items-center mb-6 px-4">
