@@ -593,9 +593,10 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     const container = mapContainerRef.current;
     if (!container) return;
 
-    // Force container sizing on init
+    // No explicit style changes needed if container uses absolute layout below,
+    // but ensure container is never 0-height during init if possible.
     if (container.clientHeight === 0) {
-      container.style.height = '100%';
+      container.style.minHeight = '400px';
     }
 
     const map = new maplibregl.Map({
@@ -620,8 +621,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     map.on('load', () => {
       addSourcesAndLayers(map);
       renderVenueMarkers(map);
+      
+      // Perform multiple resizes to catch any late layout shifts
       map.resize();
-      window.setTimeout(() => map.resize(), 180);
+      window.setTimeout(() => map.resize(), 100);
+      window.setTimeout(() => map.resize(), 500);
+      window.setTimeout(() => map.resize(), 1000);
+      window.setTimeout(() => map.resize(), 2000);
+      
       setMapReady(true);
     });
 
@@ -714,19 +721,32 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     const container = mapContainerRef.current;
     if (!map || !container || !mapReady) return;
 
-    const handleResize = () => map.resize();
-    const observer = new ResizeObserver(handleResize);
+    const handleResize = () => {
+      if (map && map.getCanvas()) {
+         map.resize();
+      }
+    };
+
+    const observer = new ResizeObserver(() => {
+        // Debounce resize to prevent performance issues but ensure it eventually recalculates
+        window.requestAnimationFrame(handleResize);
+    });
+    
     observer.observe(container);
     window.addEventListener('resize', handleResize);
 
     const rafId = window.requestAnimationFrame(handleResize);
-    const timeoutId = window.setTimeout(handleResize, 200);
+    const timeoutIds = [
+        window.setTimeout(handleResize, 100),
+        window.setTimeout(handleResize, 500),
+        window.setTimeout(handleResize, 1000)
+    ];
 
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', handleResize);
       window.cancelAnimationFrame(rafId);
-      window.clearTimeout(timeoutId);
+      timeoutIds.forEach(id => window.clearTimeout(id));
     };
   }, [mapReady]);
 
@@ -1016,7 +1036,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className="relative flex-1 w-full h-full min-h-[400px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col">
+    <div className="relative flex-1 w-full h-full min-h-[500px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col">
       <div 
         ref={mapContainerRef} 
         className="absolute inset-0 w-full h-full z-0" 
