@@ -170,7 +170,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     return (
       <>
         <SEO title="Timetable | Lecturer Dashboard" description="View your teaching schedule and class timetable on Presently." noIndex />
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="h-full overflow-y-auto space-y-6 animate-in fade-in duration-300 px-1">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="font-headline text-xl font-semibold text-text">Teaching Schedule</h2>
@@ -257,7 +257,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   return (
     <>
       <SEO title="Lecturer Dashboard | Presently" description="Manage your courses, attendance sessions and view real-time student engagement on Presently." noIndex />
-      <div className="space-y-6 animate-in fade-in duration-300">
+      <div className="h-full overflow-y-auto space-y-6 animate-in fade-in duration-300">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>

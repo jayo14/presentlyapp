@@ -89,7 +89,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   // Dashboard/history: reuse student view with class rep banner
   if (view === 'dashboard' || view === 'history') {
       return (
-          <div className="space-y-6">
+          <div className="h-full overflow-y-auto space-y-6">
               <div className="bg-primary/5 border border-primary/15 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                       <h3 className="font-headline text-sm font-semibold text-primary">Class Representative Mode</h3>
@@ -107,7 +107,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   // Timetable view (editable for class rep)
   if (view === 'timetable') {
       return (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="h-full overflow-y-auto space-y-6 animate-in fade-in duration-300">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 className="font-headline text-xl font-semibold text-text">Manage Class Timetable</h2>
@@ -318,7 +318,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   // Class Management view
   if (view === 'class-mgmt') {
       return (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="h-full overflow-y-auto space-y-6 animate-in fade-in duration-300">
               <div>
                   <h2 className="font-headline text-xl font-semibold text-text">Class Management</h2>
                   <p className="text-sm text-textMuted mt-0.5">Manage attendance and reports for your class.</p>
