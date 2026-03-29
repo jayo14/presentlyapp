@@ -763,32 +763,40 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
         if (v.latitude && v.longitude) bounds.extend([Number(v.longitude), Number(v.latitude)]);
       });
       if (!bounds.isEmpty()) {
-        try {
-          map.resize();
-          const canvas = map.getCanvas();
-          if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
-            // Check if bounds have any area
+        map.resize();
+        const canvas = map.getCanvas();
+        if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
+          try {
+            // Check if bounds have any area (degenerate bounds)
             const sw = bounds.getSouthWest();
             const ne = bounds.getNorthEast();
-            const isPoint = sw.lng === ne.lng && sw.lat === ne.lat;
+            const isPoint = Math.abs(sw.lng - ne.lng) < 0.00001 && Math.abs(sw.lat - ne.lat) < 0.00001;
 
             if (isPoint) {
               map.flyTo({ center: sw, zoom: 16 });
             } else {
-              // Adjust padding based on container size
+              // Ensure padding isn't larger than half the smallest dimension 
+              // to prevent "Map cannot fit" errors.
               const minDim = Math.min(canvas.clientWidth, canvas.clientHeight);
-              const padding = minDim < 200 ? 20 : 60;
-              map.fitBounds(bounds, { padding, maxZoom: 16 });
+              const safePadding = Math.max(10, Math.floor(minDim / 4)); // Use 1/4 of size as padding, at least 10px
+              
+              map.fitBounds(bounds, { 
+                padding: safePadding, 
+                maxZoom: 16,
+                animate: true,
+                duration: 1000
+              });
             }
-          }
-        } catch (error) {
-          // Fallback to first venue if fitBounds fails
-          const firstVenue = venues.find((v) => v.latitude && v.longitude);
-          if (firstVenue) {
-            map.flyTo({
-              center: [Number(firstVenue.longitude), Number(firstVenue.latitude)],
-              zoom: 14,
-            });
+          } catch (e) {
+            console.debug('Map fitBounds failed, falling back to flyTo first venue.', e);
+            const firstVenue = venues.find((v) => v.latitude && v.longitude);
+            if (firstVenue) {
+              map.flyTo({
+                center: [Number(firstVenue.longitude), Number(firstVenue.latitude)],
+                zoom: 15,
+                speed: 1.0
+              });
+            }
           }
         }
       }
