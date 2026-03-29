@@ -23,7 +23,7 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ center, zoom, markers }) => {
   return (
-    <MapContainer center={center} zoom={zoom} style={{ height: '400px', width: '100%' }}>
+    <MapContainer center={center} zoom={zoom} style={{ height: '100%', minHeight: '400px', width: '100%' }}>
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
