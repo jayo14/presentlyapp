@@ -678,32 +678,30 @@ def login_view(request):
             if (parsed_ua.is_mobile or parsed_ua.is_tablet) and device_brand != UNKNOWN:
                 device_name = f"{device_brand} {device_model}"
 
-            # Check for existing device
-            existing_device = UserDevice.objects.filter(user=user, device_fingerprint=device_fingerprint).first()
-            
+            # Check for existing device (atomic, race-safe)
+            existing_device, created = UserDevice.objects.get_or_create(
+                user=user,
+                device_fingerprint=device_fingerprint,
+                defaults={
+                    'device_name': device_name,
+                    'user_agent': user_agent_raw,
+                    'ip_address': ip_address,
+                    'geo_country': geo_data['country'],
+                    'geo_city': geo_data['city'],
+                    'timezone': geo_data['timezone'],
+                    'isp': geo_data['isp'],
+                    'lat': geo_data['lat'],
+                    'lon': geo_data['lon'],
+                    'is_trusted': False,
+                }
+            )
+
             send_alert = False
             alert_reason = ""
-            
-            if not existing_device:
-                # New Fingerprint detected
+
+            if created:
                 send_alert = True
                 alert_reason = "New device or browser detected"
-                
-                # Create new device record
-                existing_device = UserDevice.objects.create(
-                    user=user,
-                    device_name=device_name,
-                    user_agent=user_agent_raw,
-                    ip_address=ip_address,
-                    device_fingerprint=device_fingerprint,
-                    geo_country=geo_data['country'],
-                    geo_city=geo_data['city'],
-                    timezone=geo_data['timezone'],
-                    isp=geo_data['isp'],
-                    lat=geo_data['lat'],
-                    lon=geo_data['lon'],
-                    is_trusted=False
-                )
             else:
                 # Check for anomalies on existing device
                 if existing_device.geo_country and geo_data['country'] != existing_device.geo_country:
