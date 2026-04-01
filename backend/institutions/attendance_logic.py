@@ -263,7 +263,7 @@ def perform_attendance_check_in(request, session):
 
     # 3. Device/Integrity Signal (10 points)
     if visitor_id:
-        device_exists = UserDevice.objects.filter(user=request.user, visitor_id=visitor_id).exists()
+        device_exists = UserDevice.objects.filter(user=request.user, device_fingerprint=visitor_id).exists()
         if device_exists:
             score += 10
         else:
@@ -382,7 +382,7 @@ def perform_attendance_check_in(request, session):
         if visitor_id:
             UserDevice.objects.update_or_create(
                 user=request.user,
-                visitor_id=visitor_id,
+                device_fingerprint=visitor_id,
                 defaults={
                     'device_name': user_agent[:250],
                     'user_agent': user_agent,
