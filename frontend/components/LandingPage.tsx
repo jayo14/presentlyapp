@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SEO } from './SEO';
@@ -11,19 +11,11 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 // Eagerly load the Hero to prevent CLS
 import { LandingHero } from './LandingPage/LandingHero';
 
-// Lazy load non-critical sections
-const LandingBento = lazy(() => import('./LandingPage/LandingBento').then(m => ({ default: m.LandingBento })));
-const LandingEngineRoom = lazy(() => import('./LandingPage/LandingEngineRoom').then(m => ({ default: m.LandingEngineRoom })));
-const LandingTestimonials = lazy(() => import('./LandingPage/LandingTestimonials').then(m => ({ default: m.LandingTestimonials })));
-const LandingMobileApp = lazy(() => import('./LandingPage/LandingMobileApp').then(m => ({ default: m.LandingMobileApp })));
-const LandingCTA = lazy(() => import('./LandingPage/LandingCTA').then(m => ({ default: m.LandingCTA })));
-
-// Loading placeholder for lazy sections
-const SectionLoader = () => (
-  <div className="py-20 flex justify-center items-center">
-    <div className="w-8 h-8 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-  </div>
-);
+import { LandingBento } from './LandingPage/LandingBento';
+import { LandingEngineRoom } from './LandingPage/LandingEngineRoom';
+import { LandingTestimonials } from './LandingPage/LandingTestimonials';
+import { LandingMobileApp } from './LandingPage/LandingMobileApp';
+import { LandingCTA } from './LandingPage/LandingCTA';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -63,25 +55,11 @@ export const LandingPage: React.FC = () => {
         <main className="pt-20 sm:pt-24 md:pt-28">
           <LandingHero onGetStarted={goRegister} />
           
-          <Suspense fallback={<SectionLoader />}>
-            <LandingBento />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
-            <LandingEngineRoom />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
-            <LandingTestimonials />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
-            <LandingMobileApp />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
-            <LandingCTA onRegister={goRegister} />
-          </Suspense>
+          <LandingBento />
+          <LandingEngineRoom />
+          <LandingTestimonials />
+          <LandingMobileApp />
+          <LandingCTA onRegister={goRegister} />
         </main>
 
         <LandingFooter />
