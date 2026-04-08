@@ -151,13 +151,16 @@ export const AttendanceReport: React.FC = () => {
       });
     } else {
       return analyticsData?.students.filter(student => {
+        const name = student.full_name || student.name || '';
+        const matric = student.matric_number || student.matric || '';
+        const rate = student.attendance_rate ?? student.percentage ?? 0;
         const matchesSearch = 
-          student.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-          student.matric.toLowerCase().includes(searchTerm.toLowerCase());
+          name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          matric.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = 
           statusFilter === 'ALL' ? true :
-          statusFilter === 'good' ? student.percentage >= 75 :
-          student.percentage < 75;
+          statusFilter === 'good' ? rate >= 75 :
+          rate < 75;
         const dept = student.department || 'Unspecified';
         const matchesDept = selectedDept === 'ALL' || dept === selectedDept;
         return matchesSearch && matchesStatus && matchesDept;
@@ -198,14 +201,14 @@ export const AttendanceReport: React.FC = () => {
         ]);
         fileName = `${analyticsData?.course_code}_Session_${new Date(session.created_at).toISOString().split('T')[0]}_Report.csv`;
     } else {
-        headers = ['Matric Number', 'Student Name', 'Department', 'Attended', 'Total', 'Percentage', 'Report Generated'];
+        headers = ['Matric Number', 'Full Name', 'Total Sessions', 'Sessions Attended', 'Attendance Rate (%)', 'Status', 'Report Generated'];
         rows = (filteredData as StudentAnalytics[]).map(s => [
-            s.matric,
-            s.name,
-            s.department,
-            s.attended,
-            s.total,
-            `${s.percentage}%`,
+            s.matric_number || s.matric,
+            s.full_name || s.name,
+            s.total_sessions ?? s.total,
+            s.sessions_attended ?? s.attended,
+            `${Number(s.attendance_rate ?? s.percentage).toFixed(1)}%`,
+            s.status ?? ((s.attendance_rate ?? s.percentage) >= 75 ? 'Present' : 'Absent'),
             new Date().toLocaleDateString()
         ]);
         fileName = `${analyticsData?.course_code}_Overall_Attendance_Report.csv`;
@@ -495,7 +498,7 @@ export const AttendanceReport: React.FC = () => {
                                         <thead className="bg-surfaceLow border-b border-outline text-textMuted font-bold uppercase text-[10px] tracking-widest">
                                             <tr>
                                                 <th className="px-6 py-4">Matric Number</th>
-                                                <th className="px-6 py-4">Student Name</th>
+                                                <th className="px-6 py-4">Full Name</th>
                                                 {selectedSessionId ? (
                                                     <>
                                                         <th className="px-6 py-4">Status</th>
@@ -504,8 +507,9 @@ export const AttendanceReport: React.FC = () => {
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <th className="px-6 py-4 text-center">Sessions</th>
-                                                        <th className="px-6 py-4">Attendance Rate</th>
+                                                        <th className="px-6 py-4 text-center">Total Sessions</th>
+                                                        <th className="px-6 py-4 text-center">Sessions Attended</th>
+                                                        <th className="px-6 py-4 text-center">Attendance Rate (%)</th>
                                                         <th className="px-6 py-4 text-right">Status</th>
                                                     </>
                                                 )}
@@ -540,36 +544,49 @@ export const AttendanceReport: React.FC = () => {
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <td className="px-6 py-4 font-mono text-textMuted">{(item as StudentAnalytics).matric}</td>
-                                                            <td className="px-6 py-4 font-bold text-text group-hover:text-primary transition-colors">{(item as StudentAnalytics).name}</td>
-                                                            <td className="px-6 py-4 text-center text-textMuted">
-                                                                <span className="font-bold text-text">{(item as StudentAnalytics).attended}</span>
-                                                                <span className="text-textMuted text-xs">/{(item as StudentAnalytics).total}</span>
+                                                            <td className="px-6 py-4 font-mono text-textMuted">
+                                                                {(item as StudentAnalytics).matric_number || (item as StudentAnalytics).matric}
                                                             </td>
-                                                            <td className="px-6 py-4">
+                                                            <td className="px-6 py-4 font-bold text-text group-hover:text-primary transition-colors">
+                                                                {(item as StudentAnalytics).full_name || (item as StudentAnalytics).name}
+                                                            </td>
+                                                            <td className="px-6 py-4 text-center text-textMuted">
+                                                                {(item as StudentAnalytics).total_sessions ?? (item as StudentAnalytics).total}
+                                                            </td>
+                                                            <td className="px-6 py-4 text-center text-textMuted">
+                                                                {(item as StudentAnalytics).sessions_attended ?? (item as StudentAnalytics).attended}
+                                                            </td>
+                                                            <td className="px-6 py-4 text-center">
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="flex-1 h-2 bg-surfaceHigh rounded-full overflow-hidden">
                                                                         <div 
                                                                             className={`h-full rounded-full ${ 
-                                                                                (item as StudentAnalytics).percentage >= 75 ? 'bg-green-500' : 
-                                                                                (item as StudentAnalytics).percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                                                                                ((item as StudentAnalytics).attendance_rate ?? (item as StudentAnalytics).percentage) >= 75 ? 'bg-green-500' : 
+                                                                                ((item as StudentAnalytics).attendance_rate ?? (item as StudentAnalytics).percentage) >= 50 ? 'bg-yellow-500' : 'bg-red-500'
                                                                             }`}
-                                                                            style={{ width: `${(item as StudentAnalytics).percentage}%` }}
+                                                                            style={{ width: `${(item as StudentAnalytics).attendance_rate ?? (item as StudentAnalytics).percentage}%` }}
                                                                         ></div>
                                                                     </div>
-                                                                    <span className="font-bold w-12 text-right">{(item as StudentAnalytics).percentage}%</span>
+                                                                    <span className="font-bold w-12 text-right">
+                                                                        {Number((item as StudentAnalytics).attendance_rate ?? (item as StudentAnalytics).percentage).toFixed(1)}%
+                                                                    </span>
                                                                 </div>
                                                             </td>
                                                             <td className="px-6 py-4 text-right">
-                                                                {(item as StudentAnalytics).percentage >= 75 ? (
-                                                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-green-100 text-green-700 uppercase">
-                                                                        <CheckCircle2 size={12} /> Good
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-red-100 text-red-700 uppercase">
-                                                                        <AlertCircle size={12} /> Risk
-                                                                    </span>
-                                                                )}
+                                                                {(() => {
+                                                                    const st = (item as StudentAnalytics).status;
+                                                                    const rate = (item as StudentAnalytics).attendance_rate ?? (item as StudentAnalytics).percentage;
+                                                                    const isPresent = st ? st === 'Present' : rate >= 75;
+                                                                    return isPresent ? (
+                                                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-green-100 text-green-700 uppercase">
+                                                                            <CheckCircle2 size={12} /> Present
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-red-100 text-red-700 uppercase">
+                                                                            <AlertCircle size={12} /> Absent
+                                                                        </span>
+                                                                    );
+                                                                })()}
                                                             </td>
                                                         </>
                                                     )}
