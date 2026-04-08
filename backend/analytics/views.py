@@ -431,8 +431,8 @@ class CourseAttendanceTableExportView(APIView):
                 return Response({'error': f'Unsupported format: {fmt}. Use csv, excel/xlsx, or pdf.'}, status=400)
         except Course.DoesNotExist:
             return Response({'error': 'Course not found'}, status=404)
-        except Exception as e:
-            return Response({'error': str(e)}, status=500)
+        except Exception:
+            return Response({'error': 'Failed to generate export. Please try again.'}, status=500)
 
 
 class StudentAttendanceAnalyticsView(APIView):
