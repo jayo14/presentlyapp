@@ -14,8 +14,13 @@ export const analyticsService = {
   getAdminDashboard: async (): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.ADMIN_DASHBOARD);
   },
-  getCourseAttendance: async (courseId: string): Promise<any> => {
-    return apiClient.get(API_ENDPOINTS.ANALYTICS.COURSE(courseId));
+  getCourseAttendance: async (courseId: string, params?: any): Promise<any> => {
+    return apiClient.get(API_ENDPOINTS.ANALYTICS.COURSE(courseId), params);
+  },
+  exportCourseAttendance: async (courseId: string, fmt: string, params?: any): Promise<any> => {
+    return apiClient.get(API_ENDPOINTS.ANALYTICS.COURSE_EXPORT(courseId, fmt), params, {
+      responseType: 'blob',
+    });
   },
   getStudentAttendance: async (studentId: string): Promise<any> => {
     return apiClient.get(API_ENDPOINTS.ANALYTICS.STUDENT(studentId));

@@ -29,10 +29,48 @@ class DeleteReportView(APIView):
         return Response({'message': 'Report deleted', 'id': pk})
 
 
+def _export_attendance_response(course_id, fmt, date_from=None, date_to=None):
+    """Generate and return an HttpResponse with the attendance file."""
+    if fmt == 'csv':
+        content = generate_attendance_csv(course_id, date_from, date_to)
+        resp = HttpResponse(content, content_type='text/csv')
+        resp['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.csv"'
+        return resp
+    elif fmt in ('excel', 'xlsx'):
+        content = generate_attendance_excel(course_id, date_from, date_to)
+        resp = HttpResponse(
+            content,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        resp['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.xlsx"'
+        return resp
+    elif fmt == 'pdf':
+        content = generate_attendance_pdf(course_id, date_from, date_to)
+        resp = HttpResponse(content, content_type='application/pdf')
+        resp['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.pdf"'
+        return resp
+    return None
+
+
 class GenerateAttendanceReportView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        return Response({'message': 'Attendance report generated'})
+        course_id = request.data.get('course_id')
+        fmt = (request.data.get('format') or request.data.get('fmt') or 'pdf').lower()
+        date_from = request.data.get('date_from')
+        date_to = request.data.get('date_to')
+
+        if not course_id:
+            return Response({'error': 'course_id is required'}, status=400)
+
+        try:
+            resp = _export_attendance_response(course_id, fmt, date_from, date_to)
+            if resp is None:
+                return Response({'error': f'Unsupported format: {fmt}'}, status=400)
+            return resp
+        except Exception:
+            return Response({'error': 'Failed to generate report. Please try again.'}, status=500)
 
 
 class GenerateExamClearanceReportView(APIView):
@@ -55,8 +93,23 @@ class GenerateStudentReportView(APIView):
 
 class GenerateCourseReportView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        return Response({'message': 'Course report generated'})
+        course_id = request.data.get('course_id')
+        fmt = (request.data.get('format') or request.data.get('fmt') or 'pdf').lower()
+        date_from = request.data.get('date_from')
+        date_to = request.data.get('date_to')
+
+        if not course_id:
+            return Response({'error': 'course_id is required'}, status=400)
+
+        try:
+            resp = _export_attendance_response(course_id, fmt, date_from, date_to)
+            if resp is None:
+                return Response({'error': f'Unsupported format: {fmt}'}, status=400)
+            return resp
+        except Exception:
+            return Response({'error': 'Failed to generate report. Please try again.'}, status=500)
 
 
 class GenerateDepartmentReportView(APIView):
@@ -113,25 +166,9 @@ class ExportAttendanceView(APIView):
             return Response({'error': 'course_id is required'}, status=400)
 
         try:
-            if format == 'csv':
-                content = generate_attendance_csv(course_id, date_from, date_to)
-                response = HttpResponse(content, content_type='text/csv')
-                response['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.csv"'
-                return response
-            
-            elif format == 'excel':
-                content = generate_attendance_excel(course_id, date_from, date_to)
-                response = HttpResponse(content, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                response['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.xlsx"'
-                return response
-            
-            elif format == 'pdf':
-                content = generate_attendance_pdf(course_id, date_from, date_to)
-                response = HttpResponse(content, content_type='application/pdf')
-                response['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.pdf"'
-                return response
-            
-            else:
+            resp = _export_attendance_response(course_id, format, date_from, date_to)
+            if resp is None:
                 return Response({'error': 'Invalid format'}, status=400)
-        except Exception as e:
-            return Response({'error': str(e)}, status=500)
+            return resp
+        except Exception:
+            return Response({'error': 'Failed to generate export. Please try again.'}, status=500)
