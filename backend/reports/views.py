@@ -69,8 +69,8 @@ class GenerateAttendanceReportView(APIView):
             if resp is None:
                 return Response({'error': f'Unsupported format: {fmt}'}, status=400)
             return resp
-        except Exception as e:
-            return Response({'error': str(e)}, status=500)
+        except Exception:
+            return Response({'error': 'Failed to generate report. Please try again.'}, status=500)
 
 
 class GenerateExamClearanceReportView(APIView):
@@ -108,8 +108,8 @@ class GenerateCourseReportView(APIView):
             if resp is None:
                 return Response({'error': f'Unsupported format: {fmt}'}, status=400)
             return resp
-        except Exception as e:
-            return Response({'error': str(e)}, status=500)
+        except Exception:
+            return Response({'error': 'Failed to generate report. Please try again.'}, status=500)
 
 
 class GenerateDepartmentReportView(APIView):
@@ -170,5 +170,5 @@ class ExportAttendanceView(APIView):
             if resp is None:
                 return Response({'error': 'Invalid format'}, status=400)
             return resp
-        except Exception as e:
-            return Response({'error': str(e)}, status=500)
+        except Exception:
+            return Response({'error': 'Failed to generate export. Please try again.'}, status=500)
