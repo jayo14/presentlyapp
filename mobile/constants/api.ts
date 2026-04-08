@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
     LECTURER_DASHBOARD: '/analytics/dashboard/lecturer/',
     ADMIN_DASHBOARD: '/analytics/dashboard/admin/',
     COURSE: (courseId: string) => `/analytics/attendance/course/${courseId}/`,
+    COURSE_EXPORT: (courseId: string, fmt: string) => `/analytics/attendance/course/${courseId}/export/${fmt}/`,
     STUDENT: (studentId: string) => `/analytics/attendance/student/${studentId}/`,
     TRENDS: '/analytics/attendance/trends/',
     OVERVIEW: '/analytics/attendance/overview/',
@@ -161,6 +162,7 @@ export const API_ENDPOINTS = {
     ALERTS: '/system/alerts/',
     CONFIG: '/system/config/',
     LOGS: '/system/logs/',
+    LOGS_EXPORT_CSV: '/system/logs/export/csv/',
     STATS: '/system/stats/',
   },
   // Timetables

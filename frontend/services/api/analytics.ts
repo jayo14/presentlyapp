@@ -13,6 +13,14 @@ export interface LecturerDashboardAnalytics {
 
 export interface StudentAnalytics {
   id: string;
+  // PRD-required fields
+  matric_number: string;
+  full_name: string;
+  total_sessions: number;
+  sessions_attended: number;
+  attendance_rate: number;
+  status: 'Present' | 'Absent';
+  // Legacy fields (backward-compat)
   name: string;
   matric: string;
   department: string;
@@ -26,12 +34,15 @@ export interface CourseAttendanceAnalytics {
   course_id: number;
   course_code: string;
   course_name: string;
+  lecturer?: string;
   total_sessions: number;
   students: StudentAnalytics[];
   avg_attendance: number;
   at_risk_count: number;
   good_standing_count: number;
   benchmark: number;
+  date_from?: string | null;
+  date_to?: string | null;
 }
 
 export const analyticsApi = {
@@ -67,10 +78,26 @@ export const analyticsApi = {
     };
   },
 
-  // Get course attendance analytics
-  getCourseAttendance: async (courseId: number, benchmark?: number): Promise<CourseAttendanceAnalytics> => {
-    const params = benchmark ? { benchmark } : {};
+  // Get course attendance analytics (returns PRD-required table format, sorted by matric)
+  getCourseAttendance: async (
+    courseId: number,
+    params?: { benchmark?: number; date_from?: string; date_to?: string; department_id?: number; college_id?: number }
+  ): Promise<CourseAttendanceAnalytics> => {
     const response = await apiClient.get(`/analytics/attendance/course/${courseId}/`, { params });
     return response.data;
+  },
+
+  // Export course attendance table as file (csv | excel | pdf)
+  exportCourseAttendance: (
+    courseId: number,
+    fmt: 'csv' | 'excel' | 'pdf',
+    params?: { date_from?: string; date_to?: string }
+  ) => {
+    const base = apiClient.defaults.baseURL ?? '';
+    const queryStr = params
+      ? '?' + Object.entries(params).filter(([, v]) => v).map(([k, v]) => `${k}=${v}`).join('&')
+      : '';
+    const url = `${base}/analytics/attendance/course/${courseId}/export/${fmt}/${queryStr}`;
+    window.open(url, '_blank');
   },
 };

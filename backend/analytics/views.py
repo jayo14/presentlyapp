@@ -1,7 +1,10 @@
+import csv
+import io
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Q, Avg, F
+from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -269,99 +272,167 @@ class AttendanceTrendsView(APIView):
 
 class CourseAttendanceAnalyticsView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     @method_decorator(cache_page(30))
     @method_decorator(vary_on_headers('Authorization'))
     def get(self, request, course_id):
         """
-        Get detailed attendance analytics for a specific course
-        Returns: student list with attendance records, percentages, at-risk students
+        Get detailed attendance analytics for a specific course.
+        Returns students sorted by matric number (ascending) with:
+        Matric Number, Full Name, Total Sessions, Sessions Attended,
+        Attendance Rate (%), Status (Present/Absent).
         """
         try:
             course = Course.objects.get(id=course_id)
         except Course.DoesNotExist:
             return Response({'error': 'Course not found'}, status=404)
-        
-        # Check if user has permission (lecturer of this course or admin)
+
         user = request.user
         if user.role not in [UserRole.LECTURER, UserRole.ADMIN] and course.lecturer != user:
             return Response({'error': 'Permission denied'}, status=403)
-        
-        # Get all sessions for this course
-        total_sessions = AttendanceSession.objects.filter(course=course).count()
-        
+
+        # Optional date-range filters
+        date_from = request.query_params.get('date_from')
+        date_to = request.query_params.get('date_to')
+        department_id = request.query_params.get('department_id')
+        college_id = request.query_params.get('college_id')
+        benchmark = int(request.query_params.get('benchmark', 75))
+
+        sessions_qs = AttendanceSession.objects.filter(course=course)
+        if date_from:
+            sessions_qs = sessions_qs.filter(start_time__date__gte=date_from)
+        if date_to:
+            sessions_qs = sessions_qs.filter(start_time__date__lte=date_to)
+        total_sessions = sessions_qs.count()
+
         if total_sessions == 0:
             return Response({
                 'course_id': course_id,
                 'course_code': course.code,
                 'course_name': course.title,
+                'lecturer': course.lecturer.full_name if course.lecturer else None,
                 'total_sessions': 0,
                 'students': [],
                 'avg_attendance': 0,
                 'at_risk_count': 0,
-                'good_standing_count': 0
+                'good_standing_count': 0,
+                'benchmark': benchmark,
+                'date_from': date_from,
+                'date_to': date_to,
             })
-        
-        # Get enrolled students for this course using the enrollment system
+
         from institutions.models import CourseEnrollment
-        enrolled_student_ids = CourseEnrollment.objects.filter(
-            course=course,
-            is_active=True
-        ).values_list('student_id', flat=True)
-        
-        # Get students who have attended at least one session but might not be enrolled
+        enrolled_qs = CourseEnrollment.objects.filter(course=course, is_active=True)
+        enrolled_student_ids = enrolled_qs.values_list('student_id', flat=True)
+
         attending_student_ids = Attendance.objects.filter(
-            session__course=course
+            session__in=sessions_qs
         ).values_list('student_id', flat=True).distinct()
-        
-        # Combine both sets of student IDs and filter out None
+
         all_student_ids = {sid for sid in (set(enrolled_student_ids) | set(attending_student_ids)) if sid}
-        
-        # Fetch user objects
-        all_students = User.objects.filter(id__in=all_student_ids)
-        
-        # Build student analytics
+
+        students_qs = User.objects.filter(id__in=all_student_ids)
+        if department_id:
+            students_qs = students_qs.filter(department_id=department_id)
+        if college_id:
+            students_qs = students_qs.filter(college_id=college_id)
+
         student_analytics = []
-        benchmark = int(request.GET.get('benchmark', 70))
-        
-        for student in all_students:
+        for student in students_qs:
             attended_count = Attendance.objects.filter(
                 student=student,
-                session__course=course
+                session__in=sessions_qs,
             ).count()
-            
-            attendance_percentage = round((attended_count / total_sessions) * 100) if total_sessions > 0 else 0
-            
+
+            attendance_rate = round((attended_count / total_sessions) * 100, 1) if total_sessions > 0 else 0.0
+            status = 'Present' if attendance_rate >= benchmark else 'Absent'
+
+            dept = student.department
+            dept_name = dept.name if hasattr(dept, 'name') else (dept or 'N/A')
+
             student_analytics.append({
                 'id': str(student.id),
+                'matric_number': student.matric_number or 'N/A',
+                'full_name': student.full_name,
+                'department': dept_name,
+                'level': student.level or 'N/A',
+                'total_sessions': total_sessions,
+                'sessions_attended': attended_count,
+                'attendance_rate': attendance_rate,
+                'status': status,
+                # Legacy fields kept for backward-compat
                 'name': student.full_name,
                 'matric': student.matric_number or 'N/A',
-                'department': student.department.name if hasattr(student.department, 'name') else (student.department or 'N/A'),
-                'level': student.level or 'N/A',
                 'attended': attended_count,
                 'total': total_sessions,
-                'percentage': attendance_percentage
+                'percentage': attendance_rate,
             })
-        
-        # Sort by attendance percentage (descending)
-        student_analytics.sort(key=lambda x: x['percentage'], reverse=True)
-        
-        # Calculate summary statistics
-        avg_attendance = round(sum([s['percentage'] for s in student_analytics]) / len(student_analytics)) if student_analytics else 0
-        at_risk_count = len([s for s in student_analytics if s['percentage'] < benchmark])
-        good_standing_count = len([s for s in student_analytics if s['percentage'] >= benchmark])
-        
+
+        # Sort ascending by matric number (PRD requirement)
+        student_analytics.sort(key=lambda x: (x['matric_number'] == 'N/A', x['matric_number']))
+
+        avg_attendance = round(
+            sum(s['attendance_rate'] for s in student_analytics) / len(student_analytics), 1
+        ) if student_analytics else 0.0
+        at_risk_count = sum(1 for s in student_analytics if s['attendance_rate'] < benchmark)
+        good_standing_count = sum(1 for s in student_analytics if s['attendance_rate'] >= benchmark)
+
         return Response({
             'course_id': course_id,
             'course_code': course.code,
             'course_name': course.title,
+            'lecturer': course.lecturer.full_name if course.lecturer else None,
             'total_sessions': total_sessions,
             'students': student_analytics,
             'avg_attendance': avg_attendance,
             'at_risk_count': at_risk_count,
             'good_standing_count': good_standing_count,
-            'benchmark': benchmark
+            'benchmark': benchmark,
+            'date_from': date_from,
+            'date_to': date_to,
         })
+
+
+class CourseAttendanceTableExportView(APIView):
+    """
+    Export the attendance analytics table as CSV, Excel or PDF.
+    GET /analytics/attendance/course/<course_id>/export/<fmt>/
+    Supported fmt values: csv, excel, xlsx, pdf
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id, fmt):
+        from reports.export_services import generate_attendance_csv, generate_attendance_excel, generate_attendance_pdf
+
+        fmt = fmt.lower()
+        date_from = request.query_params.get('date_from')
+        date_to = request.query_params.get('date_to')
+
+        try:
+            if fmt == 'csv':
+                content = generate_attendance_csv(course_id, date_from, date_to)
+                resp = HttpResponse(content, content_type='text/csv')
+                resp['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.csv"'
+                return resp
+            elif fmt in ('excel', 'xlsx'):
+                content = generate_attendance_excel(course_id, date_from, date_to)
+                resp = HttpResponse(
+                    content,
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                )
+                resp['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.xlsx"'
+                return resp
+            elif fmt == 'pdf':
+                content = generate_attendance_pdf(course_id, date_from, date_to)
+                resp = HttpResponse(content, content_type='application/pdf')
+                resp['Content-Disposition'] = f'attachment; filename="attendance_{course_id}.pdf"'
+                return resp
+            else:
+                return Response({'error': f'Unsupported format: {fmt}. Use csv, excel/xlsx, or pdf.'}, status=400)
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=404)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
 
 
 class StudentAttendanceAnalyticsView(APIView):
