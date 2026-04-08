@@ -381,6 +381,87 @@ export const LecturerAnalytics: React.FC = () => {
              <p className="text-textMuted">Host a few sessions to see data here.</p>
           </div>
         )}
+
+        {/* ── Analytics Table (PRD-required exact format) ─────────────────── */}
+        {courseAnalytics && courseAnalytics.students.length > 0 && (
+          <div className="bg-surface border border-outline rounded-2xl overflow-hidden shadow-sm">
+            {/* Table header + export buttons */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 border-b border-outline">
+              <div>
+                <h4 className="font-headline text-lg font-bold">
+                  Attendance Register — {courseAnalytics.course_code}
+                </h4>
+                <p className="text-sm text-textMuted mt-0.5">
+                  {courseAnalytics.total_sessions} sessions • sorted by Matric Number
+                </p>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {(['csv', 'excel', 'pdf'] as const).map(fmt => (
+                  <button
+                    key={fmt}
+                    onClick={() => analyticsApi.exportCourseAttendance(courseAnalytics.course_id, fmt)}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    <Download size={13} />
+                    {fmt.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-primary/10">
+                    <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Matric Number</th>
+                    <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Full Name</th>
+                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Total Sessions</th>
+                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Attended</th>
+                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Rate (%)</th>
+                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {courseAnalytics.students
+                    .filter(s =>
+                      !searchTerm ||
+                      (s.full_name || s.name).toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      (s.matric_number || s.matric).toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((student, idx) => {
+                      const rate = student.attendance_rate ?? student.percentage ?? 0;
+                      const status = student.status ?? (rate >= (courseAnalytics.benchmark ?? 75) ? 'Present' : 'Absent');
+                      const matricNo = student.matric_number || student.matric || 'N/A';
+                      const fullName = student.full_name || student.name || 'Unknown';
+                      const attended = student.sessions_attended ?? student.attended ?? 0;
+                      const total = student.total_sessions ?? student.total ?? courseAnalytics.total_sessions;
+                      return (
+                        <tr key={student.id} className={idx % 2 === 0 ? 'bg-surface' : 'bg-surfaceLow/30'}>
+                          <td className="px-4 py-3 font-mono text-xs text-textMuted">{matricNo}</td>
+                          <td className="px-4 py-3 font-medium text-text">{fullName}</td>
+                          <td className="px-4 py-3 text-center text-textMuted">{total}</td>
+                          <td className="px-4 py-3 text-center text-textMuted">{attended}</td>
+                          <td className={`px-4 py-3 text-center font-bold ${rate >= 75 ? 'text-green-500' : 'text-red-500'}`}>
+                            {Number(rate).toFixed(1)}%
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-bold ${
+                              status === 'Present'
+                                ? 'bg-green-500/10 text-green-600'
+                                : 'bg-red-500/10 text-red-600'
+                            }`}>
+                              {status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
