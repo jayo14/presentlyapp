@@ -187,11 +187,11 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
 
             {/* Manual Entry Modal */}
             {isTimetableModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4">
                     <div
                         {...manualEntryProps}
                         aria-labelledby="manual-entry-title"
-                        className="bg-surface text-text border border-outline rounded-xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95 outline-none"
+                        className="bg-surface text-text border border-outline rounded-none md:rounded-xl w-full h-[100dvh] md:h-auto md:max-w-md p-6 shadow-xl animate-in zoom-in-95 outline-none overflow-y-auto"
                     >
                         <div className="mb-5 flex justify-between items-center">
                             <h3 id="manual-entry-title" className="font-headline text-base font-semibold text-text">Add Timetable Entry</h3>
@@ -265,11 +265,11 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
 
             {/* AI Scan Modal */}
             {isAiScanOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4">
                     <div
                         {...aiScanProps}
                         aria-labelledby="ai-scan-title"
-                        className="bg-surface text-text border border-outline rounded-xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95 text-center outline-none"
+                        className="bg-surface text-text border border-outline rounded-none md:rounded-xl w-full h-[100dvh] md:h-auto md:max-w-md p-6 shadow-xl animate-in zoom-in-95 text-center outline-none overflow-y-auto"
                     >
                         <div className="flex justify-end">
                             <button onClick={() => setIsAiScanOpen(false)} aria-label="Close dialog" className="p-1 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors">

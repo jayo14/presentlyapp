@@ -2270,13 +2270,14 @@ def public_check_in_view(request, session_code):
                 'error': 'Authentication required to mark attendance'
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        # Rate-limit AFTER auth — now request.user is the real authenticated user
-        # key='user_or_ip' falls back to IP for anonymous (won't happen here, but safe)
+        # Rate-limit AFTER auth using user identity only (POST requires auth).
+        # Higher threshold prevents accidental lockouts from rapid scanner retries.
+        check_in_rate = getattr(settings, 'PUBLIC_CHECK_IN_RATE', '20/m')
         ratelimited = is_ratelimited(
             request,
             group='check_in_post',
-            key='user_or_ip',
-            rate='5/m',
+            key='user',
+            rate=check_in_rate,
             increment=True,
         )
         if ratelimited:

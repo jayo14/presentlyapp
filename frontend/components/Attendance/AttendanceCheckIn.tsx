@@ -30,6 +30,10 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
 
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (status === 'locating' || status === 'verifying') {
+      return;
+    }
     
     if (!sessionCode || sessionCode.length < 6) {
       setError('Please enter a valid session code');
@@ -118,7 +122,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: "100%", opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="bg-white dark:bg-surface w-full md:max-w-lg h-[90vh] md:h-auto md:max-h-[85vh] rounded-t-[3.5rem] md:rounded-[3.5rem] shadow-[0_32px_128px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden border border-outline/10 relative"
+        className="bg-white dark:bg-surface w-full md:max-w-lg h-[100dvh] md:h-auto md:max-h-[85vh] rounded-none md:rounded-[3.5rem] shadow-[0_32px_128px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden border border-outline/10 relative"
       >
         <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
 
@@ -188,10 +192,10 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
                 <div className="flex flex-col gap-4 pt-4">
                   <button 
                     onClick={handleCheckIn}
-                    disabled={sessionCode.length < 6}
+                    disabled={sessionCode.length < 6 || status === 'locating' || status === 'verifying'}
                     className="w-full h-24 bg-text dark:bg-primary text-background dark:text-background font-black text-xl rounded-[2rem] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-30 disabled:grayscale disabled:scale-100"
                   >
-                    {status === 'error' ? 'Retry Synchronisation' : 'Initiate Sync'}
+                    {status === 'error' ? 'Retry Synchronisation' : status === 'locating' || status === 'verifying' ? 'Synchronising...' : 'Initiate Sync'}
                     <ChevronRight size={24} strokeWidth={3} />
                   </button>
                   <button 

@@ -530,11 +530,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
 
       {/* Report Issue Modal */}
       {isReportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div 
                 {...reportModalProps}
                 aria-labelledby="report-title"
-                className="bg-surface text-text border border-outline rounded-2xl w-full max-w-md p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200 outline-none"
+            className="bg-surface text-text border border-outline rounded-none md:rounded-2xl w-full h-[100dvh] md:h-auto md:max-w-md p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200 outline-none overflow-y-auto"
             >
                 <div className="flex justify-between items-start mb-4">
                     <div>

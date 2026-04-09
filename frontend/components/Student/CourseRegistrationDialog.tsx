@@ -97,10 +97,10 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="bg-white dark:bg-surface w-[calc(100vw-32px)] sm:max-w-lg h-[92vh] md:h-auto md:max-h-[85vh] rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
+        className="bg-white dark:bg-surface w-full md:max-w-lg h-[100dvh] md:h-auto md:max-h-[85vh] rounded-none md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
       >
         {/* Mobile Drag Handle */}
-        <div className="w-12 h-1.5 bg-outline/20 rounded-full mx-auto mt-4 md:hidden" />
+        <div className="hidden md:block w-12 h-1.5 bg-outline/20 rounded-full mx-auto mt-4" />
 
         {/* Header */}
         <div className="px-8 pt-8 pb-4 flex flex-col gap-1 relative flex-shrink-0">

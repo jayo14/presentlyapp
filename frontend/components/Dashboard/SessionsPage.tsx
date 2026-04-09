@@ -207,11 +207,11 @@ export const SessionsPage: React.FC = () => {
 
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4">
             <div
               {...deleteModalProps}
               aria-labelledby="delete-session-title"
-              className="bg-surface text-text border border-outline rounded-xl w-full max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none"
+              className="bg-surface text-text border border-outline rounded-none md:rounded-xl w-full h-[100dvh] md:h-auto md:max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none overflow-y-auto"
             >
               <div className="text-center space-y-3">
                 <div className="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
