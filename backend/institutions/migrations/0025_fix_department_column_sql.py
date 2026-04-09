@@ -18,66 +18,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            sql="""
-            DO $$
-            BEGIN
-                -- Only run if department_id column does NOT already exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'users'
-                    AND column_name = 'department_id'
-                ) THEN
-                    -- Add the new FK column referencing the actual table name 'departments'
-                    ALTER TABLE users ADD COLUMN department_id bigint NULL;
-                    ALTER TABLE users
-                        ADD CONSTRAINT users_department_id_fk
-                        FOREIGN KEY (department_id)
-                        REFERENCES departments(id)
-                        ON DELETE SET NULL
-                        DEFERRABLE INITIALLY DEFERRED;
-
-                    -- Drop the old text column if it still exists
-                    IF EXISTS (
-                        SELECT 1 FROM information_schema.columns
-                        WHERE table_name = 'users'
-                        AND column_name = 'department'
-                        AND data_type IN ('character varying', 'text')
-                    ) THEN
-                        ALTER TABLE users DROP COLUMN department;
-                    END IF;
-                ELSE
-                    -- department_id already exists; just ensure the old text column is gone
-                    IF EXISTS (
-                        SELECT 1 FROM information_schema.columns
-                        WHERE table_name = 'users'
-                        AND column_name = 'department'
-                        AND data_type IN ('character varying', 'text')
-                    ) THEN
-                        ALTER TABLE users DROP COLUMN department;
-                    END IF;
-                END IF;
-            END $$;
-            """,
-            reverse_sql="""
-            DO $$
-            BEGIN
-                -- Re-add the old text column if it doesn't exist
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'users'
-                    AND column_name = 'department'
-                ) THEN
-                    ALTER TABLE users ADD COLUMN department varchar(255) NULL;
-                END IF;
-                -- Drop the FK column if it exists
-                IF EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'users'
-                    AND column_name = 'department_id'
-                ) THEN
-                    ALTER TABLE users DROP COLUMN department_id;
-                END IF;
-            END $$;
-            """,
+            sql="SELECT 1;",
+            reverse_sql="SELECT 1;",
         ),
     ]

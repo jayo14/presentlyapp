@@ -3,6 +3,7 @@ services:
     name: presently-backend-web
     env: python
     plan: free
+    rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: ./entrypoint.sh gunicorn presently.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 --graceful-timeout 30 --max-requests 500 --max-requests-jitter 100 --worker-tmp-dir /dev/shm
     healthCheckPath: /admin/login/
@@ -31,6 +32,7 @@ services:
     name: presently-backend-worker
     env: python
     plan: free
+    rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: celery -A presently worker --loglevel=info
     envVars:
