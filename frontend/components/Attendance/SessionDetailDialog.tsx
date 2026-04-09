@@ -74,12 +74,12 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 bg-black/60 backdrop-blur-xl animate-in fade-in duration-500">
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        className="bg-white dark:bg-surface w-full max-w-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-outline/10 overflow-hidden relative"
+        className="bg-white dark:bg-surface w-full h-[100dvh] md:h-auto md:max-h-[92vh] md:max-w-2xl rounded-none md:rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.4)] border border-outline/10 overflow-hidden relative"
         {...modalProps}
       >
         {/* End Session Overlay */}

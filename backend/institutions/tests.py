@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework import status
+from rest_framework.response import Response
 from .views import AttendanceSessionViewSet, public_check_in_view
 from .models import User, AttendanceSession, Course, Venue, Institution, College, Department, Attendance, UserRole, CourseEnrollment
 from unittest.mock import patch, MagicMock
@@ -175,6 +176,43 @@ class CheckInTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertFalse(response.data['success'])
+
+    @patch('institutions.views.is_ratelimited', return_value=True)
+    def test_public_check_in_rate_limit_returns_429(self, _mock_ratelimited):
+        request = self.factory.post(
+            f'/api/check-in/{self.session.session_code}/',
+            {'latitude': 10.0, 'longitude': 10.0},
+            format='json'
+        )
+        force_authenticate(request, user=self.student)
+
+        response = public_check_in_view(request, session_code=self.session.session_code)
+
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+        self.assertIn('Too many check-in attempts', response.data['error'])
+
+    @patch('institutions.views.perform_attendance_check_in')
+    @patch('institutions.views.is_ratelimited', return_value=False)
+    def test_public_check_in_rate_limit_uses_user_key_and_default_rate(self, mock_ratelimited, mock_perform_check_in):
+        mock_perform_check_in.return_value = Response({'success': True}, status=status.HTTP_201_CREATED)
+
+        request = self.factory.post(
+            f'/api/check-in/{self.session.session_code}/',
+            {'latitude': 10.0, 'longitude': 10.0},
+            format='json'
+        )
+        force_authenticate(request, user=self.student)
+
+        response = public_check_in_view(request, session_code=self.session.session_code)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        mock_ratelimited.assert_called_once_with(
+            request,
+            group='check_in_post',
+            key='user',
+            rate='20/m',
+            increment=True,
+        )
 
     @patch('institutions.attendance_logic.verify_location')
     def test_check_in_multi_sample_stable(self, mock_verify):

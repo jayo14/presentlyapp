@@ -26,7 +26,7 @@ export const AttendanceFailurePage: React.FC<AttendanceFailurePageProps> = ({
 
   return (
     <div className="fixed inset-0 z-[220] bg-black/60 backdrop-blur-sm md:p-6 lg:p-10">
-      <div className="relative h-full w-full bg-background text-foreground flex flex-col font-sans overflow-hidden transition-colors duration-500 md:rounded-[2.5rem] md:border md:border-border md:shadow-2xl md:max-w-[920px] md:max-h-[900px] md:mx-auto">
+      <div className="relative h-[100dvh] md:h-full w-full bg-background text-foreground flex flex-col font-sans overflow-hidden transition-colors duration-500 md:rounded-[2.5rem] md:border md:border-border md:shadow-2xl md:max-w-[920px] md:max-h-[900px] md:mx-auto">
       {/* Background Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 

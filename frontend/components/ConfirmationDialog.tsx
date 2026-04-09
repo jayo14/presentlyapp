@@ -45,7 +45,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[200] flex items-end md:items-center justify-center p-0 md:p-4">
         {/* Backdrop */}
         <motion.div 
           initial={{ opacity: 0 }}
@@ -60,7 +60,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full max-w-md bg-white dark:bg-surface rounded-[2.5rem] shadow-2xl border border-outline/10 overflow-hidden"
+          className="relative w-full h-[100dvh] md:h-auto md:max-w-md bg-white dark:bg-surface rounded-none md:rounded-[2.5rem] shadow-2xl border border-outline/10 overflow-y-auto md:overflow-hidden"
         >
           <div className="p-8">
             <div className="flex flex-col items-center text-center space-y-4">
