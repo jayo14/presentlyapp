@@ -12,6 +12,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { analyticsApi, LecturerDashboardAnalytics, CourseAttendanceAnalytics } from '../../services/api/analytics';
 import { courseApi, Course } from '../../services/api/attendance';
+import { systemApi } from '../../services/api/system';
 import { toast } from 'sonner';
 
 export const LecturerAnalytics: React.FC = () => {
@@ -22,6 +23,7 @@ export const LecturerAnalytics: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [courseLoading, setCourseLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [atRiskAlertsEnabled, setAtRiskAlertsEnabled] = useState(true);
 
   useEffect(() => {
     fetchInitialData();
@@ -36,12 +38,14 @@ export const LecturerAnalytics: React.FC = () => {
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const [analytics, coursesData] = await Promise.all([
+      const [analytics, coursesData, config] = await Promise.all([
         analyticsApi.getLecturerDashboard(),
-        courseApi.getAll()
+        courseApi.getAll(),
+        systemApi.getConfig(),
       ]);
       setDashboardData(analytics);
       setCourses(coursesData);
+      setAtRiskAlertsEnabled(config.at_risk_alerts_enabled !== false);
       
       // Select first course by default if available
       if (coursesData.length > 0) {
@@ -295,7 +299,7 @@ export const LecturerAnalytics: React.FC = () => {
              ))}
           </div>
         ) : courseAnalytics ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-8">
             {/* Course Summary Card */}
             <div className="bg-surface border-outline rounded-2xl p-8 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
@@ -330,6 +334,7 @@ export const LecturerAnalytics: React.FC = () => {
             </div>
 
             {/* At-Risk Alerts */}
+            {atRiskAlertsEnabled && (
             <div className="bg-surface text-text border border-outline rounded-2xl p-6 shadow-sm flex flex-col">
               <div className="flex justify-between items-center mb-6">
                 <h4 className="font-headline font-bold flex items-center gap-2 text-lg">
@@ -373,6 +378,7 @@ export const LecturerAnalytics: React.FC = () => {
                 </Button>
               </div>
             </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-20 bg-surfaceLow/50 rounded-3xl border border-dashed border-outline">
