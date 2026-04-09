@@ -125,21 +125,13 @@ DATABASES = {
     }
 }
 
-# Override with PostgreSQL if DATABASE_URL is set (production)
-if 'DATABASE_URL' in os.environ:
-    db_url = os.environ.get('DATABASE_URL')
-    if db_url:
-        is_postgres = db_url.startswith('postgresql') # Covers both 'postgres://' and 'postgresql://'
-        
-        DATABASES['default'] = dj_database_url.config(
-            default=db_url,
-            conn_max_age=0,
-            conn_health_checks=True,
-            ssl_require=is_postgres
-        )
-        # Use regular PostgreSQL backend (no PostGIS/GDAL required)
-        if is_postgres:
-            DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+# Override with PostgreSQL if DATABASE_URL is set
+if os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=0,  # Set to 0 for serverless/automated scaling environments
+        conn_health_checks=True,
+        ssl_require=True,
+    )
 
 
 # Password validation
