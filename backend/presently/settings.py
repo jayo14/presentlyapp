@@ -241,7 +241,7 @@ if DEBUG or os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True':
 else:
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = [
-        'http://localhost:3000',
+        'localhost',
         'http://127.0.0.1:3000',
         'https://getpresently.com.ng',
         FRONTEND_ORIGIN,
@@ -250,6 +250,12 @@ else:
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://*.app.github.dev",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "https://getpresently.com.ng",
     "https://www.getpresently.com.ng",
 ]
