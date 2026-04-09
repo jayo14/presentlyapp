@@ -278,28 +278,30 @@ export const AttendanceReport: React.FC = () => {
     setShowExportMenu(false);
   };
 
-  const handleManualMark = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedSessionId || !manualMatric) {
-      toast.error('Please enter a matric number');
-      return;
-    }
-    
-    try {
-      setMarkingManual(true);
-      await dashboardApi.manualMark(selectedSessionId, manualMatric, 'PRESENT');
-      toast.success(`Student (${manualMatric}) marked as present`);
-      setManualMatric('');
-      setShowManualMarkModal(false);
-      loadSessionAttendance(selectedSessionId);
-    } catch (err: any) {
-      console.error('Manual mark error:', err);
-      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Failed to mark student';
-      toast.error(errorMsg);
-    } finally {
-      setMarkingManual(false);
-    }
-  };
+    const handleManualMark = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const normalizedMatric = manualMatric.trim();
+
+        if (!selectedSessionId || !normalizedMatric) {
+            toast.error('Please enter a matric number');
+            return;
+        }
+
+        try {
+            setMarkingManual(true);
+            await dashboardApi.manualMark(selectedSessionId, normalizedMatric, 'PRESENT');
+            toast.success(`Student (${normalizedMatric}) marked as present`);
+            setManualMatric('');
+            setShowManualMarkModal(false);
+            loadSessionAttendance(selectedSessionId);
+        } catch (err: any) {
+            console.error('Manual mark error:', err);
+            const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Failed to mark student';
+            toast.error(errorMsg);
+        } finally {
+            setMarkingManual(false);
+        }
+    };
 
   if (loadingCourses) {
     return (

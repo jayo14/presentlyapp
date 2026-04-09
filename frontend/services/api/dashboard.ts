@@ -124,9 +124,11 @@ export const dashboardApi = {
    * Manually mark a student's attendance (lecturer only).
    * Endpoint: POST /sessions/{sessionId}/manual_mark/
    */
-  manualMark: async (sessionId: number, studentId: string, status: string): Promise<any> => {
+  manualMark: async (sessionId: number, studentIdentifier: string, status: string): Promise<any> => {
+    const normalizedIdentifier = studentIdentifier.trim();
     const response = await apiClient.post(`/sessions/${sessionId}/manual_mark/`, {
-      student_id: studentId,
+      student_id: normalizedIdentifier,
+      matric_number: normalizedIdentifier,
       status,
     });
     return response.data;

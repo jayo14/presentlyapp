@@ -1,4 +1,5 @@
 import requests
+import uuid
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
@@ -1903,15 +1904,40 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         if request.user.role != UserRole.ADMIN and session.course.lecturer != request.user:
             return Response({'success': False, 'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
 
-        student_id = request.data.get('student_id')
+        raw_student_identifier = (
+            request.data.get('student_id')
+            or request.data.get('matric_number')
+            or request.data.get('student_identifier')
+            or ''
+        )
+        student_identifier = str(raw_student_identifier).strip()
         status_choice = request.data.get('status', 'PRESENT')
         reason = request.data.get('reason', 'Manual override by lecturer')
 
-        if not student_id:
-            return Response({'success': False, 'error': 'student_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not student_identifier:
+            return Response({'success': False, 'error': 'student_id or matric_number is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            student = User.objects.get(id=student_id, role=UserRole.STUDENT)
+            student_filter = Q(role=UserRole.STUDENT) & (
+                Q(matric_number__iexact=student_identifier) |
+                Q(email__iexact=student_identifier)
+            )
+
+            # Accept UUID user IDs when provided while avoiding invalid-UUID crashes.
+            try:
+                student_uuid = uuid.UUID(student_identifier)
+                student_filter = student_filter | Q(role=UserRole.STUDENT, id=student_uuid)
+            except (TypeError, ValueError, AttributeError):
+                pass
+
+            student = User.objects.filter(student_filter).first()
+            if not student:
+                return Response({'success': False, 'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Manual mark is only valid for enrolled students in the session course.
+            if not CourseEnrollment.objects.filter(student=student, course=session.course, is_active=True).exists():
+                return Response({'success': False, 'error': 'Student is not enrolled in this course'}, status=status.HTTP_400_BAD_REQUEST)
+
             attendance, created = Attendance.objects.update_or_create(
                 session=session,
                 student=student,
@@ -1927,8 +1953,9 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 'message': f"Student {student.full_name} marked as {status_choice}",
                 'data': AttendanceSerializer(attendance).data
             })
-        except User.DoesNotExist:
-            return Response({'success': False, 'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception:
+            logger.exception("Manual attendance mark failed for session=%s student_identifier=%s", session.id, student_identifier)
+            return Response({'success': False, 'error': 'Unable to mark attendance at the moment'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'])
     def check_in(self, request, pk=None):

@@ -297,6 +297,40 @@ class CheckInTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('speed', response.data['error'].lower())
 
+    def test_manual_mark_accepts_matric_number(self):
+        view = AttendanceSessionViewSet.as_view({'post': 'manual_mark'})
+        if not self.student.matric_number:
+            self.student.matric_number = 'MTR0001'
+            self.student.save(update_fields=['matric_number'])
+
+        request = self.factory.post(
+            f'/api/sessions/{self.session.id}/manual_mark/',
+            {'student_id': self.student.matric_number, 'status': 'PRESENT'},
+            format='json'
+        )
+        force_authenticate(request, user=self.lecturer)
+
+        response = view(request, pk=self.session.id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['success'])
+        self.assertEqual(Attendance.objects.filter(session=self.session, student=self.student).count(), 1)
+
+    def test_manual_mark_with_invalid_uuid_like_student_identifier_returns_404(self):
+        view = AttendanceSessionViewSet.as_view({'post': 'manual_mark'})
+        request = self.factory.post(
+            f'/api/sessions/{self.session.id}/manual_mark/',
+            {'student_id': '240303010036', 'status': 'PRESENT'},
+            format='json'
+        )
+        force_authenticate(request, user=self.lecturer)
+
+        response = view(request, pk=self.session.id)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(response.data['success'])
+        self.assertIn('Student not found', response.data['error'])
+
 
 # ---------------------------------------------------------------------------
 # Venue display field tests
