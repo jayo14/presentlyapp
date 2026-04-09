@@ -29,10 +29,11 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans overflow-hidden transition-colors duration-500">
+    <div className="fixed inset-0 z-[220] bg-black/60 backdrop-blur-sm md:p-6 lg:p-10">
+      <div className="relative h-full w-full bg-background text-foreground flex flex-col font-sans overflow-hidden transition-colors duration-500 md:rounded-[2.5rem] md:border md:border-border md:shadow-2xl md:max-w-[920px] md:max-h-[900px] md:mx-auto">
       {/* Background Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
-      
+
       {/* Header */}
       <header className="p-6 flex items-center justify-between relative z-10">
         <button 
@@ -46,7 +47,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center p-8 relative z-10">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 md:p-8 relative z-10 overflow-y-auto">
         {/* Success Visual */}
         <div className="relative mb-12">
             <motion.div 
@@ -131,7 +132,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
       </main>
 
       {/* Footer Actions */}
-      <footer className="p-8 space-y-4 relative z-10">
+      <footer className="p-6 md:p-8 space-y-4 relative z-10">
          <motion.button 
            initial={{ y: 20, opacity: 0 }}
            animate={{ y: 0, opacity: 1 }}
@@ -152,6 +153,7 @@ export const AttendanceSuccessPage: React.FC<AttendanceSuccessPageProps> = ({
             Share Proof
          </motion.button>
       </footer>
+      </div>
     </div>
   );
 };
