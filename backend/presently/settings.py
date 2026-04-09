@@ -179,13 +179,20 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Use manifest-based storage in production, but keep development tolerant of
+# uncollected static files so the admin login can render without collectstatic.
+if DEBUG:
+    staticfiles_storage_backend = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    staticfiles_storage_backend = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # WhiteNoise storage to serve compressed and cached static files
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": staticfiles_storage_backend,
     },
 }
 
