@@ -23,6 +23,7 @@ export interface SystemAlert {
 
 export interface SystemConfig {
   payment_gateway_enabled: boolean;
+  at_risk_alerts_enabled: boolean;
 }
 
 export interface SystemLog {
@@ -118,8 +119,10 @@ export const systemApi = {
       // Return from localStorage if endpoint doesn't exist yet
       console.warn('System config endpoint not available, using localStorage');
       const stored = localStorage.getItem('PAYMENT_GATEWAY_ENABLED');
+      const atRiskStored = localStorage.getItem('AT_RISK_ALERTS_ENABLED');
       return {
         payment_gateway_enabled: stored === 'true',
+        at_risk_alerts_enabled: atRiskStored !== 'false',
       };
     }
   },
@@ -134,6 +137,9 @@ export const systemApi = {
       console.warn('System config endpoint not available, using localStorage');
       if (config.payment_gateway_enabled !== undefined) {
         localStorage.setItem('PAYMENT_GATEWAY_ENABLED', String(config.payment_gateway_enabled));
+      }
+      if (config.at_risk_alerts_enabled !== undefined) {
+        localStorage.setItem('AT_RISK_ALERTS_ENABLED', String(config.at_risk_alerts_enabled));
       }
       return config as SystemConfig;
     }

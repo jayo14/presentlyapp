@@ -4,11 +4,13 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import status
 from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.utils import timezone
 from datetime import timedelta
-from .models import SystemLog
+from .models import SystemLog, FeatureFlag
+from .feature_flags import get_feature_flag
 from .serializers import SystemLogSerializer
 from institutions.models import User, AttendanceSession, Venue
 
@@ -155,8 +157,30 @@ class SystemConfigView(APIView):
 
     def get(self, request):
         return Response({
-            'payment_gateway_enabled': False
+            'payment_gateway_enabled': False,
+            'at_risk_alerts_enabled': get_feature_flag('at_risk_alerts', default=True),
         })
 
     def patch(self, request):
-        return Response(request.data)
+        payload = dict(request.data)
+
+        if 'at_risk_alerts_enabled' in payload:
+            if not request.user.is_staff:
+                return Response({'error': 'Only staff can update feature flags.'}, status=status.HTTP_403_FORBIDDEN)
+
+            enabled = bool(payload.get('at_risk_alerts_enabled'))
+            flag, _ = FeatureFlag.objects.get_or_create(
+                key='at_risk_alerts',
+                defaults={
+                    'name': 'At-Risk Alerts',
+                    'description': 'Show at-risk student alerts and bulk reminder actions in lecturer analytics.',
+                    'enabled': enabled,
+                },
+            )
+            if flag.enabled != enabled:
+                flag.enabled = enabled
+                flag.save(update_fields=['enabled', 'updated_at'])
+
+            payload['at_risk_alerts_enabled'] = enabled
+
+        return Response(payload)
