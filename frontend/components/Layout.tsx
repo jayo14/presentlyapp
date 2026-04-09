@@ -561,17 +561,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MOBILE BOTTOM NAV (Dock)  */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-6 left-0 right-0 z-[100] pointer-events-none flex justify-center">
-        <Dock
-          items={[
-            { id: 'dashboard', label: 'Home', active: currentPage === 'dashboard', onClick: () => handleNavClick('dashboard'), icon: <Home size={20} strokeWidth={2} /> },
-            { id: 'courses', label: 'Courses', active: currentPage === 'courses', onClick: () => handleNavClick('courses'), icon: <GraduationCap size={20} strokeWidth={2} /> },
-            { id: 'scanner', label: '', isAccent: true, onClick: () => setIsScannerOpen(true), icon: <QrCode size={24} strokeWidth={2.5} /> },
-            { id: 'analytics', label: 'Stats', active: currentPage === 'analytics', onClick: () => handleNavClick('analytics'), icon: <TrendingUp size={20} strokeWidth={2} /> },
-            { id: 'profile', label: 'Me', active: currentPage === 'profile', onClick: () => handleNavClick('profile'), icon: <User size={20} strokeWidth={2} /> },
-          ]}
-        />
-      </div>
+      {!isMobileMenuOpen && (
+        <div className="md:hidden fixed bottom-6 left-0 right-0 z-[100] pointer-events-none flex justify-center">
+          <Dock
+            items={[
+              { id: 'dashboard', label: 'Home', active: currentPage === 'dashboard', onClick: () => handleNavClick('dashboard'), icon: <Home size={20} strokeWidth={2} /> },
+              { id: 'courses', label: 'Courses', active: currentPage === 'courses', onClick: () => handleNavClick('courses'), icon: <GraduationCap size={20} strokeWidth={2} /> },
+              { id: 'scanner', label: '', isAccent: true, onClick: () => setIsScannerOpen(true), icon: <QrCode size={24} strokeWidth={2.5} /> },
+              { id: 'analytics', label: 'Stats', active: currentPage === 'analytics', onClick: () => handleNavClick('analytics'), icon: <TrendingUp size={20} strokeWidth={2} /> },
+              { id: 'profile', label: 'Me', active: currentPage === 'profile', onClick: () => handleNavClick('profile'), icon: <User size={20} strokeWidth={2} /> },
+            ]}
+          />
+        </div>
+      )}
 
       <EnhancedAttendanceScanner 
         isOpen={isScannerOpen}

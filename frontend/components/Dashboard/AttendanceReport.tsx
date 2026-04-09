@@ -38,11 +38,22 @@ export const AttendanceReport: React.FC = () => {
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'good' | 'at_risk'>('ALL');
-  const [selectedDept, setSelectedDepartment] = useState<string>('ALL');
+    const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+    const [showDepartmentMenu, setShowDepartmentMenu] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showManualMarkModal, setShowManualMarkModal] = useState(false);
   const [manualMatric, setManualMatric] = useState('');
   const [markingManual, setMarkingManual] = useState(false);
+
+    const UNKNOWN_DEPARTMENT_LABEL = 'Department Not Set';
+
+    const normalizeDepartmentLabel = (department?: string | null) => {
+        const value = (department || '').trim();
+        if (!value || value.toUpperCase() === 'N/A' || value.toLowerCase() === 'unspecified') {
+            return UNKNOWN_DEPARTMENT_LABEL;
+        }
+        return value;
+    };
 
   useEffect(() => {
     loadCourses();
@@ -57,6 +68,14 @@ export const AttendanceReport: React.FC = () => {
         setSessions([]);
     }
   }, [selectedCourseId]);
+
+    useEffect(() => {
+        if (!showDepartmentMenu) return;
+
+        const onDocClick = () => setShowDepartmentMenu(false);
+        document.addEventListener('click', onDocClick);
+        return () => document.removeEventListener('click', onDocClick);
+    }, [showDepartmentMenu]);
 
   useEffect(() => {
     if (selectedSessionId) {
@@ -131,12 +150,12 @@ export const AttendanceReport: React.FC = () => {
   const availableDepartments = useMemo(() => {
     const depts = new Set<string>();
     if (selectedSessionId) {
-      sessionAttendance.forEach(r => depts.add(r.student_department || 'Unspecified'));
+            sessionAttendance.forEach(r => depts.add(normalizeDepartmentLabel(r.student_department)));
     } else {
-      analyticsData?.students.forEach(s => depts.add(s.department || 'Unspecified'));
+            analyticsData?.students.forEach(s => depts.add(normalizeDepartmentLabel(s.department)));
     }
-    return Array.from(depts).filter(d => d !== 'N/A').sort();
-  }, [selectedSessionId, sessionAttendance, analyticsData]);
+        return Array.from(depts).sort();
+    }, [selectedSessionId, sessionAttendance, analyticsData]);
 
   // Filter Logic
   const filteredData = useMemo(() => {
@@ -145,8 +164,8 @@ export const AttendanceReport: React.FC = () => {
         const matchesSearch = 
           (record.student_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
           (record.student_matric || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const dept = record.student_department || 'Unspecified';
-        const matchesDept = selectedDept === 'ALL' || dept === selectedDept;
+                const dept = normalizeDepartmentLabel(record.student_department);
+                const matchesDept = selectedDepartments.length === 0 || selectedDepartments.includes(dept);
         return matchesSearch && matchesDept;
       });
     } else {
@@ -161,24 +180,34 @@ export const AttendanceReport: React.FC = () => {
           statusFilter === 'ALL' ? true :
           statusFilter === 'good' ? rate >= 75 :
           rate < 75;
-        const dept = student.department || 'Unspecified';
-        const matchesDept = selectedDept === 'ALL' || dept === selectedDept;
+                const dept = normalizeDepartmentLabel(student.department);
+                const matchesDept = selectedDepartments.length === 0 || selectedDepartments.includes(dept);
         return matchesSearch && matchesStatus && matchesDept;
       }) || [];
-    }
-  }, [selectedSessionId, sessionAttendance, analyticsData, searchTerm, statusFilter, selectedDept]);
+        }
+        }, [selectedSessionId, sessionAttendance, analyticsData, searchTerm, statusFilter, selectedDepartments]);
+
+    const toggleDepartmentFilter = (department: string) => {
+        setSelectedDepartments((prev) => {
+            if (prev.includes(department)) {
+                return prev.filter((item) => item !== department);
+            }
+            return [...prev, department];
+        });
+    };
 
   // Grouped Data
   const groupedData = useMemo(() => {
     const groups: { [key: string]: any[] } = {};
     filteredData.forEach(item => {
-      const dept = (selectedSessionId ? (item as Attendance).student_department : (item as StudentAnalytics).department) || 'Unspecified';
-      const cleanDept = dept === 'N/A' ? 'Unspecified' : dept;
-      if (!groups[cleanDept]) groups[cleanDept] = [];
-      groups[cleanDept].push(item);
+            const dept = normalizeDepartmentLabel(
+                selectedSessionId ? (item as Attendance).student_department : (item as StudentAnalytics).department
+            );
+            if (!groups[dept]) groups[dept] = [];
+            groups[dept].push(item);
     });
     return groups;
-  }, [filteredData, selectedSessionId]);
+    }, [filteredData, selectedSessionId]);
 
   const handleExport = () => {
     const isSessionReport = !!selectedSessionId;
@@ -301,7 +330,7 @@ export const AttendanceReport: React.FC = () => {
                     onChange={(e) => {
                         setSelectedCourseId(Number(e.target.value));
                         setSelectedSessionId(null);
-                        setSelectedDepartment('ALL');
+                        setSelectedDepartments([]);
                     }}
                     className="w-full bg-surface text-text border border-outline rounded-xl pl-10 pr-10 py-2.5 appearance-none text-text text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm"
                 >
@@ -321,7 +350,7 @@ export const AttendanceReport: React.FC = () => {
                     value={selectedSessionId || ''}
                     onChange={(e) => {
                         setSelectedSessionId(e.target.value ? Number(e.target.value) : null);
-                        setSelectedDepartment('ALL');
+                        setSelectedDepartments([]);
                     }}
                     className="w-full bg-surface text-text border border-outline rounded-xl pl-10 pr-10 py-2.5 appearance-none text-text text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm disabled:opacity-50"
                     disabled={loadingSessions}
@@ -336,22 +365,50 @@ export const AttendanceReport: React.FC = () => {
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={16} />
             </div>
 
-            {/* Department Select */}
-            <div className="relative flex-1 sm:w-56">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted z-10 pointer-events-none">
-                    <Building2 size={16} />
-                </div>
-                <select
-                    value={selectedDept}
-                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                    className="w-full bg-surface text-text border border-outline rounded-xl pl-10 pr-10 py-2.5 appearance-none text-text text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm"
+            {/* Department Multi-Select */}
+            <div className="relative flex-1 sm:w-72" onClick={(e) => e.stopPropagation()}>
+                <button
+                    type="button"
+                    onClick={() => setShowDepartmentMenu((prev) => !prev)}
+                    className="w-full bg-surface text-text border border-outline rounded-xl px-3 py-2.5 text-left text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm flex items-center gap-2"
                 >
-                    <option value="ALL">All Departments</option>
-                    {availableDepartments.map(dept => (
-                        <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={16} />
+                    <Building2 size={16} className="text-textMuted" />
+                    <span className="truncate">
+                        {selectedDepartments.length === 0
+                            ? 'All Departments'
+                            : `${selectedDepartments.length} Department${selectedDepartments.length > 1 ? 's' : ''} Selected`}
+                    </span>
+                    <ChevronDown className="ml-auto text-textMuted" size={16} />
+                </button>
+
+                {showDepartmentMenu && (
+                    <div className="absolute z-50 mt-2 w-full max-h-72 overflow-y-auto rounded-xl border border-outline bg-surface shadow-xl p-2 space-y-1">
+                        <button
+                            type="button"
+                            onClick={() => setSelectedDepartments([])}
+                            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold hover:bg-surfaceHigh transition-colors"
+                        >
+                            All Departments
+                        </button>
+                        {availableDepartments.map((dept) => {
+                            const checked = selectedDepartments.includes(dept);
+                            return (
+                                <label
+                                    key={dept}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surfaceHigh transition-colors cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={() => toggleDepartmentFilter(dept)}
+                                        className="h-4 w-4 rounded border-outline"
+                                    />
+                                    <span className="text-sm truncate">{dept}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
 
             {analyticsData && (
@@ -616,7 +673,9 @@ export const AttendanceReport: React.FC = () => {
                             : "Course Aggregate Report"}
                     </span>
                     <div className="h-3 w-[1px] bg-border hidden sm:block" />
-                    <span className="hidden sm:block">Filter: {selectedDept === 'ALL' ? 'All Departments' : selectedDept}</span>
+                    <span className="hidden sm:block">
+                        Filter: {selectedDepartments.length === 0 ? 'All Departments' : selectedDepartments.join(', ')}
+                    </span>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
