@@ -13,36 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            sql="""
-            DO $$
-            BEGIN
-                -- Ensure department_id FK column exists and points to 'departments'
-                IF NOT EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'users'
-                    AND column_name = 'department_id'
-                ) THEN
-                    -- Column is missing: add it with correct FK to 'departments' table
-                    ALTER TABLE users ADD COLUMN department_id bigint NULL;
-                    ALTER TABLE users
-                        ADD CONSTRAINT users_department_id_fk
-                        FOREIGN KEY (department_id)
-                        REFERENCES departments(id)
-                        ON DELETE SET NULL
-                        DEFERRABLE INITIALLY DEFERRED;
-                END IF;
-
-                -- Clean up any lingering old text 'department' column
-                IF EXISTS (
-                    SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'users'
-                    AND column_name = 'department'
-                    AND data_type IN ('character varying', 'text')
-                ) THEN
-                    ALTER TABLE users DROP COLUMN department;
-                END IF;
-            END $$;
-            """,
-            reverse_sql=migrations.RunSQL.noop,
+            sql="SELECT 1;",
+            reverse_sql="SELECT 1;",
         ),
     ]
