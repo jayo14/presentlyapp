@@ -45,7 +45,10 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-  const scanIntervalRef = useRef<number | null>(null);
+  const scanFrameRef = useRef<number | null>(null);
+  const jsQrRef = useRef<any>(null);
+  const isDecodeInProgressRef = useRef(false);
+  const hasDetectedCodeRef = useRef(false);
 
   const triggerHaptic = async (style: ImpactStyle = ImpactStyle.Medium) => {
     if (Capacitor.isNativePlatform()) {
@@ -84,6 +87,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setMode('scan');
       setAttendanceData(null);
       setAutoSwitchToQr(false);
+      hasDetectedCodeRef.current = false;
     } else {
       stopCamera();
     }
@@ -94,6 +98,23 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setMode('scan');
     }
   }, [mode, autoSwitchToQr]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    import('jsqr')
+      .then((m) => {
+        const jsQR = m.default || (m as any);
+        if (typeof jsQR === 'function') {
+          jsQrRef.current = jsQR;
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to preload jsqr:', err);
+      });
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && mode === 'scan' && status === 'idle') {
@@ -131,17 +152,24 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-    if (scanIntervalRef.current) {
-      window.clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
+    if (scanFrameRef.current) {
+      window.cancelAnimationFrame(scanFrameRef.current);
+      scanFrameRef.current = null;
     }
+    isDecodeInProgressRef.current = false;
+    hasDetectedCodeRef.current = false;
     setIsCameraActive(false);
   };
 
   const scanQRCode = () => {
-    if (!videoRef.current || !isCameraActive || status !== 'idle') return;
+    if (!videoRef.current || !isCameraActive || status !== 'idle' || isDecodeInProgressRef.current || hasDetectedCodeRef.current) return;
     const video = videoRef.current;
     if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+    const jsQR = jsQrRef.current;
+    if (typeof jsQR !== 'function') {
+      return;
+    }
 
     if (!canvasRef.current) {
       canvasRef.current = document.createElement('canvas');
@@ -150,19 +178,15 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     const canvas = canvasRef.current;
     const context = contextRef.current;
     if (!context) return;
-    if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-    }
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    import('jsqr').then((m) => {
-      const jsQR = m.default || (m as any);
-      if (typeof jsQR !== 'function') {
-        console.error('jsQR is not a function after dynamic import');
-        return;
+    isDecodeInProgressRef.current = true;
+    try {
+      if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
       }
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
       if (code && code.data) {
         let qrData = code.data;
@@ -171,19 +195,33 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           const match = qrData.match(/\/check-in\/([A-Z0-9]+)/i);
           if (match && match[1]) sessionCodeFromQR = match[1].toUpperCase();
         }
+        hasDetectedCodeRef.current = true;
         processAttendance(sessionCodeFromQR.toUpperCase());
         triggerHaptic(ImpactStyle.Heavy);
       }
-    }).catch((err) => {
-      console.error('Failed to load jsqr:', err);
-    });
+    } finally {
+      isDecodeInProgressRef.current = false;
+    }
   };
 
   useEffect(() => {
+    const runScanLoop = () => {
+      scanQRCode();
+      scanFrameRef.current = window.requestAnimationFrame(runScanLoop);
+    };
+
     if (isCameraActive && mode === 'scan' && status === 'idle') {
-      scanIntervalRef.current = window.setInterval(scanQRCode, 250);
+      scanFrameRef.current = window.requestAnimationFrame(runScanLoop);
     }
-    return () => { if (scanIntervalRef.current) window.clearInterval(scanIntervalRef.current); };
+
+    return () => {
+      if (scanFrameRef.current) {
+        window.cancelAnimationFrame(scanFrameRef.current);
+        scanFrameRef.current = null;
+      }
+      isDecodeInProgressRef.current = false;
+      hasDetectedCodeRef.current = false;
+    };
   }, [isCameraActive, mode, status]);
 
   const processAttendance = async (codeToVerify: string) => {
