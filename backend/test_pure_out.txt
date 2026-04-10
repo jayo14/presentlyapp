@@ -1,0 +1,3 @@
+Connecting...
+Failed: connection to server at "ep-dry-truth-ansqgzu2.c-6.us-east-1.aws.neon.tech" (3.227.221.118), port 5432 failed: ERROR:  password authentication failed for user 'ep-dry-truth-ansqgzu2$neondb_owner'
+

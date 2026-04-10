@@ -7,6 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Backup
+backup_*.json
+backup.json
+presently_backup.json
+
 node_modules
 dist
 dist-ssr
