@@ -255,7 +255,33 @@ class LecturerDashboardAnalyticsView(APIView):
 class AdminDashboardAnalyticsView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        return Response({'admin_dashboard': {}})
+        """Get summary statistics for the admin dashboard"""
+        total_users = User.objects.count()
+        students = User.objects.filter(role=UserRole.STUDENT).count()
+        lecturers = User.objects.filter(role=UserRole.LECTURER).count()
+        admins = User.objects.filter(role=UserRole.ADMIN).count()
+        
+        # Other useful stats for admin
+        total_courses = Course.objects.count()
+        total_sessions = AttendanceSession.objects.count()
+        total_attendances = Attendance.objects.count()
+        
+        return Response({
+            'success': True,
+            'data': {
+                'users': {
+                    'total': total_users,
+                    'students': students,
+                    'lecturers': lecturers,
+                    'admins': admins
+                },
+                'platform': {
+                    'courses': total_courses,
+                    'sessions': total_sessions,
+                    'attendances': total_attendances
+                }
+            }
+        })
 
 
 class AttendanceOverviewView(APIView):

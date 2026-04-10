@@ -2102,6 +2102,24 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAdminUser]
     
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Get summary statistics for users"""
+        total_users = User.objects.count()
+        students = User.objects.filter(role=UserRole.STUDENT).count()
+        lecturers = User.objects.filter(role=UserRole.LECTURER).count()
+        admins = User.objects.filter(role=UserRole.ADMIN).count()
+        
+        return Response({
+            'success': True,
+            'data': {
+                'total_users': total_users,
+                'students': students,
+                'lecturers': lecturers,
+                'admins': admins
+            }
+        })
+    
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
