@@ -16,6 +16,8 @@ import { SEO } from '../SEO';
 import { Switch } from '../Switch';
 import { AccessibleCombobox } from '../AccessibleCombobox';
 
+const EMPTY_COURSES: Course[] = [];
+
 export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: user } = useCurrentUser();
@@ -69,7 +71,7 @@ export const CreateSessionPage: React.FC = () => {
         staleTime: 10 * 60 * 1000
     });
 
-    const { data: lecturerCourses = [], isLoading: loadingLecturerCourses } = useQuery({
+    const { data: lecturerCoursesRaw, isLoading: loadingLecturerCourses } = useQuery({
         queryKey: ['lecturerCourses'],
         queryFn: async () => {
             // Fetch all courses for this lecturer
@@ -78,6 +80,7 @@ export const CreateSessionPage: React.FC = () => {
         },
         staleTime: 5 * 60 * 1000
     });
+    const lecturerCourses = lecturerCoursesRaw || EMPTY_COURSES;
 
     // Initial Load & Defaults
     useEffect(() => {
@@ -117,8 +120,8 @@ export const CreateSessionPage: React.FC = () => {
     useEffect(() => {
         if (selectedDepartments.length > 0) {
             loadCoursesForDepartments(selectedDepartments);
-        } else {
-            // Default to lecturer's courses if no department filters
+        } else if (courses !== lecturerCourses) {
+            // Only set if they are not already effectively the same reference or data
             setCourses(lecturerCourses);
         }
     }, [selectedDepartments, lecturerCourses]);

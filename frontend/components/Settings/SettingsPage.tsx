@@ -18,8 +18,8 @@ import { useTheme } from '../ThemeProvider';
 
 // Premium Card Component adapted to app colors
 const Card: React.FC<{ children: React.ReactNode; className?: string; hover?: boolean; noPadding?: boolean }> = ({ children, className = "", hover = true, noPadding = false }) => (
-  <div className={`bg-surface/70 backdrop-blur-xl rounded-2xl md:rounded-[2rem] border border-outline shadow-sm overflow-hidden transition-all duration-300 ${hover ? 'hover:shadow-xl hover:shadow-primary/5' : ''} ${className}`}>
-    <div className={noPadding ? "" : "p-5 md:p-8"}>
+  <div className={`bg-surface/70 backdrop-blur-xl rounded-xl md:rounded-[2rem] border border-outline shadow-sm overflow-hidden transition-all duration-300 ${hover ? 'hover:shadow-xl hover:shadow-primary/5' : ''} ${className}`}>
+    <div className={noPadding ? "" : "p-4 sm:p-6 md:p-8"}>
       {children}
     </div>
   </div>
@@ -106,9 +106,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
               <Card className="text-center relative group">
                 <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-primary/10 to-transparent" />
                 <div className="flex flex-col items-center">
-                  <div className="relative inline-block mt-4">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] sm:rounded-[2.5rem] bg-primary p-1 shadow-2xl">
-                      <div className="w-full h-full rounded-[1.8rem] sm:rounded-[2.3rem] overflow-hidden border-4 border-surface bg-surfaceLow flex items-center justify-center text-3xl sm:text-4xl font-black text-text">
+                  <div className="relative inline-block mt-2">
+                    <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-[1.8rem] sm:rounded-[2.5rem] bg-primary p-0.5 sm:p-1 shadow-xl">
+                      <div className="w-full h-full rounded-[1.6rem] sm:rounded-[2.3rem] overflow-hidden border-2 sm:border-4 border-surface bg-surfaceLow flex items-center justify-center text-2xl sm:text-4xl font-black text-text">
                         {userInitials}
                       </div>
                     </div>
@@ -122,14 +122,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                   <p className="text-sm font-bold text-primary mt-1 uppercase tracking-widest">{userRole.replace('_', ' ')}</p>
 
                   {userRole !== UserRole.ADMIN && (
-                    <div className="mt-6 pt-6 border-t border-outline grid grid-cols-2 gap-4">
+                    <div className="mt-4 pt-4 border-t border-outline grid grid-cols-2 gap-2 sm:gap-4">
                       <div className="text-center">
-                        <p className="text-lg font-black text-text leading-none">{user?.attendance_rate || 0}%</p>
-                        <p className="text-[10px] font-bold text-textMuted uppercase tracking-widest mt-1">Attendance</p>
+                        <p className="text-base sm:text-lg font-black text-text leading-none">{user?.attendance_rate || 0}%</p>
+                        <p className="text-[9px] sm:text-[10px] font-bold text-textMuted uppercase tracking-widest mt-0.5">Attendance</p>
                       </div>
                       <div className="text-center border-l border-outline">
-                        <p className="text-lg font-black text-text leading-none">{user?.active_courses_count || 0}</p>
-                        <p className="text-[10px] font-bold text-textMuted uppercase tracking-widest mt-1">Courses</p>
+                        <p className="text-base sm:text-lg font-black text-text leading-none">{user?.active_courses_count || 0}</p>
+                        <p className="text-[9px] sm:text-[10px] font-bold text-textMuted uppercase tracking-widest mt-0.5">Courses</p>
                       </div>
                     </div>
                   )}
@@ -138,12 +138,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             </div>
 
             <div className="lg:col-span-2 space-y-6">
-              <Card className="space-y-6">
-                <h4 className="font-headline text-lg font-black text-text flex items-center gap-2">
-                  <Fingerprint className="text-primary" size={20} />
+              <Card className="space-y-4 sm:space-y-6">
+                <h4 className="font-headline text-base sm:text-lg font-black text-text flex items-center gap-2">
+                  <Fingerprint className="text-primary" size={18} />
                   General Information
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
                   <Input label="Full Name" defaultValue={user?.full_name || ''} />
                   <Input label="Email" defaultValue={user?.email || ''} disabled />
 
@@ -175,32 +175,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
                   </h4>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl bg-surfaceLow border border-outline gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-surface border border-outline flex items-center justify-center shrink-0">
-                        <Lock size={18} className="text-textMuted" />
+                  <div className="flex flex-wrap items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-surfaceLow border border-outline gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-surface border border-outline flex items-center justify-center shrink-0">
+                        <Lock size={16} className="text-textMuted" />
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-text">Password</p>
-                        <p className="text-xs text-textMuted">Update your password</p>
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-bold text-text truncate">Password</p>
+                        <p className="text-[10px] text-textMuted truncate">Update password</p>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => setIsPasswordModalOpen(true)} className="w-full sm:w-auto">Change</Button>
+                    <Button variant="outline" size="sm" onClick={() => setIsPasswordModalOpen(true)} className="ml-auto sm:ml-0 text-[10px] h-8 px-3">Change</Button>
                   </div>
 
                   {userRole === UserRole.STUDENT && (
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl bg-surfaceLow border border-outline gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-surface border border-outline flex items-center justify-center shrink-0">
-                          {signature ? <Check size={18} className="text-emerald-500" /> : <X size={18} className="text-red-500" />}
+                    <div className="flex flex-wrap items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-surfaceLow border border-outline gap-3">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-surface border border-outline flex items-center justify-center shrink-0">
+                          {signature ? <Check size={16} className="text-emerald-500" /> : <X size={16} className="text-red-500" />}
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-text">Digital Signature</p>
-                          <p className="text-xs text-textMuted">{signature ? 'Configured' : 'Not setup'}</p>
+                        <div className="min-w-0">
+                          <p className="text-xs sm:text-sm font-bold text-text truncate">Digital Signature</p>
+                          <p className="text-[10px] text-textMuted truncate">{signature ? 'Configured' : 'Not setup'}</p>
                         </div>
                       </div>
-                      <label className="cursor-pointer w-full sm:w-auto">
-                        <Button variant="outline" size="sm" as="span" className="w-full sm:w-auto text-center">{signature ? 'Change' : 'Upload'}</Button>
+                      <label className="cursor-pointer ml-auto sm:ml-0">
+                        <Button variant="outline" size="sm" as="span" className="text-[10px] h-8 px-3">
+                          {signature ? 'Change' : 'Upload'}
+                        </Button>
                         <input type="file" accept="image/*" className="hidden" onChange={handleSignatureUpload} />
                       </label>
                     </div>
@@ -235,26 +237,26 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
         return (
           <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
             <Card noPadding className="divide-y divide-outline">
-              <div className="p-4 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-primary shrink-0">
-                    <Mail size={20} className="sm:w-6 sm:h-6" />
+              <div className="p-3 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
+                <div className="flex items-center gap-3 sm:gap-6">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-primary shrink-0">
+                    <Mail size={16} className="sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <p className="font-headline text-sm sm:text-base md:text-lg font-black text-text">Email Notifications</p>
-                    <p className="text-[10px] sm:text-xs md:text-sm text-textMuted font-medium">Receive summaries via email</p>
+                    <p className="font-headline text-xs sm:text-base md:text-lg font-black text-text">Email Notifications</p>
+                    <p className="text-[9px] sm:text-xs md:text-sm text-textMuted font-medium">Summaries via email</p>
                   </div>
                 </div>
                 <Switch checked={emailNotifs} onCheckedChange={setEmailNotifs} />
               </div>
-              <div className="p-4 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-amber-500 shrink-0">
-                    <Bell size={20} className="sm:w-6 sm:h-6" />
+              <div className="p-3 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
+                <div className="flex items-center gap-3 sm:gap-6">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-amber-500 shrink-0">
+                    <Bell size={16} className="sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <p className="font-headline text-sm sm:text-base md:text-lg font-black text-text">Class Reminders</p>
-                    <p className="text-[10px] sm:text-xs md:text-sm text-textMuted font-medium">Notify me before class starts</p>
+                    <p className="font-headline text-xs sm:text-base md:text-lg font-black text-text">Class Reminders</p>
+                    <p className="text-[9px] sm:text-xs md:text-sm text-textMuted font-medium">Alerts before class</p>
                   </div>
                 </div>
                 <Switch checked={reminderBeforeClass} onCheckedChange={setReminderBeforeClass} />
@@ -296,40 +298,40 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
             </Card>
 
             <Card noPadding className="divide-y divide-outline">
-              <div className="p-4 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-primary shrink-0">
-                    <Phone size={20} className="sm:w-6 sm:h-6" />
+              <div className="p-3 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
+                <div className="flex items-center gap-3 sm:gap-6">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-primary shrink-0">
+                    <Phone size={16} className="sm:w-6 sm:h-6" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-headline text-sm sm:text-base md:text-lg font-black text-text truncate">Location Access</p>
-                    <p className="text-[10px] sm:text-xs md:text-sm text-textMuted font-medium truncate">GPS for verification</p>
+                    <p className="font-headline text-xs sm:text-base md:text-lg font-black text-text truncate">Location Access</p>
+                    <p className="text-[9px] sm:text-xs md:text-sm text-textMuted font-medium truncate">GPS for verification</p>
                   </div>
                 </div>
                 <Switch checked={locationAccess} onCheckedChange={setLocationAccess} />
               </div>
-              <div className="p-4 sm:p-6 md:p-8 flex items-center justify-between opacity-50 grayscale cursor-not-allowed">
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-zinc-400 shrink-0">
-                    <Lock size={20} className="sm:w-6 sm:h-6" />
+              <div className="p-3 sm:p-6 md:p-8 flex items-center justify-between opacity-50 grayscale cursor-not-allowed">
+                <div className="flex items-center gap-3 sm:gap-6">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-zinc-400 shrink-0">
+                    <Lock size={16} className="sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <p className="font-headline text-sm sm:text-base md:text-lg font-black text-textMuted">Two-Factor Auth</p>
-                    <p className="text-[10px] sm:text-xs md:text-sm text-textMuted font-medium">Coming soon</p>
+                    <p className="font-headline text-xs sm:text-base md:text-lg font-black text-textMuted truncate">Two-Factor Auth</p>
+                    <p className="text-[9px] sm:text-xs md:text-sm text-textMuted font-medium">Coming soon</p>
                   </div>
                 </div>
               </div>
-              <button className="w-full text-left p-4 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-primary shrink-0">
-                    <Database size={20} className="sm:w-6 sm:h-6" />
+              <button className="w-full text-left p-3 sm:p-6 md:p-8 flex items-center justify-between hover:bg-surfaceLow transition-all">
+                <div className="flex items-center gap-3 sm:gap-6 overflow-hidden">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-2xl bg-surfaceHigh flex items-center justify-center text-primary shrink-0">
+                    <Database size={16} className="sm:w-6 sm:h-6" />
                   </div>
-                  <div>
-                    <p className="font-headline text-sm sm:text-base md:text-lg font-black text-text">Data Export</p>
-                    <p className="text-[10px] sm:text-xs md:text-sm text-textMuted font-medium">Download your data</p>
+                  <div className="min-w-0">
+                    <p className="font-headline text-xs sm:text-base md:text-lg font-black text-text truncate">Data Export</p>
+                    <p className="text-[9px] sm:text-xs md:text-sm text-textMuted font-medium truncate">Download your data</p>
                   </div>
                 </div>
-                <ChevronRight size={20} className="text-textMuted shrink-0" />
+                <ChevronRight size={16} className="text-textMuted shrink-0" />
               </button>
             </Card>
           </div>
@@ -491,31 +493,33 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole: propUserRo
       <main className="flex-1 w-full relative min-h-screen lg:min-h-0 bg-background overflow-x-hidden">
 
         {/* Mobile Header Tabs */}
-        <div className="lg:hidden flex overflow-x-auto gap-2 no-scrollbar px-4 pt-6 pb-4 mb-2 border-b border-outline bg-surfaceHigh/10 sticky top-0 z-20 backdrop-blur-xl">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex shrink-0 items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === tab.id
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
-                  : 'bg-surface text-textMuted border border-outline opacity-70'
-                }`}
-            >
-              <tab.icon size={12} className={activeTab === tab.id ? 'text-primary-foreground' : tab.color} />
-              {tab.label}
-            </button>
-          ))}
+        <div className="lg:hidden px-4 pt-6 pb-2 sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-outline">
+          <div className="flex overflow-x-auto gap-2 no-scrollbar pb-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex shrink-0 items-center gap-1.5 px-3.5 py-2 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 ${activeTab === tab.id
+                    ? 'bg-primary text-black shadow-lg shadow-primary/20 scale-105 ring-2 ring-primary/20'
+                    : 'bg-surfaceLow text-textMuted border border-outline/50 hover:bg-surface'
+                  }`}
+              >
+                <tab.icon size={11} className={activeTab === tab.id ? 'text-black' : tab.color} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="w-full px-4 md:px-8 lg:px-12 max-w-4xl mx-auto space-y-8 lg:space-y-10 pb-12">
-          <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <header className="flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4">
             <div className="animate-in fade-in slide-in-from-left-4 duration-700">
-              <div className="flex items-center gap-2 text-primary mb-2">
-                <ActiveTabIcon size={16} />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">User Preferences</span>
+              <div className="flex items-center gap-2 text-primary mb-1 sm:mb-2">
+                <ActiveTabIcon size={14} className="sm:size-4" />
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em]">Preferences</span>
               </div>
-              <h2 className="text-3xl lg:text-5xl font-black text-text tracking-tight capitalize leading-none">
-                {activeTab === 'profile' ? 'Profile Identity' : activeTab}
+              <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-text tracking-tight capitalize leading-tight">
+                {activeTab === 'profile' ? 'Profile' : activeTab}
               </h2>
             </div>
             {activeTab === 'profile' && (
