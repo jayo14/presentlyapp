@@ -89,46 +89,9 @@ export const UserManagement: React.FC = () => {
     }
   };
 
-  // Real-time local filtering with regex support
-  const displayUsers = useMemo(() => {
-    let filtered = users;
-
-    // Apply local regex search if searchTerm exists
-    if (searchTerm) {
-      try {
-        const regex = new RegExp(searchTerm, 'i');
-        filtered = filtered.filter(user => 
-          regex.test(user.name || '') || 
-          regex.test(user.email || '') ||
-          regex.test(user.matric_number || '')
-        );
-      } catch (e) {
-        const lowerSearch = searchTerm.toLowerCase();
-        filtered = filtered.filter(user => 
-          (user.name || '').toLowerCase().includes(lowerSearch) || 
-          (user.email || '').toLowerCase().includes(lowerSearch) ||
-          (user.matric_number || '').toLowerCase().includes(lowerSearch)
-        );
-      }
-    }
-
-    // Apply local filters for role, active, and onboarding (as fallback/additional layer)
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter);
-    }
-    if (activeFilter !== 'all') {
-      filtered = filtered.filter(user => 
-        (activeFilter === 'true' ? user.is_active !== false : user.is_active === false)
-      );
-    }
-    if (onboardingFilter !== 'all') {
-      filtered = filtered.filter(user => 
-        (onboardingFilter === 'true' ? user.onboarding_complete : !user.onboarding_complete)
-      );
-    }
-
-    return filtered;
-  }, [users, searchTerm, roleFilter, activeFilter, onboardingFilter]);
+  // The backend already handles all search, role, status, and onboarding filtering via the API call parameters.
+  // We just directly use the API returned users to avoid false-negative client-side filters acting on paginated chunks.
+  const displayUsers = users;
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
@@ -231,7 +194,7 @@ export const UserManagement: React.FC = () => {
     const csv = [
       ['Name', 'Email', 'Role', 'Institution', 'College', 'Onboarding Complete'].join(','),
       ...displayUsers.map(user => [
-        user.name || 'No Name',
+        user.full_name || user.name || 'No Name',
         user.email,
         user.role,
         user.institution || user.institution_id || 'N/A',
@@ -399,11 +362,11 @@ export const UserManagement: React.FC = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
                         <span className="text-primary font-semibold">
-                          {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                          {(user.full_name || user.name || user.email || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-text">{user.name || 'No Name'}</div>
+                        <div className="text-sm font-medium text-text">{user.full_name || user.name || 'No Name'}</div>
                         <div className="text-sm text-textMuted">{user.email}</div>
                       </div>
                     </div>
@@ -582,7 +545,7 @@ export const UserManagement: React.FC = () => {
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-headline text-lg font-semibold text-text">{selectedUser.name || 'No Name'}</h4>
+                  <h4 className="font-headline text-lg font-semibold text-text">{selectedUser.full_name || selectedUser.name || 'No Name'}</h4>
                   <p className="text-textMuted">{selectedUser.email}</p>
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 border ${getRoleColor(selectedUser.role)}`}>
                     {selectedUser.role}
