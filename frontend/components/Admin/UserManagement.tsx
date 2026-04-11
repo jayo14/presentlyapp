@@ -39,7 +39,7 @@ export const UserManagement: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       loadUsers(currentPage);
-    }, totalUsers === 0 ? 0 : 300); // Small debounce for typing
+    }, 300); // Standard debounce for typing and pagination
     return () => clearTimeout(timer);
   }, [roleFilter, searchTerm, activeFilter, onboardingFilter, currentPage]);
 
@@ -67,8 +67,10 @@ export const UserManagement: React.FC = () => {
       ]);
       
       setUsers(usersRes.data.results || []);
-      setTotalPages(usersRes.data.total_pages || 1);
-      setTotalUsers(usersRes.data.count || 0);
+      const count = usersRes.data.count || 0;
+      setTotalUsers(count);
+      // Calculate total pages based on count and PAGE_SIZE (30)
+      setTotalPages(Math.ceil(count / 30) || 1);
 
       if (statsRes.data.success) {
         setUserStats(statsRes.data.data);

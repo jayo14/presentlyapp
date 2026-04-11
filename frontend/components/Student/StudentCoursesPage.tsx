@@ -40,8 +40,9 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
   const loadCourses = async () => {
     try {
       setLoading(true);
-      const data = await studentApi.getDashboard();
-      setCourses(data.enrolled_courses || []);
+      // Fetch directly from enrolled courses endpoint for reliability on this page
+      const enrolledData = await studentApi.getEnrolledCourses();
+      setCourses(enrolledData || []);
     } catch (error: any) {
       toast.error('Sync Error', { description: 'Failed to retrieve academic portfolio' });
     } finally {
@@ -75,7 +76,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
   return (
     <>
-      <SEO title="Academic Portfolio | Presently" description="Manage your registered modules and track academic progress." noIndex />
+      <SEO title="Academic Portfolio | Presently" description="Manage your registered courses and track academic progress." noIndex />
 
       <div className="space-y-8 animate-in fade-in duration-700 max-w-4xl mx-auto pb-24">
 
@@ -94,7 +95,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
               </button>
            </div>
            <div className="mt-6">
-              <h1 className="text-4xl font-headline font-black tracking-tight text-text">Modules</h1>
+              <h1 className="text-4xl font-headline font-black tracking-tight text-text">Courses</h1>
               <p className="text-textMuted font-medium text-sm mt-1">{courses.length} Active Enrollments found</p>
            </div>
         </header> */}
@@ -105,7 +106,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary transition-colors" size={20} />
             <input
               type="text"
-              placeholder="Find a module..."
+              placeholder="Find a course..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-white dark:bg-surfaceContainer/20 border border-outline/10 h-16 pl-14 pr-6 rounded-[1.5rem] font-bold text-sm focus:outline-none focus:border-primary/50 shadow-sm transition-all"
@@ -130,9 +131,9 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                     <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10"></div>
 
                     <div className="flex justify-between items-start mb-6">
-                      <CourseIcon 
-                        title={course.course_name} 
-                        className="w-14 h-14 group-hover:scale-110 transition-transform duration-500" 
+                      <CourseIcon
+                        title={course.course_name}
+                        className="w-14 h-14 group-hover:scale-110 transition-transform duration-500"
                       />
                       <button
                         onClick={() => setCourseToDrop(course)}
@@ -183,8 +184,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 <div className="w-20 h-20 bg-surfaceHigh/40 rounded-full flex items-center justify-center mb-6 text-textMuted/40">
                   <BookMarked size={40} />
                 </div>
-                <h4 className="text-2xl font-headline font-black text-text">No Modules Registered</h4>
-                <p className="text-textMuted/80 text-sm font-medium mt-2 max-w-[240px]">Expand your academic portfolio by enrolling in new department modules.</p>
+                <h4 className="text-2xl font-headline font-black text-text">No Courses Registered</h4>
+                <p className="text-textMuted/80 text-sm font-medium mt-2 max-w-[240px]">Expand your academic portfolio by enrolling in new department courses.</p>
                 <button
                   onClick={() => setIsRegistrationOpen(true)}
                   className="mt-8 px-10 py-4 bg-primary text-[#111111] font-headline font-black text-sm rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
@@ -217,8 +218,8 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
           onConfirm={handleDropCourse}
           isLoading={!!droppingId}
           variant="danger"
-          title="Disenroll Module"
-          description={`Are you sure you want to remove ${courseToDrop?.course_code} from your portfolio? This will permanentely delete your local attendance records for this module.`}
+          title="Disenroll Course"
+          description={`Are you sure you want to remove ${courseToDrop?.course_code} from your portfolio? This will permanently delete your local attendance records for this course.`}
           confirmText="Drop Course"
         />
       </div>
