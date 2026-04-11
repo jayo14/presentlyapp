@@ -6,7 +6,7 @@ import { SEO } from '../SEO';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
 import { LoadingScreen } from '../LoadingScreen';
 import { AuthBackground } from './AuthBackground';
-import { ThemeToggle } from '../ThemeToggle';
+// import { ThemeToggle } from '../ThemeToggle';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -121,7 +121,7 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
       <AuthBackground />
-      
+
       <SEO
         title="Login | Presently"
         description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
@@ -136,8 +136,8 @@ export const Login: React.FC = () => {
         >
           <ArrowLeft size={24} />
         </button>
-        
-        <ThemeToggle />
+
+        {/* <ThemeToggle /> */}
       </div>
 
       <div className="w-full max-w-md relative z-10">
@@ -284,7 +284,7 @@ export const Login: React.FC = () => {
             </button>
           </p>
         </div>
-        
+
         {/* Footer text */}
         <p className="mt-8 text-center text-xs text-textMuted/60 font-medium">
           &copy; {new Date().getFullYear()} Presently Inc. All rights reserved.

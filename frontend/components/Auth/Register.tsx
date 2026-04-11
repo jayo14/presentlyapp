@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { Mail, Lock, User as UserIcon, ArrowLeft, Eye, EyeOff, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { AuthBackground } from './AuthBackground';
-import { ThemeToggle } from '../ThemeToggle';
+// import { ThemeToggle } from '../ThemeToggle';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Check if password is too weak
     const strength = calculatePasswordStrength(password);
     if (strength < 50) {
@@ -78,21 +78,21 @@ export const Register: React.FC = () => {
 
   const calculatePasswordStrength = (pwd: string) => {
     if (!pwd) return 0;
-    
+
     // Common passwords list (basic check)
     const commonPasswords = ['password', '123456', '12345678', 'qwerty', 'admin', 'password123', 'Password123'];
     if (commonPasswords.includes(pwd.toLowerCase())) return 10;
-    
+
     let score = 0;
     if (pwd.length >= 8) score += 25;
     if (/[A-Z]/.test(pwd)) score += 25;
     if (/[0-9]/.test(pwd)) score += 25;
     if (/[^A-Za-z0-9]/.test(pwd)) score += 25;
-    
+
     // Pattern checks
     if (/(.)\1{2,}/.test(pwd)) score -= 15; // Repeating characters (aaa)
     if (pwd.length < 6) score = Math.min(score, 15);
-    
+
     return Math.max(0, Math.min(100, score));
   };
 
@@ -136,7 +136,7 @@ export const Register: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
       <AuthBackground />
-      
+
       <SEO
         title="Register | Presently"
         description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
@@ -151,8 +151,8 @@ export const Register: React.FC = () => {
         >
           <ArrowLeft size={24} />
         </button>
-        
-        <ThemeToggle />
+
+        {/* <ThemeToggle /> */}
       </div>
 
       <div className="w-full max-w-md relative z-10">
@@ -239,7 +239,7 @@ export const Register: React.FC = () => {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
-                
+
                 {/* Password Strength Gauge */}
                 {password && (
                   <div className="mt-3">
@@ -251,11 +251,10 @@ export const Register: React.FC = () => {
                     </div>
                     <div className="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden flex gap-1">
                       {[25, 50, 75, 100].map((step) => (
-                        <div 
+                        <div
                           key={step}
-                          className={`h-full flex-1 transition-all duration-500 ${
-                            passwordStrength >= step ? getStrengthColor(passwordStrength) : 'bg-white/5'
-                          }`}
+                          className={`h-full flex-1 transition-all duration-500 ${passwordStrength >= step ? getStrengthColor(passwordStrength) : 'bg-white/5'
+                            }`}
                         />
                       ))}
                     </div>
@@ -332,7 +331,7 @@ export const Register: React.FC = () => {
             </button>
           </p>
         </div>
-        
+
         {/* Footer text */}
         <p className="mt-8 text-center text-xs text-textMuted/60 font-medium">
           &copy; {new Date().getFullYear()} Presently Inc. All rights reserved.
