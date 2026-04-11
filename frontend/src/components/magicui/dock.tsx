@@ -8,7 +8,7 @@ export type DockItemConfig = {
   icon: React.ReactNode;
   active?: boolean;
   onClick?: () => void;
-  isAccent?: boolean; 
+  isAccent?: boolean;
 };
 
 interface DockProps {
@@ -45,9 +45,9 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
                 initial={false}
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                 className="absolute top-1 bottom-1 bg-primary/10 blur-xl rounded-full"
-                style={{ 
-                   left: `${(activeIndex / items.length) * 100}%`,
-                   width: `${100 / items.length}%`
+                style={{
+                  left: `${(activeIndex / items.length) * 100}%`,
+                  width: `${100 / items.length}%`
                 }}
               />
             )}
@@ -76,7 +76,7 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
                     transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                     className={cn(
                       "flex h-16 w-16 items-center justify-center rounded-[1.5rem]",
-                      "bg-gradient-to-br from-primary to-primary/80 text-background",
+                      "bg-gradient-to-br from-primary to-primary text-background",
                       "shadow-[0_8px_30px_rgba(var(--primary-rgb, 99, 102, 241), 0.4)]",
                       "border-[3px] border-surface dark:border-zinc-950 relative z-10"
                     )}
@@ -96,14 +96,14 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                     className={cn(
                       'flex items-center justify-center rounded-xl p-1',
-                      isActive 
-                        ? 'text-primary' 
+                      isActive
+                        ? 'text-primary'
                         : 'text-textMuted group-hover:text-text group-active:text-text'
                     )}
                   >
                     {item.icon}
                   </motion.div>
-                  
+
                   <footer className="mt-0.5 flex items-center justify-center">
                     <span
                       className={cn(
