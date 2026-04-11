@@ -9,7 +9,7 @@ import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { SEO } from '../SEO';
 
 export const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,8 +21,8 @@ export const UserManagement: React.FC = () => {
   const [onboardingFilter, setOnboardingFilter] = useState<string>('all');
   
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const pageSize = 30;
+  
   const [userStats, setUserStats] = useState({
     total_users: 0,
     students: 0,
@@ -33,44 +33,25 @@ export const UserManagement: React.FC = () => {
   const { modalProps } = useModalAccessibility(showModal, () => setShowModal(false));
 
   useEffect(() => {
+    loadAllUsers();
+  }, []);
+
+  useEffect(() => {
     setCurrentPage(1);
   }, [roleFilter, searchTerm, activeFilter, onboardingFilter]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      loadUsers(currentPage);
-    }, 300); // Standard debounce for typing and pagination
-    return () => clearTimeout(timer);
-  }, [roleFilter, searchTerm, activeFilter, onboardingFilter, currentPage]);
-
-  const loadUsers = async (page: number) => {
+  const loadAllUsers = async () => {
     try {
       setLoading(true);
-      const params: any = { page };
-      if (roleFilter !== 'all') {
-        params.role = roleFilter;
-      }
-      if (searchTerm) {
-        params.search = searchTerm;
-      }
-      if (activeFilter !== 'all') {
-        params.active = activeFilter;
-      }
-      if (onboardingFilter !== 'all') {
-        params.onboarding = onboardingFilter;
-      }
-
-      // Fetch users and stats in parallel
+      
+      // Fetch users (unpaginated) and stats in parallel
       const [usersRes, statsRes] = await Promise.all([
-        apiClient.get('/users/', { params }),
-        apiClient.get('/users/stats/', { params })
+        apiClient.get('/users/', { params: { nopagination: 'true' } }),
+        apiClient.get('/users/stats/')
       ]);
       
-      setUsers(usersRes.data.results || []);
-      const count = usersRes.data.count || 0;
-      setTotalUsers(count);
-      // Calculate total pages based on count and PAGE_SIZE (30)
-      setTotalPages(Math.ceil(count / 30) || 1);
+      const fetchedUsers = Array.isArray(usersRes.data) ? usersRes.data : usersRes.data.results || [];
+      setAllUsers(fetchedUsers);
 
       if (statsRes.data.success) {
         setUserStats(statsRes.data.data);
@@ -89,9 +70,48 @@ export const UserManagement: React.FC = () => {
     }
   };
 
-  // The backend already handles all search, role, status, and onboarding filtering via the API call parameters.
-  // We just directly use the API returned users to avoid false-negative client-side filters acting on paginated chunks.
-  const displayUsers = users;
+  const loadUsers = async () => {
+    // This is now handled by loadAllUsers on mount. 
+    // We'll rename it or use it for refreshing.
+    await loadAllUsers();
+  };
+
+  // Frontend filtering logic
+  const filteredUsers = useMemo(() => {
+    let filtered = allUsers;
+
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(user => 
+        (user.full_name || user.name || '').toLowerCase().includes(searchLower) || 
+        (user.email || '').toLowerCase().includes(searchLower) ||
+        (user.matric_number || '').toLowerCase().includes(searchLower)
+      );
+    }
+
+    if (roleFilter !== 'all') {
+      filtered = filtered.filter(user => user.role === roleFilter);
+    }
+
+    if (activeFilter !== 'all') {
+      const isActive = activeFilter === 'true';
+      filtered = filtered.filter(user => user.is_active === isActive);
+    }
+
+    if (onboardingFilter !== 'all') {
+      const isComplete = onboardingFilter === 'true';
+      filtered = filtered.filter(user => user.onboarding_complete === isComplete);
+    }
+
+    return filtered;
+  }, [allUsers, searchTerm, roleFilter, activeFilter, onboardingFilter]);
+
+  // Frontend pagination logic
+  const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+  const displayUsers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredUsers.slice(start, start + pageSize);
+  }, [filteredUsers, currentPage, pageSize]);
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
@@ -103,7 +123,7 @@ export const UserManagement: React.FC = () => {
       toast.success('User Deleted', {
         description: 'User has been successfully deleted'
       });
-      await loadUsers(currentPage);
+      await loadAllUsers();
     } catch (err: any) {
       toast.error('Delete Failed', {
         description: err.response?.data?.error || 'Failed to delete user'
@@ -118,7 +138,7 @@ export const UserManagement: React.FC = () => {
       toast.success('Role Updated', {
         description: 'User role has been updated successfully'
       });
-      await loadUsers(currentPage);
+      await loadAllUsers();
     } catch (err: any) {
       toast.error('Update Failed', {
         description: err.response?.data?.error || 'Failed to update user role'
@@ -133,7 +153,7 @@ export const UserManagement: React.FC = () => {
       toast.success(suspend ? 'User Suspended' : 'User Activated', {
         description: `User has been ${suspend ? 'suspended' : 'activated'} successfully`
       });
-      await loadUsers(currentPage);
+      await loadAllUsers();
     } catch (err: any) {
       toast.error('Action Failed', {
         description: err.response?.data?.error || `Failed to ${suspend ? 'suspend' : 'activate'} user`
@@ -211,7 +231,7 @@ export const UserManagement: React.FC = () => {
     a.click();
   };
 
-  if (loading && users.length === 0) {
+  if (loading && allUsers.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader className="w-8 h-8 animate-spin text-primary" />
@@ -489,7 +509,7 @@ export const UserManagement: React.FC = () => {
         </div>
         <div className="flex items-center justify-between p-4">
           <span className="text-sm text-textMuted">
-            Showing {displayUsers.length} of {totalUsers} users
+            Showing {displayUsers.length} of {filteredUsers.length} users
           </span>
           <div className="flex items-center gap-2">
             <button

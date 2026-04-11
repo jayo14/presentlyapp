@@ -14,6 +14,7 @@ import { SessionDetailDialog } from './SessionDetailDialog';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { SEO } from '../SEO';
 import { Switch } from '../Switch';
+import { AccessibleCombobox } from '../AccessibleCombobox';
 
 export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
@@ -68,6 +69,16 @@ export const CreateSessionPage: React.FC = () => {
         staleTime: 10 * 60 * 1000
     });
 
+    const { data: lecturerCourses = [], isLoading: loadingLecturerCourses } = useQuery({
+        queryKey: ['lecturerCourses'],
+        queryFn: async () => {
+            // Fetch all courses for this lecturer
+            const data = await courseApi.getAll();
+            return Array.isArray(data) ? data : [];
+        },
+        staleTime: 5 * 60 * 1000
+    });
+
     // Initial Load & Defaults
     useEffect(() => {
         // Smart Pre-fill from fetched profile
@@ -107,9 +118,10 @@ export const CreateSessionPage: React.FC = () => {
         if (selectedDepartments.length > 0) {
             loadCoursesForDepartments(selectedDepartments);
         } else {
-            setCourses([]);
+            // Default to lecturer's courses if no department filters
+            setCourses(lecturerCourses);
         }
-    }, [selectedDepartments]);
+    }, [selectedDepartments, lecturerCourses]);
 
 
 
@@ -457,42 +469,41 @@ export const CreateSessionPage: React.FC = () => {
                 {/* 2. Core Session Details */}
                 <div className="bg-surface text-text border border-outline rounded-2xl p-6 shadow-sm space-y-6">
                     <div>
-                        <label className="block text-sm font-bold text-text mb-2">Select Course</label>
-                        <div className="relative">
-                            <select
-                                value={selectedCourse}
-                                onChange={(e) => setSelectedCourse(e.target.value)}
-                                className="w-full bg-surfaceLow border border-outline rounded-xl p-4 text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50 transition-all"
-                                disabled={selectedDepartments.length === 0}
-                                required
-                            >
-                                <option value="">Select a course...</option>
-                                {courses.map(course => (
-                                    <option key={course.id} value={course.id}>{course.code} - {course.title}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={20} />
-                        </div>
-                        {selectedDepartments.length === 0 && <p className="text-xs text-muted-foregroundmber-500 mt-2 flex items-center gap-1"><AlertCircle size={12} /> Please select at least one department above first.</p>}
+                        <AccessibleCombobox
+                            id="course-selection"
+                            label="Select Course"
+                            placeholder="Search course code or title..."
+                            options={courses.map(c => ({
+                                id: c.id,
+                                name: `${c.code} - ${c.title}`,
+                                description: c.department_name || ''
+                            }))}
+                            value={selectedCourse}
+                            onChange={(val) => setSelectedCourse(val.toString())}
+                            required
+                        />
+                        {selectedDepartments.length === 0 && courses.length === 0 && (
+                            <p className="text-xs text-muted-foregroundmber-500 mt-2 flex items-center gap-1">
+                                <AlertCircle size={12} /> Please select at least one department above first or check your teaching profile.
+                            </p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-bold text-text mb-2">Venue</label>
-                            <div className="relative">
-                                <select
-                                    value={selectedVenue}
-                                    onChange={(e) => setSelectedVenue(e.target.value)}
-                                    className="w-full bg-surfaceLow border border-outline rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
-                                    required
-                                >
-                                    <option value="">Select venue...</option>
-                                    {venues.map(venue => (
-                                        <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={16} />
-                            </div>
+                        <div className="md:col-span-1">
+                            <AccessibleCombobox
+                                id="venue-selection"
+                                label="Lecture Hall"
+                                placeholder="Search location..."
+                                options={venues.map(v => ({
+                                    id: v.id,
+                                    name: v.name,
+                                    description: `${v.capacity} seats • ${v.code || ''}`
+                                }))}
+                                value={selectedVenue}
+                                onChange={(val) => setSelectedVenue(val.toString())}
+                                required
+                            />
                         </div>
 
                         <div>
