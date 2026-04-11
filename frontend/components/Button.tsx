@@ -20,7 +20,7 @@ export const Button = ({
   disabled,
   ...props
 }: ButtonProps) => {
-  const baseStyles = "relative inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none disabled:grayscale overflow-hidden group";
+  const baseStyles = "relative inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none disabled:grayscale overflow-hidden group whitespace-nowrap shrink-0";
 
   const variants = {
     primary: "bg-primary text-black shadow-[0_8px_32px_rgba(255,215,0,0.25)] hover:shadow-[0_12px_48px_rgba(255,215,0,0.4)] rounded-2xl",
