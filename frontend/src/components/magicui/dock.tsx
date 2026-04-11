@@ -104,21 +104,15 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
                     {item.icon}
                   </motion.div>
                   
-                  <footer className="h-4 flex items-center justify-center overflow-hidden">
-                    <motion.span
-                      initial={false}
-                      animate={{ 
-                        opacity: isActive ? 1 : 0,
-                        y: isActive ? 0 : 10,
-                        height: isActive ? 'auto' : 0
-                      }}
+                  <footer className="mt-0.5 flex items-center justify-center">
+                    <span
                       className={cn(
-                        'text-[10px] font-bold tracking-tight whitespace-nowrap',
+                        'text-[10px] font-bold tracking-tight whitespace-nowrap transition-colors duration-200',
                         isActive ? 'text-text' : 'text-textMuted'
                       )}
                     >
                       {item.label}
-                    </motion.span>
+                    </span>
                   </footer>
                 </div>
               )}
