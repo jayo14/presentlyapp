@@ -15,7 +15,7 @@ import {
   GraduationCap, Briefcase, UserCheck, X, Plus, Loader, RefreshCw, AlertCircle, Sparkles
 } from 'lucide-react';
 import { AuthBackground } from './AuthBackground';
-// import { ThemeToggle } from '../ThemeToggle';
+import { ThemeToggle } from '../ThemeToggle';
 
 const CACHE_KEYS = {
   institutions: 'presently_institutions',
@@ -784,7 +784,7 @@ export const Onboarding: React.FC = () => {
             onChange={handleInputChange}
           />
           {state.validationErrors.phoneNumber && (
-            <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.phoneNumber}</p>
+            <p className="text-error text-xs mt-1 ml-4 font-medium">{state.validationErrors.phoneNumber}</p>
           )}
         </div>
       </div>
@@ -833,28 +833,28 @@ export const Onboarding: React.FC = () => {
                 }}
                 aria-required="true"
                 aria-label="Select your university or institution"
-                className="w-full bg-surface border border-[#E0E0E0] text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50"
+                className="w-full bg-surface border border-outline/20 text-text rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-primary/50"
               >
-                <option value="">Select your institution</option>
+                <option value="" className="bg-surface">Select your institution</option>
                 {state.institutions.map(inst => (
-                  <option key={inst.id} value={inst.id}>
+                  <option key={inst.id} value={inst.id} className="bg-surface">
                     {inst.short_name} - {inst.full_name}
                   </option>
                 ))}
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
-                <ChevronRight size={14} className="text-[#8B7355] -rotate-90" strokeWidth={2.5} />
-                <ChevronRight size={14} className="text-[#8B7355] rotate-90" strokeWidth={2.5} />
+                <ChevronRight size={14} className="text-textMuted -rotate-90" strokeWidth={2.5} />
+                <ChevronRight size={14} className="text-textMuted rotate-90" strokeWidth={2.5} />
               </div>
             </div>
           )}
           {!state.institutionsLoading && state.institutionsError && (
             <div className="mt-2 flex items-center gap-2">
-              <p className="text-red-600 text-xs">{state.institutionsError}</p>
+              <p className="text-error text-xs font-medium">{state.institutionsError}</p>
               <button
                 type="button"
                 onClick={fetchInstitutions}
-                className="text-xs text-primary hover:underline"
+                className="text-xs text-primary font-bold hover:underline"
               >
                 Retry
               </button>
@@ -862,18 +862,18 @@ export const Onboarding: React.FC = () => {
           )}
           {!state.institutionsLoading && !state.institutionsError && state.institutions.length === 0 && (
             <div className="mt-2 flex items-center gap-2">
-              <p className="text-muted-foregroundmber-600 text-xs">No institutions available yet.</p>
+              <p className="text-textMuted text-xs font-medium">No institutions available yet.</p>
               <button
                 type="button"
                 onClick={fetchInstitutions}
-                className="text-xs text-primary hover:underline"
+                className="text-xs text-primary font-bold hover:underline"
               >
                 Refresh
               </button>
             </div>
           )}
           {state.validationErrors.institution && (
-            <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.institution}</p>
+            <p className="text-error text-xs mt-1 ml-4 font-medium">{state.validationErrors.institution}</p>
           )}
         </div>
 
@@ -901,23 +901,23 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your faculty or college"
                   aria-disabled={state.colleges.length === 0}
-                  className="w-full bg-surface border border-[#E0E0E0] text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-surface border border-outline/20 text-text rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="">Select college/faculty</option>
+                  <option value="" className="bg-surface">Select college/faculty</option>
                   {state.colleges.map(col => (
-                    <option key={col.id} value={col.id}>
+                    <option key={col.id} value={col.id} className="bg-surface">
                       {col.code} - {col.name}
                     </option>
                   ))}
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
-                  <ChevronRight size={14} className="text-[#8B7355] -rotate-90" strokeWidth={2.5} />
-                  <ChevronRight size={14} className="text-[#8B7355] rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-textMuted -rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-textMuted rotate-90" strokeWidth={2.5} />
                 </div>
               </div>
             )}
             {state.validationErrors.college && (
-              <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.college}</p>
+              <p className="text-error text-xs mt-1 ml-4 font-medium">{state.validationErrors.college}</p>
             )}
           </div>
         )}
@@ -946,23 +946,23 @@ export const Onboarding: React.FC = () => {
                   aria-required="true"
                   aria-label="Select your department"
                   aria-disabled={state.departments.length === 0}
-                  className="w-full bg-surface border border-[#E0E0E0] text-primary rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-[#FDB913]/30 focus:border-[#FDB913] outline-none transition-all appearance-none cursor-pointer hover:border-[#FDB913]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-surface border border-outline/20 text-text rounded-2xl p-4 pl-4 pr-12 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all appearance-none cursor-pointer hover:border-primary/50"
                 >
-                  <option value="">Select department</option>
+                  <option value="" className="bg-surface">Select department</option>
                   {state.departments.map(dept => (
-                    <option key={dept.id} value={dept.id}>
+                    <option key={dept.id} value={dept.id} className="bg-surface">
                       {dept.code} - {dept.name}
                     </option>
                   ))}
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 pointer-events-none">
-                  <ChevronRight size={14} className="text-[#8B7355] -rotate-90" strokeWidth={2.5} />
-                  <ChevronRight size={14} className="text-[#8B7355] rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-textMuted -rotate-90" strokeWidth={2.5} />
+                  <ChevronRight size={14} className="text-textMuted rotate-90" strokeWidth={2.5} />
                 </div>
               </div>
             )}
             {state.validationErrors.department && (
-              <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.department}</p>
+              <p className="text-error text-xs mt-1 ml-4 font-medium">{state.validationErrors.department}</p>
             )}
           </div>
         )}
@@ -978,7 +978,7 @@ export const Onboarding: React.FC = () => {
                 onChange={handleInputChange}
               />
               {state.validationErrors.matricNumber && (
-                <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.matricNumber}</p>
+                <p className="text-error text-xs mt-1 ml-4 font-medium">{state.validationErrors.matricNumber}</p>
               )}
             </div>
             <div>
@@ -990,7 +990,7 @@ export const Onboarding: React.FC = () => {
                 onChange={handleInputChange}
               />
               {state.validationErrors.level && (
-                <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.level}</p>
+                <p className="text-error text-xs mt-1 ml-4 font-medium">{state.validationErrors.level}</p>
               )}
             </div>
           </>
@@ -1086,28 +1086,30 @@ export const Onboarding: React.FC = () => {
                   role="option"
                   aria-selected={isSelected}
                   aria-label={`${isSelected ? 'Deselect' : 'Select'} course ${course.code} – ${course.title}`}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913] ${isSelected
-                      ? 'bg-primary/10 border-primary shadow-md'
-                      : 'bg-zinc-50 border-zinc-300 hover:border-zinc-400 hover:shadow-sm'
-                    }`}
-                >
-                  <div className="text-left">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-text'}`}>{course.code}</span>
-                      {course.level && (
-                        <span className="text-[10px] bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
-                      )}
-                    </div>
-                    <p className="text-xs text-textMuted mt-1">{course.title}</p>
-                    {course.lecturer_name && (
-                      <p className="text-[10px] text-textMuted mt-0.5">{course.lecturer_name}</p>
-                    )}
-                  </div>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${isSelected ? 'bg-primary border-primary text-background' : 'border-zinc-400 bg-transparent'
-                    }`} aria-hidden="true">
-                    {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
-                  </div>
-                </button>
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                            isSelected
+                                ? 'bg-primary/10 border-primary shadow-md'
+                                : 'bg-surfaceContainer/50 border-outline/20 hover:border-primary/30 hover:shadow-sm'
+                        }`}
+                    >
+                        <div className="text-left">
+                            <div className="flex items-center gap-2">
+                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-text'}`}>{course.code}</span>
+                                 {course.level && (
+                                   <span className="text-[10px] bg-surfaceVariant text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
+                                 )}
+                            </div>
+                            <p className="text-xs text-textMuted mt-1">{course.title}</p>
+                            {course.lecturer_name && (
+                              <p className="text-[10px] text-textMuted mt-0.5">{course.lecturer_name}</p>
+                            )}
+                        </div>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
+                            isSelected ? 'bg-primary border-primary text-on-primary-fixed' : 'border-outline/40 bg-transparent'
+                        }`} aria-hidden="true">
+                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
+                        </div>
+                    </button>
               );
             })}
           </div>
@@ -1164,14 +1166,14 @@ export const Onboarding: React.FC = () => {
             aria-checked={item.state}
             tabIndex={0}
             aria-label={`${item.label}: ${item.state ? 'enabled' : 'disabled'}. ${item.desc}`}
-            className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]
+            className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
                     ${item.state
-                ? 'bg-white border-primary/30 shadow-sm'
-                : 'bg-zinc-100 border-zinc-300 hover:bg-white'
-              }`}
+                        ? 'bg-primary/5 border-primary/30 shadow-sm'
+                        : 'bg-surfaceContainer/30 border-outline/20 hover:bg-surfaceContainer/50'
+                    }`}
           >
             <div className="flex items-center gap-4">
-              <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-background' : 'bg-zinc-300 text-zinc-700'}`} aria-hidden="true">
+              <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-on-primary-fixed' : 'bg-surfaceVariant text-textMuted'}`} aria-hidden="true">
                 <item.icon size={20} />
               </div>
               <div className="text-left">
@@ -1180,7 +1182,7 @@ export const Onboarding: React.FC = () => {
               </div>
             </div>
             <div
-              className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-400 justify-start'}`}
+              className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-surfaceVariant justify-start'}`}
               aria-hidden="true"
             >
               <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
@@ -1192,16 +1194,18 @@ export const Onboarding: React.FC = () => {
   );
 
   return (
-    <div
-      className="min-h-screen bg-[#F5F5F0] flex flex-col items-center justify-center p-4"
-      aria-label="Account setup wizard"
-    >
-      <div className="w-full max-w-lg">
-        {/* Header Logo */}
-        <div className="flex justify-center mb-8">
-          <Logo />
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      <AuthBackground />
+      
+      {/* Header bar */}
+      <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
+        <div className="flex items-center gap-2">
+            <Logo />
         </div>
+        <ThemeToggle />
+      </div>
 
+      <div className="w-full max-w-lg relative z-10">
         {/* Screen-reader live region – announces step changes */}
         <div aria-live="polite" aria-atomic="true" className="sr-only">
           Step {state.step} of {totalSteps}:{' '}
@@ -1213,20 +1217,29 @@ export const Onboarding: React.FC = () => {
         </div>
 
         <div
-          className="bg-surface border border-[#E0E0E0] p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden"
+          className="glass-panel border-outline/20 p-6 md:p-8 rounded-[2rem] shadow-2xl relative overflow-hidden backdrop-blur-3xl animate-reveal"
           role="main"
         >
+          {/* Header Title */}
+          <div className="mb-8 text-center space-y-2">
+             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider mb-2">
+                <Sparkles size={12} />
+                <span>Onboarding Stage {state.step}</span>
+             </div>
+             <h1 className="text-3xl font-headline font-bold tracking-tight">Complete your profile</h1>
+          </div>
+
           {/* Error Display */}
           {state.error && (
             <div
               role="alert"
-              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2"
+              className="mb-6 p-4 bg-error/10 border border-error/20 rounded-2xl text-error text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2"
             >
               <AlertCircle size={20} className="flex-shrink-0 mt-0.5" aria-hidden="true" />
-              <div className="flex-1">{state.error}</div>
+              <div className="flex-1 font-medium">{state.error}</div>
               <button
                 onClick={() => dispatch({ type: 'SET_ERROR', payload: '' })}
-                className="text-red-500 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-500 rounded"
+                className="text-error/60 hover:text-error transition-colors p-1"
                 aria-label="Dismiss error"
               >
                 <X size={16} aria-hidden="true" />
@@ -1236,7 +1249,7 @@ export const Onboarding: React.FC = () => {
 
           {/* Progress Bar */}
           <div
-            className="flex gap-2 mb-8 px-2"
+            className="flex gap-2 mb-10 px-2"
             role="progressbar"
             aria-label="Onboarding progress"
             aria-valuenow={state.step}
@@ -1244,15 +1257,15 @@ export const Onboarding: React.FC = () => {
             aria-valuemax={totalSteps}
           >
             {Array.from({ length: totalSteps }).map((_, i) => (
-              <div key={i} className="flex-1 h-1.5 rounded-full bg-[#E0E0E0] overflow-hidden">
+              <div key={i} className="flex-1 h-2 rounded-full bg-surfaceVariant/30 overflow-hidden">
                 <div
-                  className={`h-full bg-[#FDB913] transition-all duration-500 ease-out ${state.step >= i + 1 ? 'w-full' : 'w-0'}`}
+                  className={`h-full bg-primary transition-all duration-700 ease-out shadow-[0_0_12px_rgba(253,185,19,0.3)] ${state.step >= i + 1 ? 'w-full' : 'w-0'}`}
                 />
               </div>
             ))}
           </div>
 
-          <div className="min-h-[400px] flex flex-col">
+          <div className="min-h-[420px] flex flex-col">
             <AnimatePresence mode="wait" custom={state.direction}>
               <motion.div
                 key={state.step}
@@ -1272,34 +1285,40 @@ export const Onboarding: React.FC = () => {
               </motion.div>
             </AnimatePresence>
 
-            <div className="flex gap-4 mt-8 pt-6 border-t border-[#E0E0E0]">
+            <div className="flex gap-4 mt-8 pt-8 border-t border-outline/10">
               {state.step > 1 && (
                 <button
                   onClick={handleBack}
                   aria-label="Go back to previous step"
-                  className="px-4 py-3 bg-surface border border-outline text-textMuted rounded-full hover:bg-[#F5F5F0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
+                  className="w-14 h-14 bg-surfaceLow border border-outline/20 text-textMuted rounded-2xl hover:bg-surfaceVariant transition-all flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
-                  <ChevronLeft size={20} aria-hidden="true" />
+                  <ChevronLeft size={24} aria-hidden="true" />
                 </button>
               )}
               <button
-                className="flex-1 py-5 bg-[#FDB913] hover:bg-[#E5A912] text-black font-bold text-lg rounded-full transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]"
+                className="btn-presently-primary flex-1 h-14 flex items-center justify-center gap-2 group text-on-primary-fixed"
                 onClick={handleNext}
                 disabled={(state.step === 1 && !state.selectedRole) || (state.pendingImage !== null) || completeOnboardingMutation.isPending}
                 aria-busy={completeOnboardingMutation.isPending}
               >
                 {completeOnboardingMutation.isPending ? (
                   <>
-                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Setting up...</span>
+                    <Loader size={20} className="animate-spin text-on-primary-fixed" />
+                    <span>Finalizing...</span>
                   </>
                 ) : (
                   <>
-                    {state.step === totalSteps ? 'Finish Setup' : 'Continue'}
-                    {state.step < totalSteps && <ChevronRight size={18} className="ml-1" strokeWidth={2.5} aria-hidden="true" />}
+                    <span className="text-lg">
+                      {state.step === totalSteps ? 'Complete Profile' : 'Next Step'}
+                    </span>
+                    {state.step < totalSteps && (
+                      <ChevronRight 
+                        size={20} 
+                        className="ml-1 group-hover:translate-x-1 transition-transform" 
+                        strokeWidth={3} 
+                        aria-hidden="true" 
+                      />
+                    )}
                   </>
                 )}
               </button>
@@ -1307,8 +1326,8 @@ export const Onboarding: React.FC = () => {
           </div>
         </div>
 
-        <p className="text-center text-textMuted text-xs mt-6" aria-hidden="true">
-          Step {state.step} of {totalSteps}
+        <p className="text-center text-textMuted text-xs mt-8 font-medium" aria-hidden="true">
+          Step {state.step} of {totalSteps} &bull; Progress saved automatically
         </p>
       </div>
     </div>

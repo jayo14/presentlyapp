@@ -22,7 +22,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, className = ''
             text-text font-medium placeholder:text-textMuted/40 placeholder:font-normal
             shadow-sm group-focus-within/field:shadow-[0_8px_32px_rgba(255,215,0,0.05)]
             ${icon ? 'pl-14' : ''}
-            ${error ? 'border-red-500/50 focus:border-red-500 group-hover/field:border-red-500/30' : ''}
+            ${error ? 'border-error/50 focus:border-error group-hover/field:border-error/30' : ''}
             ${className}
             disabled:opacity-40 disabled:grayscale
           `}
@@ -35,8 +35,8 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, className = ''
         )}
       </div>
       {error && (
-        <p className="mt-2 text-xs text-red-500 font-bold ml-1 flex items-center gap-1 animate-in slide-in-from-top-1 duration-300">
-           <span className="w-1 h-1 rounded-full bg-red-500" />
+        <p className="mt-2 text-xs text-error font-bold ml-1 flex items-center gap-1 animate-in slide-in-from-top-1 duration-300">
+           <span className="w-1 h-1 rounded-full bg-error" />
            {error}
         </p>
       )}
