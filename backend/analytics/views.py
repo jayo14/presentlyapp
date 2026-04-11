@@ -143,6 +143,33 @@ class StudentDashboardAnalyticsView(APIView):
                 'description': f"Marked {attendance.status.lower()} for {attendance.session.course.code}"
             })
         
+        # Weekly attendance (last 4 weeks)
+        weekly_attendance = []
+        for i in range(3, -1, -1):
+            start_date = now - timedelta(days=(i+1)*7)
+            end_date = now - timedelta(days=i*7)
+            
+            week_sessions = AttendanceSession.objects.filter(
+                course__in=[e.course for e in enrollments],
+                start_time__gte=start_date,
+                start_time__lte=end_date
+            )
+            
+            if week_sessions.exists():
+                week_attended = Attendance.objects.filter(
+                    student=user,
+                    session__in=week_sessions
+                ).count()
+                week_total = week_sessions.count()
+                week_pct = round((week_attended / week_total) * 100) if week_total > 0 else 0
+            else:
+                week_pct = 0
+                
+            weekly_attendance.append({
+                'week': f"Week {4-i}",
+                'attendance': week_pct
+            })
+
         return Response({
             'user': {
                 'id': str(user.id),
@@ -159,9 +186,15 @@ class StudentDashboardAnalyticsView(APIView):
                 'average_attendance': avg_attendance,
                 'total_present': total_present,
                 'total_late': total_late,
-                'total_absent': total_absent,
+                'total_absent': max(0, total_sessions_overall - (total_present + total_late)),
                 'total_sessions': total_sessions_overall,
             },
+            'status_breakdown': {
+                'present': total_present,
+                'late': total_late,
+                'absent': max(0, total_sessions_overall - (total_present + total_late)),
+            },
+            'weekly_attendance': weekly_attendance,
             'next_class': next_class,
             'recent_activity': recent_activity
         })

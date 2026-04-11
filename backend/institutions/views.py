@@ -12,6 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
+from django.core import signing
 from django_ratelimit.decorators import ratelimit
 from django_ratelimit.core import is_ratelimited
 import secrets
@@ -679,30 +680,55 @@ def login_view(request):
             if (parsed_ua.is_mobile or parsed_ua.is_tablet) and device_brand != UNKNOWN:
                 device_name = f"{device_brand} {device_model}"
 
-            # Check for existing device (atomic, race-safe)
-            existing_device, created = UserDevice.objects.get_or_create(
-                user=user,
-                device_fingerprint=device_fingerprint,
-                defaults={
-                    'device_name': device_name,
-                    'user_agent': user_agent_raw,
-                    'ip_address': ip_address,
-                    'geo_country': geo_data['country'],
-                    'geo_city': geo_data['city'],
-                    'timezone': geo_data['timezone'],
-                    'isp': geo_data['isp'],
-                    'lat': geo_data['lat'],
-                    'lon': geo_data['lon'],
-                    'is_trusted': False,
-                }
-            )
-
+            # Check for existing device
+            existing_device = UserDevice.objects.filter(
+                user=user, 
+                device_fingerprint=device_fingerprint
+            ).first()
+            
+            created = False
             send_alert = False
             alert_reason = ""
 
-            if created:
-                send_alert = True
-                alert_reason = "New device or browser detected"
+            if not existing_device:
+                # Try to find a "similar" device to avoid redundant alerts on same network/location
+                similar_device = UserDevice.objects.filter(
+                    user=user,
+                    device_name=device_name,
+                    geo_city=geo_data.get('city'),
+                    isp=geo_data.get('isp')
+                ).order_by('-last_seen_at').first()
+
+                existing_device = UserDevice.objects.create(
+                    user=user,
+                    device_fingerprint=device_fingerprint,
+                    device_name=device_name,
+                    user_agent=user_agent_raw,
+                    ip_address=ip_address,
+                    geo_country=geo_data.get('country'),
+                    geo_city=geo_data.get('city'),
+                    timezone=geo_data.get('timezone'),
+                    isp=geo_data.get('isp'),
+                    lat=geo_data.get('lat'),
+                    lon=geo_data.get('lon'),
+                    is_trusted=False,
+                )
+                created = True
+                
+                # Logic: Don't alert if it's the SAME network prefix or if we have a TRUSTED similar device
+                if similar_device:
+                    old_prefix = '.'.join(similar_device.ip_address.split('.')[:3])
+                    new_prefix = '.'.join(ip_address.split('.')[:3])
+                    # If same /24 network or similar device is already trusted, skip alert
+                    if old_prefix == new_prefix or similar_device.is_trusted:
+                        send_alert = False
+                        alert_reason = "Recognized network/location for known device type"
+                    else:
+                        send_alert = True
+                        alert_reason = "New network detected for device type"
+                else:
+                    send_alert = True
+                    alert_reason = "New device or browser detected"
             else:
                 # Check for anomalies on existing device
                 if existing_device.geo_country and geo_data['country'] != existing_device.geo_country:
@@ -728,6 +754,10 @@ def login_view(request):
                 existing_device.save()
 
             if send_alert and not parsed_ua.is_bot:
+                # Generate a trust token for the "Yes, it was me" link
+                trust_token = signing.dumps({'device_id': existing_device.id}, salt='trust-device')
+                confirm_url = f"{settings.BACKEND_URL}/api/accounts/devices/trust-confirm/?token={trust_token}"
+                
                 send_login_alert_email(
                     to=user.email,
                     first_name=user.full_name.split(' ')[0],
@@ -736,7 +766,7 @@ def login_view(request):
                     login_location=f"{geo_data['city']}, {geo_data['country']}",
                     login_time=timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC'),
                     ip_address=ip_address,
-                    confirm_url=f"{settings.FRONTEND_URL}/security/devices",
+                    confirm_url=confirm_url,
                     secure_url=f"{settings.FRONTEND_URL}/security",
                 )
             

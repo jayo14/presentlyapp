@@ -5,9 +5,11 @@ import {
   Loader2, RefreshCw,
   LayoutGrid, BellRing, Sparkles,
   Fingerprint, Zap, Shapes, Trophy, Star,
-  ArrowUpRight, Layers, Atom
+  ArrowUpRight, Layers, Atom, ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { LoadingScreen } from '../LoadingScreen';
 import { studentApi, StudentDashboardData } from '../../services/api/student';
@@ -31,11 +33,29 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
   const [loading, setLoading] = useState(true);
   const [isImageTransitioning, setIsImageTransitioning] = useState(true);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   useEffect(() => {
     loadDashboardData();
     const interval = setInterval(() => { loadDashboardData(); }, 60000);
+
+    // Check for device trust confirmation
+    if (searchParams.get('device_trusted') === 'true') {
+      const deviceName = searchParams.get('device_name') || 'Your device';
+      toast.success(`${deviceName} is now trusted.`, {
+        description: 'You will no longer receive alerts for logins from this device.',
+        icon: <ShieldCheck className="text-green-500" size={20} />,
+        duration: 5000,
+      });
+      // Clear params to avoid repeat toasts
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('device_trusted');
+      newParams.delete('device_name');
+      setSearchParams(newParams);
+    }
+
     return () => clearInterval(interval);
-  }, []);
+  }, [searchParams]);
 
   const loadDashboardData = async () => {
     try {
