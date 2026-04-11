@@ -307,7 +307,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
       <main className="flex-1 flex flex-col relative overflow-hidden bg-surface">
         <AnimatePresence mode="wait">
-          {mode === 'input' && (
+          {status === 'idle' && mode === 'input' && (
             <motion.div
               key="input"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -378,7 +378,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
             </motion.div>
           )}
 
-          {mode === 'scan' && (
+          {status === 'idle' && mode === 'scan' && (
             <motion.div
               key="scan"
               initial={{ opacity: 0 }}
