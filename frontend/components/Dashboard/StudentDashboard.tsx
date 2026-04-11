@@ -115,7 +115,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
             </p>
             <h2 className="text-3xl font-black tracking-tighter leading-tight">
-              Hey {userName.split(' ')[0]}, <span className="text-slate-400 dark:text-slate-600">you're on track.</span>
+              Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
             </h2>
           </header>
 

@@ -316,8 +316,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               className="absolute inset-0 z-[115] bg-background flex flex-col justify-center p-8 transition-colors duration-500"
             >
               <div className="max-w-md mx-auto w-full flex flex-col h-full items-center justify-center">
-                <div className="text-center space-y-3 mb-12">
-                  <h2 className="text-4xl font-headline font-black tracking-tight text-foreground">Mission Key</h2>
+                <div className="text-center pt-6 mb-12">
+                  <h2 className="text-4xl font-headline font-black tracking-tight text-foreground">Session Code</h2>
                   <p className="text-muted-foreground font-medium">Enter the 8-character unique session code assigned to your current lecture.</p>
                 </div>
 
@@ -361,13 +361,13 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   </div>
                 </div>
 
-                <div className="w-full mt-12 mb-8">
+                <div className="w-full my-4">
                   <button
                     disabled={sessionCode.length !== 8}
                     onClick={() => processAttendance(sessionCode)}
                     className="w-full h-20 bg-primary text-on-primary-fixed rounded-[2.5rem] font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all active:scale-95"
                   >
-                    Validate Mission Key
+                    Validate Session Code
                   </button>
 
                   <p className="mt-6 text-center text-xs font-bold text-muted-foreground opacity-60">
@@ -420,11 +420,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   </div>
 
                   {/* Status Indicator Bar */}
-                  <div className="mt-16 text-center">
-                    <h3 className="text-xl font-headline font-black text-background drop-shadow-lg mb-2">Center QR Code</h3>
+                  <div className="mt-4 text-center">
+                    {/* <h3 className="text-xl font-headline font-black text-background drop-shadow-lg mb-2">Center QR Code</h3> */}
                     <div className="flex items-center gap-3 justify-center">
                       <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-background/60">Scanning environment...</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-[#ffffff]">Scanning environment...</span>
                     </div>
                   </div>
                 </div>
@@ -434,13 +434,13 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
               </div>
 
               {/* Mobile-Friendly Bottom Sheet Style Indicator */}
-              <div className="absolute bottom-10 left-0 right-0 px-8 pointer-events-none">
+              {/* <div className="absolute bottom-10 left-0 right-0 px-8 pointer-events-none">
                 <div className="max-w-xs mx-auto p-2 bg-white/5 backdrop-blur-3xl rounded-[2rem] border border-white/10 text-center">
                   <p className="text-[10px] font-bold text-background leading-relaxed">
                     Verification is instantaneous once the code is identified within the frame.
                   </p>
                 </div>
-              </div>
+              </div> */}
             </motion.div>
           )}
 
