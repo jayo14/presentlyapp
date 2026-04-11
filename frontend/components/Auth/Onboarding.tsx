@@ -9,11 +9,13 @@ import { useCompleteOnboarding, useCurrentUser } from '../../hooks/useAuth';
 import { coursesApi } from '../../services/api';
 import { authApi } from '../../services/api/auth';
 import { institutionsApi } from '../../services/api/institutions';
-import { 
-  User, Bell, MapPin, Check, Upload, 
+import {
+  User, Bell, MapPin, Check, Upload,
   Moon, Sun, Camera, Smartphone, ChevronRight, ChevronLeft,
-  GraduationCap, Briefcase, UserCheck, X, Plus, Loader, RefreshCw, AlertCircle
+  GraduationCap, Briefcase, UserCheck, X, Plus, Loader, RefreshCw, AlertCircle, Sparkles
 } from 'lucide-react';
+import { AuthBackground } from './AuthBackground';
+// import { ThemeToggle } from '../ThemeToggle';
 
 const CACHE_KEYS = {
   institutions: 'presently_institutions',
@@ -37,11 +39,11 @@ interface OnboardingState {
   pendingImage: string | null;
   error: string;
   photoError: string;
-  
+
   courses: Course[];
   coursesLoading: boolean;
   coursesError: string;
-  
+
   institutions: Institution[];
   institutionsLoading: boolean;
   institutionsError: string;
@@ -49,11 +51,11 @@ interface OnboardingState {
   collegesLoading: boolean;
   departments: Department[];
   departmentsLoading: boolean;
-  
+
   selectedInstitution: number | null;
   selectedCollege: number | null;
   selectedDepartment: number | null;
-  
+
   formData: {
     phoneNumber: string;
     matricNumber: string;
@@ -63,15 +65,15 @@ interface OnboardingState {
     courses: string;
     assignedLecturer: string;
   };
-  
+
   selectedCourses: number[];
-  
+
   permissions: {
     notifications: boolean;
     location: boolean;
     darkMode: boolean;
   };
-  
+
   validationErrors: Record<string, string>;
 }
 
@@ -110,11 +112,11 @@ const initialState: OnboardingState = {
   pendingImage: null,
   error: '',
   photoError: '',
-  
+
   courses: [],
   coursesLoading: false,
   coursesError: '',
-  
+
   institutions: [],
   institutionsLoading: false,
   institutionsError: '',
@@ -122,11 +124,11 @@ const initialState: OnboardingState = {
   collegesLoading: false,
   departments: [],
   departmentsLoading: false,
-  
+
   selectedInstitution: null,
   selectedCollege: null,
   selectedDepartment: null,
-  
+
   formData: {
     phoneNumber: '',
     matricNumber: '',
@@ -136,15 +138,15 @@ const initialState: OnboardingState = {
     courses: '',
     assignedLecturer: ''
   },
-  
+
   selectedCourses: [],
-  
+
   permissions: {
     notifications: false,
     location: false,
     darkMode: false
   },
-  
+
   validationErrors: {}
 };
 
@@ -183,8 +185,8 @@ function onboardingReducer(state: OnboardingState, action: OnboardingAction): On
     case 'SET_DEPARTMENTS_LOADING':
       return { ...state, departmentsLoading: action.payload };
     case 'SET_SELECTED_INSTITUTION':
-      return { 
-        ...state, 
+      return {
+        ...state,
         selectedInstitution: action.payload,
         selectedCollege: null,
         selectedDepartment: null,
@@ -192,8 +194,8 @@ function onboardingReducer(state: OnboardingState, action: OnboardingAction): On
         departments: []
       };
     case 'SET_SELECTED_COLLEGE':
-      return { 
-        ...state, 
+      return {
+        ...state,
         selectedCollege: action.payload,
         selectedDepartment: null,
         departments: []
@@ -246,7 +248,7 @@ export const Onboarding: React.FC = () => {
     try {
       const cached = localStorage.getItem(key);
       if (!cached) return null;
-      
+
       const { data, timestamp }: CachedData<T> = JSON.parse(cached);
       if (Date.now() - timestamp > CACHE_DURATION) {
         localStorage.removeItem(key);
@@ -424,7 +426,7 @@ export const Onboarding: React.FC = () => {
   // Validation function
   const validateStep = (): boolean => {
     dispatch({ type: 'CLEAR_VALIDATION_ERRORS' });
-    
+
     if (state.step === 1 && !state.selectedRole) {
       dispatch({ type: 'SET_ERROR', payload: 'Please select a role to continue' });
       return false;
@@ -527,7 +529,7 @@ export const Onboarding: React.FC = () => {
         };
 
         completeOnboardingMutation.mutate(onboardingData);
-        
+
         // Clear saved progress after successful completion
         localStorage.removeItem(CACHE_KEYS.onboarding);
       }
@@ -563,10 +565,10 @@ export const Onboarding: React.FC = () => {
 
   const handleImageUpload = async (e?: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: 'SET_PHOTO_ERROR', payload: '' });
-    
+
     if (e && e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         dispatch({ type: 'SET_PHOTO_ERROR', payload: 'Image size must be less than 5MB' });
@@ -602,14 +604,14 @@ export const Onboarding: React.FC = () => {
         width: 512,
         height: 512,
       });
-      
+
       if (photoData) {
         dispatch({ type: 'SET_PENDING_IMAGE', payload: photoData });
       }
     } catch (error: any) {
       console.error('Camera error:', error);
       dispatch({ type: 'SET_PHOTO_ERROR', payload: error.message || 'Failed to capture photo. Try uploading from gallery.' });
-      
+
       // Fallback to file input if camera fails
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
@@ -646,17 +648,17 @@ export const Onboarding: React.FC = () => {
 
   const renderRoleSelection = () => {
     const roles = [
-      { 
-        id: UserRole.STUDENT, 
-        icon: GraduationCap, 
-        label: 'Student', 
+      {
+        id: UserRole.STUDENT,
+        icon: GraduationCap,
+        label: 'Student',
         desc: 'I want to track my attendance, grades and academic progress.',
         features: ['View schedule', 'Submit assignments', 'Track grades']
       },
-      { 
-        id: UserRole.LECTURER, 
-        icon: Briefcase, 
-        label: 'Lecturer', 
+      {
+        id: UserRole.LECTURER,
+        icon: Briefcase,
+        label: 'Lecturer',
         desc: 'I want to manage classes, record attendance, and export reports.',
         features: ['Create sessions', 'Generate reports', 'Manage courses']
       },
@@ -669,20 +671,20 @@ export const Onboarding: React.FC = () => {
           <p className="text-textMuted">Select your role to get started</p>
           <p className="text-xs text-textMuted mt-2">Step 1 of {totalSteps}</p>
         </div>
-        
+
         <div className="grid gap-4">
           {roles.map((role) => (
             <button
               key={role.id}
               onClick={() => dispatch({ type: 'SET_ROLE', payload: role.id })}
-              className={`flex flex-col p-5 rounded-xl border-border transition-all w-full text-left group hover:shadow-md
-                ${state.selectedRole === role.id 
-                  ? 'border-primary bg-primary/10 shadow-md' 
-                  : 'border-zinc-300 bg-zinc-50 hover:border-primary/30'
+              className={`flex flex-col p-5 rounded-xl border transition-all w-full text-left group hover:shadow-md
+                ${state.selectedRole === role.id
+                  ? 'border-primary bg-primary/10 shadow-md'
+                  : 'border-outline/40 bg-surfaceLow hover:border-primary/30'
                 }`}
             >
               <div className="flex items-start gap-4 mb-3">
-                <div className={`p-3 rounded-xl transition-colors ${state.selectedRole === role.id ? 'bg-primary text-background' : 'bg-zinc-200 text-zinc-700 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                <div className={`p-3 rounded-xl transition-colors ${state.selectedRole === role.id ? 'bg-primary text-on-primary-fixed' : 'bg-surfaceVariant text-textMuted group-hover:bg-primary/20 group-hover:text-primary'}`}>
                   <role.icon size={28} />
                 </div>
                 <div className="flex-1">
@@ -692,16 +694,16 @@ export const Onboarding: React.FC = () => {
                   <p className="text-sm text-textMuted leading-relaxed">{role.desc}</p>
                 </div>
                 <div className={`w-6 h-6 rounded-full border-border flex items-center justify-center transition-all flex-shrink-0 ${state.selectedRole === role.id ? 'border-primary bg-primary' : 'border-outline'}`}>
-                   {state.selectedRole === role.id && <Check size={16} className="text-text" />}
+                  {state.selectedRole === role.id && <Check size={16} className="text-text" />}
                 </div>
               </div>
-              
+
               {/* Features List */}
               <div className="flex flex-wrap gap-2 ml-16">
                 {role.features.map((feature, idx) => (
-                  <span 
+                  <span
                     key={idx}
-                    className={`text-xs px-2 py-1 rounded-full ${state.selectedRole === role.id ? 'bg-primary/20 text-primary' : 'bg-zinc-200 text-zinc-700'}`}
+                    className={`text-xs px-2 py-1 rounded-full ${state.selectedRole === role.id ? 'bg-primary/20 text-primary' : 'bg-surfaceVariant/50 text-textMuted'}`}
                   >
                     {feature}
                   </span>
@@ -725,46 +727,46 @@ export const Onboarding: React.FC = () => {
 
       <div className="flex flex-col items-center mb-8 gap-4">
         <div className="relative group cursor-pointer">
-           <div
-             className="w-28 h-28 rounded-full bg-surfaceLow overflow-hidden border-2 border-outline ring-2 ring-outline group-hover:ring-primary transition-all"
-             aria-hidden="true"
-           >
-              {state.pendingImage ? (
-                  <img src={state.pendingImage} alt="Preview" className="w-full h-full object-cover opacity-80" />
-              ) : state.profileImage ? (
-                  <img src={state.profileImage} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                  <div className="w-full h-full flex items-center justify-center text-textMuted">
-                      <User size={40} />
-                  </div>
-              )}
-           </div>
-           
-           {!state.pendingImage && (
-             <button
-               type="button"
-               onClick={handleCameraClick}
-               aria-label="Upload profile photo"
-               className="absolute bottom-0 right-0 bg-primary text-text p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-             >
-                <Camera size={16} />
-             </button>
-           )}
+          <div
+            className="w-28 h-28 rounded-full bg-surfaceLow overflow-hidden border-2 border-outline ring-2 ring-outline group-hover:ring-primary transition-all"
+            aria-hidden="true"
+          >
+            {state.pendingImage ? (
+              <img src={state.pendingImage} alt="Preview" className="w-full h-full object-cover opacity-80" />
+            ) : state.profileImage ? (
+              <img src={state.profileImage} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-textMuted">
+                <User size={40} />
+              </div>
+            )}
+          </div>
+
+          {!state.pendingImage && (
+            <button
+              type="button"
+              onClick={handleCameraClick}
+              aria-label="Upload profile photo"
+              className="absolute bottom-0 right-0 bg-primary text-text p-2 rounded-full cursor-pointer hover:bg-primary-hover shadow-lg transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <Camera size={16} />
+            </button>
+          )}
         </div>
 
         {state.pendingImage && (
-            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                <Button size="sm" variant="secondary" onClick={cancelImage} className="h-8">
-                    <X size={14} className="mr-1" /> Cancel
-                </Button>
-                <Button size="sm" onClick={confirmImage} className="h-8">
-                    <Check size={14} className="mr-1" /> Confirm Photo
-                </Button>
-            </div>
+          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+            <Button size="sm" variant="secondary" onClick={cancelImage} className="h-8">
+              <X size={14} className="mr-1" /> Cancel
+            </Button>
+            <Button size="sm" onClick={confirmImage} className="h-8">
+              <Check size={14} className="mr-1" /> Confirm Photo
+            </Button>
+          </div>
         )}
 
         {state.photoError && (
-          <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 px-3 py-2 rounded-full animate-in fade-in">
+          <div className="flex items-center gap-2 text-error text-sm bg-error/10 px-3 py-2 rounded-full animate-in fade-in">
             <AlertCircle size={16} />
             <span>{state.photoError}</span>
           </div>
@@ -773,10 +775,10 @@ export const Onboarding: React.FC = () => {
 
       <div className="space-y-4">
         <div>
-          <Input 
+          <Input
             name="phoneNumber"
-            label="Phone Number" 
-            placeholder="+234 800 000 0000" 
+            label="Phone Number"
+            placeholder="+234 800 000 0000"
             icon={<Smartphone size={16} />}
             value={state.formData.phoneNumber}
             onChange={handleInputChange}
@@ -966,76 +968,76 @@ export const Onboarding: React.FC = () => {
         )}
 
         {(state.selectedRole === UserRole.STUDENT || state.selectedRole === UserRole.CLASS_REP) && (
-            <>
-                <div>
-                  <Input 
-                      name="matricNumber"
-                      label="Matriculation Number" 
-                      placeholder="e.g. ENG/2021/001" 
-                      value={state.formData.matricNumber}
-                      onChange={handleInputChange}
-                  />
-                  {state.validationErrors.matricNumber && (
-                    <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.matricNumber}</p>
-                  )}
-                </div>
-                <div>
-                  <Input 
-                      name="level"
-                      label="Level" 
-                      placeholder="e.g. 100, 200, 300, 400" 
-                      value={state.formData.level}
-                      onChange={handleInputChange}
-                  />
-                  {state.validationErrors.level && (
-                    <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.level}</p>
-                  )}
-                </div>
-            </>
+          <>
+            <div>
+              <Input
+                name="matricNumber"
+                label="Matriculation Number"
+                placeholder="e.g. ENG/2021/001"
+                value={state.formData.matricNumber}
+                onChange={handleInputChange}
+              />
+              {state.validationErrors.matricNumber && (
+                <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.matricNumber}</p>
+              )}
+            </div>
+            <div>
+              <Input
+                name="level"
+                label="Level"
+                placeholder="e.g. 100, 200, 300, 400"
+                value={state.formData.level}
+                onChange={handleInputChange}
+              />
+              {state.validationErrors.level && (
+                <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.level}</p>
+              )}
+            </div>
+          </>
         )}
 
         {state.selectedRole === UserRole.STUDENT && (
-             <div className="w-full">
-                 <label className="block text-sm font-medium text-textMuted mb-1.5">Digital Signature <span className="text-textMuted font-normal">(Optional)</span></label>
-                 <div className="border border-dashed border-outline bg-surfaceLow rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-surfaceLow hover:border-primary/50 cursor-pointer transition-colors group">
-                    <Upload className="h-6 w-6 text-textMuted group-hover:text-primary mb-2 transition-colors" />
-                    <p className="text-xs text-textMuted group-hover:text-text">Upload signature image</p>
-                 </div>
+          <div className="w-full">
+            <label className="block text-sm font-medium text-textMuted mb-1.5">Digital Signature <span className="text-textMuted font-normal">(Optional)</span></label>
+            <div className="border border-dashed border-outline bg-surfaceLow rounded-lg h-24 flex flex-col items-center justify-center text-center hover:bg-surfaceLow hover:border-primary/50 cursor-pointer transition-colors group">
+              <Upload className="h-6 w-6 text-textMuted group-hover:text-primary mb-2 transition-colors" />
+              <p className="text-xs text-textMuted group-hover:text-text">Upload signature image</p>
             </div>
+          </div>
         )}
 
         {state.selectedRole === UserRole.CLASS_REP && (
-            <Input 
-                name="assignedLecturer"
-                label="Assigned Lecturer / Course" 
-                placeholder="Dr. Smith - CS402" 
-                value={state.formData.assignedLecturer}
-                onChange={handleInputChange}
-            />
+          <Input
+            name="assignedLecturer"
+            label="Assigned Lecturer / Course"
+            placeholder="Dr. Smith - CS402"
+            value={state.formData.assignedLecturer}
+            onChange={handleInputChange}
+          />
         )}
 
         {state.selectedRole === UserRole.LECTURER && (
-            <>
-                <div>
-                  <Input 
-                      name="staffId"
-                      label="Staff ID" 
-                      placeholder="e.g. STF/001" 
-                      value={state.formData.staffId}
-                      onChange={handleInputChange}
-                  />
-                  {state.validationErrors.staffId && (
-                    <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.staffId}</p>
-                  )}
-                </div>
-                 <Input 
-                    name="courses"
-                    label="Courses Taught" 
-                    placeholder="CS101, CS202..." 
-                    value={state.formData.courses}
-                    onChange={handleInputChange}
-                />
-            </>
+          <>
+            <div>
+              <Input
+                name="staffId"
+                label="Staff ID"
+                placeholder="e.g. STF/001"
+                value={state.formData.staffId}
+                onChange={handleInputChange}
+              />
+              {state.validationErrors.staffId && (
+                <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.staffId}</p>
+              )}
+            </div>
+            <Input
+              name="courses"
+              label="Courses Taught"
+              placeholder="CS101, CS202..."
+              value={state.formData.courses}
+              onChange={handleInputChange}
+            />
+          </>
         )}
       </div>
     </div>
@@ -1076,39 +1078,37 @@ export const Onboarding: React.FC = () => {
             aria-multiselectable="true"
           >
             {state.courses.map((course) => {
-                const isSelected = state.selectedCourses.includes(course.id);
-                return (
-                    <button
-                        key={course.id}
-                        onClick={() => toggleCourseSelection(course.id)}
-                        role="option"
-                        aria-selected={isSelected}
-                        aria-label={`${isSelected ? 'Deselect' : 'Select'} course ${course.code} – ${course.title}`}
-                        className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913] ${
-                            isSelected
-                                ? 'bg-primary/10 border-primary shadow-md'
-                                : 'bg-zinc-50 border-zinc-300 hover:border-zinc-400 hover:shadow-sm'
-                        }`}
-                    >
-                        <div className="text-left">
-                            <div className="flex items-center gap-2">
-                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-text'}`}>{course.code}</span>
-                                 {course.level && (
-                                   <span className="text-[10px] bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
-                                 )}
-                            </div>
-                            <p className="text-xs text-textMuted mt-1">{course.title}</p>
-                            {course.lecturer_name && (
-                              <p className="text-[10px] text-textMuted mt-0.5">{course.lecturer_name}</p>
-                            )}
-                        </div>
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
-                            isSelected ? 'bg-primary border-primary text-background' : 'border-zinc-400 bg-transparent'
-                        }`} aria-hidden="true">
-                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
-                        </div>
-                    </button>
-                );
+              const isSelected = state.selectedCourses.includes(course.id);
+              return (
+                <button
+                  key={course.id}
+                  onClick={() => toggleCourseSelection(course.id)}
+                  role="option"
+                  aria-selected={isSelected}
+                  aria-label={`${isSelected ? 'Deselect' : 'Select'} course ${course.code} – ${course.title}`}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913] ${isSelected
+                      ? 'bg-primary/10 border-primary shadow-md'
+                      : 'bg-zinc-50 border-zinc-300 hover:border-zinc-400 hover:shadow-sm'
+                    }`}
+                >
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-text'}`}>{course.code}</span>
+                      {course.level && (
+                        <span className="text-[10px] bg-surfaceLow text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-textMuted mt-1">{course.title}</p>
+                    {course.lecturer_name && (
+                      <p className="text-[10px] text-textMuted mt-0.5">{course.lecturer_name}</p>
+                    )}
+                  </div>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${isSelected ? 'bg-primary border-primary text-background' : 'border-zinc-400 bg-transparent'
+                    }`} aria-hidden="true">
+                    {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
+                  </div>
+                </button>
+              );
             })}
           </div>
 
@@ -1129,63 +1129,63 @@ export const Onboarding: React.FC = () => {
 
       <div className="space-y-3" role="group" aria-label="App permissions">
         {[
-            {
-                id: 'location',
-                label: 'Location Access',
-                desc: 'Required for GPS attendance verification.',
-                icon: MapPin,
-                state: state.permissions.location
-            },
-            {
-                id: 'notifications',
-                label: 'Notifications',
-                desc: 'Get alerts for classes and attendance.',
-                icon: Bell,
-                state: state.permissions.notifications
-            },
-            {
-                id: 'darkMode',
-                label: 'Dark Mode',
-                desc: 'Easier on the eyes in low light.',
-                icon: state.permissions.darkMode ? Moon : Sun,
-                state: state.permissions.darkMode
-            }
+          {
+            id: 'location',
+            label: 'Location Access',
+            desc: 'Required for GPS attendance verification.',
+            icon: MapPin,
+            state: state.permissions.location
+          },
+          {
+            id: 'notifications',
+            label: 'Notifications',
+            desc: 'Get alerts for classes and attendance.',
+            icon: Bell,
+            state: state.permissions.notifications
+          },
+          {
+            id: 'darkMode',
+            label: 'Dark Mode',
+            desc: 'Easier on the eyes in low light.',
+            icon: state.permissions.darkMode ? Moon : Sun,
+            state: state.permissions.darkMode
+          }
         ].map((item) => (
-            <div
-                key={item.id}
-                onClick={() => togglePermission(item.id as any)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    togglePermission(item.id as any);
-                  }
-                }}
-                role="switch"
-                aria-checked={item.state}
-                tabIndex={0}
-                aria-label={`${item.label}: ${item.state ? 'enabled' : 'disabled'}. ${item.desc}`}
-                className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]
+          <div
+            key={item.id}
+            onClick={() => togglePermission(item.id as any)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                togglePermission(item.id as any);
+              }
+            }}
+            role="switch"
+            aria-checked={item.state}
+            tabIndex={0}
+            aria-label={`${item.label}: ${item.state ? 'enabled' : 'disabled'}. ${item.desc}`}
+            className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FDB913]
                     ${item.state
-                        ? 'bg-white border-primary/30 shadow-sm'
-                        : 'bg-zinc-100 border-zinc-300 hover:bg-white'
-                    }`}
-            >
-                <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-background' : 'bg-zinc-300 text-zinc-700'}`} aria-hidden="true">
-                        <item.icon size={20} />
-                    </div>
-                    <div className="text-left">
-                        <p className={`font-medium transition-colors ${item.state ? 'text-text' : 'text-text'}`}>{item.label}</p>
-                        <p className="text-xs text-textMuted">{item.desc}</p>
-                    </div>
-                </div>
-                <div
-                  className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-400 justify-start'}`}
-                  aria-hidden="true"
-                >
-                    <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
-                </div>
+                ? 'bg-white border-primary/30 shadow-sm'
+                : 'bg-zinc-100 border-zinc-300 hover:bg-white'
+              }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-background' : 'bg-zinc-300 text-zinc-700'}`} aria-hidden="true">
+                <item.icon size={20} />
+              </div>
+              <div className="text-left">
+                <p className={`font-medium transition-colors ${item.state ? 'text-text' : 'text-text'}`}>{item.label}</p>
+                <p className="text-xs text-textMuted">{item.desc}</p>
+              </div>
             </div>
+            <div
+              className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${item.state ? 'bg-primary justify-end' : 'bg-zinc-400 justify-start'}`}
+              aria-hidden="true"
+            >
+              <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
+            </div>
+          </div>
         ))}
       </div>
     </div>

@@ -3,8 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLogin, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
-import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
 import { LoadingScreen } from '../LoadingScreen';
+import { AuthBackground } from './AuthBackground';
+import { ThemeToggle } from '../ThemeToggle';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -117,30 +119,40 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      <AuthBackground />
+      
       <SEO
         title="Login | Presently"
         description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
       />
 
-      {/* Back Button */}
-      <button
-        onClick={onBack}
-        className="absolute top-6 left-6 text-textMuted hover:text-text flex items-center gap-2 transition-colors z-10"
-        aria-label="Go back"
-      >
-        <ArrowLeft size={20} />
-      </button>
+      {/* Header bar */}
+      <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
+        <button
+          onClick={onBack}
+          className="p-2 text-textMuted hover:text-text hover:bg-surface-container rounded-full transition-all"
+          aria-label="Go back"
+        >
+          <ArrowLeft size={24} />
+        </button>
+        
+        <ThemeToggle />
+      </div>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md relative z-10">
         {/* Title */}
-        <div className="mb-8 text-center">
-          <h2 className="text-4xl font-headline font-bold mb-2">Welcome back</h2>
-          <p className="text-textMuted">Enter your credentials to access your account.</p>
+        <div className="mb-10 text-center space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest mb-4">
+            <Sparkles size={14} />
+            <span>Welcome Back</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-headline font-bold mb-2 tracking-tight">Sign in</h2>
+          <p className="text-textMuted text-lg">Enter your credentials to continue.</p>
         </div>
 
         {/* Login Form Card */}
-        <div className="glass-panel border p-6 rounded-2xl shadow-lg">
+        <div className="glass-panel border-outline/20 p-8 rounded-[2rem] shadow-2xl backdrop-blur-3xl">
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-5">
               {/* Email Input */}
@@ -149,7 +161,7 @@ export const Login: React.FC = () => {
                 <div className="relative">
                   <Mail
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#a1a1aa] z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
                   />
                   <input
                     type="email"
@@ -196,7 +208,7 @@ export const Login: React.FC = () => {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer accent-[#FFD700]"
+                    className="w-4 h-4 cursor-pointer accent-primary"
                   />
                   <span className="text-textMuted">Remember me</span>
                 </label>
@@ -262,16 +274,21 @@ export const Login: React.FC = () => {
             </button>
           </div>
 
-          <p className="mt-8 text-center text-sm text-textMuted">
+          <p className="mt-10 text-center text-sm text-textMuted flex items-center justify-center gap-2">
             Don't have an account?{' '}
             <button
               onClick={() => navigate('/register')}
-              className="text-primary font-semibold hover:underline transition-colors"
+              className="text-primary font-bold hover:underline transition-colors py-1 px-2 hover:bg-primary/5 rounded-lg"
             >
               Sign up
             </button>
           </p>
         </div>
+        
+        {/* Footer text */}
+        <p className="mt-8 text-center text-xs text-textMuted/60 font-medium">
+          &copy; {new Date().getFullYear()} Presently Inc. All rights reserved.
+        </p>
       </div>
     </div>
   );
