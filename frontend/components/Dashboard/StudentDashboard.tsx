@@ -83,7 +83,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     }
   };
 
-  if (loading && !dashboardData) return <LoadingScreen message="Syncing your flow" />;
+  if (loading && !dashboardData) return <LoadingScreen message="Loading..." />;
 
   const displayInitials = userName
     .split(' ')

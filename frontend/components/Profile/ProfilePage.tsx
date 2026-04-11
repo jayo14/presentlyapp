@@ -273,7 +273,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
   const desktopLayout = (
     <div className="max-w-3xl mx-auto min-h-screen pb-24 md:pb-8 animate-in fade-in duration-500 px-4 md:px-0">
-      <div className="flex items-center justify-between mb-8 pt-4">
+      {/* <div className="flex items-center justify-between mb-8 pt-4">
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-surface rounded-lg transition-colors text-text">
           <ArrowLeft size={24} />
         </button>
@@ -281,7 +281,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <button onClick={handleShare} className="p-2 hover:bg-surface rounded-full transition-colors text-textMuted">
           <Share2 size={24} />
         </button>
-      </div>
+      </div> */}
 
       <div className="relative mb-12 flex flex-col items-center">
         <div className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-primary shadow-xl group">
