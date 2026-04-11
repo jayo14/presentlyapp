@@ -42,7 +42,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
       setLoading(true);
       // Fetch directly from enrolled courses endpoint for reliability on this page
       const enrolledData = await studentApi.getEnrolledCourses();
-      setCourses(enrolledData || []);
+      setCourses(Array.isArray(enrolledData) ? enrolledData : []);
     } catch (error: any) {
       toast.error('Sync Error', { description: 'Failed to retrieve academic portfolio' });
     } finally {
@@ -65,10 +65,16 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
     }
   };
 
-  const filteredCourses = courses.filter(course =>
-    course.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    course.course_code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Highly defensive filtering to prevent "filter is not a function" errors
+  const filteredCourses = React.useMemo(() => {
+    const sourceArr = Array.isArray(courses) ? courses : [];
+    return sourceArr.filter(course => {
+      const name = course?.course_name?.toLowerCase() || '';
+      const code = course?.course_code?.toLowerCase() || '';
+      const search = searchTerm?.toLowerCase() || '';
+      return name.includes(search) || code.includes(search);
+    });
+  }, [courses, searchTerm]);
 
   if (loading && courses.length === 0) {
     return <SkeletonCourseGrid />;

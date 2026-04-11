@@ -133,7 +133,7 @@ export const studentApi = {
           } : undefined,
           recent_activity: (summary.data.recent_attendance || []).map((rec: any) => ({
             id: rec.id,
-            type: 'attendance' as const,
+            type: 'attendance',
             course_code: rec.course_code,
             timestamp: rec.checked_in_at,
             status: rec.status,
@@ -142,23 +142,37 @@ export const studentApi = {
           _summary: summary.data,
         } as any;
       }
-    } catch {
-      // Fall through to legacy endpoint
+    } catch (err) {
+      console.warn('Student hybrid dashboard fetch failed, falling back to legacy analytics:', err);
     }
     const response = await apiClient.get('/analytics/dashboard/student/');
-    return response.data;
+    const legacyData = response.data;
+    if (legacyData && !Array.isArray(legacyData.enrolled_courses)) {
+      legacyData.enrolled_courses = legacyData.results || legacyData.courses || [];
+    }
+    return legacyData;
   },
 
   // Get enrolled courses
   getEnrolledCourses: async (): Promise<EnrolledCourse[]> => {
     const response = await apiClient.get('/course-enrollments/');
-    return response.data;
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
+      return data.results || data.courses || data.enrolled_courses || [];
+    }
+    return [];
   },
 
   // Get available courses for enrollment (by student's department)
   getAvailableCourses: async (): Promise<AvailableCourse[]> => {
     const response = await apiClient.get('/courses/available/');
-    return response.data.courses || response.data;
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
+      return data.results || data.courses || data.enrolled_courses || [];
+    }
+    return [];
   },
 
   // Enroll in a course
@@ -177,7 +191,12 @@ export const studentApi = {
   // Get student timetable
   getTimetable: async (): Promise<TimetableEntry[]> => {
     const response = await apiClient.get('/timetables/');
-    return response.data;
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
+      return data.results || data.courses || data.enrolled_courses || [];
+    }
+    return [];
   },
 
   // Get student analytics
@@ -193,6 +212,11 @@ export const studentApi = {
     limit?: number;
   }): Promise<any[]> => {
     const response = await apiClient.get('/attendances/', { params: filters });
-    return response.data;
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
+      return data.results || data.courses || data.enrolled_courses || [];
+    }
+    return [];
   },
 };
