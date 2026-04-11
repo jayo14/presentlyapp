@@ -139,6 +139,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                     <div className="flex justify-between items-start mb-6">
                       <CourseIcon
                         title={course.course_name}
+                        code={course.course_code}
                         className="w-14 h-14 group-hover:scale-110 transition-transform duration-500"
                       />
                       <button

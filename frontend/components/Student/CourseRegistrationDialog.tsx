@@ -171,6 +171,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <CourseIcon
                       title={course.title}
+                      code={course.code}
                       className={`w-12 h-12 flex-shrink-0 transition-all ${isEnrolled ? 'shadow-lg ring-4 ring-primary/20' : ''
                         }`}
                     />

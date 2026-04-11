@@ -291,7 +291,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                         className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-4 rounded-[1.75rem] flex items-center gap-4 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group"
                       >
                         <CourseIcon
-                          title={activity.course_name || activity.course_code || ''}
+                          title={activity.course_name}
+                          code={activity.course_code}
                           className={`w-12 h-12 flex-shrink-0 ${activity.status === 'PRESENT' ? 'ring-4 ring-emerald-500/20' : 'ring-4 ring-rose-500/20'
                             }`}
                         />
