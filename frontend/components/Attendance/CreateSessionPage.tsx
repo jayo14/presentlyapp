@@ -12,39 +12,171 @@ import { toast } from 'sonner';
 import { SessionDetailDialog } from './SessionDetailDialog';
 import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { SEO } from '../SEO';
+import { Switch } from '../Switch';
+
+const AccessibleCombobox = ({
+    value,
+    onChange,
+    options,
+    placeholder,
+    className = ""
+}: {
+    value: string;
+    onChange: (val: string) => void;
+    options: { value: string; label: string }[];
+    placeholder: string;
+    className?: string;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState('');
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    const filteredOptions = options.filter(opt =>
+        opt.label.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const selectedLabel = options.find(opt => opt.value === value)?.label || '';
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+                setSearch('');
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (!isOpen && e.key === 'ArrowDown') {
+            setIsOpen(true);
+            return;
+        }
+
+        if (!isOpen) return;
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setActiveIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : prev));
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
+                    onChange(filteredOptions[activeIndex].value);
+                    setIsOpen(false);
+                    setSearch('');
+                }
+                break;
+            case 'Escape':
+                setIsOpen(false);
+                break;
+        }
+    };
+
+    return (
+        <div ref={containerRef} className="relative w-full">
+            <div
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
+                aria-owns="venue-listbox"
+                className="w-full relative"
+            >
+                <input
+                    type="text"
+                    className={`w-full bg-surfaceLow border border-outline rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary pr-10 appearance-none ${className}`}
+                    placeholder={value ? selectedLabel : placeholder}
+                    value={isOpen ? search : selectedLabel}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setIsOpen(true);
+                        setActiveIndex(0);
+                    }}
+                    onClick={() => setIsOpen(true)}
+                    onKeyDown={handleKeyDown}
+                    aria-autocomplete="list"
+                    aria-controls="venue-listbox"
+                    aria-label={placeholder}
+                    aria-activedescendant={activeIndex >= 0 ? `venue-option-${activeIndex}` : undefined}
+                />
+                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} size={16} />
+            </div>
+
+            {isOpen && (
+                <ul
+                    id="venue-listbox"
+                    role="listbox"
+                    className="absolute z-50 w-full mt-2 max-h-60 overflow-auto bg-surface border border-outline rounded-xl shadow-2xl p-2"
+                >
+                    {filteredOptions.length === 0 ? (
+                        <li className="p-3 text-sm text-textMuted text-center font-medium">No venues found</li>
+                    ) : (
+                        filteredOptions.map((opt, index) => (
+                            <li
+                                key={opt.value}
+                                id={`venue-option-${index}`}
+                                role="option"
+                                aria-selected={value === opt.value}
+                                className={`p-3 text-sm rounded-lg cursor-pointer flex items-center justify-between transition-colors ${
+                                    index === activeIndex ? 'bg-primary/10 text-primary' : 'hover:bg-surfaceLow text-text'
+                                }`}
+                                onClick={() => {
+                                    onChange(opt.value);
+                                    setIsOpen(false);
+                                    setSearch('');
+                                }}
+                                onMouseEnter={() => setActiveIndex(index)}
+                            >
+                                <span className={value === opt.value ? 'font-bold' : 'font-medium'}>{opt.label}</span>
+                                {value === opt.value && <Check size={16} className="text-primary" />}
+                            </li>
+                        ))
+                    )}
+                </ul>
+            )}
+        </div>
+    );
+};
 
 export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: user } = useCurrentUser();
-    
+
     // Data State
     const [institutions, setInstitutions] = useState<Institution[]>([]);
     const [colleges, setColleges] = useState<College[]>([]);
     const [departments, setDepartments] = useState<Department[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
     const [venues, setVenues] = useState<Venue[]>([]);
-    
+
     // Selection State
     const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
     const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
     const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<string>('');
     const [selectedVenue, setSelectedVenue] = useState<string>('');
-    
+
     // UX State
     const [isHierarchyExpanded, setIsHierarchyExpanded] = useState(true);
     const [deptSearchTerm, setDeptSearchTerm] = useState('');
-    
+
     // Session Details State
     const [duration, setDuration] = useState<string>('60');
     const [durationUnit, setDurationUnit] = useState<'minutes' | 'hours'>('minutes');
-    
+
     // Verification Methods State
     const [qrCodeEnabled, setQrCodeEnabled] = useState(true);
     const [digitCodeEnabled, setDigitCodeEnabled] = useState(false);
     const [gpsEnabled, setGpsEnabled] = useState(true);
     const [geofenceRadius, setGeofenceRadius] = useState(250);
-    
+
     // UI State
     const [loading, setLoading] = useState(false);
     const [createdSession, setCreatedSession] = useState<Session | null>(null);
@@ -80,31 +212,46 @@ export const CreateSessionPage: React.FC = () => {
         if (selectedDepartments.length > 0) {
             loadCoursesForDepartments(selectedDepartments);
         } else {
-             setCourses([]);
+            setCourses([]);
         }
     }, [selectedDepartments]);
 
     const loadInitialData = async () => {
         try {
-            const [instData, venuesData] = await Promise.all([
+            const promises: Promise<any>[] = [
                 institutionsApi.getAllInstitutions(),
                 venueApi.getAll()
-            ]);
-            
+            ];
+
+            if (user?.id) {
+                // Fetch the lecturer's own courses automatically regardless of department
+                // Assuming user.id handles the string to ID internally on the backend
+                promises.push(courseApi.getAll({ lecturer: parseInt(user.id) || user.id as any }));
+            }
+
+            const results = await Promise.all(promises);
+            const instData = results[0];
+            const venuesData = results[1];
+            const lecturerCourses = results[2] || [];
+
             setInstitutions(Array.isArray(instData) ? instData : []);
             setVenues(Array.isArray(venuesData) ? venuesData : []);
+            
+            if (Array.isArray(lecturerCourses) && lecturerCourses.length > 0) {
+                setCourses(lecturerCourses);
+            }
 
             // Smart Pre-fill
             if (user?.institution) {
                 setSelectedInstitution(user.institution);
                 if (user.college) setSelectedCollege(user.college);
-                
+
                 if (user.department) {
                     setSelectedDepartments([user.department]);
                     // Only auto-collapse if we have a department. 
                     // But since user might want to add more, maybe don't collapse?
                     // Let's collapse for cleaner default, user can expand to add more.
-                    setIsHierarchyExpanded(false); 
+                    setIsHierarchyExpanded(false);
                 }
             }
         } catch (err) {
@@ -137,7 +284,12 @@ export const CreateSessionPage: React.FC = () => {
     const loadCoursesForDepartments = async (deptIds: number[]) => {
         try {
             // Fetch courses for ALL selected departments
-            const promises = deptIds.map(id => courseApi.getAll({ department: id }));
+            const promises: Promise<Course[]>[] = deptIds.map(id => courseApi.getAll({ department: id }));
+            
+            if (user?.id) {
+                promises.push(courseApi.getAll({ lecturer: parseInt(user.id) || user.id as any }));
+            }
+            
             const results = await Promise.all(promises);
             // Flatten and deduplicate by ID
             const allCourses = results.flat();
@@ -158,7 +310,7 @@ export const CreateSessionPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!selectedCourse || !selectedVenue || !duration) {
             toast.error('Please fill in all required fields');
             return;
@@ -176,8 +328,12 @@ export const CreateSessionPage: React.FC = () => {
                 venue: parseInt(selectedVenue),
                 start_time: new Date().toISOString(),
                 end_time: new Date(Date.now() + durationInMinutes * 60000).toISOString(),
-                is_active: true
-            });
+                is_active: true,
+                location_radius: gpsEnabled ? geofenceRadius : undefined,
+                qr_enabled: qrCodeEnabled,
+                digit_enabled: digitCodeEnabled,
+                gps_enabled: gpsEnabled
+            } as any);
 
             toast.success('Session created successfully');
             setCreatedSession(session as any);
@@ -191,11 +347,11 @@ export const CreateSessionPage: React.FC = () => {
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Escape') {
-             if (createdSession) {
-                 navigate('/dashboard');
-             } else {
-                 navigate('/dashboard');
-             }
+            if (createdSession) {
+                navigate('/dashboard');
+            } else {
+                navigate('/dashboard');
+            }
         }
     };
 
@@ -203,18 +359,17 @@ export const CreateSessionPage: React.FC = () => {
         <button
             type="button"
             onClick={() => { setDuration(mins.toString()); setDurationUnit('minutes'); }}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                duration === mins.toString() && durationUnit === 'minutes'
-                ? 'bg-primary text-black ring-2 ring-primary/20' 
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${duration === mins.toString() && durationUnit === 'minutes'
+                ? 'bg-primary text-black ring-2 ring-primary/20'
                 : 'bg-inputccent text-muted-foreground hover:bg-zinc-200 dark:hover:bg-surfaceHigh'
-            }`}
+                }`}
         >
             {label}
         </button>
     );
 
-    const filteredDepartments = departments.filter(d => 
-        d.name.toLowerCase().includes(deptSearchTerm.toLowerCase()) || 
+    const filteredDepartments = departments.filter(d =>
+        d.name.toLowerCase().includes(deptSearchTerm.toLowerCase()) ||
         d.code.toLowerCase().includes(deptSearchTerm.toLowerCase())
     );
 
@@ -222,15 +377,15 @@ export const CreateSessionPage: React.FC = () => {
     const mobileLayout = (
         <div className="min-h-screen bg-background pb-24" onKeyDown={handleKeyDown}>
             {createdSession && (
-                <SessionDetailDialog 
-                    session={createdSession as any} 
-                    onClose={() => navigate('/dashboard')} 
+                <SessionDetailDialog
+                    session={createdSession as any}
+                    onClose={() => navigate('/dashboard')}
                 />
             )}
 
             {/* Mobile Header */}
             <div className="flex items-center p-4 border-b border-outline">
-                <button 
+                <button
                     onClick={() => navigate(-1)}
                     className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors mr-3"
                 >
@@ -260,29 +415,22 @@ export const CreateSessionPage: React.FC = () => {
                 </div>
 
                 {/* Lecture Hall */}
-                <div>
+                <div className="relative z-10">
                     <label className="block text-text text-sm font-semibold mb-3">Lecture Hall</label>
-                    <div className="relative">
-                        <select
-                            value={selectedVenue}
-                            onChange={(e) => setSelectedVenue(e.target.value)}
-                            className="w-full bg-surface border border-outline rounded-xl p-4 text-text text-base outline-none appearance-none pr-10"
-                            required
-                        >
-                            <option value="">Select location</option>
-                            {venues.map(venue => (
-                                <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
-                            ))}
-                        </select>
-                        <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-primary pointer-events-none" size={20} />
-                    </div>
+                    <AccessibleCombobox
+                        value={selectedVenue}
+                        onChange={setSelectedVenue}
+                        options={venues.map(v => ({ value: v.id.toString(), label: `${v.name} (${v.capacity || 0} seats)` }))}
+                        placeholder="Select location..."
+                        className="py-4 text-base"
+                    />
                 </div>
 
                 {/* Verification Methods */}
-                <div>
+                {/* <div>
                     <label className="block text-text text-sm font-semibold mb-3">Verification Methods</label>
                     <div className="space-y-3">
-                        {/* QR Code */}
+
                         <div className="bg-surface rounded-xl p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -295,15 +443,10 @@ export const CreateSessionPage: React.FC = () => {
                                 </div>
                                 <span className="text-text font-medium">QR Code</span>
                             </div>
-                            <div 
-                                onClick={() => setQrCodeEnabled(!qrCodeEnabled)}
-                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${qrCodeEnabled ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}
-                            >
-                                <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
-                            </div>
+                            <Switch checked={qrCodeEnabled} onCheckedChange={setQrCodeEnabled} />
                         </div>
 
-                        {/* 8-Digit Code */}
+
                         <div className="bg-surface rounded-xl p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -311,15 +454,10 @@ export const CreateSessionPage: React.FC = () => {
                                 </div>
                                 <span className="text-text font-medium">8-Digit Code</span>
                             </div>
-                            <div 
-                                onClick={() => setDigitCodeEnabled(!digitCodeEnabled)}
-                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${digitCodeEnabled ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}
-                            >
-                                <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
-                            </div>
+                            <Switch checked={digitCodeEnabled} onCheckedChange={setDigitCodeEnabled} />
                         </div>
 
-                        {/* GPS Verification */}
+
                         <div className="bg-surface rounded-xl p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -327,18 +465,13 @@ export const CreateSessionPage: React.FC = () => {
                                 </div>
                                 <span className="text-text font-medium">GPS Verification</span>
                             </div>
-                            <div 
-                                onClick={() => setGpsEnabled(!gpsEnabled)}
-                                className={`w-12 h-6 rounded-full p-1 flex transition-colors cursor-pointer ${gpsEnabled ? 'bg-primary justify-end' : 'bg-surfaceHigh justify-start'}`}
-                            >
-                                <div className="w-4 h-4 rounded-full bg-surface shadow-sm" />
-                            </div>
+                            <Switch checked={gpsEnabled} onCheckedChange={setGpsEnabled} />
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Geofence Radius */}
-                {gpsEnabled && (
+                {/* {gpsEnabled && (
                     <div>
                         <div className="flex items-center justify-between mb-3">
                             <label className="block text-text text-sm font-semibold">Geofence Radius</label>
@@ -363,10 +496,10 @@ export const CreateSessionPage: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
 
                 {/* Create Button */}
-                <button 
+                <button
                     type="submit"
                     disabled={loading || !selectedCourse || !selectedVenue}
                     className="w-full bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -381,12 +514,12 @@ export const CreateSessionPage: React.FC = () => {
     const desktopLayout = (
         <div className="max-w-2xl mx-auto space-y-6 animate-in slide-in-from-right-4 duration-300 pb-12" onKeyDown={handleKeyDown}>
             {createdSession && (
-                <SessionDetailDialog 
-                    session={createdSession as any} 
-                    onClose={() => navigate('/dashboard')} 
+                <SessionDetailDialog
+                    session={createdSession as any}
+                    onClose={() => navigate('/dashboard')}
                 />
             )}
-            
+
             {/* Header */}
             <div className="flex items-center gap-4 mb-2">
                 <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')} aria-label="Go back">
@@ -398,7 +531,7 @@ export const CreateSessionPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                
+
                 {/* 1. Location / Context Section */}
                 <div className="bg-surface text-text border border-outline rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
                     {/* Collapsed View (Summary) */}
@@ -493,7 +626,7 @@ export const CreateSessionPage: React.FC = () => {
                                                 className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                                             />
                                         </div>
-                                        
+
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                                             {filteredDepartments.map(dept => {
                                                 const isSelected = selectedDepartments.includes(dept.id);
@@ -501,11 +634,10 @@ export const CreateSessionPage: React.FC = () => {
                                                     <div
                                                         key={dept.id}
                                                         onClick={() => toggleDepartment(dept.id)}
-                                                        className={`cursor-pointer p-3 rounded-xl border transition-all relative group ${
-                                                            isSelected
-                                                            ? 'bg-primary/10 border-primary shadow-sm' 
+                                                        className={`cursor-pointer p-3 rounded-xl border transition-all relative group ${isSelected
+                                                            ? 'bg-primary/10 border-primary shadow-sm'
                                                             : 'bg-zinc-50 dark:bg-zinc-950 border-border hover:border-zinc-300 dark:hover:border-outline'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         <div className="flex justify-between items-start">
                                                             <div>
@@ -557,44 +689,36 @@ export const CreateSessionPage: React.FC = () => {
                             </select>
                             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={20} />
                         </div>
-                        {selectedDepartments.length === 0 && <p className="text-xs text-muted-foregroundmber-500 mt-2 flex items-center gap-1"><AlertCircle size={12}/> Please select at least one department above first.</p>}
+                        {selectedDepartments.length === 0 && <p className="text-xs text-muted-foregroundmber-500 mt-2 flex items-center gap-1"><AlertCircle size={12} /> Please select at least one department above first.</p>}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+                        <div className="relative z-10">
                             <label className="block text-sm font-bold text-text mb-2">Venue</label>
-                            <div className="relative">
-                                <select
-                                    value={selectedVenue}
-                                    onChange={(e) => setSelectedVenue(e.target.value)}
-                                    className="w-full bg-surfaceLow border border-outline rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
-                                    required
-                                >
-                                    <option value="">Select venue...</option>
-                                    {venues.map(venue => (
-                                        <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={16} />
-                            </div>
+                            <AccessibleCombobox
+                                value={selectedVenue}
+                                onChange={setSelectedVenue}
+                                options={venues.map(v => ({ value: v.id.toString(), label: `${v.name} (${v.capacity || 0} seats)` }))}
+                                placeholder="Select venue..."
+                            />
                         </div>
 
                         <div>
                             <label className="block text-sm font-bold text-text mb-2">Duration</label>
                             <div className="flex gap-2 mb-2">
                                 <div className="relative flex-1">
-                                    <Input 
-                                        type="number" 
+                                    <Input
+                                        type="number"
                                         min="1"
-                                        className="w-full" 
-                                        placeholder="60" 
-                                        value={duration} 
-                                        onChange={e => setDuration(e.target.value)} 
-                                        required 
+                                        className="w-full"
+                                        placeholder="60"
+                                        value={duration}
+                                        onChange={e => setDuration(e.target.value)}
+                                        required
                                     />
                                 </div>
                                 <div className="relative w-28">
-                                    <select 
+                                    <select
                                         className="w-full h-[42px] bg-surfaceLow border border-outline rounded-lg px-3 text-sm focus:ring-primary focus:border-primary outline-none appearance-none"
                                         value={durationUnit}
                                         onChange={(e) => setDurationUnit(e.target.value as any)}
@@ -615,40 +739,42 @@ export const CreateSessionPage: React.FC = () => {
                     </div>
                 </div>
 
+                {/* 3. Verification Methods (Desktop) comment block removed */}
+
                 {/* Action Bar */}
                 <div className="sticky bottom-4 z-10">
-                     <div className="bg-surface/80 backdrop-blur-lg border border-outline p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4">
-                        <div className="hidden sm:block">
-                            <p className="text-sm font-medium text-text">Ready to start?</p>
-                            <p className="text-xs text-textMuted">Students can join immediately.</p>
-                        </div>
-                        <div className="flex gap-3 w-full sm:w-auto">
-                            <Button variant="secondary" className="flex-1 sm:flex-none" onClick={() => navigate('/dashboard')} type="button">
-                                Cancel
-                            </Button>
-                            <Button type="submit" className="flex-1 sm:flex-none min-w-[140px]" disabled={loading}>
-                                {loading ? 'Starting...' : 'Create Session'}
-                            </Button>
-                        </div>
-                     </div>
-                </div>
-
-            </form>
+    <div className="bg-surface/80 backdrop-blur-lg border border-outline p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4">
+        <div className="hidden sm:block">
+            <p className="text-sm font-medium text-text">Ready to start?</p>
+            <p className="text-xs text-textMuted">Students can join immediately.</p>
         </div>
+        <div className="flex gap-3 w-full sm:w-auto">
+            <Button variant="secondary" className="flex-1 sm:flex-none" onClick={() => navigate('/dashboard')} type="button">
+                Cancel
+            </Button>
+            <Button type="submit" className="flex-1 sm:flex-none min-w-[140px]" disabled={loading}>
+                {loading ? 'Starting...' : 'Create Session'}
+            </Button>
+        </div>
+    </div>
+</div>
+
+            </form >
+        </div >
     );
 
-    return (
-        <>
+return (
+    <>
         <SEO
-          title="Create Attendance Session | Lecturer Dashboard"
-          description="Create a new attendance session for your course. Students can check in via QR code or session code on Presently."
-          noIndex
+            title="Create Attendance Session | Lecturer Dashboard"
+            description="Create a new attendance session for your course. Students can check in via QR code or session code on Presently."
+            noIndex
         />
         <ResponsiveContainer
             mobileChildren={mobileLayout}
         >
             {desktopLayout}
         </ResponsiveContainer>
-        </>
-    );
+    </>
+);
 };
