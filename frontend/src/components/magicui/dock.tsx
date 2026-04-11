@@ -1,86 +1,131 @@
-import React from 'react'
-import { cn } from '../ui/utils'
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../ui/utils';
 
 export type DockItemConfig = {
-  id: string
-  label: string
-  icon: React.ReactNode
-  active?: boolean
-  onClick?: () => void
-  isAccent?: boolean  // true = center FAB
-}
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  active?: boolean;
+  onClick?: () => void;
+  isAccent?: boolean; 
+};
 
 interface DockProps {
-  items: DockItemConfig[]
+  items: DockItemConfig[];
 }
 
+/**
+ * AAA-Grade Mobile Dock Navigation
+ * Optimized for Presently App with smooth physics and glassmorphism.
+ * Adaptive to Light and Dark themes.
+ */
 export const Dock: React.FC<DockProps> = ({ items }) => {
-  if (!items.length) return null
+  if (!items.length) return null;
+
+  // Find active index to position the "Glow" background
+  const activeIndex = items.findIndex(item => item.active && !item.isAccent);
 
   return (
-    <div
-      className={cn(
-        'pointer-events-auto mx-auto flex h-16 items-center justify-around',
-        'rounded-[2rem] border border-outline/20 bg-surface/95 backdrop-blur-2xl',
-        'px-3 shadow-[0_8px_32px_rgba(0,0,0,0.12)] transition-all duration-300',
-        'max-w-[320px] w-[calc(100vw-48px)]'
-      )}
-    >
-      {items.map((item) => {
-        const isActive = !!item.active
-        const isAccent = !!item.isAccent
-
-        return (
-          <button
-            key={item.id}
-            type="button"
-            onClick={item.onClick}
-            aria-label={item.label || 'Action'}
-            aria-current={isActive ? 'page' : undefined}
-            className={cn(
-              'relative flex flex-col items-center justify-center gap-0.5',
-              'transition-all duration-200 active:scale-95',
-              isAccent ? '-translate-y-3' : 'min-w-[52px]'
+    <div className="fixed bottom-8 left-0 right-0 z-50 flex justify-center px-6 pointer-events-none">
+      <nav
+        className={cn(
+          'relative flex h-16 items-center justify-around gap-1 pointer-events-auto',
+          'rounded-[2.25rem] border border-outline/10 bg-surface/80 dark:bg-zinc-950/70 backdrop-blur-2xl saturate-150',
+          'px-2 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-500',
+          'max-w-[400px] w-full'
+        )}
+      >
+        {/* Dynamic Background Glow - Slides behind standard items */}
+        <div className="absolute inset-0 px-2 pointer-events-none overflow-hidden rounded-[2.25rem]">
+          <AnimatePresence>
+            {activeIndex !== -1 && (
+              <motion.div
+                layoutId="dock-glow"
+                initial={false}
+                transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                className="absolute top-1 bottom-1 bg-primary/10 blur-xl rounded-full"
+                style={{ 
+                   left: `${(activeIndex / items.length) * 100}%`,
+                   width: `${100 / items.length}%`
+                }}
+              />
             )}
-          >
-            {/* Icon container */}
-            <div
+          </AnimatePresence>
+        </div>
+
+        {items.map((item) => {
+          const isActive = !!item.active;
+          const isAccent = !!item.isAccent;
+
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={item.onClick}
               className={cn(
-                'flex items-center justify-center rounded-2xl transition-all duration-200',
-                isAccent
-                  ? 'h-14 w-14 bg-primary text-background shadow-[0_4px_16px_rgba(0,0,0,0.15)] hover:scale-105 active:scale-95'
-                  : cn(
-                      'h-9 w-9',
-                      isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-textMuted hover:text-text hover:bg-surfaceHigh/60'
-                    )
+                'group relative flex flex-col items-center justify-center outline-none transition-all',
+                isAccent ? 'w-20' : 'flex-1 h-full'
               )}
             >
-              <span className={isAccent ? 'scale-110' : 'scale-100'}>
-                {item.icon}
-              </span>
-            </div>
-
-            {/* Label — hidden for accent FAB */}
-            {!isAccent && (
-              <span
-                className={cn(
-                  'text-[9px] font-bold uppercase tracking-[0.12em] transition-colors duration-200',
-                  isActive ? 'text-primary' : 'text-textMuted'
-                )}
-              >
-                {item.label}
-              </span>
-            )}
-
-            {/* Active dot indicator */}
-            {isActive && !isAccent && (
-              <span className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary" />
-            )}
-          </button>
-        )
-      })}
+              {isAccent ? (
+                <div className="relative -top-7">
+                  <motion.div
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.92 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                    className={cn(
+                      "flex h-16 w-16 items-center justify-center rounded-[1.5rem]",
+                      "bg-gradient-to-br from-primary to-primary/80 text-background",
+                      "shadow-[0_8px_30px_rgba(var(--primary-rgb, 99, 102, 241), 0.4)]",
+                      "border-[3px] border-surface dark:border-zinc-950 relative z-10"
+                    )}
+                  >
+                    <div className="scale-110">
+                      {item.icon}
+                    </div>
+                  </motion.div>
+                </div>
+              ) : (
+                <div className="relative flex flex-col items-center justify-center z-10 px-2">
+                  <motion.div
+                    animate={{
+                      y: isActive ? -2 : 0,
+                      scale: isActive ? 1.15 : 1,
+                    }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                    className={cn(
+                      'flex items-center justify-center rounded-xl p-1',
+                      isActive 
+                        ? 'text-primary' 
+                        : 'text-textMuted group-hover:text-text group-active:text-text'
+                    )}
+                  >
+                    {item.icon}
+                  </motion.div>
+                  
+                  <footer className="h-4 flex items-center justify-center overflow-hidden">
+                    <motion.span
+                      initial={false}
+                      animate={{ 
+                        opacity: isActive ? 1 : 0,
+                        y: isActive ? 0 : 10,
+                        height: isActive ? 'auto' : 0
+                      }}
+                      className={cn(
+                        'text-[10px] font-bold tracking-tight whitespace-nowrap',
+                        isActive ? 'text-text' : 'text-textMuted'
+                      )}
+                    >
+                      {item.label}
+                    </motion.span>
+                  </footer>
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </nav>
     </div>
-  )
-}
+  );
+};

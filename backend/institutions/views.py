@@ -2104,11 +2104,14 @@ class UserViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def stats(self, request):
-        """Get summary statistics for users"""
-        total_users = User.objects.count()
-        students = User.objects.filter(role=UserRole.STUDENT).count()
-        lecturers = User.objects.filter(role=UserRole.LECTURER).count()
-        admins = User.objects.filter(role=UserRole.ADMIN).count()
+        """Get summary statistics for users, respecting filters"""
+        queryset = self.get_queryset()
+        
+        # We need to bypass pagination for stats
+        total_users = queryset.count()
+        students = queryset.filter(role=UserRole.STUDENT).count()
+        lecturers = queryset.filter(role=UserRole.LECTURER).count()
+        admins = queryset.filter(role=UserRole.ADMIN).count()
         
         return Response({
             'success': True,
@@ -2127,13 +2130,20 @@ class UserViewSet(viewsets.ModelViewSet):
         role = self.request.query_params.get('role', None)
         institution_id = self.request.query_params.get('institution', None)
         college_id = self.request.query_params.get('college', None)
+        search = self.request.query_params.get('search', None)
         
-        if role:
+        if role and role != 'all':
             queryset = queryset.filter(role=role)
         if institution_id:
             queryset = queryset.filter(institution_id=institution_id)
         if college_id:
             queryset = queryset.filter(college_id=college_id)
+        if search:
+            queryset = queryset.filter(
+                Q(full_name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(matric_number__icontains=search)
+            )
         
         return queryset
 
