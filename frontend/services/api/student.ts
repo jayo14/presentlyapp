@@ -202,7 +202,13 @@ export const studentApi = {
   // Get student analytics
   getAnalytics: async (): Promise<StudentAnalytics> => {
     const response = await apiClient.get('/analytics/dashboard/student/');
-    return response.data;
+    const data = response.data;
+    // Harden internal lists
+    if (data) {
+      data.weekly_attendance = Array.isArray(data.weekly_attendance) ? data.weekly_attendance : [];
+      data.course_performance = Array.isArray(data.course_performance) ? data.course_performance : [];
+    }
+    return data;
   },
 
   // Get attendance history
