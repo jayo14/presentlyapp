@@ -3,7 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRegister, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
-import { Mail, Lock, User as UserIcon, ArrowLeft, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, ArrowLeft, Eye, EyeOff, Loader2, AlertCircle, Sparkles } from 'lucide-react';
+import { AuthBackground } from './AuthBackground';
+import { ThemeToggle } from '../ThemeToggle';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -132,27 +134,38 @@ export const Register: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      <AuthBackground />
+      
       <SEO
         title="Register | Presently"
         description="Create a Presently account to start tracking attendance efficiently with GPS-verified check-ins."
       />
 
-      <button
-        onClick={onBack}
-        className="absolute top-8 left-8 text-textMuted hover:text-text flex items-center gap-2 transition-colors z-10"
-        aria-label="Go back"
-      >
-        <ArrowLeft size={20} />
-      </button>
+      {/* Header bar */}
+      <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
+        <button
+          onClick={onBack}
+          className="p-2 text-textMuted hover:text-text hover:bg-surface-container rounded-full transition-all"
+          aria-label="Go back"
+        >
+          <ArrowLeft size={24} />
+        </button>
+        
+        <ThemeToggle />
+      </div>
 
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h2 className="text-4xl font-headline font-bold mb-2">Create an account</h2>
-          <p className="text-textMuted">Get started with smart attendance management.</p>
+      <div className="w-full max-w-md relative z-10">
+        <div className="mb-10 text-center space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest mb-4">
+            <Sparkles size={14} />
+            <span>Join Presently</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-headline font-bold mb-2 tracking-tight">Create account</h2>
+          <p className="text-textMuted text-lg">Start tracking attendance with precision.</p>
         </div>
 
-        <div className="glass-panel border p-6 rounded-2xl shadow-lg">
+        <div className="glass-panel border-outline/20 p-8 rounded-[2rem] shadow-2xl backdrop-blur-3xl">
           {registerMutation.error && (
             <div className="p-3 bg-red-500/10 border border-red-500 rounded-lg mb-4">
               <p className="text-sm text-red-500">
@@ -309,16 +322,21 @@ export const Register: React.FC = () => {
             </button>
           </div>
 
-          <p className="mt-8 text-center text-sm text-textMuted">
+          <p className="mt-10 text-center text-sm text-textMuted flex items-center justify-center gap-2">
             Already have an account?{' '}
             <button
               onClick={() => navigate('/login')}
-              className="text-primary font-semibold hover:underline transition-colors"
+              className="text-primary font-bold hover:underline transition-colors py-1 px-2 hover:bg-primary/5 rounded-lg"
             >
               Log in
             </button>
           </p>
         </div>
+        
+        {/* Footer text */}
+        <p className="mt-8 text-center text-xs text-textMuted/60 font-medium">
+          &copy; {new Date().getFullYear()} Presently Inc. All rights reserved.
+        </p>
       </div>
     </div>
   );
