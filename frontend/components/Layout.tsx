@@ -591,7 +591,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
               if (userRole === UserRole.LECTURER) {
                 return [
                   ...baseItems,
-                  { id: 'create-session', label: 'New', isAccent: true, onClick: () => handleNavClick('sessions'), icon: <Plus size={24} strokeWidth={2.5} /> },
+                  { id: 'create-session', label: 'New', isAccent: true, onClick: () => navigate('/dashboard/sessions/new'), icon: <Plus size={24} strokeWidth={2.5} /> },
                   ...endItems
                 ];
               }

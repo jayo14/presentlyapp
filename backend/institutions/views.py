@@ -2183,6 +2183,30 @@ class UserViewSet(viewsets.ModelViewSet):
         
         return queryset
 
+    @property
+    def paginator(self):
+        """
+        The object that should be used in pagination.
+        """
+        if self.request.query_params.get('nopagination') == 'true':
+            return None
+        return super().paginator
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        if request.query_params.get('nopagination') == 'true':
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [RequireRBACPermission('system.users.manage')]
