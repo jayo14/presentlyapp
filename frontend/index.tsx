@@ -57,8 +57,6 @@ const clearStaleServiceWorkersInDev = async () => {
       const cacheKeys = await caches.keys();
       await Promise.all(cacheKeys.map((cacheKey) => caches.delete(cacheKey)));
     }
-
-    console.log('[SW] Development mode detected. Existing service workers and caches were cleared.');
   } catch (error) {
     console.warn('[SW] Failed to clear development service workers/caches:', error);
   }

@@ -31,11 +31,7 @@ const normalizeApiBaseUrl = (apiUrl?: string): string => {
 const rawApiUrl: string = import.meta.env.VITE_API_URL || '';
 const API_BASE_URL: string = normalizeApiBaseUrl(rawApiUrl);
 
-// Log for debugging in development (localhost only)
-if (import.meta.env.DEV && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-  console.log('[API Client] Raw API URL:', rawApiUrl);
-  console.log('[API Client] Final API Base URL:', API_BASE_URL);
-}
+// Debug logs removed for security purposes
 
 // List of endpoints that gracefully handle 404s with fallback data
 const GRACEFUL_404_ENDPOINTS = [
