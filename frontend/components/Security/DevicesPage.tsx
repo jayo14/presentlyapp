@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Shield, Smartphone, Monitor, Tablet, Trash2,
   MapPin, Clock, Wifi, ChevronLeft, ShieldCheck,
-  ShieldAlert, RefreshCw, Loader2, Globe, Laptop
+  ShieldAlert, RefreshCw, Loader2, Globe, Laptop, Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';

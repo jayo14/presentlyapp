@@ -206,12 +206,27 @@ export const studentApi = {
   getAnalytics: async (): Promise<StudentAnalytics> => {
     const response = await apiClient.get('/analytics/dashboard/student/');
     const data = response.data;
-    // Harden internal lists
-    if (data) {
-      data.weekly_attendance = Array.isArray(data.weekly_attendance) ? data.weekly_attendance : [];
-      data.course_performance = Array.isArray(data.course_performance) ? data.course_performance : [];
-    }
-    return data;
+    
+    // Map backend response to StudentAnalytics interface
+    return {
+      weekly_attendance: Array.isArray(data.weekly_attendance) ? data.weekly_attendance : [],
+      status_breakdown: data.status_breakdown || { present: 0, late: 0, absent: 0 },
+      overall_stats: data.attendance_stats || { 
+        average_attendance: 0, 
+        total_present: 0, 
+        total_late: 0, 
+        total_absent: 0, 
+        total_sessions: 0 
+      },
+      course_performance: (data.enrolled_courses || []).map((c: any) => ({
+        course_code: c.course_code,
+        course_name: c.course_name,
+        attendance_percentage: c.attendance_percentage,
+        sessions_attended: c.sessions_attended,
+        total_sessions: c.total_sessions,
+        status: c.status
+      }))
+    };
   },
 
   // Get attendance history

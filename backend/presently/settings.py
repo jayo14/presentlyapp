@@ -334,6 +334,7 @@ EMAIL_SUBJECT_PREFIX = '[Presently] '
 
 # Frontend URL for password reset links
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://getpresently.com.ng')
+BACKEND_URL = os.environ.get('BACKEND_URL', 'https://presentlyapp-alpha.onrender.com')
 SUPPORT_URL = os.environ.get('SUPPORT_URL', f'{FRONTEND_URL}/support')
 PRIVACY_URL = os.environ.get('PRIVACY_URL', f'{FRONTEND_URL}/privacy')
 INSTITUTION_URL = os.environ.get('INSTITUTION_URL', FRONTEND_URL)
