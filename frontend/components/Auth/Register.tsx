@@ -161,8 +161,8 @@ export const Register: React.FC = () => {
             <Sparkles size={14} />
             <span>Join Presently</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-headline font-bold mb-2 tracking-tight">Create account</h2>
-          <p className="text-textMuted text-lg">Start tracking attendance with precision.</p>
+          <h2 className="text-4xl md:text-5xl font-headline font-bold mb-2 tracking-tight text-text">Create account</h2>
+          <p className="text-textMuted text-lg leading-relaxed">Start tracking attendance with precision.</p>
         </div>
 
         <div className="glass-panel border-outline/20 p-8 rounded-[2rem] shadow-2xl backdrop-blur-3xl">
@@ -178,7 +178,7 @@ export const Register: React.FC = () => {
             <div className="flex flex-col gap-5">
               {/* Full Name */}
               <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
+                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Full Name</label>
                 <div className="relative">
                   <UserIcon
                     size={20}
@@ -197,7 +197,7 @@ export const Register: React.FC = () => {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
+                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Email Address</label>
                 <div className="relative">
                   <Mail
                     size={20}
@@ -216,7 +216,7 @@ export const Register: React.FC = () => {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
+                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Password</label>
                 <div className="relative">
                   <Lock
                     size={20}

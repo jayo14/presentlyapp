@@ -106,7 +106,7 @@ export const ForgotPassword: React.FC = () => {
             <Lock size={48} className="text-on-primary-fixed" strokeWidth={2.5} />
           </div>
           <h2 className="font-headline text-4xl font-bold text-text mb-2">Reset Password</h2>
-          <p className="text-textMuted text-center">
+          <p className="text-textMuted text-center leading-relaxed">
             Enter your registered university email address and we'll send you a secure link to reset your password.
           </p>
         </div>
@@ -116,7 +116,7 @@ export const ForgotPassword: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-textMuted mb-2">University Email</label>
+                  <label className="block text-sm font-bold text-text/80 mb-2 tracking-wide">University Email</label>
                   <div className="relative">
                     <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10" />
                     <input
@@ -191,12 +191,12 @@ export const ForgotPassword: React.FC = () => {
                 <CheckCircle size={40} className="text-green-500" />
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="font-headline text-xl font-bold text-green-400">Link sent!</h3>
-                <p className="text-[#a1a1aa]">Check your email for the password reset link.</p>
+                <h3 className="font-headline text-xl font-bold text-green-500">Link sent!</h3>
+                <p className="text-textMuted">Check your email for the password reset link.</p>
               </div>
               <button
                 onClick={handleReset}
-                className="text-[#FFD700] font-semibold hover:underline"
+                className="text-primary font-bold hover:underline transition-colors"
               >
                 Send to a different email
               </button>
@@ -209,8 +209,8 @@ export const ForgotPassword: React.FC = () => {
                 <AlertCircle size={40} className="text-red-500" />
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="font-headline text-xl font-bold text-red-400">Something went wrong</h3>
-                <p className="text-[#a1a1aa]">We couldn't send the reset link. Please try again.</p>
+                <h3 className="font-headline text-xl font-bold text-error">Something went wrong</h3>
+                <p className="text-textMuted">We couldn't send the reset link. Please try again.</p>
               </div>
               <button
                 onClick={handleReset}

@@ -43,7 +43,7 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
         </motion.div>
 
         <div className="flex flex-col gap-2">
-          <h2 className="font-headline text-2xl font-bold text-green-400">Password Reset Successful!</h2>
+          <h2 className="font-headline text-2xl font-bold text-green-500">Password Reset Successful!</h2>
           <p className="text-textMuted text-center">
             You can now sign in to{' '}
             <span className="text-primary font-semibold">Presently</span>{' '}
@@ -67,7 +67,7 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
             <span className="underline">Cancel</span>
           </button>
         ) : cancelRedirect ? (
-          <p className="text-sm text-[#71717a]">Auto-redirect cancelled</p>
+          <p className="text-sm text-textMuted font-medium">Auto-redirect cancelled</p>
         ) : null}
       </div>
     </div>
@@ -222,7 +222,7 @@ export const ResetPassword: React.FC = () => {
             <div className="flex flex-col gap-5">
               {/* New Password */}
               <div>
-                <label className="block text-sm font-medium text-textMuted mb-2">New Password</label>
+                <label className="block text-sm font-bold text-text/80 mb-2 tracking-wide">New Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -265,9 +265,9 @@ export const ResetPassword: React.FC = () => {
                         {req.met ? (
                           <Check size={14} className="text-green-400 flex-shrink-0" />
                         ) : (
-                          <X size={14} className="text-[#71717a] flex-shrink-0" />
+                          <X size={14} className="text-textMuted/60 flex-shrink-0" />
                         )}
-                        <span className={req.met ? 'text-green-400' : 'text-[#71717a]'}>
+                        <span className={req.met ? 'text-green-500' : 'text-textMuted/60'}>
                           {req.label}
                         </span>
                       </div>
@@ -278,7 +278,7 @@ export const ResetPassword: React.FC = () => {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-sm font-medium text-textMuted mb-2">Confirm New Password</label>
+                <label className="block text-sm font-bold text-text/80 mb-2 tracking-wide">Confirm New Password</label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}

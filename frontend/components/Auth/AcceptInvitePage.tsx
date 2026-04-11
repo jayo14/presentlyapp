@@ -107,7 +107,7 @@ export const AcceptInvitePage: React.FC = () => {
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 {/* Password */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Password</label>
+                  <label className="block text-sm font-bold text-text/80 mb-2 tracking-wide">Password</label>
                   <div className="relative">
                     <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10" />
                     <input
@@ -132,7 +132,7 @@ export const AcceptInvitePage: React.FC = () => {
 
                 {/* Confirm Password */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Confirm Password</label>
+                  <label className="block text-sm font-bold text-text/80 mb-2 tracking-wide">Confirm Password</label>
                   <div className="relative">
                     <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10" />
                     <input
