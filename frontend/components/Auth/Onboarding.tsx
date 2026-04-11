@@ -1027,16 +1027,16 @@ export const Onboarding: React.FC = () => {
                 onChange={handleInputChange}
               />
               {state.validationErrors.staffId && (
-                <p className="text-red-600 text-xs mt-1 ml-4">{state.validationErrors.staffId}</p>
+                <p className="text-error text-xs mt-1 ml-4 font-medium">{state.validationErrors.staffId}</p>
               )}
             </div>
-            <Input
+            {/* <Input
               name="courses"
               label="Courses Taught"
               placeholder="CS101, CS202..."
               value={state.formData.courses}
               onChange={handleInputChange}
-            />
+            /> */}
           </>
         )}
       </div>
@@ -1056,9 +1056,9 @@ export const Onboarding: React.FC = () => {
         </div>
       ) : state.coursesError ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 px-4 py-3 rounded-xl">
+          <div className="flex items-center gap-2 text-error text-sm bg-error/10 px-4 py-3 rounded-xl">
             <AlertCircle size={20} />
-            <p>{state.coursesError}</p>
+            <p className="font-medium">{state.coursesError}</p>
           </div>
           <Button size="sm" onClick={fetchCourses} className="flex items-center gap-2">
             <RefreshCw size={16} />
@@ -1086,30 +1086,28 @@ export const Onboarding: React.FC = () => {
                   role="option"
                   aria-selected={isSelected}
                   aria-label={`${isSelected ? 'Deselect' : 'Select'} course ${course.code} – ${course.title}`}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-                            isSelected
-                                ? 'bg-primary/10 border-primary shadow-md'
-                                : 'bg-surfaceContainer/50 border-outline/20 hover:border-primary/30 hover:shadow-sm'
-                        }`}
-                    >
-                        <div className="text-left">
-                            <div className="flex items-center gap-2">
-                                 <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-text'}`}>{course.code}</span>
-                                 {course.level && (
-                                   <span className="text-[10px] bg-surfaceVariant text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
-                                 )}
-                            </div>
-                            <p className="text-xs text-textMuted mt-1">{course.title}</p>
-                            {course.lecturer_name && (
-                              <p className="text-[10px] text-textMuted mt-0.5">{course.lecturer_name}</p>
-                            )}
-                        </div>
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${
-                            isSelected ? 'bg-primary border-primary text-on-primary-fixed' : 'border-outline/40 bg-transparent'
-                        }`} aria-hidden="true">
-                            {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
-                        </div>
-                    </button>
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${isSelected
+                      ? 'bg-primary/10 border-primary shadow-md'
+                      : 'bg-surfaceContainer/50 border-outline/20 hover:border-primary/30 hover:shadow-sm'
+                    }`}
+                >
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-text'}`}>{course.code}</span>
+                      {course.level && (
+                        <span className="text-[10px] bg-surfaceVariant text-textMuted px-1.5 py-0.5 rounded" aria-label={`${course.level} level`}>{course.level}L</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-textMuted mt-1">{course.title}</p>
+                    {course.lecturer_name && (
+                      <p className="text-[10px] text-textMuted mt-0.5">{course.lecturer_name}</p>
+                    )}
+                  </div>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${isSelected ? 'bg-primary border-primary text-on-primary-fixed' : 'border-outline/40 bg-transparent'
+                    }`} aria-hidden="true">
+                    {isSelected ? <Check size={14} /> : <Plus size={14} className="text-textMuted" />}
+                  </div>
+                </button>
               );
             })}
           </div>
@@ -1168,9 +1166,9 @@ export const Onboarding: React.FC = () => {
             aria-label={`${item.label}: ${item.state ? 'enabled' : 'disabled'}. ${item.desc}`}
             className={`flex items-center justify-between p-4 rounded-xl cursor-pointer border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
                     ${item.state
-                        ? 'bg-primary/5 border-primary/30 shadow-sm'
-                        : 'bg-surfaceContainer/30 border-outline/20 hover:bg-surfaceContainer/50'
-                    }`}
+                ? 'bg-primary/5 border-primary/30 shadow-sm'
+                : 'bg-surfaceContainer/30 border-outline/20 hover:bg-surfaceContainer/50'
+              }`}
           >
             <div className="flex items-center gap-4">
               <div className={`p-2 rounded-lg transition-colors ${item.state ? 'bg-primary text-on-primary-fixed' : 'bg-surfaceVariant text-textMuted'}`} aria-hidden="true">
@@ -1196,11 +1194,11 @@ export const Onboarding: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
       <AuthBackground />
-      
+
       {/* Header bar */}
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
         <div className="flex items-center gap-2">
-            <Logo />
+          <Logo />
         </div>
         <ThemeToggle />
       </div>
@@ -1222,11 +1220,11 @@ export const Onboarding: React.FC = () => {
         >
           {/* Header Title */}
           <div className="mb-8 text-center space-y-2">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider mb-2">
-                <Sparkles size={12} />
-                <span>Onboarding Stage {state.step}</span>
-             </div>
-             <h1 className="text-3xl font-headline font-bold tracking-tight">Complete your profile</h1>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider mb-2">
+              <Sparkles size={12} />
+              <span>Onboarding Stage {state.step}</span>
+            </div>
+            <h1 className="text-3xl font-headline font-bold tracking-tight">Complete your profile</h1>
           </div>
 
           {/* Error Display */}
@@ -1312,11 +1310,11 @@ export const Onboarding: React.FC = () => {
                       {state.step === totalSteps ? 'Complete Profile' : 'Next Step'}
                     </span>
                     {state.step < totalSteps && (
-                      <ChevronRight 
-                        size={20} 
-                        className="ml-1 group-hover:translate-x-1 transition-transform" 
-                        strokeWidth={3} 
-                        aria-hidden="true" 
+                      <ChevronRight
+                        size={20}
+                        className="ml-1 group-hover:translate-x-1 transition-transform"
+                        strokeWidth={3}
+                        aria-hidden="true"
                       />
                     )}
                   </>
