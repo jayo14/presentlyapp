@@ -2126,11 +2126,13 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = User.objects.all()
+        queryset = User.objects.all().order_by('-date_joined')
         role = self.request.query_params.get('role', None)
         institution_id = self.request.query_params.get('institution', None)
         college_id = self.request.query_params.get('college', None)
         search = self.request.query_params.get('search', None)
+        is_active = self.request.query_params.get('active', None)
+        onboarding = self.request.query_params.get('onboarding', None)
         
         if role and role != 'all':
             queryset = queryset.filter(role=role)
@@ -2138,6 +2140,10 @@ class UserViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(institution_id=institution_id)
         if college_id:
             queryset = queryset.filter(college_id=college_id)
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        if onboarding is not None:
+            queryset = queryset.filter(onboarding_complete=onboarding.lower() == 'true')
         if search:
             queryset = queryset.filter(
                 Q(full_name__icontains=search) |

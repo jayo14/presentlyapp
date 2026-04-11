@@ -17,6 +17,8 @@ export const UserManagement: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [onboardingFilter, setOnboardingFilter] = useState<string>('all');
   
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -32,14 +34,14 @@ export const UserManagement: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [roleFilter, searchTerm]);
+  }, [roleFilter, searchTerm, activeFilter, onboardingFilter]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       loadUsers(currentPage);
     }, totalUsers === 0 ? 0 : 300); // Small debounce for typing
     return () => clearTimeout(timer);
-  }, [roleFilter, searchTerm, currentPage]);
+  }, [roleFilter, searchTerm, activeFilter, onboardingFilter, currentPage]);
 
   const loadUsers = async (page: number) => {
     try {
@@ -50,6 +52,12 @@ export const UserManagement: React.FC = () => {
       }
       if (searchTerm) {
         params.search = searchTerm;
+      }
+      if (activeFilter !== 'all') {
+        params.active = activeFilter;
+      }
+      if (onboardingFilter !== 'all') {
+        params.onboarding = onboardingFilter;
       }
 
       // Fetch users and stats in parallel
@@ -81,27 +89,44 @@ export const UserManagement: React.FC = () => {
 
   // Real-time local filtering with regex support
   const displayUsers = useMemo(() => {
-    if (!searchTerm) return users;
-    
-    try {
-      // Create regex from search term
-      const regex = new RegExp(searchTerm, 'i');
-      return users.filter(user => 
-        regex.test(user.name || '') || 
-        regex.test(user.email || '') ||
-        regex.test(user.matric_number || '') ||
-        regex.test(user.matric_number || '')
-      );
-    } catch (e) {
-      // If regex is invalid (e.g. partial typing like "["), fall back to simple string includes
-      const lowerSearch = searchTerm.toLowerCase();
-      return users.filter(user => 
-        (user.name || '').toLowerCase().includes(lowerSearch) || 
-        (user.email || '').toLowerCase().includes(lowerSearch) ||
-        (user.matric_number || '').toLowerCase().includes(lowerSearch)
+    let filtered = users;
+
+    // Apply local regex search if searchTerm exists
+    if (searchTerm) {
+      try {
+        const regex = new RegExp(searchTerm, 'i');
+        filtered = filtered.filter(user => 
+          regex.test(user.name || '') || 
+          regex.test(user.email || '') ||
+          regex.test(user.matric_number || '')
+        );
+      } catch (e) {
+        const lowerSearch = searchTerm.toLowerCase();
+        filtered = filtered.filter(user => 
+          (user.name || '').toLowerCase().includes(lowerSearch) || 
+          (user.email || '').toLowerCase().includes(lowerSearch) ||
+          (user.matric_number || '').toLowerCase().includes(lowerSearch)
+        );
+      }
+    }
+
+    // Apply local filters for role, active, and onboarding (as fallback/additional layer)
+    if (roleFilter !== 'all') {
+      filtered = filtered.filter(user => user.role === roleFilter);
+    }
+    if (activeFilter !== 'all') {
+      filtered = filtered.filter(user => 
+        (activeFilter === 'true' ? user.is_active !== false : user.is_active === false)
       );
     }
-  }, [users, searchTerm]);
+    if (onboardingFilter !== 'all') {
+      filtered = filtered.filter(user => 
+        (onboardingFilter === 'true' ? user.onboarding_complete : !user.onboarding_complete)
+      );
+    }
+
+    return filtered;
+  }, [users, searchTerm, roleFilter, activeFilter, onboardingFilter]);
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
@@ -192,6 +217,14 @@ export const UserManagement: React.FC = () => {
     }
   };
 
+  const clearFilters = () => {
+    setSearchTerm('');
+    setRoleFilter('all');
+    setActiveFilter('all');
+    setOnboardingFilter('all');
+    setCurrentPage(1);
+  };
+
   const exportUsers = () => {
     const csv = [
       ['Name', 'Email', 'Role', 'Institution', 'College', 'Onboarding Complete'].join(','),
@@ -234,6 +267,12 @@ export const UserManagement: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {(searchTerm || roleFilter !== 'all' || activeFilter !== 'all' || onboardingFilter !== 'all') && (
+            <Button onClick={clearFilters} variant="ghost" className="gap-2 text-textMuted hover:text-text">
+              <X className="w-4 h-4" />
+              Clear Filters
+            </Button>
+          )}
           <Button onClick={exportUsers} variant="secondary" className="gap-2">
             <Download className="w-4 h-4" />
             Export
@@ -273,29 +312,62 @@ export const UserManagement: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-surface p-4 border border-outline rounded-lg">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-textMuted" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-textMuted" />
           <Input
             type="text"
-            placeholder="Search users..."
+            placeholder="Search name, email, matric..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-9 h-10 text-sm"
           />
         </div>
         
-        <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          className="px-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-text focus:outline-none focus:border-primary"
-        >
-          <option value="all">All Roles</option>
-          <option value={UserRole.STUDENT}>Students</option>
-          <option value={UserRole.LECTURER}>Lecturers</option>
-          <option value={UserRole.ADMIN}>Admins</option>
-          <option value={UserRole.CLASS_REP}>Class Reps</option>
-        </select>
+        <div className="relative">
+          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-textMuted z-10" />
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-sm text-text focus:outline-none focus:border-primary appearance-none cursor-pointer h-10"
+          >
+            <option value="all">Any Role</option>
+            <option value={UserRole.STUDENT}>Students</option>
+            <option value={UserRole.LECTURER}>Lecturers</option>
+            <option value={UserRole.ADMIN}>Admins</option>
+            <option value={UserRole.CLASS_REP}>Class Reps</option>
+          </select>
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-textMuted z-10">
+            <Shield className="w-full h-full" />
+          </div>
+          <select
+            value={activeFilter}
+            onChange={(e) => setActiveFilter(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-sm text-text focus:outline-none focus:border-primary appearance-none cursor-pointer h-10"
+          >
+            <option value="all">Any Status</option>
+            <option value="true">Active Only</option>
+            <option value="false">Suspended Only</option>
+          </select>
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-textMuted z-10">
+            <AlertCircle className="w-full h-full" />
+          </div>
+          <select
+            value={onboardingFilter}
+            onChange={(e) => setOnboardingFilter(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-surfaceHigh border border-outline rounded-lg text-sm text-text focus:outline-none focus:border-primary appearance-none cursor-pointer h-10"
+          >
+            <option value="all">Any Onboarding</option>
+            <option value="true">Completed</option>
+            <option value="false">Pending</option>
+          </select>
+        </div>
       </div>
 
       {/* Users Table */}
