@@ -463,9 +463,9 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                   </motion.div>
                 </div>
               </div>
-              <h3 className="text-4xl font-headline font-black mb-4 text-foreground tracking-tight">Syncing Mission Data</h3>
+              <h3 className="text-4xl font-headline font-black mb-4 text-white/80 tracking-tight">Verifying Attendance</h3>
               <p className="text-muted-foreground font-medium leading-relaxed max-w-xs">
-                {status === 'locating' ? 'Calibrating geospatial context and proximity anchors...' : 'Authorising check-in with institutional attendance ledger...'}
+                {status === 'locating' ? 'Identifying your location...' : 'Confirming your check-in...'}
               </p>
             </motion.div>
           )}
