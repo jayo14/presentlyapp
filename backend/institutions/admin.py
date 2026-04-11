@@ -13,6 +13,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     """Admin configuration for custom User model"""
     list_display = ['email', 'full_name', 'role', 'matric_number', 'staff_id', 'department', 'institution', 'college', 'onboarding_complete', 'is_active', 'last_login', 'date_joined']
     list_filter = ['role', 'onboarding_complete', 'is_active', 'is_staff']
+    list_select_related = ['department', 'institution', 'college']
     search_fields = ['email', 'full_name', 'matric_number', 'staff_id']
     ordering = ['-date_joined']
     
@@ -99,9 +100,13 @@ class CourseAdmin(ModelAdmin):
     """Admin configuration for Course model"""
     list_display = ['code', 'title', 'get_departments', 'lecturer', 'credit_units', 'is_active', 'created_at']
     list_filter = ['is_active', 'semester', 'level']
+    list_select_related = ['lecturer']
     search_fields = ['code', 'title', 'description']
     ordering = ['code']
     readonly_fields = ['created_at', 'updated_at']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('department')
 
     def get_departments(self, obj):
         return ", ".join([d.name for d in obj.department.all()])

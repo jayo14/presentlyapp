@@ -43,24 +43,23 @@ def initialize_firebase():
                             cleaned_json = cleaned_json[1:-1]
                         
                         try:
+                            # Try standard load first
                             service_account_dict = json.loads(cleaned_json)
                         except json.JSONDecodeError as first_err:
-                            # Handle common escaping issues in private keys (backslash escapes)
-                            if "Invalid \\escape" in str(first_err):
-                                # If we have literal backslashes that aren't escaped properly for JSON,
-                                # we try to escape them. However, we must be careful not to double-escape \n
-                                # A common fix for "Invalid \escape" in env vars is to replace single backslashes
-                                # that aren't followed by valid JSON escape chars.
-                                # But first, let's try a simpler fix: replace literal newlines if they exist
+                            # Handle common escaping issues in environment variables
+                            try:
+                                # Many shell environments require double-escaping backslashes
+                                # or they strip them. We try to normalize them.
+                                # Also ensure literal newlines are handled.
+                                fixed_json = cleaned_json.replace('\n', '\\n')
+                                service_account_dict = json.loads(fixed_json)
+                            except json.JSONDecodeError:
+                                # If that still fails, try with strict=False to allow control characters
                                 try:
-                                    # Try to make it a valid JSON string by ensuring it doesn't have raw control characters
                                     service_account_dict = json.loads(cleaned_json, strict=False)
                                 except json.JSONDecodeError:
-                                    # Last ditch: if it has literal \n as characters, they should be fine,
-                                    # but if it has unescaped backslashes, we're in trouble.
+                                    # Rethrow original error if all fixes fail
                                     raise first_err
-                            else:
-                                raise first_err
 
                         cred = credentials.Certificate(service_account_dict)
                         logger.info("Firebase: loaded credentials from FIREBASE_SERVICE_ACCOUNT_JSON env var.")
