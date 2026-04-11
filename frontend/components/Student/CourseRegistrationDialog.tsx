@@ -115,7 +115,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
               <X size={20} strokeWidth={3} />
             </button>
           </div>
-          <p className="text-textMuted font-medium text-sm">Select the modules you wish to enroll in this semester</p>
+          <p className="text-textMuted font-medium text-sm">Select the courses you wish to enroll in this semester</p>
         </div>
 
         {/* Filters */}
@@ -184,7 +184,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                                 <Info size={10} /> {course.credit_units} Units
                              </span>
                              {isEnrolled && (
-                               <span className="text-[10px] font-black text-primary uppercase tracking-tighter">Current Module</span>
+                               <span className="text-[10px] font-black text-primary uppercase tracking-tighter">Current Course</span>
                              )}
                           </div>
                        </div>
@@ -208,7 +208,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
            ) : (
              <div className="py-20 flex flex-col items-center justify-center text-textMuted/40 text-center px-8">
                 <Search size={48} className="mb-4 text-textMuted/20" />
-                <p className="font-headline font-black text-lg text-textMuted/60">No modules found</p>
+                <p className="font-headline font-black text-lg text-textMuted/60">No courses found</p>
                 <p className="text-xs font-medium max-w-[200px] mt-1 text-textMuted/40">Try adjusting your search criteria or filter.</p>
              </div>
            )}

@@ -113,10 +113,10 @@ export const studentApi = {
       const response = await apiClient.get('/dashboard/student/');
       const summary = response.data;
       // Transform the new response shape into StudentDashboardData for backwards compatibility
-      if (summary?.success && summary.data) {
+      if (summary?.success && summary.data && summary.data.enrolled_courses) {
         return {
-          user: {} as any, // User data comes from useCurrentUser hook
-          enrolled_courses: [],
+          user: {} as any, 
+          enrolled_courses: summary.data.enrolled_courses,
           attendance_stats: {
             average_attendance: summary.data.overview?.overall_attendance ?? 0,
             total_present: 0,
@@ -139,7 +139,7 @@ export const studentApi = {
             status: rec.status,
             description: `Checked in – ${rec.status}`,
           })),
-          _summary: summary.data, // Attach raw summary for enhanced dashboard features
+          _summary: summary.data,
         } as any;
       }
     } catch {

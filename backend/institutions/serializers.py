@@ -453,11 +453,35 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     student_matric = serializers.CharField(source='student.matric_number', read_only=True)
     course_code = serializers.CharField(source='course.code', read_only=True)
     course_title = serializers.CharField(source='course.title', read_only=True)
+    course_name = serializers.CharField(source='course.title', read_only=True)
+    lecturer_name = serializers.CharField(source='course.lecturer.full_name', read_only=True, allow_null=True)
+    
+    # Extra stats
+    attendance_percentage = serializers.SerializerMethodField()
+    sessions_attended = serializers.SerializerMethodField()
+    total_sessions = serializers.SerializerMethodField()
     
     class Meta:
         model = CourseEnrollment
-        fields = '__all__'
+        fields = [
+            'id', 'student', 'student_name', 'student_email', 'student_matric',
+            'course', 'course_code', 'course_title', 'course_name', 'lecturer_name',
+            'attendance_percentage', 'sessions_attended', 'total_sessions',
+            'is_active', 'enrolled_at', 'updated_at'
+        ]
         read_only_fields = ['enrolled_at', 'updated_at']
+
+    def get_attendance_percentage(self, obj):
+        total = AttendanceSession.objects.filter(course=obj.course).count()
+        if total == 0: return 0
+        attended = Attendance.objects.filter(student=obj.student, session__course=obj.course).count()
+        return round((attended / total) * 100)
+
+    def get_sessions_attended(self, obj):
+        return Attendance.objects.filter(student=obj.student, session__course=obj.course).count()
+
+    def get_total_sessions(self, obj):
+        return AttendanceSession.objects.filter(course=obj.course).count()
 
 
 class TimetableSerializer(serializers.ModelSerializer):

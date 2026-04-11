@@ -15,7 +15,9 @@ const normalizeApiBaseUrl = (apiUrl?: string): string => {
   const normalizedUrl = trimmedUrl.replace(/\/+$/, '');
 
   if (!/^https?:\/\//i.test(normalizedUrl)) {
-    console.warn('[API Client] VITE_API_URL must be absolute (http/https). Falling back to default backend URL.');
+    if (import.meta.env.DEV) {
+      console.warn('[API Client] VITE_API_URL must be absolute (http/https). Falling back to default backend URL.');
+    }
     return DEFAULT_API_URL;
   }
 
@@ -29,8 +31,8 @@ const normalizeApiBaseUrl = (apiUrl?: string): string => {
 const rawApiUrl: string = import.meta.env.VITE_API_URL || '';
 const API_BASE_URL: string = normalizeApiBaseUrl(rawApiUrl);
 
-// Log for debugging in development
-if (import.meta.env.DEV) {
+// Log for debugging in development (localhost only)
+if (import.meta.env.DEV && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
   console.log('[API Client] Raw API URL:', rawApiUrl);
   console.log('[API Client] Final API Base URL:', API_BASE_URL);
 }
