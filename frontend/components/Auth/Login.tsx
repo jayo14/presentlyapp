@@ -147,8 +147,8 @@ export const Login: React.FC = () => {
             <Sparkles size={14} />
             <span>Welcome Back</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-headline font-bold mb-2 tracking-tight">Sign in</h2>
-          <p className="text-textMuted text-lg">Enter your credentials to continue.</p>
+          <h2 className="text-4xl md:text-5xl font-headline font-bold mb-2 tracking-tight text-text">Sign in</h2>
+          <p className="text-textMuted text-lg leading-relaxed">Enter your credentials to continue.</p>
         </div>
 
         {/* Login Form Card */}
@@ -157,7 +157,7 @@ export const Login: React.FC = () => {
             <div className="flex flex-col gap-5">
               {/* Email Input */}
               <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
+                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Email Address</label>
                 <div className="relative">
                   <Mail
                     size={20}
@@ -176,7 +176,7 @@ export const Login: React.FC = () => {
 
               {/* Password Input */}
               <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
+                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Password</label>
                 <div className="relative">
                   <Lock
                     size={20}
@@ -210,7 +210,7 @@ export const Login: React.FC = () => {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4 cursor-pointer accent-primary"
                   />
-                  <span className="text-textMuted">Remember me</span>
+                  <span className="text-textMuted font-medium">Remember me</span>
                 </label>
                 <button
                   type="button"
