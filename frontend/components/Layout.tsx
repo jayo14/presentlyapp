@@ -571,8 +571,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
                 { id: 'courses', label: 'Courses', active: currentPage === 'courses', onClick: () => handleNavClick('courses'), icon: <GraduationCap size={20} strokeWidth={2} /> },
               ];
               
+              const analyticsItem = userRole !== UserRole.ADMIN ? [
+                { id: 'analytics', label: 'Stats', active: (currentPage === 'analytics' || currentPage === 'reports'), onClick: () => handleNavClick('analytics'), icon: <TrendingUp size={20} strokeWidth={2} /> }
+              ] : [];
+
               const endItems = [
-                { id: 'analytics', label: 'Stats', active: (currentPage === 'analytics' || currentPage === 'reports'), onClick: () => handleNavClick('analytics'), icon: <TrendingUp size={20} strokeWidth={2} /> },
+                ...analyticsItem,
                 { id: 'profile', label: 'Me', active: currentPage === 'profile', onClick: () => handleNavClick('profile'), icon: <User size={20} strokeWidth={2} /> },
               ];
 

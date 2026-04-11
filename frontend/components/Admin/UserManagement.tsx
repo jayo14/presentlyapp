@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Users, Plus, Edit2, Trash2, Search, Filter, Mail, Shield, AlertCircle, Loader, Download, UserX, UserCheck, Key, Eye, MoreVertical, X } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -79,8 +79,29 @@ export const UserManagement: React.FC = () => {
     }
   };
 
-  // Server-side filtering is now used, so we use the users state directly
-  const displayUsers = users;
+  // Real-time local filtering with regex support
+  const displayUsers = useMemo(() => {
+    if (!searchTerm) return users;
+    
+    try {
+      // Create regex from search term
+      const regex = new RegExp(searchTerm, 'i');
+      return users.filter(user => 
+        regex.test(user.name || '') || 
+        regex.test(user.email || '') ||
+        regex.test(user.matric_number || '') ||
+        regex.test(user.matric_number || '')
+      );
+    } catch (e) {
+      // If regex is invalid (e.g. partial typing like "["), fall back to simple string includes
+      const lowerSearch = searchTerm.toLowerCase();
+      return users.filter(user => 
+        (user.name || '').toLowerCase().includes(lowerSearch) || 
+        (user.email || '').toLowerCase().includes(lowerSearch) ||
+        (user.matric_number || '').toLowerCase().includes(lowerSearch)
+      );
+    }
+  }, [users, searchTerm]);
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
@@ -431,7 +452,7 @@ export const UserManagement: React.FC = () => {
         </div>
         <div className="flex items-center justify-between p-4">
           <span className="text-sm text-textMuted">
-            Showing {users.length} of {totalUsers} users
+            Showing {displayUsers.length} of {totalUsers} users
           </span>
           <div className="flex items-center gap-2">
             <button
