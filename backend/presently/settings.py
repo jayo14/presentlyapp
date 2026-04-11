@@ -233,8 +233,9 @@ if DEBUG or os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True':
 else:
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = [
-        'localhost',
+        'http://localhost:3000',
         'http://127.0.0.1:3000',
+        'http://localhost:5173',
         'https://getpresently.com.ng',
         FRONTEND_ORIGIN,
     ]

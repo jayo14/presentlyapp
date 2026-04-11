@@ -107,6 +107,12 @@ def seed_permissions_and_roles() -> None:
                 RolePermission.objects.get_or_create(role=role, permission=perm)
 
 
+from functools import lru_cache
+
+@lru_cache(max_age=1)
+def get_all_permission_codenames() -> List[str]:
+    return sorted(RBACPermission.objects.values_list("codename", flat=True))
+
 def get_user_effective_permissions(user) -> List[str]:
     """Resolve permissions as (role defaults + user overrides)."""
     if not user or not user.is_authenticated:
@@ -114,19 +120,19 @@ def get_user_effective_permissions(user) -> List[str]:
 
     # Super admins have unrestricted access to all permissions.
     if getattr(user, 'is_superuser', False):
-        return sorted(RBACPermission.objects.values_list("codename", flat=True))
+        return get_all_permission_codenames()
 
     base_codes = set()
 
+    # Optimized staff role check
     if hasattr(user, "staff_profile") and user.staff_profile and user.staff_profile.role_id:
-        role_codes = user.staff_profile.role.role_permissions.select_related("permission").values_list(
-            "permission__codename", flat=True
-        )
-        base_codes.update(role_codes)
+        role_codes = user.staff_profile.role.role_permissions.all()
+        base_codes.update(rp.permission.codename for rp in role_codes)
     elif getattr(user, "role", None) == "ADMIN":
         # Backward-compatible full access for legacy admins.
-        base_codes = set(RBACPermission.objects.values_list("codename", flat=True))
+        base_codes = set(get_all_permission_codenames())
 
+    # User-specific overrides
     overrides = UserPermission.objects.filter(user=user).select_related("permission")
     for override in overrides:
         code = override.permission.codename
