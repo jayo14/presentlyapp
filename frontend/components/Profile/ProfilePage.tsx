@@ -14,8 +14,10 @@ import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { SEO } from '../SEO';
 import { authApi } from '../../services/api/auth';
 import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../../services/api/queryClient';
+import { studentApi } from '../../services/api/student';
+import { Users } from 'lucide-react';
 
 interface ProfilePageProps {
   userRole?: UserRole;
@@ -52,12 +54,43 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     ? `Senior Lecturer - ${user?.department_name || 'Academic'}`
     : user?.department_name || user?.department || 'Computer Science';
 
-  const stats = {
-    activeCourses: user?.active_courses_count || 0,
-    totalSessions: user?.total_sessions_count || 0,
-    attendanceRate: user?.attendance_rate || 0,
+  const { data: studentSummary } = useQuery({
+    queryKey: ['studentSummary', user?.id],
+    queryFn: () => studentApi.getDashboard(),
+    enabled: userRole === UserRole.STUDENT && !!user?.id,
+  });
+
+  const { data: lecturerSummary } = useQuery({
+    queryKey: ['lecturerSummary', user?.id],
+    queryFn: () => dashboardApi.getLecturerSummary(),
+    enabled: userRole === UserRole.LECTURER && !!user?.id,
+  });
+
+  const stats = userRole === UserRole.STUDENT ? {
+    activeCourses: studentSummary?.enrolled_courses?.length || user?.active_courses_count || 0,
+    totalSessions: studentSummary?.attendance_stats?.total_sessions || user?.total_sessions_count || 0,
+    attendanceRate: Math.round(studentSummary?.attendance_stats?.average_attendance || user?.attendance_rate || 0),
     completedCourses: user?.completed_courses_count || 0
+  } : {
+    activeCourses: lecturerSummary?.data?.stats?.total_courses || user?.active_courses_count || 0,
+    totalSessions: lecturerSummary?.data?.stats?.active_sessions || user?.total_sessions_count || 0,
+    attendanceRate: lecturerSummary?.data?.stats?.todays_sessions || user?.attendance_rate || 0,
+    completedCourses: lecturerSummary?.data?.stats?.total_students || user?.completed_courses_count || 0
   };
+
+  const statCards = userRole === UserRole.LECTURER 
+    ? [
+        { icon: BookOpen, val: stats.activeCourses, label: 'Courses', color: 'primary' },
+        { icon: Calendar, val: stats.totalSessions, label: 'Active Sessions', color: 'blue-500' },
+        { icon: Clock, val: stats.attendanceRate, label: "Today's Sessions", color: 'green-500' },
+        { icon: Users, val: stats.completedCourses, label: 'Total Students', color: 'purple-500' }
+      ]
+    : [
+        { icon: BookOpen, val: stats.activeCourses, label: 'Active Courses', color: 'primary' },
+        { icon: Calendar, val: stats.totalSessions, label: 'Total Sessions', color: 'blue-500' },
+        { icon: TrendingUp, val: `${stats.attendanceRate}%`, label: 'Attendance', color: 'green-500' },
+        { icon: Award, val: stats.completedCourses, label: 'Completed', color: 'purple-500' }
+      ];
 
   const handleAvatarUpdate = async () => {
     await uploadAvatar();
@@ -162,12 +195,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       </div>
 
       <div className="grid grid-cols-2 gap-3 px-4 mb-8">
-        {[
-          { icon: BookOpen, val: stats.activeCourses, label: 'Active Courses', color: 'primary' },
-          { icon: Calendar, val: stats.totalSessions, label: 'Total Sessions', color: 'blue-500' },
-          { icon: TrendingUp, val: `${stats.attendanceRate}%`, label: 'Attendance', color: 'green-500' },
-          { icon: Award, val: stats.completedCourses, label: 'Completed', color: 'purple-500' }
-        ].map((item, i) => (
+        {statCards.map((item, i) => (
           <div key={i} className="bg-surface border border-outline rounded-2xl p-4 shadow-sm hover:shadow-md transition-all">
             <div className={`p-1.5 bg-${item.color}/10 rounded-lg w-fit mb-2`}>
               <item.icon size={18} className={`text-${item.color}`} />
@@ -316,12 +344,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-        {[
-          { icon: BookOpen, val: stats.activeCourses, label: 'Courses', color: 'primary' },
-          { icon: Calendar, val: stats.totalSessions, label: 'Sessions', color: 'blue-500' },
-          { icon: TrendingUp, val: `${stats.attendanceRate}%`, label: 'Attendance', color: 'green-500' },
-          { icon: Award, val: stats.completedCourses, label: 'Completed', color: 'purple-500' }
-        ].map((item, i) => (
+        {statCards.map((item, i) => (
           <div key={i} className="bg-surface border border-outline rounded-2xl p-6 flex flex-col items-center shadow-sm hover:shadow-md transition-all hover:scale-[1.02]">
             <div className={`bg-${item.color}/10 p-2.5 rounded-xl mb-3`}>
               <item.icon size={24} className={`text-${item.color}`} />

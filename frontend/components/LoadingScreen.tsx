@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Layers } from 'lucide-react';
+import { Logo } from './Logo';
 
 export const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Syncing your flow' }) => {
   return (
@@ -48,8 +49,8 @@ export const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Synci
                 transition={{ duration: 3, repeat: Infinity }}
                 className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"
               />
-              <div className="relative w-16 h-16 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-[4px_4px_10px_rgba(0,0,0,0.1)] border-t border-white dark:border-white/5 z-10">
-                <Layers size={28} className="text-primary" />
+              <div className="w-14 h-14">
+                <img src="/logo.png" alt="Presently Logo" className="w-full" />
               </div>
             </div>
           </div>
