@@ -300,7 +300,7 @@ export const Register: React.FC = () => {
             <button
               onClick={handleGoogleLogin}
               disabled={googleAuthMutation.isPending || isRedirecting}
-              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surface-variant border transition-all disabled:opacity-50"
+              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surfaceVariant border transition-all disabled:opacity-50"
               aria-label="Sign up with Google"
             >
               <svg width="24" height="24" viewBox="0 0 24 24">
@@ -313,7 +313,7 @@ export const Register: React.FC = () => {
 
             <button
               onClick={handleAppleLogin}
-              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surface-variant border transition-all"
+              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surfaceVariant border transition-all"
               aria-label="Sign up with Apple"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" className="fill-foreground">

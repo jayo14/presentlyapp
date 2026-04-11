@@ -39,6 +39,8 @@
     --background:               #fbf8fc;
     --outline-variant:          #d2c5ab;
     --error:                    #ba1a1a;
+    --success:                  #2e7d32;
+    --warning:                  #ed6c02;
     --inverse-surface:          #303033;
 
     /* Semantic tokens for shadcn compats */
@@ -87,6 +89,8 @@
     --secondary-fixed-dim:      #5f5e61;
 
     --error:                    #ffb4ab;
+    --success:                  #4caf50;
+    --warning:                  #ffa726;
     --inverse-surface:          #fbf8fc;
 
     /* Semantic tokens for shadcn compats */

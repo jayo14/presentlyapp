@@ -33,19 +33,19 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
   
   if (strength === 0) {
     strengthText = '';
-    strengthColor = 'bg-border-light';
+    strengthColor = 'bg-surfaceVariant';
   } else if (strength < 40) {
     strengthText = 'Weak';
-    strengthColor = 'bg-error dark:bg-error-dark';
+    strengthColor = 'bg-error';
   } else if (strength < 60) {
     strengthText = 'Fair';
-    strengthColor = 'bg-warning dark:bg-warning-dark';
+    strengthColor = 'bg-warning';
   } else if (strength < 80) {
     strengthText = 'Good';
     strengthColor = 'bg-primary';
   } else {
     strengthText = 'Strong';
-    strengthColor = 'bg-success dark:bg-success-dark';
+    strengthColor = 'bg-success';
   }
 
   return (
@@ -60,11 +60,11 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
             />
           </div>
           {strengthText && (
-            <p className={`text-sm font-medium ${
-              strength < 40 ? 'text-error dark:text-error-dark' :
-              strength < 60 ? 'text-warning dark:text-warning-dark' :
+            <p className={`text-sm font-bold ${
+              strength < 40 ? 'text-error' :
+              strength < 60 ? 'text-warning' :
               strength < 80 ? 'text-primary' :
-              'text-success dark:text-success-dark'
+              'text-success'
             }`}>
               {strengthText} password {strength >= 80 && '✓'}
             </p>
@@ -80,8 +80,8 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
               key={index}
               className={`flex items-center gap-2 text-sm transition-colors ${
                 req.met
-                  ? 'text-success dark:text-success-dark'
-                  : 'text-tertiary dark:text-dark-text-tertiary'
+                  ? 'text-success'
+                  : 'text-textMuted/60'
               }`}
             >
               {req.met ? (

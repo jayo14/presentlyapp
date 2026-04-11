@@ -33,6 +33,8 @@ export default {
         outline: "var(--outline-variant)",
         foreground: "var(--foreground)",
         error: "var(--error)",
+        success: "var(--success)",
+        warning: "var(--warning)",
       },
       keyframes: {
         'float': {
