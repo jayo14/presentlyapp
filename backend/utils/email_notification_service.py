@@ -86,15 +86,16 @@ class EmailNotificationService:
         course_code: str,
         course_name: str,
         start_time: str,
-        end_time: str,
+        closes_at: str,
         venue_name: str,
+        lecturer_name: str = "Lecturer",
     ) -> bool:
         send_session_live_email(
             to=user_email,
             first_name=user_name.split(" ")[0],
             course_code=course_code,
             course_name=course_name,
-            lecturer_name="Lecturer",
+            lecturer_name=lecturer_name,
             room_location=venue_name,
             session_time=start_time,
             minutes_remaining=0,
@@ -212,9 +213,10 @@ def send_attendance_session_created(
     start_time: str,
     end_time: str,
     venue_name: str,
+    lecturer_name: str = "Lecturer",
 ) -> bool:
     return EmailNotificationService.send_attendance_session_created(
-        user_email, user_name, course_code, course_name, start_time, end_time, venue_name
+        user_email, user_name, course_code, course_name, start_time, end_time, venue_name, lecturer_name
     )
 
 

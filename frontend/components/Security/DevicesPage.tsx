@@ -1,7 +1,7 @@
 import React from 'react';
-import { 
-  Shield, Smartphone, Monitor, Tablet, Trash2, 
-  MapPin, Clock, Wifi, ChevronLeft, ShieldCheck, 
+import {
+  Shield, Smartphone, Monitor, Tablet, Trash2,
+  MapPin, Clock, Wifi, ChevronLeft, ShieldCheck,
   ShieldAlert, RefreshCw, Loader2, Globe, Laptop
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -60,7 +60,7 @@ export const DevicesPage: React.FC = () => {
 
   const mobileLayout = (
     <div className="min-h-screen bg-background pb-20">
-      <div className="p-4 flex items-center gap-4 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-outline">
+      {/* <div className="p-4 flex items-center gap-4 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-outline">
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-surfaceHigh rounded-full transition-colors">
           <ChevronLeft size={24} />
         </button>
@@ -74,7 +74,7 @@ export const DevicesPage: React.FC = () => {
             <RefreshCw size={20} className={isRefetching ? 'animate-spin' : ''} />
           </button>
         </div>
-      </div>
+      </div> */}
 
       <div className="p-4 space-y-4">
         <div className="bg-surfaceLow/50 border border-blue-500/20 rounded-2xl p-4 flex gap-4 items-start">
@@ -126,7 +126,7 @@ export const DevicesPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => revokeMutation.mutate(device.id)}
                       disabled={revokeMutation.isPending}
                       className="p-2 text-red-400 hover:bg-red-400/10 rounded-full transition-colors"
@@ -155,9 +155,9 @@ export const DevicesPage: React.FC = () => {
                   </div>
 
                   {!device.is_trusted && (
-                    <Button 
-                      variant="primary" 
-                      className="w-full text-sm py-2.5 h-auto rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20"
+                    <Button
+                      variant="primary"
+                      className="w-full text-sm py-2.5 h-auto rounded-xl bg-primary/10 border border-primary/20 text-white hover:bg-primary/20"
                       onClick={() => trustMutation.mutate(device.id)}
                       disabled={trustMutation.isPending}
                     >
@@ -176,7 +176,7 @@ export const DevicesPage: React.FC = () => {
 
   const desktopLayout = (
     <div className="max-w-5xl mx-auto p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-       <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-6">
           <button onClick={() => navigate(-1)} className="p-3 bg-surface border border-outline hover:border-primary/50 rounded-2xl transition-all hover:scale-105 group">
             <ChevronLeft size={28} className="text-textMuted group-hover:text-primary transition-colors" />
@@ -186,9 +186,9 @@ export const DevicesPage: React.FC = () => {
             <p className="text-textMuted mt-1 text-lg">Manage access to your Presently infrastructure</p>
           </div>
         </div>
-        <Button 
-          variant="secondary" 
-          onClick={() => refetch()} 
+        <Button
+          variant="secondary"
+          onClick={() => refetch()}
           disabled={isRefetching}
           className="rounded-2xl border-outline hover:border-primary/30"
         >
@@ -199,128 +199,128 @@ export const DevicesPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-6">
-           <div className="bg-gradient-to-br from-surfaceHigh/50 to-surface/30 p-8 rounded-[2rem] border border-outline relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Shield size={120} />
+          <div className="bg-gradient-to-br from-surfaceHigh/50 to-surface/30 p-8 rounded-[2rem] border border-outline relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Shield size={120} />
+            </div>
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6 border border-blue-500/30">
+                <ShieldCheck className="text-blue-400" size={32} />
               </div>
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6 border border-blue-500/30">
-                  <ShieldCheck className="text-blue-400" size={32} />
-                </div>
-                <h2 className="text-2xl font-bold mb-3">Trusted Zones</h2>
-                <p className="text-textMuted leading-relaxed">
-                  Your account is monitored for anomalies. Devices marked as <b>Trusted</b> will not trigger security alerts during login even if the network environment changes slightly.
-                </p>
-              </div>
-           </div>
-
-           <div className="bg-amber-400/5 p-8 rounded-[2rem] border border-amber-400/20">
-              <div className="flex items-center gap-3 mb-4 text-amber-400">
-                <ShieldAlert size={24} />
-                <h3 className="font-bold text-xl uppercase tracking-wider">Warning</h3>
-              </div>
-              <p className="text-textMuted text-sm leading-relaxed italic">
-                "If you see a device you don't recognize, revoke it immediately and change your account password."
+              <h2 className="text-2xl font-bold mb-3">Trusted Zones</h2>
+              <p className="text-textMuted leading-relaxed">
+                Your account is monitored for anomalies. Devices marked as <b>Trusted</b> will not trigger security alerts during login even if the network environment changes slightly.
               </p>
-           </div>
+            </div>
+          </div>
+
+          <div className="bg-amber-400/5 p-8 rounded-[2rem] border border-amber-400/20">
+            <div className="flex items-center gap-3 mb-4 text-amber-400">
+              <ShieldAlert size={24} />
+              <h3 className="font-bold text-xl uppercase tracking-wider">Warning</h3>
+            </div>
+            <p className="text-textMuted text-sm leading-relaxed italic">
+              "If you see a device you don't recognize, revoke it immediately and change your account password."
+            </p>
+          </div>
         </div>
 
         <div className="md:col-span-2">
-            {isLoading ? (
-              <div className="grid grid-cols-1 gap-4">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-40 bg-surface/50 animate-pulse rounded-[2rem] border border-outline" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-6">
-                <AnimatePresence mode="popLayout">
-                  {devices?.map((device, index) => (
-                    <motion.div
-                      key={device.id}
-                      layout
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.4, ease: "circOut" }}
-                      className="group bg-surface hover:bg-surfaceHigh/50 border border-outline hover:border-primary/40 rounded-[2rem] p-6 shadow-xl transition-all duration-500"
-                    >
-                      <div className="flex items-start gap-6">
-                        <div className="w-20 h-20 rounded-3xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500 border border-outline group-hover:border-primary/20">
-                          {React.cloneElement(getDeviceIcon(device.device_name) as React.ReactElement, { size: 36 })}
-                        </div>
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-2xl font-bold text-text group-hover:text-primary transition-colors">{device.device_name}</h3>
-                            <div className="flex items-center gap-3">
-                              {device.is_trusted ? (
-                                <span className="flex items-center gap-2 text-xs font-black text-green-400 bg-green-400/10 px-4 py-1.5 rounded-full border border-green-500/20 uppercase tracking-widest shadow-lg shadow-green-900/10">
-                                  <ShieldCheck size={14} /> Trusted
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-2 text-xs font-black text-amber-400 bg-amber-400/10 px-4 py-1.5 rounded-full border border-amber-500/20 uppercase tracking-widest shadow-lg shadow-amber-900/10">
-                                  <ShieldAlert size={14} /> Untrusted
-                                </span>
-                              )}
-                              <button 
-                                onClick={() => revokeMutation.mutate(device.id)}
-                                disabled={revokeMutation.isPending}
-                                className="p-3 text-red-400 hover:bg-red-400/10 rounded-2xl transition-all hover:scale-110 active:scale-95"
-                                title="Revoke Device"
-                              >
-                                <Trash2 size={24} />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-y-3 gap-x-8 max-w-xl">
-                            <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
-                              <MapPin size={18} className="text-primary/70" />
-                              <span className="text-sm font-medium">{device.geo_city || 'Unknown City'}, {device.geo_country || 'Unknown Country'}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
-                              <Globe size={18} className="text-primary/70" />
-                              <span className="text-sm font-mono tracking-tight">{device.ip_address}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
-                              <Clock size={18} className="text-primary/70" />
-                              <span className="text-sm font-medium">Last seen {formatDate(device.last_seen_at)}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
-                              <Wifi size={18} className="text-primary/70" />
-                              <span className="text-sm truncate font-medium">{device.isp || 'Internal Provider'}</span>
-                            </div>
-                          </div>
-
-                          {!device.is_trusted && (
-                            <div className="mt-6 pt-6 border-t border-outline/50">
-                              <Button 
-                                variant="primary" 
-                                className="rounded-2xl px-8 bg-primary/20 hover:bg-primary/30 text-primary border-primary/20"
-                                onClick={() => trustMutation.mutate(device.id)}
-                                disabled={trustMutation.isPending}
-                              >
-                                <ShieldCheck size={20} className="mr-2" />
-                                Add to Trusted Zone
-                              </Button>
-                            </div>
-                          )}
-                        </div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 gap-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-40 bg-surface/50 animate-pulse rounded-[2rem] border border-outline" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6">
+              <AnimatePresence mode="popLayout">
+                {devices?.map((device, index) => (
+                  <motion.div
+                    key={device.id}
+                    layout
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4, ease: "circOut" }}
+                    className="group bg-surface hover:bg-surfaceHigh/50 border border-outline hover:border-primary/40 rounded-[2rem] p-6 shadow-xl transition-all duration-500"
+                  >
+                    <div className="flex items-start gap-6">
+                      <div className="w-20 h-20 rounded-3xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500 border border-outline group-hover:border-primary/20">
+                        {React.cloneElement(getDeviceIcon(device.device_name) as React.ReactElement, { size: 36 })}
                       </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                
-                {devices?.length === 0 && (
-                  <div className="p-20 text-center border-2 border-dashed border-outline rounded-[3rem] bg-surface/30">
-                    <Activity className="mx-auto text-textMuted mb-6 opacity-20" size={64} />
-                    <h3 className="text-2xl font-bold text-text mb-2">No devices registered</h3>
-                    <p className="text-textMuted max-w-xs mx-auto">Your active sessions will appear here once you've logged in from a recognized environment.</p>
-                  </div>
-                )}
-              </div>
-            )}
+
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-2xl font-bold text-text group-hover:text-primary transition-colors">{device.device_name}</h3>
+                          <div className="flex items-center gap-3">
+                            {device.is_trusted ? (
+                              <span className="flex items-center gap-2 text-xs font-black text-green-400 bg-green-400/10 px-4 py-1.5 rounded-full border border-green-500/20 uppercase tracking-widest shadow-lg shadow-green-900/10">
+                                <ShieldCheck size={14} /> Trusted
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-2 text-xs font-black text-amber-400 bg-amber-400/10 px-4 py-1.5 rounded-full border border-amber-500/20 uppercase tracking-widest shadow-lg shadow-amber-900/10">
+                                <ShieldAlert size={14} /> Untrusted
+                              </span>
+                            )}
+                            <button
+                              onClick={() => revokeMutation.mutate(device.id)}
+                              disabled={revokeMutation.isPending}
+                              className="p-3 text-red-400 hover:bg-red-400/10 rounded-2xl transition-all hover:scale-110 active:scale-95"
+                              title="Revoke Device"
+                            >
+                              <Trash2 size={24} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-8 max-w-xl">
+                          <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
+                            <MapPin size={18} className="text-primary/70" />
+                            <span className="text-sm font-medium">{device.geo_city || 'Unknown City'}, {device.geo_country || 'Unknown Country'}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
+                            <Globe size={18} className="text-primary/70" />
+                            <span className="text-sm font-mono tracking-tight">{device.ip_address}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
+                            <Clock size={18} className="text-primary/70" />
+                            <span className="text-sm font-medium">Last seen {formatDate(device.last_seen_at)}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-textMuted group-hover:text-text transition-colors">
+                            <Wifi size={18} className="text-primary/70" />
+                            <span className="text-sm truncate font-medium">{device.isp || 'Internal Provider'}</span>
+                          </div>
+                        </div>
+
+                        {!device.is_trusted && (
+                          <div className="mt-6 pt-6 border-t border-outline/50">
+                            <Button
+                              variant="primary"
+                              className="rounded-2xl px-8 bg-primary/20 hover:bg-primary/30 text-primary border-primary/20"
+                              onClick={() => trustMutation.mutate(device.id)}
+                              disabled={trustMutation.isPending}
+                            >
+                              <ShieldCheck size={20} className="mr-2" />
+                              Add to Trusted Zone
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {devices?.length === 0 && (
+                <div className="p-20 text-center border-2 border-dashed border-outline rounded-[3rem] bg-surface/30">
+                  <Activity className="mx-auto text-textMuted mb-6 opacity-20" size={64} />
+                  <h3 className="text-2xl font-bold text-text mb-2">No devices registered</h3>
+                  <p className="text-textMuted max-w-xs mx-auto">Your active sessions will appear here once you've logged in from a recognized environment.</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -328,9 +328,9 @@ export const DevicesPage: React.FC = () => {
 
   return (
     <>
-      <SEO 
-        title="Security & Devices | Presently" 
-        description="Monitor and manage the devices that have access to your account." 
+      <SEO
+        title="Security & Devices | Presently"
+        description="Monitor and manage the devices that have access to your account."
       />
       <ResponsiveContainer mobileChildren={mobileLayout}>
         {desktopLayout}
