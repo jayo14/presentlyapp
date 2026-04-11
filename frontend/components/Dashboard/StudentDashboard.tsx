@@ -18,6 +18,7 @@ import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScann
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 import CourseIcon from '../Course/CourseIcon';
 import { useCurrentUser } from '../../hooks/useAuth';
+import { StudentAnalytics } from '../Analytics/StudentAnalytics';
 
 interface StudentDashboardProps {
   userName: string;
@@ -92,6 +93,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     .join('') || 'U';
 
   const nextClass = dashboardData?.next_class;
+
+  if (view === 'analytics') {
+    return <StudentAnalytics />;
+  }
 
   return (
     <>
