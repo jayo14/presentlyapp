@@ -77,7 +77,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     <>
       <SEO title="Presently | Home" />
 
-      <div className="min-h-screen bg-[#FDFDFF] dark:bg-[#08080A] pb-24 text-slate-900 dark:text-white font-sans selection:bg-primary/20 overflow-x-hidden">
+      <div className="min-h-screen pb-24 text-slate-900 dark:text-white font-sans selection:bg-primary/20 overflow-x-hidden">
 
         {/* TOP NAV - MOBILE VIEW ONLY (Desktop has Sidebar) */}
         {/* <nav className="sticky top-0 z-50 px-6 py-4 bg-[#FDFDFF]/70 dark:bg-[#08080A]/70 backdrop-blur-2xl md:hidden">
@@ -265,11 +265,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                         key={activity.id}
                         className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-4 rounded-[1.75rem] flex items-center gap-4 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group"
                       >
-                        <CourseIcon 
-                          title={activity.course_name || activity.course_code || ''} 
-                          className={`w-12 h-12 flex-shrink-0 ${
-                            activity.status === 'PRESENT' ? 'ring-4 ring-emerald-500/20' : 'ring-4 ring-rose-500/20'
-                          }`} 
+                        <CourseIcon
+                          title={activity.course_name || activity.course_code || ''}
+                          className={`w-12 h-12 flex-shrink-0 ${activity.status === 'PRESENT' ? 'ring-4 ring-emerald-500/20' : 'ring-4 ring-rose-500/20'
+                            }`}
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">

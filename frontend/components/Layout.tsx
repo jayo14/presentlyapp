@@ -5,7 +5,7 @@ import {
   LogOut, Home, User, Bell, Settings, BookOpen, FileText,
   Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3,
   Download, GraduationCap, Building2, Timer, Menu, X,
-  ChevronLeft, Search, PanelLeftClose, PanelLeft, Command
+  ChevronLeft, Search, PanelLeftClose, PanelLeft, Command, Plus
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
@@ -561,16 +561,44 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MOBILE BOTTOM NAV (Dock)  */}
       {/* ═══════════════════════════════════════════════════════ */}
+      {/* Floating Dock Navigation for mobile users */}
       {!isMobileMenuOpen && (
-        <div className="md:hidden fixed bottom-6 left-0 right-0 z-[100] pointer-events-none flex justify-center">
+        <div className="md:hidden">
           <Dock
-            items={[
-              { id: 'dashboard', label: 'Home', active: currentPage === 'dashboard', onClick: () => handleNavClick('dashboard'), icon: <Home size={20} strokeWidth={2} /> },
-              { id: 'courses', label: 'Courses', active: currentPage === 'courses', onClick: () => handleNavClick('courses'), icon: <GraduationCap size={20} strokeWidth={2} /> },
-              { id: 'scanner', label: '', isAccent: true, onClick: () => setIsScannerOpen(true), icon: <QrCode size={24} strokeWidth={2.5} /> },
-              { id: 'analytics', label: 'Stats', active: currentPage === 'analytics', onClick: () => handleNavClick('analytics'), icon: <TrendingUp size={20} strokeWidth={2} /> },
-              { id: 'profile', label: 'Me', active: currentPage === 'profile', onClick: () => handleNavClick('profile'), icon: <User size={20} strokeWidth={2} /> },
-            ]}
+            items={(() => {
+              const baseItems = [
+                { id: 'dashboard', label: 'Home', active: currentPage === 'dashboard', onClick: () => handleNavClick('dashboard'), icon: <Home size={20} strokeWidth={2} /> },
+                { id: 'courses', label: 'Courses', active: currentPage === 'courses', onClick: () => handleNavClick('courses'), icon: <GraduationCap size={20} strokeWidth={2} /> },
+              ];
+              
+              const endItems = [
+                { id: 'analytics', label: 'Stats', active: (currentPage === 'analytics' || currentPage === 'reports'), onClick: () => handleNavClick('analytics'), icon: <TrendingUp size={20} strokeWidth={2} /> },
+                { id: 'profile', label: 'Me', active: currentPage === 'profile', onClick: () => handleNavClick('profile'), icon: <User size={20} strokeWidth={2} /> },
+              ];
+
+              if (userRole === UserRole.ADMIN) {
+                return [
+                  ...baseItems,
+                  { id: 'users', label: 'Users', active: (currentPage === 'users' || currentPage === 'staff'), onClick: () => handleNavClick('users'), icon: <Users size={20} strokeWidth={2} /> },
+                  ...endItems
+                ];
+              }
+
+              if (userRole === UserRole.LECTURER) {
+                return [
+                  ...baseItems,
+                  { id: 'create-session', label: 'New', isAccent: true, onClick: () => handleNavClick('sessions'), icon: <Plus size={24} strokeWidth={2.5} /> },
+                  ...endItems
+                ];
+              }
+
+              // Default for Students and Class Reps
+              return [
+                ...baseItems,
+                { id: 'scanner', label: 'Scan', isAccent: true, onClick: () => setIsScannerOpen(true), icon: <QrCode size={24} strokeWidth={2.5} /> },
+                ...endItems
+              ];
+            })()}
           />
         </div>
       )}

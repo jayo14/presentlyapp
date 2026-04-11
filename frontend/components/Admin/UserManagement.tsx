@@ -21,12 +21,25 @@ export const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [userStats, setUserStats] = useState({
+    total_users: 0,
+    students: 0,
+    lecturers: 0,
+    admins: 0
+  });
 
   const { modalProps } = useModalAccessibility(showModal, () => setShowModal(false));
 
   useEffect(() => {
-    loadUsers(currentPage);
-  }, [roleFilter, currentPage]);
+    setCurrentPage(1);
+  }, [roleFilter, searchTerm]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadUsers(currentPage);
+    }, totalUsers === 0 ? 0 : 300); // Small debounce for typing
+    return () => clearTimeout(timer);
+  }, [roleFilter, searchTerm, currentPage]);
 
   const loadUsers = async (page: number) => {
     try {
@@ -35,11 +48,23 @@ export const UserManagement: React.FC = () => {
       if (roleFilter !== 'all') {
         params.role = roleFilter;
       }
-      const response = await apiClient.get('/users/', { params });
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
+
+      // Fetch users and stats in parallel
+      const [usersRes, statsRes] = await Promise.all([
+        apiClient.get('/users/', { params }),
+        apiClient.get('/users/stats/', { params })
+      ]);
       
-      setUsers(response.data.results || []);
-      setTotalPages(response.data.total_pages || 1);
-      setTotalUsers(response.data.count || 0);
+      setUsers(usersRes.data.results || []);
+      setTotalPages(usersRes.data.total_pages || 1);
+      setTotalUsers(usersRes.data.count || 0);
+
+      if (statsRes.data.success) {
+        setUserStats(statsRes.data.data);
+      }
       
       setError(null);
     } catch (err: any) {
@@ -54,10 +79,8 @@ export const UserManagement: React.FC = () => {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Server-side filtering is now used, so we use the users state directly
+  const displayUsers = users;
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
@@ -69,7 +92,7 @@ export const UserManagement: React.FC = () => {
       toast.success('User Deleted', {
         description: 'User has been successfully deleted'
       });
-      await loadUsers();
+      await loadUsers(currentPage);
     } catch (err: any) {
       toast.error('Delete Failed', {
         description: err.response?.data?.error || 'Failed to delete user'
@@ -84,7 +107,7 @@ export const UserManagement: React.FC = () => {
       toast.success('Role Updated', {
         description: 'User role has been updated successfully'
       });
-      await loadUsers();
+      await loadUsers(currentPage);
     } catch (err: any) {
       toast.error('Update Failed', {
         description: err.response?.data?.error || 'Failed to update user role'
@@ -99,7 +122,7 @@ export const UserManagement: React.FC = () => {
       toast.success(suspend ? 'User Suspended' : 'User Activated', {
         description: `User has been ${suspend ? 'suspended' : 'activated'} successfully`
       });
-      await loadUsers();
+      await loadUsers(currentPage);
     } catch (err: any) {
       toast.error('Action Failed', {
         description: err.response?.data?.error || `Failed to ${suspend ? 'suspend' : 'activate'} user`
@@ -151,7 +174,7 @@ export const UserManagement: React.FC = () => {
   const exportUsers = () => {
     const csv = [
       ['Name', 'Email', 'Role', 'Institution', 'College', 'Onboarding Complete'].join(','),
-      ...filteredUsers.map(user => [
+      ...displayUsers.map(user => [
         user.name || 'No Name',
         user.email,
         user.role,
@@ -212,25 +235,19 @@ export const UserManagement: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-surface border border-outline rounded-lg p-4">
           <p className="text-textMuted text-sm">Total Users</p>
-          <p className="text-2xl font-bold text-text">{users.length}</p>
+          <p className="text-2xl font-bold text-text">{userStats.total_users}</p>
         </div>
         <div className="bg-surface border border-outline rounded-lg p-4">
           <p className="text-textMuted text-sm">Students</p>
-          <p className="text-2xl font-bold text-text">
-            {users.filter(u => u.role === UserRole.STUDENT).length}
-          </p>
+          <p className="text-2xl font-bold text-text">{userStats.students}</p>
         </div>
         <div className="bg-surface border border-outline rounded-lg p-4">
           <p className="text-textMuted text-sm">Lecturers</p>
-          <p className="text-2xl font-bold text-text">
-            {users.filter(u => u.role === UserRole.LECTURER).length}
-          </p>
+          <p className="text-2xl font-bold text-text">{userStats.lecturers}</p>
         </div>
         <div className="bg-surface border border-outline rounded-lg p-4">
           <p className="text-textMuted text-sm">Admins</p>
-          <p className="text-2xl font-bold text-text">
-            {users.filter(u => u.role === UserRole.ADMIN).length}
-          </p>
+          <p className="text-2xl font-bold text-text">{userStats.admins}</p>
         </div>
       </div>
 
@@ -281,7 +298,7 @@ export const UserManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
-              {filteredUsers.map(user => (
+              {displayUsers.map(user => (
                 <tr key={user.id} className="hover:bg-surfaceHigh/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -437,8 +454,7 @@ export const UserManagement: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {filteredUsers.length === 0 && !loading && (
+      {displayUsers.length === 0 && !loading && (
         <div className="text-center py-12">
           <Users className="w-16 h-16 text-textMuted mx-auto mb-4" />
           <p className="text-textMuted">No users found</p>
