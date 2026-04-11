@@ -14,137 +14,6 @@ import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { SEO } from '../SEO';
 import { Switch } from '../Switch';
 
-const AccessibleCombobox = ({
-    value,
-    onChange,
-    options,
-    placeholder,
-    className = ""
-}: {
-    value: string;
-    onChange: (val: string) => void;
-    options: { value: string; label: string }[];
-    placeholder: string;
-    className?: string;
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [search, setSearch] = useState('');
-    const [activeIndex, setActiveIndex] = useState(-1);
-    const containerRef = React.useRef<HTMLDivElement>(null);
-
-    const filteredOptions = options.filter(opt =>
-        opt.label.toLowerCase().includes(search.toLowerCase())
-    );
-
-    const selectedLabel = options.find(opt => opt.value === value)?.label || '';
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-                setIsOpen(false);
-                setSearch('');
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (!isOpen && e.key === 'ArrowDown') {
-            setIsOpen(true);
-            return;
-        }
-
-        if (!isOpen) return;
-
-        switch (e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                setActiveIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : prev));
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
-                break;
-            case 'Enter':
-                e.preventDefault();
-                if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
-                    onChange(filteredOptions[activeIndex].value);
-                    setIsOpen(false);
-                    setSearch('');
-                }
-                break;
-            case 'Escape':
-                setIsOpen(false);
-                break;
-        }
-    };
-
-    return (
-        <div ref={containerRef} className="relative w-full">
-            <div
-                role="combobox"
-                aria-expanded={isOpen}
-                aria-haspopup="listbox"
-                aria-owns="venue-listbox"
-                className="w-full relative"
-            >
-                <input
-                    type="text"
-                    className={`w-full bg-surfaceLow border border-outline rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary pr-10 appearance-none ${className}`}
-                    placeholder={value ? selectedLabel : placeholder}
-                    value={isOpen ? search : selectedLabel}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setIsOpen(true);
-                        setActiveIndex(0);
-                    }}
-                    onClick={() => setIsOpen(true)}
-                    onKeyDown={handleKeyDown}
-                    aria-autocomplete="list"
-                    aria-controls="venue-listbox"
-                    aria-label={placeholder}
-                    aria-activedescendant={activeIndex >= 0 ? `venue-option-${activeIndex}` : undefined}
-                />
-                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} size={16} />
-            </div>
-
-            {isOpen && (
-                <ul
-                    id="venue-listbox"
-                    role="listbox"
-                    className="absolute z-50 w-full mt-2 max-h-60 overflow-auto bg-surface border border-outline rounded-xl shadow-2xl p-2"
-                >
-                    {filteredOptions.length === 0 ? (
-                        <li className="p-3 text-sm text-textMuted text-center font-medium">No venues found</li>
-                    ) : (
-                        filteredOptions.map((opt, index) => (
-                            <li
-                                key={opt.value}
-                                id={`venue-option-${index}`}
-                                role="option"
-                                aria-selected={value === opt.value}
-                                className={`p-3 text-sm rounded-lg cursor-pointer flex items-center justify-between transition-colors ${
-                                    index === activeIndex ? 'bg-primary/10 text-primary' : 'hover:bg-surfaceLow text-text'
-                                }`}
-                                onClick={() => {
-                                    onChange(opt.value);
-                                    setIsOpen(false);
-                                    setSearch('');
-                                }}
-                                onMouseEnter={() => setActiveIndex(index)}
-                            >
-                                <span className={value === opt.value ? 'font-bold' : 'font-medium'}>{opt.label}</span>
-                                {value === opt.value && <Check size={16} className="text-primary" />}
-                            </li>
-                        ))
-                    )}
-                </ul>
-            )}
-        </div>
-    );
-};
-
 export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: user } = useCurrentUser();
@@ -218,28 +87,13 @@ export const CreateSessionPage: React.FC = () => {
 
     const loadInitialData = async () => {
         try {
-            const promises: Promise<any>[] = [
+            const [instData, venuesData] = await Promise.all([
                 institutionsApi.getAllInstitutions(),
                 venueApi.getAll()
-            ];
-
-            if (user?.id) {
-                // Fetch the lecturer's own courses automatically regardless of department
-                // Assuming user.id handles the string to ID internally on the backend
-                promises.push(courseApi.getAll({ lecturer: parseInt(user.id) || user.id as any }));
-            }
-
-            const results = await Promise.all(promises);
-            const instData = results[0];
-            const venuesData = results[1];
-            const lecturerCourses = results[2] || [];
+            ]);
 
             setInstitutions(Array.isArray(instData) ? instData : []);
             setVenues(Array.isArray(venuesData) ? venuesData : []);
-            
-            if (Array.isArray(lecturerCourses) && lecturerCourses.length > 0) {
-                setCourses(lecturerCourses);
-            }
 
             // Smart Pre-fill
             if (user?.institution) {
@@ -284,12 +138,7 @@ export const CreateSessionPage: React.FC = () => {
     const loadCoursesForDepartments = async (deptIds: number[]) => {
         try {
             // Fetch courses for ALL selected departments
-            const promises: Promise<Course[]>[] = deptIds.map(id => courseApi.getAll({ department: id }));
-            
-            if (user?.id) {
-                promises.push(courseApi.getAll({ lecturer: parseInt(user.id) || user.id as any }));
-            }
-            
+            const promises = deptIds.map(id => courseApi.getAll({ department: id }));
             const results = await Promise.all(promises);
             // Flatten and deduplicate by ID
             const allCourses = results.flat();
@@ -415,88 +264,24 @@ export const CreateSessionPage: React.FC = () => {
                 </div>
 
                 {/* Lecture Hall */}
-                <div className="relative z-10">
+                <div>
                     <label className="block text-text text-sm font-semibold mb-3">Lecture Hall</label>
-                    <AccessibleCombobox
-                        value={selectedVenue}
-                        onChange={setSelectedVenue}
-                        options={venues.map(v => ({ value: v.id.toString(), label: `${v.name} (${v.capacity || 0} seats)` }))}
-                        placeholder="Select location..."
-                        className="py-4 text-base"
-                    />
+                    <div className="relative">
+                        <select
+                            value={selectedVenue}
+                            onChange={(e) => setSelectedVenue(e.target.value)}
+                            className="w-full bg-surface border border-outline rounded-xl p-4 text-text text-base outline-none appearance-none pr-10"
+                            required
+                        >
+                            <option value="">Select location</option>
+                            {venues.map(venue => (
+                                <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
+                            ))}
+                        </select>
+                        <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-primary pointer-events-none" size={20} />
+                    </div>
                 </div>
 
-                {/* Verification Methods */}
-                {/* <div>
-                    <label className="block text-text text-sm font-semibold mb-3">Verification Methods</label>
-                    <div className="space-y-3">
-
-                        <div className="bg-surface rounded-xl p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                                    <div className="w-6 h-6 grid grid-cols-2 gap-0.5">
-                                        <div className="bg-primary rounded-sm"></div>
-                                        <div className="bg-primary rounded-sm"></div>
-                                        <div className="bg-primary rounded-sm"></div>
-                                        <div className="bg-primary rounded-sm"></div>
-                                    </div>
-                                </div>
-                                <span className="text-text font-medium">QR Code</span>
-                            </div>
-                            <Switch checked={qrCodeEnabled} onCheckedChange={setQrCodeEnabled} />
-                        </div>
-
-
-                        <div className="bg-surface rounded-xl p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                                    <span className="text-primary font-bold text-xs">123</span>
-                                </div>
-                                <span className="text-text font-medium">8-Digit Code</span>
-                            </div>
-                            <Switch checked={digitCodeEnabled} onCheckedChange={setDigitCodeEnabled} />
-                        </div>
-
-
-                        <div className="bg-surface rounded-xl p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                                    <Target size={20} className="text-primary" />
-                                </div>
-                                <span className="text-text font-medium">GPS Verification</span>
-                            </div>
-                            <Switch checked={gpsEnabled} onCheckedChange={setGpsEnabled} />
-                        </div>
-                    </div>
-                </div> */}
-
-                {/* Geofence Radius */}
-                {/* {gpsEnabled && (
-                    <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <label className="block text-text text-sm font-semibold">Geofence Radius</label>
-                            <span className="text-primary text-lg font-bold">{geofenceRadius}m</span>
-                        </div>
-                        <div className="relative">
-                            <input
-                                type="range"
-                                min="50"
-                                max="500"
-                                step="10"
-                                value={geofenceRadius}
-                                onChange={(e) => setGeofenceRadius(parseInt(e.target.value))}
-                                className="w-full h-2 bg-surfaceHigh rounded-lg appearance-none cursor-pointer slider-primary"
-                                style={{
-                                    background: `linear-gradient(to right, #FFD700 0%, #FFD700 ${((geofenceRadius - 50) / 450) * 100}%, #27272a ${((geofenceRadius - 50) / 450) * 100}%, #27272a 100%)`
-                                }}
-                            />
-                            <div className="flex justify-between mt-2 text-xs text-textMuted">
-                                <span>50m</span>
-                                <span>500m</span>
-                            </div>
-                        </div>
-                    </div>
-                )} */}
 
                 {/* Create Button */}
                 <button
@@ -693,14 +478,22 @@ export const CreateSessionPage: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="relative z-10">
+                        <div>
                             <label className="block text-sm font-bold text-text mb-2">Venue</label>
-                            <AccessibleCombobox
-                                value={selectedVenue}
-                                onChange={setSelectedVenue}
-                                options={venues.map(v => ({ value: v.id.toString(), label: `${v.name} (${v.capacity || 0} seats)` }))}
-                                placeholder="Select venue..."
-                            />
+                            <div className="relative">
+                                <select
+                                    value={selectedVenue}
+                                    onChange={(e) => setSelectedVenue(e.target.value)}
+                                    className="w-full bg-surfaceLow border border-outline rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
+                                    required
+                                >
+                                    <option value="">Select venue...</option>
+                                    {venues.map(venue => (
+                                        <option key={venue.id} value={venue.id}>{venue.name} ({venue.capacity} seats)</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={16} />
+                            </div>
                         </div>
 
                         <div>
@@ -739,42 +532,41 @@ export const CreateSessionPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* 3. Verification Methods (Desktop) comment block removed */}
 
                 {/* Action Bar */}
                 <div className="sticky bottom-4 z-10">
-    <div className="bg-surface/80 backdrop-blur-lg border border-outline p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4">
-        <div className="hidden sm:block">
-            <p className="text-sm font-medium text-text">Ready to start?</p>
-            <p className="text-xs text-textMuted">Students can join immediately.</p>
-        </div>
-        <div className="flex gap-3 w-full sm:w-auto">
-            <Button variant="secondary" className="flex-1 sm:flex-none" onClick={() => navigate('/dashboard')} type="button">
-                Cancel
-            </Button>
-            <Button type="submit" className="flex-1 sm:flex-none min-w-[140px]" disabled={loading}>
-                {loading ? 'Starting...' : 'Create Session'}
-            </Button>
-        </div>
-    </div>
-</div>
+                    <div className="bg-surface/80 backdrop-blur-lg border border-outline p-4 rounded-2xl shadow-xl flex items-center justify-between gap-4">
+                        <div className="hidden sm:block">
+                            <p className="text-sm font-medium text-text">Ready to start?</p>
+                            <p className="text-xs text-textMuted">Students can join immediately.</p>
+                        </div>
+                        <div className="flex gap-3 w-full sm:w-auto">
+                            <Button variant="secondary" className="flex-1 sm:flex-none" onClick={() => navigate('/dashboard')} type="button">
+                                Cancel
+                            </Button>
+                            <Button type="submit" className="flex-1 sm:flex-none min-w-[140px]" disabled={loading}>
+                                {loading ? 'Starting...' : 'Create Session'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
 
-            </form >
-        </div >
+            </form>
+        </div>
     );
 
-return (
-    <>
-        <SEO
-            title="Create Attendance Session | Lecturer Dashboard"
-            description="Create a new attendance session for your course. Students can check in via QR code or session code on Presently."
-            noIndex
-        />
-        <ResponsiveContainer
-            mobileChildren={mobileLayout}
-        >
-            {desktopLayout}
-        </ResponsiveContainer>
-    </>
-);
+    return (
+        <>
+            <SEO
+                title="Create Attendance Session | Lecturer Dashboard"
+                description="Create a new attendance session for your course. Students can check in via QR code or session code on Presently."
+                noIndex
+            />
+            <ResponsiveContainer
+                mobileChildren={mobileLayout}
+            >
+                {desktopLayout}
+            </ResponsiveContainer>
+        </>
+    );
 };
