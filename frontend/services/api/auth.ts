@@ -157,9 +157,7 @@ export const authApi = {
 
   // Get current user profile
   getCurrentUser: async (): Promise<UserProfile> => {
-    console.log('[Auth API] Fetching current user from /auth/me/');
     const response = await apiClient.get('/auth/me/');
-    console.log('[Auth API] Current user response:', response.status);
     return response.data.user;
   },
 

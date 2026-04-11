@@ -37,11 +37,6 @@ export const AuthCallback: React.FC = () => {
       setMessage('Exchanging code for tokens...');
       
       const redirectUri = window.location.origin + '/auth/callback';
-      console.log('[Google OAuth] Callback Details:');
-      console.log('  Code:', code.substring(0, 20) + '...');
-      console.log('  Redirect URI:', redirectUri);
-      console.log('  Backend endpoint: /api/auth/google-callback/');
-      console.log('  Exchanging for tokens...');
       
       // Set a timeout for the API call
       const timeoutPromise = new Promise((_, reject) => 
@@ -55,30 +50,24 @@ export const AuthCallback: React.FC = () => {
       
       const response = await Promise.race([callbackPromise, timeoutPromise]) as any;
 
-      console.log('[Google OAuth] Response received:', response);
-
       if (response && response.success) {
         setMessage('Authentication successful! Redirecting...');
         toast.success('Login Successful', { description: 'Welcome back!' });
 
         // Check if user needs onboarding
         const requiresOnboarding = response.requires_onboarding || !response.user?.onboarding_complete;
-        console.log('[Google OAuth] Requires onboarding:', requiresOnboarding);
 
         if (requiresOnboarding) {
-          console.log('[Google OAuth] Redirecting to onboarding...');
           setTimeout(() => navigate('/onboarding', { replace: true }), 500);
         } else {
           // Check for pending check-in
           const pendingCheckIn = localStorage.getItem('pending_checkin');
-          console.log('[Google OAuth] Checking for pending check-in:', pendingCheckIn);
           
           if (pendingCheckIn) {
             localStorage.removeItem('pending_checkin');
             toast.info('Redirecting to check-in...');
             setTimeout(() => navigate(`/check-in/${pendingCheckIn}`, { replace: true }), 500);
           } else {
-            console.log('[Google OAuth] Redirecting to dashboard...');
             setTimeout(() => navigate('/dashboard', { replace: true }), 500);
           }
         }
