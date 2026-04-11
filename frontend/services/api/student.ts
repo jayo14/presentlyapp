@@ -53,6 +53,7 @@ export interface StudentDashboardData {
     type: 'attendance' | 'enrollment' | 'profile_update';
     course_code?: string;
     course_name?: string;
+    lecturer_name?: string;
     timestamp: string;
     status?: 'PRESENT' | 'LATE' | 'ABSENT';
     description: string;
@@ -135,6 +136,8 @@ export const studentApi = {
             id: rec.id,
             type: 'attendance',
             course_code: rec.course_code,
+            course_name: rec.course_name,
+            lecturer_name: rec.lecturer_name,
             timestamp: rec.checked_in_at,
             status: rec.status,
             description: `Checked in – ${rec.status}`,

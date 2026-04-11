@@ -286,6 +286,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                           <h5 className="font-bold text-sm tracking-tight truncate mt-0.5 group-hover:text-primary transition-colors">
                             {activity.course_code} <span className="opacity-30 mx-0.5">/</span> {activity.course_name}
                           </h5>
+                          {activity.lecturer_name && (
+                            <p className="text-[10px] font-medium text-slate-400 mt-0.5 truncate uppercase tracking-wider">
+                              {activity.lecturer_name}
+                            </p>
+                          )}
                         </div>
                       </motion.div>
                     ))

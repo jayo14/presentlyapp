@@ -573,6 +573,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
     student_avatar = serializers.URLField(source='student.avatar_url', read_only=True)
     student_department = serializers.CharField(source='student.department', read_only=True)
     course_code = serializers.CharField(source='session.course.code', read_only=True)
+    course_name = serializers.CharField(source='session.course.title', read_only=True)
+    lecturer_name = serializers.CharField(source='session.course.lecturer.full_name', read_only=True, allow_null=True)
     
     class Meta:
         model = Attendance
