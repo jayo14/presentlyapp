@@ -50,6 +50,18 @@ export const NotificationsPage: React.FC = () => {
     }
   };
 
+  const toggleReadStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      await notificationsApi.toggleReadStatus(id, currentStatus);
+      setNotifications(notifications.map(n => 
+        n.id === id ? { ...n, is_read: !currentStatus } : n
+      ));
+      toast.success(currentStatus ? 'Marked as unread' : 'Marked as read');
+    } catch (err) {
+      toast.error('Failed to update notification status');
+    }
+  };
+
   const clearAll = async () => {
     if (!confirm('Are you sure you want to clear all notifications?')) return;
     try {
@@ -194,7 +206,8 @@ export const NotificationsPage: React.FC = () => {
           filteredNotifications.map((notification) => (
             <div
               key={notification.id}
-              className="bg-surface rounded-xl p-4 flex items-start gap-3"
+              className="bg-surface rounded-xl p-4 flex items-start gap-3 cursor-pointer"
+              onClick={() => toggleReadStatus(notification.id, notification.is_read)}
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
                 {getIcon(notification.type)}
@@ -382,7 +395,7 @@ export const NotificationsPage: React.FC = () => {
               className={`bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer ${!notification.is_read ? 'border-l-4 border-l-primary' : ''
                 } ${bulkMode ? 'hover:bg-inputccent hover:text-muted-foregroundccent-foreground' : 'hover:shadow-md'
                 }`}
-              onClick={() => bulkMode && handleSelectNotification(notification.id)}
+              onClick={() => bulkMode ? handleSelectNotification(notification.id) : toggleReadStatus(notification.id, notification.is_read)}
             >
               {bulkMode && (
                 <div className="flex items-center">

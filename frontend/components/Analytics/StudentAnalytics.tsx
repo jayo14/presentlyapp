@@ -124,8 +124,8 @@ export const StudentAnalytics: React.FC = () => {
                 <LineChartIcon size={16} className="text-slate-400" />
               </div>
 
-              <div className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-6 rounded-[3rem] h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-4 sm:p-6 rounded-[2rem] sm:rounded-[3rem] h-[300px] sm:h-[350px] w-full min-h-[300px]">
+                <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                   <AreaChart data={data.weekly_attendance}>
                     <defs>
                       <linearGradient id="colorAttend" x1="0" y1="0" x2="0" y2="1">
@@ -183,8 +183,8 @@ export const StudentAnalytics: React.FC = () => {
                 <PieChartIcon size={16} className="text-slate-400" />
               </div>
 
-              <div className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-6 rounded-[3rem] h-[350px] flex flex-col items-center justify-center relative">
-                <ResponsiveContainer width="100%" height="80%">
+              <div className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-4 sm:p-6 rounded-[2rem] sm:rounded-[3rem] h-[300px] sm:h-[350px] flex flex-col items-center justify-center relative w-full min-h-[300px]">
+                <ResponsiveContainer width="100%" height="80%" minHeight={240}>
                   <PieChart>
                     <Pie
                       data={statusData}
@@ -307,7 +307,7 @@ export const StudentAnalytics: React.FC = () => {
           </section>
 
           {/* AI INSIGHTS CARD */}
-          <section className="bg-gradient-to-br from-primary to-[#755b00cc] p-1 rounded-[3.5rem] shadow-xl shadow-primary/20">
+          {/* <section className="bg-gradient-to-br from-primary to-[#755b00cc] p-1 rounded-[3.5rem] shadow-xl shadow-primary/20">
             <div className="bg-white/10 dark:bg-black/20 backdrop-blur-2xl p-8 rounded-[3.4rem] border border-white/20 flex flex-col md:flex-row items-center gap-8">
               <div className="w-20 h-20 rounded-3xl bg-white/20 flex items-center justify-center text-white shrink-0 animate-pulse">
                 <Target size={40} />
@@ -330,7 +330,7 @@ export const StudentAnalytics: React.FC = () => {
                 </div>
               </div>
             </div>
-          </section>
+          </section> */}
         </main>
       </div>
     </>

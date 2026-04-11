@@ -87,6 +87,17 @@ export const notificationsApi = {
     }
   },
 
+  // Toggle read status
+  toggleReadStatus: async (id: number, currentStatus: boolean): Promise<Notification> => {
+    try {
+      const response = await apiClient.patch(`/notifications/${id}/`, { is_read: !currentStatus });
+      return response.data;
+    } catch (error) {
+      // Mock response
+      return { id, is_read: !currentStatus } as unknown as Notification;
+    }
+  },
+
   // Mark all notifications as read
   // Clear all notifications\n  clearAll: async (): Promise<void> => {\n    try {\n      await apiClient.post("/notifications/mark-all-read/");\n    } catch (error) {\n      console.warn("Clear all endpoint not available");\n    }\n  },
   markAllAsRead: async (): Promise<void> => {
