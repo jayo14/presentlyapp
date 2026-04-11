@@ -104,10 +104,10 @@ export const tokenManager = {
     // Check localStorage first for persistent preference, then sessionStorage
     const localPref = localStorage.getItem(REMEMBER_ME_KEY);
     const sessionPref = sessionStorage.getItem(REMEMBER_ME_KEY);
-    
+
     if (localPref === 'true') return true;
     if (sessionPref === 'false') return false;
-    
+
     // Default to true if no preference is stored
     return true;
   },
@@ -215,11 +215,11 @@ apiClient.interceptors.response.use(
 
     // Show user-friendly error messages for other errors
     const status = error.response?.status;
-    
+
     // Improved error message extraction
     let errorMessage = '';
     const errorData = error.response?.data;
-    
+
     if (errorData) {
       if (typeof errorData === 'string') {
         errorMessage = errorData;
@@ -244,7 +244,7 @@ apiClient.interceptors.response.use(
         errorMessage = errorData.message;
       }
     }
-    
+
     if (!errorMessage) {
       errorMessage = error.message;
     }
