@@ -154,6 +154,7 @@ export const SessionsPage: React.FC = () => {
                   <div className="flex justify-between items-start mb-3">
                     <CourseIcon 
                       title={session.course_name || ''} 
+                      code={session.course_code || ''}
                       className="w-10 h-10 group-hover:shadow-md transition-all" 
                     />
                     <div className="flex items-center gap-2">

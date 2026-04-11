@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, CheckCircle2, AlertCircle, Clock, BookOpen, Loader2, ArrowRight, UserPlus } from 'lucide-react';
+import { MapPin, CheckCircle2, AlertCircle, Clock, Loader2, ArrowRight, UserPlus } from 'lucide-react';
 import { Button } from '../Button';
 import { useCurrentUser } from '../../hooks/useAuth';
 import { sessionApi, courseApi, type CheckInData } from '../../services/api/attendance';
+import CourseIcon from '../Course/CourseIcon';
 import { toast } from 'sonner';
 import { geolocationService, getAttendancePayload } from '../../services/geolocation';
 import { SEO } from '../SEO';
@@ -373,9 +374,11 @@ export const PublicCheckInPage: React.FC = () => {
           {/* Course Header */}
           <div className="p-8 border-b border-outline bg-surface/30">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                <BookOpen size={28} />
-              </div>
+              <CourseIcon
+                title={session?.course_name || ''}
+                code={session?.course_code || ''}
+                className="w-14 h-14"
+              />
               <div>
                 <div className="text-xs font-bold text-primary uppercase tracking-widest mb-1">{session?.course_code}</div>
                 <h1 className="font-headline text-xl font-bold text-text">{session?.course_name}</h1>
