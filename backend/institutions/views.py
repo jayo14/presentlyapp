@@ -2135,7 +2135,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def stats(self, request):
         """Get summary statistics for users, respecting filters"""
-        queryset = self.get_queryset()
+        queryset = User.objects.all() # Use clean queryset for count
         
         # We need to bypass pagination for stats
         total_users = queryset.count()
@@ -2156,7 +2156,16 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = User.objects.all().order_by('-date_joined')
+        
+        queryset = User.objects.all().select_related(
+            'institution', 'college', 'department', 'staff_profile', 'staff_profile__role'
+        ).prefetch_related(
+            'staff_profile__role__role_permissions',
+            'staff_profile__role__role_permissions__permission',
+            'rbac_user_permissions',
+            'rbac_user_permissions__permission'
+        ).order_by('-date_joined')
+        
         role = self.request.query_params.get('role', None)
         institution_id = self.request.query_params.get('institution', None)
         college_id = self.request.query_params.get('college', None)
