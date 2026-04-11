@@ -1,5 +1,6 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Geolocation } from '@capacitor/geolocation';
+import { Capacitor } from '@capacitor/core';
 import {
   haversineDistance,
   pointInPolygon as turfPointInPolygon,
@@ -39,7 +40,7 @@ const WARMUP_DELAY = 3000; // 3 seconds warm-up
 const SAMPLE_INTERVAL = 1000; // 1 second between samples
 const MAX_SAMPLES = 5;
 const MIN_SAMPLES = 3;
-const MAX_ACCURACY_GATE = 60; // Hard rejection if > 60m
+const MAX_ACCURACY_GATE = 150; // Hard rejection if > 150m (relaxed for indoor/city)
 const IP_VALIDATION_THRESHOLD = 50000; // 50km
 const IS_DEV = import.meta.env.DEV;
 
@@ -47,13 +48,31 @@ const IS_DEV = import.meta.env.DEV;
  * STEP 1 — Permission Validation
  */
 export const checkLocationPermission = async (): Promise<boolean> => {
+  // Web browser handles its own permission prompt via navigator.geolocation
+  if (Capacitor.getPlatform() === 'web') return true;
+
   try {
-    const status = await Geolocation.checkPermissions();
-    if (IS_DEV) console.log('[Auth] Permission status:', status.location);
-    return status.location === 'granted';
+    let status = await Geolocation.checkPermissions();
+    const locStatus = status?.location;
+    
+    if (IS_DEV) console.log('[Auth] Permission check status:', locStatus);
+    
+    // If explicitly denied, we can't do much
+    if (locStatus === 'denied') return false;
+    
+    // If granted, we're good
+    if (locStatus === 'granted') return true;
+
+    // If prompt, try to request (Native platforms)
+    if (locStatus === 'prompt' || locStatus === 'prompt-with-rationale' || !locStatus) {
+      status = await Geolocation.requestPermissions();
+      return status?.location === 'granted' || status?.location === 'prompt'; 
+    }
+    
+    return true; 
   } catch (err) {
-    console.error('[Auth] Permission check failed:', err);
-    return false;
+    console.error('[Auth] Permission check/request failed:', err);
+    return true; 
   }
 };
 
@@ -70,7 +89,7 @@ export const getStabilizedPosition = async (): Promise<{
   if (IS_DEV) console.log('[GPS] Starting warm-up phase...');
   try {
     // Initial call to wake up GPS hardware
-    await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
+    await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 });
     await new Promise((resolve) => setTimeout(resolve, WARMUP_DELAY));
     if (IS_DEV) console.log('[GPS] Warm-up complete. Ignore first reading.');
   } catch (err) {
@@ -102,8 +121,8 @@ export const getStabilizedPosition = async (): Promise<{
             timestamp: position.timestamp,
           };
 
-          // Filter: Discard if accuracy > 100m
-          if (current.accuracy > 100) {
+          // Filter: Discard if accuracy > 200m
+          if (current.accuracy > 200) {
             if (IS_DEV) console.log(`[GPS] Discarding poor sample: ${current.accuracy.toFixed(1)}m`);
             return;
           }
@@ -122,7 +141,7 @@ export const getStabilizedPosition = async (): Promise<{
       cleanup();
 
       if (validSamples.length < MIN_SAMPLES) {
-        reject(new Error('Location accuracy is too low. Please move outdoors or near a window. (Insufficient Samples)'));
+        reject(new Error("We couldn't confirm your location. Please ensure you're at the venue and try again."));
         return;
       }
 
@@ -144,7 +163,7 @@ export const getStabilizedPosition = async (): Promise<{
 
       // STEP 5 — Hard Accuracy Gate
       if (avgAcc > MAX_ACCURACY_GATE) {
-        reject(new Error('Location accuracy is too low. Please move outdoors or near a window.'));
+        reject(new Error("Your location signal is not precise enough to verify your presence at the venue. Please move closer to the center of the hall."));
         return;
       }
 
@@ -172,15 +191,15 @@ export const getStabilizedPosition = async (): Promise<{
       });
     };
 
-    // Safety timeout after 15 seconds
+    // Safety timeout after 25 seconds
     setTimeout(() => {
       if (validSamples.length >= MIN_SAMPLES) {
         processResults();
       } else {
         cleanup();
-        reject(new Error('GPS signal too weak or timed out. Please ensure you are outdoors.'));
+        reject(new Error("Check-in failed. We couldn't verify that you're in the lecture hall."));
       }
-    }, 15000);
+    }, 25000);
 
     startWatching();
   });
