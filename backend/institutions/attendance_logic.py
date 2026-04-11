@@ -103,7 +103,7 @@ def _validate_sample_stability(samples):
     return True, None, drift_avg
 
 
-def perform_attendance_check_in(request, session):
+def perform_attendance_check_in(request, session, method='In-App'):
     """
     Standardized attendance check-in logic with weighted confidence score system.
     """
@@ -212,6 +212,22 @@ def perform_attendance_check_in(request, session):
     if not session.is_active:
         return Response({'success': False, 'status': 'error', 'error': 'Session is not active'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # ========== SESSION WINDOW VALIDATION ==========
+    if now < session.start_time:
+        return Response({
+            'success': False,
+            'status': 'error',
+            'error': f'Attendance window hasn\'t opened yet. Starts at {session.start_time.strftime("%I:%M %p")}'
+        }, status=status.HTTP_400_BAD_REQUEST)
+        
+    if session.expiry_time and now > session.expiry_time:
+        return Response({
+            'success': False,
+            'status': 'error',
+            'error': 'Attendance window has closed for this session.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    # ===============================================
+
     now = timezone.now()
     location_data = session.get_location_coords()
     ip_address = request.META.get('REMOTE_ADDR')
@@ -258,8 +274,26 @@ def perform_attendance_check_in(request, session):
             if is_inside: is_inside_any = True
             min_dist = min(min_dist, dist)
 
-        if is_inside_any: score += 30
-        else: flags.append(f"Outside area ({min_dist:.1f}m away)")
+        if is_inside_any: 
+            score += 30
+        else:
+            # STRICT GPS VALIDATION: If venue coords are valid and student is outside, 
+            # we reject if they are significantly outside (e.g. > 10m buffer beyond radius)
+            # or just hard reject based on the verification logic.
+            # In 'strict_mode' or for magic links, we are less forgiving.
+            is_strict = getattr(session, 'strict_mode', False) or method == 'Magic Link'
+            
+            if is_strict:
+                rejected_reason = f"Location verification failed: You are {min_dist:.1f}m away from the venue."
+                return Response({
+                    'success': False,
+                    'status': 'error',
+                    'error': rejected_reason,
+                    'reason': 'outside_geofence',
+                    'distance': min_dist
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            flags.append(f"Outside area ({min_dist:.1f}m away)")
 
     # 3. Device/Integrity Signal (10 points)
     if visitor_id:
@@ -413,7 +447,7 @@ def perform_attendance_check_in(request, session):
             status=status_value,
             distance_from_venue=min_dist,
             trust_score=score,
-            verification_metadata={'flags': flags, 'is_mocked': is_mocked}
+            verification_metadata={'flags': flags, 'is_mocked': is_mocked, 'method': method}
         )
 
         # Send email confirmation
@@ -424,7 +458,7 @@ def perform_attendance_check_in(request, session):
                 course_code=session.course.code,
                 course_name=session.course.title,
                 arrival_time=attendance.checked_in_at.strftime('%I:%M %p, %b %d %Y'),
-                check_in_method='QR Check-in',
+                check_in_method=method,
                 location_label=session.venue.name if session.venue else 'Campus Venue',
                 streak_label='Attendance consistency',
                 streak_message='Keep it up. Your attendance record is improving.',

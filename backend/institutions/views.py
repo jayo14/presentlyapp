@@ -1991,7 +1991,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     def check_in(self, request, pk=None):
         """Student check-in with multi-sample verification"""
         session = self.get_object()
-        return perform_attendance_check_in(request, session)
+        return perform_attendance_check_in(request, session, method='QR Check-in')
 
 
 class AttendanceViewSet(viewsets.ModelViewSet):
@@ -2411,7 +2411,7 @@ def public_check_in_view(request, session_code):
                 'error': 'Too many check-in attempts. Please wait a moment and try again.'
             }, status=status.HTTP_429_TOO_MANY_REQUESTS)
 
-        return perform_attendance_check_in(request, session)
+        return perform_attendance_check_in(request, session, method='Magic Link')
 
 class TimetableViewSet(viewsets.ModelViewSet):
     """ViewSet for managing Timetable entries"""
