@@ -115,7 +115,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
               placeholder="Find a course..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white dark:bg-surfaceContainer/20 border border-outline/10 h-16 pl-14 pr-6 rounded-[1.5rem] font-bold text-sm focus:outline-none focus:border-primary/50 shadow-sm transition-all"
+              className="w-full bg-surfaceLow/50 dark:bg-surfaceContainer/20 border border-outline/10 h-16 pl-14 pr-6 rounded-[1.5rem] font-bold text-sm text-text placeholder:text-textMuted/50 focus:outline-none focus:border-primary/50 shadow-sm transition-all"
             />
           </div>
         </section>
@@ -132,7 +132,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     key={course.id}
-                    className="bg-white dark:bg-surfaceContainer/10 rounded-[2.5rem] p-7 border border-outline/10 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
+                    className="bg-surface dark:bg-surfaceContainer/10 rounded-[2.5rem] p-7 border border-outline/10 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
                   >
                     <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10"></div>
 
@@ -187,15 +187,15 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 );
               })
             ) : (
-              <div className="py-24 flex flex-col items-center justify-center bg-surfaceHigh/20 border-2 border-dashed border-outline/20 rounded-[3rem] text-center px-12">
-                <div className="w-20 h-20 bg-surfaceHigh/40 rounded-full flex items-center justify-center mb-6 text-textMuted/40">
+              <div className="py-24 flex flex-col items-center justify-center bg-surfaceLow/40 dark:bg-surfaceContainer/10 border-2 border-dashed border-outline/20 rounded-[3rem] text-center px-12">
+                <div className="w-20 h-20 bg-surfaceHigh dark:bg-surfaceContainer rounded-full flex items-center justify-center mb-6 text-textMuted/40">
                   <BookMarked size={40} />
                 </div>
                 <h4 className="text-2xl font-headline font-black text-text">No Courses Registered</h4>
                 <p className="text-textMuted/80 text-sm font-medium mt-2 max-w-[240px]">Expand your academic portfolio by enrolling in new department courses.</p>
                 <button
                   onClick={() => setIsRegistrationOpen(true)}
-                  className="mt-8 px-10 py-4 bg-primary text-[#111111] font-headline font-black text-sm rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
+                  className="mt-8 px-10 py-4 bg-primary text-white dark:text-black font-headline font-black text-sm rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
                 >
                   Register Courses
                 </button>
@@ -207,7 +207,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         {/* FLOATING ACTION BUTTON */}
         <button
           onClick={() => setIsRegistrationOpen(true)}
-          className="fixed bottom-28 right-6 w-16 h-16 bg-primary text-[#ffffff] rounded-[1.5rem] shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center active:scale-90 transition-all z-[60]"
+          className="fixed bottom-28 right-6 w-16 h-16 bg-primary text-white dark:text-black rounded-[1.5rem] shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center active:scale-90 transition-all z-[60]"
         >
           <Plus size={32} strokeWidth={3} />
         </button>
