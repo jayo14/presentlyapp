@@ -142,7 +142,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             <button
               onClick={fetchTimetable}
               disabled={timetableLoading}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-50 whitespace-nowrap shrink-0"
             >
               <RefreshCw size={14} className={timetableLoading ? 'animate-spin' : ''} />
               Refresh
@@ -229,7 +229,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <button
             onClick={() => navigate('/dashboard/sessions/new')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm whitespace-nowrap shrink-0"
           >
             <Plus size={16} />
             New Session
