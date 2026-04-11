@@ -35,9 +35,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   const getConfirmButtonClasses = () => {
     switch (variant) {
-      case 'danger': return 'bg-red-500 text-background hover:bg-red-600 shadow-red-500/20';
-      case 'warning': return 'bg-amber-500 text-background hover:bg-amber-600 shadow-amber-500/20';
-      default: return 'bg-primary text-[#111111] hover:bg-primary/90 shadow-primary/20';
+      case 'danger': return 'bg-red-500 text-white dark:text-black hover:bg-red-600 shadow-red-500/20';
+      case 'warning': return 'bg-amber-500 text-white dark:text-black hover:bg-amber-600 shadow-amber-500/20';
+      default: return 'bg-primary text-white dark:text-black hover:bg-primary/90 shadow-primary/20';
     }
   };
 
@@ -60,7 +60,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full h-[100dvh] md:h-auto md:max-w-md bg-white dark:bg-surface rounded-none md:rounded-[2.5rem] shadow-2xl border border-outline/10 overflow-y-auto md:overflow-hidden"
+          className="relative w-full h-[100dvh] md:h-auto md:max-w-md bg-surface rounded-none md:rounded-[2.5rem] shadow-2xl border border-outline/10 overflow-y-auto md:overflow-hidden"
         >
           <div className="p-8">
             <div className="flex flex-col items-center text-center space-y-4">

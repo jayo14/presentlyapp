@@ -98,7 +98,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="bg-white dark:bg-surface w-full md:max-w-lg h-[100dvh] md:h-auto md:max-h-[85vh] rounded-none md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
+        className="bg-surface w-full md:max-w-lg h-[100dvh] md:h-auto md:max-h-[85vh] rounded-none md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-outline/10"
       >
         {/* Mobile Drag Handle */}
         <div className="hidden md:block w-12 h-1.5 bg-outline/20 rounded-full mx-auto mt-4" />
@@ -130,7 +130,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                   placeholder="Search e.g. CS101"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-surfaceLow/50 border border-outline/10 h-14 pl-12 pr-4 rounded-2xl text-sm font-bold focus:outline-none focus:border-primary/50 focus:bg-white transition-all"
+                  className="w-full bg-surfaceLow/50 dark:bg-surfaceContainer/50 border border-outline/10 h-14 pl-12 pr-4 rounded-2xl text-sm font-bold text-text focus:outline-none focus:border-primary/50 focus:bg-surface transition-all"
                 />
               </div>
               <div className="relative">
@@ -165,7 +165,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                   key={course.id}
                   className={`p-5 rounded-[2rem] border transition-all flex items-center justify-between gap-4 group ${isEnrolled
                     ? 'bg-primary/5 border-primary/20'
-                    : 'bg-white border-outline/10 hover:border-primary/30 shadow-sm'
+                    : 'bg-surfaceLow border-outline/10 hover:border-primary/30 shadow-sm'
                     }`}
                 >
                   <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -214,7 +214,7 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-outline/5 bg-white/80 backdrop-blur-md flex-shrink-0">
+        <div className="p-4 border-t border-outline/5 bg-surface/80 backdrop-blur-md flex-shrink-0">
           <button
             onClick={onClose}
             className="w-full bg-primary text-background h-12 rounded-[1.5rem] font-headline font-black text-lg shadow-[0_16px_32px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
