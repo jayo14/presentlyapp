@@ -6,6 +6,7 @@ import { SessionDetailDialog } from '../Attendance/SessionDetailDialog';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { SEO } from '../SEO';
+import CourseIcon from '../Course/CourseIcon';
 
 export const SessionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -151,9 +152,10 @@ export const SessionsPage: React.FC = () => {
                   className="bg-surface text-text border border-outline rounded-xl p-4 hover:border-outline hover:shadow-sm transition-all cursor-pointer group"
                 >
                   <div className="flex justify-between items-start mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-surfaceHigh flex items-center justify-center text-xs font-bold text-textMuted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                      {session.course_code?.substring(0, 2) || 'CS'}
-                    </div>
+                    <CourseIcon 
+                      title={session.course_name || ''} 
+                      className="w-10 h-10 group-hover:shadow-md transition-all" 
+                    />
                     <div className="flex items-center gap-2">
                       <span className={`text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider ${statusStyles[status]}`}>
                         {status}
