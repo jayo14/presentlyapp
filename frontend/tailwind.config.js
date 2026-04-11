@@ -31,6 +31,8 @@ export default {
         primaryContainer: "var(--primary-container)",
   
         outline: "var(--outline-variant)",
+        foreground: "var(--foreground)",
+        error: "var(--error)",
       },
       keyframes: {
         'float': {
