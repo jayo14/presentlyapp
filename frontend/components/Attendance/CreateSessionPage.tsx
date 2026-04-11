@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, MapPin, BookOpen, Clock, Calendar, CheckCircle2, ChevronDown, Search, Building2, GraduationCap, Edit2, X, AlertCircle, Check, Target } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -18,12 +19,10 @@ export const CreateSessionPage: React.FC = () => {
     const navigate = useNavigate();
     const { data: user } = useCurrentUser();
 
-    // Data State
-    const [institutions, setInstitutions] = useState<Institution[]>([]);
+    // Data State (Institutions and Venues are handled by React Query)
     const [colleges, setColleges] = useState<College[]>([]);
     const [departments, setDepartments] = useState<Department[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
-    const [venues, setVenues] = useState<Venue[]>([]);
 
     // Selection State
     const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
@@ -50,10 +49,37 @@ export const CreateSessionPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [createdSession, setCreatedSession] = useState<Session | null>(null);
 
+    // Data Preloading via React Query
+    const { data: institutions = [], isLoading: loadingInstitutions } = useQuery({
+        queryKey: ['institutions'],
+        queryFn: async () => {
+            const data = await institutionsApi.getAllInstitutions();
+            return Array.isArray(data) ? data : [];
+        },
+        staleTime: 10 * 60 * 1000
+    });
+
+    const { data: venues = [], isLoading: loadingVenues } = useQuery({
+        queryKey: ['venues'],
+        queryFn: async () => {
+            const data = await venueApi.getAll();
+            return Array.isArray(data) ? data : [];
+        },
+        staleTime: 10 * 60 * 1000
+    });
+
     // Initial Load & Defaults
     useEffect(() => {
-        loadInitialData();
-    }, [user]);
+        // Smart Pre-fill from fetched profile
+        if (user?.institution && !selectedInstitution) {
+            setSelectedInstitution(user.institution);
+            if (user.college) setSelectedCollege(user.college);
+            if (user.department) {
+                setSelectedDepartments([user.department]);
+                setIsHierarchyExpanded(false);
+            }
+        }
+    }, [user, selectedInstitution]);
 
     // Hierarchy Effects
     useEffect(() => {
@@ -85,34 +111,7 @@ export const CreateSessionPage: React.FC = () => {
         }
     }, [selectedDepartments]);
 
-    const loadInitialData = async () => {
-        try {
-            const [instData, venuesData] = await Promise.all([
-                institutionsApi.getAllInstitutions(),
-                venueApi.getAll()
-            ]);
 
-            setInstitutions(Array.isArray(instData) ? instData : []);
-            setVenues(Array.isArray(venuesData) ? venuesData : []);
-
-            // Smart Pre-fill
-            if (user?.institution) {
-                setSelectedInstitution(user.institution);
-                if (user.college) setSelectedCollege(user.college);
-
-                if (user.department) {
-                    setSelectedDepartments([user.department]);
-                    // Only auto-collapse if we have a department. 
-                    // But since user might want to add more, maybe don't collapse?
-                    // Let's collapse for cleaner default, user can expand to add more.
-                    setIsHierarchyExpanded(false);
-                }
-            }
-        } catch (err) {
-            console.error('Failed to load initial data', err);
-            toast.error('Failed to load initial data');
-        }
-    };
 
     const loadColleges = async (instId: number) => {
         try {

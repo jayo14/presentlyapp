@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Users, Calendar, Clock, Trash2, X, BookOpen, FileText, RefreshCw, MapPin, Timer, Loader2, BarChart3 } from 'lucide-react';
 import { Session } from '../../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
@@ -28,40 +29,51 @@ interface LecturerDashboardProps {
 
 export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, userProfile, view = 'dashboard' }) => {
   const navigate = useNavigate();
-  const [sessions, setSessions] = useState<any[]>([]);
-  const [courses, setCourses] = useState<CourseType[]>([]);
-  const [venues, setVenues] = useState<VenueType[]>([]);
+  const queryClient = useQueryClient();
 
+  // Preserved State Hooks
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
-
   const { modalProps: deleteModalProps } = useModalAccessibility(isDeleteModalOpen, () => setIsDeleteModalOpen(false));
-
-  const [dashboardAnalytics, setDashboardAnalytics] = useState<LecturerDashboardAnalytics | null>(null);
   const [courseAnalytics, setCourseAnalytics] = useState<CourseAttendanceAnalytics | null>(null);
-
-  const [coursesLoading, setCoursesLoading] = useState(false);
-  const [venuesLoading, setVenuesLoading] = useState(false);
-  const [sessionsLoading, setSessionsLoading] = useState(false);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [departments, setDepartments] = useState<Department[]>([]);
   const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
   const [timetableLoading, setTimetableLoading] = useState(false);
 
-  useEffect(() => {
-    fetchCourses();
-    fetchVenues();
-    fetchSessions();
-    fetchDashboardAnalytics();
-    const interval = setInterval(() => {
-      fetchSessions();
-      fetchDashboardAnalytics();
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data: courses = [], isLoading: coursesLoading } = useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => {
+      const data = await courseApi.getAll();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes cache sharing globally
+  });
+
+  const { data: venues = [], isLoading: venuesLoading } = useQuery({
+    queryKey: ['venues'],
+    queryFn: async () => {
+      const data = await venueApi.getAll();
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 10 * 60 * 1000
+  });
+
+  const { data: sessions = [], isLoading: sessionsLoading, refetch: fetchSessions } = useQuery({
+    queryKey: ['sessions'],
+    queryFn: async () => {
+      const data = await sessionApi.getAll();
+      return Array.isArray(data) ? data : [];
+    },
+    refetchInterval: 60000 // Polling instead of standard interval
+  });
+
+  const { data: dashboardAnalytics, isLoading: analyticsLoading, refetch: fetchDashboardAnalytics } = useQuery({
+    queryKey: ['lecturerDashboardAnalytics'],
+    queryFn: () => analyticsApi.getLecturerDashboard(),
+    refetchInterval: 60000
+  });
 
   useEffect(() => {
     if (view === 'timetable') fetchTimetable();
@@ -81,56 +93,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     }
   };
 
-  const fetchDashboardAnalytics = async () => {
-    try {
-      setAnalyticsLoading(true);
-      const data = await analyticsApi.getLecturerDashboard();
-      setDashboardAnalytics(data);
-    } catch (err) {
-      console.error('Error fetching dashboard analytics:', err);
-    } finally {
-      setAnalyticsLoading(false);
-    }
-  };
 
-  const fetchCourses = async () => {
-    try {
-      setCoursesLoading(true);
-      setError(null);
-      const data = await courseApi.getAll();
-      setCourses(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Error fetching courses:', err);
-      setError('Failed to load courses');
-      setCourses([]);
-    } finally {
-      setCoursesLoading(false);
-    }
-  };
-
-  const fetchVenues = async () => {
-    try {
-      setVenuesLoading(true);
-      const data = await venueApi.getAll();
-      setVenues(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Error fetching venues:', err);
-    } finally {
-      setVenuesLoading(false);
-    }
-  };
-
-  const fetchSessions = async () => {
-    try {
-      setSessionsLoading(true);
-      const data = await sessionApi.getAll();
-      setSessions(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Error fetching sessions:', err);
-    } finally {
-      setSessionsLoading(false);
-    }
-  };
 
   const confirmDelete = async () => {
     if (!sessionToDelete) return;
