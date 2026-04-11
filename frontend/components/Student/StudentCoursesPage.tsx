@@ -206,7 +206,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         {/* FLOATING ACTION BUTTON */}
         <button
           onClick={() => setIsRegistrationOpen(true)}
-          className="fixed bottom-28 right-6 w-16 h-16 bg-primary text-[#111111] rounded-[1.5rem] shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center active:scale-90 transition-all z-[60]"
+          className="fixed bottom-28 right-6 w-16 h-16 bg-primary text-[#ffffff] rounded-[1.5rem] shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center active:scale-90 transition-all z-[60]"
         >
           <Plus size={32} strokeWidth={3} />
         </button>
