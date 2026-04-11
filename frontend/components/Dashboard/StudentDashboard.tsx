@@ -14,6 +14,7 @@ import { studentApi, StudentDashboardData } from '../../services/api/student';
 import { sessionApi } from '../../services/api/attendance';
 import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScanner';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
+import CourseIcon from '../Course/CourseIcon';
 import { useCurrentUser } from '../../hooks/useAuth';
 
 interface StudentDashboardProps {
@@ -264,9 +265,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                         key={activity.id}
                         className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-4 rounded-[1.75rem] flex items-center gap-4 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group"
                       >
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${activity.status === 'present' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
-                          {activity.status === 'present' ? <Shapes size={20} /> : <Atom size={20} />}
-                        </div>
+                        <CourseIcon 
+                          title={activity.course_name || activity.course_code || ''} 
+                          className={`w-12 h-12 flex-shrink-0 ${
+                            activity.status === 'PRESENT' ? 'ring-4 ring-emerald-500/20' : 'ring-4 ring-rose-500/20'
+                          }`} 
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
                             <div className="flex items-center gap-1.5 line-clamp-1">

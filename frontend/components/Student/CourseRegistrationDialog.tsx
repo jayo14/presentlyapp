@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Search, BookOpen, Check, Loader2, AlertCircle, ChevronRight, GraduationCap, LayoutGrid, Info, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { studentApi, AvailableCourse } from '../../services/api/student';
+import CourseIcon from '../Course/CourseIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -169,11 +170,12 @@ export const CourseRegistrationDialog: React.FC<CourseRegistrationDialogProps> =
                    }`}
                  >
                     <div className="flex items-center gap-4 flex-1 min-w-0">
-                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                         isEnrolled ? 'bg-primary text-background shadow-lg' : 'bg-surfaceLow text-textMuted group-hover:bg-primary/10 group-hover:text-primary'
-                       }`}>
-                          {isEnrolled ? <Check size={20} strokeWidth={3} /> : <BookOpen size={20} />}
-                       </div>
+                       <CourseIcon 
+                          title={course.title} 
+                          className={`w-12 h-12 flex-shrink-0 transition-all ${
+                            isEnrolled ? 'shadow-lg ring-4 ring-primary/20' : ''
+                          }`} 
+                       />
                        <div className="min-w-0">
                           <p className="text-[10px] font-black tracking-widest text-primary/70 uppercase mb-0.5">{course.code}</p>
                           <h4 className="font-headline font-black text-text text-base tracking-tight truncate">{course.title}</h4>

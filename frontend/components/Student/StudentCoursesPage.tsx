@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BookOpen, User, GraduationCap, Plus, Search, Trash2, ArrowLeft, MoreVertical, Activity, Loader2, BookMarked } from 'lucide-react';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
 import CourseRegistrationDialog from './CourseRegistrationDialog';
+import CourseIcon from '../Course/CourseIcon';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -129,9 +130,10 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                     <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10"></div>
 
                     <div className="flex justify-between items-start mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-surfaceHigh/50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500">
-                        <BookOpen size={24} strokeWidth={2.5} />
-                      </div>
+                      <CourseIcon 
+                        title={course.course_name} 
+                        className="w-14 h-14 group-hover:scale-110 transition-transform duration-500" 
+                      />
                       <button
                         onClick={() => setCourseToDrop(course)}
                         disabled={droppingId === course.id}
