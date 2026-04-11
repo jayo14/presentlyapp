@@ -286,7 +286,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         >
           <X size={24} strokeWidth={2.5} />
         </button>
-        
+
         <div className="flex flex-col items-center">
           <div className="px-4 py-1.5 bg-black/40 dark:bg-surface/40 backdrop-blur-2xl rounded-full border border-white/10 dark:border-border flex items-center gap-2">
             <div className={`w-1.5 h-1.5 rounded-full ${mode === 'scan' ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
@@ -388,14 +388,14 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
             >
               {/* Immersive Camera View */}
               <div className="absolute inset-0 overflow-hidden bg-surface">
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  className="w-full h-full object-cover opacity-90 transition-opacity duration-1000" 
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover opacity-90 transition-opacity duration-1000"
                 />
-                
+
                 {/* Advanced Scanning UI */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   {/* The Scanning Frame (Larger for better range) */}
@@ -435,8 +435,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
               {/* Mobile-Friendly Bottom Sheet Style Indicator */}
               <div className="absolute bottom-10 left-0 right-0 px-8 pointer-events-none">
-                <div className="max-w-xs mx-auto p-4 bg-white/5 backdrop-blur-3xl rounded-[2rem] border border-white/10 text-center">
-                  <p className="text-[11px] font-bold text-background/80 leading-relaxed">
+                <div className="max-w-xs mx-auto p-2 bg-white/5 backdrop-blur-3xl rounded-[2rem] border border-white/10 text-center">
+                  <p className="text-[10px] font-bold text-background leading-relaxed">
                     Verification is instantaneous once the code is identified within the frame.
                   </p>
                 </div>

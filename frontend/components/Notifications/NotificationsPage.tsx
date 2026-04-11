@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, Settings, Bell, Clock, Info, AlertTriangle, CheckCircle2, Calendar, 
+import {
+  ArrowLeft, Settings, Bell, Clock, Info, AlertTriangle, CheckCircle2, Calendar,
   Loader2, Play, FileText, RefreshCw, ChevronRight, Circle, Trash2, Check, X
 } from 'lucide-react';
 import { Button } from '../Button';
@@ -67,9 +67,9 @@ export const NotificationsPage: React.FC = () => {
       toast.error('No notifications selected');
       return;
     }
-    
+
     if (!confirm(`Delete ${selectedNotifications.length} notification(s)?`)) return;
-    
+
     try {
       // Delete selected notifications
       await Promise.all(
@@ -85,7 +85,7 @@ export const NotificationsPage: React.FC = () => {
   };
 
   const handleSelectNotification = (id: number) => {
-    setSelectedNotifications(prev => 
+    setSelectedNotifications(prev =>
       prev.includes(id) ? prev.filter(nId => nId !== id) : [...prev, id]
     );
   };
@@ -149,16 +149,16 @@ export const NotificationsPage: React.FC = () => {
   const mobileLayout = (
     <div className="min-h-screen bg-background pb-24">
       {/* Mobile Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-outline">
+      {/* <div className="sticky top-0 z-10 bg-background border-b border-outline">
         <div className="flex items-center justify-between p-4">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
           >
             <ArrowLeft size={24} className="text-text" />
           </button>
           <h1 className="font-headline text-xl font-bold text-text">Notifications</h1>
-          <button 
+          <button
             onClick={() => navigate('/dashboard/settings#notifications')}
             className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
             aria-label="Notification Settings"
@@ -167,40 +167,39 @@ export const NotificationsPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Mobile Tabs */}
+
         <div className="flex gap-6 px-4 pb-3 overflow-x-auto">
           {[
             { id: 'all', label: 'All' },
             { id: 'unread', label: 'Unread' },
             { id: 'important', label: 'Important' },
           ].map(tab => (
-            <button 
+            <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`pb-2 text-sm font-medium whitespace-nowrap transition-all ${
-                activeTab === tab.id 
-                  ? 'text-primary border-b-2 border-primary' 
+              className={`pb-2 text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id
+                  ? 'text-primary border-b-2 border-primary'
                   : 'text-muted-foreground'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Mobile Notifications List */}
       <div className="p-4 space-y-3">
         {filteredNotifications.length > 0 ? (
           filteredNotifications.map((notification) => (
-            <div 
-              key={notification.id} 
+            <div
+              key={notification.id}
               className="bg-surface rounded-xl p-4 flex items-start gap-3"
             >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
                 {getIcon(notification.type)}
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h3 className="font-headline font-semibold text-text text-base leading-tight">
@@ -242,7 +241,7 @@ export const NotificationsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-outline px-4">
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-surface rounded-lg transition-colors"
           >
@@ -258,7 +257,7 @@ export const NotificationsPage: React.FC = () => {
             )}
           </div>
         </div>
-        <button 
+        <button
           onClick={() => navigate('/dashboard/settings#notifications')}
           className="p-2 hover:bg-surface rounded-lg transition-colors"
           aria-label="Notification Settings"
@@ -276,22 +275,20 @@ export const NotificationsPage: React.FC = () => {
             { id: 'important', label: 'Important', count: notifications.filter(n => n.type === 'ALERT').length },
             { id: 'system', label: 'System', count: notifications.filter(n => n.type === 'SYSTEM').length },
           ].map(tab => (
-            <button 
+            <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
-                activeTab === tab.id 
-                  ? 'bg-primary text-background shadow-md' 
-                  : 'bg-surface dark:bg-zinc-900 text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${activeTab === tab.id
+                ? 'bg-primary text-background shadow-md'
+                : 'bg-surface dark:bg-zinc-900 text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
+                }`}
             >
               {tab.label}
               {tab.count > 0 && (
-                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                  activeTab === tab.id 
-                    ? 'bg-white/20' 
-                    : 'bg-zinc-200 dark:bg-surfaceHigh'
-                }`}>
+                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id
+                  ? 'bg-white/20'
+                  : 'bg-zinc-200 dark:bg-surfaceHigh'
+                  }`}>
                   {tab.count}
                 </span>
               )}
@@ -380,13 +377,11 @@ export const NotificationsPage: React.FC = () => {
       <div className="space-y-3 px-4">
         {filteredNotifications.length > 0 ? (
           filteredNotifications.map((notification) => (
-            <div 
-              key={notification.id} 
-              className={`bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer ${
-                !notification.is_read ? 'border-l-4 border-l-primary' : ''
-              } ${
-                bulkMode ? 'hover:bg-inputccent hover:text-muted-foregroundccent-foreground' : 'hover:shadow-md'
-              }`}
+            <div
+              key={notification.id}
+              className={`bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer ${!notification.is_read ? 'border-l-4 border-l-primary' : ''
+                } ${bulkMode ? 'hover:bg-inputccent hover:text-muted-foregroundccent-foreground' : 'hover:shadow-md'
+                }`}
               onClick={() => bulkMode && handleSelectNotification(notification.id)}
             >
               {bulkMode && (
@@ -403,7 +398,7 @@ export const NotificationsPage: React.FC = () => {
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
                 {getIcon(notification.type)}
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h3 className="font-headline font-semibold text-primary text-base leading-tight">
