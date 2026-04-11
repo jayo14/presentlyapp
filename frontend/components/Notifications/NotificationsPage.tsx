@@ -239,7 +239,7 @@ export const NotificationsPage: React.FC = () => {
   const desktopLayout = (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500 pb-24 md:pb-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-outline px-4">
+      {/* <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-outline px-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
@@ -264,7 +264,7 @@ export const NotificationsPage: React.FC = () => {
         >
           <Settings size={24} className="text-textMuted hover:text-primary transition-colors" />
         </button>
-      </div>
+      </div> */}
 
       {/* Filter Tabs */}
       <div className="flex items-center justify-between mb-6 px-4">

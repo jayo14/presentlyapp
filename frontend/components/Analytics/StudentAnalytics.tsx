@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-  TrendingUp, Activity, BookOpen, Clock, 
+  TrendingUp, Activity, BookOpen, Clock,
   Calendar, CheckCircle2, AlertCircle, XCircle,
   BarChart3, PieChart as PieChartIcon, LineChart as LineChartIcon,
   ChevronRight, Calendar as CalendarIcon, Filter,
   Download, Share2, Sparkles, Target, Trophy,
   ArrowUpRight, ArrowDownRight, Info
 } from 'lucide-react';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, Cell,
   PieChart, Pie, Legend
 } from 'recharts';
@@ -70,11 +70,10 @@ export const StudentAnalytics: React.FC = () => {
                   <button
                     key={period}
                     onClick={() => setSelectedPeriod(period)}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                      selectedPeriod === period 
-                        ? 'bg-white dark:bg-white/10 text-primary shadow-sm' 
-                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedPeriod === period
+                      ? 'bg-white dark:bg-white/10 text-primary shadow-sm'
+                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                      }`}
                   >
                     {period}
                   </button>
@@ -124,33 +123,33 @@ export const StudentAnalytics: React.FC = () => {
                 </div>
                 <LineChartIcon size={16} className="text-slate-400" />
               </div>
-              
+
               <div className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 p-6 rounded-[3rem] h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={data.weekly_attendance}>
                     <defs>
                       <linearGradient id="colorAttend" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#755b00" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#755b00" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#755b00" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#755b00" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#88888820" />
-                    <XAxis 
-                      dataKey="week" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{fill: '#888', fontSize: 10, fontWeight: 700}}
+                    <XAxis
+                      dataKey="week"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#888', fontSize: 10, fontWeight: 700 }}
                       dy={10}
                     />
-                    <YAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{fill: '#888', fontSize: 10, fontWeight: 700}}
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#888', fontSize: 10, fontWeight: 700 }}
                       domain={[0, 100]}
                     />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
                         backdropFilter: 'blur(10px)',
                         borderRadius: '20px',
                         border: '1px solid rgba(0,0,0,0.05)',
@@ -160,13 +159,13 @@ export const StudentAnalytics: React.FC = () => {
                       }}
                       cursor={{ stroke: '#755b00', strokeWidth: 1, strokeDasharray: '5 5' }}
                     />
-                    <Area 
-                      type="monotone" 
-                      dataKey="attendance" 
-                      stroke="#755b00" 
+                    <Area
+                      type="monotone"
+                      dataKey="attendance"
+                      stroke="#755b00"
                       strokeWidth={4}
-                      fillOpacity={1} 
-                      fill="url(#colorAttend)" 
+                      fillOpacity={1}
+                      fill="url(#colorAttend)"
                       animationDuration={1500}
                     />
                   </AreaChart>
@@ -200,9 +199,9 @@ export const StudentAnalytics: React.FC = () => {
                         <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
                       ))}
                     </Pie>
-                    <Tooltip 
-                       contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
                         backdropFilter: 'blur(10px)',
                         borderRadius: '20px',
                         border: '1px solid rgba(0,0,0,0.05)',
@@ -212,7 +211,7 @@ export const StudentAnalytics: React.FC = () => {
                     />
                   </PieChart>
                 </ResponsiveContainer>
-                
+
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-[-10%]">
                   <span className="block text-2xl font-black tracking-tighter">{totalSessions}</span>
                   <span className="block text-[8px] font-black text-slate-400 uppercase tracking-widest">Total</span>
@@ -235,78 +234,76 @@ export const StudentAnalytics: React.FC = () => {
 
           {/* COURSE PERFORMANCE TABLE */}
           <section className="space-y-4">
-             <div className="flex items-center justify-between px-2">
-                <div className="flex flex-col">
-                  <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Academic Breakdown</h2>
-                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 italic">Performance by module</p>
-                </div>
-                <Filter size={16} className="text-slate-400" />
+            <div className="flex items-center justify-between px-2">
+              <div className="flex flex-col">
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Academic Breakdown</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 italic">Performance by module</p>
               </div>
+              <Filter size={16} className="text-slate-400" />
+            </div>
 
-              <div className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 rounded-[3rem] overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-white/2">
-                        <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Course</th>
-                        <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Attendance</th>
-                        <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Sessions</th>
-                        <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
-                        <th className="px-6 py-5 text-right"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.course_performance?.map((course, idx) => (
-                        <tr key={course.course_code} className="group hover:bg-slate-50 dark:hover:bg-white/2 transition-colors border-b border-slate-200/50 dark:border-white/5 last:border-0">
-                          <td className="px-6 py-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-[10px]">
-                                {course.course_code.slice(0, 3)}
-                              </div>
-                              <div>
-                                <h4 className="font-bold text-sm tracking-tight">{course.course_code}</h4>
-                                <p className="text-[10px] font-medium text-slate-400 truncate max-w-[150px] uppercase">{course.course_name}</p>
-                              </div>
+            <div className="bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/5 rounded-[3rem] overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-white/2">
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Course</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Attendance</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Sessions</th>
+                      <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
+                      <th className="px-6 py-5 text-right"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.course_performance?.map((course, idx) => (
+                      <tr key={course.course_code} className="group hover:bg-slate-50 dark:hover:bg-white/2 transition-colors border-b border-slate-200/50 dark:border-white/5 last:border-0">
+                        <td className="px-6 py-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-[10px]">
+                              {course.course_code.slice(0, 3)}
                             </div>
-                          </td>
-                          <td className="px-6 py-6 font-black tracking-tighter">
-                            <div className="flex items-center gap-3">
-                              <div className="flex-1 max-w-[60px] h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
-                                <div 
-                                  className={`h-full rounded-full transition-all duration-1000 ${
-                                    course.attendance_percentage >= 75 ? 'bg-emerald-500' : 
-                                    course.attendance_percentage >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+                            <div>
+                              <h4 className="font-bold text-sm tracking-tight">{course.course_code}</h4>
+                              <p className="text-[10px] font-medium text-slate-400 truncate max-w-[150px] uppercase">{course.course_name}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-6 font-black tracking-tighter">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 max-w-[60px] h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-1000 ${course.attendance_percentage >= 75 ? 'bg-emerald-500' :
+                                  course.attendance_percentage >= 50 ? 'bg-amber-500' : 'bg-rose-500'
                                   }`}
-                                  style={{ width: `${course.attendance_percentage}%` }}
-                                />
-                              </div>
-                              <span className="text-xs">{course.attendance_percentage}%</span>
+                                style={{ width: `${course.attendance_percentage}%` }}
+                              />
                             </div>
-                          </td>
-                          <td className="px-6 py-6">
-                            <span className="text-xs font-bold text-slate-500 underline decoration-slate-200 dark:decoration-white/10 underline-offset-4">
-                              {course.sessions_attended} / {course.total_sessions}
-                            </span>
-                          </td>
-                          <td className="px-6 py-6">
-                            <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-current ${
-                              course.status === 'Good' ? 'text-emerald-500 bg-emerald-500/5' : 
-                              course.status === 'Average' ? 'text-amber-500 bg-amber-500/5' : 'text-rose-500 bg-rose-500/5'
+                            <span className="text-xs">{course.attendance_percentage}%</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-6">
+                          <span className="text-xs font-bold text-slate-500 underline decoration-slate-200 dark:decoration-white/10 underline-offset-4">
+                            {course.sessions_attended} / {course.total_sessions}
+                          </span>
+                        </td>
+                        <td className="px-6 py-6">
+                          <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-current ${course.status === 'Good' ? 'text-emerald-500 bg-emerald-500/5' :
+                            course.status === 'Average' ? 'text-amber-500 bg-amber-500/5' : 'text-rose-500 bg-rose-500/5'
                             }`}>
-                              {course.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-6 text-right">
-                            <button className="p-2 text-slate-300 hover:text-primary transition-colors">
-                              <ChevronRight size={18} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                            {course.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-6 text-right">
+                          <button className="p-2 text-slate-300 hover:text-primary transition-colors">
+                            <ChevronRight size={18} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+            </div>
           </section>
 
           {/* AI INSIGHTS CARD */}
