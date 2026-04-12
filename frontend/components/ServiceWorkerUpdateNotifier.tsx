@@ -38,7 +38,7 @@ export const ServiceWorkerUpdateNotifier: React.FC = () => {
           if (navigator.serviceWorker.controller) {
             // New service worker is waiting to activate
             console.log('[SW Update] New content is available');
-            setWaitingWorker(installingWorker);
+            setWaitingWorker(registration.waiting || installingWorker);
             setShowUpdatePrompt(true);
           } else {
             // First time install

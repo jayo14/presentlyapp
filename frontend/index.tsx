@@ -90,7 +90,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     const apiBaseUrl = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
     const serviceWorkerUrl = `/service-worker.js?apiBaseUrl=${encodeURIComponent(apiBaseUrl)}`;
 
-    navigator.serviceWorker.register(serviceWorkerUrl)
+    navigator.serviceWorker.register(serviceWorkerUrl, { updateViaCache: 'none', scope: '/' })
       .then(registration => {
         console.log('SW registered: ', registration);
       })

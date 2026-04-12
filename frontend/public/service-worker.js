@@ -1,12 +1,9 @@
-const CACHE_NAME = 'presently-v7';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/offline.html',
-  '/manifest.json',
-  '/logo.png',
-  '/favicon.ico',
-];
+const STATIC_CACHE = 'presently-static-v8';
+const RUNTIME_CACHE = 'presently-runtime-v8';
+const API_CACHE = 'presently-api-v8';
+const CACHE_PREFIX = 'presently-';
+
+const ASSETS_TO_CACHE = ['/', '/index.html', '/offline.html', '/manifest.json', '/logo.png', '/favicon.ico'];
 
 const resolveApiBaseUrl = () => {
   const configuredUrl = new URL(self.location.href).searchParams.get('apiBaseUrl') || 'http://localhost:8000/api';
@@ -16,108 +13,129 @@ const resolveApiBaseUrl = () => {
 
 const API_BASE_URL = resolveApiBaseUrl();
 
-// Listen for skip waiting message from client
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });
 
-// Install Event
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+    caches.open(STATIC_CACHE).then(async (cache) => {
+      try {
+        await cache.addAll(ASSETS_TO_CACHE);
+      } catch (error) {
+        console.warn('[SW] Failed to precache one or more assets:', error);
+      }
     })
   );
 });
 
-// Activate Event
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames
+          .filter((name) => name.startsWith(CACHE_PREFIX) && ![STATIC_CACHE, RUNTIME_CACHE, API_CACHE].includes(name))
+          .map((name) => caches.delete(name))
       );
-    })
+
+      if ('navigationPreload' in self.registration) {
+        await self.registration.navigationPreload.enable();
+      }
+
+      await self.clients.claim();
+    })()
   );
-  self.clients.claim();
 });
+
+const isStaticAsset = (request) =>
+  ['style', 'script', 'font', 'image', 'worker'].includes(request.destination);
+
+const isNavigationRequest = (request) =>
+  request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html');
+
+const isApiRequest = (url) => url.href.startsWith(API_BASE_URL) || url.pathname.startsWith('/api/');
+
+const canCacheResponse = (response) => response && (response.status === 200 || response.type === 'opaque');
+
+const networkFirst = async (request, cacheName, fallbackUrl) => {
+  const cache = await caches.open(cacheName);
+  try {
+    const networkResponse = await fetch(request);
+    if (canCacheResponse(networkResponse)) {
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    if (fallbackUrl) {
+      const fallback = await caches.match(fallbackUrl);
+      if (fallback) return fallback;
+    }
+    return new Response('Offline', { status: 503 });
+  }
+};
+
+const staleWhileRevalidate = async (request, cacheName) => {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  const networkPromise = fetch(request)
+    .then((networkResponse) => {
+      if (canCacheResponse(networkResponse)) {
+        cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    })
+    .catch(() => null);
+
+  return cached || (await networkPromise) || new Response('Resource unavailable', { status: 404 });
+};
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET') return;
-
-  // 1. Dev Server / HMR / Source Bypassing
-  // Bypass Vite internal files, hot updates, and source files in development
-  if (
-    url.pathname.includes('@vite') || 
-    url.pathname.includes('hot-update') || 
-    url.pathname.startsWith('/src/') ||
-    url.hostname === 'localhost' && url.port === '3000' && !url.pathname.match(/\.(png|jpg|jpeg|svg|gif|webp|woff|woff2|json|ico)$/)
-  ) {
+  if (request.method !== 'GET') {
     return;
   }
 
-  // Avoid stale hashed bundles after deploys (fixes runtime chunk mismatches)
-  if (url.pathname.startsWith('/assets/')) {
+  if (url.pathname.includes('@vite') || url.pathname.includes('hot-update') || url.pathname.startsWith('/src/')) {
     return;
   }
 
-  // 2. API & Auth Bypassing - Always Network
-  if (url.pathname.startsWith('/api/') || url.origin !== self.location.origin) {
+  if (isApiRequest(url)) {
+    event.respondWith(networkFirst(request, API_CACHE));
     return;
   }
 
-  // 3. Navigation (SPA) - Network First, falling back to cached index.html
-  if (request.mode === 'navigate') {
+  if (isNavigationRequest(request)) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', responseToCache));
-            return response;
-          }
-          // Non-200 response (e.g. 404 from server before SPA rewrite): fall back to index.html
-          return caches.match('/index.html').then((cached) => cached ? cached : caches.match('/offline.html'));
-        })
-        .catch(() => {
-          return caches.match('/index.html').then((cached) => cached ? cached : caches.match('/offline.html'));
-        })
+      (async () => {
+        const preloadResponse = await event.preloadResponse;
+        if (preloadResponse) return preloadResponse;
+
+        return networkFirst(request, RUNTIME_CACHE, '/offline.html');
+      })()
     );
     return;
   }
 
-  // 4. Static Assets - Cache First, then Network
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(staleWhileRevalidate(request, RUNTIME_CACHE));
+    return;
+  }
 
-      return fetch(request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
-        }
-        return networkResponse;
-      });
-    }).catch(() => {
-      // If both fail, return a basic error response instead of undefined
-      return new Response('Resource not available', { status: 404 });
-    })
-  );
+  if (isStaticAsset(request) || url.origin !== self.location.origin) {
+    event.respondWith(staleWhileRevalidate(request, RUNTIME_CACHE));
+    return;
+  }
+
+  event.respondWith(networkFirst(request, RUNTIME_CACHE));
 });
 
-
-// Push Notification Event
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
   const title = data.title || 'Presently Notification';
@@ -125,24 +143,30 @@ self.addEventListener('push', (event) => {
     body: data.body || 'You have a new update.',
     icon: '/logo.png',
     badge: '/logo.png',
-    data: { url: data.url || '/' }
+    data: { url: data.url || '/' },
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Notification Click Event
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+
+  const targetUrl = event.notification?.data?.url || '/';
   event.waitUntil(
-    clients.openWindow(event.notification.data.url)
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      const existing = windowClients.find((client) => client.url.includes(self.location.origin));
+      if (existing) {
+        existing.focus();
+        existing.navigate(targetUrl);
+        return;
+      }
+      return clients.openWindow(targetUrl);
+    })
   );
 });
 
-// Background Sync Event
 self.addEventListener('sync', (event) => {
-  console.log('[Service Worker] Sync event:', event.tag);
-  
   if (event.tag === 'sync-attendance') {
     event.waitUntil(syncAttendanceData());
   } else if (event.tag === 'sync-offline-actions') {
@@ -150,85 +174,51 @@ self.addEventListener('sync', (event) => {
   }
 });
 
-/**
- * Sync attendance data when back online
- * 
- * Note: This implementation needs authentication headers to work properly.
- * In a production environment, you should:
- * 1. Store auth tokens in IndexedDB
- * 2. Retrieve them in the service worker
- * 3. Add them to the fetch headers
- * 4. Implement token refresh logic if needed
- */
 async function syncAttendanceData() {
   try {
-    // Get pending attendance records from IndexedDB or cache
     const pendingRecords = await getPendingAttendanceRecords();
-    
-    if (pendingRecords.length === 0) {
-      console.log('[Service Worker] No pending attendance records to sync');
-      return;
-    }
+    if (pendingRecords.length === 0) return;
 
-    // Sync each record with the backend
     for (const record of pendingRecords) {
       try {
-        // TODO: Add authentication headers
-        // const authToken = await getAuthToken(); // Retrieve from IndexedDB
         const response = await fetch(`${API_BASE_URL}/attendance/check-in/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // 'Authorization': `Bearer ${authToken}`,
           },
           body: JSON.stringify(record),
         });
 
         if (response.ok) {
-          console.log('[Service Worker] Synced attendance record:', record.id);
           await removePendingRecord(record.id);
         }
       } catch (error) {
-        console.error('[Service Worker] Failed to sync record:', error);
+        console.error('[SW] Failed to sync attendance record:', error);
       }
     }
 
-    // Show notification to user
     self.registration.showNotification('Sync Complete', {
       body: `Synced ${pendingRecords.length} attendance record(s)`,
       icon: '/logo.png',
       badge: '/logo.png',
     });
   } catch (error) {
-    console.error('[Service Worker] Sync failed:', error);
+    console.error('[SW] Attendance sync failed:', error);
   }
 }
 
-/**
- * Sync other offline actions when back online
- */
 async function syncOfflineActions() {
   try {
-    console.log('[Service Worker] Syncing offline actions...');
-    // Implement your offline action sync logic here
+    console.log('[SW] Syncing offline actions...');
   } catch (error) {
-    console.error('[Service Worker] Failed to sync offline actions:', error);
+    console.error('[SW] Failed to sync offline actions:', error);
   }
 }
 
-/**
- * Get pending attendance records (placeholder - implement with IndexedDB)
- */
 async function getPendingAttendanceRecords() {
-  // TODO: Implement IndexedDB retrieval
-  // For now, return empty array
   return [];
 }
 
-/**
- * Remove synced record (placeholder - implement with IndexedDB)
- */
 async function removePendingRecord(recordId) {
-  // TODO: Implement IndexedDB removal
-  console.log('[Service Worker] Record removed:', recordId);
+  console.log('[SW] Record removed:', recordId);
 }
