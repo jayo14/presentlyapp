@@ -74,33 +74,33 @@ export default function OnboardingScreen() {
           {item.type === 'stats' && (
             <View style={styles.statsContainer}>
               <ImageBackground source={{ uri: item.image }} style={styles.statsBg} resizeMode="cover">
-                  <View style={[styles.statsBgOverlay, { backgroundColor: 'rgba(35, 30, 15, 0.8)' }]} />
+                <View style={[styles.statsBgOverlay, { backgroundColor: 'rgba(35, 30, 15, 0.8)' }]} />
               </ImageBackground>
               <View style={styles.statsOverlay}>
-                  <View style={styles.statsRow}>
-                      <View style={[styles.statsCard, { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: colors.primary + '4D' }]}>
-                          <View style={styles.statsIconRow}>
-                              <MapPin size={18} color={colors.primary} />
-                              <Text style={[styles.statsCardLabel, { color: colors.text }]}>Attendance</Text>
-                          </View>
-                          <Text style={[styles.statsCardValue, { color: colors.text }]}>98%</Text>
-                          <View style={styles.tagWrapper}>
-                              <Zap size={12} color="#0bda1d" />
-                              <Text style={styles.liveTagText}>LIVE</Text>
-                          </View>
-                      </View>
-                      <View style={[styles.statsCard, { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: colors.primary + '4D' }]}>
-                          <View style={styles.statsIconRow}>
-                              <Zap size={18} color={colors.primary} />
-                              <Text style={[styles.statsCardLabel, { color: colors.text }]}>Speed</Text>
-                          </View>
-                          <Text style={[styles.statsCardValue, { color: colors.text }]}>0.2s</Text>
-                          <View style={styles.tagWrapper}>
-                              <ShieldCheck size={12} color="#0bda1d" />
-                              <Text style={styles.liveTagText}>SYNCED</Text>
-                          </View>
-                      </View>
+                <View style={styles.statsRow}>
+                  <View style={[styles.statsCard, { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: colors.primary + '4D' }]}>
+                    <View style={styles.statsIconRow}>
+                      <MapPin size={18} color={colors.primary} />
+                      <Text style={[styles.statsCardLabel, { color: colors.text }]}>Attendance</Text>
+                    </View>
+                    <Text style={[styles.statsCardValue, { color: colors.text }]}>98%</Text>
+                    <View style={styles.tagWrapper}>
+                      <Zap size={12} color="#0bda1d" />
+                      <Text style={styles.liveTagText}>LIVE</Text>
+                    </View>
                   </View>
+                  <View style={[styles.statsCard, { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: colors.primary + '4D' }]}>
+                    <View style={styles.statsIconRow}>
+                      <Zap size={18} color={colors.primary} />
+                      <Text style={[styles.statsCardLabel, { color: colors.text }]}>Speed</Text>
+                    </View>
+                    <Text style={[styles.statsCardValue, { color: colors.text }]}>0.2s</Text>
+                    <View style={styles.tagWrapper}>
+                      <ShieldCheck size={12} color="#0bda1d" />
+                      <Text style={styles.liveTagText}>SYNCED</Text>
+                    </View>
+                  </View>
+                </View>
               </View>
             </View>
           )}
@@ -109,7 +109,7 @@ export default function OnboardingScreen() {
             <View style={styles.shieldSection}>
               <View style={styles.glowShield} />
               <View style={styles.shieldCircle}>
-                  <ShieldCheck size={140} color={colors.primary} strokeWidth={1} />
+                <ShieldCheck size={140} color={colors.primary} strokeWidth={1} />
               </View>
               <View style={[styles.dotDecoration, { top: 40, right: 40, width: 12, height: 12, backgroundColor: colors.primary, opacity: 0.6 }]} />
               <View style={[styles.dotDecoration, { bottom: 48, left: 48, width: 8, height: 8, backgroundColor: colors.primary, opacity: 0.4 }]} />
@@ -273,10 +273,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   tagWrapper: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-      marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
   },
   liveTagText: {
     fontSize: 12,
