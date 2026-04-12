@@ -70,8 +70,8 @@ export const DocumentationPage: React.FC = () => {
             <span>Can't find what you're looking for? Check our <span className="text-primary cursor-pointer hover:underline">FAQ</span></span>
           </div>
           <div className="flex gap-3">
-             <Button variant="outline" className="border-outline text-textMuted">Read Knowledge Base</Button>
-             <Button className="bg-primary text-black">Contact Support</Button>
+            <Button variant="outline" className="border-outline text-textMuted">Read Knowledge Base</Button>
+            <Button className="bg-primary text-black">Contact Support</Button>
           </div>
         </div>
 
@@ -97,9 +97,9 @@ export const DocumentationPage: React.FC = () => {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80"
                 />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                   <div className="w-12 h-12 bg-primary text-black rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-300">
-                      <Play fill="currentColor" size={20} />
-                   </div>
+                  <div className="w-12 h-12 bg-primary text-black rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-300">
+                    <Play fill="currentColor" size={20} />
+                  </div>
                 </div>
                 <div className="absolute bottom-3 right-3 bg-black/80 px-2 py-1 rounded text-xs font-mono">
                   {video.duration}
@@ -178,49 +178,32 @@ export const DocumentationPage: React.FC = () => {
 
           {/* Troubleshooting Section */}
           <section>
-             <div className="flex items-center gap-4 mb-12">
-                <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center text-red-500">
-                  <Shield size={24} />
-                </div>
-                <h2 className="font-headline text-3xl font-bold">Troubleshooting Common Issues</h2>
-             </div>
-             <div className="grid md:grid-cols-3 gap-8">
-                <div className="p-8 bg-surface/50 border border-white/5 rounded-3xl">
-                   <Zap size={32} className="text-primary mb-6" />
-                   <h4 className="font-headline font-bold mb-4">"Location Not Found"</h4>
-                   <p className="text-sm text-textMuted">Ensure high-accuracy mode is enabled in your phone settings and you are not using a VPN or location-spoofing app.</p>
-                </div>
-                <div className="p-8 bg-surface/50 border border-white/5 rounded-3xl">
-                   <Search size={32} className="text-primary mb-6" />
-                   <h4 className="font-headline font-bold mb-4">Session Not Appearing</h4>
-                   <p className="text-sm text-textMuted">Sessions only appear for students officially enrolled in the course. Contact your department if a course is missing from your profile.</p>
-                </div>
-                <div className="p-8 bg-surface/50 border border-white/5 rounded-3xl">
-                   <MessageCircle size={32} className="text-primary mb-6" />
-                   <h4 className="font-headline font-bold mb-4">Support Escalation</h4>
-                   <p className="text-sm text-textMuted">If issues persist, generate a "Debug Token" in your profile settings and send it to support@presently.koyeb.app.</p>
-                </div>
-             </div>
+            <div className="flex items-center gap-4 mb-12">
+              <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center text-red-500">
+                <Shield size={24} />
+              </div>
+              <h2 className="font-headline text-3xl font-bold">Troubleshooting Common Issues</h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="p-8 bg-surface/50 border border-white/5 rounded-3xl">
+                <Zap size={32} className="text-primary mb-6" />
+                <h4 className="font-headline font-bold mb-4">"Location Not Found"</h4>
+                <p className="text-sm text-textMuted">Ensure high-accuracy mode is enabled in your phone settings and you are not using a VPN or location-spoofing app.</p>
+              </div>
+              <div className="p-8 bg-surface/50 border border-white/5 rounded-3xl">
+                <Search size={32} className="text-primary mb-6" />
+                <h4 className="font-headline font-bold mb-4">Session Not Appearing</h4>
+                <p className="text-sm text-textMuted">Sessions only appear for students officially enrolled in the course. Contact your department if a course is missing from your profile.</p>
+              </div>
+              <div className="p-8 bg-surface/50 border border-white/5 rounded-3xl">
+                <MessageCircle size={32} className="text-primary mb-6" />
+                <h4 className="font-headline font-bold mb-4">Support Escalation</h4>
+                <p className="text-sm text-textMuted">If issues persist, generate a "Debug Token" in your profile settings and send it to support@presently.koyeb.app.</p>
+              </div>
+            </div>
           </section>
         </div>
 
-        {/* Resources section */}
-        <div className="mt-48 grid md:grid-cols-3 gap-8">
-           {[
-             { title: "Technical Whitepaper", icon: FileText, desc: "Deep dive into our cryptographic verification and geofencing engine." },
-             { title: "Implementation Guide", icon: CheckCircle2, desc: "Step-by-step instructions for institutional SSO and SIS integration." },
-             { title: "Privacy & Compliance", icon: ShieldCheck, desc: "Detailed breakdown of our NDPR compliance and data encryption standards." }
-           ].map((item, idx) => (
-             <div key={idx} className="p-8 bg-gradient-to-br from-zinc-900 to-black border border-outline rounded-3xl hover:border-outline transition-colors cursor-pointer group">
-                <item.icon size={40} className="text-primary mb-6 group-hover:scale-110 transition-transform" />
-                <h3 className="font-headline text-xl font-bold mb-3">{item.title}</h3>
-                <p className="text-textMuted mb-6">{item.desc}</p>
-                <span className="text-primary font-medium flex items-center gap-2 group-hover:gap-3 transition-all">
-                  Download PDF <ArrowLeft size={16} className="rotate-180" />
-                </span>
-             </div>
-           ))}
-        </div>
       </main>
 
       <footer className="py-12 border-t border-outline text-center text-textMuted text-sm">
