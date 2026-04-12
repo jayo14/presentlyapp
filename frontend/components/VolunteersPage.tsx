@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  Users, Code, Layout as LayoutIcon,
+  Users, Code,
   Smartphone, PenTool, Share2,
-  Send, CheckCircle2, ArrowLeft
+  Send, Check
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
-import { Logo } from './Logo';
 import { Input } from './Input';
 import { LandingHeader } from './LandingHeader';
 import { SEO } from './SEO';
@@ -19,20 +18,114 @@ const roles = [
   { id: 'social', title: 'Social Media Creator', icon: Share2, desc: 'Building our brand presence across academic communities.' }
 ];
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[\p{L}][\p{L}\s'-]{1,79}$/u;
+const MIN_REASON_LENGTH = 25;
+const MAX_REASON_LENGTH = 600;
+
+type FormData = {
+  name: string;
+  email: string;
+  portfolio: string;
+  reason: string;
+};
+
+type FormErrors = Partial<Record<keyof FormData | 'role', string>>;
+
+const sanitizeName = (value: string) =>
+  value.replace(/[^\p{L}\s'-]/gu, '').replace(/\s{2,}/g, ' ').slice(0, 80);
+
+const sanitizeEmail = (value: string) =>
+  value.replace(/\s+/g, '').replace(/[<>]/g, '').slice(0, 120);
+
+const sanitizePortfolio = (value: string) =>
+  value.replace(/[<>]/g, '').trim().slice(0, 160);
+
+const sanitizeReason = (value: string) =>
+  value.replace(/[<>]/g, '').replace(/\s{3,}/g, '  ').slice(0, MAX_REASON_LENGTH);
+
+const normalizePortfolioUrl = (value: string) =>
+  !value || /^https?:\/\//i.test(value) ? value : `https://${value}`;
+
+const isValidPortfolioUrl = (value: string) => {
+  if (!value) return true;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 export const VolunteersPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     portfolio: '',
     reason: ''
   });
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validate = (data: FormData, role: string): FormErrors => {
+    const nextErrors: FormErrors = {};
+
+    if (!role) nextErrors.role = 'Select a role to continue.';
+    if (!data.name.trim()) nextErrors.name = 'Full name is required.';
+    else if (!NAME_REGEX.test(data.name.trim())) nextErrors.name = 'Use 2-80 letters only.';
+
+    if (!data.email.trim()) nextErrors.email = 'Email address is required.';
+    else if (!EMAIL_REGEX.test(data.email.trim())) nextErrors.email = 'Enter a valid email address.';
+
+    if (data.portfolio && !isValidPortfolioUrl(normalizePortfolioUrl(data.portfolio))) {
+      nextErrors.portfolio = 'Enter a valid portfolio URL.';
+    }
+
+    if (!data.reason.trim()) nextErrors.reason = 'Tell us why you want to join.';
+    else if (data.reason.trim().length < MIN_REASON_LENGTH) {
+      nextErrors.reason = `Please add at least ${MIN_REASON_LENGTH} characters.`;
+    }
+
+    return nextErrors;
+  };
+
+  const updateFormField = (field: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const { [field]: _, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  const handleRoleSelect = (roleId: string) => {
+    setSelectedRole(roleId);
+    setErrors((prev) => {
+      if (!prev.role) return prev;
+      const { role: _, ...rest } = prev;
+      return rest;
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would call an API
+    const normalizedData: FormData = {
+      name: sanitizeName(formData.name).trim(),
+      email: sanitizeEmail(formData.email).toLowerCase(),
+      portfolio: normalizePortfolioUrl(sanitizePortfolio(formData.portfolio)),
+      reason: sanitizeReason(formData.reason).trim()
+    };
+
+    setFormData(normalizedData);
+    const validationErrors = validate(normalizedData, selectedRole);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
     setSubmitted(true);
   };
 
@@ -44,8 +137,8 @@ export const VolunteersPage: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-md w-full text-center space-y-6"
         >
-          <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-8">
-            <CheckCircle2 size={40} />
+          <div className="w-20 h-20 bg-primary/20 text-white rounded-full flex items-center justify-center mx-auto mb-8">
+            <Check size={40} />
           </div>
           <h2 className="font-headline text-3xl font-bold text-text">Application Received!</h2>
           <p className="text-textMuted">
@@ -92,21 +185,32 @@ export const VolunteersPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {roles.map((role) => (
-              <div
+              <button
+                type="button"
                 key={role.id}
-                onClick={() => setSelectedRole(role.id)}
-                className={`p-6 rounded-2xl border transition-all cursor-pointer ${
-                  selectedRole === role.id
-                    ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(184,134,11,0.2)]'
-                    : 'bg-surfaceLow border-outline hover:border-primary/20'
-                }`}
+                onClick={() => handleRoleSelect(role.id)}
+                aria-pressed={selectedRole === role.id}
+                className={`relative text-left p-6 rounded-2xl border transition-all cursor-pointer ${selectedRole === role.id
+                  ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(184,134,11,0.2)] -translate-y-1'
+                  : 'bg-surfaceLow border-outline hover:border-primary/20 hover:-translate-y-1'
+                  }`}
               >
-                <role.icon className={`mb-4 ${selectedRole === role.id ? 'text-primary' : 'text-muted-foreground'}`} size={28} />
+                <div
+                  className={`absolute top-4 right-4 w-6 h-6 rounded-full border flex items-center justify-center transition-all ${selectedRole === role.id
+                    ? 'bg-primary border-primary text-white'
+                    : 'border-outline text-transparent'
+                    }`}
+                  aria-hidden="true"
+                >
+                  <Check size={14} />
+                </div>
+                <role.icon className={`mb-4 ${selectedRole === role.id ? 'text-primary' : 'text-textMuted'}`} size={28} />
                 <h3 className="font-headline font-bold text-text mb-2">{role.title}</h3>
                 <p className="text-sm text-textMuted">{role.desc}</p>
-              </div>
+              </button>
             ))}
           </div>
+          {errors.role && <p className="text-sm text-error">{errors.role}</p>}
         </div>
 
         {/* Right Side: Form */}
@@ -116,15 +220,23 @@ export const VolunteersPage: React.FC = () => {
           className="bg-surface/50 border border-outline p-8 md:p-12 rounded-[32px] sticky top-32"
         >
           <h2 className="font-headline text-2xl font-bold mb-8">Volunteer Application</h2>
+          <p className="text-sm text-textMuted mb-6">
+            Selected role:{' '}
+            <span className="font-semibold text-text">
+              {roles.find((role) => role.id === selectedRole)?.title || 'None'}
+            </span>
+          </p>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-textMuted">Full Name</label>
                 <Input
                   placeholder="John Doe"
                   required
+                  maxLength={80}
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) => updateFormField('name', sanitizeName(e.target.value))}
+                  error={errors.name}
                 />
               </div>
               <div className="space-y-2">
@@ -133,8 +245,10 @@ export const VolunteersPage: React.FC = () => {
                   type="email"
                   placeholder="john@university.edu"
                   required
+                  maxLength={120}
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) => updateFormField('email', sanitizeEmail(e.target.value))}
+                  error={errors.email}
                 />
               </div>
             </div>
@@ -142,24 +256,37 @@ export const VolunteersPage: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-textMuted">Portfolio / LinkedIn / GitHub</label>
               <Input
-                placeholder="https://..."
+                placeholder="https://portfolio.com/your-profile"
+                maxLength={160}
                 value={formData.portfolio}
-                onChange={(e) => setFormData({...formData, portfolio: e.target.value})}
+                onChange={(e) => updateFormField('portfolio', sanitizePortfolio(e.target.value))}
+                error={errors.portfolio}
               />
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-textMuted">Why do you want to join?</label>
               <textarea
-                className="w-full bg-surface border border-outline rounded-xl p-4 text-textMuted focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] resize-none"
+                className={`w-full bg-surface border rounded-xl p-4 text-text focus:outline-none focus:ring-2 min-h-[120px] resize-none ${errors.reason
+                  ? 'border-error focus:ring-error/30'
+                  : 'border-outline focus:ring-primary/50'
+                  }`}
                 placeholder="Tell us a bit about yourself and your motivation..."
                 required
+                maxLength={MAX_REASON_LENGTH}
+                aria-invalid={Boolean(errors.reason)}
                 value={formData.reason}
-                onChange={(e) => setFormData({...formData, reason: e.target.value})}
+                onChange={(e) => updateFormField('reason', sanitizeReason(e.target.value))}
               />
+              <div className="flex items-center justify-between text-xs">
+                <span className={errors.reason ? 'text-error' : 'text-textMuted'}>
+                  {errors.reason || `Minimum ${MIN_REASON_LENGTH} characters.`}
+                </span>
+                <span className="text-textMuted">{formData.reason.trim().length}/{MAX_REASON_LENGTH}</span>
+              </div>
             </div>
 
-            <Button type="submit" className="w-full h-14 text-lg" disabled={!selectedRole}>
+            <Button type="submit" className="w-full h-14 text-lg">
               <Send size={18} className="mr-2" /> Submit Application
             </Button>
 
