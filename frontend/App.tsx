@@ -17,6 +17,7 @@ import { Login } from './components/Auth/Login';
 import { Register } from './components/Auth/Register';
 import { Layout } from './components/Layout';
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { UniversitiesPage } from './components/universities/UniversitiesPage';
 import { UniversityLandingPage } from './components/universities/UniversityLandingPage';
 import { BlogListPage } from './components/blog/BlogListPage';
@@ -487,6 +488,7 @@ const App: React.FC = () => {
         <BrowserRouter>
           <OfflineIndicator />
           <Toaster position="top-right" richColors closeButton />
+          <PWAInstallPrompt />
           <ServiceWorkerUpdateNotifier />
           <AppContent />
         </BrowserRouter>
