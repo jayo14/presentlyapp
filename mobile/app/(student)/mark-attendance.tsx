@@ -151,8 +151,19 @@ export default function MarkAttendanceScreen() {
       // Wait for hook to receive config in next render
       setTimeout(() => startSession(), 100);
     } catch (e: any) {
-      const msg = e.response?.data?.detail || e.response?.data?.reason || 'Invalid session code or session expired';
-      showAlert('Error', msg, 'error');
+      const rawMsg = e.response?.data?.detail || e.response?.data?.reason || e.response?.data?.error || 'Invalid session code or session expired';
+      const status = e.response?.status;
+      let userFriendlyMsg = rawMsg;
+
+      if (status === 429) {
+        userFriendlyMsg = 'Too many check-in attempts. Please wait a moment and try again.';
+      } else if (rawMsg.toLowerCase().includes('distance') || rawMsg.toLowerCase().includes('radius') || rawMsg.toLowerCase().includes('far from venue') || rawMsg.toLowerCase().includes('outside geofence') || rawMsg.toLowerCase().includes('outside area')) {
+        userFriendlyMsg = 'Be in class and try again';
+      } else if (rawMsg.toLowerCase().includes('closed') || rawMsg.toLowerCase().includes('expired') || rawMsg.toLowerCase().includes('ended') || rawMsg.toLowerCase().includes('no longer active')) {
+        userFriendlyMsg = 'Attendance session has closed, ask your lecturers for more information';
+      }
+
+      showAlert('Error', userFriendlyMsg, 'error');
     } finally {
       setFetchingSession(false);
     }
