@@ -111,8 +111,8 @@ export const CreateSessionPage: React.FC = () => {
     useEffect(() => {
         if (selectedCollege) {
             loadDepartmentsByCollege(selectedCollege);
-        } else if (selectedInstitution) {
-            loadDepartmentsByInstitution(selectedInstitution);
+        } else {
+            setDepartments([]);
         }
         setSelectedDepartments([]);
     }, [selectedCollege]);
@@ -159,6 +159,14 @@ export const CreateSessionPage: React.FC = () => {
             const uniqueCourses = Array.from(new Map(allCourses.map(c => [c.id, c])).values());
             setCourses(uniqueCourses);
         } catch (err) { console.error(err); }
+    };
+
+    const selectAllDepartments = () => {
+        setSelectedDepartments(filteredDepartments.map(d => d.id));
+    };
+
+    const deselectAllDepartments = () => {
+        setSelectedDepartments([]);
     };
 
     const toggleDepartment = (deptId: number) => {
@@ -258,6 +266,71 @@ export const CreateSessionPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-6">
+                {/* Location Hierarchy */}
+                <div className="bg-surfaceLow/30 border border-outline rounded-2xl p-4 space-y-4">
+                    <div className="flex items-center gap-2 mb-2">
+                        <MapPin size={18} className="text-primary" />
+                        <h3 className="font-semibold text-text">Location Context</h3>
+                    </div>
+
+                    <div>
+                        <label className="block text-[10px] font-bold text-textMuted uppercase mb-1">Institution</label>
+                        <Input
+                            value={institutions.find(i => i.id === selectedInstitution)?.full_name || 'Loading...'}
+                            readOnly
+                            className="bg-surface border-outline/50 opacity-80"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-[10px] font-bold text-textMuted uppercase mb-1">College</label>
+                        <select
+                            value={selectedCollege || ''}
+                            onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
+                            className="w-full bg-surface border border-outline rounded-xl p-3 text-text text-sm outline-none appearance-none pr-10"
+                            required
+                        >
+                            <option value="">Select College</option>
+                            {colleges.map(col => (
+                                <option key={col.id} value={col.id}>{col.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {selectedCollege && (
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-[10px] font-bold text-textMuted uppercase">Departments</label>
+                                <button
+                                    type="button"
+                                    onClick={selectedDepartments.length === filteredDepartments.length ? deselectAllDepartments : selectAllDepartments}
+                                    className="text-[10px] font-bold text-primary px-2 py-1 bg-primary/10 rounded-lg"
+                                >
+                                    {selectedDepartments.length === filteredDepartments.length ? 'Deselect All' : 'Select All'}
+                                </button>
+                            </div>
+                            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pt-1">
+                                {filteredDepartments.map(dept => {
+                                    const isSelected = selectedDepartments.includes(dept.id);
+                                    return (
+                                        <button
+                                            key={dept.id}
+                                            type="button"
+                                            onClick={() => toggleDepartment(dept.id)}
+                                            className={`px-3 py-2 rounded-xl border text-xs font-medium transition-all ${isSelected
+                                                ? 'bg-primary border-primary text-black'
+                                                : 'bg-surface border-outline text-textMuted'
+                                                }`}
+                                        >
+                                            {dept.code}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* Course Selection */}
                 <div>
                     <label className="block text-text text-sm font-semibold mb-3">Course Selection</label>
@@ -267,8 +340,9 @@ export const CreateSessionPage: React.FC = () => {
                             onChange={(e) => setSelectedCourse(e.target.value)}
                             className="w-full bg-surface border border-outline rounded-xl p-4 text-text text-base outline-none appearance-none pr-10"
                             required
+                            disabled={selectedDepartments.length === 0}
                         >
-                            <option value="">Search course...</option>
+                            <option value="">{selectedDepartments.length === 0 ? 'Select departments first' : 'Select course...'}</option>
                             {courses.map(course => (
                                 <option key={course.id} value={course.id}>{course.code} - {course.title}</option>
                             ))}
@@ -378,27 +452,32 @@ export const CreateSessionPage: React.FC = () => {
                                         <select
                                             value={selectedInstitution || ''}
                                             onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-                                            className="w-full bg-surfaceLow border border-outline rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none"
+                                            className="w-full bg-surfaceLow/50 border border-outline rounded-lg p-2.5 text-sm outline-none cursor-not-allowed opacity-80 appearance-none"
+                                            disabled={true}
                                         >
-                                            <option value="">Select Institution</option>
+                                            <option value="">{loadingInstitutions ? 'Loading...' : 'Select Institution'}</option>
                                             {institutions.map(inst => (
                                                 <option key={inst.id} value={inst.id}>{inst.full_name}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={14} />
+                                        <Building2 className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted/50 pointer-events-none" size={14} />
                                     </div>
+                                    <p className="text-[10px] text-textMuted mt-1 flex items-center gap-1">
+                                        <CheckCircle2 size={10} className="text-primary" /> Auto-fetched from your profile
+                                    </p>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-textMuted uppercase mb-1.5">College (Optional)</label>
+                                    <label className="block text-xs font-medium text-textMuted uppercase mb-1.5">College</label>
                                     <div className="relative">
                                         <select
                                             value={selectedCollege || ''}
                                             onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
                                             className="w-full bg-surfaceLow border border-outline rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none disabled:opacity-50"
                                             disabled={!selectedInstitution}
+                                            required
                                         >
-                                            <option value="">All Colleges</option>
+                                            <option value="">Select College</option>
                                             {colleges.map(col => (
                                                 <option key={col.id} value={col.id}>{col.name}</option>
                                             ))}
@@ -411,9 +490,20 @@ export const CreateSessionPage: React.FC = () => {
                             <div>
                                 <div className="flex justify-between items-center mb-2">
                                     <label className="block text-xs font-medium text-textMuted uppercase">Select Departments</label>
-                                    <span className="text-xs text-primary font-medium">{selectedDepartments.length} selected</span>
+                                    <div className="flex items-center gap-2">
+                                        {departments.length > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={selectedDepartments.length === filteredDepartments.length ? deselectAllDepartments : selectAllDepartments}
+                                                className="text-[10px] font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors bg-primary/5 px-2 py-1 rounded-md border border-primary/20"
+                                            >
+                                                {selectedDepartments.length === filteredDepartments.length ? 'Deselect All' : 'Select All'}
+                                            </button>
+                                        )}
+                                        <span className="text-xs text-textMuted font-medium">{selectedDepartments.length} selected</span>
+                                    </div>
                                 </div>
-                                {selectedInstitution ? (
+                                {selectedCollege ? (
                                     <div className="space-y-3">
                                         <div className="relative">
                                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
@@ -461,13 +551,12 @@ export const CreateSessionPage: React.FC = () => {
                                     </div>
                                 ) : (
                                     <div className="bg-surfaceLow border border-dashed border-outline rounded-lg p-6 text-center text-textMuted text-sm">
-                                        Please select an institution first to view departments.
+                                        Please select a college first to view departments.
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
-                </div>
 
                 {/* 2. Core Session Details */}
                 <div className="bg-surface text-text border border-outline rounded-2xl p-6 shadow-sm space-y-6">
