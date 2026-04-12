@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface SmartCampusIllustrationProps {
+interface PresentlyIllustrationProps {
   className?: string;
   style?: React.CSSProperties;
 }
 
-export const SmartCampusIllustration: React.FC<SmartCampusIllustrationProps> = ({
+export const PresentlyIllustration: React.FC<PresentlyIllustrationProps> = ({
   className = '',
   style = {},
 }) => {
@@ -251,3 +251,5 @@ export const SmartCampusIllustration: React.FC<SmartCampusIllustrationProps> = (
     </svg>
   );
 };
+
+export default PresentlyIllustration;

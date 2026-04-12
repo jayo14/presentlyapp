@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ArrowRight, BadgeCheck } from 'lucide-react';
-import { SmartCampusIllustration } from './illustrations';
+import PresentlyIllustration from './illustrations/PresentlyIllustration';
 
 interface LandingHeroProps {
   onGetStarted: () => void;
@@ -130,12 +130,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
             />
             {/* New SVG Illustration with animation */}
             <div className="hero-card relative z-[2] transition-transform duration-700 hover:rotate-2 hover:scale-[1.02]">
-              <SmartCampusIllustration
-                className="w-full h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
-                style={{
-                  filter: 'drop-shadow(0 20px 50px rgba(0, 0, 0, 0.15))',
-                }}
-              />
+              <PresentlyIllustration className="w-full h-auto" />
               <div className="sr-only">
                 Smart Campus illustration showing a university building with geofencing signals, students with smartphones, and verified checkmark indicating GPS-verified attendance tracking technology.
               </div>
