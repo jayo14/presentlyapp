@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ArrowRight, BadgeCheck } from 'lucide-react';
+import { SmartCampusIllustration } from './illustrations';
 
 interface LandingHeroProps {
   onGetStarted: () => void;
@@ -73,9 +74,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               marginBottom: '1.5rem',
             }}
           >
-            Attendance, <br />
+            GPS-Verified <br />
             <em style={{ color: 'var(--primary)', fontStyle: 'italic' }}>
-              Reinvented.
+              Attendance.
             </em>
           </h1>
 
@@ -88,8 +89,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               lineHeight: 1.65,
             }}
           >
-            A high-end editorial approach to institutional oversight.
-            Manage attendance with the precision of a curator and the speed of light.
+            GPS-verified attendance tracking with geofence precision. Real-time verification, zero proxies, maximum transparency.
           </p>
 
           <div
@@ -101,7 +101,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               className="btn-presently-primary btn-lg"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              Deploy Now <ArrowRight size={20} strokeWidth={2.5} />
+              Get started <ArrowRight size={20} strokeWidth={2.5} />
             </Button>
             <Button
               variant="outline"
@@ -128,18 +128,17 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
                 filter: 'blur(40px)',
               }}
             />
-            {/* Optimized Picture with WebP support */}
+            {/* New SVG Illustration with animation */}
             <div className="hero-card relative z-[2] transition-transform duration-700 hover:rotate-2 hover:scale-[1.02]">
-              <picture>
-                <source srcSet="/3d-logo.webp" type="image/webp" />
-                <img 
-                  src="/3d-logo.png" 
-                  alt="Presently 3D Visualization" 
-                  className="w-full h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
-                  loading="eager"
-                  fetchPriority="high"
-                />
-              </picture>
+              <SmartCampusIllustration
+                className="w-full h-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
+                style={{
+                  filter: 'drop-shadow(0 20px 50px rgba(0, 0, 0, 0.15))',
+                }}
+              />
+              <div className="sr-only">
+                Smart Campus illustration showing a university building with geofencing signals, students with smartphones, and verified checkmark indicating GPS-verified attendance tracking technology.
+              </div>
             </div>
 
             {/* Spillover badge */}
