@@ -268,10 +268,20 @@ export const PublicCheckInPage: React.FC = () => {
       setTimeout(() => navigate('/dashboard'), 2000);
 
     } catch (err: any) {
-      const msg = err.response?.data?.error || err.message || 'Check-in failed';
+      const rawMsg = err.response?.data?.error || err.message || 'Check-in failed';
       const status = err.response?.status;
+      let userFriendlyMsg = rawMsg;
 
-      if (status === 403 || msg.toLowerCase().includes('not enrolled')) {
+      // Specialized messaging per requirements
+      if (status === 429) {
+        userFriendlyMsg = 'Too many check-in attempts. Please wait a moment and try again.';
+      } else if (rawMsg.toLowerCase().includes('distance') || rawMsg.toLowerCase().includes('radius') || rawMsg.toLowerCase().includes('far from venue') || rawMsg.toLowerCase().includes('outside geofence') || rawMsg.toLowerCase().includes('outside area')) {
+        userFriendlyMsg = 'Be in class and try again';
+      } else if (rawMsg.toLowerCase().includes('closed') || rawMsg.toLowerCase().includes('expired') || rawMsg.toLowerCase().includes('ended') || rawMsg.toLowerCase().includes('no longer active')) {
+        userFriendlyMsg = 'Attendance session has closed, ask your lecturer for more information';
+      }
+
+      if (status === 403 || rawMsg.toLowerCase().includes('not enrolled')) {
         setIsEnrolled(false);
         setShowEnrollPrompt(true);
         setError('Enrollment Required: You must be registered for this course to check in.');
@@ -279,8 +289,8 @@ export const PublicCheckInPage: React.FC = () => {
         localStorage.setItem('pending_checkin', sessionCode);
         navigate(`/login?redirect_to=${encodeURIComponent(`/check-in/${sessionCode}`)}&message=Session expired. Please log in.`);
       } else {
-        setError(msg);
-        toast.error('Check-in Failed', { description: msg });
+        setError(userFriendlyMsg);
+        toast.error('Check-in Failed', { description: userFriendlyMsg });
       }
     } finally {
       setCheckingIn(false);

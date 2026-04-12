@@ -79,7 +79,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       return attendanceData;
     } catch (err: any) {
       console.error("Check-in failed:", err);
-      throw new Error(err.response?.data?.error || err.message || "Failed to check in");
+      const rawMsg = err.response?.data?.error || err.message || "Failed to check in";
+      const status = err.response?.status;
+      
+      let userFriendlyMsg = rawMsg;
+      if (status === 429) {
+        userFriendlyMsg = 'Too many check-in attempts. Please wait a moment and try again.';
+      } else if (rawMsg.toLowerCase().includes('distance') || rawMsg.toLowerCase().includes('radius') || rawMsg.toLowerCase().includes('far from venue') || rawMsg.toLowerCase().includes('outside geofence') || rawMsg.toLowerCase().includes('outside area')) {
+        userFriendlyMsg = 'Be in class and try again';
+      } else if (rawMsg.toLowerCase().includes('closed') || rawMsg.toLowerCase().includes('expired') || rawMsg.toLowerCase().includes('ended') || rawMsg.toLowerCase().includes('no longer active')) {
+        userFriendlyMsg = 'Attendance session has closed, ask your lecturers for more information';
+      }
+      
+      throw new Error(userFriendlyMsg);
     }
   };
 
