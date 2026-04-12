@@ -363,11 +363,11 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
 
                 <div className="w-full my-4">
                   <button
-                    disabled={sessionCode.length !== 8}
+                    disabled={sessionCode.length !== 8 || status !== 'idle'}
                     onClick={() => processAttendance(sessionCode)}
                     className="w-full h-20 bg-primary text-on-primary-fixed rounded-[2.5rem] font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all active:scale-95"
                   >
-                    Validate Session Code
+                    {status === 'idle' ? 'Validate Session Code' : 'Processing...'}
                   </button>
 
                   <p className="mt-6 text-center text-xs font-bold text-muted-foreground opacity-60">

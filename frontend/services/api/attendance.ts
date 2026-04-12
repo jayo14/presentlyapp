@@ -159,14 +159,18 @@ export const sessionApi = {
 
   // Check in to a session (student only)
   checkIn: async (sessionId: number, data: CheckInData): Promise<Attendance> => {
-    const response = await apiClient.post(`/sessions/${sessionId}/check_in/`, data);
+    const response = await apiClient.post(`/sessions/${sessionId}/check_in/`, data, { 
+      _skipGlobalErrorHandler: true 
+    } as any);
     return response.data.attendance;
   },
 
   // Check in by session code (student only)
   checkInByCode: async (code: string, data: CheckInData): Promise<Attendance> => {
     try {
-      const response = await apiClient.post(`/check-in/${code}/`, data);
+      const response = await apiClient.post(`/check-in/${code}/`, data, { 
+        _skipGlobalErrorHandler: true 
+      } as any);
       return response.data.attendance || response.data;
     } catch (error: any) {
       // Only retry on 5xx (server errors), never on 4xx (client errors including 403/429)

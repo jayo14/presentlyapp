@@ -557,6 +557,7 @@ export const CreateSessionPage: React.FC = () => {
                             </div>
                         </div>
                     )}
+                </div>
 
                 {/* 2. Core Session Details */}
                 <div className="bg-surface text-text border border-outline rounded-2xl p-6 shadow-sm space-y-6">
