@@ -50,7 +50,11 @@ export const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Synci
                 className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"
               />
               <div className="w-14 h-14">
-                <img src="/logo.png" alt="Presently Logo" className="w-full" />
+                <picture>
+                  <source srcSet="/logo.avif" type="image/avif" />
+                  <source srcSet="/logo.webp" type="image/webp" />
+                  <img src="/logo.png" alt="Presently Logo" width={56} height={56} className="w-full" />
+                </picture>
               </div>
             </div>
           </div>
