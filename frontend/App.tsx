@@ -26,66 +26,61 @@ import { BlogPostPage } from './components/blog/BlogPostPage';
 // Lazy load less critical components
 import { LoadingScreen } from './components/LoadingScreen';
 
-// Wrapper to handle dynamic import failures (e.g. ERR_NETWORK_CHANGED or chunk missing after deploy)
-const lazyWithRetry = (componentImport: () => Promise<any>) =>
-  lazy(async () => {
-    const pageHasAlreadyBeenForceRefreshed = JSON.parse(
-      window.sessionStorage.getItem('page-has-been-force-refreshed') || 'false'
-    );
+// Eager load critical dashboard components (no lazy loading to avoid infinite reload loops)
+import { StudentDashboard } from './components/Dashboard/StudentDashboard';
+import { LecturerDashboard } from './components/Dashboard/LecturerDashboard';
+import { AdminDashboard } from './components/Dashboard/AdminDashboard';
+import { ClassRepDashboard } from './components/Dashboard/ClassRepDashboard';
 
+// Simple lazy loader with no reload on error (show error boundary instead)
+const simpleLazy = (componentImport: () => Promise<any>) =>
+  lazy(async () => {
     try {
       const component = await componentImport();
-      window.sessionStorage.setItem('page-has-been-force-refreshed', 'false');
       return component;
     } catch (error) {
-      if (!pageHasAlreadyBeenForceRefreshed) {
-        window.sessionStorage.setItem('page-has-been-force-refreshed', 'true');
-        return window.location.reload() as unknown as any;
-      }
+      console.error('Failed to load component:', error);
+      // Don't reload - let error boundary handle it
       throw error;
     }
   });
 
-const LandingPage = lazyWithRetry(() => import('./components/EnhancedLandingPage').then(m => ({ default: m.default || m })));
-const DocumentationPage = lazyWithRetry(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
-const VolunteersPage = lazyWithRetry(() => import('./components/VolunteersPage').then(m => ({ default: m.VolunteersPage })));
-const FeaturesPage = lazyWithRetry(() => import('./components/FeaturesPage').then(m => ({ default: m.FeaturesPage })));
-const HowItWorksPage = lazyWithRetry(() => import('./components/HowItWorksPage').then(m => ({ default: m.HowItWorksPage })));
-const Onboarding = lazyWithRetry(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
-const EmailVerificationSent = lazyWithRetry(() => import('./components/Auth/EmailVerificationSent').then(module => ({ default: module.EmailVerificationSent })));
-const VerifyEmail = lazyWithRetry(() => import('./components/Auth/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
-const OTPVerification = lazyWithRetry(() => import('./components/Auth/OTPVerification').then(module => ({ default: module.OTPVerification })));
-const AuthCallback = lazyWithRetry(() => import('./components/Auth/Callback').then(module => ({ default: module.AuthCallback })));
-const ForgotPassword = lazyWithRetry(() => import('./components/Auth/ForgotPassword').then(module => ({ default: module.ForgotPassword })));
-const ResetPassword = lazyWithRetry(() => import('./components/Auth/ResetPassword').then(module => ({ default: module.ResetPassword })));
-const StudentDashboard = lazyWithRetry(() => import('./components/Dashboard/StudentDashboard').then(module => ({ default: module.StudentDashboard })));
-const StudentCoursesPage = lazyWithRetry(() => import('./components/Student/StudentCoursesPage').then(module => ({ default: module.default })));
-const LecturerDashboard = lazyWithRetry(() => import('./components/Dashboard/LecturerDashboard').then(module => ({ default: module.LecturerDashboard })));
-const CreateSessionPage = lazyWithRetry(() => import('./components/Attendance/CreateSessionPage').then(module => ({ default: module.CreateSessionPage })));
-const AdminDashboard = lazyWithRetry(() => import('./components/Dashboard/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
-const ClassRepDashboard = lazyWithRetry(() => import('./components/Dashboard/ClassRepDashboard').then(module => ({ default: module.ClassRepDashboard })));
-const ProfilePage = lazyWithRetry(() => import('./components/Profile/ProfilePage').then(module => ({ default: module.ProfilePage })));
-const SessionsPage = lazyWithRetry(() => import('./components/Dashboard/SessionsPage').then(module => ({ default: module.SessionsPage })));
-const PublicCheckInPage = lazyWithRetry(() => import('./components/Attendance/PublicCheckInPage').then(module => ({ default: module.PublicCheckInPage })));
-const NotificationsPage = lazyWithRetry(() => import('./components/Notifications/NotificationsPage').then(module => ({ default: module.NotificationsPage })));
-const SettingsPage = lazyWithRetry(() => import('./components/Settings/SettingsPage').then(module => ({ default: module.SettingsPage })));
-const NotFound = lazyWithRetry(() => import('./components/NotFound').then(module => ({ default: module.NotFound })));
-const UnauthorizedPage = lazyWithRetry(() => import('./components/UnauthorizedPage').then(module => ({ default: module.UnauthorizedPage })));
-const ProtectedRoute = lazyWithRetry(() => import('./components/ProtectedRoute').then(module => ({ default: module.ProtectedRoute })));
-const DevicesPage = lazyWithRetry(() => import('./components/Security/DevicesPage').then(module => ({ default: module.DevicesPage })));
+const LandingPage = simpleLazy(() => import('./components/EnhancedLandingPage').then(m => ({ default: m.default || m })));
+const DocumentationPage = simpleLazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
+const VolunteersPage = simpleLazy(() => import('./components/VolunteersPage').then(m => ({ default: m.VolunteersPage })));
+const FeaturesPage = simpleLazy(() => import('./components/FeaturesPage').then(m => ({ default: m.FeaturesPage })));
+const HowItWorksPage = simpleLazy(() => import('./components/HowItWorksPage').then(m => ({ default: m.HowItWorksPage })));
+const Onboarding = simpleLazy(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
+const EmailVerificationSent = simpleLazy(() => import('./components/Auth/EmailVerificationSent').then(module => ({ default: module.EmailVerificationSent })));
+const VerifyEmail = simpleLazy(() => import('./components/Auth/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
+const OTPVerification = simpleLazy(() => import('./components/Auth/OTPVerification').then(module => ({ default: module.OTPVerification })));
+const AuthCallback = simpleLazy(() => import('./components/Auth/Callback').then(module => ({ default: module.AuthCallback })));
+const ForgotPassword = simpleLazy(() => import('./components/Auth/ForgotPassword').then(module => ({ default: module.ForgotPassword })));
+const ResetPassword = simpleLazy(() => import('./components/Auth/ResetPassword').then(module => ({ default: module.ResetPassword })));
+const StudentCoursesPage = simpleLazy(() => import('./components/Student/StudentCoursesPage').then(module => ({ default: module.default })));
+const CreateSessionPage = simpleLazy(() => import('./components/Attendance/CreateSessionPage').then(module => ({ default: module.CreateSessionPage })));
+const ProfilePage = simpleLazy(() => import('./components/Profile/ProfilePage').then(module => ({ default: module.ProfilePage })));
+const SessionsPage = simpleLazy(() => import('./components/Dashboard/SessionsPage').then(module => ({ default: module.SessionsPage })));
+const PublicCheckInPage = simpleLazy(() => import('./components/Attendance/PublicCheckInPage').then(module => ({ default: module.PublicCheckInPage })));
+const NotificationsPage = simpleLazy(() => import('./components/Notifications/NotificationsPage').then(module => ({ default: module.NotificationsPage })));
+const SettingsPage = simpleLazy(() => import('./components/Settings/SettingsPage').then(module => ({ default: module.SettingsPage })));
+const NotFound = simpleLazy(() => import('./components/NotFound').then(module => ({ default: module.NotFound })));
+const UnauthorizedPage = simpleLazy(() => import('./components/UnauthorizedPage').then(module => ({ default: module.UnauthorizedPage })));
+const ProtectedRoute = simpleLazy(() => import('./components/ProtectedRoute').then(module => ({ default: module.ProtectedRoute })));
+const DevicesPage = simpleLazy(() => import('./components/Security/DevicesPage').then(module => ({ default: module.DevicesPage })));
 
 // Admin Components
-const InstitutionManagement = lazyWithRetry(() => import('./components/Admin/InstitutionManagement').then(module => ({ default: module.InstitutionManagement })));
-const InstitutionFormPage = lazyWithRetry(() => import('./components/Admin/InstitutionFormPage').then(module => ({ default: module.InstitutionFormPage })));
-const CollegeFormPage = lazyWithRetry(() => import('./components/Admin/CollegeFormPage').then(module => ({ default: module.CollegeFormPage })));
-const DepartmentFormPage = lazyWithRetry(() => import('./components/Admin/DepartmentFormPage').then(module => ({ default: module.DepartmentFormPage })));
-const UserManagement = lazyWithRetry(() => import('./components/Admin/UserManagement').then(module => ({ default: module.UserManagement })));
-const CourseManagement = lazyWithRetry(() => import('./components/Admin/CourseManagement').then(module => ({ default: module.CourseManagement })));
-const VenueManagement = lazyWithRetry(() => import('./components/Admin/VenueManagement'));
-const DepartmentManagement = lazyWithRetry(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
-const BlogManagement = lazyWithRetry(() => import('./components/Admin/BlogManagement').then(module => ({ default: module.BlogManagement })));
-const StaffManagement = lazyWithRetry(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
-const AcceptInvitePage = lazyWithRetry(() => import('./components/Auth/AcceptInvitePage').then(module => ({ default: module.AcceptInvitePage })));
+const InstitutionManagement = simpleLazy(() => import('./components/Admin/InstitutionManagement').then(module => ({ default: module.InstitutionManagement })));
+const InstitutionFormPage = simpleLazy(() => import('./components/Admin/InstitutionFormPage').then(module => ({ default: module.InstitutionFormPage })));
+const CollegeFormPage = simpleLazy(() => import('./components/Admin/CollegeFormPage').then(module => ({ default: module.CollegeFormPage })));
+const DepartmentFormPage = simpleLazy(() => import('./components/Admin/DepartmentFormPage').then(module => ({ default: module.DepartmentFormPage })));
+const UserManagement = simpleLazy(() => import('./components/Admin/UserManagement').then(module => ({ default: module.UserManagement })));
+const CourseManagement = simpleLazy(() => import('./components/Admin/CourseManagement').then(module => ({ default: module.CourseManagement })));
+const VenueManagement = simpleLazy(() => import('./components/Admin/VenueManagement'));
+const DepartmentManagement = simpleLazy(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
+const BlogManagement = simpleLazy(() => import('./components/Admin/BlogManagement').then(module => ({ default: module.BlogManagement })));
+const StaffManagement = simpleLazy(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
+const AcceptInvitePage = simpleLazy(() => import('./components/Auth/AcceptInvitePage').then(module => ({ default: module.AcceptInvitePage })));
 
 // Loading fallback component
 const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." />;
