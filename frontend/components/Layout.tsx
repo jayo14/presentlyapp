@@ -247,6 +247,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             label: 'General',
             items: [
               { id: 'dashboard', icon: Home, label: 'Home' },
+              { id: 'courses', icon: BookOpen, label: 'Courses' },
               { id: 'timetable', icon: Calendar, label: 'Timetable' },
               { id: 'analytics', icon: BarChart3, label: 'Analytics' },
             ],
