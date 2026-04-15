@@ -70,11 +70,7 @@ export default function SignUpScreen() {
     setLoading(false);
 
     if (result.success) {
-      if (result.requiresVerification) {
-        router.push({ pathname: '/auth/verify-email', params: { mode: 'signup', step: 'otp' } });
-      } else {
-        router.replace('/onboarding/role-selection');
-      }
+      router.replace({ pathname: '/auth/verify-email', params: { mode: 'signup', step: 'otp' } });
     } else if (result.error) {
       Alert.alert('Error', result.error);
     }

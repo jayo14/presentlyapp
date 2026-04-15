@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Image, Modal, FlatList } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
@@ -21,7 +21,7 @@ const STATES: Record<string, string[]> = {
 export default function PersonalInfoScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [gender, setGender] = useState<string>('');
@@ -33,6 +33,12 @@ export default function PersonalInfoScreen() {
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showStatePicker, setShowStatePicker] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace('/auth/sign-up');
+    }
+  }, [isLoading, router, user]);
 
   const validateForm = (): boolean => {
     const newErrors: { phoneNumber?: string } = {};

@@ -3,7 +3,9 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import { ShieldCheck, MapPin, ArrowRight, Zap } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Fonts from '@/constants/fonts';
+import { storage } from '@/utils/storage';
 
 const { width } = Dimensions.get('window');
 
@@ -36,7 +38,12 @@ export default function OnboardingScreen() {
   const { colors } = useTheme();
   const flatListRef = useRef<FlatList>(null);
 
-  const handleNext = () => {
+  const completePreOnboarding = async (destination: '/auth/sign-up' | '/auth/sign-in') => {
+    await storage.setOnboardingDone();
+    router.replace(destination);
+  };
+
+  const handleNext = async () => {
     if (currentIndex < screens.length - 1) {
       flatListRef.current?.scrollToIndex({
         index: currentIndex + 1,
@@ -44,12 +51,12 @@ export default function OnboardingScreen() {
       });
       setCurrentIndex(currentIndex + 1);
     } else {
-      router.replace('/onboarding/role-selection');
+      await completePreOnboarding('/auth/sign-up');
     }
   };
 
-  const handleSkip = () => {
-    router.replace('/onboarding/role-selection');
+  const handleSkip = async () => {
+    await completePreOnboarding('/auth/sign-in');
   };
 
   const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -130,7 +137,13 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <View style={styles.topBar}>
+        <Text style={[styles.brand, { color: colors.text }]}>Presently</Text>
+        <TouchableOpacity style={styles.signInPill} onPress={handleSkip} activeOpacity={0.8}>
+          <Text style={[styles.signInPillText, { color: colors.primary }]}>Sign In</Text>
+        </TouchableOpacity>
+      </View>
       {currentIndex === 1 && (
         <TouchableOpacity style={styles.skipTop} onPress={handleSkip}>
           <Text style={[styles.skipText, { color: colors.primary }]}>Skip</Text>
@@ -168,25 +181,23 @@ export default function OnboardingScreen() {
         <TouchableOpacity
           style={[
             styles.button,
-            { borderColor: colors.primary, borderWidth: 2 }
+            { borderColor: colors.primary, borderWidth: 2, backgroundColor: colors.primary }
           ]}
           onPress={handleNext}
           activeOpacity={0.8}
         >
-          <Text style={[styles.buttonText, { color: colors.primary }]}>
-            {currentIndex === 2 ? 'Get Started' : 'Next'}
+          <Text style={[styles.buttonText, { color: '#231f10' }]}>
+            {currentIndex === 2 ? 'Create Account' : 'Next'}
           </Text>
-          {currentIndex < 2 && <ArrowRight size={20} color={colors.primary} style={{ marginLeft: 8 }} />}
+          <ArrowRight size={20} color="#231f10" style={{ marginLeft: 8 }} />
         </TouchableOpacity>
 
-        {currentIndex === 2 && (
-          <TouchableOpacity onPress={handleSkip} style={styles.skipBottom}>
-            <Text style={[styles.skipBottomText, { color: colors.textSecondary }]}>Skip</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity onPress={handleSkip} style={styles.skipBottom}>
+          <Text style={[styles.skipBottomText, { color: colors.textSecondary }]}>I already have an account</Text>
+        </TouchableOpacity>
       </View>
       <View style={{ height: 40 }} />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -196,6 +207,28 @@ const styles = StyleSheet.create({
   },
   screenContainer: {
     flex: 1,
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+  },
+  brand: {
+    fontSize: 20,
+    fontFamily: Fonts.manrope.extraBold,
+    letterSpacing: -0.3,
+  },
+  signInPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: 'rgba(249,196,6,0.12)',
+  },
+  signInPillText: {
+    fontSize: 13,
+    fontFamily: Fonts.lexend.bold,
   },
   skipTop: {
     position: 'absolute',

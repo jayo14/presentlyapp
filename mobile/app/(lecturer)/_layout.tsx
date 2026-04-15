@@ -33,43 +33,61 @@ export default function LecturerLayout() {
 
   // Calculate bottom position accounting for Android navigation bar
   const bottomPosition = Platform.OS === 'ios' ? 24 : Math.max(16, insets.bottom);
+  const dockRadius = 36;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: isDark ? '#ccbf8e' : '#94A3B8',
+        tabBarActiveBackgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.82)',
         tabBarStyle: {
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(25, 22, 12, 0.85)' : 'rgba(255, 255, 255, 0.85)'),
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(24, 21, 14, 0.66)' : 'rgba(255, 255, 255, 0.66)'),
           borderTopWidth: 0,
-          height: Platform.OS === 'ios' ? 92 : 76,
-          paddingBottom: Platform.OS === 'ios' ? 32 : 12,
-          paddingTop: 12,
+          height: Platform.OS === 'ios' ? 98 : 84,
+          paddingBottom: Platform.OS === 'ios' ? 32 : 14,
+          paddingTop: 8,
           position: 'absolute',
           bottom: bottomPosition,
-          left: 16,
-          right: 16,
-          borderRadius: 32,
-          elevation: 8,
+          left: 14,
+          right: 14,
+          paddingHorizontal: 6,
+          borderRadius: dockRadius,
+          elevation: 14,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 16,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.22,
+          shadowRadius: 20,
           borderWidth: 1,
-          borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+          borderColor: isDark ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.78)',
+          overflow: 'hidden',
         },
         tabBarBackground: () => (
-          Platform.OS === 'ios' ? (
-            <BlurView intensity={95} tint={isDark ? "dark" : "light"} style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, overflow: 'hidden' }} />
-          ) : (
-            <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: 32, backgroundColor: isDark ? 'rgba(30, 27, 20, 0.85)' : 'rgba(255, 255, 255, 0.85)' }} />
-          )
+          <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: dockRadius, overflow: 'hidden' }}>
+            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFillObject} />
+            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: isDark ? 'rgba(34, 30, 20, 0.32)' : 'rgba(255,255,255,0.35)' }]} />
+            <View style={[styles.glassHighlight, { backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.72)' }]} />
+            <View style={[styles.glassDepth, { backgroundColor: isDark ? 'rgba(8, 8, 8, 0.22)' : 'rgba(148, 163, 184, 0.12)' }]} />
+          </View>
         ),
         tabBarLabelStyle: {
           fontSize: 10,
           fontFamily: 'Lexend_700Bold',
+          marginTop: 1,
+          marginBottom: 1,
+          letterSpacing: 0.2,
+        },
+        tabBarIconStyle: {
           marginTop: 2,
+        },
+        tabBarItemStyle: {
+          borderRadius: 20,
+          marginHorizontal: 4,
+          marginTop: 3,
+          marginBottom: 2,
+          paddingVertical: 2,
         },
       }}
     >
@@ -122,3 +140,20 @@ export default function LecturerLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  glassHighlight: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '48%',
+  },
+  glassDepth: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '46%',
+  },
+});

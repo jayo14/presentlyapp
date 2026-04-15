@@ -51,7 +51,7 @@ const mapApiSession = (item: any): Session => ({
 });
 
 export const [AttendanceProvider, useAttendance] = createContextHook(() => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [history, setHistory] = useState<AttendanceRecord[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -64,13 +64,15 @@ export const [AttendanceProvider, useAttendance] = createContextHook(() => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (user) {
+    if (user && isAuthenticated) {
         loadData();
+    } else {
+        setIsLoading(false);
     }
-  }, [user]);
+  }, [isAuthenticated, user]);
 
   const loadData = async () => {
-    if (!user) return;
+    if (!user || !isAuthenticated) return;
     try {
       setIsLoading(true);
       if (user.role === "student") {
@@ -97,7 +99,10 @@ export const [AttendanceProvider, useAttendance] = createContextHook(() => {
           }
       }
     } catch (error) {
-      console.error('Load attendance data error:', error);
+      const status = (error as any)?.response?.status;
+      if (status !== 401) {
+        console.error('Load attendance data error:', error);
+      }
     } finally {
       setIsLoading(false);
     }

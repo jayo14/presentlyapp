@@ -159,8 +159,15 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       }
 
       if (!token && !refreshToken) {
-        setUser(null);
-        setIsAuthenticated(false);
+        // Keep pending-signup users in memory/storage so they can complete OTP
+        // verification instead of being bounced back to sign-in.
+        if (savedUser && !savedUser.emailVerified) {
+          setUser(savedUser);
+          setIsAuthenticated(false);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
       }
     } catch (error) {
       console.error('Auth check error:', error);
@@ -254,6 +261,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         const userData = response?.user;
         if (userData) {
           const newUser = mapApiUser(userData, data?.email || userData?.email || '');
+          if (requiresVerification) {
+            newUser.onboardingCompleted = false;
+          }
           await persistUser(newUser);
           // isAuthenticated tracks email-verification status; onboarding is gated
           // separately via user.onboardingCompleted in AuthGate.

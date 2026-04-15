@@ -58,6 +58,10 @@ export default function SplashScreen() {
       const hasOnboarded = await storage.hasCompletedOnboarding();
       
       if (isAuthenticated && user) {
+        if (!user.onboardingCompleted) {
+          router.replace('/onboarding/role-selection');
+          return;
+        }
         if (user.role === 'admin') {
           router.replace('/(admin)');
         } else if (user.role === 'lecturer') {

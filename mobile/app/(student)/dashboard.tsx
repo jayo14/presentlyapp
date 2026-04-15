@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator, ImageBackground, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAttendance } from '@/contexts/AttendanceContext';
-import { Bell, QrCode, Check, X, BookOpen, Calendar, ShieldCheck, User, LayoutGrid, Clock, ChevronRight } from 'lucide-react-native';
+import { Bell, QrCode, Check, X, BookOpen, Calendar, LayoutGrid, Clock, ChevronRight } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import Svg, { Circle } from 'react-native-svg';
 import { useState, useEffect, useRef } from 'react';
@@ -21,6 +21,8 @@ const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => 
             Math.sin(dLon/2) * Math.sin(dLon/2);
   return R * 2 * Math.asin(Math.sqrt(a));
 };
+
+const { width } = Dimensions.get('window');
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -170,15 +172,13 @@ export default function StudentDashboard() {
                 </View>
             </ImageBackground>
         </View>
+        ) : null}
         {/* Quick Actions */}
         <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
             <View style={styles.quickActionsGrid}>
                 {[
                     { id: 'timetable', icon: <Calendar color="#f9c406" size={24} />, label: 'Timetable', route: '/(student)/timetable' },
-                    { id: 'clearance', icon: <ShieldCheck color="#10B981" size={24} />, label: 'Exams', route: '/(student)/exam-clearance' },
-                    { id: 'notifications', icon: <Bell color="#3B82F6" size={24} />, label: 'Alerts', route: '/(student)/notifications' },
-                    { id: 'profile', icon: <User color="#A78BFA" size={24} />, label: 'Profile', route: '/(student)/profile' }
                 ].map((action) => (
                     <TouchableOpacity 
                         key={action.id}
