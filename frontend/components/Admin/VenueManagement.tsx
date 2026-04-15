@@ -7,26 +7,9 @@ import { venueApi } from '../../services/api/venues';
 import { institutionsApi } from '../../services/api/institutions';
 import { SEO } from '../SEO';
 
-// Lazy load heavy components with error fallback
+// Lazy load heavy components
 const VenueModal = lazy(() => import('./VenueModal'));
-
-// Wrap VenueMap with error handling for mapbox dependencies
-const VenueMap = lazy(() => 
-  import('./VenueMap').catch(error => {
-    console.error('Failed to load VenueMap:', error);
-    return {
-      default: () => (
-        <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-          <div className="text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <p className="text-gray-700 font-medium">Map feature temporarily unavailable</p>
-            <p className="text-gray-500 text-sm mt-2">Please use grid view to manage venues</p>
-          </div>
-        </div>
-      )
-    };
-  })
-);
+const VenueMap = lazy(() => import('./VenueMap'));
 
 export const VenueManagement: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
