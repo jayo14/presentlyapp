@@ -139,8 +139,12 @@ export default defineConfig(({ mode }) => {
           'framer-motion',
           'next-themes',
           'react-helmet-async',
+          'recharts',
+          'es-toolkit',
+          '@google/genai',
+          'p-retry',
         ],
-        exclude: ['@google/genai', 'maplibre-gl', '@mapbox/mapbox-gl-draw', 'recharts', 'firebase'],
+        exclude: ['maplibre-gl', '@mapbox/mapbox-gl-draw', '@mapbox/geojson-area', 'firebase'],
         esbuildOptions: {
           target: 'es2022',
           define: {

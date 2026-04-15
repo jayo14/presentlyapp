@@ -31,6 +31,7 @@ import { StudentDashboard } from './components/Dashboard/StudentDashboard';
 import { LecturerDashboard } from './components/Dashboard/LecturerDashboard';
 import { AdminDashboard } from './components/Dashboard/AdminDashboard';
 import { ClassRepDashboard } from './components/Dashboard/ClassRepDashboard';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Simple lazy loader with no reload on error (show error boundary instead)
 const simpleLazy = (componentImport: () => Promise<any>) =>
@@ -66,7 +67,6 @@ const NotificationsPage = simpleLazy(() => import('./components/Notifications/No
 const SettingsPage = simpleLazy(() => import('./components/Settings/SettingsPage').then(module => ({ default: module.SettingsPage })));
 const NotFound = simpleLazy(() => import('./components/NotFound').then(module => ({ default: module.NotFound })));
 const UnauthorizedPage = simpleLazy(() => import('./components/UnauthorizedPage').then(module => ({ default: module.UnauthorizedPage })));
-const ProtectedRoute = simpleLazy(() => import('./components/ProtectedRoute').then(module => ({ default: module.ProtectedRoute })));
 const DevicesPage = simpleLazy(() => import('./components/Security/DevicesPage').then(module => ({ default: module.DevicesPage })));
 
 // Admin Components
@@ -401,7 +401,7 @@ const AppContent: React.FC = () => {
               <Route path="institutions/:id/colleges/:collegeId/departments/:deptId/edit" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentFormPage /></AdminRoute>} />
               <Route path="users" element={<AdminRoute requiredPermission="system.users.manage"><UserManagement /></AdminRoute>} />
               <Route path="staff" element={<AdminRoute requiredPermission="system.staff.manage"><StaffManagement /></AdminRoute>} />
-              <Route path="venues" element={<AdminRoute requiredPermission="venues.view"><VenueManagement /></AdminRoute>} />
+              <Route path="venues" element={<AdminRoute requiredPermission="venues.view"><Suspense fallback={<LoadingFallback />}><VenueManagement /></Suspense></AdminRoute>} />
               <Route path="departments" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentManagement /></AdminRoute>} />
               <Route path="blog" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
               <Route path="logs" element={<AdminRoute requiredPermission="system.analytics.view"><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
