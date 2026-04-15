@@ -157,7 +157,7 @@ export default defineConfig(({ mode }) => {
       // ES2019 for broad device support (iPhone 7 / Safari 13+)
       target: 'es2019',
       // keepNames can emit __name helpers that break in some optimized map chunks.
-      keepNames: false,
+      keepNames: true,
     },
   };
 });
