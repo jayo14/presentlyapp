@@ -5,14 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, Search, Check, ChevronDown, ArrowRight, CheckCircle2 } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { storage } from '@/utils/storage';
 import { schools, type School, type College } from '@/mocks/schools';
 import Fonts from '@/constants/fonts';
 
 export default function SchoolInfoScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { user, onboarding, checkAuth } = useAuth();
+  const { user, isLoading, onboarding, checkAuth } = useAuth();
   
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<College | null>(null);
@@ -30,6 +29,13 @@ export default function SchoolInfoScreen() {
   const filteredSchools = schools.filter(school =>
     school.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace('/auth/sign-up');
+      return;
+    }
+  }, [isLoading, router, user]);
 
   useEffect(() => {
     // Subtle verification simulation

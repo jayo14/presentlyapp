@@ -14,6 +14,36 @@ class ApiClient {
   public client: AxiosInstance;
   private maxRetries = 3;
 
+  private extractAccessToken(payload: any): string | undefined {
+    if (!payload) return undefined;
+    return payload.access || payload.access_token || payload.token || payload?.jwt?.access || payload?.data?.access || payload?.data?.access_token;
+  }
+
+  private extractRefreshToken(payload: any): string | undefined {
+    if (!payload) return undefined;
+    return payload.refresh || payload.refresh_token || payload?.jwt?.refresh || payload?.data?.refresh || payload?.data?.refresh_token;
+  }
+
+  private extractErrorMessage(errorData: any, fallback: string): string {
+    if (!errorData) return fallback;
+    if (typeof errorData?.detail === 'string') return errorData.detail;
+    if (typeof errorData?.message === 'string') return errorData.message;
+    if (typeof errorData?.error === 'string') return errorData.error;
+    if (errorData?.errors && typeof errorData.errors === 'object') {
+      const firstKey = Object.keys(errorData.errors)[0];
+      const firstError = errorData.errors[firstKey];
+      if (Array.isArray(firstError) && firstError[0]) return `${firstKey}: ${firstError[0]}`;
+      if (typeof firstError === 'string') return `${firstKey}: ${firstError}`;
+    }
+    if (typeof errorData === 'object') {
+      const firstKey = Object.keys(errorData)[0];
+      const firstError = errorData[firstKey];
+      if (Array.isArray(firstError) && firstError[0]) return `${firstKey}: ${firstError[0]}`;
+      if (typeof firstError === 'string') return `${firstKey}: ${firstError}`;
+    }
+    return fallback;
+  }
+
   private processQueue(error: any, token: string | null = null) {
     this.failedQueue.forEach((prom) => {
       if (error) {
@@ -59,6 +89,7 @@ class ApiClient {
               this.failedQueue.push({ resolve, reject });
             })
               .then((token) => {
+                originalRequest.headers = originalRequest.headers || {};
                 originalRequest.headers.Authorization = `Bearer ${token}`;
                 return this.client.request(originalRequest);
               })
@@ -75,8 +106,8 @@ class ApiClient {
 
           try {
             const response = await axios.post(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.REFRESH_TOKEN}`, { refresh });
-            const accessToken = response.data?.access || response.data?.access_token;
-            const newRefreshToken = response.data?.refresh || response.data?.refresh_token;
+            const accessToken = this.extractAccessToken(response.data);
+            const newRefreshToken = this.extractRefreshToken(response.data);
 
             if (!accessToken) throw new Error('Refresh failed');
 
@@ -88,6 +119,7 @@ class ApiClient {
             this.processQueue(null, accessToken);
             this.isRefreshing = false;
 
+            originalRequest.headers = originalRequest.headers || {};
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
             return this.client.request(originalRequest);
           } catch (refreshError) {
@@ -113,15 +145,15 @@ class ApiClient {
 
         // 3. Structured Error Mapping
         if (status === 400) {
-           const message = errorData?.detail || errorData?.message || 'Bad Request';
-           console.error(`[API] 400: ${message}`);
+           const message = this.extractErrorMessage(errorData, 'Bad Request');
+           console.warn(`[API] 400: ${message}`);
         } else if (status === 403) {
-            console.error('[API] 403: Permission Denied');
+            console.warn('[API] 403: Permission Denied');
         } else if (status === 404) {
-            console.error('[API] 404: Not Found');
+            console.warn('[API] 404: Not Found');
         } else if (status === 429) {
             const retryAfter = error.response?.headers['retry-after'] || '60';
-            console.error(`[API] 429: Too many requests. Retry after ${retryAfter}s`);
+            console.warn(`[API] 429: Too many requests. Retry after ${retryAfter}s`);
         } else if (status >= 500) {
             console.error('[API] 500+: Server Error');
         } else if (!status) {
@@ -137,7 +169,7 @@ class ApiClient {
     await storage.clearAll();
     // Redirect to login if we have a router available
     try {
-      router.replace('/(auth)/login');
+      router.replace('/auth/sign-in');
     } catch (e) {
       console.warn('Failed to redirect to login:', e);
     }

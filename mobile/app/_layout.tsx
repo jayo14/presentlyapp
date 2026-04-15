@@ -40,12 +40,21 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     if (isLoading) return;
 
     const topSegment = segments[0];
+    const secondSegment = segments[1];
     const inAuth = topSegment === "auth";
     const inOnboarding = topSegment === "onboarding";
     const inSplash = topSegment === "splash";
     const inProtected = ["(student)", "(lecturer)", "(admin)", "(tabs)"].includes(topSegment || "");
+    const inUserOnboarding =
+      inOnboarding &&
+      ["role-selection", "personal-info", "school-info", "success"].includes(secondSegment || "");
+    const inPreOnboarding = inOnboarding && !inUserOnboarding;
 
     if (!user) {
+      if (inUserOnboarding) {
+        router.replace("/auth/sign-up");
+        return;
+      }
       if (inProtected && pathname !== "/auth/sign-in") {
         router.replace("/auth/sign-in");
       }
@@ -60,7 +69,11 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     }
 
     if (!user.onboardingCompleted) {
-      if (pathname !== "/onboarding/role-selection") {
+      if (inPreOnboarding) {
+        router.replace("/onboarding/role-selection");
+        return;
+      }
+      if (!inUserOnboarding) {
         router.replace("/onboarding/role-selection");
       }
       return;

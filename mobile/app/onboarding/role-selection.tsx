@@ -1,27 +1,30 @@
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { GraduationCap, Users, Check, ArrowRight } from 'lucide-react-native';
-import { Button } from '@/components/Button';
 import { useAuth } from '@/contexts/AuthContext';
-import { storage } from '@/utils/storage';
 import Fonts from '@/constants/fonts';
 
 export default function RoleSelectionScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { user } = useAuth();
+  const { user, isLoading, updateProfileDetails } = useAuth();
   const [selectedRole, setSelectedRole] = useState<'student' | 'lecturer' | 'admin' | null>((user?.role as any) || 'student');
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace('/auth/sign-up');
+    }
+  }, [isLoading, router, user]);
 
   const handleContinue = async () => {
     if (!selectedRole || !user) return;
 
     setLoading(true);
-    const updatedUser = { ...user, role: selectedRole };
-    await storage.setUser(updatedUser);
+    await updateProfileDetails({ role: selectedRole });
     setLoading(false);
 
     router.push('/onboarding/personal-info');

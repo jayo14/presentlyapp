@@ -25,6 +25,12 @@ export default function SignInScreen() {
   useEffect(() => {
     if (!isAuthenticated || !user || hasRedirectedRef.current) return;
 
+    if (!user.onboardingCompleted) {
+      hasRedirectedRef.current = true;
+      router.replace('/onboarding/role-selection');
+      return;
+    }
+
     const role = user.role ?? 'student';
     const destination =
       role === 'admin'
@@ -50,6 +56,11 @@ export default function SignInScreen() {
     if (result.success) {
       if (result.requiresVerification) {
         router.replace('/auth/verify-email');
+        return;
+      }
+
+      if (!result.user?.onboardingCompleted) {
+        router.replace('/onboarding/role-selection');
         return;
       }
 

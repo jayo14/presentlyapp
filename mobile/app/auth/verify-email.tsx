@@ -103,7 +103,12 @@ export default function VerifyEmailScreen() {
     setLoading(false);
 
     if (result.success) {
-      const destination = '/onboarding/role-selection';
+      const isSignupFlow = params.mode === 'signup';
+      const destination = isSignupFlow
+        ? '/onboarding/role-selection'
+        : user?.onboardingCompleted
+          ? (user.role === 'admin' ? '/(admin)' : user.role === 'lecturer' ? '/(lecturer)' : '/(student)')
+          : '/onboarding/role-selection';
 
       router.replace(destination);
     } else {
