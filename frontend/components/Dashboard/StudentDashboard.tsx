@@ -309,14 +309,20 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                             }`}
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start">
-                            <div className="flex items-center gap-1.5 line-clamp-1">
-                              {activity.status === 'present' ? (
-                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/5 px-2 py-0.5 rounded-full border border-emerald-500/10">Present</span>
-                              ) : (
-                                <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest bg-rose-500/5 px-2 py-0.5 rounded-full border border-rose-500/10">Absent</span>
-                              )}
-                            </div>
+                            <div className="flex justify-between items-start text-xs">
+                             <div className="flex items-center gap-1.5 line-clamp-1">
+                               {['present', 'late', 'flagged'].includes(activity.status.toLowerCase()) ? (
+                                 <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                                   activity.status.toLowerCase() === 'present' ? 'text-emerald-500 bg-emerald-500/5 border-emerald-500/10' :
+                                   activity.status.toLowerCase() === 'late' ? 'text-amber-500 bg-amber-500/5 border-amber-500/10' :
+                                   'text-blue-500 bg-blue-500/5 border-blue-500/10'
+                                 }`}>
+                                   {activity.status}
+                                 </span>
+                               ) : (
+                                 <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest bg-rose-500/5 px-2 py-0.5 rounded-full border border-rose-500/10">Absent</span>
+                               )}
+                             </div>
                             <p className="text-[8px] font-bold text-slate-400 uppercase whitespace-nowrap ml-2">
                               {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </p>
