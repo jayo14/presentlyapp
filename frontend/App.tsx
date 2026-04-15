@@ -32,6 +32,7 @@ import { LecturerDashboard } from './components/Dashboard/LecturerDashboard';
 import { AdminDashboard } from './components/Dashboard/AdminDashboard';
 import { ClassRepDashboard } from './components/Dashboard/ClassRepDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ProfilePage } from './components/Profile/ProfilePage';
 
 // Simple lazy loader with no reload on error (show error boundary instead)
 const simpleLazy = (componentImport: () => Promise<any>) =>
@@ -60,7 +61,6 @@ const ForgotPassword = simpleLazy(() => import('./components/Auth/ForgotPassword
 const ResetPassword = simpleLazy(() => import('./components/Auth/ResetPassword').then(module => ({ default: module.ResetPassword })));
 const StudentCoursesPage = simpleLazy(() => import('./components/Student/StudentCoursesPage').then(module => ({ default: module.default })));
 const CreateSessionPage = simpleLazy(() => import('./components/Attendance/CreateSessionPage').then(module => ({ default: module.CreateSessionPage })));
-const ProfilePage = simpleLazy(() => import('./components/Profile/ProfilePage').then(module => ({ default: module.ProfilePage })));
 const SessionsPage = simpleLazy(() => import('./components/Dashboard/SessionsPage').then(module => ({ default: module.SessionsPage })));
 const PublicCheckInPage = simpleLazy(() => import('./components/Attendance/PublicCheckInPage').then(module => ({ default: module.PublicCheckInPage })));
 const NotificationsPage = simpleLazy(() => import('./components/Notifications/NotificationsPage').then(module => ({ default: module.NotificationsPage })));
