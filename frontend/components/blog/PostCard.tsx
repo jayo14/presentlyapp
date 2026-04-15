@@ -58,7 +58,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
           {post.author_avatar ? (
             <img
               src={post.author_avatar}
-              alt={post.author_name}
+              alt={`Avatar for ${post.author_name}, author`}
               className="h-8 sm:h-9 w-8 sm:w-9 rounded-full object-cover border border-outline/20 group-hover:border-primary/40 transition-colors duration-500 shrink-0"
               loading="lazy"
             />

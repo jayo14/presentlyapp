@@ -54,18 +54,24 @@ export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ source }) =>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4 sm:flex-row max-w-xl mx-auto items-stretch">
           <div className="flex-1 relative">
+            <label htmlFor="newsletter-email" className="sr-only">
+              Enter your professional email to subscribe
+            </label>
             <input
+              id="newsletter-email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Your professional email"
+              aria-label="Enter your professional email address to subscribe"
               className="w-full h-12 sm:h-16 rounded-xl sm:rounded-2xl border border-outline/20 bg-surface/60 px-4 sm:px-6 text-sm sm:text-base text-text placeholder:text-textMuted transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus:outline-none backdrop-blur-sm"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="h-12 sm:h-16 rounded-xl sm:rounded-2xl bg-primary px-6 sm:px-10 text-sm sm:text-base font-black text-background hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 shadow-lg sm:shadow-2xl shadow-primary/30 shrink-0"
+            aria-label="Subscribe to newsletter"
+            className="h-12 sm:h-16 rounded-xl sm:rounded-2xl bg-primary px-6 sm:px-10 text-sm sm:text-base font-black text-background hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 shadow-lg sm:shadow-2xl shadow-primary/30 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
           >
             {success ? "You're subscribed!" : loading ? 'Joining...' : 'Subscribe Now'}
           </button>
@@ -74,7 +80,11 @@ export const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ source }) =>
         <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 text-textMuted/60">
            <div className="flex -space-x-3">
               {[1,2,3,4].map(i => (
-                <div key={i} className="h-8 sm:h-10 w-8 sm:w-10 rounded-full border-3 sm:border-4 border-surface bg-surfaceHigh flex items-center justify-center text-[9px] sm:text-[11px] font-black text-text/40">
+                <div 
+                  key={i}
+                  aria-hidden="true"
+                  className="h-8 sm:h-10 w-8 sm:w-10 rounded-full border-3 sm:border-4 border-surface bg-surfaceHigh flex items-center justify-center text-[9px] sm:text-[11px] font-black text-text/40"
+                >
                   {String.fromCharCode(64 + i)}
                 </div>
               ))}

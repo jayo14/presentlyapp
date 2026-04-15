@@ -44,16 +44,19 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({ slug, title, vertica
           href={link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className={`group flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 ${link.color} shrink-0`}
+          aria-label={`Share on ${link.name}`}
           title={`Share on ${link.name}`}
+          className={`group flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 ${link.color} shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
         >
           {link.icon}
         </a>
       ))}
       <button
+        type="button"
         onClick={copyToClipboard}
-        className="group flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 hover:text-primary hover:bg-primary/10 shrink-0"
-        title="Copy link"
+        aria-label="Copy link to clipboard"
+        title="Copy link to clipboard"
+        className="group flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl border border-outline/10 bg-surface/40 backdrop-blur-sm transition-all duration-300 hover:text-primary hover:bg-primary/10 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         <LinkIcon size={18} />
       </button>

@@ -45,13 +45,34 @@ export const LandingFooter: React.FC = () => {
             GPS-verified real-time attendance system optimizing institutional flow and precision.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all">
+            <a 
+              href="https://twitter.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Follow us on Twitter"
+              title="Follow us on Twitter"
+              className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
               <Twitter size={18} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all">
+            <a 
+              href="https://linkedin.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Connect with us on LinkedIn"
+              title="Connect with us on LinkedIn"
+              className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
               <Linkedin size={18} />
             </a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all">
+            <a 
+              href="https://github.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="View our code on GitHub"
+              title="View our code on GitHub"
+              className="p-2 rounded-full border border-outline/20 text-[var(--on-surface-variant)] hover:text-primary hover:bg-surfaceHigh transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
               <Github size={18} />
             </a>
           </div>
