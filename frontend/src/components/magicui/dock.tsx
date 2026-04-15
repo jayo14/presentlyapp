@@ -63,8 +63,11 @@ export const Dock: React.FC<DockProps> = ({ items }) => {
               key={item.id}
               type="button"
               onClick={item.onClick}
+              aria-label={item.label}
+              title={item.label}
               className={cn(
                 'group relative flex flex-col items-center justify-center outline-none transition-all',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                 isAccent ? 'w-20' : 'flex-1 h-full'
               )}
             >
