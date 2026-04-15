@@ -143,15 +143,19 @@ export default defineConfig(({ mode }) => {
           'es-toolkit',
           '@google/genai',
           'p-retry',
+          '@mapbox/mapbox-gl-draw',
+          '@mapbox/geojson-area',
+          '@mapbox/point-geometry',
+          '@mapbox/unitbezier',
         ],
-        exclude: ['maplibre-gl', '@mapbox/mapbox-gl-draw', '@mapbox/geojson-area', 'firebase'],
+        exclude: ['maplibre-gl', 'firebase'],
         esbuildOptions: {
           target: 'es2022',
           define: {
             global: 'globalThis',
           },
           // Avoid emitting __name helper wrappers in prebundled deps.
-          keepNames: false,
+          keepNames: true,
         }
       },
       // Additional esbuild options
