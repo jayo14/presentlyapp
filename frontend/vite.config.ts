@@ -26,27 +26,92 @@ export default defineConfig(({ mode }) => {
         dedupe: ['react', 'react-dom'],
       },
       build: {
-        // Enable code splitting with careful control over chunks
+        // Enable code splitting with aggressive dynamic chunking
         rollupOptions: {
           output: {
-            manualChunks: {
-              'vendor-core': ['react', 'react-dom', 'react-router-dom', 'lucide-react', 'sonner', 'class-variance-authority', 'tailwind-merge', 'clsx'],
-              'vendor-query': ['@tanstack/react-query'],
-              'vendor-map': ['maplibre-gl'],
-              'vendor-charts': ['recharts'],
-              'chunk-admin': ['./components/Dashboard/AdminDashboard'],
-              'chunk-auth': ['./components/Auth/Login', './components/Auth/Register', './components/Auth/Onboarding']
+            manualChunks: (id) => {
+              // PHASE 1: Lazy-load maplibre-gl (1GB+) - only used in admin VenueMap
+              if (id.includes('maplibre-gl') || id.includes('@maplibre/')) {
+                return 'vendor-map-lazy';
+              }
+              
+              // PHASE 1: Lazy-load recharts (385KB) - only used in dashboards
+              if (id.includes('recharts')) {
+                return 'vendor-charts-lazy';
+              }
+              
+              // PHASE 2: Separate markdown bundle - used only on blog pages
+              if (id.includes('react-markdown') || 
+                  id.includes('remark-gfm') || 
+                  id.includes('rehype-slug') || 
+                  id.includes('rehype-highlight') ||
+                  id.includes('mdast-util-') ||
+                  id.includes('unified') ||
+                  id.includes('micromark')) {
+                return 'vendor-markdown';
+              }
+              
+              // Core vendor - always needed
+              if (id.includes('node_modules/react') && 
+                  !id.includes('react-markdown') && 
+                  !id.includes('react-leaflet')) {
+                return 'vendor-core';
+              }
+              if (id.includes('node_modules/react-dom')) {
+                return 'vendor-core';
+              }
+              if (id.includes('react-router-dom') || id.includes('react-router/')) {
+                return 'vendor-core';
+              }
+              if (id.includes('lucide-react') || 
+                  id.includes('sonner') || 
+                  id.includes('class-variance-authority') || 
+                  id.includes('tailwind-merge') || 
+                  id.includes('clsx')) {
+                return 'vendor-core';
+              }
+              
+              // Query management
+              if (id.includes('@tanstack/react-query')) {
+                return 'vendor-query';
+              }
+              
+              // Motion library
+              if (id.includes('framer-motion')) {
+                return 'vendor-motion';
+              }
+              
+              // Admin dashboard - admin only
+              if (id.includes('components/Dashboard/AdminDashboard')) {
+                return 'chunk-admin';
+              }
+              
+              // Auth routes - loaded on demand
+              if (id.includes('components/Auth')) {
+                return 'chunk-auth';
+              }
+              
+              // Leaflet/map libraries - lazy load
+              if (id.includes('leaflet') || id.includes('react-leaflet')) {
+                return 'vendor-leaflet-lazy';
+              }
             }
           },
         },
-        // Optimize chunk size
-        chunkSizeWarningLimit: 600,
-        // Terser with specific configurations
+        // Aggressive chunk size limits
+        chunkSizeWarningLimit: 300,
+        // Terser with aggressive settings
         minify: 'terser',
         terserOptions: {
           compress: {
             drop_console: true,
             drop_debugger: true,
+            passes: 3,
+            ecma: 2022,
+          },
+          mangle: true,
+          format: {
+            comments: false,
           },
         },
         // Source maps for debugging (disable in production for performance)
@@ -71,13 +136,11 @@ export default defineConfig(({ mode }) => {
           '@tanstack/react-query',
           'axios',
           'lucide-react',
-          'maplibre-gl',
-          '@mapbox/mapbox-gl-draw',
           'framer-motion',
           'next-themes',
           'react-helmet-async',
         ],
-        exclude: ['@google/genai'],
+        exclude: ['@google/genai', 'maplibre-gl', '@mapbox/mapbox-gl-draw', 'recharts', 'firebase'],
         esbuildOptions: {
           target: 'es2022',
           define: {
