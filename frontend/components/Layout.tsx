@@ -306,7 +306,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         <div className={`h-14 flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'px-4'} border-b border-border flex-shrink-0`}>
           {sidebarCollapsed ? (
             <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-              <img src="/logo.png" alt="Presently" className="w-full h-full object-contain" />
+              <picture>
+                <source srcSet="/logo.avif" type="image/avif" />
+                <source srcSet="/logo.webp" type="image/webp" />
+                <img src="/logo.png" alt="Presently" width={32} height={32} className="w-full h-full object-contain" />
+              </picture>
             </div>
           ) : (
             <Logo className="text-text" />

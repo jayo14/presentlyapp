@@ -176,14 +176,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     </div>
                   ) : (
                     <>
-                      <img
-                        src="/images/dashboard_hero.png"
-                        alt="Course Visual"
-                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1620641788421-7a1c342f4ec6?q=80&w=1000";
-                        }}
-                      />
+                      <picture>
+                        <source srcSet="/images/dashboard_hero.avif" type="image/avif" />
+                        <source srcSet="/images/dashboard_hero.webp" type="image/webp" />
+                        <img
+                          src="/images/dashboard_hero.png"
+                          alt="Course Visual"
+                          width={1600}
+                          height={400}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1620641788421-7a1c342f4ec6?q=80&w=1000";
+                          }}
+                        />
+                      </picture>
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
                     </>
                   )}
