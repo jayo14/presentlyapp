@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import * as maplibregl from 'maplibre-gl';
+import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -621,14 +621,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     map.on('load', () => {
       addSourcesAndLayers(map);
       renderVenueMarkers(map);
-      
+
       // Perform multiple resizes to catch any late layout shifts
       map.resize();
       window.setTimeout(() => map.resize(), 100);
       window.setTimeout(() => map.resize(), 500);
       window.setTimeout(() => map.resize(), 1000);
       window.setTimeout(() => map.resize(), 2000);
-      
+
       setMapReady(true);
     });
 
@@ -723,23 +723,23 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     const handleResize = () => {
       if (map && map.getCanvas()) {
-         map.resize();
+        map.resize();
       }
     };
 
     const observer = new ResizeObserver(() => {
-        // Debounce resize to prevent performance issues but ensure it eventually recalculates
-        window.requestAnimationFrame(handleResize);
+      // Debounce resize to prevent performance issues but ensure it eventually recalculates
+      window.requestAnimationFrame(handleResize);
     });
-    
+
     observer.observe(container);
     window.addEventListener('resize', handleResize);
 
     const rafId = window.requestAnimationFrame(handleResize);
     const timeoutIds = [
-        window.setTimeout(handleResize, 100),
-        window.setTimeout(handleResize, 500),
-        window.setTimeout(handleResize, 1000)
+      window.setTimeout(handleResize, 100),
+      window.setTimeout(handleResize, 500),
+      window.setTimeout(handleResize, 1000)
     ];
 
     return () => {
@@ -799,9 +799,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
               // to prevent "Map cannot fit" errors.
               const minDim = Math.min(canvas.clientWidth, canvas.clientHeight);
               const safePadding = Math.max(10, Math.floor(minDim / 4)); // Use 1/4 of size as padding, at least 10px
-              
-              map.fitBounds(bounds, { 
-                padding: safePadding, 
+
+              map.fitBounds(bounds, {
+                padding: safePadding,
                 maxZoom: 16,
                 animate: true,
                 duration: 1000
@@ -1037,47 +1037,47 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
   return (
     <div className="relative flex-1 w-full h-full min-h-[500px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col">
-      <div 
-        ref={mapContainerRef} 
-        className="absolute inset-0 w-full h-full z-0" 
+      <div
+        ref={mapContainerRef}
+        className="absolute inset-0 w-full h-full z-0"
       />
 
       {/* Real-time Compass UI Overlay */}
       {showCompass && heading !== null && (
         <div className="absolute top-6 right-6 z-20 flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-500">
-           <div className="relative w-28 h-28 bg-black/60 backdrop-blur-md rounded-full border-2 border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
-              {/* Compass Ring */}
-              <div 
-                className="absolute inset-0 transition-transform duration-300 ease-out"
-                style={{ transform: `rotate(${-heading}deg)` }}
-              >
-                 {[0, 90, 180, 270].map(deg => (
-                   <div key={deg} className="absolute inset-0 flex flex-col items-center" style={{ transform: `rotate(${deg}deg)` }}>
-                      <span className={`mt-2 text-[10px] font-black ${deg === 0 ? 'text-primary' : 'text-white/40'}`}>
-                        {deg === 0 ? 'N' : deg === 90 ? 'E' : deg === 180 ? 'S' : 'W'}
-                      </span>
-                      <div className={`w-0.5 h-2 ${deg % 90 === 0 ? 'bg-primary/60' : 'bg-white/20'}`} />
-                   </div>
-                 ))}
-                 {Array.from({ length: 12 }).map((_, i) => (
-                   <div key={i} className="absolute inset-0 flex flex-col items-center" style={{ transform: `rotate(${i * 30}deg)` }}>
-                      <div className="w-[1px] h-1.5 bg-white/10" />
-                   </div>
-                 ))}
+          <div className="relative w-28 h-28 bg-black/60 backdrop-blur-md rounded-full border-2 border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
+            {/* Compass Ring */}
+            <div
+              className="absolute inset-0 transition-transform duration-300 ease-out"
+              style={{ transform: `rotate(${-heading}deg)` }}
+            >
+              {[0, 90, 180, 270].map(deg => (
+                <div key={deg} className="absolute inset-0 flex flex-col items-center" style={{ transform: `rotate(${deg}deg)` }}>
+                  <span className={`mt-2 text-[10px] font-black ${deg === 0 ? 'text-primary' : 'text-white/40'}`}>
+                    {deg === 0 ? 'N' : deg === 90 ? 'E' : deg === 180 ? 'S' : 'W'}
+                  </span>
+                  <div className={`w-0.5 h-2 ${deg % 90 === 0 ? 'bg-primary/60' : 'bg-white/20'}`} />
+                </div>
+              ))}
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="absolute inset-0 flex flex-col items-center" style={{ transform: `rotate(${i * 30}deg)` }}>
+                  <div className="w-[1px] h-1.5 bg-white/10" />
+                </div>
+              ))}
+            </div>
+
+            {/* Fixed Direction Pointer */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-1 h-8 bg-gradient-to-t from-primary to-primary/40 rounded-full shadow-[0_0_15px_rgba(255,215,0,0.5)]" />
+              <div className="mt-1 text-[14px] font-black text-white font-mono tracking-tighter">
+                {Math.round(heading)}°
               </div>
-              
-              {/* Fixed Direction Pointer */}
-              <div className="relative z-10 flex flex-col items-center">
-                 <div className="w-1 h-8 bg-gradient-to-t from-primary to-primary/40 rounded-full shadow-[0_0_15px_rgba(255,215,0,0.5)]" />
-                 <div className="mt-1 text-[14px] font-black text-white font-mono tracking-tighter">
-                   {Math.round(heading)}°
-                 </div>
-              </div>
-           </div>
-           
-           <div className="px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/5 text-[8px] font-black text-white/60 tracking-[0.2em] uppercase">
-             Live Telemetry
-           </div>
+            </div>
+          </div>
+
+          <div className="px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/5 text-[8px] font-black text-white/60 tracking-[0.2em] uppercase">
+            Live Telemetry
+          </div>
         </div>
       )}
 
