@@ -36,6 +36,9 @@ export const OfflineIndicator: React.FC = () => {
 
   return (
     <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
       className={[
         'fixed top-4 left-1/2 -translate-x-1/2 z-[9999]',
         'px-4 py-2 rounded-full shadow-lg transition-all duration-300',
