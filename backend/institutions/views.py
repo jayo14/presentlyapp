@@ -2053,9 +2053,13 @@ def student_dashboard_summary(request):
         end_time__gt=now
     ).select_related('course', 'venue')
     
-    # Overall attendance rate
+    # Overall attendance rate (Include LATE and FLAGGED as present)
     all_sessions = AttendanceSession.objects.filter(course_id__in=course_ids, is_active=False)
-    attended_count = Attendance.objects.filter(student=user, status='PRESENT', session__in=all_sessions).count()
+    attended_count = Attendance.objects.filter(
+        student=user, 
+        status__in=['PRESENT', 'LATE', 'FLAGGED'], 
+        session__in=all_sessions
+    ).count()
     total_sessions_counted = all_sessions.count()
     overall_attendance = (attended_count / total_sessions_counted * 100) if total_sessions_counted > 0 else 0
     

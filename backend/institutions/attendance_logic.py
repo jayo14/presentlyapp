@@ -130,6 +130,8 @@ def perform_attendance_check_in(request, session, method='In-App'):
     logger.warning("=== END DEBUG ===")
     # ========== END DEBUG LOGGING ==========
     
+    # ========== PHASE 1: SESSION & PERMISSION CHECKS ==========
+    now = timezone.now()
     data = request.data
     samples = data.get('samples', [])
     visitor_id = data.get('visitorId') or data.get('visitor_id')
@@ -156,63 +158,40 @@ def perform_attendance_check_in(request, session, method='In-App'):
 
     is_superuser = getattr(request.user, 'is_superuser', False)
 
-    # PHASE 2: Log role checking
-    logger.warning("=== PERMISSION CHECK: ROLE ===")
-    logger.warning(f"IS_SUPERUSER: {is_superuser}")
+    # 1. Role Check
     user_role = getattr(request.user, 'role', None)
-    logger.warning(f"USER_ROLE: {user_role}")
-    logger.warning(f"ROLE == STUDENT: {user_role == UserRole.STUDENT if user_role else 'N/A'}")
-    logger.warning(f"CHECK PASSES: {is_superuser or user_role == UserRole.STUDENT}")
-    logger.warning("=== END ROLE CHECK ===")
+    if not is_superuser and user_role != UserRole.STUDENT:
+        logger.error(f"BLOCKING: User {request.user.email} (role: {user_role}) is not a student")
+        return Response({
+            'success': False, 
+            'status': 'error', 
+            'error': 'Only students can mark attendance'
+        }, status=status.HTTP_403_FORBIDDEN)
 
-    if not is_superuser and request.user.role != UserRole.STUDENT:
-        logger.error("BLOCKING: User is neither superuser nor student")
-        return Response({'success': False, 'status': 'error', 'error': 'Only students can check in'}, status=status.HTTP_403_FORBIDDEN)
-
-    # PHASE 2: Log enrollment checking
-    logger.warning("=== PERMISSION CHECK: ENROLLMENT ===")
-    if is_superuser:
-        logger.warning("SUPERUSER BYPASS: Skipping enrollment check")
-    else:
-        enrollment_query = CourseEnrollment.objects.filter(
+    # 2. Enrollment Check
+    if not is_superuser:
+        enrollment = CourseEnrollment.objects.filter(
             student=request.user,
             course=session.course,
             is_active=True,
-        )
-        is_enrolled = enrollment_query.exists()
-        enrollment_count = enrollment_query.count()
+        ).first()
         
-        logger.warning(f"STUDENT: {request.user}")
-        logger.warning(f"COURSE: {session.course} (ID: {session.course.id})")
-        logger.warning(f"ENROLLMENT EXISTS: {is_enrolled}")
-        logger.warning(f"ENROLLMENT COUNT: {enrollment_count}")
-        
-        if not is_enrolled:
-            # Debug: Show all enrollments for this student
-            all_enrollments = CourseEnrollment.objects.filter(student=request.user)
-            logger.error(f"BLOCKING: Student not enrolled. Total enrollments: {all_enrollments.count()}")
-            for enroll in all_enrollments[:5]:  # Show first 5
-                logger.error(f"  - Enrolled in: {enroll.course} (Active: {enroll.is_active})")
-    logger.warning("=== END ENROLLMENT CHECK ===")
+        if not enrollment:
+            logger.error(f"BLOCKING: Student {request.user.email} is not enrolled in {session.course.code}")
+            return Response({
+                'success': False, 
+                'status': 'error', 
+                'error': f'You are not enrolled in {session.course.code}. Please register for the course first.'
+            }, status=status.HTTP_403_FORBIDDEN)
 
-    if not is_superuser:
-        enrollment, created = CourseEnrollment.objects.get_or_create(
-            student=request.user,
-            course=session.course,
-            defaults={'is_active': True, 'enrolled_at': timezone.now()}
-        )
-        if not enrollment.is_active:
-            # Re-activate dropped enrollment
-            enrollment.is_active = True
-            enrollment.save(update_fields=['is_active'])
-            logger.info(
-                f"Re-activated enrollment for {request.user.email} in {session.course.code}"
-            )
-
+    # 3. Session Status & Time Window check
     if not session.is_active:
-        return Response({'success': False, 'status': 'error', 'error': 'Session is not active'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': False, 
+            'status': 'error', 
+            'error': 'This attendance session has been closed'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
-    # ========== SESSION WINDOW VALIDATION ==========
     if now < session.start_time:
         return Response({
             'success': False,
@@ -220,15 +199,22 @@ def perform_attendance_check_in(request, session, method='In-App'):
             'error': f'Attendance window hasn\'t opened yet. Starts at {session.start_time.strftime("%I:%M %p")}'
         }, status=status.HTTP_400_BAD_REQUEST)
         
-    if session.expiry_time and now > session.expiry_time:
+    if session.end_time and now > session.end_time: # Use end_time consistently
         return Response({
             'success': False,
             'status': 'error',
             'error': 'Attendance window has closed for this session.'
         }, status=status.HTTP_400_BAD_REQUEST)
-    # ===============================================
+    
+    # Check expiry_time alias if it exists
+    if hasattr(session, 'expiry_time') and session.expiry_time and now > session.expiry_time:
+        return Response({
+            'success': False,
+            'status': 'error',
+            'error': 'Attendance window has closed for this session.'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
-    now = timezone.now()
+    # ========== PHASE 2: LOCATION & SCORING ==========
     location_data = session.get_location_coords()
     ip_address = request.META.get('REMOTE_ADDR')
     user_agent = request.META.get('HTTP_USER_AGENT', '')
@@ -260,10 +246,17 @@ def perform_attendance_check_in(request, session, method='In-App'):
     # 2. Geofence Signal (30 points)
     is_inside_any = False
     min_dist = 999999
+    is_strict = getattr(session, 'strict_mode', False) or method == 'Magic Link'
+
     if not venue_coords_valid:
-        # No venue coordinates configured — cannot verify geofence, award partial points
-        score += 15
-        flags.append("Venue coordinates not configured — geofence skipped")
+        if is_strict:
+            # STRICT REQUIREMENT: If we cannot verify location because session has no venue coords, 
+            # and the method is strict (Magic Link or Strict Mode), we do not award points.
+            flags.append("Venue coordinates missing — proximity unverified (Strict)")
+        else:
+            # Non-strict mode: Award partial points if venue is misconfigured
+            score += 15
+            flags.append("Venue coordinates not configured — geofence skipped")
     else:
         for sample in samples:
             is_inside, dist = verify_location(
@@ -277,12 +270,7 @@ def perform_attendance_check_in(request, session, method='In-App'):
         if is_inside_any: 
             score += 30
         else:
-            # STRICT GPS VALIDATION: If venue coords are valid and student is outside, 
-            # we reject if they are significantly outside (e.g. > 10m buffer beyond radius)
-            # or just hard reject based on the verification logic.
-            # In 'strict_mode' or for magic links, we are less forgiving.
-            is_strict = getattr(session, 'strict_mode', False) or method == 'Magic Link'
-            
+            # STRICT GPS VALIDATION
             if is_strict:
                 rejected_reason = f"Location verification failed: You are {min_dist:.1f}m away from the venue."
                 return Response({
