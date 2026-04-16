@@ -216,7 +216,7 @@ def perform_attendance_check_in(request, session, method='In-App'):
 
     # Prevent duplicates if manual attendance already exists for this user/session.
     matric = str(getattr(request.user, 'matric_number', '') or '').strip().upper()
-    if matric and ManualAttendanceRecord.objects.filter(session=session, matric_number__iexact=matric).exists():
+    if matric and ManualAttendanceRecord.objects.filter(session=session, matric_number=matric).exists():
         logger.info("attendance_checkin.duplicate_manual user=%s session=%s matric=%s", request.user.id, session.id, matric)
         return Response({
             'success': False,

@@ -69,7 +69,7 @@ def sync_manual_attendance_for_user(user: User) -> int:
     linked_count = 0
     with transaction.atomic():
         records = ManualAttendanceRecord.objects.select_for_update().filter(
-            matric_number__iexact=matric
+            matric_number=matric
         ).filter(Q(student__isnull=True) | Q(student=user)).select_related('session')
 
         for record in records:
@@ -1996,7 +1996,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
 
         try:
             student_filter = Q(role=UserRole.STUDENT) & (
-                Q(matric_number__iexact=matric_number) |
+                Q(matric_number=matric_number) |
                 Q(email__iexact=student_identifier)
             )
 
