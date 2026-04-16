@@ -43,8 +43,8 @@ const mapApiUser = (data: any, fallbackEmail: string): User => {
     fullName: (userData?.full_name ?? userData?.fullName ?? userData?.name ?? fullNameFromParts) || 'User',
     email: userData?.email ?? fallbackEmail,
     role: normalizeRole(userData?.role ?? userData?.user_type),
-    emailVerified: userData?.is_verified ?? userData?.emailVerified ?? true,
-    onboardingCompleted: userData?.onboarding_completed ?? userData?.onboardingCompleted ?? true,
+    emailVerified: userData?.is_verified ?? userData?.emailVerified ?? false,
+    onboardingCompleted: userData?.onboarding_completed ?? userData?.onboardingCompleted ?? false,
     matricNumber: userData?.matric_number ?? userData?.matricNumber ?? '',
     department: userData?.department ?? '',
     level: userData?.level ?? '',
@@ -195,6 +195,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const signIn = async (email: string, password: string): Promise<SignInResult> => {
     try {
       console.log('Signing in:', email);
+      const savedUser = await storage.getUser();
       
       try {
         const response: any = await api.auth.login(email, password);
@@ -212,7 +213,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
           try {
             userData = await api.auth.me();
           } catch (meError) {
-            userData = undefined;
+            if (savedUser?.email?.toLowerCase() === email.toLowerCase()) {
+              userData = savedUser;
+            } else {
+              userData = undefined;
+            }
           }
         }
 

@@ -15,7 +15,7 @@ import Fonts from '@/constants/fonts';
 export default function SignInScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const { signIn, isAuthenticated, user } = useAuth();
+  const { signIn, user } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +23,13 @@ export default function SignInScreen() {
   const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
-    if (!isAuthenticated || !user || hasRedirectedRef.current) return;
+    if (!user || hasRedirectedRef.current) return;
+
+    if (!user.emailVerified) {
+      hasRedirectedRef.current = true;
+      router.replace('/auth/verify-email');
+      return;
+    }
 
     if (!user.onboardingCompleted) {
       hasRedirectedRef.current = true;
@@ -41,7 +47,7 @@ export default function SignInScreen() {
 
     hasRedirectedRef.current = true;
     router.replace(destination);
-  }, [isAuthenticated, user, router]);
+  }, [user, router]);
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -54,7 +60,7 @@ export default function SignInScreen() {
     setLoading(false);
 
     if (result.success) {
-      if (result.requiresVerification) {
+      if (result.requiresVerification || !result.user?.emailVerified) {
         router.replace('/auth/verify-email');
         return;
       }
