@@ -31,7 +31,7 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 function AuthGate({ children }: { children: React.ReactNode }) {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading } = useAuth();
   const segments = useSegments();
   const pathname = usePathname();
   const router = useRouter();
@@ -61,8 +61,8 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (!isAuthenticated) {
-      if (!inAuth && pathname !== "/auth/verify-email") {
+    if (!user.emailVerified) {
+      if (pathname !== "/auth/verify-email") {
         router.replace("/auth/verify-email");
       }
       return;
@@ -96,7 +96,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
         router.replace(roleRoot as any);
       }
     }
-  }, [isLoading, isAuthenticated, pathname, router, segments, user]);
+  }, [isLoading, pathname, router, segments, user]);
 
   return <>{children}</>;
 }

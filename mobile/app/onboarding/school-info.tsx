@@ -5,26 +5,55 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { ChevronLeft, Search, Check, ChevronDown, ArrowRight, CheckCircle2 } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { schools, type School, type College } from '@/mocks/schools';
+import { api } from '@/services/api';
 import Fonts from '@/constants/fonts';
+
+type InstitutionOption = {
+  id: string;
+  name: string;
+};
+
+type CollegeOption = {
+  id: string;
+  name: string;
+  institution?: string | number;
+  institution_id?: string | number;
+};
+
+type DepartmentOption = {
+  id: string;
+  name: string;
+  college?: string | number;
+  college_id?: string | number;
+};
+
+const asArray = (payload: any): any[] => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (Array.isArray(payload?.data?.results)) return payload.data.results;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+};
 
 export default function SchoolInfoScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { user, isLoading, onboarding, checkAuth } = useAuth();
   
-  const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
-  const [selectedCollege, setSelectedCollege] = useState<College | null>(null);
+  const [selectedSchool, setSelectedSchool] = useState<InstitutionOption | null>(null);
+  const [selectedCollege, setSelectedCollege] = useState<CollegeOption | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
   const [idNumber, setIdNumber] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [dataLoading, setDataLoading] = useState<boolean>(false);
 
   const [showSchoolPicker, setShowSchoolPicker] = useState<boolean>(false);
   const [showCollegePicker, setShowCollegePicker] = useState<boolean>(false);
   const [showDepartmentPicker, setShowDepartmentPicker] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [schools, setSchools] = useState<InstitutionOption[]>([]);
+  const [colleges, setColleges] = useState<CollegeOption[]>([]);
+  const [departments, setDepartments] = useState<DepartmentOption[]>([]);
 
   const filteredSchools = schools.filter(school =>
     school.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -38,19 +67,78 @@ export default function SchoolInfoScreen() {
   }, [isLoading, router, user]);
 
   useEffect(() => {
-    // Subtle verification simulation
-    if (idNumber.length >= 8) {
-        setIsVerifying(true);
-        const timer = setTimeout(() => {
-            setIsVerifying(false);
-            setIsVerified(true);
-        }, 1500);
-        return () => clearTimeout(timer);
-    } else {
-        setIsVerified(false);
+    if (user) {
+      loadInstitutions();
     }
-  }, [idNumber]);
+  }, [user]);
 
+  const loadInstitutions = async () => {
+    try {
+      setDataLoading(true);
+      const response: any = await api.institutions.list();
+      const rows = asArray(response);
+      setSchools(
+        rows.map((item: any) => ({
+          id: String(item.id),
+          name: item.name || item.institution_name || 'Unnamed Institution',
+        }))
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load institutions');
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const loadColleges = async (institutionId: string) => {
+    try {
+      setDataLoading(true);
+      const response: any = await api.colleges.list({ institution: institutionId });
+      const rows = asArray(response);
+      const filteredRows = rows.filter((item: any) => {
+        const linkedInstitution = String(item.institution_id ?? item.institution ?? '');
+        return !linkedInstitution || linkedInstitution === institutionId;
+      });
+      setColleges(
+        filteredRows.map((item: any) => ({
+          id: String(item.id),
+          name: item.name || item.college_name || 'Unnamed College',
+          institution: item.institution,
+          institution_id: item.institution_id,
+        }))
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load faculties/colleges');
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const loadDepartments = async (collegeId: string) => {
+    try {
+      setDataLoading(true);
+      const response: any = await api.departments.list({ college: collegeId });
+      const rows = asArray(response);
+      const filteredRows = rows.filter((item: any) => {
+        const linkedCollege = String(item.college_id ?? item.college ?? '');
+        return !linkedCollege || linkedCollege === collegeId;
+      });
+      setDepartments(
+        filteredRows.map((item: any) => ({
+          id: String(item.id),
+          name: item.name || item.department_name || 'Unnamed Department',
+          college: item.college,
+          college_id: item.college_id,
+        }))
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load departments');
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const isVerified = idNumber.trim().length >= 8;
 
   const handleComplete = async () => {
     if (!user || !selectedSchool || !selectedCollege || !selectedDepartment || !idNumber) return;
@@ -181,7 +269,6 @@ export default function SchoolInfoScreen() {
                   autoCapitalize="characters"
                 />
                 <View style={styles.idStatusContainer}>
-                  {isVerifying && <ActivityIndicator size="small" color={colors.primary} />}
                   {isVerified && (
                     <View style={styles.verifiedBadge}>
                         <Text style={[styles.verifiedText, { color: colors.primary }]}>VERIFIED</Text>
@@ -191,7 +278,7 @@ export default function SchoolInfoScreen() {
                 </View>
               </View>
               <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-                ID verified against university directory
+                Enter a valid ID (minimum 8 characters)
               </Text>
             </View>
           </View>
@@ -236,16 +323,24 @@ export default function SchoolInfoScreen() {
             <FlatList
               data={filteredSchools}
               keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                dataLoading
+                  ? <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 16 }} />
+                  : <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No institutions found</Text>
+              }
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[styles.listItem, selectedSchool?.id === item.id && { backgroundColor: colors.primary + '1A' }]}
-                  onPress={() => {
-                    setSelectedSchool(item);
-                    setSelectedCollege(null);
-                    setSelectedDepartment('');
-                    setShowSchoolPicker(false);
-                    setSearchQuery('');
-                  }}
+                    onPress={() => {
+                      setSelectedSchool(item);
+                      setSelectedCollege(null);
+                      setColleges([]);
+                      setDepartments([]);
+                      setSelectedDepartment('');
+                      setShowSchoolPicker(false);
+                      setSearchQuery('');
+                      loadColleges(item.id);
+                    }}
                 >
                   <Text style={[styles.listItemText, { color: colors.text }]}>{item.name}</Text>
                   {selectedSchool?.id === item.id && <Check size={20} color={colors.primary} />}
@@ -267,8 +362,13 @@ export default function SchoolInfoScreen() {
               </TouchableOpacity>
             </View>
             <FlatList
-              data={selectedSchool?.colleges || []}
+              data={colleges}
               keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                dataLoading
+                  ? <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 16 }} />
+                  : <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No faculties/colleges found</Text>
+              }
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[styles.listItem, selectedCollege?.id === item.id && { backgroundColor: colors.primary + '1A' }]}
@@ -276,6 +376,7 @@ export default function SchoolInfoScreen() {
                     setSelectedCollege(item);
                     setSelectedDepartment('');
                     setShowCollegePicker(false);
+                    loadDepartments(item.id);
                   }}
                 >
                   <Text style={[styles.listItemText, { color: colors.text }]}>{item.name}</Text>
@@ -298,18 +399,23 @@ export default function SchoolInfoScreen() {
               </TouchableOpacity>
             </View>
             <FlatList
-              data={selectedCollege?.departments || []}
-              keyExtractor={(item) => item}
+              data={departments}
+              keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                dataLoading
+                  ? <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 16 }} />
+                  : <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No departments found</Text>
+              }
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.listItem, selectedDepartment === item && { backgroundColor: colors.primary + '1A' }]}
+                  style={[styles.listItem, selectedDepartment === item.name && { backgroundColor: colors.primary + '1A' }]}
                   onPress={() => {
-                    setSelectedDepartment(item);
+                    setSelectedDepartment(item.name);
                     setShowDepartmentPicker(false);
                   }}
                 >
-                  <Text style={[styles.listItemText, { color: colors.text }]}>{item}</Text>
-                  {selectedDepartment === item && <Check size={20} color={colors.primary} />}
+                  <Text style={[styles.listItemText, { color: colors.text }]}>{item.name}</Text>
+                  {selectedDepartment === item.name && <Check size={20} color={colors.primary} />}
                 </TouchableOpacity>
               )}
             />
@@ -529,6 +635,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.lexend.medium,
     flex: 1,
+  },
+  emptyText: {
+    fontSize: 14,
+    fontFamily: Fonts.lexend.medium,
+    textAlign: 'center',
+    marginTop: 16,
   },
   glowTop: {
     position: 'absolute',
