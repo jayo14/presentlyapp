@@ -441,7 +441,7 @@ const App: React.FC = () => {
     let isMounted = true;
 
     const wakeServer = async () => {
-      const minimumSplashMs = 2200;
+      const minimumSplashMs = 800; // Reduced from 2200 for faster perceived load
       const requestTimeoutMs = 5000;
       const startedAt = Date.now();
       const controller = new AbortController();
