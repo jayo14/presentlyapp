@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from .views import send_verification_email
 from rest_framework.test import APIRequestFactory, force_authenticate
-from .views import request_password_reset_view, login_view
+from .views import request_password_reset_view, login_view, send_verification_otp_view
 from unittest.mock import patch
 
 User = get_user_model()
@@ -31,6 +31,32 @@ class EmailTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mock_dispatch.call_args.kwargs["template_key"], "reset_password")
+
+    @patch("institutions.views.send_reset_password_email")
+    def test_request_password_reset_email_failure_does_not_return_500(self, mock_send_reset):
+        mock_send_reset.side_effect = Exception("quota exceeded")
+        request = self.factory.post('/api/auth/password-reset/', {'email': self.user.email})
+        response = request_password_reset_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["success"])
+        self.assertTrue(response.data["email_send_failed"])
+
+    @patch("institutions.views.send_verify_email")
+    def test_send_verification_otp_email_failure_does_not_return_500(self, mock_send_verify):
+        mock_send_verify.side_effect = Exception("quota exceeded")
+        unverified_user = User.objects.create_user(
+            email="unverified@example.com",
+            password="password123",
+            full_name="Unverified User",
+            email_verified=False,
+        )
+        request = self.factory.post('/api/auth/email-verification/send/', {'email': unverified_user.email})
+        response = send_verification_otp_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["success"])
+        self.assertTrue(response.data["otp_send_failed"])
 
     def test_new_device_alert_email(self):
         with patch("utils.email._dispatch_template_email") as mock_dispatch:
