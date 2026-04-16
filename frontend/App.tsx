@@ -11,6 +11,7 @@ import { offlineSyncManager } from './src/utils/offlineSync';
 import { OfflineIndicator } from './src/components/OfflineIndicator';
 import { Loader2 } from 'lucide-react';
 import { ThemeProvider } from './components/ThemeProvider';
+import { AnalyticsTracker } from './components/Analytics/AnalyticsTracker';
 
 // Eager load critical components for initial page
 import { Login } from './components/Auth/Login';
@@ -481,6 +482,7 @@ const App: React.FC = () => {
     <ThemeProvider defaultTheme="system">
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <AnalyticsTracker />
           <OfflineIndicator />
           <Toaster position="top-right" richColors closeButton />
           <PWAInstallPrompt />

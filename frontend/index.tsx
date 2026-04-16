@@ -18,20 +18,6 @@ const initializeTheme = () => {
   }
 };
 
-// SEO: Load analytics lazily after initial page load.
-const loadGtagLazy = () => {
-  const measurementId = 'G-78VRQFZFKQ';
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script);
-
-  (window as any).dataLayer = (window as any).dataLayer || [];
-  const gtag = (...args: unknown[]) => (window as any).dataLayer.push(args);
-  (window as any).gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', measurementId);
-};
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -79,9 +65,6 @@ void initializeFirebaseAnalytics();
 
 initializeTheme();
 
-window.addEventListener('load', () => {
-  loadGtagLazy();
-});
 
 // Register Service Worker in production only.
 // In development, stale SW caches can cause old chunks to be served and crash the app.
