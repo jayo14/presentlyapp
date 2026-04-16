@@ -708,6 +708,66 @@ class Attendance(models.Model):
         return f"{self.student.full_name} - {self.session}"
 
 
+class ManualAttendanceRecord(models.Model):
+    """Manual attendance entries keyed primarily by matric number."""
+
+    SOURCE_MANUAL = 'MANUAL'
+    SOURCE_CHOICES = [
+        (SOURCE_MANUAL, 'Manual'),
+    ]
+
+    session = models.ForeignKey(
+        AttendanceSession,
+        on_delete=models.CASCADE,
+        related_name='manual_attendance_records'
+    )
+    matric_number = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=255)
+    student = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='manual_attendance_records',
+        null=True,
+        blank=True
+    )
+    recorded_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='recorded_manual_attendance_records',
+        null=True,
+        blank=True
+    )
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default=SOURCE_MANUAL)
+    linked_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'manual_attendance_records'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['session', 'matric_number'],
+                name='unique_manual_attendance_per_session_matric'
+            )
+        ]
+        indexes = [
+            models.Index(fields=['matric_number']),
+            models.Index(fields=['student']),
+            models.Index(fields=['created_at']),
+        ]
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if self.matric_number:
+            self.matric_number = self.matric_number.strip().upper()
+        if self.full_name:
+            self.full_name = self.full_name.strip()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.matric_number} - session {self.session_id}"
+
+
 class EmailVerificationOTP(models.Model):
     """OTP for email verification"""
     

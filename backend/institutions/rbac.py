@@ -105,11 +105,12 @@ def seed_permissions_and_roles() -> None:
             perm = permission_by_code.get(code)
             if perm:
                 RolePermission.objects.get_or_create(role=role, permission=perm)
+    get_all_permission_codenames.cache_clear()
 
 
 from functools import lru_cache
 
-@lru_cache(max_age=1)
+@lru_cache(maxsize=1)
 def get_all_permission_codenames() -> List[str]:
     return sorted(RBACPermission.objects.values_list("codename", flat=True))
 

@@ -221,6 +221,7 @@ export const PublicCheckInPage: React.FC = () => {
     if (!session) return;
 
     try {
+      console.info('[attendance] check-in start', { sessionId: session.id, sessionCode, userId: user?.id });
       setCheckingIn(true);
       setError(null);
 
@@ -258,6 +259,7 @@ export const PublicCheckInPage: React.FC = () => {
       }
 
       const result = await sessionApi.checkIn(session.id, checkInData);
+      console.info('[attendance] check-in success', { sessionId: session.id, status: result.status });
 
       toast.success('Attendance marked successfully!', {
         description: `Status: ${result.status}`
@@ -268,6 +270,13 @@ export const PublicCheckInPage: React.FC = () => {
       setTimeout(() => navigate('/dashboard'), 2000);
 
     } catch (err: any) {
+      console.error('[attendance] check-in failed', {
+        sessionId: session?.id,
+        sessionCode,
+        status: err?.response?.status,
+        payload: err?.response?.data,
+        message: err?.message,
+      });
       const rawMsg = err.response?.data?.error || err.message || 'Check-in failed';
       const status = err.response?.status;
       let userFriendlyMsg = rawMsg;

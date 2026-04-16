@@ -175,9 +175,7 @@ export const sessionApi = {
     } catch (error: any) {
       // Only retry on 5xx (server errors), never on 4xx (client errors including 403/429)
       if (error.response && error.response.status >= 400 && error.response.status < 500) {
-        // Do not retry — show the error to the user
-        const data = error.response.data;
-        throw new Error(data.error || data.reason || 'Check-in failed');
+        throw error;
       }
       throw error;
     }
