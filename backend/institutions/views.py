@@ -12,6 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
+from django.db.utils import IntegrityError
 from django.core import signing
 from django_ratelimit.decorators import ratelimit
 from django_ratelimit.core import is_ratelimited
@@ -37,7 +38,7 @@ from utils.email import (
 from .attendance_logic import perform_attendance_check_in
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
-    Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable
+    Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable, ManualAttendanceRecord
 )
 from .rbac import user_has_permission
 from accounts.models import UserDevice
@@ -53,6 +54,49 @@ from .geolocation_utils import verify_location, calculate_distance
 # Configure logging
 auth_logger = logging.getLogger('auth_events')
 logger = logging.getLogger(__name__)
+
+
+def _normalize_matric(matric_number: str) -> str:
+    return str(matric_number or '').strip().upper()
+
+
+def sync_manual_attendance_for_user(user: User) -> int:
+    """Link manual attendance records to a user by matric number and materialize Attendance rows."""
+    matric = _normalize_matric(getattr(user, 'matric_number', ''))
+    if not matric:
+        return 0
+
+    linked_count = 0
+    with transaction.atomic():
+        records = ManualAttendanceRecord.objects.select_for_update().filter(
+            matric_number__iexact=matric
+        ).filter(Q(student__isnull=True) | Q(student=user)).select_related('session')
+
+        for record in records:
+            Attendance.objects.get_or_create(
+                session=record.session,
+                student=user,
+                defaults={
+                    'status': 'PRESENT',
+                    'location_verified': False,
+                    'trust_score': 100,
+                    'verification_metadata': {
+                        'source': 'manual',
+                        'manual_record_id': record.id,
+                        'matric_number': matric,
+                    },
+                }
+            )
+
+            if record.student_id != user.id or record.linked_at is None:
+                record.student = user
+                record.linked_at = timezone.now()
+                record.save(update_fields=['student', 'linked_at', 'updated_at'])
+                linked_count += 1
+
+    if linked_count:
+        logger.info("Linked %s manual attendance records for user=%s matric=%s", linked_count, user.id, matric)
+    return linked_count
 
 
 def _safe_payload_summary(payload, max_preview: int = 500) -> dict:
@@ -918,10 +962,12 @@ def complete_onboarding_view(request):
     serializer = OnboardingSerializer(request.user, data=request.data, partial=True)
     if serializer.is_valid():
         user = serializer.save()
+        linked_manual_records = sync_manual_attendance_for_user(user)
         return Response({
             'success': True,
             'message': 'Onboarding completed successfully',
-            'user': UserProfileSerializer(user).data
+            'user': UserProfileSerializer(user).data,
+            'linked_manual_attendance_records': linked_manual_records,
         }, status=status.HTTP_200_OK)
     return Response({
         'success': False,
@@ -1929,27 +1975,28 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def manual_mark(self, request, pk=None):
-        """Lecturer manually marks a student present"""
+        """Create/update manual attendance by matric and optionally link to an existing student."""
         session = self.get_object()
         if request.user.role != UserRole.ADMIN and session.course.lecturer != request.user:
             return Response({'success': False, 'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
 
-        raw_student_identifier = (
-            request.data.get('student_id')
-            or request.data.get('matric_number')
-            or request.data.get('student_identifier')
-            or ''
-        )
+        raw_student_identifier = request.data.get('student_id') or request.data.get('student_identifier') or ''
         student_identifier = str(raw_student_identifier).strip()
+        matric_number = _normalize_matric(request.data.get('matric_number') or student_identifier)
+        full_name = str(request.data.get('full_name') or '').strip()
         status_choice = request.data.get('status', 'PRESENT')
-        reason = request.data.get('reason', 'Manual override by lecturer')
+        reason = str(request.data.get('reason', 'Manual override by lecturer')).strip()
 
-        if not student_identifier:
-            return Response({'success': False, 'error': 'student_id or matric_number is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not matric_number:
+            return Response({'success': False, 'error': 'matric_number is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if len(matric_number) < 4 or len(matric_number) > 50:
+            return Response({'success': False, 'error': 'Invalid matric number format'}, status=status.HTTP_400_BAD_REQUEST)
+        if status_choice not in dict(Attendance.STATUS_CHOICES):
+            return Response({'success': False, 'error': 'Invalid attendance status'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             student_filter = Q(role=UserRole.STUDENT) & (
-                Q(matric_number__iexact=student_identifier) |
+                Q(matric_number__iexact=matric_number) |
                 Q(email__iexact=student_identifier)
             )
 
@@ -1961,30 +2008,62 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 pass
 
             student = User.objects.filter(student_filter).first()
-            if not student:
-                return Response({'success': False, 'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
+            if not full_name and student:
+                full_name = student.full_name
+            if not full_name:
+                return Response({'success': False, 'error': 'full_name is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Manual mark is only valid for enrolled students in the session course.
-            if not CourseEnrollment.objects.filter(student=student, course=session.course, is_active=True).exists():
-                return Response({'success': False, 'error': 'Student is not enrolled in this course'}, status=status.HTTP_400_BAD_REQUEST)
+            with transaction.atomic():
+                manual_record, manual_created = ManualAttendanceRecord.objects.update_or_create(
+                    session=session,
+                    matric_number=matric_number,
+                    defaults={
+                        'full_name': full_name,
+                        'recorded_by': request.user,
+                        'student': student if student else None,
+                        'linked_at': timezone.now() if student else None,
+                    },
+                )
 
-            attendance, created = Attendance.objects.update_or_create(
-                session=session,
-                student=student,
-                defaults={
-                    'status': status_choice,
-                    'confidence_score': 100,  # Manual override is 100% trusted
-                    'notes': reason,
-                    'checked_in_at': timezone.now()
-                }
-            )
+                attendance = None
+                if student:
+                    attendance, _ = Attendance.objects.update_or_create(
+                        session=session,
+                        student=student,
+                        defaults={
+                            'status': status_choice,
+                            'location_verified': False,
+                            'trust_score': 100,
+                            'verification_metadata': {
+                                'source': 'manual',
+                                'manual_record_id': manual_record.id,
+                                'reason': reason,
+                            },
+                        }
+                    )
+
             return Response({
                 'success': True,
-                'message': f"Student {student.full_name} marked as {status_choice}",
-                'data': AttendanceSerializer(attendance).data
+                'message': (
+                    f"Manual attendance recorded for {full_name}. "
+                    + (f"Linked to {student.full_name}." if student else "Will auto-link on signup by matric number.")
+                ),
+                'data': {
+                    'manual_record_id': manual_record.id,
+                    'matric_number': manual_record.matric_number,
+                    'full_name': manual_record.full_name,
+                    'linked_to_user': bool(student),
+                    'attendance': AttendanceSerializer(attendance).data if attendance else None,
+                    'created': manual_created,
+                }
             })
+        except IntegrityError:
+            return Response(
+                {'success': False, 'error': 'Duplicate manual attendance entry for this session and matric number'},
+                status=status.HTTP_409_CONFLICT
+            )
         except Exception:
-            logger.exception("Manual attendance mark failed for session=%s student_identifier=%s", session.id, student_identifier)
+            logger.exception("Manual attendance mark failed for session=%s matric=%s", session.id, matric_number)
             return Response({'success': False, 'error': 'Unable to mark attendance at the moment'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'])
