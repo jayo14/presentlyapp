@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Clock, Users, MapPin, Copy, CheckCircle2, AlertTriangle, Timer, Power, Share2, QrCode } from 'lucide-react';
+import { X, Clock, Users, MapPin, Copy, CheckCircle2, AlertTriangle, Timer, Power, Share2, QrCode, UserPlus } from 'lucide-react';
 import { Button } from '../Button';
 import { QRCodeSVG } from 'qrcode.react';
 import { AttendanceSession, sessionApi } from '../../services/api/attendance';
+import { dashboardApi } from '../../services/api/dashboard';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +19,10 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
   const [isEnding, setIsEnding] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [showEndConfirmation, setShowEndConfirmation] = useState(false);
+  const [showManualAttendance, setShowManualAttendance] = useState(false);
+  const [manualFullName, setManualFullName] = useState('');
+  const [manualMatric, setManualMatric] = useState('');
+  const [submittingManual, setSubmittingManual] = useState(false);
 
   const { modalProps } = useModalAccessibility(true, onClose);
 
@@ -116,6 +121,32 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
     } finally {
       setIsEnding(false);
       setShowEndConfirmation(false);
+    }
+  };
+
+  const handleManualAttendanceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const fullName = manualFullName.trim();
+    const matric = manualMatric.trim().toUpperCase();
+
+    if (!fullName || !matric) {
+      toast.error('Full name and matric number are required');
+      return;
+    }
+
+    try {
+      setSubmittingManual(true);
+      await dashboardApi.manualMark(session.id, matric, 'PRESENT', fullName);
+      toast.success('Manual attendance recorded');
+      setManualFullName('');
+      setManualMatric('');
+      setShowManualAttendance(false);
+      if (onSessionEnded) onSessionEnded();
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || 'Failed to record manual attendance';
+      toast.error(msg);
+    } finally {
+      setSubmittingManual(false);
     }
   };
 
@@ -238,6 +269,13 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
                 <QrCode size={14} className="sm:w-4 sm:h-4" />
                 Save QR
               </button>
+              <button
+                onClick={() => setShowManualAttendance(true)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-primary/10 border border-primary/30 rounded-xl sm:rounded-2xl text-primary hover:bg-primary hover:text-black transition-all font-bold text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap"
+              >
+                <UserPlus size={14} className="sm:w-4 sm:h-4" />
+                Manual Attendance
+              </button>
             </div>
           </div>
 
@@ -327,6 +365,71 @@ export const SessionDetailDialog: React.FC<SessionDetailDialogProps> = ({ sessio
         className="fixed inset-0 opacity-[0.04] pointer-events-none -z-10"
         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #fff 1px, transparent 0)', backgroundSize: '40px 40px' }}
       ></div>
+
+      <AnimatePresence>
+        {showManualAttendance && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[120] bg-black/70 backdrop-blur-sm flex items-center justify-center p-6"
+          >
+            <motion.form
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onSubmit={handleManualAttendanceSubmit}
+              className="w-full max-w-lg bg-zinc-900 border border-white/10 rounded-3xl p-6 sm:p-8 space-y-5"
+            >
+              <div className="space-y-1">
+                <h3 className="text-2xl font-black text-white">Manual Attendance</h3>
+                <p className="text-xs text-slate-400">Capture attendance by Full Name and Matric Number.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Full Name</label>
+                <input
+                  type="text"
+                  value={manualFullName}
+                  onChange={(e) => setManualFullName(e.target.value)}
+                  className="w-full h-12 rounded-xl px-4 bg-zinc-950 border border-white/15 text-white outline-none focus:border-primary"
+                  placeholder="Student full name"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Matric Number</label>
+                <input
+                  type="text"
+                  value={manualMatric}
+                  onChange={(e) => setManualMatric(e.target.value.toUpperCase())}
+                  className="w-full h-12 rounded-xl px-4 bg-zinc-950 border border-white/15 text-white outline-none focus:border-primary"
+                  placeholder="CSC/2019/001"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  className="flex-1 h-11 rounded-xl border border-white/20 text-slate-300 font-bold"
+                  onClick={() => setShowManualAttendance(false)}
+                  disabled={submittingManual}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 h-11 rounded-xl bg-primary text-black font-black disabled:opacity-60"
+                  disabled={submittingManual}
+                >
+                  {submittingManual ? 'Saving...' : 'Save Attendance'}
+                </button>
+              </div>
+            </motion.form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

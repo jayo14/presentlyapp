@@ -41,6 +41,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
     }
 
     try {
+      console.info('[attendance] code check-in start', { sessionCode });
       setStatus('locating');
       setError(null);
       setLocationInfo('Calibrating precise location signals...');
@@ -86,6 +87,7 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
 
       const result: any = await sessionApi.checkInByCode(sessionCode.toUpperCase(), checkInData);
       setCheckInResult(result);
+      console.info('[attendance] code check-in success', { sessionCode, status: result?.status });
 
       if (result?.success || result?.status === 'success' || result?.location_verified) {
         setStatus('success');
@@ -100,6 +102,12 @@ export const AttendanceCheckIn: React.FC<AttendanceCheckInProps> = ({
         setError(errMsg);
       }
     } catch (err: any) {
+      console.error('[attendance] code check-in failed', {
+        sessionCode,
+        status: err?.response?.status,
+        payload: err?.response?.data,
+        message: err?.message,
+      });
       setStatus('error');
       const raw = err?.response?.data?.error || err?.response?.data?.reason || err?.message || 'Verification process failed';
       setError(raw);

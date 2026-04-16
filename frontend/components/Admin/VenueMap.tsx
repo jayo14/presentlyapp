@@ -142,7 +142,6 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
   const [heading, setHeading] = useState<number | null>(null);
   const [showCompass, setShowCompass] = useState(false);
-  const [compassPermission, setCompassPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
 
   // Real-time user location and orientation tracking
   useEffect(() => {
@@ -185,10 +184,11 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       }
     };
 
-    if (window.DeviceOrientationEvent) {
+    const OrientationEventCtor = (window as any).DeviceOrientationEvent;
+    if (OrientationEventCtor) {
       // For iOS 13+ we need permission
-      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-        (DeviceOrientationEvent as any).requestPermission()
+      if (typeof OrientationEventCtor.requestPermission === 'function') {
+        OrientationEventCtor.requestPermission()
           .then((state: string) => {
             if (state === 'granted') {
               window.addEventListener('deviceorientation', handleOrientation);
@@ -332,6 +332,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     return () => {
       if (watchId) navigator.geolocation.clearWatch(watchId);
+      window.removeEventListener('deviceorientation', handleOrientation);
       if (mapRef.current) {
         mapRef.current.off('zoom', handleZoom);
         (mapRef.current as any)._ipLoc = null;

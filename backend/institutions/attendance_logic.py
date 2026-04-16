@@ -3,7 +3,7 @@ from django.db import transaction
 from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
-from institutions.models import Attendance, AttendanceSession, UserRole, CourseEnrollment
+from institutions.models import Attendance, AttendanceSession, UserRole, CourseEnrollment, ManualAttendanceRecord
 from attendance.models import AttendanceAttemptLog
 from accounts.models import UserDevice
 from .serializers import AttendanceSerializer
@@ -108,15 +108,9 @@ def perform_attendance_check_in(request, session, method='In-App'):
     Standardized attendance check-in logic with weighted confidence score system.
     """
     # ========== PHASE 1: DEBUG LOGGING ==========
-    logger.warning("=== CHECK-IN DEBUG ===")
-    logger.warning(f"REQUEST USER: {request.user}")
-    logger.warning(f"IS AUTHENTICATED: {request.user.is_authenticated}")
-    logger.warning(f"AUTH HEADER: {request.META.get('HTTP_AUTHORIZATION', 'MISSING')}")
-    logger.warning(f"USER ROLE: {getattr(request.user, 'role', 'NO ROLE ATTR')}")
-    logger.warning(f"USER ID: {request.user.id if request.user.is_authenticated else 'N/A'}")
-    logger.warning(f"USER EMAIL: {getattr(request.user, 'email', 'NO EMAIL ATTR')}")
-    logger.warning(f"SESSION CODE: {session.session_code}")
-    logger.warning(f"SESSION COURSE: {session.course}")
+    logger.info("attendance_checkin.start user=%s role=%s session=%s code=%s method=%s",
+                getattr(request.user, 'id', None), getattr(request.user, 'role', None),
+                session.id, session.session_code, method)
     
     # Check enrollment status
     is_enrolled = False
@@ -126,8 +120,7 @@ def perform_attendance_check_in(request, session, method='In-App'):
             course=session.course,
             is_active=True,
         ).exists()
-    logger.warning(f"IS ENROLLED: {is_enrolled}")
-    logger.warning("=== END DEBUG ===")
+    logger.info("attendance_checkin.precheck user=%s enrolled=%s", getattr(request.user, 'id', None), is_enrolled)
     # ========== END DEBUG LOGGING ==========
     
     # ========== PHASE 1: SESSION & PERMISSION CHECKS ==========
@@ -145,7 +138,7 @@ def perform_attendance_check_in(request, session, method='In-App'):
         lat = data.get('latitude')
         lng = data.get('longitude')
         acc = data.get('accuracy', 100)
-        if lat and lng:
+        if lat is not None and lng is not None:
             samples = [{'latitude': lat, 'longitude': lng, 'accuracy': acc}]
 
     if not samples:
@@ -160,7 +153,7 @@ def perform_attendance_check_in(request, session, method='In-App'):
 
     # 1. Role Check
     user_role = getattr(request.user, 'role', None)
-    if not is_superuser and user_role != UserRole.STUDENT:
+    if not is_superuser and user_role not in (UserRole.STUDENT, UserRole.CLASS_REP):
         logger.error(f"BLOCKING: User {request.user.email} (role: {user_role}) is not a student")
         return Response({
             'success': False, 
@@ -205,6 +198,13 @@ def perform_attendance_check_in(request, session, method='In-App'):
             'status': 'error',
             'error': 'Attendance window has closed for this session.'
         }, status=status.HTTP_400_BAD_REQUEST)
+
+    if session.expires_at and now > session.expires_at:
+        return Response({
+            'success': False,
+            'status': 'error',
+            'error': 'Attendance window has closed for this session.'
+        }, status=status.HTTP_400_BAD_REQUEST)
     
     # Check expiry_time alias if it exists
     if hasattr(session, 'expiry_time') and session.expiry_time and now > session.expiry_time:
@@ -213,6 +213,16 @@ def perform_attendance_check_in(request, session, method='In-App'):
             'status': 'error',
             'error': 'Attendance window has closed for this session.'
         }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Prevent duplicates if manual attendance already exists for this user/session.
+    matric = str(getattr(request.user, 'matric_number', '') or '').strip().upper()
+    if matric and ManualAttendanceRecord.objects.filter(session=session, matric_number__iexact=matric).exists():
+        logger.info("attendance_checkin.duplicate_manual user=%s session=%s matric=%s", request.user.id, session.id, matric)
+        return Response({
+            'success': False,
+            'status': 'error',
+            'error': 'Attendance already recorded manually for this session.'
+        }, status=status.HTTP_409_CONFLICT)
 
     # ========== PHASE 2: LOCATION & SCORING ==========
     location_data = session.get_location_coords()
@@ -346,6 +356,12 @@ def perform_attendance_check_in(request, session, method='In-App'):
     # Desktop users get lower thresholds since they cannot provide motion/GPS signals
     effective_flag_threshold = 35 if is_desktop else _FLAG_THRESHOLD
     effective_trust_threshold = 65 if is_desktop else _TRUST_THRESHOLD
+
+    # Reliability guardrail: if core checks pass (inside geofence + no spoof signal),
+    # do not hard-reject purely because auxiliary telemetry is weak.
+    if is_inside_any and not is_mocked and score < effective_flag_threshold:
+        flags.append("Low telemetry quality; accepted with reduced trust")
+        score = effective_flag_threshold
 
     if score < effective_flag_threshold:
         rejected_reason = "; ".join(flags) or "Low confidence score"
