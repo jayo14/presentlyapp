@@ -516,12 +516,13 @@ def send_verification_otp_view(request):
                 resend_url=f"{settings.FRONTEND_URL}/resend-otp",
             )
         except Exception as e:
-            logger.error(f"Failed to send OTP email: {str(e)}")
+            logger.error(f"Failed to send OTP email: {str(e)}", exc_info=True)
             return Response({
-                'success': False,
-                'error': 'Failed to send verification email',
-                'details': str(e) if settings.DEBUG else None
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                'success': True,
+                'message': 'Verification code generated, but email delivery is temporarily unavailable.',
+                'otp_send_failed': True,
+                'expires_in': 900,
+            }, status=status.HTTP_200_OK)
 
 
         
@@ -1076,22 +1077,28 @@ def request_password_reset_view(request):
         reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
         # Send password reset email via internal email service
-        send_reset_password_email(
-            to=user.email,
-            first_name=user.full_name.split(' ')[0],
-            reset_url=reset_link,
-            expiry_minutes=30,
-            request_ip=request.META.get('REMOTE_ADDR', ''),
-            request_browser=request.META.get('HTTP_USER_AGENT', ''),
-            request_location=request.META.get('REMOTE_ADDR', ''),
-        )
-
-        logger.info(f"Password reset email sent to {email}")
-
-        return Response({
-            'success': True,
-            'message': 'Password reset email sent successfully'
-        }, status=status.HTTP_200_OK)
+        try:
+            send_reset_password_email(
+                to=user.email,
+                first_name=user.full_name.split(' ')[0],
+                reset_url=reset_link,
+                expiry_minutes=30,
+                request_ip=request.META.get('REMOTE_ADDR', ''),
+                request_browser=request.META.get('HTTP_USER_AGENT', ''),
+                request_location=request.META.get('REMOTE_ADDR', ''),
+            )
+            logger.info(f"Password reset email sent to {email}")
+            return Response({
+                'success': True,
+                'message': 'Password reset email sent successfully'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Failed to send password reset email to {email}: {str(e)}", exc_info=True)
+            return Response({
+                'success': True,
+                'message': 'Password reset requested, but email delivery is temporarily unavailable. Please try again shortly.',
+                'email_send_failed': True,
+            }, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         logger.warning("Password reset requested for non-existent email: %s", email)
         return Response({
@@ -1099,10 +1106,10 @@ def request_password_reset_view(request):
             'error': 'No active account found with this email address'
         }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.error(f"Failed to send password reset email to {email}: {str(e)}", exc_info=True)
+        logger.error(f"Failed to process password reset request for {email}: {str(e)}", exc_info=True)
         return Response({
             'success': False,
-            'error': 'Failed to send password reset email',
+            'error': 'Failed to process password reset request',
             'details': str(e) if settings.DEBUG else None
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
