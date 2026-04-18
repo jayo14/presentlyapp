@@ -18,6 +18,7 @@ import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScann
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 import CourseIcon from '../Course/CourseIcon';
 import { StudentAnalytics } from '../Analytics/StudentAnalytics';
+import { offlineSyncManager } from '../../src/utils/offlineSync';
 
 interface StudentDashboardProps {
   userName: string;
@@ -56,6 +57,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
   const handleAttendanceCheckIn = async (code: string, location: any): Promise<any> => {
     try {
+      if (!navigator.onLine) {
+        return await offlineSyncManager.queueAttendanceCheckIn({
+          sessionCode: code,
+          location,
+          source: 'dashboard',
+        });
+      }
+
       const attendanceData = await sessionApi.checkInByCode(code, location);
       await refetch();
       return attendanceData;
@@ -71,6 +80,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         userFriendlyMsg = 'Be in class and try again';
       } else if (rawMsg.toLowerCase().includes('closed') || rawMsg.toLowerCase().includes('expired') || rawMsg.toLowerCase().includes('ended') || rawMsg.toLowerCase().includes('no longer active')) {
         userFriendlyMsg = 'Attendance session has closed, ask your lecturers for more information';
+      } else if (!err.response || err.code === 'ECONNABORTED' || /network error|failed to fetch|load failed|fetch failed/i.test(rawMsg)) {
+        return await offlineSyncManager.queueAttendanceCheckIn({
+          sessionCode: code,
+          location,
+          source: 'dashboard',
+        });
       }
       
       throw new Error(userFriendlyMsg);

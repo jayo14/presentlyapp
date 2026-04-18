@@ -1176,7 +1176,7 @@ class CollegeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = College.objects.all().order_by('name')
+        queryset = College.objects.select_related('institution').order_by('name')
         institution_id = self.request.query_params.get('institution', None)
         if institution_id:
             queryset = queryset.filter(institution_id=institution_id)
@@ -1230,7 +1230,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = Department.objects.all().order_by('name')
+        queryset = Department.objects.select_related('college', 'institution').order_by('name')
         college_id = self.request.query_params.get('college', None)
         institution_id = self.request.query_params.get('institution', None)
         
@@ -1293,7 +1293,7 @@ class VenueViewSet(viewsets.ModelViewSet):
             return self.queryset.model.objects.none()
         
         user = self.request.user
-        queryset = Venue.objects.all().order_by('name')
+        queryset = Venue.objects.select_related('institution', 'college').order_by('name')
         
         # Filtering by query parameters
         institution_id = self.request.query_params.get('institution', None)
@@ -1385,7 +1385,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = Course.objects.all().order_by('code')
+        queryset = Course.objects.select_related('lecturer').prefetch_related('department').order_by('code')
         department_id = self.request.query_params.get('department', None)
         lecturer_id = self.request.query_params.get('lecturer', None)
         enrolled_param = self.request.query_params.get('enrolled', 'false').lower() == 'true'
@@ -1415,7 +1415,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             # Non-lecturers (admins) only see active courses
             queryset = queryset.filter(is_active=True)
             
-        return queryset
+        return queryset.distinct()
 
     def perform_create(self, serializer):
         """Auto-assign the lecturer if the user is a lecturer"""
@@ -1643,7 +1643,7 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
         
-        queryset = CourseEnrollment.objects.all().order_by('-enrolled_at')
+        queryset = CourseEnrollment.objects.select_related('student', 'course', 'course__lecturer').prefetch_related('course__department').order_by('-enrolled_at')
         student_id = self.request.query_params.get('student', None)
         course_id = self.request.query_params.get('course', None)
         is_active = self.request.query_params.get('active', None)
@@ -1843,7 +1843,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return self.queryset.model.objects.none()
-        queryset = AttendanceSession.objects.all().order_by('-start_time')
+        queryset = AttendanceSession.objects.select_related('course', 'course__lecturer', 'venue').prefetch_related('course__department').order_by('-start_time')
         course_id = self.request.query_params.get('course', None)
         is_active = self.request.query_params.get('active', None)
         
@@ -1999,7 +1999,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def get_queryset(self):
-        queryset = Attendance.objects.all().order_by('-checked_in_at')
+        queryset = Attendance.objects.select_related('session', 'session__course', 'session__venue', 'student').order_by('-checked_in_at')
         course_id = self.request.query_params.get('course')
         session_id = self.request.query_params.get('session')
         student_id = self.request.query_params.get('student')
@@ -2429,10 +2429,10 @@ class TimetableViewSet(viewsets.ModelViewSet):
             if user.role == UserRole.STUDENT:
                 # Get registered courses for student
                 enrolled_courses = CourseEnrollment.objects.filter(student=user, is_active=True).values_list('course_id', flat=True)
-                return self.queryset.filter(course_id__in=enrolled_courses)
+                return self.queryset.select_related('course', 'venue', 'created_by').prefetch_related('course__department').filter(course_id__in=enrolled_courses)
             elif user.role == UserRole.LECTURER:
-                return self.queryset.filter(course__lecturer=user)
-        return self.queryset
+                return self.queryset.select_related('course', 'venue', 'created_by').prefetch_related('course__department').filter(course__lecturer=user)
+        return self.queryset.select_related('course', 'venue', 'created_by').prefetch_related('course__department')
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
