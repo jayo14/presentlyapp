@@ -3,9 +3,34 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.http import JsonResponse
+import time
+
+from django.db import connection
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from presently.firebase_config import initialize_firebase
 
 def health_check(request):
     return JsonResponse({"status": "healthy"}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def warmup_view(request):
+    """Lightweight endpoint for frontend app-load warmup."""
+    start = time.time()
+    firebase_initialized = initialize_firebase()
+
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT 1')
+
+    elapsed = round((time.time() - start) * 1000)
+    return Response({
+        'status': 'warm',
+        'db_ms': elapsed,
+        'firebase_initialized': firebase_initialized,
+    })
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -42,6 +67,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     # Health Check
     path('health/', health_check, name='health-check'),
+    path('warmup/', warmup_view, name='warmup'),
     
     # API Documentation
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
