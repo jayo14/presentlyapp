@@ -4,8 +4,10 @@ from types import SimpleNamespace
 
 from django.core.cache import cache
 from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.utils import timezone
 from rest_framework import status
+from django_ratelimit.decorators import ratelimit
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -223,6 +225,7 @@ def _get_session_cached(session_id):
 # Views
 # ---------------------------------------------------------------------------
 
+@method_decorator(ratelimit(key='user', rate='5/m', method='POST', block=True), name='post')
 class SubmitAttendanceView(APIView):
     """
     POST /api/attendance/submit/
@@ -297,35 +300,55 @@ class SubmitAttendanceView(APIView):
                 status=status.HTTP_429_TOO_MANY_REQUESTS
             )
 
-        # Reject duplicate if a non-REJECTED record already exists
-        accepted_record = AttendanceRecord.objects.filter(
-            session_id=session.id, student=student
-        ).exclude(final_verdict=AttendanceSubmission.VERDICT_REJECTED).first()
-        if accepted_record:
-            return Response(
-                {
-                    'error': 'Attendance already recorded for this session.',
-                    'verdict': accepted_record.final_verdict,
-                    'confidenceScore': accepted_record.confidence_score,
-                },
-                status=status.HTTP_409_CONFLICT
+        with transaction.atomic():
+            locked_session = AttendanceSession.objects.select_for_update().select_related('course').get(
+                pk=session.id,
+                is_active=True,
             )
 
-        # Server-side score re-computation
-        server_score, server_fail_reasons = _server_recompute_score(session, data)
-        verdict, all_fail_reasons = _determine_verdict(
-            server_score,
-            data['confidence_score'],
-            session,
-            server_fail_reasons,
-            data
-        )
+            # Reject duplicate if a non-REJECTED record already exists.
+            existing_submission = AttendanceSubmission.objects.select_for_update(nowait=False).filter(
+                session_id=locked_session.id,
+                student=student,
+            ).exclude(verdict=AttendanceSubmission.VERDICT_REJECTED).first()
+            if existing_submission:
+                return Response(
+                    {
+                        'error': 'You have already checked in for this session.',
+                        'verdict': existing_submission.verdict,
+                        'confidenceScore': existing_submission.confidence_score,
+                    },
+                    status=status.HTTP_409_CONFLICT
+                )
 
-        ip_address = _get_client_ip(request)
+            accepted_record = AttendanceRecord.objects.select_for_update(nowait=False).filter(
+                session_id=locked_session.id,
+                student=student,
+            ).exclude(final_verdict=AttendanceSubmission.VERDICT_REJECTED).first()
+            if accepted_record:
+                return Response(
+                    {
+                        'error': 'Attendance already recorded for this session.',
+                        'verdict': accepted_record.final_verdict,
+                        'confidenceScore': accepted_record.confidence_score,
+                    },
+                    status=status.HTTP_409_CONFLICT
+                )
 
-        with transaction.atomic():
+            # Server-side score re-computation.
+            server_score, server_fail_reasons = _server_recompute_score(locked_session, data)
+            verdict, all_fail_reasons = _determine_verdict(
+                server_score,
+                data['confidence_score'],
+                locked_session,
+                server_fail_reasons,
+                data
+            )
+
+            ip_address = _get_client_ip(request)
+
             submission = AttendanceSubmission.objects.create(
-                session_id=session.id,
+                session_id=locked_session.id,
                 student=student,
                 coordinates=data['coordinates'],
                 sample_count=data['sample_count'],
@@ -346,7 +369,7 @@ class SubmitAttendanceView(APIView):
 
             # Create or update AttendanceRecord
             AttendanceRecord.objects.update_or_create(
-                session_id=session.id,
+                session_id=locked_session.id,
                 student=student,
                 defaults={
                     'submission': submission,

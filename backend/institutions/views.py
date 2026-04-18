@@ -147,6 +147,7 @@ def get_tokens_for_user(user):
 
 
 # Authentication Views
+@ratelimit(key='ip', rate='10/m', method='POST', block=True)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def google_auth_view(request):
@@ -640,6 +641,7 @@ def calculate_travel_speed(lat1, lon1, time1, lat2, lon2, time2):
         
     return distance / time_diff
 
+@ratelimit(key='ip', rate='10/m', method='POST', block=True)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
