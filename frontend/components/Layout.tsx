@@ -568,7 +568,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {/* Floating Dock Navigation for mobile users */}
       {!isMobileMenuOpen && (
-        <div className="md:hidden">
+        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pt-2 px-4 pb-[env(safe-area-inset-bottom)]">
           <Dock
             items={(() => {
               const baseItems = [
