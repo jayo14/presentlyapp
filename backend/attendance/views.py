@@ -1,6 +1,8 @@
 import math
 import logging
+from types import SimpleNamespace
 
+from django.core.cache import cache
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import status
@@ -177,6 +179,46 @@ def _get_client_ip(request):
     return request.META.get('REMOTE_ADDR')
 
 
+def _get_session_cached(session_id):
+    cache_key = f'session_geo_{session_id}'
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    try:
+        session = AttendanceSession.objects.select_related(
+            'course',
+            'course__department',
+            'course__department__college',
+            'course__department__college__institution',
+            'venue',
+        ).get(pk=session_id, is_active=True)
+
+        course_department = getattr(session.course, 'department', None)
+        college = getattr(course_department, 'college', None) if course_department else None
+        institution = getattr(college, 'institution', None) if college else None
+
+        data = {
+            'id': session.id,
+            'course_id': session.course_id,
+            'latitude': float(session.latitude) if session.latitude is not None else None,
+            'longitude': float(session.longitude) if session.longitude is not None else None,
+            'allowed_radius_meters': session.allowed_radius_meters or 50,
+            'lecturer_coordinates': session.lecturer_coordinates,
+            'strict_mode': session.strict_mode,
+            'min_samples': session.min_samples or 3,
+            'expires_at': session.expires_at,
+            'end_time': session.end_time,
+            'institution_id': institution.id if institution else None,
+            'college_id': college.id if college else None,
+            'department_id': course_department.id if course_department else None,
+        }
+        cache.set(cache_key, data, timeout=300)
+        return data
+    except AttendanceSession.DoesNotExist:
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Views
 # ---------------------------------------------------------------------------
@@ -202,19 +244,18 @@ class SubmitAttendanceView(APIView):
         student = request.user
 
         # Fetch session
-        try:
-            session = AttendanceSession.objects.select_related('course').get(
-                pk=data['session_id']
-            )
-        except AttendanceSession.DoesNotExist:
+        session_data = _get_session_cached(data['session_id'])
+        if not session_data:
             return Response(
                 {'error': 'Session not found.'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        session = SimpleNamespace(**session_data)
+
         # Validate session is active and not expired
         now = timezone.now()
-        if not session.is_active:
+        if not getattr(session, 'is_active', True):
             return Response(
                 {'error': 'Session is not active.'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -234,7 +275,7 @@ class SubmitAttendanceView(APIView):
         # Validate student enrollment
         is_enrolled = CourseEnrollment.objects.filter(
             student=student,
-            course=session.course,
+            course_id=session.course_id,
             is_active=True
         ).exists()
         if not is_enrolled:
@@ -245,7 +286,7 @@ class SubmitAttendanceView(APIView):
 
         # Rate limit: max 3 submissions per student per session
         existing_submissions = AttendanceSubmission.objects.filter(
-            session=session, student=student
+            session_id=session.id, student=student
         )
         non_rejected_count = existing_submissions.exclude(
             verdict=AttendanceSubmission.VERDICT_REJECTED
@@ -258,7 +299,7 @@ class SubmitAttendanceView(APIView):
 
         # Reject duplicate if a non-REJECTED record already exists
         accepted_record = AttendanceRecord.objects.filter(
-            session=session, student=student
+            session_id=session.id, student=student
         ).exclude(final_verdict=AttendanceSubmission.VERDICT_REJECTED).first()
         if accepted_record:
             return Response(
@@ -284,7 +325,7 @@ class SubmitAttendanceView(APIView):
 
         with transaction.atomic():
             submission = AttendanceSubmission.objects.create(
-                session=session,
+                session_id=session.id,
                 student=student,
                 coordinates=data['coordinates'],
                 sample_count=data['sample_count'],
@@ -305,7 +346,7 @@ class SubmitAttendanceView(APIView):
 
             # Create or update AttendanceRecord
             AttendanceRecord.objects.update_or_create(
-                session=session,
+                session_id=session.id,
                 student=student,
                 defaults={
                     'submission': submission,

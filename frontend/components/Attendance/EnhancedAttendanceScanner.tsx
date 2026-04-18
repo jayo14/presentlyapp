@@ -49,6 +49,8 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
   const jsQrRef = useRef<any>(null);
   const isDecodeInProgressRef = useRef(false);
   const hasDetectedCodeRef = useRef(false);
+  const preCollectedLocationRef = useRef<any>(null);
+  const locationStatusRef = useRef<'idle' | 'collecting' | 'ready' | 'failed'>('idle');
 
   const triggerHaptic = async (style: ImpactStyle = ImpactStyle.Medium) => {
     if (Capacitor.isNativePlatform()) {
@@ -88,6 +90,19 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setAttendanceData(null);
       setAutoSwitchToQr(false);
       hasDetectedCodeRef.current = false;
+      preCollectedLocationRef.current = null;
+      locationStatusRef.current = 'collecting';
+
+      geolocationService.getAttendancePayload()
+        .then((payload) => {
+          preCollectedLocationRef.current = payload;
+          locationStatusRef.current = 'ready';
+          setLocationInfo('Location ready ✓');
+        })
+        .catch((err) => {
+          locationStatusRef.current = 'failed';
+          console.warn('[Scanner] Pre-collection failed, will retry on submit:', err);
+        });
     } else {
       stopCamera();
     }
@@ -196,7 +211,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
           if (match && match[1]) sessionCodeFromQR = match[1].toUpperCase();
         }
         hasDetectedCodeRef.current = true;
-        processAttendance(sessionCodeFromQR.toUpperCase());
+        handleVerify(sessionCodeFromQR.toUpperCase());
         triggerHaptic(ImpactStyle.Heavy);
       }
     } finally {
@@ -224,7 +239,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     };
   }, [isCameraActive, mode, status]);
 
-  const processAttendance = async (codeToVerify: string) => {
+  const handleVerify = async (codeToVerify: string) => {
     const normalizedCode = sanitizeSessionCode(codeToVerify);
     if (normalizedCode.length !== 8) {
       setErrorMsg('Session code must be exactly 8 alphanumeric characters.');
@@ -232,8 +247,13 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       return;
     }
     try {
-      setStatus('locating');
-      const payload = await geolocationService.getAttendancePayload();
+      let payload = preCollectedLocationRef.current;
+
+      if (!payload || locationStatusRef.current !== 'ready') {
+        setStatus('locating');
+        payload = await geolocationService.getAttendancePayload();
+      }
+
       setStatus('verifying');
       const attendanceResponse = await onVerify(normalizedCode, payload);
       if (attendanceResponse) {
@@ -249,6 +269,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
     } catch (err: any) {
       setStatus('error');
       setErrorMsg(err.message || 'Verification Failed');
+      hasDetectedCodeRef.current = false;
     }
   };
 
@@ -364,7 +385,7 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
                 <div className="w-full my-4">
                   <button
                     disabled={sessionCode.length !== 8 || status !== 'idle'}
-                    onClick={() => processAttendance(sessionCode)}
+                    onClick={() => handleVerify(sessionCode)}
                     className="w-full h-20 bg-primary text-on-primary-fixed rounded-[2.5rem] font-headline font-black text-xl shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] disabled:opacity-30 disabled:grayscale transition-all active:scale-95"
                   >
                     {status === 'idle' ? 'Validate Session Code' : 'Processing...'}

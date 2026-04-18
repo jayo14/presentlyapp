@@ -36,7 +36,8 @@ export interface AntiCheatSignals {
 }
 
 // Configuration Constants
-const WARMUP_DELAY = 3000; // 3 seconds warm-up
+// Web browsers handle GPS wake-up internally; 3s warmup is only needed for Capacitor native.
+const WARMUP_DELAY = Capacitor.getPlatform() === 'web' ? 500 : 3000;
 const SAMPLE_INTERVAL = 1000; // 1 second between samples
 const MAX_SAMPLES = 5;
 const MIN_SAMPLES = 3;
@@ -109,6 +110,9 @@ export const getStabilizedPosition = async (): Promise<{
     };
 
     const startWatching = async () => {
+      // PRIVACY NOTE: GPS is ONLY collected while the attendance scanner modal is open.
+      // watchPosition is cleared in stopCamera() which is called on modal close.
+      // No background location tracking occurs. This is by design.
       watchId = await Geolocation.watchPosition(
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
         (position, err) => {
