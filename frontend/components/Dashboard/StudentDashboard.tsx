@@ -12,12 +12,11 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
 import { LoadingScreen } from '../LoadingScreen';
-import { studentApi, StudentDashboardData } from '../../services/api/student';
+import { useStudentDashboard } from '../../services/api/student';
 import { sessionApi } from '../../services/api/attendance';
 import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScanner';
 import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
 import CourseIcon from '../Course/CourseIcon';
-import { useCurrentUser } from '../../hooks/useAuth';
 import { StudentAnalytics } from '../Analytics/StudentAnalytics';
 
 interface StudentDashboardProps {
@@ -26,20 +25,14 @@ interface StudentDashboardProps {
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, view = 'dashboard' }) => {
-  const { data: currentUser } = useCurrentUser();
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-
-  const [dashboardData, setDashboardData] = useState<StudentDashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: dashboardData, isLoading, refetch } = useStudentDashboard();
   const [isImageTransitioning, setIsImageTransitioning] = useState(true);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    loadDashboardData();
-    const interval = setInterval(() => { loadDashboardData(); }, 60000);
-
     // Check for device trust confirmation
     if (searchParams.get('device_trusted') === 'true') {
       const deviceName = searchParams.get('device_name') || 'Your device';
@@ -54,28 +47,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       newParams.delete('device_name');
       setSearchParams(newParams);
     }
-
-    return () => clearInterval(interval);
   }, [searchParams]);
 
-  const loadDashboardData = async () => {
-    try {
-      if (!dashboardData) setLoading(true);
-      const data = await studentApi.getDashboard();
-      setDashboardData(data);
-    } catch (err: any) {
-      console.error('Failed to load dashboard data:', err);
-    } finally {
-      setLoading(false);
-      // Simulate image load delay for smooth transition
-      setTimeout(() => setIsImageTransitioning(false), 800);
-    }
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setIsImageTransitioning(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAttendanceCheckIn = async (code: string, location: any): Promise<any> => {
     try {
       const attendanceData = await sessionApi.checkInByCode(code, location);
-      await loadDashboardData();
+      await refetch();
       return attendanceData;
     } catch (err: any) {
       console.error("Check-in failed:", err);
@@ -95,7 +77,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     }
   };
 
-  if (loading && !dashboardData) return <LoadingScreen message="Loading..." />;
+  if (isLoading && !dashboardData) return <LoadingScreen message="Loading dashboard..." />;
 
   const displayInitials = userName
     .split(' ')

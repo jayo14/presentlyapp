@@ -10,6 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
+from django.core.cache import cache
 from django.utils import timezone
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -46,6 +47,7 @@ from .serializers import (
 )
 from .attendance_logic import perform_attendance_check_in, check_session_validity
 from .geolocation_utils import verify_location, calculate_distance
+from .cache_keys import institutions_list_cache_key, colleges_list_cache_key, departments_list_cache_key
 
 # Configure logging
 auth_logger = logging.getLogger('auth_events')
@@ -1123,6 +1125,16 @@ class InstitutionViewSet(viewsets.ModelViewSet):
     """ViewSet for Institution CRUD"""
     queryset = Institution.objects.all()
     serializer_class = InstitutionSerializer
+
+    def list(self, request, *args, **kwargs):
+        cache_key = institutions_list_cache_key(request)
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout=3600)
+        return response
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -1143,6 +1155,16 @@ class CollegeViewSet(viewsets.ModelViewSet):
     """ViewSet for College CRUD"""
     queryset = College.objects.all()
     serializer_class = CollegeSerializer
+
+    def list(self, request, *args, **kwargs):
+        cache_key = colleges_list_cache_key(request)
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout=3600)
+        return response
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -1166,6 +1188,16 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     """ViewSet for Department CRUD"""
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+
+    def list(self, request, *args, **kwargs):
+        cache_key = departments_list_cache_key(request)
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout=3600)
+        return response
     
     @action(detail=True, methods=['get'])
     def courses(self, request, pk=None):

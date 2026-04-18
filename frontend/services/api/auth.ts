@@ -81,6 +81,9 @@ export interface AuthResponse {
     onboarding_complete: boolean;
     email_verified?: boolean;
     avatar_url?: string;
+    institution?: number;
+    college?: number;
+    department?: string;
     permissions?: string[];
   };
   tokens?: {
