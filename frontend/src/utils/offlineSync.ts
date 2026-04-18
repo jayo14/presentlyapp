@@ -3,21 +3,24 @@
  * Handles synchronization of offline data when connection is restored
  */
 
-import { getPendingSyncItems, deleteData, STORES } from './offlineDB';
+import { getPendingSyncItems, deleteData, STORES, addToSyncQueue } from './offlineDB';
 import { toast } from 'sonner';
-import { apiClient } from '../../services/api/client';
+import apiClient from '../../services/api/client';
+import { sessionApi } from '../../services/api/attendance';
 
 export class OfflineSyncManager {
   private syncInProgress = false;
   private syncInterval: NodeJS.Timeout | null = null;
+  private boundOnlineHandler = () => this.handleOnline();
+  private boundOfflineHandler = () => this.handleOffline();
 
   /**
    * Initialize the sync manager
    */
   init() {
     // Listen for online/offline events
-    window.addEventListener('online', () => this.handleOnline());
-    window.addEventListener('offline', () => this.handleOffline());
+    window.addEventListener('online', this.boundOnlineHandler);
+    window.addEventListener('offline', this.boundOfflineHandler);
 
     // Check initial connection status
     if (navigator.onLine) {
@@ -48,6 +51,45 @@ export class OfflineSyncManager {
     });
     
     this.stopPeriodicSync();
+  }
+
+  async queueAttendanceCheckIn(payload: {
+    sessionCode: string;
+    location: any;
+    recordedAt?: string;
+    source?: string;
+  }): Promise<any> {
+    const sessionCode = payload.sessionCode.trim().toUpperCase();
+    const queueItem = {
+      type: 'attendance_check_in',
+      payload: {
+        sessionCode,
+        location: payload.location,
+        recordedAt: payload.recordedAt || new Date().toISOString(),
+        source: payload.source || 'scanner',
+      },
+      timestamp: Date.now(),
+    };
+
+    const existingItems = await getPendingSyncItems();
+    const duplicate = existingItems.find(
+      (item) =>
+        item.type === 'attendance_check_in' &&
+        item.payload?.sessionCode === sessionCode &&
+        item.payload?.source === queueItem.payload.source
+    );
+
+    if (!duplicate) {
+      await addToSyncQueue(queueItem);
+    }
+
+    return {
+      queued: true,
+      session_code: sessionCode,
+      course_code: sessionCode,
+      course_name: 'Attendance queued offline',
+      venue_name: navigator.onLine ? 'Will sync when connection stabilizes' : 'Offline check-in saved',
+    };
   }
 
   /**
@@ -139,6 +181,7 @@ export class OfflineSyncManager {
     const { type, payload } = item;
 
     switch (type) {
+      case 'attendance_check_in':
       case 'attendance':
         await this.syncAttendance(payload);
         break;
@@ -154,7 +197,11 @@ export class OfflineSyncManager {
    * Sync attendance record
    */
   private async syncAttendance(payload: any): Promise<void> {
-    await apiClient.post('/attendance/check-in/', payload);
+    if (!payload?.sessionCode) {
+      throw new Error('Missing session code for offline attendance sync');
+    }
+
+    await sessionApi.checkInByCode(payload.sessionCode, payload.location || {});
   }
 
   /**
@@ -169,8 +216,8 @@ export class OfflineSyncManager {
    */
   cleanup() {
     this.stopPeriodicSync();
-    window.removeEventListener('online', () => this.handleOnline());
-    window.removeEventListener('offline', () => this.handleOffline());
+    window.removeEventListener('online', this.boundOnlineHandler);
+    window.removeEventListener('offline', this.boundOfflineHandler);
   }
 }
 

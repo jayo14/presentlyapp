@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { AttendanceSuccessPage } from './AttendanceSuccessPage';
 import { AttendanceFailurePage } from './AttendanceFailurePage';
 import { geolocationService } from '../../services/geolocation';
+import { offlineSyncManager } from '../../src/utils/offlineSync';
 
 interface EnhancedAttendanceScannerProps {
   isOpen: boolean;
@@ -246,6 +247,31 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
       setStatus('error');
       return;
     }
+
+    const queueOfflineCheckIn = async (payload: any) => {
+      const queuedResponse = await offlineSyncManager.queueAttendanceCheckIn({
+        sessionCode: normalizedCode,
+        location: payload,
+        source: 'scanner',
+      });
+
+      toast.success('Attendance queued', {
+        description: navigator.onLine
+          ? 'Your check-in will sync as soon as the connection improves.'
+          : 'Your check-in was saved offline and will sync automatically later.',
+      });
+
+      setCheckInTime(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
+      setAttendanceData({
+        courseCode: normalizedCode,
+        courseName: 'Attendance queued offline',
+        location: queuedResponse.venue_name || 'Pending sync',
+        sessionCode: normalizedCode,
+      });
+      setStatus('success');
+      return queuedResponse;
+    };
+
     try {
       let payload = preCollectedLocationRef.current;
 
@@ -267,8 +293,27 @@ export const EnhancedAttendanceScanner: React.FC<EnhancedAttendanceScannerProps>
         setStatus('success');
       }
     } catch (err: any) {
-      setStatus('error');
-      setErrorMsg(err.message || 'Verification Failed');
+      const status = err?.response?.status;
+      const isConnectivityIssue =
+        !err?.response ||
+        status >= 500 ||
+        err?.code === 'ECONNABORTED' ||
+        /network error|failed to fetch|load failed|fetch failed/i.test(err?.message || '');
+
+      if (isConnectivityIssue) {
+        try {
+          await queueOfflineCheckIn(preCollectedLocationRef.current || (await geolocationService.getAttendancePayload()));
+          triggerHaptic(ImpactStyle.Heavy);
+          return;
+        } catch (queueError: any) {
+          setStatus('error');
+          setErrorMsg(queueError?.message || 'Unable to save offline check-in.');
+        }
+      } else {
+        setStatus('error');
+        setErrorMsg(err.message || 'Verification Failed');
+      }
+
       hasDetectedCodeRef.current = false;
     }
   };

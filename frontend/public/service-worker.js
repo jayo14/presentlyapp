@@ -1,6 +1,6 @@
-const STATIC_CACHE = 'presently-static-v8';
-const RUNTIME_CACHE = 'presently-runtime-v8';
-const API_CACHE = 'presently-api-v8';
+const STATIC_CACHE = 'presently-static-v9';
+const RUNTIME_CACHE = 'presently-runtime-v9';
+const API_CACHE = 'presently-api-v9';
 const CACHE_PREFIX = 'presently-';
 
 const ASSETS_TO_CACHE = ['/', '/index.html', '/offline.html', '/manifest.json', '/logo.png', '/favicon.ico'];
@@ -12,6 +12,16 @@ const resolveApiBaseUrl = () => {
 };
 
 const API_BASE_URL = resolveApiBaseUrl();
+const STALE_API_PATHS = [
+  '/api/student/dashboard/',
+  '/api/lecturer/dashboard/',
+  '/api/institutions/',
+  '/api/colleges/',
+  '/api/departments/',
+  '/api/courses/',
+  '/api/sessions/',
+  '/api/timetables/',
+];
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -57,6 +67,9 @@ const isNavigationRequest = (request) =>
   request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html');
 
 const isApiRequest = (url) => url.href.startsWith(API_BASE_URL) || url.pathname.startsWith('/api/');
+
+const isStaleFriendlyApiRequest = (url) =>
+  url.pathname.startsWith('/api/') && STALE_API_PATHS.some((path) => url.pathname.startsWith(path));
 
 const canCacheResponse = (response) => response && (response.status === 200 || response.type === 'opaque');
 
@@ -107,7 +120,11 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (isApiRequest(url)) {
-    event.respondWith(networkFirst(request, API_CACHE));
+    event.respondWith(
+      isStaleFriendlyApiRequest(url)
+        ? staleWhileRevalidate(request, API_CACHE)
+        : networkFirst(request, API_CACHE)
+    );
     return;
   }
 
