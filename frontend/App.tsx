@@ -108,8 +108,9 @@ const DashboardLayout: React.FC = () => {
          }
     }, [navigate, location.pathname]);
 
-    if (isLoading) return <LoadingFallback />;
-    if (!user) return <Navigate to="/login" replace />;
+    // Only show loading on first load when no cached user is available.
+    if (isLoading && !user) return <LoadingFallback />;
+    if (!isLoading && !user) return <Navigate to="/login" replace />;
 
     return (
         <Layout

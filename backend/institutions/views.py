@@ -13,7 +13,6 @@ from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
 from django.db.utils import IntegrityError
-from django.core import signing
 from django_ratelimit.decorators import ratelimit
 from django_ratelimit.core import is_ratelimited
 import secrets
@@ -25,10 +24,8 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
-from user_agents import parse
 from presently.firebase_config import initialize_firebase
 from utils.email import (
-    send_login_alert_email,
     send_reset_password_email,
     send_session_live_email,
     send_verify_email,
@@ -41,7 +38,6 @@ from .models import (
     Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable, ManualAttendanceRecord
 )
 from .rbac import user_has_permission
-from accounts.models import UserDevice
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
@@ -684,148 +680,23 @@ def login_view(request):
                 'otp_send_failed': otp_send_failed,
             }, status=status.HTTP_200_OK)
         
-        # Security: Device Tracking
+        # Fire-and-forget: device tracking + login alert runs async
         try:
-            from utils.geoip import get_geoip_data
-            import hashlib
-            
-            UNKNOWN = "Unknown"
-            user_agent_raw = request.META.get('HTTP_USER_AGENT', 'Unknown Device')
-            
-            # Handle proxy headers for IP
+            from .tasks import process_login_security_async
+
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
             if x_forwarded_for:
                 ip_address = x_forwarded_for.split(',')[0]
             else:
                 ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
-
-            # Get GeoIP data
-            geo_data = get_geoip_data(ip_address)
-            
-            # Determine Fingerprint
-            device_fingerprint = request.data.get('device_id')
-            if not device_fingerprint:
-                ip_bits = '.'.join(ip_address.split('.')[:2])
-                fp_raw = f"{user_agent_raw}-{ip_bits}"
-                device_fingerprint = hashlib.sha256(fp_raw.encode()).hexdigest()
-            
-            # Parse user agent
-            parsed_ua = parse(user_agent_raw)
-            browser_name = parsed_ua.browser.family
-            os_name = parsed_ua.os.family
-            device_brand = parsed_ua.device.brand or UNKNOWN
-            device_model = parsed_ua.device.model or UNKNOWN
-            
-            device_category = "Desktop/Laptop"
-            if parsed_ua.is_mobile: device_category = "Mobile Device"
-            elif parsed_ua.is_tablet: device_category = "Tablet"
-            elif parsed_ua.is_bot: device_category = "Bot"
-
-            device_name = f"{device_category} ({os_name})"
-            if (parsed_ua.is_mobile or parsed_ua.is_tablet) and device_brand != UNKNOWN:
-                device_name = f"{device_brand} {device_model}"
-
-            # Check for existing device
-            existing_device = UserDevice.objects.filter(
-                user=user, 
-                device_fingerprint=device_fingerprint
-            ).first()
-            
-            created = False
-            send_alert = False
-            alert_reason = ""
-
-            if not existing_device:
-                # Try to find a "similar" device to avoid redundant alerts on same network/location
-                similar_device = UserDevice.objects.filter(
-                    user=user,
-                    device_name=device_name,
-                    geo_city=geo_data.get('city'),
-                    isp=geo_data.get('isp')
-                ).order_by('-last_seen_at').first()
-
-                existing_device = UserDevice.objects.create(
-                    user=user,
-                    device_fingerprint=device_fingerprint,
-                    device_name=device_name,
-                    user_agent=user_agent_raw,
-                    ip_address=ip_address,
-                    geo_country=geo_data.get('country'),
-                    geo_city=geo_data.get('city'),
-                    timezone=geo_data.get('timezone'),
-                    isp=geo_data.get('isp'),
-                    lat=geo_data.get('lat'),
-                    lon=geo_data.get('lon'),
-                    is_trusted=False,
-                )
-                created = True
-                
-                # Logic: Don't alert if it's the SAME network prefix or if we have a TRUSTED similar device
-                if similar_device:
-                    old_prefix = '.'.join(similar_device.ip_address.split('.')[:3])
-                    new_prefix = '.'.join(ip_address.split('.')[:3])
-                    # If same /24 network or similar device is already trusted, skip alert
-                    if old_prefix == new_prefix or similar_device.is_trusted:
-                        send_alert = False
-                        alert_reason = "Recognized network/location for known device type"
-                    else:
-                        send_alert = True
-                        alert_reason = "New network detected for device type"
-                else:
-                    send_alert = True
-                    alert_reason = "New device or browser detected"
-            else:
-                # Check for anomalies on existing device
-                if existing_device.geo_country and geo_data['country'] != existing_device.geo_country:
-                    send_alert = True
-                    alert_reason = f"Login from a new country: {geo_data['country']}"
-                
-                if not send_alert and existing_device.lat and geo_data['lat']:
-                    speed = calculate_travel_speed(
-                        existing_device.lat, existing_device.lon, existing_device.last_seen_at,
-                        geo_data['lat'], geo_data['lon'], timezone.now()
-                    )
-                    if speed > 800:
-                        send_alert = True
-                        alert_reason = "Impossible travel detected"
-                
-                # Update device record
-                existing_device.ip_address = ip_address
-                existing_device.geo_city = geo_data['city']
-                existing_device.geo_country = geo_data['country']
-                existing_device.lat = geo_data['lat']
-                existing_device.lon = geo_data['lon']
-                existing_device.isp = geo_data['isp']
-                existing_device.save()
-
-            if send_alert and not parsed_ua.is_bot:
-                # Generate a trust token for the "Yes, it was me" link
-                trust_token = signing.dumps({'device_id': existing_device.id}, salt='trust-device')
-                confirm_url = f"{settings.BACKEND_URL}/api/accounts/devices/trust-confirm/?token={trust_token}"
-                
-                send_login_alert_email(
-                    to=user.email,
-                    first_name=user.full_name.split(' ')[0],
-                    device_name=device_name,
-                    browser_name=f"{browser_name}",
-                    login_location=f"{geo_data['city']}, {geo_data['country']}",
-                    login_time=timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC'),
-                    ip_address=ip_address,
-                    confirm_url=confirm_url,
-                    secure_url=f"{settings.FRONTEND_URL}/security",
-                )
-            
-            # Log in Audit
-            AuditLog.objects.create(
-                user=user,
-                action='LOGIN',
-                resource='AUTH',
+            process_login_security_async.delay(
+                user_id=str(user.id),
                 ip_address=ip_address,
-                details=f"Login successful. Device: {device_name}. Location: {geo_data['city']}. Reason: {alert_reason}"
+                user_agent_raw=request.META.get('HTTP_USER_AGENT', 'Unknown Device'),
+                device_fingerprint_from_client=request.data.get('device_id'),
             )
-
-        except Exception as e:
-            logger.warning("Device tracking error", extra={'error': str(e), 'email': user.email})
+        except Exception as exc:
+            logger.warning("Could not enqueue login security task: %s", exc)
             
         tokens = get_tokens_for_user(user)
         return Response({

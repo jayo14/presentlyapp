@@ -129,10 +129,14 @@ DATABASES = {
 # Override with PostgreSQL if DATABASE_URL is set
 if os.environ.get('DATABASE_URL'):
     DATABASES['default'] = dj_database_url.config(
-        conn_max_age=0,  # Set to 0 for serverless/automated scaling environments
+        conn_max_age=600,  # Keep PostgreSQL connections alive for 10 minutes
         conn_health_checks=True,
         ssl_require=True,
     )
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 10,
+        'options': '-c statement_timeout=30000',
+    }
 
 
 # Password validation
