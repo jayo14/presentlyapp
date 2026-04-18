@@ -6,6 +6,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('institutions', '0029_manualattendancerecord'),
+      ('attendance', '0005_add_submission_and_record_models'),
     ]
 
     operations = [
@@ -19,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_session_code_active
-              ON institutions_attendancesession(session_code)
+              ON attendance_sessions(session_code)
               WHERE is_active = true;
             """,
             reverse_sql="DROP INDEX IF EXISTS idx_session_code_active;",
@@ -27,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_enrollment_student_course_active
-              ON institutions_courseenrollment(student_id, course_id)
+              ON course_enrollments(student_id, course_id)
               WHERE is_active = true;
             """,
             reverse_sql="DROP INDEX IF EXISTS idx_enrollment_student_course_active;",
@@ -35,7 +36,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_attendance_student_session_submission
-              ON attendance_attendancesubmission(student_id, session_id);
+              ON attendance_submissions(student_id, session_id);
             """,
             reverse_sql="DROP INDEX IF EXISTS idx_attendance_student_session_submission;",
         ),
