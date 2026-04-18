@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Plus, Users, Calendar, Clock, Trash2, X, BookOpen, FileText, RefreshCw, MapPin, Timer, Loader2, BarChart3 } from 'lucide-react';
 import { Session } from '../../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { courseApi, sessionApi, AttendanceSession } from '../../services/api/attendance';
 import { venueApi } from '../../services/api/venues';
 import { Venue as VenueType } from '../../types';
-import { analyticsApi, LecturerDashboardAnalytics, CourseAttendanceAnalytics } from '../../services/api/analytics';
+import { CourseAttendanceAnalytics } from '../../services/api/analytics';
 import { UserProfile } from '../../services/api/auth';
 import { CourseManagement } from './CourseManagement';
 import { LecturerAnalytics } from './LecturerAnalytics';
@@ -20,6 +20,8 @@ import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { AttendanceReport } from './AttendanceReport';
 import { SEO } from '../SEO';
 import { studentApi, TimetableEntry } from '../../services/api/student';
+import { LoadingScreen } from '../LoadingScreen';
+import { useLecturerDashboard } from '../../services/api/dashboard';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -29,7 +31,6 @@ interface LecturerDashboardProps {
 
 export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, userProfile, view = 'dashboard' }) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   // Preserved State Hooks
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -41,8 +42,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [timetableData, setTimetableData] = useState<TimetableEntry[]>([]);
   const [timetableLoading, setTimetableLoading] = useState(false);
+  const { data: lecturerDashboard, isLoading: lecturerDashboardLoading, refetch: refetchLecturerDashboard } = useLecturerDashboard();
 
-  const { data: courses = [], isLoading: coursesLoading } = useQuery({
+  const { data: courses = [] } = useQuery({
     queryKey: ['courses'],
     queryFn: async () => {
       const data = await courseApi.getAll();
@@ -51,7 +53,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     staleTime: 5 * 60 * 1000 // 5 minutes cache sharing globally
   });
 
-  const { data: venues = [], isLoading: venuesLoading } = useQuery({
+  const { data: venues = [] } = useQuery({
     queryKey: ['venues'],
     queryFn: async () => {
       const data = await venueApi.getAll();
@@ -60,19 +62,13 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
     staleTime: 10 * 60 * 1000
   });
 
-  const { data: sessions = [], isLoading: sessionsLoading, refetch: fetchSessions } = useQuery({
+  const { data: sessions = [], refetch: fetchSessions } = useQuery({
     queryKey: ['sessions'],
     queryFn: async () => {
       const data = await sessionApi.getAll();
       return Array.isArray(data) ? data : [];
     },
     refetchInterval: 60000 // Polling instead of standard interval
-  });
-
-  const { data: dashboardAnalytics, isLoading: analyticsLoading, refetch: fetchDashboardAnalytics } = useQuery({
-    queryKey: ['lecturerDashboardAnalytics'],
-    queryFn: () => analyticsApi.getLecturerDashboard(),
-    refetchInterval: 60000
   });
 
   useEffect(() => {
@@ -217,6 +213,12 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
   }
 
   // ─── Default Dashboard View ────────────────────────────
+  if (lecturerDashboardLoading && !lecturerDashboard) {
+    return <LoadingScreen message="Loading dashboard..." />;
+  }
+
+  const lecturerStats = lecturerDashboard?.data.stats;
+
   return (
     <>
       <SEO title="Lecturer Dashboard | Presently" description="Manage your courses, attendance sessions and view real-time student engagement on Presently." noIndex />
@@ -244,7 +246,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 <BookOpen size={18} className="text-blue-600" />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-text">{courses.length}</p>
+            <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
             <p className="text-xs text-textMuted mt-0.5">My Courses</p>
           </div>
           <div className="bg-surface text-text border border-outline rounded-xl p-4">
@@ -253,7 +255,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 <Clock size={18} className="text-emerald-600" />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-text">{sessions.filter(s => s.is_active).length}</p>
+            <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
             <p className="text-xs text-textMuted mt-0.5">Active Sessions</p>
           </div>
           <div className="bg-surface text-text border border-outline rounded-xl p-4">
@@ -262,7 +264,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 <Users size={18} className="text-violet-600" />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-text">{dashboardAnalytics?.total_students || 0}</p>
+            <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
             <p className="text-xs text-textMuted mt-0.5">Total Students</p>
           </div>
         </div>
@@ -375,7 +377,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             onClose={() => setSelectedSession(null)}
             onSessionEnded={() => {
               fetchSessions();
-              fetchDashboardAnalytics();
+              refetchLecturerDashboard();
             }}
           />
         )}

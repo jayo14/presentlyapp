@@ -1,5 +1,7 @@
 import apiClient from './client';
 import { Course } from './attendance';
+import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from './queryClient';
 
 export interface EnrolledCourse {
   id: number;
@@ -244,3 +246,13 @@ export const studentApi = {
     return [];
   },
 };
+
+export const useStudentDashboard = () =>
+  useQuery({
+    queryKey: [...queryKeys.currentUser, 'student-dashboard'],
+    queryFn: studentApi.getDashboard,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
+    refetchInterval: 60 * 1000,
+  });

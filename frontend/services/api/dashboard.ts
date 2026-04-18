@@ -1,4 +1,6 @@
 import apiClient from './client';
+import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from './queryClient';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -94,6 +96,13 @@ export const dashboardApi = {
   },
 
   /**
+   * Backwards-compatible alias for the lecturer dashboard summary endpoint.
+   */
+  getLecturerDashboard: async (): Promise<LecturerDashboardSummary> => {
+    return dashboardApi.getLecturerSummary();
+  },
+
+  /**
    * Export attendance report as a file download.
    * Endpoint: GET /reports/export/attendance/{format}/?course_id={id}
    * @param format - 'csv' | 'excel' | 'pdf'
@@ -140,3 +149,13 @@ export const dashboardApi = {
     return response.data;
   },
 };
+
+export const useLecturerDashboard = () =>
+  useQuery({
+    queryKey: [...queryKeys.currentUser, 'lecturer-dashboard'],
+    queryFn: dashboardApi.getLecturerDashboard,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
+    refetchInterval: 60 * 1000,
+  });
