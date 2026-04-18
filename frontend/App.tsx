@@ -86,6 +86,19 @@ const AcceptInvitePage = simpleLazy(() => import('./components/Auth/AcceptInvite
 // Loading fallback component
 const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." />;
 
+const warmUpBackend = () => {
+  const rawApi = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+  if (!rawApi) return;
+
+  const backendBase = rawApi.endsWith('/api') ? rawApi : `${rawApi}/api`;
+  fetch(`${backendBase}/warmup/`, {
+    method: 'GET',
+    signal: AbortSignal.timeout(40000),
+  }).catch(() => {});
+};
+
+warmUpBackend();
+
 // Wrapper for Layout to handle props from context/hooks
 const DashboardLayout: React.FC = () => {
     const { data: user, isLoading } = useCurrentUser();
@@ -111,11 +124,12 @@ const DashboardLayout: React.FC = () => {
     // Only show loading on first load when no cached user is available.
     if (isLoading && !user) return <LoadingFallback />;
     if (!isLoading && !user) return <Navigate to="/login" replace />;
+    const activeUser = user as NonNullable<typeof user>;
 
     return (
         <Layout
-            userRole={user.role}
-            userName={user.full_name}
+        userRole={activeUser.role}
+        userName={activeUser.full_name}
             onLogout={handleLogout}
             currentPage={currentPage}
             setCurrentPage={handlePageChange}

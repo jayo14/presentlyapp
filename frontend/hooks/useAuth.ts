@@ -5,7 +5,8 @@ import { institutionsApi } from '../services/api/institutions';
 import { studentApi } from '../services/api/student';
 import { dashboardApi } from '../services/api/dashboard';
 import { useNavigate } from 'react-router-dom';
-import { UserRole } from '../../types';
+import { UserRole } from '../types';
+import { toast } from 'sonner';
 
 const PREFETCH_REFERENCE_STALE_TIME = 10 * 60 * 1000;
 const PREFETCH_DASHBOARD_STALE_TIME = 2 * 60 * 1000;
@@ -22,18 +23,12 @@ const warmAuthenticatedCaches = (queryClient: QueryClient, user: AuthResponse['u
       queryKey: [...queryKeys.currentUser, 'student-dashboard'],
       queryFn: studentApi.getDashboard,
       staleTime: PREFETCH_DASHBOARD_STALE_TIME,
-      gcTime: 10 * 60 * 1000,
-      refetchOnMount: false,
-      refetchInterval: 60 * 1000,
     });
   } else if (user?.role === UserRole.LECTURER) {
     void queryClient.prefetchQuery({
       queryKey: [...queryKeys.currentUser, 'lecturer-dashboard'],
       queryFn: dashboardApi.getLecturerDashboard,
       staleTime: PREFETCH_DASHBOARD_STALE_TIME,
-      gcTime: 10 * 60 * 1000,
-      refetchOnMount: false,
-      refetchInterval: 60 * 1000,
     });
   }
 
@@ -138,6 +133,20 @@ export const useGoogleAuth = () => {
   return useMutation({
     mutationFn: ({ idToken, rememberMe }: { idToken: string; rememberMe?: boolean }) => 
       authApi.googleAuth(idToken, rememberMe),
+    onError: (error: any) => {
+      const errorMessage = String(error?.message || '').toLowerCase();
+      if (error?.code === 'ECONNABORTED' || errorMessage.includes('timeout')) {
+        toast.error('Server is waking up', {
+          description: 'Our server was sleeping. Please try again in 10 seconds.',
+          duration: 8000,
+        });
+        return;
+      }
+
+      toast.error('Google Sign-In failed', {
+        description: error?.response?.data?.error || 'Please try again.',
+      });
+    },
     onSuccess: (response: AuthResponse) => {
       if (response.success && response.user) {
         queryClient.setQueryData(queryKeys.currentUser, response.user);

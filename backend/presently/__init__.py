@@ -1,3 +1,5 @@
+default_app_config = 'presently.apps.PresentlyConfig'
+
 # Import celery only if available
 # This allows Django to run without celery installed for basic operations
 try:

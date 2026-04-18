@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'fcm_django',
 
     # Presently apps
+    'presently.apps.PresentlyConfig',
     'institutions.apps.InstitutionsConfig',
     'attendance',
     'analytics',
