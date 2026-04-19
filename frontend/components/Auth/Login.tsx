@@ -6,6 +6,7 @@ import { SEO } from '../SEO';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
 import { LoadingScreen } from '../LoadingScreen';
 import { AuthBackground } from './AuthBackground';
+import { getGoogleAuthRedirectUri } from '../../utils/authRedirect';
 // import { ThemeToggle } from '../ThemeToggle';
 
 export const Login: React.FC = () => {
@@ -102,7 +103,7 @@ export const Login: React.FC = () => {
       return;
     }
 
-    const redirectUri = `${window.location.origin}/auth/callback`;
+    const redirectUri = getGoogleAuthRedirectUri();
     const scope = 'email profile';
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
     window.location.href = authUrl;

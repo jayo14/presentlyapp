@@ -54,7 +54,7 @@ auth_logger = logging.getLogger('auth_events')
 logger = logging.getLogger(__name__)
 
 
-def _rate_limit_client_ip(group, request):
+def _get_client_ip(request) -> str:
     forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
     if forwarded_for:
         client_ip = forwarded_for.split(',')[0].strip()
@@ -65,7 +65,25 @@ def _rate_limit_client_ip(group, request):
     if forwarded_ip:
         return forwarded_ip
 
-    return request.META.get('REMOTE_ADDR', '')
+    return request.META.get('REMOTE_ADDR', '').strip()
+
+
+def _rate_limit_client_ip(group, request):
+    return _get_client_ip(request)
+
+
+def _rate_limit_auth_identifier(group, request):
+    """Rate-limit auth attempts by IP plus principal to reduce shared-IP collisions."""
+    client_ip = _get_client_ip(request) or 'unknown'
+
+    try:
+        email = str(request.data.get('email', '')).strip().lower()
+    except Exception:
+        email = ''
+
+    if email:
+        return f"{client_ip}:{email}"
+    return client_ip
 
 
 def _normalize_matric(matric_number: str) -> str:
@@ -161,13 +179,20 @@ def get_tokens_for_user(user):
 
 
 # Authentication Views
-@ratelimit(key=_rate_limit_client_ip, rate='10/m', method='POST', block=True)
+@ratelimit(key=_rate_limit_auth_identifier, rate='10/m', method='POST', block=False)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def google_auth_view(request):
     """
     Authenticate user using Google ID token from Firebase with additional verification.
     """
+    if getattr(request, 'limited', False):
+        return Response({
+            'success': False,
+            'error': 'Too many authentication attempts. Please wait a minute and try again.',
+            'code': 'RATE_LIMITED',
+        }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
     id_token_str = request.data.get('id_token')
     
     if not id_token_str:
@@ -655,11 +680,18 @@ def calculate_travel_speed(lat1, lon1, time1, lat2, lon2, time2):
         
     return distance / time_diff
 
-@ratelimit(key=_rate_limit_client_ip, rate='10/m', method='POST', block=True)
+@ratelimit(key=_rate_limit_auth_identifier, rate='10/m', method='POST', block=False)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
     """User login with device recognition and anomaly detection"""
+    if getattr(request, 'limited', False):
+        return Response({
+            'success': False,
+            'error': 'Too many login attempts. Please wait a minute and try again.',
+            'code': 'RATE_LIMITED',
+        }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
     serializer = UserLoginSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         user = serializer.validated_data['user']
