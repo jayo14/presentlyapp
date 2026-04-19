@@ -73,12 +73,17 @@ const isStaleFriendlyApiRequest = (url) =>
 
 const canCacheResponse = (response) => response && (response.status === 200 || response.type === 'opaque');
 
+const isCacheableRequest = (request) => {
+  const protocol = new URL(request.url).protocol;
+  return protocol === 'http:' || protocol === 'https:';
+};
+
 const networkFirst = async (request, cacheName, fallbackUrl) => {
   const cache = await caches.open(cacheName);
   try {
     const networkResponse = await fetch(request);
     if (canCacheResponse(networkResponse)) {
-      cache.put(request, networkResponse.clone());
+      void cache.put(request, networkResponse.clone()).catch(() => {});
     }
     return networkResponse;
   } catch {
@@ -98,7 +103,7 @@ const staleWhileRevalidate = async (request, cacheName) => {
   const networkPromise = fetch(request)
     .then((networkResponse) => {
       if (canCacheResponse(networkResponse)) {
-        cache.put(request, networkResponse.clone());
+        void cache.put(request, networkResponse.clone()).catch(() => {});
       }
       return networkResponse;
     })
@@ -109,6 +114,11 @@ const staleWhileRevalidate = async (request, cacheName) => {
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+
+  if (!isCacheableRequest(request)) {
+    return;
+  }
+
   const url = new URL(request.url);
 
   if (request.method !== 'GET') {

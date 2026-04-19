@@ -54,6 +54,20 @@ auth_logger = logging.getLogger('auth_events')
 logger = logging.getLogger(__name__)
 
 
+def _rate_limit_client_ip(group, request):
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    if forwarded_for:
+        client_ip = forwarded_for.split(',')[0].strip()
+        if client_ip:
+            return client_ip
+
+    forwarded_ip = request.META.get('HTTP_X_REAL_IP', '').strip()
+    if forwarded_ip:
+        return forwarded_ip
+
+    return request.META.get('REMOTE_ADDR', '')
+
+
 def _normalize_matric(matric_number: str) -> str:
     return str(matric_number or '').strip().upper()
 
@@ -147,7 +161,7 @@ def get_tokens_for_user(user):
 
 
 # Authentication Views
-@ratelimit(key='ip', rate='10/m', method='POST', block=True)
+@ratelimit(key=_rate_limit_client_ip, rate='10/m', method='POST', block=True)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def google_auth_view(request):
@@ -641,7 +655,7 @@ def calculate_travel_speed(lat1, lon1, time1, lat2, lon2, time2):
         
     return distance / time_diff
 
-@ratelimit(key='ip', rate='10/m', method='POST', block=True)
+@ratelimit(key=_rate_limit_client_ip, rate='10/m', method='POST', block=True)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
