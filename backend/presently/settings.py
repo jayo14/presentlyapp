@@ -370,16 +370,18 @@ GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_AUTH_CALLBACK_URL = f"{FRONTEND_URL}/auth/callback"
 
 # Celery Configuration for async tasks
-# In development without Redis, tasks run eagerly (synchronously)
+# In development without Redis, use threading for async task execution
 if os.environ.get('REDIS_URL'):
     CELERY_BROKER_URL = os.environ.get('REDIS_URL')
     CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
 else:
-    # For local development without Redis, use eager/synchronous task execution
-    CELERY_TASK_ALWAYS_EAGER = True
-    CELERY_TASK_EAGER_PROPAGATES = True
+    # For local development without Redis, use threading backend
+    # This allows tasks to run asynchronously without blocking the main request
     CELERY_BROKER_URL = 'memory://'
     CELERY_RESULT_BACKEND = 'cache+memory://'
+    # Don't run tasks eagerly - let them run in background threads instead
+    CELERY_TASK_ALWAYS_EAGER = False
+    CELERY_WORKER_POOL = 'solo'  # Use solo pool for development (single worker)
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'

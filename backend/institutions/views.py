@@ -731,23 +731,24 @@ def login_view(request):
                 'otp_send_failed': otp_send_failed,
             }, status=status.HTTP_200_OK)
         
-        # Fire-and-forget: device tracking + login alert runs async
-        try:
-            from .tasks import process_login_security_async
+        # Fire-and-forget: device tracking + login alert runs async (skip in DEBUG mode to avoid hanging)
+        if not settings.DEBUG:
+            try:
+                from .tasks import process_login_security_async
 
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-            if x_forwarded_for:
-                ip_address = x_forwarded_for.split(',')[0]
-            else:
-                ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
-            process_login_security_async.delay(
-                user_id=str(user.id),
-                ip_address=ip_address,
-                user_agent_raw=request.META.get('HTTP_USER_AGENT', 'Unknown Device'),
-                device_fingerprint_from_client=request.data.get('device_id'),
-            )
-        except Exception as exc:
-            logger.warning("Could not enqueue login security task: %s", exc)
+                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+                if x_forwarded_for:
+                    ip_address = x_forwarded_for.split(',')[0]
+                else:
+                    ip_address = request.META.get('REMOTE_ADDR', '0.0.0.0')
+                process_login_security_async.delay(
+                    user_id=str(user.id),
+                    ip_address=ip_address,
+                    user_agent_raw=request.META.get('HTTP_USER_AGENT', 'Unknown Device'),
+                    device_fingerprint_from_client=request.data.get('device_id'),
+                )
+            except Exception as exc:
+                logger.warning("Could not enqueue login security task: %s", exc)
             
         tokens = get_tokens_for_user(user)
         return Response({
