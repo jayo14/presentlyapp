@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authApi } from '../../services/api/auth';
 import { toast } from 'sonner';
+import { getGoogleAuthRedirectUri } from '../../utils/authRedirect';
 
 export const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export const AuthCallback: React.FC = () => {
     try {
       setMessage('Exchanging code for tokens...');
       
-      const redirectUri = window.location.origin + '/auth/callback';
+      const redirectUri = getGoogleAuthRedirectUri();
       
       // Set a timeout for the API call
       const timeoutPromise = new Promise((_, reject) => 
