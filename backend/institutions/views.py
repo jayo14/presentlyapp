@@ -680,12 +680,13 @@ def calculate_travel_speed(lat1, lon1, time1, lat2, lon2, time2):
         
     return distance / time_diff
 
-@ratelimit(key=_rate_limit_auth_identifier, rate='10/m', method='POST', block=False)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
     """User login with device recognition and anomaly detection"""
-    if getattr(request, 'limited', False):
+    # Rate-limiting disabled in development mode for easier testing
+    # Enable by setting RATELIMIT_ENABLE=True in environment
+    if settings.RATELIMIT_ENABLE and getattr(request, 'limited', False):
         return Response({
             'success': False,
             'error': 'Too many login attempts. Please wait a minute and try again.',

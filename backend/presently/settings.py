@@ -112,12 +112,17 @@ if os.environ.get('REDIS_URL'):
         }
     }
 else:
+    # In development without Redis, use locmem cache
+    # Note: Rate limiting may not work reliably with locmem in multi-process environments
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
             "LOCATION": "presently-cache",
         }
     }
+
+# Rate-limiting configuration - disable in development for easier testing
+RATELIMIT_ENABLE = os.environ.get('RATELIMIT_ENABLE', 'False' if DEBUG else 'True') == 'True'
 
 # Default to SQLite for development
 DATABASES = {
