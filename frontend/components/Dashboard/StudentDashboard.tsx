@@ -92,8 +92,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     }
   };
 
-  if (isLoading && !dashboardData) return <LoadingScreen message="Loading dashboard..." />;
-
   const displayInitials = userName
     .split(' ')
     .filter(Boolean)
@@ -103,9 +101,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
   const nextClass = dashboardData?.next_class;
 
+  // Show analytics without loading screen
   if (view === 'analytics') {
     return <StudentAnalytics />;
   }
+
+  // Only show loading screen for main dashboard view
+  if (isLoading && !dashboardData) return <LoadingScreen message="Loading dashboard..." />;
 
   return (
     <>
@@ -362,7 +364,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
         <CourseRegistrationDialog
           isOpen={isRegistrationOpen}
           onClose={() => setIsRegistrationOpen(false)}
-          onSuccess={loadDashboardData}
+          onSuccess={refetch}
         />
       </div>
     </>
