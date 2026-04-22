@@ -45,6 +45,58 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
+export interface EmailDeliveryLog {
+  id: number;
+  provider: string;
+  status: 'sent' | 'failed' | 'quota_exhausted';
+  template_key?: string | null;
+  subject?: string;
+  recipients: string[];
+  recipient_count: number;
+  error_message?: string;
+  provider_response?: Record<string, any>;
+  duration_ms?: number | null;
+  created_at: string;
+}
+
+export interface EmailProviderBreakdown {
+  provider: string;
+  sent: number;
+  failed: number;
+  quota_exhausted: number;
+  total: number;
+}
+
+export interface EmailDailyTrend {
+  date: string;
+  sent: number;
+  failed: number;
+  quota_exhausted: number;
+}
+
+export interface EmailDeliveryOverview {
+  summary: {
+    total_attempts: number;
+    sent_count: number;
+    failed_count: number;
+    quota_exhausted_count: number;
+    success_rate: number;
+  };
+  providers: EmailProviderBreakdown[];
+  daily_trends: EmailDailyTrend[];
+  recent_logs: EmailDeliveryLog[];
+}
+
+export interface EmailDeliveryFilters {
+  provider?: string;
+  status?: string;
+  template_key?: string;
+  search?: string;
+  date_from?: string;
+  date_to?: string;
+  page?: number;
+}
+
 export const systemApi = {
   // Get system statistics
   getStats: async (): Promise<SystemStats> => {
@@ -214,5 +266,27 @@ export const systemApi = {
         results: mockData
       };
     }
+  },
+
+  getEmailOverview: async (filters?: EmailDeliveryFilters): Promise<EmailDeliveryOverview> => {
+    const response = await apiClient.get('/system/email/overview/', { params: filters });
+    return response.data;
+  },
+
+  getEmailLogs: async (filters?: EmailDeliveryFilters): Promise<PaginatedResponse<EmailDeliveryLog>> => {
+    const response = await apiClient.get('/system/email/logs/', { params: filters });
+    return response.data;
+  },
+
+  getEmailLogsExportUrl: (filters?: EmailDeliveryFilters): string => {
+    const base = apiClient.defaults.baseURL ?? '';
+    const params = new URLSearchParams();
+    Object.entries(filters || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value).trim() !== '') {
+        params.append(key, String(value));
+      }
+    });
+    const query = params.toString();
+    return `${base}/system/email/logs/export/csv/${query ? `?${query}` : ''}`;
   },
 };

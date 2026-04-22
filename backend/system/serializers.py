@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SystemLog
+from .models import SystemLog, EmailDeliveryLog
 
 class SystemLogSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.full_name', read_only=True)
@@ -11,4 +11,22 @@ class SystemLogSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'event_type', 'level', 'action', 'user_name', 'user_email',
             'user_role', 'ip_address', 'details', 'timestamp',
+        ]
+
+
+class EmailDeliveryLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailDeliveryLog
+        fields = [
+            'id',
+            'provider',
+            'status',
+            'template_key',
+            'subject',
+            'recipients',
+            'recipient_count',
+            'error_message',
+            'provider_response',
+            'duration_ms',
+            'created_at',
         ]

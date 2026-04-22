@@ -81,6 +81,7 @@ const VenueManagement = simpleLazy(() => import('./components/Admin/VenueManagem
 const DepartmentManagement = simpleLazy(() => import('./components/Admin/DepartmentManagement').then(module => ({ default: module.DepartmentManagement })));
 const BlogManagement = simpleLazy(() => import('./components/Admin/BlogManagement').then(module => ({ default: module.BlogManagement })));
 const StaffManagement = simpleLazy(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
+const EmailMonitor = simpleLazy(() => import('./components/Admin/EmailMonitor').then(module => ({ default: module.EmailMonitor })));
 const AcceptInvitePage = simpleLazy(() => import('./components/Auth/AcceptInvitePage').then(module => ({ default: module.AcceptInvitePage })));
 
 const PUBLIC_ROUTE_PREFIXES = [
@@ -454,6 +455,7 @@ const AppContent: React.FC = () => {
               <Route path="departments" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentManagement /></AdminRoute>} />
               <Route path="blog" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
               <Route path="logs" element={<AdminRoute requiredPermission="system.analytics.view"><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
+              <Route path="email-monitor" element={<AdminRoute requiredPermission="system.analytics.view"><EmailMonitor /></AdminRoute>} />
 
               {/* Lecturer Specific Routes */}
               <Route path="reports" element={<LecturerRoute><LecturerDashboard userName={user?.full_name || ''} userProfile={user} view="reports" /></LecturerRoute>} />

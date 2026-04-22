@@ -332,15 +332,24 @@ USE_GMAIL_API_EMAIL_BACKEND = os.environ.get('USE_GMAIL_API_EMAIL_BACKEND', 'Fal
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     print('INFO: DEBUG=True; using console email backend.')
-elif USE_GMAIL_API_EMAIL_BACKEND and os.environ.get('GMAIL_API_REFRESH_TOKEN') and os.environ.get('GOOGLE_CLIENT_ID'):
-    EMAIL_BACKEND = 'presently.email_backend.GmailApiEmailBackend'
-    print("INFO: Using Gmail API email backend.")
 else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    if RESEND_API_KEY:
-        print("INFO: Using Resend API for emails.")
-    else:
-        print("WARNING: RESEND_API_KEY missing; emails will fall back to console backend.")
+    EMAIL_BACKEND = 'presently.email_failover.FailoverEmailBackend'
+    print("INFO: Using multi-provider failover email backend.")
+
+# Provider credentials used by presently.email_failover
+SENDPULSE_SMTP_USERNAME = os.environ.get('SENDPULSE_SMTP_USERNAME')
+SENDPULSE_SMTP_PASSWORD = os.environ.get('SENDPULSE_SMTP_PASSWORD')
+
+MAILJET_SMTP_USERNAME = os.environ.get('MAILJET_SMTP_USERNAME')
+MAILJET_SMTP_PASSWORD = os.environ.get('MAILJET_SMTP_PASSWORD')
+
+MAILTRAP_API_TOKEN = os.environ.get('MAILTRAP_API_TOKEN')
+
+AHASEND_SMTP_USERNAME = os.environ.get('AHASEND_SMTP_USERNAME')
+AHASEND_SMTP_PASSWORD = os.environ.get('AHASEND_SMTP_PASSWORD')
+
+GMAIL_SMTP_USER = os.environ.get('GMAIL_SMTP_USER')
+GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD')
 
 raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or 'Presently <noreply@getpresently.com.ng>'
 DEFAULT_FROM_EMAIL = raw_from_email if '<' in raw_from_email else f"Presently <{raw_from_email}>"
