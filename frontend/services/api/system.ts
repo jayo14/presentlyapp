@@ -48,7 +48,7 @@ export interface PaginatedResponse<T> {
 export interface EmailDeliveryLog {
   id: number;
   provider: string;
-  status: 'sent' | 'failed' | 'quota_exhausted';
+  status: 'sent' | 'failed' | 'quota_exhausted' | 'throttled';
   template_key?: string | null;
   subject?: string;
   recipients: string[];
@@ -64,6 +64,7 @@ export interface EmailProviderBreakdown {
   sent: number;
   failed: number;
   quota_exhausted: number;
+  throttled: number;
   total: number;
 }
 
@@ -72,6 +73,7 @@ export interface EmailDailyTrend {
   sent: number;
   failed: number;
   quota_exhausted: number;
+  throttled: number;
 }
 
 export interface EmailDeliveryOverview {
@@ -80,6 +82,7 @@ export interface EmailDeliveryOverview {
     sent_count: number;
     failed_count: number;
     quota_exhausted_count: number;
+    throttled_count: number;
     success_rate: number;
   };
   providers: EmailProviderBreakdown[];

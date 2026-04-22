@@ -68,6 +68,7 @@ class EmailDeliveryLog(models.Model):
         ('sent', 'Sent'),
         ('failed', 'Failed'),
         ('quota_exhausted', 'Quota Exhausted'),
+        ('throttled', 'Throttled'),
     )
 
     provider = models.CharField(max_length=50)
