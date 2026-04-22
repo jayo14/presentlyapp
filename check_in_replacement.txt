@@ -1,5 +1,0 @@
-    @action(detail=True, methods=['post'])
-    def check_in(self, request, pk=None):
-        """Student check-in with multi-sample verification"""
-        session = self.get_object()
-        return perform_attendance_check_in(request, session)
