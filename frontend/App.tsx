@@ -83,11 +83,38 @@ const BlogManagement = simpleLazy(() => import('./components/Admin/BlogManagemen
 const StaffManagement = simpleLazy(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
 const AcceptInvitePage = simpleLazy(() => import('./components/Auth/AcceptInvitePage').then(module => ({ default: module.AcceptInvitePage })));
 
+const PUBLIC_ROUTE_PREFIXES = [
+  '/',
+  '/documentation',
+  '/volunteers',
+  '/features',
+  '/how-it-works',
+  '/universities',
+  '/blog',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/terms',
+  '/privacy',
+  '/auth/callback',
+  '/email-verification',
+  '/verify-email',
+  '/otp-verification',
+  '/check-in',
+  '/accept-invite',
+];
+
+const isPublicPath = (pathname: string): boolean =>
+  PUBLIC_ROUTE_PREFIXES.some((page) =>
+    page === '/' ? pathname === '/' : pathname.startsWith(page),
+  );
+
 // Loading fallback component - for authenticated/protected routes only
 const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." showOnPublicPages={false} />;
 
-// Loading fallback for public pages and check-in routes
-const PublicLoadingFallback: React.FC = () => <LoadingScreen message="Loading..." showOnPublicPages={true} />;
+// Public routes should not display the preloader.
+const PublicLoadingFallback: React.FC = () => null;
 
 const warmUpBackend = () => {
   const rawApi = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
@@ -254,29 +281,7 @@ const AppContent: React.FC = () => {
   const { data: user, isLoading, isError } = useCurrentUser();
   const [loadTimeout, setLoadTimeout] = useState(false);
 
-  // Define public pages that should never show the loading screen
-  const publicPages = [
-    '/',
-    '/documentation',
-    '/volunteers',
-    '/features',
-    '/how-it-works',
-    '/universities',
-    '/blog',
-    '/login',
-    '/register',
-    '/forgot-password',
-    '/reset-password',
-    '/terms',
-    '/privacy',
-    '/auth/callback',
-    '/email-verification',
-    '/verify-email'
-  ];
-
-  const isPublicRoute = publicPages.some(page => 
-    page === '/' ? location.pathname === '/' : location.pathname.startsWith(page)
-  );
+  const isPublicRoute = isPublicPath(location.pathname);
 
   // Safeguard: If loading takes too long (e.g., 10 seconds), show content anyway or an error
   useEffect(() => {
@@ -467,6 +472,7 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   const [isBootstrapping, setIsBootstrapping] = useState(true);
+  const initialPathname = typeof window !== 'undefined' ? window.location.pathname : '/';
 
   const getHealthEndpoint = () => {
     const rawApi = (import.meta.env.VITE_API_URL || 'http://localhost:8000').trim().replace(/\/+$/, '');
@@ -517,7 +523,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  if (isBootstrapping) {
+  if (isBootstrapping && !isPublicPath(initialPathname)) {
     return <LoadingScreen message="Preparing your dashboard..." />;
   }
 
