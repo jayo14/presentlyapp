@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('system', '0004_emaildeliverylog'),
+        ('system', '0005_rename_system_email_provider_b51f5a_idx_system_emai_provide_f23901_idx_and_more'),
     ]
 
     operations = [
