@@ -351,6 +351,15 @@ AHASEND_SMTP_PASSWORD = os.environ.get('AHASEND_SMTP_PASSWORD')
 GMAIL_SMTP_USER = os.environ.get('GMAIL_SMTP_USER')
 GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD')
 
+EMAIL_PROVIDER_DAILY_BUDGETS = {
+    'resend': int(os.environ.get('EMAIL_DAILY_BUDGET_RESEND', '100')),
+    'sendpulse': int(os.environ.get('EMAIL_DAILY_BUDGET_SENDPULSE', '400')),
+    'mailjet': int(os.environ.get('EMAIL_DAILY_BUDGET_MAILJET', '200')),
+    'mailtrap': int(os.environ.get('EMAIL_DAILY_BUDGET_MAILTRAP', '150')),
+    'ahasend': int(os.environ.get('EMAIL_DAILY_BUDGET_AHASEND', '33')),
+    'gmail': int(os.environ.get('EMAIL_DAILY_BUDGET_GMAIL', '500')),
+}
+
 raw_from_email = os.environ.get('DEFAULT_FROM_EMAIL') or 'Presently <noreply@getpresently.com.ng>'
 DEFAULT_FROM_EMAIL = raw_from_email if '<' in raw_from_email else f"Presently <{raw_from_email}>"
 EMAIL_SUBJECT_PREFIX = '[Presently] '

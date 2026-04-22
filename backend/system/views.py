@@ -237,6 +237,7 @@ class EmailDeliveryOverviewView(APIView):
         sent_count = logs.filter(status='sent').count()
         failed_count = logs.filter(status='failed').count()
         quota_count = logs.filter(status='quota_exhausted').count()
+        throttled_count = logs.filter(status='throttled').count()
         success_rate = round((sent_count / total_attempts * 100), 2) if total_attempts else 0.0
 
         provider_rows = logs.values('provider', 'status').annotate(total=Count('id')).order_by('provider')
@@ -249,6 +250,7 @@ class EmailDeliveryOverviewView(APIView):
                     'sent': 0,
                     'failed': 0,
                     'quota_exhausted': 0,
+                    'throttled': 0,
                     'total': 0,
                 }
             status_key = row['status']
@@ -265,7 +267,7 @@ class EmailDeliveryOverviewView(APIView):
         for row in daily_data:
             key = row['day'].isoformat() if row['day'] else 'unknown'
             if key not in trend_map:
-                trend_map[key] = {'date': key, 'sent': 0, 'failed': 0, 'quota_exhausted': 0}
+                trend_map[key] = {'date': key, 'sent': 0, 'failed': 0, 'quota_exhausted': 0, 'throttled': 0}
             trend_map[key][row['status']] = row['total']
 
         recent_logs = EmailDeliveryLogSerializer(logs[:20], many=True).data
@@ -276,6 +278,7 @@ class EmailDeliveryOverviewView(APIView):
                 'sent_count': sent_count,
                 'failed_count': failed_count,
                 'quota_exhausted_count': quota_count,
+                'throttled_count': throttled_count,
                 'success_rate': success_rate,
             },
             'providers': list(provider_map.values()),

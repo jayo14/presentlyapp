@@ -16,6 +16,7 @@ const statusClassMap: Record<string, string> = {
   sent: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
   failed: 'bg-red-500/15 text-red-500 border-red-500/30',
   quota_exhausted: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
+  throttled: 'bg-slate-500/15 text-slate-500 border-slate-500/30',
 };
 
 export const EmailMonitor: React.FC = () => {
@@ -121,7 +122,7 @@ export const EmailMonitor: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-surface border border-outline rounded-lg p-4">
           <p className="text-textMuted text-sm">Total Attempts</p>
           <p className="text-2xl font-bold text-text">{summary?.total_attempts ?? 0}</p>
@@ -133,6 +134,10 @@ export const EmailMonitor: React.FC = () => {
         <div className="bg-surface border border-outline rounded-lg p-4">
           <p className="text-textMuted text-sm">Failed</p>
           <p className="text-2xl font-bold text-red-500">{summary?.failed_count ?? 0}</p>
+        </div>
+        <div className="bg-surface border border-outline rounded-lg p-4">
+          <p className="text-textMuted text-sm">Throttled</p>
+          <p className="text-2xl font-bold text-slate-500">{summary?.throttled_count ?? 0}</p>
         </div>
         <div className="bg-surface border border-outline rounded-lg p-4">
           <p className="text-textMuted text-sm">Success Rate</p>
@@ -163,6 +168,7 @@ export const EmailMonitor: React.FC = () => {
           <option value="sent">Sent</option>
           <option value="failed">Failed</option>
           <option value="quota_exhausted">Quota Exhausted</option>
+          <option value="throttled">Throttled</option>
         </select>
 
         <Input
@@ -198,6 +204,7 @@ export const EmailMonitor: React.FC = () => {
                 <Area type="monotone" dataKey="sent" stroke="#10b981" fill="#10b98133" />
                 <Area type="monotone" dataKey="failed" stroke="#ef4444" fill="#ef444433" />
                 <Area type="monotone" dataKey="quota_exhausted" stroke="#f59e0b" fill="#f59e0b33" />
+                <Area type="monotone" dataKey="throttled" stroke="#64748b" fill="#64748b33" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -216,6 +223,7 @@ export const EmailMonitor: React.FC = () => {
                 <Bar dataKey="sent" fill="#10b981" />
                 <Bar dataKey="failed" fill="#ef4444" />
                 <Bar dataKey="quota_exhausted" fill="#f59e0b" />
+                <Bar dataKey="throttled" fill="#64748b" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -256,6 +264,7 @@ export const EmailMonitor: React.FC = () => {
                       {log.status === 'sent' ? <CheckCircle2 className="w-3 h-3 mr-1" /> : null}
                       {log.status === 'failed' ? <XCircle className="w-3 h-3 mr-1" /> : null}
                       {log.status === 'quota_exhausted' ? <AlertTriangle className="w-3 h-3 mr-1" /> : null}
+                      {log.status === 'throttled' ? <Activity className="w-3 h-3 mr-1" /> : null}
                       {log.status}
                     </span>
                   </td>

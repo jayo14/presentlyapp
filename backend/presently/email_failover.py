@@ -9,8 +9,19 @@ from typing import Any, Callable
 
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
+from django.db.models import Sum
+from django.utils import timezone
 
 logger = logging.getLogger("presently.email")
+
+DEFAULT_EMAIL_PROVIDER_DAILY_BUDGETS = {
+    "resend": 100,
+    "sendpulse": 400,
+    "mailjet": 200,
+    "mailtrap": 150,
+    "ahasend": 33,
+    "gmail": 500,
+}
 
 
 class QuotaExhaustedError(Exception):
@@ -38,6 +49,52 @@ def _mask_email(value: str) -> str:
 def _smtp_envelope_sender(value: str) -> str:
     parsed = parseaddr(value)[1]
     return parsed or value
+
+
+def _provider_slug(provider: str) -> str:
+    return provider.strip().lower().replace(" ", "")
+
+
+def _provider_daily_budget(provider: str) -> int | None:
+    configured = getattr(settings, "EMAIL_PROVIDER_DAILY_BUDGETS", {}) or {}
+    merged = {**DEFAULT_EMAIL_PROVIDER_DAILY_BUDGETS}
+    for key, value in configured.items():
+        try:
+            merged[str(key).strip().lower()] = int(value)
+        except (TypeError, ValueError):
+            continue
+
+    return merged.get(_provider_slug(provider))
+
+
+def _provider_sent_today(provider: str) -> int:
+    try:
+        from system.models import EmailDeliveryLog
+
+        today = timezone.localdate()
+        aggregate = EmailDeliveryLog.objects.filter(
+            provider__iexact=provider,
+            status="sent",
+            created_at__date=today,
+        ).aggregate(total=Sum("recipient_count"))
+        return int(aggregate.get("total") or 0)
+    except Exception:
+        logger.debug("Failed reading provider sent count for throttling", exc_info=True)
+        return 0
+
+
+def _provider_throttle_state(provider: str, recipient_count: int) -> tuple[bool, int | None, int]:
+    budget = _provider_daily_budget(provider)
+    if budget is None:
+        return False, None, 0
+
+    sent_today = _provider_sent_today(provider)
+    projected_total = sent_today + max(1, recipient_count)
+
+    if budget <= 0:
+        return True, budget, sent_today
+
+    return projected_total > budget, budget, sent_today
 
 
 def _log_delivery(
@@ -161,8 +218,28 @@ class FailoverEmailBackend(BaseEmailBackend):
             logger.error("No email providers configured for failover backend")
             return 0
 
+        recipient_count = sum(len(message.to or []) for message in email_messages)
+        masked_recipients = [_mask_email(addr) for message in email_messages for addr in (message.to or [])]
+        email_subject = email_messages[0].subject if email_messages else ""
+
         last_error: Exception | None = None
         for provider_name, sender in providers:
+            throttled, budget, sent_today = _provider_throttle_state(provider_name, recipient_count)
+            if throttled:
+                reason = f"Daily budget reached for {provider_name}: sent_today={sent_today}, budget={budget}"
+                _log_delivery(
+                    provider=provider_name,
+                    status="throttled",
+                    template_key="django_email_message",
+                    subject=email_subject,
+                    recipients=masked_recipients,
+                    to_count=recipient_count,
+                    error_message=reason,
+                )
+                logger.info(reason)
+                last_error = RuntimeError(reason)
+                continue
+
             started = perf_counter()
             try:
                 sent_count = sender(email_messages)
@@ -173,9 +250,9 @@ class FailoverEmailBackend(BaseEmailBackend):
                         provider=provider_name,
                         status="sent",
                         template_key="django_email_message",
-                        subject=email_messages[0].subject if email_messages else "",
-                        recipients=[_mask_email(addr) for m in email_messages for addr in (m.to or [])],
-                        to_count=sum(len(m.to or []) for m in email_messages),
+                        subject=email_subject,
+                        recipients=masked_recipients,
+                        to_count=recipient_count,
                         duration_ms=duration_ms,
                     )
                     return sent_count
@@ -185,9 +262,9 @@ class FailoverEmailBackend(BaseEmailBackend):
                     provider=provider_name,
                     status="quota_exhausted",
                     template_key="django_email_message",
-                    subject=email_messages[0].subject if email_messages else "",
-                    recipients=[_mask_email(addr) for m in email_messages for addr in (m.to or [])],
-                    to_count=sum(len(m.to or []) for m in email_messages),
+                    subject=email_subject,
+                    recipients=masked_recipients,
+                    to_count=recipient_count,
                     error_message=str(exc),
                 )
                 logger.warning("%s quota exhausted; trying next provider", provider_name)
@@ -198,9 +275,9 @@ class FailoverEmailBackend(BaseEmailBackend):
                     provider=provider_name,
                     status="failed",
                     template_key="django_email_message",
-                    subject=email_messages[0].subject if email_messages else "",
-                    recipients=[_mask_email(addr) for m in email_messages for addr in (m.to or [])],
-                    to_count=sum(len(m.to or []) for m in email_messages),
+                    subject=email_subject,
+                    recipients=masked_recipients,
+                    to_count=recipient_count,
                     error_message=str(exc),
                 )
                 logger.error("%s failed unexpectedly", provider_name, exc_info=True)
@@ -400,6 +477,22 @@ def send_templated_email_with_failover(
 
     last_error: Exception | None = None
     for provider_name, sender in providers:
+        throttled, budget, sent_today = _provider_throttle_state(provider_name, len(recipients))
+        if throttled:
+            reason = f"Daily budget reached for {provider_name}: sent_today={sent_today}, budget={budget}"
+            _log_delivery(
+                provider=provider_name,
+                status="throttled",
+                template_key=template_key,
+                subject=email_subject,
+                recipients=[_mask_email(addr) for addr in recipients],
+                to_count=len(recipients),
+                error_message=reason,
+            )
+            logger.info(reason)
+            last_error = RuntimeError(reason)
+            continue
+
         started = perf_counter()
         try:
             provider_response = sender()
