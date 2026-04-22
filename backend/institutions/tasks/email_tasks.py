@@ -6,6 +6,6 @@ def send_template_email_task(self, template_key, to, variables, subject=None, fr
     from utils.email import send_template_email
 
     try:
-        return send_template_email(template_key, to, variables, subject, from_email)
+        return send_template_email(template_key, to, variables, subject, from_email, raise_on_error=True)
     except Exception as exc:
         raise self.retry(exc=exc)

@@ -2,12 +2,10 @@ import datetime
 import logging
 from typing import Any
 
-import resend
 from django.conf import settings
+from presently.email_failover import send_templated_email_with_failover
 
 logger = logging.getLogger(__name__)
-
-resend.api_key = getattr(settings, "RESEND_API_KEY", None)
 
 
 def _default_template_params() -> dict[str, str]:
@@ -26,72 +24,40 @@ def send_template_email(
     variables: dict[str, Any],
     subject: str | None = None,
     from_email: str | None = None,
+    raise_on_error: bool = False,
 ) -> dict:
     """
-    Sends an email using a Resend-hosted template by its template ID.
-    Returns the Resend API response dict.
-    Raises ValueError if the template_key is not found in settings.
-    Raises resend.exceptions.ResendError on API failure.
+    Sends an email using the multi-provider failover sender.
+    Returns a standardized send result dictionary.
     """
-    template_map = getattr(settings, "RESEND_TEMPLATES", {})
-    template_id = template_map.get(template_key)
-    if not template_id:
-        raise ValueError(
-            f"Unknown Resend template key '{template_key}'. "
-            f"Available keys: {', '.join(sorted(template_map.keys()))}"
-        )
-
     recipients = [to] if isinstance(to, str) else list(to)
     params = {**_default_template_params(), **(variables or {})}
 
-    payload: dict[str, Any] = {
-        "from": from_email or settings.DEFAULT_FROM_EMAIL,
-        "to": recipients,
-        "template_id": template_id,
-        "params": params,
-    }
-    if subject:
-        payload["subject"] = subject
+    response = send_templated_email_with_failover(
+        template_key=template_key,
+        to=recipients,
+        variables=params,
+        subject=subject,
+        from_email=from_email,
+        raise_on_error=raise_on_error,
+    )
 
-    try:
-        response = resend.Emails.send(payload)
+    if response.get("success"):
         logger.info(
-            "Resend template email sent",
-            extra={"template_key": template_key, "to": recipients},
-        )
-        return response
-    except Exception as exc:
-        # Some Resend SDK/API versions require template payload under "template"
-        # instead of top-level "template_id"/"params".
-        if "Missing `html` or `text` field" in str(exc):
-            compat_payload: dict[str, Any] = {
-                "from": from_email or settings.DEFAULT_FROM_EMAIL,
+            "Template email sent",
+            extra={
+                "template_key": template_key,
                 "to": recipients,
-                "template": {
-                    "id": template_id,
-                    "variables": params,
-                },
-            }
-            if subject:
-                compat_payload["subject"] = subject
-
-            logger.warning(
-                "Retrying Resend send with compatibility template payload",
-                extra={"template_key": template_key, "to": recipients},
-            )
-            response = resend.Emails.send(compat_payload)
-            logger.info(
-                "Resend template email sent (compat mode)",
-                extra={"template_key": template_key, "to": recipients},
-            )
-            return response
-
-        logger.error(
-            "Failed to send Resend template email",
-            exc_info=True,
-            extra={"template_key": template_key, "to": recipients},
+                "provider": response.get("provider"),
+            },
         )
-        raise
+    else:
+        logger.error(
+            "Template email failed after failover attempts",
+            extra={"template_key": template_key, "to": recipients, "error": response.get("error")},
+        )
+
+    return response
 
 
 def _dispatch_template_email(
@@ -100,6 +66,7 @@ def _dispatch_template_email(
     variables: dict[str, Any],
     subject: str | None = None,
     from_email: str | None = None,
+    raise_on_error: bool = False,
 ) -> dict:
     return send_template_email(
         template_key=template_key,
@@ -107,6 +74,7 @@ def _dispatch_template_email(
         variables=variables,
         subject=subject,
         from_email=from_email,
+        raise_on_error=raise_on_error,
     )
 
 

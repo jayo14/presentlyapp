@@ -61,3 +61,34 @@ class SystemLog(models.Model):
 
     def __str__(self):
         return f"[{self.level.upper()}] {self.action} - {self.timestamp}"
+
+
+class EmailDeliveryLog(models.Model):
+    STATUS_CHOICES = (
+        ('sent', 'Sent'),
+        ('failed', 'Failed'),
+        ('quota_exhausted', 'Quota Exhausted'),
+    )
+
+    provider = models.CharField(max_length=50)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='failed')
+    template_key = models.CharField(max_length=120, blank=True, null=True)
+    subject = models.CharField(max_length=255, blank=True, default='')
+    recipients = models.JSONField(default=list, blank=True)
+    recipient_count = models.PositiveIntegerField(default=0)
+    error_message = models.TextField(blank=True, default='')
+    provider_response = models.JSONField(default=dict, blank=True)
+    duration_ms = models.PositiveIntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['provider']),
+            models.Index(fields=['status']),
+            models.Index(fields=['template_key']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.provider} [{self.status}] {self.subject}".strip()

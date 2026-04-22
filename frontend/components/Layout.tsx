@@ -5,7 +5,7 @@ import {
   LogOut, Home, User, Bell, Settings, BookOpen, FileText,
   Calendar, Users, Map, ShieldAlert, Sun, Moon, BarChart3,
   Download, GraduationCap, Building2, Timer, Menu, X,
-  ChevronLeft, Search, PanelLeftClose, PanelLeft, Command, Plus
+  ChevronLeft, Search, PanelLeftClose, PanelLeft, Command, Plus, Mail
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
@@ -194,6 +194,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             label: 'System',
             items: [
               { id: 'logs', icon: ShieldAlert, label: 'Audit Logs', permission: 'system.analytics.view' },
+              { id: 'email-monitor', icon: Mail, label: 'Email Monitor', permission: 'system.analytics.view' },
               { id: 'notifications', icon: Bell, label: 'Notifications', permission: null },
             ].filter((item) => canAccess(item.permission)),
           },
