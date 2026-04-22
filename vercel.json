@@ -5,6 +5,19 @@
   "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
+"redirects": [
+  {
+    "source": "/:path*",
+    "has": [
+      {
+        "type": "host",
+        "value": "www.getpresently.com.ng"
+      }
+    ],
+    "destination": "https://getpresently.com.ng/:path*",
+    "permanent": true
+  }
+],
 "rewrites": [
   {
     "source": "/api/:path*",
