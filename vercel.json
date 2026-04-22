@@ -11,7 +11,7 @@
     "destination": "https://presentlyapp-alpha.onrender.com/api/$1"
   },
   {
-    "source": "/(.*)",
+    "source": "/(?!assets/|service-worker\\.js|index\\.html|.*\\.\\w+$)(.*)",
     "destination": "/index.html"
   }
 ],
