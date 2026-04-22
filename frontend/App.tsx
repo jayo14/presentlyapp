@@ -83,8 +83,11 @@ const BlogManagement = simpleLazy(() => import('./components/Admin/BlogManagemen
 const StaffManagement = simpleLazy(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
 const AcceptInvitePage = simpleLazy(() => import('./components/Auth/AcceptInvitePage').then(module => ({ default: module.AcceptInvitePage })));
 
-// Loading fallback component
-const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." />;
+// Loading fallback component - for authenticated/protected routes only
+const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." showOnPublicPages={false} />;
+
+// Loading fallback for public pages and check-in routes
+const PublicLoadingFallback: React.FC = () => <LoadingScreen message="Loading..." showOnPublicPages={true} />;
 
 const warmUpBackend = () => {
   const rawApi = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
@@ -251,6 +254,30 @@ const AppContent: React.FC = () => {
   const { data: user, isLoading, isError } = useCurrentUser();
   const [loadTimeout, setLoadTimeout] = useState(false);
 
+  // Define public pages that should never show the loading screen
+  const publicPages = [
+    '/',
+    '/documentation',
+    '/volunteers',
+    '/features',
+    '/how-it-works',
+    '/universities',
+    '/blog',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/terms',
+    '/privacy',
+    '/auth/callback',
+    '/email-verification',
+    '/verify-email'
+  ];
+
+  const isPublicRoute = publicPages.some(page => 
+    page === '/' ? location.pathname === '/' : location.pathname.startsWith(page)
+  );
+
   // Safeguard: If loading takes too long (e.g., 10 seconds), show content anyway or an error
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -283,7 +310,8 @@ const AppContent: React.FC = () => {
     }
   }, [user, isLoading, navigate, location.pathname]);
 
-  if (isLoading && !loadTimeout) {
+  // For public routes, don't show loading screen on initial load
+  if (isLoading && !loadTimeout && !isPublicRoute) {
     return <LoadingFallback />;
   }
 
@@ -292,7 +320,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={<PublicLoadingFallback />}>
       <main id="main-content">
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -315,8 +343,8 @@ const AppContent: React.FC = () => {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/email-verification" element={<EmailVerificationSent />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/check-in/:sessionCode" element={<Suspense fallback={<LoadingFallback />}><PublicCheckInPage /></Suspense>} />
-          <Route path="/accept-invite" element={<Suspense fallback={<LoadingFallback />}><AcceptInvitePage /></Suspense>} />
+          <Route path="/check-in/:sessionCode" element={<Suspense fallback={<PublicLoadingFallback />}><PublicCheckInPage /></Suspense>} />
+          <Route path="/accept-invite" element={<Suspense fallback={<PublicLoadingFallback />}><AcceptInvitePage /></Suspense>} />
           
           <Route
             path="/onboarding"
