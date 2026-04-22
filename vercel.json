@@ -5,17 +5,17 @@
   "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
- "rewrites": [
+"rewrites": [
   {
     "source": "/api/(.*)",
     "destination": "https://presentlyapp-alpha.onrender.com/api/$1"
   },
   {
-    "source": "/(?!assets/|service-worker\\.js|index\\.html|.*\\.\\w+$)(.*)",
+    "source": "/((?!api/).*)",
     "destination": "/index.html"
   }
 ],
-  "headers": [
+"headers": [
     {
       "source": "/assets/(.*)",
       "headers": [
