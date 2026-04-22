@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Layers } from 'lucide-react';
 import { Logo } from './Logo';
 
-export const LoadingScreen: React.FC<{ message?: string }> = ({ message = 'Syncing your flow' }) => {
+export const LoadingScreen: React.FC<{ message?: string; showOnPublicPages?: boolean }> = ({ message = 'Syncing your flow', showOnPublicPages = true }) => {
+  if (!showOnPublicPages) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 z-[1000] bg-[#FDFDFF] dark:bg-[#08080A] flex flex-col items-center justify-center overflow-hidden">
       {/* Soft Animated Background Mesh */}
