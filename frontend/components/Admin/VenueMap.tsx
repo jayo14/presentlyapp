@@ -808,7 +808,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
                 duration: 1000
               });
             }
-          } catch (e) {
+          } catch (error) {
             console.debug('Map fitBounds failed, falling back to flyTo first venue.');
             const firstVenue = venues.find((v) => v.latitude && v.longitude);
             if (firstVenue) {

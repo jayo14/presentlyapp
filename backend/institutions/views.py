@@ -566,7 +566,6 @@ def send_verification_otp_view(request):
         EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
         
         # Create new OTP
-            }, status=status.HTTP_201_CREATED)
         otp_obj = EmailVerificationOTP.create_otp(user)
         
         # Send OTP email via internal email service
@@ -728,7 +727,6 @@ def login_view(request):
             otp_send_failed = False
             try:
                 EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
-            }, status=status.HTTP_201_CREATED)
                 otp_obj = EmailVerificationOTP.create_otp(user)
                 send_verification_email(user, otp_obj.otp)
                 auth_logger.info("Unverified user login OTP sent: %s", user.email)
