@@ -162,31 +162,46 @@ class SystemConfigView(APIView):
 
     def get(self, request):
         return Response({
-            'payment_gateway_enabled': False,
-            'at_risk_alerts_enabled': get_feature_flag('at_risk_alerts', default=True),
+            "payment_gateway_enabled": False,
+            "at_risk_alerts_enabled": get_feature_flag("at_risk_alerts", default=True),
+            "email_verification_enabled": get_feature_flag("email_verification", default=True),
         })
 
     def patch(self, request):
+        if not request.user.is_staff:
+            return Response({"error": "Only staff can update feature flags."}, status=status.HTTP_403_FORBIDDEN)
+
         payload = dict(request.data)
 
-        if 'at_risk_alerts_enabled' in payload:
-            if not request.user.is_staff:
-                return Response({'error': 'Only staff can update feature flags.'}, status=status.HTTP_403_FORBIDDEN)
+        # Map frontend keys to backend feature flag keys
+        flag_mappings = {
+            "at_risk_alerts_enabled": {
+                "key": "at_risk_alerts",
+                "name": "At-Risk Alerts",
+                "description": "Show at-risk student alerts and bulk reminder actions in lecturer analytics."
+            },
+            "email_verification_enabled": {
+                "key": "email_verification",
+                "name": "Email Verification",
+                "description": "Require email verification for new signups."
+            }
+        }
 
-            enabled = bool(payload.get('at_risk_alerts_enabled'))
-            flag, _ = FeatureFlag.objects.get_or_create(
-                key='at_risk_alerts',
-                defaults={
-                    'name': 'At-Risk Alerts',
-                    'description': 'Show at-risk student alerts and bulk reminder actions in lecturer analytics.',
-                    'enabled': enabled,
-                },
-            )
-            if flag.enabled != enabled:
-                flag.enabled = enabled
-                flag.save(update_fields=['enabled', 'updated_at'])
-
-            payload['at_risk_alerts_enabled'] = enabled
+        for frontend_key, config in flag_mappings.items():
+            if frontend_key in payload:
+                enabled = bool(payload.get(frontend_key))
+                flag, _ = FeatureFlag.objects.get_or_create(
+                    key=config["key"],
+                    defaults={
+                        "name": config["name"],
+                        "description": config["description"],
+                        "enabled": enabled,
+                    },
+                )
+                if flag.enabled != enabled:
+                    flag.enabled = enabled
+                    flag.save(update_fields=["enabled", "updated_at"])
+                payload[frontend_key] = enabled
 
         return Response(payload)
 

@@ -1,3 +1,4 @@
+from system.feature_flags import get_feature_flag
 import requests
 import uuid
 from rest_framework import viewsets, status, permissions
@@ -432,6 +433,31 @@ def register_view(request):
     if serializer.is_valid():
         user = serializer.save()
         
+        # Check if global email verification is enabled
+        email_verification_enabled = get_feature_flag("email_verification", default=True)
+
+        if not email_verification_enabled:
+            user.email_verified = True
+            user.email_verified_at = timezone.now()
+            user.save(update_fields=["email_verified", "email_verified_at"])
+
+            logger.info(f"User registered (auto-verified): {user.email}")
+
+            return Response({
+                'success': True,
+                'message': 'User registered successfully.',
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'full_name': user.full_name,
+                    'role': user.role,
+                    'email_verified': True,
+                    'onboarding_complete': user.onboarding_complete
+                },
+                'requires_email_verification': False,
+                'requires_onboarding': not user.onboarding_complete
+            }, status=status.HTTP_201_CREATED)
+
         # Create and send OTP for email verification
         try:
             # Create OTP
@@ -454,7 +480,7 @@ def register_view(request):
                     'onboarding_complete': user.onboarding_complete
                 },
                 'requires_email_verification': True,
-                'requires_onboarding': True
+                'requires_onboarding': not user.onboarding_complete
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
@@ -472,7 +498,7 @@ def register_view(request):
                     'onboarding_complete': user.onboarding_complete
                 },
                 'requires_email_verification': True,
-                'requires_onboarding': True,
+                'requires_onboarding': not user.onboarding_complete,
                 'otp_send_failed': True,
                 'error': 'Failed to send verification email. Please request a new code.'
             }, status=status.HTTP_201_CREATED)
@@ -496,7 +522,6 @@ def register_view(request):
         'code': 'REGISTRATION_FAILED',
         'message': error_message
     }, status=status.HTTP_400_BAD_REQUEST)
-
 # Add these views to institutions/views.py after the register_view
 
 def send_verification_email(user, otp_code):
@@ -541,6 +566,7 @@ def send_verification_otp_view(request):
         EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
         
         # Create new OTP
+            }, status=status.HTTP_201_CREATED)
         otp_obj = EmailVerificationOTP.create_otp(user)
         
         # Send OTP email via internal email service
@@ -702,6 +728,7 @@ def login_view(request):
             otp_send_failed = False
             try:
                 EmailVerificationOTP.objects.filter(user=user, is_used=False).update(is_used=True)
+            }, status=status.HTTP_201_CREATED)
                 otp_obj = EmailVerificationOTP.create_otp(user)
                 send_verification_email(user, otp_obj.otp)
                 auth_logger.info("Unverified user login OTP sent: %s", user.email)
