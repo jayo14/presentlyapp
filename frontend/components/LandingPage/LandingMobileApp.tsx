@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Smartphone, Download, Apple, Play } from 'lucide-react';
+import { Smartphone, Download, Apple, Play, Check } from 'lucide-react';
 
 export const LandingMobileApp: React.FC = () => {
   const targetRef = React.useRef<HTMLDivElement>(null);
