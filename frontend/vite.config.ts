@@ -77,15 +77,9 @@ export default defineConfig(({ mode }) => {
               return 'vendor-motion';
             }
 
-            // Admin dashboard - admin only
-            if (id.includes('components/Dashboard/AdminDashboard')) {
-              return 'chunk-admin';
-            }
 
-            // Auth routes - loaded on demand
-            if (id.includes('components/Auth')) {
-              return 'chunk-auth';
-            }
+
+
 
             // Leaflet/map libraries - lazy load
             if (id.includes('leaflet') || id.includes('react-leaflet')) {
@@ -103,7 +97,7 @@ export default defineConfig(({ mode }) => {
           drop_console: true,
           drop_debugger: true,
           passes: 3,
-          ecma: 2022,
+          ecma: 2020,
         },
         mangle: true,
         format: {
