@@ -7,6 +7,17 @@
 
 import { getToken, onMessage, Messaging } from 'firebase/messaging';
 import { getFirebaseMessaging, isFirebaseConfigured } from './config';
+// Mocking logic for simulation
+const IS_DEV = import.meta.env.DEV;
+const ENABLE_FCM_SIMULATION = import.meta.env.VITE_ENABLE_FCM_SIMULATION === 'true' || IS_DEV;
+
+/**
+ * Generate a mock FCM token for simulation
+ */
+const getMockFCMToken = (): string => {
+  return 'mock-fcm-token-' + Math.random().toString(36).substring(2, 15) + '-' + Date.now();
+};
+
 
 // VAPID key from Firebase Console (Cloud Messaging settings)
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || '';
@@ -49,6 +60,11 @@ export const getNotificationPermission = (): NotificationPermission => {
  * @returns FCM token string or null if unavailable
  */
 export const getFCMToken = async (messaging: Messaging): Promise<string | null> => {
+  if (ENABLE_FCM_SIMULATION) {
+    console.log('[FCM] Simulation mode active. Returning mock token.');
+    return getMockFCMToken();
+  }
+
   if (!isFirebaseConfigured()) {
     console.warn('[FCM] Firebase is not configured. Cannot get FCM token.');
     return null;
@@ -75,6 +91,11 @@ export const getFCMToken = async (messaging: Messaging): Promise<string | null> 
     }
   } catch (error) {
     console.error('[FCM] Error getting token:', error);
+    // Fallback to simulation if specifically requested via env or if it's a known non-standard environment
+    if (ENABLE_FCM_SIMULATION) {
+       console.log('[FCM] Token retrieval failed, using mock token as fallback in simulation mode');
+       return getMockFCMToken();
+    }
     return null;
   }
 };
@@ -116,7 +137,7 @@ export const subscribeToPushNotifications = async (): Promise<{
 
     // Get Firebase Messaging instance
     const messaging = await getFirebaseMessaging();
-    if (!messaging) {
+    if (!messaging && !ENABLE_FCM_SIMULATION) {
       return {
         success: false,
         token: null,
@@ -126,7 +147,7 @@ export const subscribeToPushNotifications = async (): Promise<{
     }
 
     // Get FCM token
-    const token = await getFCMToken(messaging);
+    const token = await getFCMToken(messaging as any);
     
     if (!token) {
       return {

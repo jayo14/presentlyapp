@@ -1,137 +1,101 @@
 import React from 'react';
-import { Quote } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
+import { InfiniteSlider } from './components/InfiniteSlider';
 
 const TESTIMONIALS = [
   {
-    quote:
-      '"The level of precision Presently provides has completely transformed our faculty oversight. It\'s not just a tool; it\'s an editorial standard for data."',
-    name: 'Dr. Alistair Thorne',
-    role: 'Dean of Sciences, Oakhaven',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA9COqM4fJRsMreUnVWeh12TR5PdxZdzG1I9fC6lFkKmkjk5_VCGgj2TzHp2Iazhal4OWk9nKEpCPLlrE-2rh_hW_a3uJgTpQrQSxu2w8K6FZmDQfj56CAYV8oJajR1hehYzwyhkLTxXQN5mrPfv27TeJfeq1sRoU4RdpmL_qO-91MfxFC_koJNIamvXbkodHlBGL8DCKouB9PHtB2_wPZrTbHEsBtKOJLAqMaRMWB0GQz0CvOn5ozoEzfPfGLw-n-GWXLC-4mKSdo',
+    quote: "Presently has eliminated the chaos of manual roll calls. My lectures now start with 100% focus on teaching, not attendance logistics.",
+    name: "Prof. Chinedu Okafor",
+    role: "Faculty of Engineering, UNILAG",
+    img: "https://i.pravatar.cc/150?u=chinedu",
+    rating: 5
   },
   {
-    quote:
-      '"Finally, a system that respects the sophistication of modern administrative needs. The real-time visual analytics are simply unparalleled."',
-    name: 'Marcus Vane',
-    role: "Registrar, St. Jude's",
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDto_i1wsGaAj6EdsEnBX_Kmgk-ZpJ7jv3fAkqmPvruCetikQTfZXaNtvX5YCvb4ukLcoW2xLjWarhnVBsXTaNAF1zLGHvlyXVnOwKHLp0USyjJtKm-NCPjZ9ShyUxTD16La9m5xD4pqS_oNM7iJ8ro8jGVXx6UbdvtaGsPATON6bLgbQ9oh09apBYh0nNK_EBtVap8YahyY-0XFMUw0Wa9vuSt5JsrawEp3e0Oej_QCwJG7YBuOemCGR7K5RhhEYtpnMYn2mIq-0g',
+    quote: "The geofencing is incredibly accurate. No more proxy attendance from the dorms. It's a game changer for Nigerian universities.",
+    name: "Dr. Funke Adeyemi",
+    role: "Department of Computer Science, OAU",
+    img: "https://i.pravatar.cc/150?u=funke",
+    rating: 5
   },
   {
-    quote:
-      '"Integration was seamless. Our staff loves the mobile app companion, and the accuracy of the biometric sync is truly world-class."',
-    name: 'Sarah Jenkins',
-    role: 'COO, Global Academy',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAj4c7d2--Y4NdiBDRXmMLJSwdxbKvJwC-eYht_x_5GUncR_KcPnLyKHyMq2aaQzVHyH05UIWPQpntoQcmJbsOU3TXHQsHwL7Jkm5yOVjvzwfjbmsMPg_T0AY3MRiD0yM_UM3SDMeYVzuDx3xEofVj91Bj2TMa1f88ub8nfoSE5D8vI_9GL6Gk5m1m1fcJPVuO3dHZCyfGJy8mXw-O98XWWPrfrB_X-cke8AY_MkX6SWjSoHUrnbFG-6ad0oBypOTx9oNbtVJplh5s',
+    quote: "Real-time verification means I can trust the data. The visual analytics help us identify student engagement patterns early.",
+    name: "Mr. Ibrahim Musa",
+    role: "Registrar's Office, BUK",
+    img: "https://i.pravatar.cc/150?u=ibrahim",
+    rating: 5
   },
+  {
+    quote: "Seamless integration with our existing systems. The students love the ease of check-in, and we love the zero-tolerance for proxies.",
+    name: "Dr. Ngozi Okeke",
+    role: "College of Medicine, UNN",
+    img: "https://i.pravatar.cc/150?u=ngozi",
+    rating: 5
+  }
 ];
 
-export const LandingTestimonials: React.FC = () => {
-  return (
-    <section style={{ background: 'var(--surface)', padding: '8rem 2rem' }}>
-      <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-        <div className="fade-up" style={{ textAlign: 'center', marginBottom: '5rem' }}>
-          <span
-            style={{
-              display: 'block',
-              color: 'var(--primary)',
-              fontWeight: 700,
-              fontSize: '0.7rem',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              marginBottom: '1rem',
-            }}
-          >
-            Institutional Trust
-          </span>
-          <h2
-            className="font-headline"
-            style={{
-              fontSize: 'clamp(2rem,4vw,3.25rem)',
-              fontWeight: 700,
-              letterSpacing: '-0.03em',
-              color: 'var(--on-surface)',
-            }}
-          >
-            Trusted by Leading Institutions
-          </h2>
-        </div>
+const TestimonialCard = ({ testimonial }: { testimonial: typeof TESTIMONIALS[0] }) => (
+  <div className="w-[450px] p-8 rounded-[2.5rem] liquid-glass-gold border-white/5 mx-4 flex flex-col justify-between h-[300px] hover:border-[#D4AF37]/30 transition-all group">
+    <div>
+      <div className="flex items-center gap-1 mb-4">
+        {[...Array(testimonial.rating)].map((_, i) => (
+          <Star key={i} size={14} className="fill-[#D4AF37] text-[#D4AF37]" />
+        ))}
+      </div>
+      <p className="text-zinc-300 italic leading-relaxed text-lg font-medium group-hover:text-white transition-colors">
+        "{testimonial.quote}"
+      </p>
+    </div>
+    <div className="flex items-center gap-4 mt-6">
+      <div className="relative">
+        <div className="absolute inset-0 bg-[#D4AF37] blur-md opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
+        <img
+          src={testimonial.img}
+          alt={testimonial.name}
+          className="w-12 h-12 rounded-full border-2 border-[#D4AF37]/30 relative z-10 object-cover"
+        />
+      </div>
+      <div>
+        <p className="text-white font-black tracking-tight">{testimonial.name}</p>
+        <p className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest">{testimonial.role}</p>
+      </div>
+    </div>
+  </div>
+);
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '2rem',
-          }}
-        >
-          {TESTIMONIALS.map(({ quote, name, role, img }) => (
-            <div
-              key={name}
-              className="fade-up testimonial-card editorial-shadow"
-              style={{
-                background: 'var(--surface-container-low)',
-                padding: '2.5rem',
-                borderRadius: '1.5rem',
-                border: '1px solid rgba(210,197,171,0.12)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '2.5rem',
-              }}
-            >
-              <div>
-                <div style={{ marginBottom: '2rem' }}>
-                  <Quote size={36} color="#ffca0d" />
-                </div>
-                <p
-                  style={{
-                    fontSize: '1.05rem',
-                    color: 'var(--on-surface)',
-                    lineHeight: 1.7,
-                    fontStyle: 'italic',
-                    fontWeight: 500,
-                  }}
-                >
-                  {quote}
-                </p>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <img
-                  src={img}
-                  alt={name}
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    filter: 'grayscale(1)',
-                    transition: 'filter 0.5s',
-                  }}
-                  onMouseEnter={(e) => ((e.target as HTMLImageElement).style.filter = 'grayscale(0)')}
-                  onMouseLeave={(e) => ((e.target as HTMLImageElement).style.filter = 'grayscale(1)')}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--on-surface)' }}>
-                    {name}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: '0.7rem',
-                      color: 'var(--secondary)',
-                      fontWeight: 600,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {role}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
+export const LandingTestimonials: React.FC = () => {
+  const firstRow = TESTIMONIALS.slice(0, 2);
+  const secondRow = TESTIMONIALS.slice(2, 4);
+
+  return (
+    <section className="py-32 bg-[#0A0A0A] overflow-hidden relative">
+      {/* Background Decor */}
+      <div className="absolute top-1/4 -left-64 w-[500px] h-[500px] bg-[#D4AF37]/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-64 w-[500px] h-[500px] bg-[#D4AF37]/5 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 mb-20 text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 mb-6">
+          <Quote size={16} className="text-[#D4AF37]" />
+          <span className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.2em]">Wall of Love</span>
         </div>
+        <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-6">
+          Trusted by <span className="text-gradient-gold">Leading Institutions</span>
+        </h2>
+        <p className="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto font-medium">
+          See how Nigerian universities are reclaiming lecture time and ensuring academic integrity with Presently.
+        </p>
+      </div>
+
+      <div className="space-y-8">
+        <InfiniteSlider
+          items={TESTIMONIALS.map((t, i) => <TestimonialCard key={i} testimonial={t} />)}
+          direction="left"
+          speed={50}
+        />
+        <InfiniteSlider
+          items={[...TESTIMONIALS].reverse().map((t, i) => <TestimonialCard key={i} testimonial={t} />)}
+          direction="right"
+          speed={60}
+        />
       </div>
     </section>
   );

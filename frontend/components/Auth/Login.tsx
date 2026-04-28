@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLogin, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
-import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
 import { LoadingScreen } from '../LoadingScreen';
 import { AuthBackground } from './AuthBackground';
 import { getGoogleAuthRedirectUri } from '../../utils/authRedirect';
@@ -204,19 +204,34 @@ export const Login: React.FC = () => {
 
               {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer accent-primary"
-                  />
-                  <span className="text-textMuted font-medium">Remember me</span>
-                </label>
+                <button
+                  type="button"
+                  onClick={() => setRememberMe(!rememberMe)}
+                  className="flex items-center gap-2 group transition-all"
+                  aria-checked={rememberMe}
+                  role="checkbox"
+                >
+                  <div className={`
+                    w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
+                    ${rememberMe
+                      ? 'bg-primary border-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.3)]'
+                      : 'border-outline group-hover:border-primary/50'
+                    }
+                  `}>
+                    {rememberMe ? (
+                      <CheckCircle2 size={16} className="text-white fill-white/20" />
+                    ) : (
+                      <div className="w-2 h-2 rounded-full bg-transparent group-hover:bg-primary/20 transition-all" />
+                    )}
+                  </div>
+                  <span className={`font-semibold tracking-tight transition-colors ${rememberMe ? 'text-primary' : 'text-textMuted'}`}>
+                    Remember me
+                  </span>
+                </button>
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
-                  className="text-primary font-medium hover:text-primary-fixed transition-colors"
+                  className="text-primary font-bold hover:text-primary-fixed transition-all hover:scale-105 active:scale-95"
                 >
                   Forgot password?
                 </button>

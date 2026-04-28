@@ -42,7 +42,8 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
   };
 
   // Check if everything is ready for push notifications
-  const isFullyConfigured = isSupported && firebaseStatus.configured;
+  const ENABLE_FCM_SIMULATION = import.meta.env.VITE_ENABLE_FCM_SIMULATION === 'true' || import.meta.env.DEV;
+  const isFullyConfigured = isSupported && (firebaseStatus.configured || ENABLE_FCM_SIMULATION);
 
   return (
     <div className="bg-surface text-text rounded-lg p-6 border border-outline">
@@ -80,6 +81,11 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
                 <>
                   <Check className="w-4 h-4 text-green-500" />
                   <span className="text-textMuted">Firebase is configured</span>
+                </>
+              ) : ENABLE_FCM_SIMULATION ? (
+                <>
+                  <Check className="w-4 h-4 text-blue-500" />
+                  <span className="text-textMuted">Push simulation active</span>
                 </>
               ) : (
                 <>
@@ -132,7 +138,7 @@ export const PushNotificationSettings: React.FC<PushNotificationSettingsProps> =
           )}
 
           {/* Firebase Configuration Warning */}
-          {!firebaseStatus.configured && (
+          {!firebaseStatus.configured && !ENABLE_FCM_SIMULATION && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />

@@ -494,20 +494,21 @@ const App: React.FC = () => {
     let isMounted = true;
 
     const wakeServer = async () => {
-      const minimumSplashMs = 800; // Reduced from 2200 for faster perceived load
-      const requestTimeoutMs = 5000;
+      const minimumSplashMs = 400; // Further reduced for near-instant feel
+      const requestTimeoutMs = 3000;
       const startedAt = Date.now();
+
+      // Perform health check in background without blocking the splash screen completion
+      // if it takes too long.
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), requestTimeoutMs);
 
       try {
-        await fetch(getHealthEndpoint(), {
+        fetch(getHealthEndpoint(), {
           method: 'GET',
           cache: 'no-store',
           signal: controller.signal,
-        });
-      } catch (err) {
-        console.log('Waking server...');
+        }).catch(() => {}); // Fire and forget
       } finally {
         window.clearTimeout(timeoutId);
         const elapsed = Date.now() - startedAt;
