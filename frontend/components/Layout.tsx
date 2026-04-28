@@ -195,6 +195,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             items: [
               { id: 'logs', icon: ShieldAlert, label: 'Audit Logs', permission: 'system.analytics.view' },
               { id: 'email-monitor', icon: Mail, label: 'Email Monitor', permission: 'system.analytics.view' },
+              { id: 'config', icon: Settings, label: 'System Config', permission: 'system.settings.manage' },
               { id: 'notifications', icon: Bell, label: 'Notifications', permission: null },
             ].filter((item) => canAccess(item.permission)),
           },
