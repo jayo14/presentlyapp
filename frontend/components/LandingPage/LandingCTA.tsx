@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 interface LandingCTAProps {
   onRegister: () => void;
@@ -7,92 +8,51 @@ interface LandingCTAProps {
 
 export const LandingCTA: React.FC<LandingCTAProps> = ({ onRegister }) => {
   return (
-    <section id="pricing" style={{ padding: '8rem 2rem' }}>
-      <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-        <div
-          className="fade-up"
-          style={{
-            background: 'var(--inverse-surface)',
-            borderRadius: '4rem',
-            padding: 'clamp(3rem,8vw,8rem)',
-            position: 'relative',
-            overflow: 'hidden',
-            textAlign: 'center',
-          }}
+    <section className="py-32 bg-[#0A0A0A] relative overflow-hidden">
+      {/* Decorative Orbs */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#D4AF37]/10 blur-[150px] rounded-full pointer-events-none" />
+
+      <div className="container mx-auto px-6 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="max-w-5xl mx-auto liquid-glass-gold border-white/10 rounded-[4rem] p-12 md:p-24 text-center relative overflow-hidden group"
         >
-          {[800, 600, 400].map((size) => (
-            <div
-              key={size}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%,-50%)',
-                width: size,
-                height: size,
-                borderRadius: '50%',
-                border: '1px solid var(--background)',
-                opacity: 0.15,
-                pointerEvents: 'none',
-              }}
-            />
-          ))}
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              maxWidth: 700,
-              margin: '0 auto',
-            }}
-          >
-            <h2
-              className="font-headline"
-              style={{
-                fontSize: 'clamp(2.5rem,6vw,4.5rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-                color: 'var(--surface)',
-                marginBottom: '2rem',
-              }}
+          <div className="relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/30 mb-10"
             >
-              Ready to Elevate Your Institution?
+              <Sparkles size={16} className="text-[#D4AF37]" />
+              <span className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.2em]">Ready to start?</span>
+            </motion.div>
+
+            <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-10 leading-[0.85]">
+              Restore <span className="text-gradient-gold">Academic <br className="hidden md:block" /> Integrity</span> Today.
             </h2>
-            <p
-              style={{
-                color: 'var(--surface-variant)',
-                fontSize: '1.2rem',
-                marginBottom: '3rem',
-                opacity: 0.8,
-                lineHeight: 1.6,
-              }}
-            >
-              Join over 400 world-class universities using Presently
-              to curate their daily presence.
+
+            <p className="text-zinc-400 text-xl md:text-2xl font-medium leading-relaxed mb-16 max-w-2xl mx-auto">
+              Join the growing list of Nigerian universities using Presently to reclaim their lecture halls.
             </p>
-            <div
-              style={{
-                display: 'flex',
-                gap: '1.5rem',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-              }}
+
+            <button
+              onClick={onRegister}
+              className="group relative px-12 py-6 bg-[#D4AF37] text-[#0A0A0A] rounded-2xl font-black text-xl uppercase tracking-widest overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(212,175,55,0.3)]"
             >
-              <Button
-                onClick={onRegister}
-                className="btn-presently-primary btn-lg"
-              >
-                Request Access
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onRegister}
-                className="btn-presently-outline btn-lg btn-light"
-              >
-                Contact Sales
-              </Button>
-            </div>
+              <div className="relative z-10 flex items-center gap-4">
+                <span>Join Presently Now</span>
+                <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity" />
+            </button>
           </div>
-        </div>
+
+          {/* Abstract background shapes */}
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-[80px]" />
+          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-[80px]" />
+        </motion.div>
       </div>
     </section>
   );

@@ -6,20 +6,17 @@ import { JsonLd } from './seo/JsonLd';
 import { SITE_URL } from './seo/seoConfig';
 import { LandingFooter } from './LandingFooter';
 import { LandingHeader } from './LandingHeader';
-import { useScrollReveal } from '../hooks/useScrollReveal';
 
-// Eagerly load the Hero to prevent CLS
 import { LandingHero } from './LandingPage/LandingHero';
-
 import { LandingBento } from './LandingPage/LandingBento';
 import { LandingEngineRoom } from './LandingPage/LandingEngineRoom';
 import { LandingTestimonials } from './LandingPage/LandingTestimonials';
+import { LandingPricing } from './LandingPage/LandingPricing';
 import { LandingMobileApp } from './LandingPage/LandingMobileApp';
 import { LandingCTA } from './LandingPage/LandingCTA';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  useScrollReveal('.fade-up');
 
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -27,17 +24,10 @@ export const LandingPage: React.FC = () => {
     name: 'Presently',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web, Android, iOS',
-    description: 'GPS-verified real-time attendance system with geofencing for Nigerian universities. Anti-proxy attendance tracking with zero tolerance for proxies.',
+    description: 'The premier anti-proxy attendance system for Nigerian universities. GPS-verified and built for integrity.',
     url: SITE_URL,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'NGN' },
     provider: { '@type': 'Organization', name: 'Presently', url: SITE_URL },
-    featureList: [
-      'GPS-verified attendance tracking',
-      'Real-time geofencing',
-      'Anti-proxy verification',
-      'Mobile app support (iOS and Android)',
-      'Institution dashboard',
-    ],
   };
 
   const goRegister = () => navigate('/register');
@@ -46,25 +36,20 @@ export const LandingPage: React.FC = () => {
   return (
     <TooltipProvider>
       <SEO
-        title="Presently — GPS-Verified Attendance for Nigerian Universities"
-        description="Real-time, location-verified attendance system with geofencing technology for Nigerian university lecturers and students. GPS-based anti-proxy attendance tracking. No proxies. No paper registers."
-        keywords="nigerian university attendance system, gps verified attendance, campus attendance software, anti proxy attendance, geofence attendance, location verified attendance, real-time attendance tracking"
-        canonicalPath="/"
+        title="Presently — Reclaiming Lecture Integrity"
+        description="Stop proxies. Save time. Presently ensures 100% accurate, location-verified attendance for Nigerian universities."
       />
       <JsonLd schema={softwareSchema} />
       
-      <div 
-        className="min-h-screen bg-background overflow-x-hidden"
-        style={{ background: 'var(--background)' }}
-      >
+      <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#D4AF37] selection:text-[#0A0A0A]">
         <LandingHeader onGetStarted={goRegister} onLogin={goLogin} />
 
-        <main className="pt-20 sm:pt-24 md:pt-28">
+        <main>
           <LandingHero onGetStarted={goRegister} />
-          
           <LandingBento />
           <LandingEngineRoom />
           <LandingTestimonials />
+          <LandingPricing />
           <LandingMobileApp />
           <LandingCTA onRegister={goRegister} />
         </main>
