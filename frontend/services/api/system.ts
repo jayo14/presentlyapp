@@ -22,6 +22,7 @@ export interface SystemAlert {
 }
 
 export interface SystemConfig {
+  pricing_enabled?: boolean;
   payment_gateway_enabled: boolean;
   at_risk_alerts_enabled: boolean;
 }

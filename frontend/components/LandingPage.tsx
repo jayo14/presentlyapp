@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { systemApi } from "../services/api/system";
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SEO } from './SEO';
 import { JsonLd } from './seo/JsonLd';
@@ -17,6 +19,21 @@ import { LandingCTA } from './LandingPage/LandingCTA';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [pricingEnabled, setPricingEnabled] = useState(true);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const config = await systemApi.getConfig();
+        if (config.pricing_enabled !== undefined) {
+          setPricingEnabled(config.pricing_enabled);
+        }
+      } catch (error) {
+        console.error("Failed to fetch system config:", error);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -49,7 +66,7 @@ export const LandingPage: React.FC = () => {
           <LandingBento />
           <LandingEngineRoom />
           <LandingTestimonials />
-          <LandingPricing />
+          {pricingEnabled && <LandingPricing />}
           <LandingMobileApp />
           <LandingCTA onRegister={goRegister} />
         </main>
