@@ -5,10 +5,10 @@
   "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
+   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://presentlyapp-alpha.onrender.com/api/"
+      "destination": "https://presentlyapp-alpha.onrender.com/api/warmup"
     },
     {
       "source": "/(.*)",
