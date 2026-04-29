@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
   Settings,
-  ShieldCheck,
-  Mail,
-  AlertTriangle,
   Save,
   RefreshCw,
-  Info,
+  Mail,
+  ShieldCheck,
+  AlertTriangle,
   Database,
+  Bell,
   Lock,
   Globe,
-  Bell
+  Info
 } from 'lucide-react';
 import { systemApi, SystemConfig } from '../../services/api/system';
 import { Button } from '../Button';
@@ -18,10 +18,11 @@ import { Switch } from '../Switch';
 import { toast } from 'sonner';
 
 const SystemConfiguration: React.FC = () => {
-  const [config, setConfig] = useState<SystemConfig & { email_verification_enabled?: boolean }>({
+  const [config, setConfig] = useState<SystemConfig>({
     payment_gateway_enabled: false,
     at_risk_alerts_enabled: true,
     email_verification_enabled: true,
+    pricing_enabled: true,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -31,10 +32,12 @@ const SystemConfiguration: React.FC = () => {
   }, []);
 
   const fetchConfig = async () => {
-    setLoading(true);
     try {
       const data = await systemApi.getConfig();
-      setConfig(data as any);
+      setConfig(prev => ({
+        ...prev,
+        ...data
+      }));
     } catch (error) {
       console.error('Failed to fetch system config:', error);
       toast.error('Failed to load system configuration');
@@ -115,12 +118,33 @@ const SystemConfiguration: React.FC = () => {
                 </div>
                 <p className="text-sm text-textMuted leading-relaxed">
                   When enabled, all new signups must verify their email address before accessing the platform.
-                  Disabling this allows instant access but increases security risk.
                 </p>
               </div>
               <Switch
                 checked={!!config.email_verification_enabled}
                 onCheckedChange={() => handleToggle('email_verification_enabled')}
+              />
+            </div>
+
+            <div className="h-px bg-outline/50" />
+
+            {/* Pricing Section Toggle */}
+            <div className="flex items-start justify-between gap-4 group">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-text" />
+                  <label className="font-medium text-text">Landing Page Pricing</label>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${config.pricing_enabled ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                    {config.pricing_enabled ? 'Visible' : 'Hidden'}
+                  </span>
+                </div>
+                <p className="text-sm text-textMuted leading-relaxed">
+                  Control the visibility of the pricing and plans section on the main landing page.
+                </p>
+              </div>
+              <Switch
+                checked={!!config.pricing_enabled}
+                onCheckedChange={() => handleToggle('pricing_enabled')}
               />
             </div>
 
@@ -135,7 +159,7 @@ const SystemConfiguration: React.FC = () => {
                   <span className="text-[10px] bg-surfaceHigh text-textMuted px-1.5 py-0.5 rounded-full font-bold uppercase">Locked</span>
                 </div>
                 <p className="text-sm text-textMuted leading-relaxed">
-                  Enable integrated payments for premium institution features and automated course enrollment fees.
+                  Enable integrated payments for premium institution features.
                 </p>
                 <div className="flex items-center gap-1 text-[10px] text-primary italic">
                   <Info size={10} />
@@ -164,7 +188,7 @@ const SystemConfiguration: React.FC = () => {
                   <label className="font-medium text-text">At-Risk Student Detection</label>
                 </div>
                 <p className="text-sm text-textMuted leading-relaxed">
-                  Uses machine learning to identify students falling below attendance thresholds and triggers automated intervention alerts to lecturers.
+                  Uses machine learning to identify students falling below attendance thresholds.
                 </p>
               </div>
               <Switch
@@ -183,7 +207,7 @@ const SystemConfiguration: React.FC = () => {
                   <label className="font-medium opacity-70">Anomaly Detection</label>
                 </div>
                 <p className="text-sm text-textMuted leading-relaxed">
-                  Real-time monitoring for suspicious attendance patterns, proxy attempts, and geolocation spoofing.
+                  Real-time monitoring for suspicious attendance patterns.
                 </p>
               </div>
               <Switch checked={true} onCheckedChange={() => {}} disabled />
@@ -206,7 +230,7 @@ const SystemConfiguration: React.FC = () => {
                     <Database size={18} className="text-primary" />
                     Data Retention
                   </div>
-                  <p className="text-xs text-textMuted">Attendance logs are currently retained indefinitely. Auto-archiving is disabled.</p>
+                  <p className="text-xs text-textMuted">Attendance logs are currently retained indefinitely.</p>
                   <Button variant="ghost" size="sm" className="mt-auto w-fit text-primary h-auto py-1">Manage Archive</Button>
                </div>
 
@@ -215,7 +239,7 @@ const SystemConfiguration: React.FC = () => {
                     <RefreshCw size={18} className="text-primary" />
                     System Cache
                   </div>
-                  <p className="text-xs text-textMuted">Reduces DB load by caching institution metadata. Last cleared 2 hours ago.</p>
+                  <p className="text-xs text-textMuted">Reduces DB load by caching institution metadata.</p>
                   <Button variant="ghost" size="sm" className="mt-auto w-fit text-primary h-auto py-1" onClick={() => toast.success('Cache cleared')}>Clear Cache</Button>
                </div>
 
@@ -224,7 +248,7 @@ const SystemConfiguration: React.FC = () => {
                     <AlertTriangle size={18} className="text-red-500" />
                     Maintenance Mode
                   </div>
-                  <p className="text-xs text-textMuted">Prevents user logins while performing database migrations or system updates.</p>
+                  <p className="text-xs text-textMuted">Prevents user logins while performing database migrations.</p>
                   <Button variant="ghost" size="sm" className="mt-auto w-fit text-red-500 h-auto py-1" onClick={() => toast.info('Maintenance mode requires super-admin password')}>Enable Mode</Button>
                </div>
             </div>
@@ -235,8 +259,7 @@ const SystemConfiguration: React.FC = () => {
       <div className="flex items-center justify-center p-6 bg-primary/5 border border-primary/20 rounded-2xl gap-3 text-center">
         <Info className="w-5 h-5 text-primary flex-shrink-0" />
         <p className="text-sm text-text/80">
-          Changes to <strong>Global Email Verification</strong> take effect immediately for all new signups across all institutions.
-          Existing users will not be affected.
+          Changes to <strong>Global Email Verification</strong> take effect immediately for all new signups.
         </p>
       </div>
     </div>

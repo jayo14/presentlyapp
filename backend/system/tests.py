@@ -43,3 +43,41 @@ class StrictVenuePayloadFeatureFlagTests(TestCase):
         serializer = VenueSerializer(data={'name': 'Test Hall', 'boundary_coordinates': self.boundary})
         self.assertFalse(serializer.is_valid())
         self.assertIn('boundary_coordinates', serializer.errors)
+
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from institutions.models import User, UserRole
+
+class SystemConfigViewTests(APITestCase):
+    def setUp(self):
+        self.admin_user = User.objects.create_user(
+            email='admin@test.com',
+            password='password123',
+            full_name='Admin User',
+            role=UserRole.ADMIN,
+            is_staff=True
+        )
+        self.client.force_authenticate(user=self.admin_user)
+
+    def test_get_config_includes_pricing_enabled(self):
+        url = reverse('config')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('pricing_enabled', response.data)
+
+    def test_patch_config_updates_pricing_enabled(self):
+        url = reverse('config')
+        # Initial set
+        response = self.client.patch(url, {'pricing_enabled': False}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['pricing_enabled'], False)
+
+        # Verify in GET
+        response = self.client.get(url)
+        self.assertEqual(response.data['pricing_enabled'], False)
+
+        # Toggle back
+        response = self.client.patch(url, {'pricing_enabled': True}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['pricing_enabled'], True)

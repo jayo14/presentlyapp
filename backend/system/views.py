@@ -165,6 +165,7 @@ class SystemConfigView(APIView):
             "payment_gateway_enabled": False,
             "at_risk_alerts_enabled": get_feature_flag("at_risk_alerts", default=True),
             "email_verification_enabled": get_feature_flag("email_verification", default=True),
+            "pricing_enabled": get_feature_flag("pricing_section", default=True),
         })
 
     def patch(self, request):
@@ -184,6 +185,11 @@ class SystemConfigView(APIView):
                 "key": "email_verification",
                 "name": "Email Verification",
                 "description": "Require email verification for new signups."
+            },
+            "pricing_enabled": {
+                "key": "pricing_section",
+                "name": "Pricing Section",
+                "description": "Show/hide the pricing section on the landing page."
             }
         }
 
