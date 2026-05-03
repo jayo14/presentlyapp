@@ -9,6 +9,7 @@ from accounts.models import UserDevice
 from .serializers import AttendanceSerializer
 from .geolocation_utils import verify_location, calculate_distance
 from utils.email import send_attendance_confirmed_email
+from system.feature_flags import get_feature_flag
 import logging
 
 logger = logging.getLogger(__name__)
@@ -455,25 +456,26 @@ def perform_attendance_check_in(request, session, method='In-App'):
         )
 
         # Send email confirmation
-        try:
-            send_attendance_confirmed_email(
-                to=request.user.email,
-                first_name=request.user.full_name.split(' ')[0],
-                course_code=session.course.code,
-                course_name=session.course.title,
-                arrival_time=attendance.checked_in_at.strftime('%I:%M %p, %b %d %Y'),
-                check_in_method=method,
-                location_label=session.venue.name if session.venue else 'Campus Venue',
-                streak_label='Attendance consistency',
-                streak_message='Keep it up. Your attendance record is improving.',
-                streak_percent=85,
-                history_url=f"{settings.FRONTEND_URL}/attendance/history",
-                report_url=f"{settings.FRONTEND_URL}/attendance/report",
-            )
-        except Exception as e:
-            # Don't fail the check-in if email fails
-            import logging
-            logging.getLogger(__name__).error(f"Failed to send attendance marked email: {e}")
+        if get_feature_flag("email_attendance_confirmed", default=False):
+            try:
+                send_attendance_confirmed_email(
+                    to=request.user.email,
+                    first_name=request.user.full_name.split(' ')[0],
+                    course_code=session.course.code,
+                    course_name=session.course.title,
+                    arrival_time=attendance.checked_in_at.strftime('%I:%M %p, %b %d %Y'),
+                    check_in_method=method,
+                    location_label=session.venue.name if session.venue else 'Campus Venue',
+                    streak_label='Attendance consistency',
+                    streak_message='Keep it up. Your attendance record is improving.',
+                    streak_percent=85,
+                    history_url=f"{settings.FRONTEND_URL}/attendance/history",
+                    report_url=f"{settings.FRONTEND_URL}/attendance/report",
+                )
+            except Exception as e:
+                # Don't fail the check-in if email fails
+                import logging
+                logging.getLogger(__name__).error(f"Failed to send attendance marked email: {e}")
 
         return Response({
             'success': True,

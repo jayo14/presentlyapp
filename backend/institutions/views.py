@@ -1895,18 +1895,19 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
                 )
 
                 # Send email notification
-                send_session_live_email(
-                    to=student.email,
-                    first_name=student.full_name.split(' ')[0],
-                    course_code=session.course.code,
-                    course_name=session.course.title,
-                    lecturer_name=session.course.lecturer.full_name if session.course.lecturer else "Lecturer",
-                    room_location=session.venue.name if session.venue else "Main Hall",
-                    session_time=session.start_time.strftime('%I:%M %p'),
-                    minutes_remaining=max(int((session.end_time - timezone.now()).total_seconds() // 60), 0),
-                    closes_at=session.end_time.strftime('%I:%M %p'),
-                    mark_url=f"{settings.FRONTEND_URL}/check-in/{session.session_code}",
-                )
+                if get_feature_flag("email_session_live", default=False):
+                    send_session_live_email(
+                        to=student.email,
+                        first_name=student.full_name.split(' ')[0],
+                        course_code=session.course.code,
+                        course_name=session.course.title,
+                        lecturer_name=session.course.lecturer.full_name if session.course.lecturer else "Lecturer",
+                        room_location=session.venue.name if session.venue else "Main Hall",
+                        session_time=session.start_time.strftime('%I:%M %p'),
+                        minutes_remaining=max(int((session.end_time - timezone.now()).total_seconds() // 60), 0),
+                        closes_at=session.end_time.strftime('%I:%M %p'),
+                        mark_url=f"{settings.FRONTEND_URL}/check-in/{session.session_code}",
+                    )
                 
             logger.info(f"Sent notifications to {enrolled_students.count()} students for session {session.id}")
         except Exception as e:
