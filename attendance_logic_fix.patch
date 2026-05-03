@@ -1,0 +1,11 @@
+<<<<<<< SEARCH
+            except Exception as e:
+            # Don't fail the check-in if email fails
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send attendance marked email: {e}")
+=======
+            except Exception as e:
+                # Don't fail the check-in if email fails
+                import logging
+                logging.getLogger(__name__).error(f"Failed to send attendance marked email: {e}")
+>>>>>>> REPLACE
