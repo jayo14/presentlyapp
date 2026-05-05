@@ -5,15 +5,14 @@
   "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
-    { "handle": "filesystem" },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "https://presentlyapp-alpha.onrender.com/api/$1"
+      "source": "/api/(.*)",
+      "destination": "https://presentlyapp-alpha.onrender.com/api/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
