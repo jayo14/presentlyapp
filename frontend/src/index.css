@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Outfit:wght@100;200;300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,153 +6,157 @@
 
 @layer base {
   :root {
-    --background: #0A0A0A;
-    --surface: #121212;
+    --background: #F7F9FC;
+    --surface: #FFFFFF;
+    --surface-container: #EEF2F7;
     --primary: #D4AF37;
-    --primary-foreground: #0A0A0A;
-    --text: #FFFFFF;
-    --text-muted: #A1A1AA;
-    --outline: rgba(255, 255, 255, 0.1);
-    --radius: 1rem;
+    --primary-foreground: #091723;
+    --text: #091723;
+    --text-muted: #64748B;
+    --outline: #E2E8F0;
+    --outline-variant: #E2E8F0;
+    --error: #FF4F40;
+    --success: #14B86A;
+    --warning: #F59E0B;
 
-    /* System tokens */
-    --surface-container-lowest: #0a0a0a;
-    --surface-container-low: #121212;
-    --surface-variant: #27272a;
-    --on-surface: #ffffff;
-    --on-surface-variant: #a1a1aa;
-    --primary-container: #D4AF37;
-    --on-primary-fixed: #0A0A0A;
-    --inverse-surface: #ffffff;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 28px;
+    --radius-full: 999px;
   }
 
-  html { scroll-behavior: smooth; font-family: 'Outfit', sans-serif; }
+  .dark {
+    --background: #091723;
+    --surface: #121E2A;
+    --surface-container: #1B2936;
+    --primary: #D4AF37;
+    --primary-foreground: #091723;
+    --text: #F7F9FC;
+    --text-muted: #94A3B8;
+    --outline: #1E293B;
+    --outline-variant: #1E293B;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   body {
     background: var(--background);
     color: var(--text);
-    font-family: 'Outfit', sans-serif;
     overflow-x: hidden;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
   }
 
-  button, [role='button'], a, input[type='checkbox'], input[type='radio'], select {
-    min-height: 44px;
-    min-width: 44px;
+  /* Accessible touch targets */
+  button, [role='button'], a {
+    min-height: 48px;
+    min-width: 48px;
+    touch-action: manipulation;
   }
 
-  input, select, textarea { font-size: 16px !important; }
+  input, select, textarea {
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+
   .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
 }
 
 @layer components {
-  /* Liquid Glass Core Tokens */
-  .liquid-glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  /* Premium App Shell Layouts */
+  .app-shell {
+    @apply flex flex-col min-h-screen bg-background;
   }
 
-  .liquid-glass-gold {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.01) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(212, 175, 55, 0.1);
+  .mobile-nav-dock {
+    @apply fixed bottom-0 left-0 right-0 z-50 px-4 pb-[env(safe-area-inset-bottom)] pt-2;
+    background: linear-gradient(to top, var(--background) 80%, transparent);
   }
 
-  .text-gradient-gold {
-    background: linear-gradient(to right, #D4AF37, #F4CF57, #D4AF37);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% auto;
-    animation: textGradient 4s linear infinite;
+  .dock-container {
+    @apply flex items-center justify-around h-[72px] rounded-full px-2 shadow-dock backdrop-blur-xl;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(226, 232, 240, 0.4);
   }
 
-  @keyframes textGradient {
-    to { background-position: 200% center; }
+  .dark .dock-container {
+    background: rgba(18, 30, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  .gold-glow {
-    box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+  /* Soft Surfaces & Cards */
+  .card-premium {
+    @apply bg-surface rounded-md p-5 border border-outline shadow-soft transition-all duration-300;
   }
 
-  .perspective-2000 {
-    perspective: 2000px;
+  .card-premium:active {
+    @apply transform scale-[0.98];
   }
 
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+  .live-indicator {
+    @apply relative flex h-2 w-2;
   }
   
-  .editorial-shadow { box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+  .live-indicator-ring {
+    @apply animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75;
+  }
   
-  .hover-lift { transition: transform 0.4s ease, box-shadow 0.4s ease; }
-  .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 24px 56px rgba(0,0,0,0.5); }
-
-  .hero-card { animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
-
-  .testimonial-card { transition: transform 0.5s ease; }
-  .testimonial-card:hover { transform: translateY(-8px); }
-
-  .status-dot { animation: status-pulse 2s ease-in-out infinite; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(32px); }
-    to { opacity: 1; transform: translateY(0); }
+  .live-indicator-dot {
+    @apply relative inline-flex rounded-full h-2 w-2 bg-primary;
   }
 
-  .fade-up { opacity: 0; transform: translateY(32px); }
-  .fade-up.in-view { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-  /* Presently Design System Buttons */
-  .btn-presently-primary {
-    background: var(--primary-container) !important;
-    color: var(--on-primary-fixed) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 700 !important;
-    border-radius: 0.75rem !important;
-    border: none !important;
-    transition: opacity 0.2s, transform 0.15s !important;
+  /* Buttons */
+  .btn-native {
+    @apply flex items-center justify-center gap-2 px-6 h-[52px] rounded-full font-semibold transition-all duration-200 active:scale-95;
   }
-  .btn-presently-primary:hover { opacity: 0.88 !important; }
-  .btn-presently-primary:active { transform: scale(0.97) !important; }
+
+  .btn-native-primary {
+    @apply btn-native bg-primary text-primary-foreground shadow-lg shadow-primary/20;
+  }
+
+  .btn-native-secondary {
+    @apply btn-native bg-surface-container text-text border border-outline;
+  }
+
+  /* Glassmorphism */
+  .glass {
+    @apply backdrop-blur-lg bg-white/70 border border-white/20;
+  }
+
+  .dark .glass {
+    @apply bg-black/40 border-white/10;
+  }
+
+  /* Inputs */
+  .input-native {
+    @apply w-full h-[52px] px-4 rounded-sm bg-surface-container border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all;
+  }
 }
 
 @layer utilities {
-  @keyframes status-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-  .animate-status-pulse { animation: status-pulse 2s ease-in-out infinite; }
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
   
-  .bg-grid-pattern {
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
+  .text-balance { text-wrap: balance; }
 
-  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-  .animate-float { animation: float 6s ease-in-out infinite; }
+  /* Smooth scale for touch interactions */
+  .touch-scale {
+    @apply transition-transform active:scale-95;
+  }
 }
 
-/* Map Styles (Preserved for VenueMap.tsx) */
+/* Map Styles Optimization */
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
   z-index: 1;
+  border-radius: var(--radius-md);
 }
 
-.maplibregl-popup-content {
-  background-color: var(--surface) !important;
-  color: var(--on-surface) !important;
-  border: 1px solid var(--outline) !important;
-  border-radius: var(--radius);
-  padding: 8px 12px;
-}
-
-.mapboxgl-ctrl-group, .maplibregl-ctrl-group {
-  background-color: var(--surface) !important;
-  border: 1px solid var(--outline) !important;
-  border-radius: var(--radius) !important;
-}
+/* Hide scrollbars but keep functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

@@ -90,36 +90,25 @@ export interface CheckInData {
 
 // Course API
 export const courseApi = {
-  // Get all courses (optionally filtered)
   getAll: async (filters?: { department?: number; lecturer?: number }): Promise<Course[]> => {
     const response = await apiClient.get('/courses/', { params: filters });
     return response.data.results || response.data;
   },
-
-  // Get course by ID
   getById: async (id: number): Promise<Course> => {
     const response = await apiClient.get(`/courses/${id}/`);
     return response.data;
   },
-
-  // Create course (lecturer/admin only)
   create: async (data: Partial<Course>): Promise<Course> => {
     const response = await apiClient.post('/courses/', data);
     return response.data;
   },
-
-  // Update course (lecturer/admin only)
   update: async (id: number, data: Partial<Course>): Promise<Course> => {
     const response = await apiClient.patch(`/courses/${id}/`, data);
     return response.data;
   },
-
-  // Delete course (lecturer/admin only)
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/courses/${id}/`);
   },
-
-  // Get all course enrollments (optionally filtered)
   getAllEnrollments: async (filters?: { student?: string; course?: number; active?: boolean }): Promise<any[]> => {
     const response = await apiClient.get('/course-enrollments/', { params: filters });
     return response.data.results || response.data;
@@ -128,60 +117,37 @@ export const courseApi = {
 
 // Attendance Session API
 export const sessionApi = {
-  // Get all sessions (optionally filtered)
   getAll: async (filters?: { course?: number; active?: boolean }): Promise<AttendanceSession[]> => {
     const response = await apiClient.get('/sessions/', { params: filters });
     return response.data.results || response.data;
   },
-
-  // Get session by ID
   getById: async (id: number): Promise<AttendanceSession> => {
     const response = await apiClient.get(`/sessions/${id}/`);
     return response.data;
   },
-
-  // Create session (lecturer/admin only)
   create: async (data: Partial<AttendanceSession>): Promise<AttendanceSession> => {
     const response = await apiClient.post('/sessions/', data);
     return response.data;
   },
-
-  // Update session (lecturer/admin only)
   update: async (id: number, data: Partial<AttendanceSession>): Promise<AttendanceSession> => {
     const response = await apiClient.patch(`/sessions/${id}/`, data);
     return response.data;
   },
-
-  // Delete session (lecturer/admin only)
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/sessions/${id}/`);
   },
-
-  // Check in to a session (student only)
   checkIn: async (sessionId: number, data: CheckInData): Promise<Attendance> => {
     const response = await apiClient.post(`/sessions/${sessionId}/check_in/`, data, { 
       _skipGlobalErrorHandler: true 
     } as any);
     return response.data.attendance;
   },
-
-  // Check in by session code (student only)
   checkInByCode: async (code: string, data: CheckInData): Promise<Attendance> => {
-    try {
-      const response = await apiClient.post(`/check-in/${code}/`, data, { 
-        _skipGlobalErrorHandler: true 
-      } as any);
-      return response.data.attendance || response.data;
-    } catch (error: any) {
-      // Only retry on 5xx (server errors), never on 4xx (client errors including 403/429)
-      if (error.response && error.response.status >= 400 && error.response.status < 500) {
-        throw error;
-      }
-      throw error;
-    }
+    const response = await apiClient.post(`/check-in/${code}/`, data, {
+      _skipGlobalErrorHandler: true
+    } as any);
+    return response.data.attendance || response.data;
   },
-
-  // End a session (lecturer/admin only)
   end: async (sessionId: number): Promise<AttendanceSession> => {
     const response = await apiClient.post(`/sessions/${sessionId}/end/`);
     return response.data;
@@ -190,32 +156,62 @@ export const sessionApi = {
 
 // Attendance API
 export const attendanceApi = {
-  // Get all attendance records (optionally filtered)
-  getAll: async (filters?: { session?: number; student?: string }): Promise<Attendance[]> => {
+  getAll: async (filters?: { session?: number; student?: string, lecturer_only?: boolean }): Promise<Attendance[]> => {
     const response = await apiClient.get('/attendances/', { params: filters });
     return response.data.results || response.data;
   },
-
-  // Get attendance by ID
   getById: async (id: number): Promise<Attendance> => {
     const response = await apiClient.get(`/attendances/${id}/`);
     return response.data;
   },
-
-  // Create attendance record (admin only - usually students use checkIn)
-  create: async (data: Partial<Attendance>): Promise<Attendance> => {
-    const response = await apiClient.post('/attendances/', data);
+  getSessions: async (filters?: { lecturer_only?: boolean }): Promise<AttendanceSession[]> => {
+    const response = await apiClient.get('/sessions/', { params: filters });
+    return response.data.results || response.data;
+  },
+  getAttendanceStats: async (): Promise<any> => {
+    const response = await apiClient.get('/analytics/dashboard/student/');
     return response.data;
-  },
+  }
+};
 
-  // Update attendance record
-  update: async (id: number, data: Partial<Attendance>): Promise<Attendance> => {
-    const response = await apiClient.patch(`/attendances/${id}/`, data);
+// Student API Wrapper
+export const studentApi = {
+  getDashboardData: async () => {
+    const response = await apiClient.get('/dashboard/student/');
+    return response.data.data;
+  },
+  getEnrolledCourses: async () => {
+    const response = await apiClient.get('/course-enrollments/');
+    return response.data.results || response.data;
+  },
+  dropCourse: async (id: number) => {
+    await apiClient.delete(`/course-enrollments/${id}/`);
+  },
+  getAttendanceStats: async () => {
+    const response = await apiClient.get('/analytics/dashboard/student/');
     return response.data;
-  },
+  }
+};
 
-  // Delete attendance record
-  delete: async (id: number): Promise<void> => {
-    await apiClient.delete(`/attendances/${id}/`);
+// Lecturer API Wrapper
+export const lecturerApi = {
+  getLecturerDashboard: async () => {
+    const response = await apiClient.get('/dashboard/lecturer/');
+    return response.data.data;
   },
+  getLecturerCourses: async () => {
+    const response = await apiClient.get('/courses/', { params: { lecturer_only: true } });
+    return response.data.results || response.data;
+  },
+  getCourseAnalytics: async (courseId: string) => {
+    const response = await apiClient.get(`/analytics/course/${courseId}/`);
+    return response.data;
+  }
+};
+
+// Analytics API Wrapper
+export const analyticsApi = {
+  exportCourseAttendance: async (courseId: number, format: string) => {
+    window.open(`/api/reports/export/attendance/${format}/?course_id=${courseId}`, '_blank');
+  }
 };

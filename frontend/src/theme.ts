@@ -1,59 +1,60 @@
 /**
- * Material Design 3 Color Palette
- * Custom theme configuration for the Presently app
+ * Presently Modern Native Theme
+ * Custom theme configuration for the redesigned Presently app
  */
 
 export const colors = {
-  // Primary colors
-  primary: '#755b00',
-  primaryContainer: '#ffca0d',
-  primaryFixed: '#ffdf90',
-  primaryFixedDim: '#f3c000',
-  onPrimaryFixed: '#241a00',
+  // Primary colors (Gold/Yellow)
+  primary: '#D4AF37',
+  primaryContainer: '#D4AF37',
+  primaryFixed: '#E5C158',
+  primaryFixedDim: '#D4AF37',
+  onPrimaryFixed: '#091723',
 
-  // Secondary colors
-  secondary: '#5f5e61',
-  secondaryFixedDim: '#c8c6c9',
+  // Secondary colors (Dark/Slate/Navy)
+  secondary: '#091723',
+  secondaryFixedDim: '#1B2936',
 
-  // Surface colors
-  surface: '#fbf8fc',
-  surfaceBright: '#fbf8fc',
-  surfaceContainer: '#f0edf1',
-  surfaceContainerLow: '#f5f3f6',
-  surfaceContainerLowest: '#ffffff',
-  surfaceContainerHigh: '#eae7eb',
-  surfaceContainerHighest: '#e4e1e5',
-  surfaceVariant: '#e4e1e5',
+  // Surface colors (Light Mode)
+  surface: '#FFFFFF',
+  surfaceBright: '#FFFFFF',
+  surfaceContainer: '#F7F9FC',
+  surfaceContainerLow: '#F1F5F9',
+  surfaceContainerLowest: '#FFFFFF',
+  surfaceContainerHigh: '#E2E8F0',
+  surfaceContainerHighest: '#CBD5E1',
+  surfaceVariant: '#EEF2F7',
 
   // Text colors
-  onSurface: '#1b1b1e',
-  onSurfaceVariant: '#4e4632',
+  onSurface: '#091723',
+  onSurfaceVariant: '#64748B',
 
   // Background and other colors
-  background: '#fbf8fc',
-  outlineVariant: '#d2c5ab',
-  error: '#ba1a1a',
-  inverseSurface: '#303033',
+  background: '#F7F9FC',
+  outlineVariant: '#E2E8F0',
+  error: '#FF4F40',
+  success: '#14B86A',
+  inverseSurface: '#091723',
 } as const
 
 export const semanticTokens = {
   // Button styles
   buttonPrimary: {
-    background: colors.primaryContainer,
+    background: colors.primary,
     color: colors.onPrimaryFixed,
   },
   buttonSecondary: {
-    background: colors.surface,
+    background: colors.surfaceVariant,
     color: colors.onSurface,
   },
 
   // Card styles
-  cardBackground: colors.surfaceContainerLowest,
+  cardBackground: colors.surface,
   cardText: colors.onSurface,
   cardBorder: colors.outlineVariant,
 
   // Input styles
-  inputBackground: colors.surfaceContainerLow,
+  inputBackground: colors.surfaceVariant,
   inputBorder: colors.outlineVariant,
   inputText: colors.onSurface,
 
@@ -62,7 +63,7 @@ export const semanticTokens = {
   textSecondary: colors.onSurfaceVariant,
 
   // Shadow
-  shadow: 'rgba(27, 27, 30, 0.07)',
+  shadow: 'rgba(9, 23, 35, 0.04)',
 }
 
 export const themeStyles = `
@@ -91,7 +92,23 @@ export const themeStyles = `
     --background: ${colors.background};
     --outline-variant: ${colors.outlineVariant};
     --error: ${colors.error};
+    --success: ${colors.success};
     --inverse-surface: ${colors.inverseSurface};
+
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 28px;
+    --radius-full: 999px;
+  }
+
+  .dark {
+    --background: #091723;
+    --surface: #121E2A;
+    --surface-container: #1B2936;
+    --on-surface: #F7F9FC;
+    --on-surface-variant: #94A3B8;
+    --outline-variant: #1E293B;
   }
 ` as const
 

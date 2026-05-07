@@ -1,474 +1,183 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  CartesianGrid, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area 
-} from 'recharts';
-import { 
-  BarChart3, Users, Calendar, TrendingUp, AlertCircle, 
-  ChevronDown, Filter, Download, ArrowRight, BookOpen,
-  Search, CheckCircle2, Clock
+  BarChart3, Users, BookOpen, Download,
+  Search, Filter, ChevronRight, AlertCircle,
+  TrendingUp, ArrowRight
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { lecturerApi, analyticsApi } from '../../services/api/attendance';
+import { ModernCard } from '../ModernCard';
 import { Button } from '../Button';
-import { Input } from '../Input';
-import { analyticsApi, LecturerDashboardAnalytics, CourseAttendanceAnalytics } from '../../services/api/analytics';
-import { courseApi, Course } from '../../services/api/attendance';
-import { systemApi } from '../../services/api/system';
+import { cn } from '../../src/components/ui/utils';
 import { toast } from 'sonner';
 
-export const LecturerAnalytics: React.FC = () => {
-  const [dashboardData, setDashboardData] = useState<LecturerDashboardAnalytics | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
-  const [courseAnalytics, setCourseAnalytics] = useState<CourseAttendanceAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [courseLoading, setCourseLoading] = useState(false);
+interface LecturerAnalyticsProps {
+  userName: string;
+}
+
+const LecturerAnalytics: React.FC<LecturerAnalyticsProps> = () => {
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [atRiskAlertsEnabled, setAtRiskAlertsEnabled] = useState(true);
 
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
+  const { data: courses = [] } = useQuery({
+    queryKey: ['lecturerCourses'],
+    queryFn: () => lecturerApi.getLecturerCourses(),
+  });
 
-  useEffect(() => {
-    if (selectedCourseId) {
-      fetchCourseAnalytics(selectedCourseId);
-    }
-  }, [selectedCourseId]);
-
-  const fetchInitialData = async () => {
-    try {
-      setLoading(true);
-      const [analytics, coursesData, config] = await Promise.all([
-        analyticsApi.getLecturerDashboard(),
-        courseApi.getAll(),
-        systemApi.getConfig(),
-      ]);
-      setDashboardData(analytics);
-      setCourses(coursesData);
-      setAtRiskAlertsEnabled(config.at_risk_alerts_enabled !== false);
-      
-      // Select first course by default if available
-      if (coursesData.length > 0) {
-        setSelectedCourseId(coursesData[0].id);
-      }
-    } catch (err) {
-      console.error('Error fetching analytics data:', err);
-      toast.error('Failed to load analytics overview');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCourseAnalytics = async (courseId: number) => {
-    try {
-      setCourseLoading(true);
-      const data = await analyticsApi.getCourseAttendance(courseId);
-      setCourseAnalytics(data);
-    } catch (err) {
-      console.error('Error fetching course analytics:', err);
-      toast.error('Failed to load course details');
-    } finally {
-      setCourseLoading(false);
-    }
-  };
-
-  const COLORS = ['#C1B66D', '#002368', '#ef4444', '#10b981', '#f59e0b'];
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-textMuted animate-pulse">Gathering insights...</p>
-      </div>
-    );
-  }
+  const { data: courseAnalytics, isLoading } = useQuery({
+    queryKey: ['courseAnalytics', selectedCourse],
+    queryFn: () => lecturerApi.getCourseAnalytics(selectedCourse!),
+    enabled: !!selectedCourse,
+  });
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="font-headline text-2xl font-bold text-text">Attendance Analytics</h2>
-          <p className="text-textMuted">Track student participation and engagement trends.</p>
-        </div>
-        <Button variant="secondary" className="gap-2">
-          <Download size={18} />
-          <span>Export Reports</span>
-        </Button>
-      </div>
+    <div className="space-y-8 max-w-6xl mx-auto pb-20">
+      <header className="flex flex-col gap-1">
+        <h1 className="text-3xl font-black tracking-tight text-text">Performance Analytics</h1>
+        <p className="text-textMuted font-medium">Insights into student engagement and course health.</p>
+      </header>
 
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-surface text-text border border-outline p-6 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-primary/10 text-primary rounded-xl">
-              <BarChart3 size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-textMuted uppercase tracking-wider">Avg. Attendance</p>
-              <h3 className="font-headline text-2xl font-black">{dashboardData?.avg_attendance_percentage.toFixed(1)}%</h3>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded-full w-fit">
-            <TrendingUp size={12} />
-            <span>+2.4% from last week</span>
-          </div>
-        </div>
+      {/* COURSE SELECTOR */}
+      <section className="flex flex-wrap gap-3">
+        {courses.map((course: any) => (
+          <button
+            key={course.id}
+            onClick={() => setSelectedCourse(course.id.toString())}
+            className={cn(
+              "px-6 py-3 rounded-full text-sm font-bold transition-all border",
+              selectedCourse === course.id.toString()
+                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
+                : "bg-surface text-textMuted border-outline hover:border-primary/50"
+            )}
+          >
+            {course.course_code}
+          </button>
+        ))}
+      </section>
 
-        <div className="bg-surface text-text border border-outline p-6 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-blue-500/10 text-blue-500 rounded-xl">
-              <Calendar size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-textMuted uppercase tracking-wider">Total Sessions</p>
-              <h3 className="font-headline text-2xl font-black">{dashboardData?.total_sessions}</h3>
-            </div>
-          </div>
-          <p className="text-xs text-textMuted font-medium italic">Across all active courses</p>
-        </div>
-
-        <div className="bg-surface text-text border border-outline p-6 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-green-500/10 text-green-500 rounded-xl">
-              <Clock size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-textMuted uppercase tracking-wider">Active Today</p>
-              <h3 className="font-headline text-2xl font-black">{dashboardData?.active_sessions_count}</h3>
-            </div>
-          </div>
-          <p className="text-xs text-textMuted font-medium italic">Ongoing sessions right now</p>
-        </div>
-
-        <div className="bg-surface text-text border border-outline p-6 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-purple-500/10 text-purple-500 rounded-xl">
-              <Users size={24} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-textMuted uppercase tracking-wider">Engagement</p>
-              <h3 className="font-headline text-2xl font-black">High</h3>
-            </div>
-          </div>
-          <div className="w-full bg-surfaceHigh h-1.5 rounded-full overflow-hidden mt-2">
-            <div className="bg-purple-500 h-full w-[85%] rounded-full"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Charts Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Weekly Trend */}
-        <div className="lg:col-span-2 bg-surface text-text border border-outline rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h3 className="font-headline text-lg font-bold">Weekly Overview</h3>
-              <p className="text-sm text-textMuted">Attendance volume per day</p>
-            </div>
-            <div className="flex gap-2">
-               <div className="flex items-center gap-2 text-xs font-bold text-textMuted uppercase">
-                  <span className="w-3 h-3 rounded-sm bg-primary"></span>
-                  Attendance
-               </div>
-            </div>
-          </div>
-          
-          <div className="h-[300px] w-full min-h-[300px]">
-            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
-              <BarChart data={dashboardData?.weekly_overview}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#3f3f46" opacity={0.1} />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{fill: '#71717a', fontSize: 12, fontWeight: 600}} 
-                  dy={10}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{fill: '#71717a', fontSize: 12}} 
-                />
-                <Tooltip 
-                  cursor={{fill: 'rgba(193, 182, 109, 0.05)'}}
-                  contentStyle={{
-                    backgroundColor: '#18181b',
-                    border: '1px solid #27272a',
-                    borderRadius: '12px',
-                    color: '#fff'
-                  }}
-                />
-                <Bar 
-                  dataKey="attendees" 
-                  fill="#C1B66D" 
-                  radius={[6, 6, 0, 0]} 
-                  barSize={40}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Status Distribution */}
-        <div className="bg-surface text-text border border-outline rounded-2xl p-6 shadow-sm">
-          <h3 className="font-headline text-lg font-bold mb-1">Status Distribution</h3>
-          <p className="text-sm text-textMuted mb-8">Overall student standing</p>
-          
-          <div className="h-[250px] w-full relative min-h-[250px]">
-            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: 'Good Standing', value: courseAnalytics?.good_standing_count || 75 },
-                    { name: 'At Risk', value: courseAnalytics?.at_risk_count || 25 },
-                  ]}
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={8}
-                  dataKey="value"
-                >
-                  <Cell fill="#C1B66D" />
-                  <Cell fill="#ef4444" />
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-               <span className="text-3xl font-black">{courseAnalytics?.avg_attendance.toFixed(0) || 0}%</span>
-               <span className="text-[10px] uppercase font-bold text-textMuted">Avg Rate</span>
-            </div>
-          </div>
-
-          <div className="space-y-3 mt-4">
-             <div className="flex items-center justify-between p-3 rounded-xl bg-surfaceLow border border-outline">
-                <div className="flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full bg-primary"></div>
-                   <span className="text-sm font-medium">Good Standing</span>
+      {selectedCourse ? (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* TOP CARDS */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <ModernCard variant="accent" className="lg:col-span-2 flex flex-col justify-between py-8">
+              <div className="space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Course Health</p>
+                <h2 className="text-4xl font-black tracking-tight">{courseAnalytics?.course_code}</h2>
+                <p className="text-textMuted font-medium">{courseAnalytics?.course_name}</p>
+              </div>
+              
+              <div className="mt-8 space-y-4">
+                <div className="flex justify-between items-end">
+                  <span className="text-sm font-bold text-textMuted uppercase">Average Attendance</span>
+                  <span className="text-3xl font-black text-primary">{courseAnalytics?.avg_attendance?.toFixed(1) || 0}%</span>
                 </div>
-                <span className="text-sm font-bold">{courseAnalytics?.good_standing_count || 0}</span>
-             </div>
-             <div className="flex items-center justify-between p-3 rounded-xl bg-surfaceLow border border-outline">
-                <div className="flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                   <span className="text-sm font-medium">At Risk</span>
+                <div className="h-3 w-full bg-primary/10 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${courseAnalytics?.avg_attendance || 0}%` }}
+                    className="h-full bg-primary"
+                  />
                 </div>
-                <span className="text-sm font-bold">{courseAnalytics?.at_risk_count || 0}</span>
-             </div>
-          </div>
-        </div>
-      </div>
+              </div>
+            </ModernCard>
 
-      {/* Course Specific Insights */}
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-outline pb-6">
-          <div className="space-y-1">
-            <h3 className="font-headline text-xl font-bold">Course Insights</h3>
-            <p className="text-sm text-textMuted">Deep dive into specific course metrics</p>
+            <ModernCard className="flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-error">
+                  <AlertCircle size={20} />
+                  <h4 className="font-bold">At-Risk Students</h4>
+                </div>
+                <p className="text-sm text-textMuted font-medium">
+                  Students below the {courseAnalytics?.benchmark || 75}% benchmark.
+                </p>
+              </div>
+              <div>
+                <p className="text-5xl font-black tracking-tighter text-error">{courseAnalytics?.at_risk_count || 0}</p>
+                <Button variant="ghost" className="p-0 h-auto text-primary mt-2" onClick={() => {}}>
+                  View List <ChevronRight size={16} />
+                </Button>
+              </div>
+            </ModernCard>
           </div>
-          
-          <div className="flex flex-wrap gap-3 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
-              <Input 
-                placeholder="Search students..." 
-                className="pl-9 h-10 text-sm"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="relative">
-              <select 
-                className="bg-surface text-text border border-outline rounded-lg pl-4 pr-10 py-2 text-sm font-bold focus:ring-primary focus:border-primary outline-none appearance-none"
-                value={selectedCourseId || ''}
-                onChange={e => setSelectedCourseId(Number(e.target.value))}
-              >
-                {courses.map(course => (
-                  <option key={course.id} value={course.id}>{course.code}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted pointer-events-none" size={16} />
-            </div>
-          </div>
-        </div>
 
-        {courseLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-             {[1,2,3].map(i => (
-               <div key={i} className="h-64 bg-surfaceHigh/50 animate-pulse rounded-2xl"></div>
-             ))}
-          </div>
-        ) : courseAnalytics ? (
-          <div className="grid grid-cols-1 gap-8">
-            {/* Course Summary Card */}
-            <div className="bg-surface border-outline rounded-2xl p-8 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                  <BookOpen size={120} />
+          {/* ATTENDANCE TABLE */}
+          <ModernCard padding="none" className="overflow-hidden">
+            <div className="p-6 border-b border-outline flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="relative flex-1 max-w-md group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full h-11 bg-surfaceContainer border border-outline rounded-xl pl-12 pr-4 text-sm font-medium outline-none focus:border-primary transition-all"
+                />
               </div>
-              <h4 className="font-headline text-textMuted text-xs font-bold uppercase tracking-widest mb-1">Course Summary</h4>
-              <h3 className="font-headline text-3xl font-black text-text mb-8">{courseAnalytics.course_code}</h3>
-              
-              <div className="grid grid-cols-2 gap-8 relative z-10 mb-8">
-                  <div>
-                    <span className="text-textMuted text-sm block mb-1">Total Sessions</span>
-                    <span className="text-2xl font-bold text-text">{courseAnalytics.total_sessions}</span>
-                  </div>
-                  <div>
-                    <span className="text-textMuted text-sm block mb-1">Benchmark</span>
-                    <span className="text-2xl font-bold text-primary">{courseAnalytics.benchmark}%</span>
-                  </div>
-              </div>
-              
-              <div className="pt-6 border-t border-outline relative z-10">
-                  <div className="text-xs font-bold text-textMuted uppercase tracking-widest mb-3 flex justify-between">
-                    <span>Health Status</span>
-                    <span className="text-text">{courseAnalytics.avg_attendance.toFixed(0)}%</span>
-                  </div>
-                  <div className="w-full h-3 bg-surfaceHigh rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary" 
-                        style={{width: `${courseAnalytics.avg_attendance}%`}}
-                      ></div>
-                  </div>
-              </div>
-            </div>
-
-            {/* At-Risk Alerts */}
-            {atRiskAlertsEnabled && (
-            <div className="bg-surface text-text border border-outline rounded-2xl p-6 shadow-sm flex flex-col">
-              <div className="flex justify-between items-center mb-6">
-                <h4 className="font-headline font-bold flex items-center gap-2 text-lg">
-                    <AlertCircle size={20} className="text-red-500" />
-                    At-Risk Alerts
-                </h4>
-                <span className="bg-red-100 text-red-600 px-2 py-1 rounded-lg text-xs font-bold">
-                  {courseAnalytics.at_risk_count} Students
-                </span>
-              </div>
-              
-              <div className="flex-1 space-y-4 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
-                  {courseAnalytics.students
-                    .filter(s => s.percentage < courseAnalytics.benchmark)
-                    .map(student => (
-                    <div key={student.id} className="flex items-center gap-4 p-4 rounded-xl bg-red-50 border border-red-100">
-                        <div className="w-10 h-10 rounded-full bg-red-200 flex items-center justify-center text-red-600 font-bold">
-                          {student.name.substring(0, 1)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-bold text-text truncate">{student.name}</div>
-                          <div className="text-xs text-red-600 font-medium">
-                            {student.percentage.toFixed(0)}% attendance • {student.department}
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="icon" className="text-textMuted hover:text-primary">
-                          <ArrowRight size={16} />
-                        </Button>
-                    </div>
-                  ))}
-                  {courseAnalytics.at_risk_count === 0 && (
-                    <div className="text-center py-12 text-textMuted italic">
-                      No students currently at risk.
-                    </div>
-                  )}
-              </div>
-              
-              <div className="pt-6 mt-auto border-t border-outline">
-                <Button className="w-full bg-surface border border-outline font-bold h-12 rounded-xl hover:bg-surfaceHigh">
-                    Send Bulk Reminders
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm" className="h-10">
+                  <Download size={14} />
+                  Export CSV
+                </Button>
+                <Button variant="secondary" size="sm" className="h-10">
+                  <Download size={14} />
+                  PDF
                 </Button>
               </div>
             </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-center py-20 bg-surfaceLow/50 rounded-3xl border border-dashed border-outline">
-             <BookOpen className="mx-auto text-textMuted mb-4" size={48} />
-             <h3 className="font-headline text-lg font-bold">No analytics for this course</h3>
-             <p className="text-textMuted">Host a few sessions to see data here.</p>
-          </div>
-        )}
 
-        {/* ── Analytics Table (PRD-required exact format) ─────────────────── */}
-        {courseAnalytics && courseAnalytics.students.length > 0 && (
-          <div className="bg-surface border border-outline rounded-2xl overflow-hidden shadow-sm">
-            {/* Table header + export buttons */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 border-b border-outline">
-              <div>
-                <h4 className="font-headline text-lg font-bold">
-                  Attendance Register — {courseAnalytics.course_code}
-                </h4>
-                <p className="text-sm text-textMuted mt-0.5">
-                  {courseAnalytics.total_sessions} sessions • sorted by Matric Number
-                </p>
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                {(['csv', 'excel', 'pdf'] as const).map(fmt => (
-                  <button
-                    key={fmt}
-                    onClick={() => analyticsApi.exportCourseAttendance(courseAnalytics.course_id, fmt)}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
-                  >
-                    <Download size={13} />
-                    {fmt.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full">
                 <thead>
-                  <tr className="bg-primary/10">
-                    <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Matric Number</th>
-                    <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Full Name</th>
-                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Total Sessions</th>
-                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Attended</th>
-                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Rate (%)</th>
-                    <th className="text-center px-4 py-3 font-bold text-xs uppercase tracking-wider text-textMuted">Status</th>
+                  <tr className="bg-surfaceContainer/50 text-left">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-textMuted">Matric Number</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-textMuted">Student Name</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-textMuted text-center">Attended</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-textMuted text-center">Rate</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-textMuted text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {courseAnalytics.students
-                    .filter(s =>
-                      !searchTerm ||
-                      (s.full_name || s.name).toLowerCase().includes(searchTerm.toLowerCase()) ||
-                      (s.matric_number || s.matric).toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                    .map((student, idx) => {
-                      const rate = student.attendance_rate ?? student.percentage ?? 0;
-                      const status = student.status ?? (rate >= (courseAnalytics.benchmark ?? 75) ? 'Present' : 'Absent');
-                      const matricNo = student.matric_number || student.matric || 'N/A';
-                      const fullName = student.full_name || student.name || 'Unknown';
-                      const attended = student.sessions_attended ?? student.attended ?? 0;
-                      const total = student.total_sessions ?? student.total ?? courseAnalytics.total_sessions;
-                      return (
-                        <tr key={student.id} className={idx % 2 === 0 ? 'bg-surface' : 'bg-surfaceLow/30'}>
-                          <td className="px-4 py-3 font-mono text-xs text-textMuted">{matricNo}</td>
-                          <td className="px-4 py-3 font-medium text-text">{fullName}</td>
-                          <td className="px-4 py-3 text-center text-textMuted">{total}</td>
-                          <td className="px-4 py-3 text-center text-textMuted">{attended}</td>
-                          <td className={`px-4 py-3 text-center font-bold ${rate >= 75 ? 'text-green-500' : 'text-red-500'}`}>
-                            {Number(rate).toFixed(1)}%
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-bold ${
-                              status === 'Present'
-                                ? 'bg-green-500/10 text-green-600'
-                                : 'bg-red-500/10 text-red-600'
-                            }`}>
-                              {status}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                <tbody className="divide-y divide-outline">
+                  {courseAnalytics?.students?.filter((s: any) =>
+                    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    s.matric.toLowerCase().includes(searchTerm.toLowerCase())
+                  ).map((student: any) => (
+                    <tr key={student.id} className="group hover:bg-surfaceContainer/30 transition-colors">
+                      <td className="px-6 py-4 font-mono text-xs text-textMuted">{student.matric}</td>
+                      <td className="px-6 py-4 font-bold text-sm">{student.name}</td>
+                      <td className="px-6 py-4 text-center text-sm font-medium">{student.attended} / {courseAnalytics.total_sessions}</td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={cn(
+                          "font-black text-sm",
+                          student.percentage >= 75 ? "text-success" : "text-error"
+                        )}>
+                          {student.percentage}%
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                          <ArrowRight size={16} />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+          </ModernCard>
+        </div>
+      ) : (
+        <div className="py-20 flex flex-col items-center justify-center text-center gap-6">
+          <div className="w-20 h-20 bg-surfaceContainer rounded-full flex items-center justify-center text-textMuted/40">
+            <BarChart3 size={40} />
           </div>
-        )}
-      </div>
+          <div className="space-y-1">
+            <h3 className="text-2xl font-bold">Select a Course</h3>
+            <p className="text-textMuted max-w-xs mx-auto">Choose a course above to view detailed attendance performance and at-risk alerts.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+export default LecturerAnalytics;
