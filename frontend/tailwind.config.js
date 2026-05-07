@@ -13,8 +13,26 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'Lexend', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['Inter', 'SF Pro Display', 'Geist', 'Outfit', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         headline: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        'xs': '8px',
+        'sm': '16px',
+        'md': '24px',
+        'lg': '28px',
+        'full': '999px',
+      },
+      spacing: {
+        'xs': '4px',
+        'sm': '8px',
+        'md': '12px',
+        'base': '16px',
+        'lg': '20px',
+        'xl': '24px',
+        '2xl': '32px',
+        '3xl': '48px',
+        '4xl': '64px',
       },
       colors: {
         background: "var(--background)",
@@ -48,12 +66,21 @@ export default {
         'reveal': {
           '0%': { transform: 'translateY(100%)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        'shimmer': {
+          '100%': { transform: 'translateX(100%)' },
         }
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
         'reveal': 'reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'shimmer': 'shimmer 2s infinite',
+      },
+      boxShadow: {
+        'soft': '0px 2px 10px rgba(0,0,0,0.04)',
+        'premium': '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+        'dock': '0 -4px 12px rgba(0, 0, 0, 0.05)',
       }
     },
   },
