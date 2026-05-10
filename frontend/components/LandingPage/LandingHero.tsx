@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { Button } from '../Button';
-import { cn } from '../../src/components/ui/utils';
 
 interface LandingHeroProps {
   onGetStarted: () => void;
@@ -10,14 +9,14 @@ interface LandingHeroProps {
 
 export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
   return (
-    <section className="relative min-h-screen flex items-center pt-20 pb-32 overflow-hidden bg-presently-black text-white">
+    <section className="relative min-h-screen flex items-center pt-24 md:pt-20 pb-20 md:pb-28 overflow-hidden bg-presently-black text-white">
       {/* Background Decorative Element */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -right-1/4 w-[600px] h-[600px] bg-sungold/5 blur-[120px] rounded-full" />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
+      <div className="container mx-auto px-5 sm:px-6 relative z-10">
+        <div className="grid lg:grid-cols-12 gap-10 md:gap-12 items-center">
 
           {/* Left Content */}
           <div className="lg:col-span-7">
@@ -29,22 +28,38 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               <span className="text-sungold font-bold uppercase tracking-widest text-sm mb-6 block">
                 THE MODERN STANDARD
               </span>
-              <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8">
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-8">
                 Attendance that <br />
                 survives every audit.
               </h1>
-              <p className="font-sans text-lg md:text-xl text-slate-400 max-w-xl mb-12">
+              <p className="font-sans text-base sm:text-lg md:text-xl text-slate-300 max-w-xl mb-10 md:mb-12">
                 A premium, GPS-verified attendance system for the modern university.
                 No paperwork, no proxies, no stress.
               </p>
 
-              <div className="flex flex-wrap gap-4">
-                <Button variant="primary" size="lg" onClick={onGetStarted}>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
+                <Button variant="primary" size="lg" onClick={onGetStarted} className="w-full sm:w-auto">
                   Get started for free <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white/10">
                   Request a school demo
                 </Button>
+              </div>
+
+              <div className="lg:hidden mt-10 max-w-sm rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-slate-200 text-sm font-semibold">Live check-ins</span>
+                  <span className="text-sungold text-sm font-bold">94.7%</span>
+                </div>
+                <div className="space-y-3">
+                  {[1, 2, 3].map((entry) => (
+                    <div key={entry} className="flex items-center gap-3 rounded-xl bg-black/30 border border-white/10 px-3 py-2">
+                      <span className="h-2 w-2 rounded-full bg-sungold" />
+                      <span className="h-2 w-20 rounded-full bg-white/30" />
+                      <span className="ml-auto h-2 w-12 rounded-full bg-sungold/30" />
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           </div>
