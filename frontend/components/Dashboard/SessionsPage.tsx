@@ -1,33 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Search, Filter, Trash2, Plus, Timer, Users, RefreshCw } from 'lucide-react';
-import { sessionApi, AttendanceSession } from '../../services/api/attendance';
-import { SessionDetailDialog } from '../Attendance/SessionDetailDialog';
+import { ArrowLeft, Plus, Search, Filter, RefreshCw, Calendar, Users, Trash2, BookOpen, Clock } from 'lucide-react';
+import { sessionApi } from '../../services/api/attendance';
+import { Session } from '../../types';
 import { toast } from 'sonner';
-import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { SEO } from '../SEO';
-import CourseIcon from '../Course/CourseIcon';
+import { Button } from '../Button';
+import { ModernCard } from '../ModernCard';
+import { Badge } from '../../src/components/ui/badge';
+import { cn } from '../../src/components/ui/utils';
+import { SessionDetailDialog } from '../Attendance/SessionDetailDialog';
 
 export const SessionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [sessions, setSessions] = useState<AttendanceSession[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSession, setSelectedSession] = useState<AttendanceSession | null>(null);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<number | null>(null);
 
-  const { modalProps: deleteModalProps } = useModalAccessibility(isDeleteModalOpen, () => setIsDeleteModalOpen(false));
-
-  useEffect(() => { fetchSessions(); }, []);
+  useEffect(() => {
+    fetchSessions();
+  }, []);
 
   const fetchSessions = async () => {
     try {
       setLoading(true);
       const data = await sessionApi.getAll();
-      setSessions(Array.isArray(data) ? data : []);
+      setSessions(data);
     } catch (err) {
-      console.error('Error fetching sessions:', err);
       toast.error('Failed to load sessions');
     } finally {
       setLoading(false);
@@ -39,9 +41,9 @@ export const SessionsPage: React.FC = () => {
     try {
       await sessionApi.delete(sessionToDelete);
       toast.success('Session deleted successfully');
+      setSessions(sessions.filter(s => s.id !== sessionToDelete));
       setIsDeleteModalOpen(false);
       setSessionToDelete(null);
-      fetchSessions();
     } catch (err) {
       toast.error('Failed to delete session');
     }
@@ -54,197 +56,167 @@ export const SessionsPage: React.FC = () => {
   );
 
   return (
-    <>
-      <SEO title="Sessions | Dashboard" description="View and manage all your attendance sessions on Presently." noIndex />
-      <div className="space-y-6 animate-in fade-in duration-300 pb-12">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/dashboard')}
-              aria-label="Back to dashboard"
-              className="p-2 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <h2 className="font-headline text-xl font-semibold text-text">Attendance Sessions</h2>
-              <p className="text-sm text-textMuted mt-0.5">History of all created attendance sessions.</p>
-            </div>
-          </div>
-          <button
-            onClick={() => navigate('/dashboard/sessions/new')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
-          >
-            <Plus size={16} />
-            New Session
-          </button>
+    <div className="space-y-10 max-w-7xl mx-auto pb-20">
+      <SEO title="Attendance History | Presently" />
+
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+           <Badge variant="secondary" className="px-3 py-1">SESSION LOGS</Badge>
+           <h1 className="font-display text-4xl md:text-5xl font-bold text-presently-black">
+             Attendance History
+           </h1>
+           <p className="text-on-surface-variant font-medium text-lg">
+             Audit and manage all your academic sessions.
+           </p>
         </div>
+        <Button size="lg" className="h-16 px-10 shadow-gold" onClick={() => navigate('/dashboard/sessions/new')}>
+          <Plus size={24} className="mr-2" />
+          New Session
+        </Button>
+      </header>
 
-        {/* Search & Filters */}
-        <div className="bg-surface text-text border border-outline rounded-xl p-3 flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
-            <input
-              type="text"
-              placeholder="Search by course code, name or session code..."
-              className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2">
-            <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors">
-              <Filter size={14} />
-              Filter
-            </button>
-            <button
-              onClick={fetchSessions}
-              disabled={loading}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-50"
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              {loading ? 'Loading...' : 'Refresh'}
-            </button>
-          </div>
-        </div>
-
-        {/* Sessions Grid */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-44 bg-surfaceHigh/50 animate-pulse rounded-xl border border-outline" />
-            ))}
-          </div>
-        ) : filteredSessions.length === 0 ? (
-          <div className="text-center py-20 bg-surface text-text border border-dashed border-outline rounded-xl">
-            <div className="w-14 h-14 bg-surfaceHigh rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="text-textMuted" size={24} />
-            </div>
-            <h3 className="font-headline text-base font-semibold text-text mb-1">No sessions found</h3>
-            <p className="text-sm text-textMuted mb-6 max-w-sm mx-auto">
-              {searchTerm ? `No sessions matching "${searchTerm}"` : "You haven't created any attendance sessions yet."}
-            </p>
-            {!searchTerm && (
-              <button
-                onClick={() => navigate('/dashboard/sessions/new')}
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                Create Your First Session
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredSessions.map(session => {
-              const isExpired = session.is_active && new Date(session.end_time) < new Date();
-              const status = session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED';
-              const statusStyles: Record<string, string> = {
-                'ACTIVE': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-                'EXPIRED': 'bg-inputmber-50 text-muted-foregroundmber-700 dark:bg-inputmber-500/10 dark:text-muted-foregroundmber-400',
-                'ENDED': 'bg-muted text-muted-foreground',
-              };
-
-              return (
-                <div
-                  key={session.id}
-                  onClick={() => setSelectedSession(session)}
-                  className="bg-surface text-text border border-outline rounded-xl p-4 hover:border-outline hover:shadow-sm transition-all cursor-pointer group"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <CourseIcon 
-                      title={session.course_name || ''} 
-                      code={session.course_code || ''}
-                      className="w-10 h-10 group-hover:shadow-md transition-all" 
-                    />
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider ${statusStyles[status]}`}>
-                        {status}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSessionToDelete(session.id);
-                          setIsDeleteModalOpen(true);
-                        }}
-                        className="p-1 text-textMuted hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <h4 className="font-headline text-sm font-semibold text-text group-hover:text-primary transition-colors line-clamp-1">{session.course_name}</h4>
-                    <div className="flex items-center gap-2 text-xs text-textMuted font-mono mt-0.5">
-                      <span className="font-semibold text-primary">{session.course_code}</span>
-                      <span>•</span>
-                      <span>{session.session_code}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 pt-3 border-t border-outline text-xs text-textMuted">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar size={12} />
-                      <span>{new Date(session.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Users size={12} />
-                      <span>{session.attendee_count || 0} students</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Session Detail Dialog */}
-        {selectedSession && (
-          <SessionDetailDialog
-            session={selectedSession}
-            onClose={() => setSelectedSession(null)}
-            onSessionEnded={() => { fetchSessions(); }}
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="relative w-full md:w-96">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant" size={20} />
+          <input
+            type="text"
+            placeholder="Search by course or code..."
+            className="w-full h-14 pl-14 pr-6 bg-white border border-outline rounded-2xl text-presently-black font-medium focus:ring-2 focus:ring-sungold/20 outline-none"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-        )}
+        </div>
+        <button
+          onClick={fetchSessions}
+          disabled={loading}
+          className="h-14 px-6 rounded-2xl border border-outline flex items-center gap-3 text-xs font-bold text-on-surface-variant hover:bg-warm-ivory transition-all disabled:opacity-50"
+        >
+          <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+          REFRESH DATA
+        </button>
+      </div>
 
-        {/* Delete Confirmation Modal */}
-        {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4">
-            <div
-              {...deleteModalProps}
-              aria-labelledby="delete-session-title"
-              className="bg-surface text-text border border-outline rounded-none md:rounded-xl w-full h-[100dvh] md:h-auto md:max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none overflow-y-auto"
-            >
-              <div className="text-center space-y-3">
-                <div className="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
-                  <Trash2 size={24} />
+      {/* Grid */}
+      {loading && sessions.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-64 bg-slate-100 animate-pulse rounded-3xl" />
+          ))}
+        </div>
+      ) : filteredSessions.length === 0 ? (
+        <div className="text-center py-24 bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-outline">
+          <Calendar className="w-20 h-20 text-slate-200 mx-auto mb-6" />
+          <h4 className="font-display text-2xl font-bold text-presently-black">No Sessions Found</h4>
+          <p className="text-on-surface-variant font-medium mt-2">Create your first attendance session to begin tracking.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredSessions.map(session => {
+            const isExpired = session.is_active && new Date(session.end_time) < new Date();
+            const status = session.is_active ? (isExpired ? 'EXPIRED' : 'ACTIVE') : 'ENDED';
+
+            return (
+              <ModernCard
+                key={session.id}
+                padding="lg"
+                className="group hover:border-sungold/40 transition-all flex flex-col justify-between cursor-pointer"
+                onClick={() => setSelectedSession(session)}
+              >
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-warm-ivory border border-outline flex items-center justify-center text-sungold">
+                      <BookOpen size={24} />
+                    </div>
+                    <div className="flex gap-2">
+                       <Badge variant={status === 'ACTIVE' ? 'present' : status === 'EXPIRED' ? 'excused' : 'secondary'}>
+                         {status}
+                       </Badge>
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setSessionToDelete(session.id);
+                           setIsDeleteModalOpen(true);
+                         }}
+                         className="p-2 hover:bg-red-50 rounded-xl text-soft-coral transition-colors"
+                       >
+                         <Trash2 size={16} />
+                       </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-display text-xl font-bold text-presently-black leading-tight mb-1 group-hover:text-sungold transition-colors line-clamp-1">
+                      {session.course_name}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-sungold uppercase tracking-widest">{session.course_code}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{session.session_code}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-outline grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2 text-on-surface-variant">
+                      <Calendar size={14} className="text-sungold" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{new Date(session.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-on-surface-variant">
+                      <Users size={14} className="text-sungold" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{session.attendee_count || 0} STUDENTS</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 id="delete-session-title" className="font-headline text-base font-semibold text-text">Delete Session?</h3>
-                  <p className="text-sm text-textMuted mt-1.5 leading-relaxed">
-                    This will permanently remove the session and all associated records.
-                  </p>
-                </div>
+              </ModernCard>
+            );
+          })}
+        </div>
+      )}
+
+      {selectedSession && (
+        <SessionDetailDialog
+          session={selectedSession}
+          onClose={() => setSelectedSession(null)}
+          onSessionEnded={fetchSessions}
+        />
+      )}
+
+      {/* Delete Confirmation */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-presently-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <ModernCard className="max-w-md w-full animate-in zoom-in-95 duration-300 shadow-2xl">
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 bg-soft-coral/10 text-soft-coral rounded-full flex items-center justify-center mx-auto">
+                <Trash2 size={32} />
               </div>
-              <div className="flex gap-3 mt-6">
-                <button
+              <div>
+                <h3 className="font-display text-2xl font-bold text-presently-black">Delete Session?</h3>
+                <p className="text-on-surface-variant font-medium mt-2">
+                  This will permanently remove the attendance record for this session. This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-4 mt-8">
+                <Button
+                  variant="outline"
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-textMuted bg-surfaceHigh rounded-lg hover:bg-surfaceHigh transition-colors"
+                  className="flex-1 h-14"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
                   onClick={handleDeleteSession}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-text rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex-1 h-14 bg-soft-coral hover:bg-red-700 text-white border-none"
                 >
-                  Delete
-                </button>
+                  Confirm Delete
+                </Button>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </>
+          </ModernCard>
+        </div>
+      )}
+    </div>
   );
 };
+
+export default SessionsPage;

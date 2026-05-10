@@ -25,6 +25,8 @@ vi.mock('../../services/api/auth', () => ({
     register: mockRegister,
     getCurrentUser: mockGetCurrentUser,
     isAuthenticated: () => true,
+    sendVerificationOTP: vi.fn(),
+    verifyEmailOTP: vi.fn(),
   },
 }));
 
@@ -32,6 +34,18 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
   return { ...actual, useNavigate: () => mockNavigate };
 });
+
+vi.mock('../../services/api/institutions', () => ({
+  institutionsApi: {
+    getAllInstitutions: vi.fn(),
+  },
+}));
+
+vi.mock('../../services/api/student', () => ({
+  studentApi: {
+    getDashboard: vi.fn(),
+  },
+}));
 
 import { useCurrentUser, useLogin, useLogout, useRegister } from '../../hooks/useAuth';
 
@@ -53,6 +67,7 @@ const STUDENT_USER = {
   full_name: 'Test Student',
   role: UserRole.STUDENT,
   onboarding_complete: true,
+  email_verified: true,
   notifications_enabled: true,
   location_enabled: false,
   dark_mode: false,

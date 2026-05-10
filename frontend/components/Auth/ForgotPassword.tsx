@@ -1,223 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { Mail, ArrowLeft, Lock, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { useRequestPasswordReset } from '../../hooks/useAuth';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SEO } from '../SEO';
+import { Mail, ArrowLeft, Loader2, Send } from 'lucide-react';
+import { authApi } from '../../services/api/auth';
 import { toast } from 'sonner';
-
-type PageState = 'form' | 'sent' | 'error';
+import { SEO } from '../SEO';
+import { Logo } from '../Logo';
+import { Button } from '../Button';
+import { Input } from '../Input';
 
 export const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [pageState, setPageState] = useState<PageState>('form');
-  const [emailError, setEmailError] = useState('');
-  const [lastSentTime, setLastSentTime] = useState<number | null>(null);
-  const [cooldownRemaining, setCooldownRemaining] = useState(0);
-  const requestPasswordResetMutation = useRequestPasswordReset();
-
-  const COOLDOWN_SECONDS = 120;
-
-  useEffect(() => {
-    if (lastSentTime) {
-      const interval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - lastSentTime) / 1000);
-        const remaining = Math.max(0, COOLDOWN_SECONDS - elapsed);
-        setCooldownRemaining(remaining);
-        if (remaining === 0) clearInterval(interval);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [lastSentTime]);
-
-  const validateEmail = (emailValue: string) => {
-    if (!emailValue) { setEmailError(''); return false; }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailValue)) {
-      setEmailError('Please enter a valid email address');
-      return false;
-    }
-    setEmailError('');
-    return true;
-  };
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    validateEmail(value);
-  };
-
-  const clearEmail = () => { setEmail(''); setEmailError(''); };
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cooldownRemaining > 0) {
-      toast.error(`Please wait ${cooldownRemaining} seconds before requesting another link`);
-      return;
+    setIsLoading(true);
+    try {
+      await authApi.requestPasswordReset(email);
+      setIsSubmitted(true);
+      toast.success('Reset link sent!', {
+        description: 'Please check your email for instructions.'
+      });
+    } catch (error: any) {
+      toast.error('Failed to send link', {
+        description: error.response?.data?.detail || 'Please try again later.'
+      });
+    } finally {
+      setIsLoading(false);
     }
-    if (!validateEmail(email)) return;
-
-    requestPasswordResetMutation.mutate(email, {
-      onSuccess: () => {
-        setPageState('sent');
-        setLastSentTime(Date.now());
-        toast.success('Reset link sent to your email!');
-      },
-      onError: (error: any) => {
-        setPageState('error');
-        const errorMessage = error?.response?.data?.message || 'Failed to send reset link. Please try again.';
-        toast.error(errorMessage);
-      },
-    });
-  };
-
-  const handleReset = () => {
-    setEmail('');
-    setEmailError('');
-    requestPasswordResetMutation.reset();
-    setPageState('form');
-  };
-
-  const formatCooldown = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative">
-      <SEO
-        title="Forgot Password | Presently"
-        description="Reset your Presently password to regain access to your account."
-      />
+    <div className="min-h-screen bg-warm-ivory flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      <SEO title="Reset Password | Presently" description="Recover your Presently account password." />
 
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 text-textMuted hover:text-text flex items-center gap-2 transition-colors"
-        aria-label="Go back"
-      >
-        <ArrowLeft size={20} />
-      </button>
+      <div className="absolute top-8 left-8 z-20">
+        <button
+          onClick={() => navigate('/login')}
+          className="p-3 text-presently-black hover:bg-black/5 rounded-full transition-all"
+        >
+          <ArrowLeft size={24} />
+        </button>
+      </div>
 
-      <div className="w-full max-w-md">
-        {/* Icon + Title */}
-        <div className="mb-8 text-center flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-primaryContainer flex items-center justify-center mb-6">
-            <Lock size={48} className="text-on-primary-fixed" strokeWidth={2.5} />
-          </div>
-          <h2 className="font-headline text-4xl font-bold text-text mb-2">Reset Password</h2>
-          <p className="text-textMuted text-center leading-relaxed">
-            Enter your registered university email address and we'll send you a secure link to reset your password.
-          </p>
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-10">
+          <Logo className="justify-center mb-8" />
+          <h2 className="font-display text-4xl font-bold text-presently-black mb-2">Reset Password</h2>
+          <p className="text-on-surface-variant">We'll send you a link to recover your account.</p>
         </div>
 
-        <div className="bg-surface border border-outline p-6 rounded-2xl shadow-lg">
-          {pageState === 'form' && (
-            <form onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-5">
-                <div>
-                  <label className="block text-sm font-bold text-text/80 mb-2 tracking-wide">University Email</label>
-                  <div className="relative">
-                    <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10" />
-                    <input
-                      type="email"
-                      placeholder="name@university.edu"
-                      required
-                      value={email}
-                      onChange={handleEmailChange}
-                      disabled={requestPasswordResetMutation.isPending}
-                      className={[
-                        'w-full h-14 pl-12 pr-12 bg-surfaceLow border rounded-2xl text-text placeholder-textMuted',
-                        'focus:outline-none focus:ring-1 transition-colors',
-                        emailError
-                          ? 'border-destructive focus:border-destructive focus:ring-destructive'
-                          : 'border-outline focus:border-primary focus:ring-primary',
-                        'disabled:opacity-50',
-                      ].join(' ')}
-                    />
-                    {email && !requestPasswordResetMutation.isPending && (
-                      <button
-                        type="button"
-                        onClick={clearEmail}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-text transition-colors z-10"
-                        aria-label="Clear email"
-                      >
-                        <X size={20} />
-                      </button>
-                    )}
-                  </div>
-                  {emailError && (
-                    <div className="flex items-center gap-1.5 mt-2 text-red-400 text-xs">
-                      <AlertCircle size={14} />
-                      <span>{emailError}</span>
-                    </div>
-                  )}
-                </div>
+        <div className="bg-white p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
+          {!isSubmitted ? (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <Input
+                label="Email Address"
+                type="email"
+                placeholder="name@university.edu"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                icon={<Mail />}
+              />
 
-                <button
-                  type="submit"
-                  disabled={requestPasswordResetMutation.isPending || !email || !!emailError || cooldownRemaining > 0}
-                  className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {requestPasswordResetMutation.isPending ? (
-                    <>
-                      <Loader2 size={20} className="animate-spin" />
-                      <span>Sending...</span>
-                    </>
-                  ) : cooldownRemaining > 0 ? (
-                    `Wait ${formatCooldown(cooldownRemaining)}`
-                  ) : (
-                    'Send Reset Link'
-                  )}
-                </button>
-
-                <p className="text-center text-sm text-textMuted mt-2">
-                  Having trouble?{' '}
-                  <button
-                    type="button"
-                    onClick={() => window.open('mailto:support@getpresently.com.ng', '_blank')}
-                    className="text-primary font-semibold hover:underline"
-                  >
-                    Contact Support
-                  </button>
-                </p>
-              </div>
+              <Button
+                type="submit"
+                isLoading={isLoading}
+                fullWidth
+                className="h-14 text-lg"
+              >
+                Send Reset Link
+              </Button>
             </form>
-          )}
-
-          {pageState === 'sent' && (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center">
-                <CheckCircle size={40} className="text-green-500" />
+          ) : (
+            <div className="text-center py-4">
+              <div className="w-16 h-16 bg-sungold/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Send className="text-sungold w-8 h-8" />
               </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="font-headline text-xl font-bold text-green-500">Link sent!</h3>
-                <p className="text-textMuted">Check your email for the password reset link.</p>
-              </div>
-              <button
-                onClick={handleReset}
-                className="text-primary font-bold hover:underline transition-colors"
+              <h3 className="text-xl font-bold mb-2">Check your email</h3>
+              <p className="text-on-surface-variant mb-8 leading-relaxed">
+                We've sent a password reset link to <span className="font-bold text-presently-black">{email}</span>.
+              </p>
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={() => navigate('/login')}
+                className="h-14"
               >
-                Send to a different email
-              </button>
-            </div>
-          )}
-
-          {pageState === 'error' && (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
-                <AlertCircle size={40} className="text-red-500" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="font-headline text-xl font-bold text-error">Something went wrong</h3>
-                <p className="text-textMuted">We couldn't send the reset link. Please try again.</p>
-              </div>
-              <button
-                onClick={handleReset}
-                className="w-full h-12 bg-primaryContainer text-on-primary-fixed rounded-full font-semibold hover:opacity-90 transition-all"
-              >
-                Try Again
-              </button>
+                Back to Login
+              </Button>
             </div>
           )}
         </div>

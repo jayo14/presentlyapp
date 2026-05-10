@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Logo } from './Logo';
 import { Button } from './Button';
+import { cn } from '../src/components/ui/utils';
 
 interface LandingHeaderProps {
   onGetStarted: () => void;
@@ -23,26 +24,31 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onGetStarted, onLo
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-[100] transition-all duration-500 ${
-        isScrolled ? 'py-4' : 'py-8'
-      }`}
+      className={cn(
+        "fixed top-0 inset-x-0 z-[100] transition-all duration-500",
+        isScrolled ? "py-4" : "py-8"
+      )}
     >
       <div className="container mx-auto px-6">
-        <div className={`relative flex items-center justify-between px-8 py-4 rounded-full transition-all duration-500 ${
+        <div className={cn(
+          "flex items-center justify-between px-8 py-4 transition-all duration-500",
           isScrolled
-            ? 'bg-surface/80 backdrop-blur-2xl border border-outline shadow-dock'
-            : 'bg-transparent border border-transparent'
-        }`}>
+            ? "bg-white/80 dark:bg-black/80 backdrop-blur-xl border border-outline rounded-full shadow-lg"
+            : "bg-transparent border border-transparent"
+        )}>
 
           {/* Logo */}
-          <Logo className="scale-90" />
+          <Logo showText={true} variant={!isScrolled ? 'dark' : undefined} />
 
           {/* Navigation */}
           <nav className="hidden lg:flex items-center gap-10">
-            {['Solutions', 'Features', 'Pricing', 'About'].map((item) => (
+            {['Product', 'Company', 'Resources', 'Legal'].map((item) => (
               <button
                 key={item}
-                className="text-textMuted text-xs font-black uppercase tracking-[0.2em] hover:text-primary transition-colors"
+                className={cn(
+                  "text-xs font-bold uppercase tracking-[0.2em] transition-colors",
+                  !isScrolled ? "text-slate-400 hover:text-white" : "text-on-surface-variant hover:text-sungold"
+                )}
               >
                 {item}
               </button>
@@ -53,14 +59,17 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onGetStarted, onLo
           <div className="hidden sm:flex items-center gap-6">
             <button
               onClick={onLogin}
-              className="text-text text-xs font-black uppercase tracking-[0.2em] hover:text-primary transition-colors"
+              className={cn(
+                "text-xs font-bold uppercase tracking-[0.2em] transition-colors",
+                !isScrolled ? "text-slate-400 hover:text-white" : "text-on-surface-variant hover:text-sungold"
+              )}
             >
               Log In
             </button>
             <Button
               size="sm"
               onClick={onGetStarted}
-              className="h-12 px-6"
+              className="h-10 px-6"
             >
               Get Started
             </Button>
@@ -68,7 +77,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onGetStarted, onLo
 
           {/* Mobile Menu Toggle */}
           <button
-            className="lg:hidden text-text p-2"
+            className={cn("lg:hidden p-2", !isScrolled ? "text-white" : "text-on-surface")}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -80,16 +89,16 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({ onGetStarted, onLo
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="absolute top-full inset-x-6 mt-4 p-8 bg-surface/95 backdrop-blur-2xl border border-outline rounded-[2rem] shadow-premium lg:hidden z-50 overflow-hidden"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-full inset-x-6 mt-4 p-8 bg-white dark:bg-[#141414] border border-outline rounded-3xl shadow-xl lg:hidden z-50"
           >
-            <div className="flex flex-col gap-8 relative z-10">
-              {['Solutions', 'Features', 'Pricing', 'About'].map((item) => (
+            <div className="flex flex-col gap-8">
+              {['Product', 'Company', 'Resources', 'Legal'].map((item) => (
                 <button
                   key={item}
-                  className="text-text text-xl font-black uppercase tracking-[0.2em] text-left hover:text-primary transition-colors"
+                  className="text-on-surface text-lg font-bold uppercase tracking-widest text-left"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item}

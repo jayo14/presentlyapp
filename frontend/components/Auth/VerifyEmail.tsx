@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Logo } from '../Logo';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
@@ -30,7 +30,8 @@ export const VerifyEmail: React.FC = () => {
       setMessage('Verifying your email...');
     } else if (verifyEmailMutation.isSuccess) {
       setStatus('success');
-      setMessage('Email verified successfully! Redirecting...');
+      setMessage('Email verified successfully!');
+      setTimeout(() => navigate('/login'), 2000);
     } else if (verifyEmailMutation.isError) {
       setStatus('error');
       setMessage(verifyEmailMutation.error.message || 'An error occurred during verification.');
@@ -38,55 +39,49 @@ export const VerifyEmail: React.FC = () => {
   }, [verifyEmailMutation.status]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="text-center mb-8">
-          <Logo className="justify-center mb-8 text-2xl" />
+    <div className="min-h-screen bg-warm-ivory flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-10">
+          <Logo className="justify-center mb-8" />
         </div>
 
-        <div className="bg-background/80 backdrop-blur-xl border border-outline/50 p-8 rounded-2xl shadow-2xl">
-          <div className="flex flex-col items-center text-center space-y-6">
+        <div className="bg-white p-10 rounded-[20px] shadow-lg border border-outline text-center">
+          <div className="flex flex-col items-center space-y-6">
             {status === 'loading' && (
               <>
-                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Loader2 className="text-primary animate-spin" size={40} />
+                <div className="w-20 h-20 bg-sungold/10 rounded-full flex items-center justify-center">
+                  <Loader2 className="text-sungold animate-spin" size={40} />
                 </div>
-                <div>
-                  <h2 className="font-headline text-2xl font-bold text-text mb-2">Verifying Email</h2>
-                  <p className="text-textMuted">{message}</p>
-                </div>
+                <h2 className="font-display text-2xl font-bold text-presently-black">Verifying Email</h2>
+                <p className="text-on-surface-variant">{message}</p>
               </>
             )}
 
             {status === 'success' && (
               <>
-                <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
-                  <CheckCircle className="text-green-500" size={40} />
+                <div className="w-20 h-20 bg-moss-green/10 rounded-full flex items-center justify-center">
+                  <CheckCircle className="text-moss-green" size={40} />
                 </div>
-                <div>
-                  <h2 className="font-headline text-2xl font-bold text-text mb-2">Email Verified!</h2>
-                  <p className="text-textMuted">{message}</p>
-                </div>
+                <h2 className="font-display text-2xl font-bold text-presently-black">Email Verified!</h2>
+                <p className="text-on-surface-variant">{message}</p>
+                <p className="text-xs text-on-surface-variant">Redirecting you to login...</p>
               </>
             )}
 
             {status === 'error' && (
               <>
-                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
-                  <XCircle className="text-red-500" size={40} />
+                <div className="w-20 h-20 bg-soft-coral/10 rounded-full flex items-center justify-center">
+                  <XCircle className="text-soft-coral" size={40} />
                 </div>
-                <div>
-                  <h2 className="font-headline text-2xl font-bold text-text mb-2">Verification Failed</h2>
-                  <p className="text-textMuted">{message}</p>
-                </div>
-                <div className="w-full flex flex-col gap-3 mt-4">
-                  <Button 
-                    onClick={() => navigate('/login')} 
-                    className="w-full"
-                  >
-                    Go to Login
-                  </Button>
-                </div>
+                <h2 className="font-display text-2xl font-bold text-presently-black">Verification Failed</h2>
+                <p className="text-on-surface-variant">{message}</p>
+                <Button
+                  onClick={() => navigate('/login')}
+                  fullWidth
+                  className="mt-6"
+                >
+                  Back to Login
+                </Button>
               </>
             )}
           </div>

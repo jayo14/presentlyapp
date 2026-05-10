@@ -1,42 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Logo } from './Logo';
 import {
-  LogOut, Home, User, Bell, Settings, BookOpen,
-  Calendar, Users, Map, ShieldAlert, Sun, Moon,
-  GraduationCap, Plus, QrCode, TrendingUp, Menu, X, ChevronRight,
-  ClipboardList
+  Home, User, Bell, Settings, Calendar, TrendingUp, QrCode, Plus, LogOut, ClipboardList, Menu, X
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
 import { Dock } from '@/components/magicui/dock';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from './ThemeProvider';
 import NotificationInbox from './NotificationInbox';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
 import { cn } from '../src/components/ui/utils';
 
 interface LayoutProps {
-  children?: React.ReactNode;
   userRole?: UserRole;
   userName?: string;
   onLogout: () => void;
   currentPage: string;
+  setCurrentPage?: (page: string) => void;
+  children?: React.ReactNode;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
-  children,
   userRole,
   userName = "User",
   onLogout,
-  currentPage
+  currentPage,
+  children
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: currentUser } = useCurrentUser();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleNavClick = (id: string) => {
+    setIsSidebarOpen(false);
     if (id === 'dashboard') navigate('/dashboard');
     else if (id === 'profile') navigate('/dashboard/profile');
     else if (id === 'courses') navigate('/dashboard/courses');
@@ -57,16 +56,16 @@ export const Layout: React.FC<LayoutProps> = ({
   const filteredNav = navItems.filter(item => item.roles.includes(userRole as UserRole));
 
   return (
-    <div className="flex min-h-screen bg-background text-text font-sans selection:bg-primary/30 selection:text-primary-foreground">
+    <div className="flex min-h-screen bg-background text-on-surface font-sans selection:bg-sungold/30 selection:text-presently-black">
 
       {/* DESKTOP SIDEBAR */}
-      <aside className="hidden md:flex w-20 lg:w-64 flex-col border-r border-outline bg-surface sticky top-0 h-screen z-30 transition-all duration-300">
-        <div className="p-6">
-          <Logo showText={false} className="lg:hidden" />
+      <aside className="hidden md:flex w-24 lg:w-72 flex-col border-r border-outline bg-surface sticky top-0 h-screen z-30 transition-all duration-300">
+        <div className="p-8">
+          <Logo showText={false} className="lg:hidden mx-auto" />
           <Logo className="hidden lg:flex" />
         </div>
 
-        <nav className="flex-1 px-3 space-y-1 mt-4">
+        <nav className="flex-1 px-4 space-y-2 mt-4">
           {filteredNav.map((item) => {
             const isActive = location.pathname.endsWith(item.id) || (item.id === 'dashboard' && location.pathname === '/dashboard');
             return (
@@ -74,60 +73,61 @@ export const Layout: React.FC<LayoutProps> = ({
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group",
+                  "w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all duration-300 group",
                   isActive
-                    ? "bg-primary/10 text-primary font-semibold"
-                    : "text-textMuted hover:bg-surfaceContainer hover:text-text"
+                    ? "bg-sungold text-presently-black shadow-md font-bold"
+                    : "text-on-surface-variant hover:bg-black/5 hover:text-on-surface"
                 )}
               >
-                <item.icon size={22} className={cn(isActive ? "text-primary" : "text-textMuted group-hover:text-text")} />
-                <span className="hidden lg:block truncate">{item.label}</span>
+                <item.icon size={22} className={cn(isActive ? "text-presently-black" : "text-on-surface-variant group-hover:text-on-surface")} />
+                <span className="hidden lg:block truncate text-sm">{item.label}</span>
               </button>
             );
           })}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-outline space-y-2">
+        <div className="p-6 mt-auto border-t border-outline space-y-4">
           <button
             onClick={() => handleNavClick('profile')}
-            className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-surfaceContainer transition-colors group"
+            className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-black/5 transition-all group"
           >
-            <div className="w-10 h-10 rounded-full bg-surfaceContainer border border-outline flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-12 h-12 rounded-[22%] bg-sungold/10 border border-sungold/20 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
               {currentUser?.avatar_url ? (
                 <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <User size={20} className="text-textMuted" />
+                <User size={24} className="text-sungold" />
               )}
             </div>
             <div className="hidden lg:block text-left overflow-hidden">
               <p className="text-sm font-bold truncate">{userName}</p>
-              <p className="text-xs text-textMuted truncate capitalize">{userRole?.toLowerCase()}</p>
+              <p className="text-xs text-on-surface-variant truncate capitalize">{userRole?.toLowerCase()}</p>
             </div>
           </button>
 
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-error hover:bg-error/10 transition-colors group"
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-soft-coral hover:bg-soft-coral/10 transition-all group font-bold text-sm"
           >
             <LogOut size={20} />
-            <span className="hidden lg:block font-semibold">Sign Out</span>
+            <span className="hidden lg:block">Sign Out</span>
           </button>
         </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-h-screen">
-        <header className="md:hidden h-16 flex items-center justify-between px-6 bg-surface/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
+        {/* MOBILE HEADER */}
+        <header className="md:hidden h-20 flex items-center justify-between px-6 bg-white/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
           <Logo showText={false} />
           <div className="flex items-center gap-4">
             <NotificationInbox />
             <button
               onClick={() => handleNavClick('profile')}
-              className="w-8 h-8 rounded-full bg-surfaceContainer border border-outline overflow-hidden"
+              className="w-10 h-10 rounded-[22%] bg-sungold/10 border border-outline overflow-hidden shadow-sm"
             >
               {currentUser?.avatar_url ? (
                 <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-textMuted">
+                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-sungold">
                   {userName.charAt(0)}
                 </div>
               )}
@@ -136,14 +136,14 @@ export const Layout: React.FC<LayoutProps> = ({
         </header>
 
         <main className="flex-1 relative pb-32 md:pb-8">
-          <div className="max-w-7xl mx-auto p-4 md:p-8 lg:p-12">
+          <div className="max-w-7xl mx-auto p-6 md:p-10 lg:p-16">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
                 {children}
               </motion.div>
@@ -157,7 +157,7 @@ export const Layout: React.FC<LayoutProps> = ({
             items={(() => {
               const base = [
                 { id: 'dashboard', label: 'Home', active: location.pathname === '/dashboard', onClick: () => handleNavClick('dashboard'), icon: <Home size={22} /> },
-                { id: 'attendance', label: 'Attendance', active: location.pathname.includes('courses') || location.pathname.includes('sessions'), onClick: () => handleNavClick(userRole === UserRole.LECTURER ? 'sessions' : 'courses'), icon: <ClipboardList size={22} /> },
+                { id: 'attendance', label: 'History', active: location.pathname.includes('courses') || location.pathname.includes('sessions'), onClick: () => handleNavClick(userRole === UserRole.LECTURER ? 'sessions' : 'courses'), icon: <ClipboardList size={22} /> },
               ];
 
               const action = userRole === UserRole.LECTURER
