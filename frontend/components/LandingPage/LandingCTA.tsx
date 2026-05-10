@@ -1,56 +1,62 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '../Button';
-import { ModernCard } from '../ModernCard';
 
-interface LandingCTAProps {
-  onRegister: () => void;
-}
-
-export const LandingCTA: React.FC<LandingCTAProps> = ({ onRegister }) => {
+export const LandingCTA: React.FC = () => {
   return (
-    <section className="py-40 bg-background relative overflow-hidden">
-      <div className="container mx-auto px-6 relative z-10">
+    <section className="py-32 bg-[#0D0D0D] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#F5C51815_0%,_transparent_70%)]" />
+
+      <div className="container mx-auto px-6 relative z-10 text-center">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="font-display text-5xl md:text-7xl lg:text-8xl text-white mb-8"
+        >
+          Every class.<br />
+          Every student.<br />
+          <span className="text-sungold">Present.</span>
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12"
+        >
+          Join institutions already running smarter with Presently.<br />
+          Setup takes less than 5 minutes.
+        </motion.p>
+
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="max-w-6xl mx-auto"
+          transition={{ delay: 0.4 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-6"
         >
-          <ModernCard variant="accent" padding="none" className="rounded-[4rem] p-16 md:p-32 text-center relative overflow-hidden group shadow-premium border-primary/20">
-            <div className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 mb-12 backdrop-blur-md"
-              >
-                <Sparkles size={18} className="text-primary" />
-                <span className="text-primary text-[10px] font-black uppercase tracking-[0.4em]">Ready to Elevate?</span>
-              </motion.div>
+          <Button variant="primary" size="lg" className="px-12 h-16 text-lg">
+            Get started for free <ArrowRight className="ml-2" />
+          </Button>
+          <Button variant="outline" size="lg" className="px-12 h-16 text-lg border-white text-white hover:bg-white/10">
+            Request a school demo
+          </Button>
+        </motion.div>
 
-              <h2 className="text-5xl md:text-8xl font-black text-text tracking-tighter mb-12 leading-[0.8]">
-                Join the <br className="hidden md:block" /> <span className="text-primary">Movement.</span>
-              </h2>
-
-              <p className="text-textMuted text-xl md:text-3xl font-medium leading-relaxed mb-20 max-w-3xl mx-auto">
-                Reclaim your lecture time, ensure your marks are safe, and join the thousands of students already using Presently.
-              </p>
-
-              <Button
-                size="lg"
-                onClick={onRegister}
-                className="px-16 h-20 text-xl"
-              >
-                Start Free Now
-                <ArrowRight size={28} />
-              </Button>
-            </div>
-
-            {/* Abstract background blobs */}
-            <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-[100px] animate-pulse" />
-            <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-[100px] animate-pulse delay-1000" />
-          </ModernCard>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6 }}
+          className="mt-16 flex flex-wrap justify-center gap-8 text-slate-500 text-sm"
+        >
+          <span>🔒 Secure & private</span>
+          <span>📱 iOS & Android</span>
+          <span>🌍 Works in Nigeria</span>
+          <span>✓ Free to start</span>
         </motion.div>
       </div>
     </section>

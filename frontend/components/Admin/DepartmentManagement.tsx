@@ -1,363 +1,304 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { GraduationCap, Plus, Edit2, Trash2, Search, AlertCircle, Loader, ArrowLeft, Building, MapPin, CheckCircle2, XCircle, MoreVertical, ChevronDown } from 'lucide-react';
+import { GraduationCap, Plus, Search, Edit2, Trash2, Building2, BookOpen, Loader, AlertCircle } from 'lucide-react';
 import { Button } from '../Button';
-import { Input } from '../Input';
-import { Department, College, Institution } from '../../types';
-import { institutionsApi } from '../../services/api/institutions';
+import { Department, Institution, College } from '../../types';
+import { departmentApi, collegeApi, institutionApi } from '../../services/api/admin';
+import { toast } from 'sonner';
 import { SEO } from '../SEO';
+import { ModernCard } from '../ModernCard';
+import { Badge } from '../../src/components/ui/badge';
+import { cn } from '../../src/components/ui/utils';
+import { DepartmentModal } from './DepartmentModal';
 
-interface DepartmentManagementProps {
-  institution?: Institution;
-  college?: College;
-  onBack?: () => void;
-}
-
-export const DepartmentManagement: React.FC<DepartmentManagementProps> = ({
-  institution,
-  college,
-  onBack
-}) => {
-  const { id, collegeId } = useParams<{ id: string; collegeId: string }>();
-  const navigate = useNavigate();
+export const DepartmentManagement: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [colleges, setColleges] = useState<College[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
-  const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
+  const [colleges, setColleges] = useState<College[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    // This effect runs once on mount or when institution/college props change.
-    // It initializes the data or sets up URL param handling.
-    if (!institution && !college) {
-      // If in standalone mode (no props), try to use URL params for initial selection
-      if (id && !selectedInstitution) {
-        setSelectedInstitution(Number(id));
-      }
-      if (collegeId && !selectedCollege) {
-        setSelectedCollege(Number(collegeId));
-      }
-      loadInitialData();
-    } else {
-      // If props are provided, directly load departments based on props
-      loadDepartmentsByContext();
-    }
-  }, [id, collegeId, institution, college]);
+  const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
+  const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
+
+  const [showModal, setShowModal] = useState(false);
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
 
   useEffect(() => {
-    // This effect handles loading colleges when a new institution is selected
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
     if (selectedInstitution) {
-      loadColleges(selectedInstitution as number);
-    } else {
-      setColleges([]);
+      loadColleges(selectedInstitution);
       setSelectedCollege(null);
     }
-  }, [selectedInstitution]); // Depend on selectedInstitution
+  }, [selectedInstitution]);
 
   useEffect(() => {
-    // This effect triggers loading departments whenever filters change
-    loadDepartmentsByContext();
-  }, [selectedInstitution, selectedCollege, institution, college]); // Depend on all relevant filters
+    if (selectedCollege) {
+      loadDepartmentsByCollege(selectedCollege);
+    } else {
+      loadDepartments();
+    }
+  }, [selectedCollege]);
 
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      const institutionsData = await institutionsApi.getAllInstitutions();
-      const results = (institutionsData as any).results || institutionsData;
-      setInstitutions(Array.isArray(results) ? results : []);
-
-      // If no institution is selected (and not coming from params), select the first one
-      if (!selectedInstitution && Array.isArray(results) && results.length > 0 && !id) {
-        setSelectedInstitution(results[0].id);
-      }
-      
-      // loadColleges and loadDepartmentsByContext will be triggered by subsequent useEffects
+      const [instRes] = await Promise.all([
+        institutionApi.getAll(),
+        loadDepartments()
+      ]);
+      setInstitutions(instRes);
     } catch (err) {
-      console.error('Failed to load initial data:', err);
+      setError('Failed to load initial data');
+      toast.error('Load failed');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const loadColleges = async (institutionId: number) => {
+  const loadDepartments = async () => {
     try {
-      const data = await institutionsApi.getCollegesByInstitution(institutionId);
-      const results = (data as any).results || data;
-      setColleges(Array.isArray(results) ? results : []);
-
-      // If no college is selected and there are colleges, select the first one
-      if (!selectedCollege && Array.isArray(results) && results.length > 0) {
-        setSelectedCollege(results[0].id);
-      }
-    } catch (err) {
-      console.error('Failed to load colleges:', err);
-    }
-  };
-
-  const loadDepartmentsByContext = async () => {
-    try {
-      setLoading(true);
-      let data;
-      
-      if (college || selectedCollege) {
-        data = await institutionsApi.getDepartmentsByFilter({ college: college?.id || selectedCollege! });
-      } else if (institution || selectedInstitution) {
-        data = await institutionsApi.getDepartmentsByFilter({ institution: institution?.id || selectedInstitution! });
-      } else {
-        data = await institutionsApi.getAllDepartments();
-      }
-      
-      const results = (data as any).results || data;
-      setDepartments(Array.isArray(results) ? results : []);
-      setError(null);
+      const data = await departmentApi.getAll();
+      setDepartments(data);
     } catch (err) {
       setError('Failed to load departments');
-      console.error(err);
+    }
+  };
+
+  const loadColleges = async (instId: number) => {
+    try {
+      const data = await collegeApi.getByInstitution(instId);
+      setColleges(data);
+    } catch (err) {
+      toast.error('Failed to load colleges');
+    }
+  };
+
+  const loadDepartmentsByCollege = async (collegeId: number) => {
+    try {
+      setLoading(true);
+      const data = await departmentApi.getByCollege(collegeId);
+      setDepartments(data);
+    } catch (err) {
+      toast.error('Failed to load college departments');
     } finally {
       setLoading(false);
     }
   };
 
   const filteredDepartments = departments.filter(dept =>
-    (dept.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (dept.code || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (dept.abbreviation || '').toLowerCase().includes(searchTerm.toLowerCase())
+    dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    dept.college_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDeleteDepartment = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this department?')) {
-      return;
-    }
+  const handleCreateDepartment = () => {
+    setEditingDepartment(null);
+    setShowModal(true);
+  };
 
+  const handleEditDepartment = (dept: Department) => {
+    setEditingDepartment(dept);
+    setShowModal(true);
+  };
+
+  const handleSaveDepartment = async (formData: Partial<Department>) => {
     try {
-      await institutionsApi.deleteDepartment(id);
-      await loadDepartmentsByContext();
-    } catch (err) {
-      setError('Failed to delete department');
-      console.error(err);
+      if (editingDepartment) {
+        await departmentApi.updateDepartment(editingDepartment.id, formData);
+        toast.success('Department updated');
+      } else {
+        await departmentApi.createDepartment(formData as Omit<Department, 'id' | 'created_at' | 'updated_at' | 'college_name'>);
+        toast.success('Department created');
+      }
+
+      if (selectedCollege) {
+        loadDepartmentsByCollege(selectedCollege);
+      } else {
+        loadDepartments();
+      }
+      setShowModal(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save department');
+      throw err;
     }
   };
 
-  return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <SEO title="Departments | Admin | Presently" description="Manage academic departments across institutions and colleges." />
-      {/* Header Section */}
-      <div className="flex flex-col gap-4">
-        {onBack && (
-          <button 
-            onClick={onBack}
-            className="flex items-center gap-2 text-sm text-textMuted hover:text-primary transition-colors w-fit"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to {college ? 'College' : 'Institution'}
-          </button>
-        )}
-        
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-              <GraduationCap className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="font-headline text-2xl font-bold text-text">
-                {college ? college.name : institution ? institution.full_name : 'Department Management'}
-              </h2>
-              <p className="text-sm text-textMuted">
-                {college ? 'Departments in this College' : institution ? 'Departments in this Institution' : 'Manage all departments'}
-              </p>
-            </div>
-          </div>
-          <Button 
-            onClick={() => {
-              const instId = institution?.id || selectedInstitution;
-              const collId = college?.id || selectedCollege;
-              navigate(`/dashboard/institutions/${instId}/colleges/${collId}/departments/new`);
-            }}
-            className="gap-2"
-            disabled={
-              !(institution || selectedInstitution) || 
-              (!(college || selectedCollege) && selectedInstitution !== null)
-            }
-          >
-            <Plus className="w-4 h-4" />
-            Add Department
-          </Button>
-        </div>
-      </div>
+  const handleDeleteDepartment = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this department? All associated courses will be affected.')) return;
+    try {
+      await departmentApi.deleteDepartment(id);
+      toast.success('Department deleted');
+      if (selectedCollege) {
+        loadDepartmentsByCollege(selectedCollege);
+      } else {
+        loadDepartments();
+      }
+    } catch (err) {
+      toast.error('Failed to delete department');
+    }
+  };
 
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        {!institution && (
-          <div className="relative flex-1">
+  const resetFilters = () => {
+    setSelectedInstitution(null);
+    setSelectedCollege(null);
+    loadDepartments();
+  };
+
+  return (
+    <div className="space-y-10 max-w-7xl mx-auto pb-20">
+      <SEO title="Academic Departments | Presently Admin" />
+
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+           <Badge variant="secondary" className="px-3 py-1">ACADEMIC UNITS</Badge>
+           <h1 className="font-display text-4xl md:text-5xl font-bold text-presently-black">
+             Academic Departments
+           </h1>
+           <p className="text-on-surface-variant font-medium text-lg">
+             Configure specialized units and their curricula.
+           </p>
+        </div>
+        <Button size="lg" className="h-16 px-10 shadow-gold" onClick={handleCreateDepartment}>
+          <Plus size={24} className="mr-2" />
+          Add Department
+        </Button>
+      </header>
+
+      {error && (
+        <div className="p-6 bg-soft-coral/10 border border-soft-coral/30 rounded-2xl flex items-start gap-4">
+          <AlertCircle className="w-6 h-6 text-soft-coral mt-0.5" />
+          <div>
+            <p className="text-soft-coral font-bold uppercase tracking-widest text-xs mb-1">System Error</p>
+            <p className="text-presently-black font-medium">{error}</p>
+          </div>
+        </div>
+      )}
+
+      <ModernCard padding="lg" className="bg-warm-ivory/20">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-display text-lg font-bold text-presently-black">Department Hierarchy</h3>
+          {(selectedInstitution || selectedCollege) && (
+            <button onClick={resetFilters} className="text-xs font-bold text-sungold hover:underline uppercase tracking-widest">
+              Reset Filters
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Institution</label>
             <select
               value={selectedInstitution || ''}
-              onChange={(e) => {
-                const instId = parseInt(e.target.value);
-                setSelectedInstitution(instId);
-                setSelectedCollege(null); // Reset college when institution changes
-                if (instId) {
-                  loadColleges(instId);
-                } else {
-                  setColleges([]);
-                }
-              }}
-              className="pl-3 pr-10 h-11 bg-surface border-outline rounded-lg text-text appearance-none w-full"
+              onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
+              className="w-full h-14 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-2 focus:ring-sungold/20 outline-none appearance-none"
             >
-              <option value="">Select Institution</option>
+              <option value="">All Institutions</option>
               {institutions.map(inst => (
-                <option key={inst.id} value={inst.id}>{inst.full_name}</option>
+                <option key={inst.id} value={inst.id}>{inst.short_name}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-textMuted pointer-events-none" />
           </div>
-        )}
-        
-        {!college && (
-          <div className="relative flex-1">
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">College/Faculty</label>
             <select
               value={selectedCollege || ''}
-              onChange={(e) => setSelectedCollege(parseInt(e.target.value))}
-              className="pl-3 pr-10 h-11 bg-surface border-outline rounded-lg text-text appearance-none w-full"
-              disabled={!selectedInstitution || colleges.length === 0}
+              onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
+              disabled={!selectedInstitution}
+              className="w-full h-14 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-2 focus:ring-sungold/20 outline-none appearance-none disabled:opacity-50"
             >
-              <option value="">Select College</option>
-              {colleges.map(col => (
-                <option key={col.id} value={col.id}>{col.name}</option>
+              <option value="">All Colleges</option>
+              {colleges.map(college => (
+                <option key={college.id} value={college.id}>{college.name}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-textMuted pointer-events-none" />
           </div>
-        )}
-
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-textMuted" />
-          <Input
-            type="text"
-            placeholder="Search departments..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11 bg-surface border-outline"
-          />
         </div>
+      </ModernCard>
+
+      <div className="relative max-w-2xl">
+        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant" size={20} />
+        <input
+          type="text"
+          placeholder="Search departments..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full h-16 pl-14 pr-6 bg-white border border-outline rounded-2xl text-presently-black font-medium focus:ring-2 focus:ring-sungold/20 outline-none"
+        />
       </div>
 
-      {/* Loading State */}
-      {loading && departments.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <Loader className="w-10 h-10 animate-spin text-primary" />
-          <p className="text-textMuted animate-pulse">Loading departments...</p>
-        </div>
-      )}
-
-      {/* Error State */}
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500">
-          <AlertCircle className="w-5 h-5" />
-          <p className="text-sm font-medium">{error}</p>
-          <Button variant="secondary" size="sm" onClick={loadDepartmentsByContext} className="ml-auto">Retry</Button>
-        </div>
-      )}
-
-      {/* Departments Grid */}
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDepartments.map(dept => (
-            <div
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {loading && departments.length === 0 ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-56 bg-slate-100 animate-pulse rounded-3xl" />
+          ))
+        ) : (
+          filteredDepartments.map(dept => (
+            <ModernCard
               key={dept.id}
-              className="group bg-surface border border-outline rounded-2xl overflow-hidden hover:border-outline hover:shadow-xl transition-all duration-300 flex flex-col"
+              padding="lg"
+              className="group hover:border-sungold/40 transition-all flex flex-col justify-between"
             >
-              <div className="p-6 flex-1">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-surfaceHigh flex items-center justify-center text-textMuted group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-                      <Building className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-headline font-bold text-text group-hover:text-primary transition-colors line-clamp-1">{dept.name}</h3>
-                      <p className="text-xs font-mono text-textMuted uppercase">{dept.code} • {dept.abbreviation}</p>
-                    </div>
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-warm-ivory border border-outline flex items-center justify-center text-sungold">
+                    <GraduationCap size={24} />
                   </div>
-                  
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => {
-                        const instId = institution?.id || selectedInstitution;
-                        const collId = college?.id || selectedCollege;
-                        navigate(`/dashboard/institutions/${instId}/colleges/${collId}/departments/${dept.id}`);
-                      }}
-                      className="p-2 hover:bg-surfaceHigh rounded-lg text-textMuted hover:text-text transition-colors"
+                      onClick={() => handleEditDepartment(dept)}
+                      className="p-2 hover:bg-slate-50 rounded-xl border border-outline text-on-surface-variant"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 size={16} />
                     </button>
                     <button
                       onClick={() => handleDeleteDepartment(dept.id)}
-                      className="p-2 hover:bg-surfaceHigh rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                      className="p-2 hover:bg-red-50 rounded-xl border border-outline text-soft-coral"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
 
-                {dept.description && (
-                  <p className="text-sm text-textMuted line-clamp-2 mb-4 leading-relaxed">
-                    {dept.description}
-                  </p>
-                )}
+                <div>
+                  <h3 className="font-display text-xl font-bold text-presently-black leading-tight mb-1">{dept.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <Building2 size={14} className="text-sungold" />
+                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest line-clamp-1">{dept.college_name}</span>
+                  </div>
+                </div>
 
-                <div className="space-y-2.5 pt-4 border-t border-outline/50">
-                  {dept.head_of_department_name && (
-                    <div className="flex items-center gap-2 text-sm text-textMuted">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      <span>HOD: {dept.head_of_department_name}</span>
-                    </div>
-                  )}
-                  {dept.office_location && (
-                    <div className="flex items-center gap-2 text-sm text-textMuted">
-                      <MapPin className="w-4 h-4 text-textMuted" />
-                      <span>{dept.office_location}</span>
-                    </div>
-                  )}
+                <div className="pt-4 border-t border-outline flex items-center gap-4">
+                  <div className="flex items-center gap-2 text-on-surface-variant">
+                    <BookOpen size={16} className="text-sungold" />
+                    <span className="text-xs font-bold uppercase tracking-widest">{dept.courses_count || 0} COURSES</span>
+                  </div>
                 </div>
               </div>
-              
-              <div className="px-6 py-4 bg-background/50 border-t border-outline/50 flex items-center justify-between">
-                <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
-                  dept.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-muted-foreground'
-                }`}>
-                  {dept.is_active ? 'Active' : 'Inactive'}
-                </span>
-                {dept.accreditation_status && (
-                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
-                    dept.accreditation_status === 'ACCREDITED' ? 'bg-blue-500/10 text-blue-500' : 'bg-yellow-500/10 text-yellow-500'
-                  }`}>
-                    {dept.accreditation_status}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
+            </ModernCard>
+          ))
+        )}
+      </div>
+
+      {!loading && filteredDepartments.length === 0 && (
+        <div className="text-center py-24 bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-outline">
+          <GraduationCap className="w-20 h-20 text-slate-200 mx-auto mb-6" />
+          <h4 className="font-display text-2xl font-bold text-presently-black">No Departments</h4>
+          <p className="text-on-surface-variant font-medium mt-2">Define the specialized units for each college.</p>
         </div>
       )}
 
-      {/* Empty State */}
-      {!loading && filteredDepartments.length === 0 && (
-        <div className="text-center py-20 bg-surface/30 border border-dashed border-outline rounded-3xl">
-          <GraduationCap className="w-16 h-16 text-text mx-auto mb-4" />
-          <h3 className="font-headline text-lg font-bold text-textMuted">No departments found</h3>
-          <p className="text-textMuted text-sm mt-1 mb-6">Start by adding a new department to this {college ? 'college' : 'institution'}.</p>
-          <Button 
-            onClick={() => {
-              const instId = institution?.id || selectedInstitution;
-              const collId = college?.id || selectedCollege;
-              navigate(`/dashboard/institutions/${instId}/colleges/${collId}/departments/new`);
-            }}
-            variant="secondary"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add First Department
-          </Button>
-        </div>
+      {showModal && (
+        <DepartmentModal
+          department={editingDepartment || undefined}
+          colleges={colleges}
+          onSave={handleSaveDepartment}
+          onClose={() => setShowModal(false)}
+        />
       )}
     </div>
   );

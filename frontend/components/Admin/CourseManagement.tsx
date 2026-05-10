@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Plus, Edit2, Trash2, Search, Building2, GraduationCap, AlertCircle, Loader, ArrowLeft, Users } from 'lucide-react';
+import { BookOpen, Plus, Search, Edit2, Trash2, GraduationCap, Users, Loader, AlertCircle } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
-import { Course, Department, College, Institution } from '../../types';
-import { coursesApi } from '../../services/api/courses';
-import { institutionsApi } from '../../services/api/institutions';
-import CourseModal from './CourseModal';
+import { Course, Institution, College, Department } from '../../types';
+import { coursesApi, institutionApi, collegeApi, departmentApi } from '../../services/api/admin';
+import { toast } from 'sonner';
 import { SEO } from '../SEO';
+import { ModernCard } from '../ModernCard';
+import { Badge } from '../../src/components/ui/badge';
+import { cn } from '../../src/components/ui/utils';
+import { CourseModal } from './CourseModal';
 
 export const CourseManagement: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [colleges, setColleges] = useState<College[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+
   const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
   const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<number | null>(null);
+
   const [showModal, setShowModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   useEffect(() => {
-    loadData();
+    loadInitialData();
   }, []);
 
   useEffect(() => {
@@ -49,21 +55,17 @@ export const CourseManagement: React.FC = () => {
     }
   }, [selectedDepartment]);
 
-  const loadData = async () => {
+  const loadInitialData = async () => {
     try {
       setLoading(true);
-      const [institutionsData, coursesData, departmentsData] = await Promise.all([
-        institutionsApi.getAllInstitutions(),
-        coursesApi.getAllCourses(),
-        institutionsApi.getAllDepartments()
+      const [instRes] = await Promise.all([
+        institutionApi.getAll(),
+        loadCourses()
       ]);
-      setInstitutions(Array.isArray(institutionsData) ? institutionsData : []);
-      setCourses(Array.isArray(coursesData) ? coursesData : []);
-      setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
-      setError(null);
+      setInstitutions(instRes);
     } catch (err) {
-      setError('Failed to load data');
-      console.error(err);
+      setError('Failed to load initial data');
+      toast.error('Load failed');
     } finally {
       setLoading(false);
     }
@@ -71,55 +73,48 @@ export const CourseManagement: React.FC = () => {
 
   const loadCourses = async () => {
     try {
-      setLoading(true);
-      const data = await coursesApi.getAllCourses();
-      setCourses(Array.isArray(data) ? data : []);
-      setError(null);
+      const data = await coursesApi.getAll();
+      setCourses(data);
     } catch (err) {
       setError('Failed to load courses');
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const loadCoursesByDepartment = async (departmentId: number) => {
+  const loadColleges = async (instId: number) => {
     try {
-      setLoading(true);
-      const data = await coursesApi.getCoursesByDepartment(departmentId);
-      setCourses(Array.isArray(data) ? data : []);
-      setError(null);
+      const data = await collegeApi.getByInstitution(instId);
+      setColleges(data);
     } catch (err) {
-      setError('Failed to load courses');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadColleges = async (institutionId: number) => {
-    try {
-      const data = await institutionsApi.getCollegesByInstitution(institutionId);
-      setColleges(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Failed to load colleges', err);
+      toast.error('Failed to load colleges');
     }
   };
 
   const loadDepartments = async (collegeId: number) => {
     try {
-      const data = await institutionsApi.getDepartmentsByCollege(collegeId);
-      setDepartments(Array.isArray(data) ? data : []);
+      const data = await departmentApi.getByCollege(collegeId);
+      setDepartments(data);
     } catch (err) {
-      console.error('Failed to load departments', err);
+      toast.error('Failed to load departments');
     }
   };
 
-  const filteredCourses = Array.isArray(courses) ? courses.filter(course =>
+  const loadCoursesByDepartment = async (deptId: number) => {
+    try {
+      setLoading(true);
+      const data = await coursesApi.getByDepartment(deptId);
+      setCourses(data);
+    } catch (err) {
+      toast.error('Failed to load department courses');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredCourses = courses.filter(course =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     course.department_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  );
 
   const handleCreateCourse = () => {
     setEditingCourse(null);
@@ -135,35 +130,37 @@ export const CourseManagement: React.FC = () => {
     try {
       if (editingCourse) {
         await coursesApi.updateCourse(editingCourse.id, formData);
+        toast.success('Course updated');
       } else {
         await coursesApi.createCourse(formData as Omit<Course, 'id' | 'created_at' | 'updated_at' | 'department_name' | 'lecturer_name'>);
+        toast.success('Course created');
       }
+
       if (selectedDepartment) {
-        await loadCoursesByDepartment(selectedDepartment);
+        loadCoursesByDepartment(selectedDepartment);
       } else {
-        await loadCourses();
+        loadCourses();
       }
       setShowModal(false);
     } catch (err: any) {
-      throw new Error(err.response?.data?.message || 'Failed to save course');
+      toast.error(err.message || 'Failed to save course');
+      throw err;
     }
   };
 
   const handleDeleteCourse = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this course?')) {
-      return;
-    }
+    if (!confirm('Are you sure you want to delete this course?')) return;
 
     try {
       await coursesApi.deleteCourse(id);
+      toast.success('Course removed');
       if (selectedDepartment) {
-        await loadCoursesByDepartment(selectedDepartment);
+        loadCoursesByDepartment(selectedDepartment);
       } else {
-        await loadCourses();
+        loadCourses();
       }
     } catch (err) {
-      setError('Failed to delete course');
-      console.error(err);
+      toast.error('Failed to delete course');
     }
   };
 
@@ -174,66 +171,54 @@ export const CourseManagement: React.FC = () => {
     loadCourses();
   };
 
-  if (loading && courses.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <SEO title="Courses | Admin | Presently" description="Manage courses offered across departments and institutions." />
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <BookOpen className="w-8 h-8 text-primary" />
-          <div>
-            <h2 className="font-headline text-2xl font-bold text-text">Course Management</h2>
-            <p className="text-sm text-textMuted">Manage courses across institutions</p>
-          </div>
+    <div className="space-y-10 max-w-7xl mx-auto pb-20">
+      <SEO title="Course Catalog | Presently Admin" />
+
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+           <Badge variant="secondary" className="px-3 py-1">ACADEMIC INVENTORY</Badge>
+           <h1 className="font-display text-4xl md:text-5xl font-bold text-presently-black">
+             Course Catalog
+           </h1>
+           <p className="text-on-surface-variant font-medium text-lg">
+             Manage curricula and student enrollments across institutions.
+           </p>
         </div>
-        <Button onClick={handleCreateCourse} className="gap-2">
-          <Plus className="w-4 h-4" />
+        <Button size="lg" className="h-16 px-10 shadow-gold" onClick={handleCreateCourse}>
+          <Plus size={24} className="mr-2" />
           Add Course
         </Button>
-      </div>
+      </header>
 
-      {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+        <div className="p-6 bg-soft-coral/10 border border-soft-coral/30 rounded-2xl flex items-start gap-4">
+          <AlertCircle className="w-6 h-6 text-soft-coral mt-0.5" />
           <div>
-            <p className="text-red-500 font-semibold">Error</p>
-            <p className="text-red-400 text-sm">{error}</p>
+            <p className="text-soft-coral font-bold uppercase tracking-widest text-xs mb-1">System Error</p>
+            <p className="text-presently-black font-medium">{error}</p>
           </div>
         </div>
       )}
 
       {/* Hierarchical Filters */}
-      <div className="bg-surface border border-outline rounded-lg p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-headline text-sm font-semibold text-text">Filter by Hierarchy</h3>
+      <ModernCard padding="lg" className="bg-warm-ivory/20">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-display text-lg font-bold text-presently-black">Hierarchy Filter</h3>
           {(selectedInstitution || selectedCollege || selectedDepartment) && (
-            <button
-              onClick={resetFilters}
-              className="text-sm text-primary hover:underline"
-            >
-              Clear Filters
+            <button onClick={resetFilters} className="text-xs font-bold text-sungold hover:underline uppercase tracking-widest">
+              Reset All Filters
             </button>
           )}
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-textMuted mb-2">
-              Institution
-            </label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Institution</label>
             <select
               value={selectedInstitution || ''}
               onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-              className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary"
+              className="w-full h-14 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-2 focus:ring-sungold/20 outline-none appearance-none"
             >
               <option value="">All Institutions</option>
               {institutions.map(inst => (
@@ -242,15 +227,13 @@ export const CourseManagement: React.FC = () => {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-textMuted mb-2">
-              College/Faculty
-            </label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">College/Faculty</label>
             <select
               value={selectedCollege || ''}
               onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedInstitution}
-              className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-14 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-2 focus:ring-sungold/20 outline-none appearance-none disabled:opacity-50"
             >
               <option value="">All Colleges</option>
               {colleges.map(college => (
@@ -259,15 +242,13 @@ export const CourseManagement: React.FC = () => {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-textMuted mb-2">
-              Department
-            </label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Department</label>
             <select
               value={selectedDepartment || ''}
               onChange={(e) => setSelectedDepartment(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedCollege}
-              className="w-full px-4 py-2 bg-surfaceHigh border border-outline rounded-full text-text focus:outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-14 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-2 focus:ring-sungold/20 outline-none appearance-none disabled:opacity-50"
             >
               <option value="">All Departments</option>
               {departments.map(dept => (
@@ -276,114 +257,103 @@ export const CourseManagement: React.FC = () => {
             </select>
           </div>
         </div>
-      </div>
+      </ModernCard>
 
       {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-textMuted" />
-        <Input
+      <div className="relative max-w-2xl">
+        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant" size={20} />
+        <input
           type="text"
-          placeholder="Search courses by title, code, or department..."
+          placeholder="Search by title, code, or department..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+          className="w-full h-16 pl-14 pr-6 bg-white border border-outline rounded-2xl text-presently-black font-medium focus:ring-2 focus:ring-sungold/20 outline-none"
         />
       </div>
 
       {/* Courses Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredCourses.map(course => (
-          <div
-            key={course.id}
-            className="bg-surface border border-outline rounded-lg p-4 hover:border-outline transition-colors"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-primary" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {loading && courses.length === 0 ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-64 bg-slate-100 animate-pulse rounded-3xl" />
+          ))
+        ) : (
+          filteredCourses.map(course => (
+            <ModernCard
+              key={course.id}
+              padding="lg"
+              className="group hover:border-sungold/40 transition-all flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-warm-ivory border border-outline flex items-center justify-center text-sungold">
+                    <BookOpen size={24} />
+                  </div>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleEditCourse(course)}
+                      className="p-2 hover:bg-slate-50 rounded-xl border border-outline text-on-surface-variant"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCourse(course.id)}
+                      className="p-2 hover:bg-red-50 rounded-xl border border-outline text-soft-coral"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
                 <div>
-                  <h3 className="font-headline font-semibold text-text">{course.title}</h3>
-                  <p className="text-xs text-textMuted">{course.code}</p>
+                  <h3 className="font-display text-xl font-bold text-presently-black leading-tight mb-1">{course.title}</h3>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-[10px] py-0">{course.code}</Badge>
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">{course.credit_units} UNITS</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-outline">
+                  {course.department_name && (
+                    <div className="flex items-center gap-3 text-on-surface-variant">
+                      <GraduationCap size={16} className="text-sungold" />
+                      <span className="text-xs font-bold uppercase tracking-wider line-clamp-1">{course.department_name}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 text-on-surface-variant">
+                    <Users size={16} className="text-sungold" />
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      {course.enrolled_students_count || 0} ENROLLED
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => handleEditCourse(course)}
-                  className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
-                  title="Edit course"
-                >
-                  <Edit2 className="w-4 h-4 text-textMuted" />
-                </button>
-                <button
-                  onClick={() => handleDeleteCourse(course.id)}
-                  className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
-                  title="Delete course"
-                >
-                  <Trash2 className="w-4 h-4 text-red-400" />
-                </button>
-              </div>
-            </div>
 
-            <div className="space-y-2 text-sm">
-              {course.department_name && (
-                <div className="flex items-center gap-2 text-textMuted">
-                  <GraduationCap className="w-4 h-4" />
-                  <span>{course.department_name}</span>
-                </div>
-              )}
-
-              {course.lecturer_name && (
-                <div className="text-textMuted">
-                  Lecturer: {course.lecturer_name}
-                </div>
-              )}
-
-              {typeof course.enrolled_students_count === 'number' && (
-                <div className="flex items-center gap-2 text-textMuted">
-                  <Users className="w-4 h-4" />
-                  <span>{course.enrolled_students_count} Student{course.enrolled_students_count !== 1 ? 's' : ''} Enrolled</span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-2 border-t border-outline">
-                <div className="text-textMuted">
-                  {course.credit_units} Credit{course.credit_units !== 1 ? 's' : ''}
+              <div className="mt-6 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                   <div className={cn("w-2 h-2 rounded-full", course.is_active ? "bg-moss-green" : "bg-slate-300")} />
+                   <span className="text-[10px] font-bold text-presently-black uppercase tracking-[0.2em]">
+                     {course.is_active ? 'ACTIVE' : 'DORMANT'}
+                   </span>
                 </div>
                 {course.level && (
-                  <div className="text-textMuted">
-                    Level {course.level}
-                  </div>
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em]">LEVEL {course.level}</span>
                 )}
               </div>
-
-              {course.semester && (
-                <div className="text-textMuted text-xs">
-                  Semester: {course.semester}
-                </div>
-              )}
-
-              <div className="flex items-center gap-2 mt-2">
-                <span className={`px-2 py-1 rounded text-xs ${
-                  course.is_active 
-                    ? 'bg-green-500/10 text-green-500' 
-                    : 'bg-surfaceHigh text-muted-foreground'
-                }`}>
-                  {course.is_active ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+            </ModernCard>
+          ))
+        )}
       </div>
 
-      {filteredCourses.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <BookOpen className="w-16 h-16 text-textMuted mx-auto mb-4" />
-          <p className="text-textMuted">No courses found</p>
-          <p className="text-textMuted text-sm mt-1">Create your first course to get started</p>
+      {!loading && filteredCourses.length === 0 && (
+        <div className="text-center py-24 bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-outline">
+          <BookOpen className="w-20 h-20 text-slate-200 mx-auto mb-6" />
+          <h4 className="font-display text-2xl font-bold text-presently-black">No Courses Found</h4>
+          <p className="text-on-surface-variant font-medium mt-2">Try adjusting your filters or create a new course.</p>
         </div>
       )}
 
-      {/* Course Modal */}
       {showModal && (
         <CourseModal
           course={editingCourse || undefined}

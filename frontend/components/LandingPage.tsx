@@ -10,12 +10,43 @@ import { LandingFooter } from './LandingFooter';
 import { LandingHeader } from './LandingHeader';
 
 import { LandingHero } from './LandingPage/LandingHero';
+import { LandingMarquee } from "./LandingPage/LandingMarquee";
 import { LandingBento } from './LandingPage/LandingBento';
-import { LandingEngineRoom } from './LandingPage/LandingEngineRoom';
 import { LandingTestimonials } from './LandingPage/LandingTestimonials';
-import { LandingPricing } from './LandingPage/LandingPricing';
 import { LandingMobileApp } from './LandingPage/LandingMobileApp';
 import { LandingCTA } from './LandingPage/LandingCTA';
+import { ModernCard } from './ModernCard';
+import { GraduationCap, Presentation, Building2, Plus, Minus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-outline py-6">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-left hover:text-sungold transition-colors"
+      >
+        <span className="font-sans text-lg font-medium">{question}</span>
+        <span className="text-sungold">{isOpen ? <Minus /> : <Plus />}</span>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <p className="pt-4 text-on-surface-variant leading-relaxed">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -50,25 +81,113 @@ export const LandingPage: React.FC = () => {
   const goRegister = () => navigate('/register');
   const goLogin = () => navigate('/login');
 
+  const roles = [
+    {
+      title: "Students",
+      subtitle: "\"No stress. Just show up.\"",
+      body: "Check in from your phone the moment you walk in. See your attendance percentage in real time. Never be surprised before exams.",
+      accent: "border-l-sungold",
+      icon: <GraduationCap className="text-sungold" />,
+      features: ["3-second GPS check-in", "Real-time attendance dashboard", "Notifications before you fall below threshold", "Works even on slow data"]
+    },
+    {
+      title: "Lecturers",
+      subtitle: "\"Attendance handled before you say good morning.\"",
+      body: "Open a session, teach, close it. Your register is already filled. Export to PDF or CSV whenever you need it. No chasing, no paperwork.",
+      accent: "border-l-sky-teal",
+      icon: <Presentation className="text-sky-teal" />,
+      features: ["One-tap session creation", "Live attendance feed during class", "Auto-generated reports", "Excuse request management"]
+    },
+    {
+      title: "Schools & Institutions",
+      subtitle: "\"Visibility across every faculty, every day.\"",
+      body: "A live institutional dashboard. Attendance trends. Compliance reports. Everything an HOD, Dean, or registrar needs — without asking anyone for a file.",
+      accent: "border-l-moss-green",
+      icon: <Building2 className="text-moss-green" />,
+      features: ["Multi-faculty dashboard", "Audit-ready exports", "Role-based staff access", "Semester & session analytics"]
+    }
+  ];
+
   return (
     <TooltipProvider>
       <SEO
-        title="Presently — Reclaiming Lecture Integrity"
-        description="Stop proxies. Save time. Presently ensures 100% accurate, location-verified attendance for Nigerian universities."
+        title="Presently — GPS-Verified Attendance"
+        description="Every class. Every student. Present. The modern standard for university attendance tracking."
       />
       <JsonLd schema={softwareSchema} />
       
-      <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-[#D4AF37] selection:text-[#0A0A0A]">
+      <div className="min-h-screen bg-white selection:bg-sungold/30 selection:text-presently-black">
         <LandingHeader onGetStarted={goRegister} onLogin={goLogin} />
 
         <main>
           <LandingHero onGetStarted={goRegister} />
+          <LandingMarquee />
+
+          {/* Section 04 — How it Works (Role Selection) */}
+          <section className="py-32 bg-white">
+            <div className="container mx-auto px-6">
+              <div className="mb-20">
+                <span className="text-sungold font-bold uppercase tracking-widest text-sm mb-4 block">
+                   BUILT FOR EVERYONE IN THE ROOM
+                </span>
+                <h2 className="font-display text-4xl md:text-5xl text-presently-black">
+                  Whoever you are,<br />Presently works for you.
+                </h2>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {roles.map((role, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.08 }}
+                  >
+                    <ModernCard variant="gold-accent" className={role.accent + " h-full flex flex-col"}>
+                      <div className="mb-6">{role.icon}</div>
+                      <h3 className="font-display text-2xl mb-2">{role.title}</h3>
+                      <p className="font-sans font-bold text-lg mb-4">{role.subtitle}</p>
+                      <p className="text-on-surface-variant text-sm mb-8 flex-grow">{role.body}</p>
+                      <ul className="space-y-3">
+                        {role.features.map((f, j) => (
+                          <li key={j} className="flex items-center gap-2 text-sm font-medium">
+                            <span className="text-sungold">✓</span> {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </ModernCard>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
           <LandingBento />
-          <LandingEngineRoom />
           <LandingTestimonials />
-          {pricingEnabled && <LandingPricing />}
+
           <LandingMobileApp />
-          <LandingCTA onRegister={goRegister} />
+
+          {/* Section 08 — FAQ */}
+          <section className="py-32 bg-[#F9F7F3]">
+            <div className="container mx-auto px-6 max-w-4xl">
+              <div className="mb-16">
+                <h2 className="font-display text-4xl md:text-5xl text-presently-black">
+                  Questions you'll have.<br />Answered already.
+                </h2>
+              </div>
+              <div className="space-y-4">
+                <FAQItem question="Does it work without internet?" answer="Yes. Check-ins queue locally and sync automatically when a connection is restored." />
+                <FAQItem question="Can students spoof their GPS location?" answer="No. Presently uses multi-source verification including GPS and Wi-Fi triangulation to ensure physical presence." />
+                <FAQItem question="What happens if a student's phone dies mid-class?" answer="As long as they checked in while their phone was on, their record is secure. Lecturers can also manually verify students in emergencies." />
+                <FAQItem question="Does my school need to pay for students to use it?" answer="Presently offers a free tier for students. Institutional features are available through school-wide subscriptions." />
+                <FAQItem question="Can lecturers edit attendance records after submission?" answer="Yes, with proper authorization and audit logging to maintain integrity." />
+                <FAQItem question="Is student data safe and private?" answer="Absolutely. We follow strict data protection protocols and only use location data for the duration of the check-in process." />
+              </div>
+            </div>
+          </section>
+
+          <LandingCTA />
         </main>
 
         <LandingFooter />

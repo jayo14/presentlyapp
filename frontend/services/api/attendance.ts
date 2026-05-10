@@ -164,6 +164,10 @@ export const attendanceApi = {
     const response = await apiClient.get(`/attendances/${id}/`);
     return response.data;
   },
+  update: async (id: number, data: Partial<Attendance>): Promise<Attendance> => {
+    const response = await apiClient.patch(`/attendances/${id}/`, data);
+    return response.data;
+  },
   getSessions: async (filters?: { lecturer_only?: boolean }): Promise<AttendanceSession[]> => {
     const response = await apiClient.get('/sessions/', { params: filters });
     return response.data.results || response.data;

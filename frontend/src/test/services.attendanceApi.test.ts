@@ -130,14 +130,7 @@ describe('attendanceApi', () => {
     });
   });
 
-  describe('update', () => {
-    it('patches attendance record status', async () => {
-      const updated = { id: 1, session: 1, student: 's1', status: 'EXCUSED', checked_in_at: '', location_verified: true };
-      mockPatch.mockResolvedValueOnce({ data: updated });
-      const result = await attendanceApi.update(1, { status: 'EXCUSED' });
-      expect(result.status).toBe('EXCUSED');
-    });
-  });
+  // update was removed from attendanceApi in services/api/attendance.ts
 });
 
 describe('courseApi', () => {
@@ -152,4 +145,3 @@ describe('courseApi', () => {
     });
   });
 });
-

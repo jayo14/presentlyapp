@@ -4,12 +4,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SEO } from '../SEO';
 import { useVerifyEmailOTP, useResendEmailVerification } from '../../hooks/useAuth';
 import { Haptics } from '@capacitor/haptics';
+import { Logo } from '../Logo';
+import { Button } from '../Button';
+import { cn } from '../../src/components/ui/utils';
 
 export const OTPVerification: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email') || '';
-  const phone = searchParams.get('phone') || '';
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [countdown, setCountdown] = useState(60);
@@ -36,7 +38,9 @@ export const OTPVerification: React.FC = () => {
     setOtp(newOtp);
 
     try {
-      if (typeof Haptics !== 'undefined') Haptics.impact({ style: 'light' });
+      if (typeof Haptics !== 'undefined') {
+        Haptics.impact({ style: 'light' }).catch(() => {});
+      }
     } catch {
       // Haptics not available
     }
@@ -111,120 +115,101 @@ export const OTPVerification: React.FC = () => {
 
   const isOtpComplete = otp.every(d => d !== '');
 
-  const formatPhoneDisplay = (phoneNum: string) => {
-    if (!phoneNum) return '';
-    const cleaned = phoneNum.replace(/\D/g, '');
-    const last2 = cleaned.slice(-2);
-    return `+1 (555) *** ***${last2}`;
-  };
-
   const formatCountdown = () => {
-    const minutes = Math.floor(countdown / 60);
     const seconds = countdown % 60;
-    return minutes > 0 ? `${minutes}:${String(seconds).padStart(2, '0')}` : `${seconds}`;
+    return `${seconds}`;
   };
 
   return (
-    <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-warm-ivory text-on-surface flex flex-col items-center justify-center p-6 relative">
       <SEO title="OTP Verification | Presently" />
 
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 text-textMuted hover:text-text transition-colors"
+        className="absolute top-8 left-8 p-3 text-presently-black hover:bg-black/5 rounded-full transition-all"
         aria-label="Go back"
       >
-        <ArrowLeft size={20} />
+        <ArrowLeft size={24} />
       </button>
 
-      <div className="w-full max-w-md rounded-2xl border border-outline bg-surface shadow-xl p-6 md:p-8">
-        {/* Header */}
-        <div className="mb-10 text-center">
-          <h1 className="font-headline text-4xl font-bold text-text mb-4">
-            Verify your {email ? 'email' : 'phone number'}
+      <div className="w-full max-w-md">
+        <div className="text-center mb-10">
+          <Logo className="justify-center mb-8" />
+          <h1 className="font-display text-3xl font-bold text-presently-black mb-4">
+            Verify your account
           </h1>
-          <p className="text-textMuted mb-2">Enter the 6-digit code we sent to</p>
-          <p className="text-primary font-medium">{email || formatPhoneDisplay(phone)}</p>
+          <p className="text-on-surface-variant">
+            Enter the 6-digit code we sent to <br />
+            <span className="font-bold text-presently-black">{email}</span>
+          </p>
         </div>
 
-        {/* OTP Inputs */}
-        <div className="flex flex-wrap gap-2 justify-center mb-4" onPaste={handlePaste}>
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              className={[
-                'w-11 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold',
-                'bg-surfaceContainer border text-text rounded-xl',
-                'transition-all focus:outline-none focus:ring-2 focus:ring-primary',
-                digit ? 'border-primary' : 'border-outline focus:border-primary',
-              ].join(' ')}
-              aria-label={`OTP digit ${index + 1}`}
-            />
-          ))}
-        </div>
+        <div className="bg-white p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
+          <div className="flex justify-center gap-2 mb-6" onPaste={handlePaste}>
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={(el) => (inputRefs.current[index] = el)}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                className={cn(
+                  "w-11 h-14 text-center text-2xl font-bold rounded-xl border transition-all focus:outline-none",
+                  digit
+                    ? "border-sungold bg-sungold/5 text-presently-black"
+                    : "border-[#CBD5E1] focus:border-sungold focus:ring-3 focus:ring-sungold/15 bg-white"
+                )}
+                aria-label={`OTP digit ${index + 1}`}
+              />
+            ))}
+          </div>
 
-        <div className="flex justify-center mb-8">
-          <button
-            type="button"
-            onClick={handlePasteFromClipboard}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-card text-text hover:bg-surfaceHigh transition-colors"
-          >
-            <ClipboardPaste size={16} />
-            Paste code
-          </button>
-        </div>
-
-        {/* Timer */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          {!canResend ? (
-            <div className="flex items-center gap-2 text-textMuted text-sm">
-              <div className="w-8 h-8 rounded-full border-outline border shadow-sm flex items-center justify-center text-xs font-bold text-primary">
-                {formatCountdown()}
-              </div>
-              <span>Resend code in {formatCountdown()}s</span>
-            </div>
-          ) : (
+          <div className="flex justify-center mb-8">
             <button
-              onClick={handleResend}
-              disabled={resendMutation.isPending}
-              className="text-primary font-medium hover:underline disabled:opacity-50 flex items-center gap-2"
+              type="button"
+              onClick={handlePasteFromClipboard}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-sungold transition-colors"
             >
-              {resendMutation.isPending && <Loader2 size={16} className="animate-spin" />}
-              Resend Code
+              <ClipboardPaste size={16} />
+              Paste code from clipboard
             </button>
-          )}
-        </div>
+          </div>
 
-        {/* Error Display */}
-        {verifyMutation.isError && (
-          <div className="p-3 bg-red-100 dark:bg-red-950/40 border border-red-500 rounded-lg mb-4">
-            <p className="text-sm text-red-700 dark:text-red-300 text-center">
+          <div className="text-center mb-10">
+            {!canResend ? (
+              <p className="text-sm text-on-surface-variant">
+                Resend code in <span className="font-bold text-sungold">{formatCountdown()}s</span>
+              </p>
+            ) : (
+              <button
+                onClick={handleResend}
+                disabled={resendMutation.isPending}
+                className="text-sungold font-bold hover:underline disabled:opacity-50 flex items-center justify-center gap-2 mx-auto"
+              >
+                {resendMutation.isPending && <Loader2 size={16} className="animate-spin" />}
+                Resend Verification Code
+              </button>
+            )}
+          </div>
+
+          <Button
+            onClick={handleVerify}
+            disabled={!isOtpComplete || verifyMutation.isPending}
+            fullWidth
+            className="h-14 text-lg"
+          >
+            {verifyMutation.isPending ? 'Verifying...' : 'Verify & Continue'}
+          </Button>
+
+          {verifyMutation.isError && (
+            <p className="mt-4 text-xs text-soft-coral font-bold text-center">
               Invalid code. Please try again.
             </p>
-          </div>
-        )}
-
-        {/* Verify Button */}
-        <button
-          onClick={handleVerify}
-          disabled={!isOtpComplete || verifyMutation.isPending}
-          className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {verifyMutation.isPending ? (
-            <>
-              <Loader2 size={20} className="animate-spin" />
-              <span>Verifying...</span>
-            </>
-          ) : (
-            'Verify Code'
           )}
-        </button>
+        </div>
       </div>
     </div>
   );

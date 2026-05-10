@@ -1,97 +1,76 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useLogin, useCurrentUser, useGoogleAuth } from '../../hooks/useAuth';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, Loader2, CheckCircle2, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useLogin, useGoogleAuth, useCurrentUser } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
-import { Mail, Lock, ArrowLeft, Eye, EyeOff, Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
-import { LoadingScreen } from '../LoadingScreen';
-import { AuthBackground } from './AuthBackground';
-import { getGoogleAuthRedirectUri } from '../../utils/authRedirect';
-// import { ThemeToggle } from '../ThemeToggle';
+import { Logo } from '../Logo';
+import { Button } from '../Button';
+import { Input } from '../Input';
+import { cn } from '../../src/components/ui/utils';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
   const loginMutation = useLogin();
   const googleAuthMutation = useGoogleAuth();
   const { data: user, isLoading } = useCurrentUser();
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  const [hasHandledRedirect, setHasHandledRedirect] = useState(false);
-
-  const redirectTo = searchParams.get('redirect_to') || '/dashboard';
-  const message = searchParams.get('message');
 
   useEffect(() => {
-    if (message) {
-      toast.info(message, { id: 'login-message' });
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+
+    if (code && !isRedirecting) {
+      setIsRedirecting(true);
+      googleAuthMutation.mutate({ code, state }, {
+        onSuccess: (data) => {
+          toast.success('Logged in successfully!');
+          navigate('/dashboard', { replace: true });
+        },
+        onError: (error: any) => {
+          toast.error('Login Failed', {
+            description: error.response?.data?.message || 'Failed to authenticate with Google.'
+          });
+          setIsRedirecting(false);
+          navigate('/login', { replace: true });
+        }
+      });
     }
-  }, [message]);
-
-  // OAuth landing logic is now handled in the dedicated /auth/callback route
+  }, [location, navigate, googleAuthMutation, isRedirecting]);
 
   useEffect(() => {
-    if (!user || isLoading || isRedirecting) return;
-
-    setIsRedirecting(true);
-    const pendingCheckIn = localStorage.getItem('pending_checkin');
-    const explicitRedirect = searchParams.get('redirect_to');
-
-    if (!user.email_verified) {
-      navigate(`/otp-verification?email=${encodeURIComponent(user.email)}`, { replace: true });
-    } else if (!user.onboarding_complete) {
-      navigate('/onboarding', { replace: true });
-    } else if (explicitRedirect) {
-      navigate(explicitRedirect, { replace: true });
-    } else if (pendingCheckIn) {
-      localStorage.removeItem('pending_checkin');
-      navigate(`/check-in/${pendingCheckIn}`, { replace: true });
-    } else {
+    if (user && !isLoading && !isRedirecting) {
       navigate('/dashboard', { replace: true });
     }
-  }, [user, isLoading, navigate, searchParams]);
+  }, [user, isLoading, navigate, isRedirecting]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsRedirecting(true);
-    loginMutation.mutate({ email, password, rememberMe }, {
-      onError: (error: any) => {
-        setIsRedirecting(false);
-        let errorMessage = 'Invalid credentials. Please try again.';
-        const errorData = error.response?.data;
-
-        if (errorData) {
-          if (errorData.errors?.non_field_errors) {
-            errorMessage = errorData.errors.non_field_errors[0];
-          } else if (errorData.non_field_errors) {
-            errorMessage = errorData.non_field_errors[0];
-          } else if (errorData.error) {
-            errorMessage = errorData.error;
-          } else if (errorData.message) {
-            errorMessage = errorData.message;
-          }
-        }
-
-        toast.error('Login Failed', { description: errorMessage });
+    loginMutation.mutate({ email, password }, {
+      onSuccess: () => {
+        toast.success('Welcome back!');
+        navigate('/dashboard');
       },
-      onSuccess: (response: any) => {
-        if (response?.requires_email_verification) {
-          toast.info('Verify Your Email', {
-            description: response?.otp_send_failed
-              ? 'Your email is not verified. We could not send a code automatically. Please use resend on the verification page.'
-              : 'Your email is not verified. A verification code has been sent to your email.'
-          });
-          return;
-        }
-
-        toast.success('Login Successful', {
-          description: 'Welcome back! Redirecting to dashboard...'
+      onError: (error: any) => {
+        toast.error('Login Failed', {
+          description: error.response?.data?.detail || 'Invalid email or password.'
         });
       }
     });
+  };
+
+  const getGoogleAuthRedirectUri = () => {
+    const rawApi = (import.meta.env.VITE_API_URL || 'http://localhost:8000').trim().replace(/\/+$/, '');
+    const apiBase = /\/api$/i.test(rawApi) ? rawApi : `${rawApi}/api`;
+    return `${apiBase}/auth/google/callback/`;
   };
 
   const handleGoogleLogin = () => {
@@ -109,204 +88,143 @@ export const Login: React.FC = () => {
     window.location.href = authUrl;
   };
 
-  const handleAppleLogin = () => {
-    toast.info('Apple Login', { description: 'Apple authentication is coming soon.' });
-  };
-
-  const onBack = () => navigate(-1);
-
   if (isRedirecting || (user && isLoading)) {
-    return <LoadingScreen message="Redirecting to dashboard" />;
+    return (
+      <div className="min-h-screen bg-presently-black flex flex-col items-center justify-center">
+        <Logo variant="dark" className="mb-8 scale-125" />
+        <Loader2 className="w-8 h-8 text-sungold animate-spin" />
+        <p className="mt-4 text-slate-400 font-display">Redirecting to dashboard...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      <AuthBackground />
+    <div className="min-h-screen bg-warm-ivory flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      <SEO title="Login | Presently" description="Sign in to your Presently account." />
 
-      <SEO
-        title="Login | Presently"
-        description="Sign in to your Presently account to manage attendance, track sessions, and view analytics."
-      />
-
-      {/* Header bar */}
-      <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-20">
+      <div className="absolute top-8 left-8 z-20">
         <button
-          onClick={onBack}
-          className="p-2 text-textMuted hover:text-text hover:bg-surface-container rounded-full transition-all"
-          aria-label="Go back"
+          onClick={() => navigate('/')}
+          className="p-3 text-presently-black hover:bg-black/5 rounded-full transition-all"
         >
           <ArrowLeft size={24} />
         </button>
-
-        {/* <ThemeToggle /> */}
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Title */}
-        <div className="mb-10 text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-            <Sparkles size={14} />
-            <span>Welcome Back</span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-headline font-bold mb-2 tracking-tight text-text">Sign in</h2>
-          <p className="text-textMuted text-lg leading-relaxed">Enter your credentials to continue.</p>
+        <div className="text-center mb-10">
+          <Logo className="justify-center mb-8" />
+          <h2 className="font-display text-4xl font-bold text-presently-black mb-2">Welcome Back</h2>
+          <p className="text-on-surface-variant">Enter your credentials to continue.</p>
         </div>
 
-        {/* Login Form Card */}
-        <div className="glass-panel border-outline/20 p-8 rounded-[2rem] shadow-2xl backdrop-blur-3xl">
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-5">
-              {/* Email Input */}
-              <div>
-                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Email Address</label>
-                <div className="relative">
-                  <Mail
-                    size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
-                  />
-                  <input
-                    type="email"
-                    placeholder="name@university.edu"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                  />
-                </div>
-              </div>
+        <div className="bg-white p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="name@university.edu"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              icon={<Mail />}
+            />
 
-              {/* Password Input */}
-              <div>
-                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Password</label>
-                <div className="relative">
-                  <Lock
-                    size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
-                  />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary transition-colors z-10"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between text-sm">
-                <button
-                  type="button"
-                  onClick={() => setRememberMe(!rememberMe)}
-                  className="flex items-center gap-2 group transition-all"
-                  aria-checked={rememberMe}
-                  role="checkbox"
-                >
-                  <div className={`
-                    w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
-                    ${rememberMe
-                      ? 'bg-primary border-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.3)]'
-                      : 'border-outline group-hover:border-primary/50'
-                    }
-                  `}>
-                    {rememberMe ? (
-                      <CheckCircle2 size={16} className="text-white fill-white/20" />
-                    ) : (
-                      <div className="w-2 h-2 rounded-full bg-transparent group-hover:bg-primary/20 transition-all" />
-                    )}
-                  </div>
-                  <span className={`font-semibold tracking-tight transition-colors ${rememberMe ? 'text-primary' : 'text-textMuted'}`}>
-                    Remember me
-                  </span>
-                </button>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center px-1">
+                <label className="text-[13px] font-semibold text-on-surface-variant">Password</label>
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
-                  className="text-primary font-bold hover:text-primary-fixed transition-all hover:scale-105 active:scale-95"
+                  className="text-xs font-bold text-sungold hover:underline"
                 >
-                  Forgot password?
+                  Forgot?
                 </button>
               </div>
-
-              {/* Sign In Button */}
-              <button
-                type="submit"
-                disabled={loginMutation.isPending}
-                className="btn-presently-primary w-full flex items-center justify-center gap-2 w-full h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loginMutation.isPending ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin" />
-                    <span>Signing in...</span>
-                  </>
-                ) : (
-                  'Sign In'
-                )}
-              </button>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full h-[52px] pl-12 pr-12 bg-white border-1.5 border-[#CBD5E1] focus:border-sungold focus:ring-3 focus:ring-sungold/15 rounded-md outline-none transition-all"
+                />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" size={20} />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-sungold"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
+
+            <div className="flex items-center gap-2 px-1">
+               <button
+                  type="button"
+                  onClick={() => setRememberMe(!rememberMe)}
+                  className="flex items-center gap-2 group"
+                >
+                  <div className={cn(
+                    "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
+                    rememberMe ? "bg-sungold border-sungold" : "border-[#CBD5E1] group-hover:border-sungold"
+                  )}>
+                    {rememberMe && <CheckCircle2 size={12} className="text-presently-black" />}
+                  </div>
+                  <span className="text-sm font-semibold text-on-surface-variant">Remember me</span>
+               </button>
+            </div>
+
+            <Button
+              type="submit"
+              isLoading={loginMutation.isPending}
+              fullWidth
+              className="h-14 text-lg"
+            >
+              Sign In
+            </Button>
           </form>
 
           <div className="flex items-center gap-4 my-8">
             <div className="h-px bg-outline flex-1" />
-            <span className="text-xs text-textMuted uppercase font-bold tracking-wide">Or continue with</span>
+            <span className="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Or continue with</span>
             <div className="h-px bg-outline flex-1" />
           </div>
 
-          {/* OAuth Buttons */}
-          <div className="flex justify-center gap-6 mb-4">
-            {/* Google */}
-            <button
-              onClick={handleGoogleLogin}
-              disabled={googleAuthMutation.isPending || isRedirecting}
-              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surfaceVariant border transition-all disabled:opacity-50"
-              aria-label="Sign in with Google"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24">
+          <div className="grid grid-cols-2 gap-4">
+             <button
+               onClick={handleGoogleLogin}
+               className="h-14 flex items-center justify-center rounded-xl border border-outline hover:bg-slate-50 transition-all"
+             >
+               <svg width="20" height="20" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-            </button>
-
-            {/* Apple */}
-            <button
-              onClick={handleAppleLogin}
-              className="w-14 h-14 flex items-center justify-center rounded-full bg-surface hover:bg-surfaceVariant border transition-all"
-              aria-label="Sign in with Apple"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" className="fill-foreground">
+             </button>
+             <button
+               className="h-14 flex items-center justify-center rounded-xl border border-outline hover:bg-slate-50 transition-all"
+             >
+                <svg width="20" height="20" viewBox="0 0 24 24" className="fill-presently-black">
                 <path d="M17.05 20.28c-.96.95-2.45 2.1-4.05 2.1-1.45 0-2.1-.8-3.65-.8-1.55 0-2.3.75-3.6.8-1.5.05-3.1-1.25-4.15-2.85-1.95-3.15-1.5-8.25.95-11.5 1.25-1.6 2.85-2.6 4.6-2.6 1.45 0 2.3.85 3.55.85s2.1-.9 3.8-.85c1.45.05 2.75.65 3.65 1.7-3.05 1.8-2.55 6 .65 7.4-.7 1.7-1.6 3.4-2.75 4.85zM12.03 5.48c-.05-1.85 1.55-3.65 3.35-3.7.25 1.95-1.7 3.8-3.35 3.7z" />
               </svg>
-            </button>
+             </button>
           </div>
-
-          <p className="mt-10 text-center text-sm text-textMuted flex items-center justify-center gap-2">
-            Don't have an account?{' '}
-            <button
-              onClick={() => navigate('/register')}
-              className="text-primary font-bold hover:underline transition-colors py-1 px-2 hover:bg-primary/5 rounded-lg"
-            >
-              Sign up
-            </button>
-          </p>
         </div>
 
-        {/* Footer text */}
-        <p className="mt-8 text-center text-xs text-textMuted/60 font-medium">
-          &copy; {new Date().getFullYear()} Presently Inc. All rights reserved.
+        <p className="mt-8 text-center text-sm text-on-surface-variant">
+          Don't have an account?{' '}
+          <button
+            onClick={() => navigate('/register')}
+            className="text-sungold font-bold hover:underline"
+          >
+            Create one for free
+          </button>
         </p>
       </div>
     </div>
   );
 };
-

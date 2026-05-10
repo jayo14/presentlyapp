@@ -1,19 +1,35 @@
 import React from 'react';
+import { cn } from '../src/components/ui/utils';
 
-export const Logo: React.FC<{ className?: string, showText?: boolean }> = ({
+export const Logo: React.FC<{ className?: string, showText?: boolean, variant?: 'light' | 'dark' }> = ({
   className = "",
-  showText = true
-}) => (
-  <div className={`flex items-center gap-3 font-bold text-xl tracking-tight ${className}`}>
-    <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-primary shadow-lg shadow-primary/20 overflow-hidden group">
-      <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <span className="text-primary-foreground font-black text-xl italic select-none">P</span>
-      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white/20 blur-md rounded-full" />
+  showText = true,
+  variant
+}) => {
+  const isDark = variant === 'dark';
+
+  return (
+    <div className={cn("flex items-center gap-2 tracking-tight", className)}>
+      <div className={cn(
+        "relative flex items-center justify-center w-10 h-10 rounded-[22%] transition-all shadow-md group",
+        isDark ? "bg-presently-black" : "bg-sungold"
+      )}>
+        <span className={cn(
+          "font-display font-bold text-2xl select-none relative",
+          isDark ? "text-sungold" : "text-presently-black"
+        )}>
+          P
+          <span className="absolute -right-0.5 bottom-1 text-[10px]">◆</span>
+        </span>
+      </div>
+      {showText && (
+        <span className={cn(
+          "font-display font-bold tracking-[-0.02em] text-2xl transition-colors",
+          isDark ? "text-white" : "text-presently-black"
+        )}>
+          Presently
+        </span>
+      )}
     </div>
-    {showText && (
-      <span className="text-text dark:text-text transition-colors font-headline font-bold tracking-[-0.02em] text-[22px]">
-        Presently
-      </span>
-    )}
-  </div>
-);
+  );
+};
