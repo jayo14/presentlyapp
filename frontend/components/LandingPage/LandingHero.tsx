@@ -46,14 +46,14 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
                 </Button>
               </div>
 
-              <div className="lg:hidden mt-10 max-w-sm rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+              <div className="lg:hidden mt-10 max-w-sm rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-slate-200 text-sm font-semibold">Live check-ins</span>
                   <span className="text-sungold text-sm font-bold">94.7%</span>
                 </div>
                 <div className="space-y-3">
                   {[1, 2, 3].map((entry) => (
-                    <div key={entry} className="flex items-center gap-3 rounded-xl bg-black/30 border border-white/10 px-3 py-2">
+                    <div key={entry} className="flex items-center gap-3 rounded-xl bg-black/40 border border-white/20 px-3 py-2">
                       <span className="h-2 w-2 rounded-full bg-sungold" />
                       <span className="h-2 w-20 rounded-full bg-white/30" />
                       <span className="ml-auto h-2 w-12 rounded-full bg-sungold/30" />

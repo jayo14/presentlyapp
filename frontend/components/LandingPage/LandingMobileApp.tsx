@@ -21,7 +21,7 @@ export const LandingMobileApp: React.FC = () => {
         </h2>
       </div>
 
-      <div className="flex gap-4 md:gap-8 px-5 sm:px-6 lg:px-0 overflow-x-auto lg:overflow-visible no-scrollbar snap-x snap-mandatory lg:justify-center pb-4">
+      <div className="flex gap-4 md:gap-8 px-5 sm:px-6 lg:px-0 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:justify-center pb-4">
         {/* Screen 1: Onboarding */}
         <motion.div style={{ y: y1 }} className="w-44 sm:w-52 md:w-64 h-[360px] sm:h-[420px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-lg flex-shrink-0 overflow-hidden snap-center">
           <div className="p-6 h-full flex flex-col justify-end bg-sungold/5">
