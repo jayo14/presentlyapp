@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Smartphone, BarChart3, Zap, Lock, Users } from 'lucide-react';
 import { ModernCard } from '../ModernCard';
+import { cn } from '../../src/components/ui/utils';
 
 const BENTO_ITEMS = [
   {
