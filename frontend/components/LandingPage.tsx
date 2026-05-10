@@ -25,7 +25,7 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
     <div className="border-b border-outline py-6">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex justify-between items-center text-left hover:text-sungold transition-colors"
+        className="w-full flex justify-between items-center text-left text-on-surface hover:text-sungold transition-colors"
       >
         <span className="font-sans text-lg font-medium">{question}</span>
         <span className="text-sungold">{isOpen ? <Minus /> : <Plus />}</span>
@@ -116,7 +116,7 @@ export const LandingPage: React.FC = () => {
       />
       <JsonLd schema={softwareSchema} />
       
-      <div className="min-h-screen bg-white selection:bg-sungold/30 selection:text-presently-black">
+      <div className="min-h-screen bg-background text-on-surface selection:bg-sungold/30 selection:text-presently-black">
         <LandingHeader onGetStarted={goRegister} onLogin={goLogin} />
 
         <main>
@@ -124,18 +124,18 @@ export const LandingPage: React.FC = () => {
           <LandingMarquee />
 
           {/* Section 04 — How it Works (Role Selection) */}
-          <section className="py-32 bg-white">
-            <div className="container mx-auto px-6">
-              <div className="mb-20">
+          <section className="py-20 md:py-28 bg-background">
+            <div className="container mx-auto px-5 sm:px-6">
+              <div className="mb-14 md:mb-20">
                 <span className="text-sungold font-bold uppercase tracking-widest text-sm mb-4 block">
                    BUILT FOR EVERYONE IN THE ROOM
                 </span>
-                <h2 className="font-display text-4xl md:text-5xl text-presently-black">
+                <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-on-surface">
                   Whoever you are,<br />Presently works for you.
                 </h2>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                 {roles.map((role, i) => (
                   <motion.div
                     key={i}
@@ -146,8 +146,8 @@ export const LandingPage: React.FC = () => {
                   >
                     <ModernCard variant="gold-accent" className={role.accent + " h-full flex flex-col"}>
                       <div className="mb-6">{role.icon}</div>
-                      <h3 className="font-display text-2xl mb-2">{role.title}</h3>
-                      <p className="font-sans font-bold text-lg mb-4">{role.subtitle}</p>
+                      <h3 className="font-display text-2xl mb-2 text-on-surface">{role.title}</h3>
+                      <p className="font-sans font-bold text-lg mb-4 text-on-surface">{role.subtitle}</p>
                       <p className="text-on-surface-variant text-sm mb-8 flex-grow">{role.body}</p>
                       <ul className="space-y-3">
                         {role.features.map((f, j) => (
@@ -169,10 +169,10 @@ export const LandingPage: React.FC = () => {
           <LandingMobileApp />
 
           {/* Section 08 — FAQ */}
-          <section className="py-32 bg-[#F9F7F3]">
-            <div className="container mx-auto px-6 max-w-4xl">
-              <div className="mb-16">
-                <h2 className="font-display text-4xl md:text-5xl text-presently-black">
+          <section className="py-20 md:py-28 bg-surface">
+            <div className="container mx-auto px-5 sm:px-6 max-w-4xl">
+              <div className="mb-12 md:mb-16">
+                <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-on-surface">
                   Questions you'll have.<br />Answered already.
                 </h2>
               </div>

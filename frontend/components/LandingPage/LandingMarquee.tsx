@@ -12,9 +12,9 @@ export const LandingMarquee: React.FC = () => {
   ];
 
   return (
-    <div className="py-12 bg-white border-y border-outline overflow-hidden">
-      <div className="container mx-auto px-6 mb-8">
-        <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+    <div className="py-10 md:py-12 bg-surface border-y border-outline overflow-hidden">
+      <div className="container mx-auto px-5 sm:px-6 mb-6 md:mb-8">
+        <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">
           Trusted by Nigeria's leading institutions
         </p>
       </div>
@@ -25,7 +25,7 @@ export const LandingMarquee: React.FC = () => {
           className="flex whitespace-nowrap gap-20 items-center pr-20"
         >
           {[...logos, ...logos].map((logo, i) => (
-            <span key={i} className="font-display text-2xl md:text-3xl text-slate-200 grayscale hover:grayscale-0 transition-all cursor-default">
+            <span key={i} className="font-display text-2xl md:text-3xl text-slate-600 dark:text-slate-300 grayscale hover:grayscale-0 hover:text-on-surface transition-all cursor-default">
               {logo}
             </span>
           ))}

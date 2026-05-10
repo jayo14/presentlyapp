@@ -15,8 +15,11 @@
   :root {
     --background: #FFFFFF;
     --surface: #F9F7F3;
+    --surface-container: #F3F0EA;
+    --surface-variant: #EAF0F7;
     --primary: #F5C518;
     --on-primary: #0D0D0D;
+    --on-primary-fixed: #0D0D0D;
     --on-surface: #0D0D0D;
     --on-surface-variant: #64748B;
     --outline: #E2E8F0;
@@ -32,8 +35,11 @@
   .dark {
     --background: #0D0D0D;
     --surface: #141414;
+    --surface-container: #1A1A1A;
+    --surface-variant: #242424;
     --primary: #F5C518;
     --on-primary: #0D0D0D;
+    --on-primary-fixed: #0D0D0D;
     --on-surface: #FFFFFF;
     --on-surface-variant: #94A3B8;
     --outline: #2A2A2A;

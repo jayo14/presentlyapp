@@ -27,8 +27,8 @@ export const Button = ({
   const variants = {
     primary: "bg-sungold text-presently-black shadow-gold hover:-translate-y-0.5 hover:shadow-lg",
     secondary: "bg-presently-black text-white hover:-translate-y-0.5 hover:shadow-md",
-    outline: "bg-transparent border border-presently-black text-presently-black hover:bg-presently-black/5",
-    ghost: "bg-transparent text-presently-black hover:underline",
+    outline: "bg-transparent border border-presently-black text-presently-black hover:bg-presently-black/5 dark:border-outline dark:text-white dark:hover:bg-white/10",
+    ghost: "bg-transparent text-presently-black hover:underline dark:text-white",
     error: "bg-soft-coral text-white shadow-md",
     destructive: "bg-soft-coral text-white shadow-md"
   };

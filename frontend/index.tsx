@@ -10,12 +10,16 @@ import { Provider } from '@/components/ui/provider';
 import { getFirebaseAnalytics, isFirebaseConfigured } from './services/firebase/config';
 
 // SEO: Initialize theme class before first render without blocking head scripts.
+const THEME_STORAGE_KEY = 'presently-theme';
+
 const initializeTheme = () => {
-  const savedTheme = localStorage.getItem('vite-ui-theme');
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as 'light' | 'dark' | 'system' | null;
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    document.documentElement.classList.add('dark');
-  }
+  const resolvedTheme = savedTheme === 'system' || !savedTheme
+    ? (prefersDark ? 'dark' : 'light')
+    : savedTheme;
+  document.documentElement.classList.remove('light', 'dark');
+  document.documentElement.classList.add(resolvedTheme);
 };
 
 

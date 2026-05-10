@@ -14,16 +14,16 @@ export const LandingMobileApp: React.FC = () => {
   const y4 = useTransform(scrollYProgress, [0, 1], [0, -220]);
 
   return (
-    <section ref={containerRef} className="py-32 bg-warm-ivory overflow-hidden">
-      <div className="container mx-auto px-6 mb-20 text-center">
-        <h2 className="font-display text-4xl md:text-5xl text-presently-black mb-6">
+    <section ref={containerRef} className="py-20 md:py-28 bg-warm-ivory dark:bg-[#191612] overflow-hidden">
+      <div className="container mx-auto px-5 sm:px-6 mb-14 md:mb-20 text-center">
+        <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-on-surface mb-6">
           Beautiful on every screen.<br />Effortless in every pocket.
         </h2>
       </div>
 
-      <div className="flex justify-center gap-4 md:gap-8 px-6 lg:px-0">
+      <div className="flex gap-4 md:gap-8 px-5 sm:px-6 lg:px-0 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:justify-center pb-4">
         {/* Screen 1: Onboarding */}
-        <motion.div style={{ y: y1 }} className="w-48 md:w-64 h-[400px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-lg flex-shrink-0 overflow-hidden">
+        <motion.div style={{ y: y1 }} className="w-44 sm:w-52 md:w-64 h-[360px] sm:h-[420px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-lg flex-shrink-0 overflow-hidden snap-center">
           <div className="p-6 h-full flex flex-col justify-end bg-sungold/5">
              <div className="w-10 h-10 bg-sungold rounded-xl mb-4" />
              <div className="w-full h-4 bg-sungold/20 rounded-full mb-2" />
@@ -36,7 +36,7 @@ export const LandingMobileApp: React.FC = () => {
         </motion.div>
 
         {/* Screen 2: Student Dashboard */}
-        <motion.div style={{ y: y2 }} className="w-48 md:w-64 h-[400px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-xl flex-shrink-0 overflow-hidden">
+        <motion.div style={{ y: y2 }} className="w-44 sm:w-52 md:w-64 h-[360px] sm:h-[420px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-xl flex-shrink-0 overflow-hidden snap-center">
           <div className="p-6 h-full bg-[#141414] text-white">
              <div className="flex justify-between items-center mb-8">
                <div className="w-8 h-8 rounded-full bg-sungold" />
@@ -53,7 +53,7 @@ export const LandingMobileApp: React.FC = () => {
         </motion.div>
 
         {/* Screen 3: Live Check-in */}
-        <motion.div style={{ y: y3 }} className="w-48 md:w-64 h-[400px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-2xl flex-shrink-0 overflow-hidden">
+        <motion.div style={{ y: y3 }} className="w-44 sm:w-52 md:w-64 h-[360px] sm:h-[420px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-2xl flex-shrink-0 overflow-hidden snap-center">
           <div className="h-full bg-slate-800 relative flex flex-col items-center justify-center">
              <div className="absolute inset-0 opacity-40">
                <div className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-sungold/40 via-transparent to-transparent" />
@@ -70,7 +70,7 @@ export const LandingMobileApp: React.FC = () => {
         </motion.div>
 
         {/* Screen 4: History */}
-        <motion.div style={{ y: y4 }} className="w-48 md:w-64 h-[400px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-lg flex-shrink-0 overflow-hidden">
+        <motion.div style={{ y: y4 }} className="w-44 sm:w-52 md:w-64 h-[360px] sm:h-[420px] md:h-[500px] bg-presently-black rounded-[40px] border-4 border-[#2A2A2A] shadow-lg flex-shrink-0 overflow-hidden snap-center">
           <div className="p-6 h-full bg-white">
              <div className="w-full h-8 bg-slate-100 rounded-full mb-8" />
              <div className="grid grid-cols-7 gap-2 mb-8">
