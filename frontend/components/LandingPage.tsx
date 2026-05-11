@@ -13,6 +13,8 @@ import {
   Building,
   Plus,
   Minus,
+  List,
+  X,
 } from '@phosphor-icons/react';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -30,6 +32,7 @@ const IconWrapper = ({ children, size = 24 }) => (
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -75,13 +78,49 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="flex items-center gap-8">
+        <div className="hidden sm:flex items-center gap-8">
           <a href="/login" className="hidden sm:block font-bold text-sm text-on-surface hover:text-primary transition-colors py-2 px-4 leading-relaxed">
             Log In
           </a>
           <a href="/register" className="bg-primary text-on-primary-fixed px-7 py-3 rounded-full hover:shadow-[0_10px_30px_rgba(245,197,24,0.18)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
             Join <ArrowUpRight size={24} weight="duotone" />
           </a>
+        </div>
+
+        <div className="sm:hidden flex items-center">
+          <button onClick={() => setMobileOpen((s) => !s)} aria-label={mobileOpen ? "Close menu" : "Open menu"} className="p-2 rounded-md bg-transparent hover:bg-surface-container/50">
+            {mobileOpen ? <X size={24} weight="duotone" className="text-on-surface" /> : <List size={24} weight="duotone" className="text-on-surface" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile dropdown panel directly under header */}
+      <div className="absolute left-0 right-0 top-full flex justify-center pointer-events-none">
+        <div className={`w-[85%] md:w-[75%] mt-2 pointer-events-auto md:hidden transition-all duration-200 ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+          <div className="bg-surface border border-outline rounded-2xl shadow-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
+                  <div className="w-2.5 h-2.5 bg-black rounded-full" />
+                </div>
+                <span className="font-bold text-on-surface">Presently</span>
+              </div>
+              <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="p-2 rounded-md hover:bg-surface-container/50">
+                <X size={18} />
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-2 mb-4">
+              <a href="#" className="py-2 text-on-surface hover:text-primary">How it Works</a>
+              <a href="#" className="py-2 text-on-surface hover:text-primary">Pricing</a>
+              <a href="#" className="py-2 text-on-surface hover:text-primary">Blog</a>
+            </nav>
+
+            <div className="flex flex-col gap-3">
+              <a href="/login" className="w-full text-center py-3 rounded-md border border-outline text-on-surface">Log in</a>
+              <a href="/register" className="w-full text-center py-3 rounded-md bg-primary text-on-primary-fixed">Join</a>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
@@ -110,10 +149,13 @@ const StatCounter = ({ value, label }) => {
     }
   }, [isInView, value]);
 
+  // preserve suffix characters like + or % from the original value
+  const suffix = (value.match(/[^0-9.,-]+/g) || []).join('');
+
   return (
     <div ref={ref} className="text-center py-12 md:py-0 px-8">
-      <div className="text-5xl md:text-7xl  text-[#F5C518] tracking-tighter mb-6">{count}{value.includes('%') ? '' : (value.includes('+') ? '+' : '')}</div>
-      <div className="text-slate-400 font-medium text-base uppercase tracking-widest leading-relaxed">{label}</div>
+      <div className="text-5xl md:text-7xl text-primary font-extrabold tracking-tighter mb-6">{count}{suffix}</div>
+      <div className="text-textMuted font-semibold text-base uppercase tracking-widest leading-relaxed">{label}</div>
     </div>
   );
 };
@@ -522,7 +564,7 @@ export default function App() {
       
       <section className="bg-surface py-56 px-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 border-y border-white/5 py-20">
-          <StatCounter value="200+" label="Students Enrolled" />
+          <StatCounter value="200++" label="Students Enrolled" />
           <StatCounter value="94.7%" label="Avg Attendance Rate" />
           <StatCounter value="3" label="Sec Check-in Time" />
           <StatCounter value="1" label="University & Growing" />

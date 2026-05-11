@@ -90,22 +90,22 @@ export const Login: React.FC = () => {
 
   if (isRedirecting || (user && isLoading)) {
     return (
-      <div className="min-h-screen bg-presently-black flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
         <Logo variant="dark" className="mb-8 scale-125" />
-        <Loader2 className="w-8 h-8 text-sungold animate-spin" />
-        <p className="mt-4 text-slate-400 font-display">Redirecting to dashboard...</p>
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <p className="mt-4 text-textMuted font-display">Redirecting to dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-warm-ivory flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
       <SEO title="Login | Presently" description="Sign in to your Presently account." />
 
       <div className="absolute top-8 left-8 z-20">
         <button
           onClick={() => navigate('/')}
-          className="p-3 text-presently-black hover:bg-black/5 rounded-full transition-all"
+          className="p-3 text-on-surface hover:bg-surface-container/40 rounded-full transition-all"
         >
           <ArrowLeft size={24} />
         </button>
@@ -114,11 +114,11 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-10">
           <Logo className="justify-center mb-8" />
-          <h2 className="font-display text-4xl font-bold text-presently-black mb-2">Welcome Back</h2>
-          <p className="text-on-surface-variant">Enter your credentials to continue.</p>
+          <h2 className="font-display text-4xl font-bold text-on-surface mb-2">Welcome Back</h2>
+          <p className="text-textMuted">Enter your credentials to continue.</p>
         </div>
 
-        <div className="bg-white p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
+        <div className="bg-surface p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
               label="Email Address"
@@ -148,13 +148,13 @@ export const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-[52px] pl-12 pr-12 bg-white border-1.5 border-[#CBD5E1] focus:border-sungold focus:ring-3 focus:ring-sungold/15 rounded-md outline-none transition-all"
+                  className="w-full h-[52px] pl-12 pr-12 bg-surface-container border border-outline placeholder:text-textMuted text-on-surface focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-md outline-none transition-all"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={20} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-sungold"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -169,11 +169,11 @@ export const Login: React.FC = () => {
                 >
                   <div className={cn(
                     "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                    rememberMe ? "bg-sungold border-sungold" : "border-[#CBD5E1] group-hover:border-sungold"
+                    rememberMe ? "bg-primary border-primary" : "border-outline group-hover:border-primary"
                   )}>
-                    {rememberMe && <CheckCircle2 size={12} className="text-presently-black" />}
+                    {rememberMe && <CheckCircle2 size={12} className="text-on-primary-fixed" />}
                   </div>
-                  <span className="text-sm font-semibold text-on-surface-variant">Remember me</span>
+                  <span className="text-sm font-semibold text-textMuted">Remember me</span>
                </button>
             </div>
 
@@ -196,7 +196,7 @@ export const Login: React.FC = () => {
           <div className="grid grid-cols-2 gap-4">
              <button
                onClick={handleGoogleLogin}
-               className="h-14 flex items-center justify-center rounded-xl border border-outline hover:bg-slate-50 transition-all"
+               className="h-14 flex items-center justify-center rounded-xl border border-outline hover:bg-surface-container transition-all bg-surface-container"
              >
                <svg width="20" height="20" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -206,7 +206,7 @@ export const Login: React.FC = () => {
               </svg>
              </button>
              <button
-               className="h-14 flex items-center justify-center rounded-xl border border-outline hover:bg-slate-50 transition-all"
+               className="h-14 flex items-center justify-center rounded-xl border border-outline hover:bg-surface-container transition-all bg-surface-container"
              >
                 <svg width="20" height="20" viewBox="0 0 24 24" className="fill-presently-black">
                 <path d="M17.05 20.28c-.96.95-2.45 2.1-4.05 2.1-1.45 0-2.1-.8-3.65-.8-1.55 0-2.3.75-3.6.8-1.5.05-3.1-1.25-4.15-2.85-1.95-3.15-1.5-8.25.95-11.5 1.25-1.6 2.85-2.6 4.6-2.6 1.45 0 2.3.85 3.55.85s2.1-.9 3.8-.85c1.45.05 2.75.65 3.65 1.7-3.05 1.8-2.55 6 .65 7.4-.7 1.7-1.6 3.4-2.75 4.85zM12.03 5.48c-.05-1.85 1.55-3.65 3.35-3.7.25 1.95-1.7 3.8-3.35 3.7z" />
@@ -215,11 +215,11 @@ export const Login: React.FC = () => {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-sm text-on-surface-variant">
+        <p className="mt-8 text-center text-sm text-textMuted">
           Don't have an account?{' '}
           <button
             onClick={() => navigate('/register')}
-            className="text-sungold font-bold hover:underline"
+            className="text-primary font-bold hover:underline"
           >
             Create one for free
           </button>

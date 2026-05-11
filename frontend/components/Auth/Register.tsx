@@ -56,13 +56,13 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-warm-ivory flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
       <SEO title="Join Presently" description="Create your Presently account." />
 
       <div className="absolute top-8 left-8 z-20">
         <button
           onClick={() => navigate('/')}
-          className="p-3 text-presently-black hover:bg-black/5 rounded-full transition-all"
+          className="p-3 text-on-surface hover:bg-surface-container/40 rounded-full transition-all"
         >
           <ArrowLeft size={24} />
         </button>
@@ -71,11 +71,11 @@ export const Register: React.FC = () => {
       <div className="w-full max-w-md relative z-10 py-12">
         <div className="text-center mb-10">
           <Logo className="justify-center mb-8" />
-          <h2 className="font-display text-4xl font-bold text-presently-black mb-2">Create Account</h2>
-          <p className="text-on-surface-variant">Join Nigeria's most trusted academic platform.</p>
+          <h2 className="font-display text-4xl font-bold text-on-surface mb-2">Create Account</h2>
+          <p className="text-textMuted">Join Nigeria's most trusted academic platform.</p>
         </div>
 
-        <div className="bg-white p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
+        <div className="bg-surface p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
               label="Full Name"
@@ -106,13 +106,13 @@ export const Register: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-[52px] pl-12 pr-12 bg-white border-1.5 border-[#CBD5E1] focus:border-sungold focus:ring-3 focus:ring-sungold/15 rounded-md outline-none transition-all"
+                  className="w-full h-[52px] pl-12 pr-12 bg-surface-container border border-outline placeholder:text-textMuted text-on-surface focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-md outline-none transition-all"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={20} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-sungold"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -137,9 +137,9 @@ export const Register: React.FC = () => {
                 >
                   <div className={cn(
                     "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
-                    agreeTerms ? "bg-sungold border-sungold" : "border-[#CBD5E1] group-hover:border-sungold"
+                    agreeTerms ? "bg-primary border-primary" : "border-outline group-hover:border-primary"
                   )}>
-                    {agreeTerms && <CheckCircle2 size={12} className="text-presently-black" />}
+                    {agreeTerms && <CheckCircle2 size={12} className="text-on-primary-fixed" />}
                   </div>
                </button>
                <span className="text-xs font-medium text-on-surface-variant leading-relaxed">
@@ -158,11 +158,11 @@ export const Register: React.FC = () => {
           </form>
         </div>
 
-        <p className="mt-8 text-center text-sm text-on-surface-variant">
+        <p className="mt-8 text-center text-sm text-textMuted">
           Already have an account?{' '}
           <button
             onClick={() => navigate('/login')}
-            className="text-sungold font-bold hover:underline"
+            className="text-primary font-bold hover:underline"
           >
             Sign in here
           </button>
