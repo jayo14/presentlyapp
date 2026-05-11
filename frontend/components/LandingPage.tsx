@@ -10,7 +10,7 @@ import {
   WifiSlash,
   User,
   ChalkboardSimple,
-  Buildings,
+  Building,
   Plus,
   Minus,
 } from '@phosphor-icons/react';
@@ -54,7 +54,7 @@ const Navbar = () => {
           <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center transition-transform group-hover:rotate-12">
             <div className="w-4 h-4 bg-[#F5C518] rounded-full" />
           </div>
-          <span className="text-xl font-black tracking-tight text-white">
+          <span className="text-xl  tracking-tight text-white">
             Presently
           </span>
         </div>
@@ -75,9 +75,9 @@ const Navbar = () => {
           <button className="hidden sm:block font-bold text-sm text-white hover:text-[#F5C518] transition-colors py-2 px-4 leading-relaxed">
             Log In
           </button>
-          <button className="bg-[#F5C518] text-black px-7 py-3 rounded-full font-black hover:shadow-[0_0_25px_rgba(245,197,24,0.4)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed">
+          <a href="/signup" className="bg-[#F5C518] text-black px-7 py-3 rounded-full  hover:shadow-[0_0_25px_rgba(245,197,24,0.4)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
             Join <ArrowUpRight size={24} weight="duotone" />
-          </button>
+          </a>
         </div>
       </div>
     </nav>
@@ -108,7 +108,7 @@ const StatCounter = ({ value, label }) => {
 
   return (
     <div ref={ref} className="text-center py-12 md:py-0 px-8">
-      <div className="text-5xl md:text-7xl font-black text-[#F5C518] tracking-tighter mb-6">{count}{value.includes('%') ? '' : (value.includes('+') ? '+' : '')}</div>
+      <div className="text-5xl md:text-7xl  text-[#F5C518] tracking-tighter mb-6">{count}{value.includes('%') ? '' : (value.includes('+') ? '+' : '')}</div>
       <div className="text-slate-400 font-medium text-base uppercase tracking-widest leading-relaxed">{label}</div>
     </div>
   );
@@ -154,23 +154,23 @@ const Hero = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-[#0D0D0D] pt-56 pb-40 px-16 overflow-hidden">
+    <section ref={containerRef} className="relative min-h-screen bg-[#0D0D0D] pt-56 pb-40 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#F5C518]/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-center relative">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-center relative w-[85%]">
         <div>
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-3 mb-10"
           >
-            <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase leading-relaxed">◆ GPS-Verified Attendance</span>
+            <span className="text-[#F5C518] text-xs tracking-[0.3em] uppercase leading-relaxed">◆ GPS-Verified Attendance</span>
           </motion.div>
 
           <motion.h1 
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-display text-6xl md:text-8xl font-black text-white leading-[1.1] tracking-tighter mb-12"
+            className="font-display text-6xl md:text-8xl text-white leading-[1.1] tracking-tighter mb-12"
           >
             Attendance<br />
             that actually<br />
@@ -195,53 +195,54 @@ const Hero = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center gap-8"
           >
-            <button className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed">
+            <a href="/signup" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex">
               Start for free <CaretRight size={24} weight="duotone" />
-            </button>
-            <button className="group flex items-center gap-4 font-bold text-white text-lg">
+            </a>
+            <a href="/how-it-works" className="group flex items-center gap-4 font-bold text-white text-lg inline-flex">
               <div className="w-14 h-14 rounded-full border-2 border-white/20 flex items-center justify-center group-hover:border-[#F5C518] transition-colors">
                 <Play size={32} weight="duotone" className="ml-0.5" />
               </div>
               <span className="border-b-2 border-white/10 group-hover:border-[#F5C518] transition-colors pb-2">Watch how it works</span>
-            </button>
+            </a>
           </motion.div>
         </div>
 
-        <div className="relative h-[600px] hidden lg:block">
-          <motion.div style={{ y: y1 }} className="absolute z-10 -left-10 top-20 w-56 p-3 bg-white rounded-[40px] shadow-2xl rotate-[-6deg]">
-             <div className="bg-gray-100 h-96 rounded-[32px] overflow-hidden p-8">
-                <div className="w-8 h-8 bg-[#F5C518] rounded-lg mb-6" />
-                <div className="h-4 w-24 bg-gray-300 rounded-full mb-10" />
-                <div className="space-y-5">
-                <div className="h-14 w-full bg-white rounded-xl shadow-sm" />
-                  <div className="h-14 w-full bg-white rounded-xl shadow-sm" />
-                </div>
+          <div className="relative h-[760px] hidden lg:block">
+           <motion.div style={{ y: y1 }} className="absolute z-10 -left-6 top-28 w-72 p-4 bg-white rounded-[40px] shadow-2xl rotate-[-6deg]">
+             <div className="bg-gray-100 h-[540px] rounded-[32px] overflow-hidden p-8">
+               <div className="w-10 h-10 bg-[#F5C518] rounded-lg mb-6" />
+               <div className="h-4 w-28 bg-gray-300 rounded-full mb-12" />
+               <div className="space-y-6">
+                <div className="h-16 w-full bg-white rounded-xl shadow-sm" />
+                <div className="h-16 w-full bg-white rounded-xl shadow-sm" />
+                <div className="h-16 w-full bg-white rounded-xl shadow-sm" />
+               </div>
              </div>
-          </motion.div>
+           </motion.div>
 
-          <motion.div style={{ y: y2 }} className="absolute z-20 left-20 top-0 w-64 p-3 bg-white rounded-[40px] shadow-2xl">
-             <div className="bg-[#0D0D0D] h-[500px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-12 text-center">
-                <div className="w-24 h-24 bg-[#F5C518]/20 rounded-full flex items-center justify-center mb-8 relative">
-                  <div className="absolute inset-0 bg-[#F5C518] rounded-full animate-ping opacity-20" />
-                  <MapPin size={56} weight="duotone" className="text-[#F5C518]" />
-                </div>
-                <h4 className="text-white font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
-                <p className="text-white/40 text-base leading-relaxed">Verifying location at Campus Library</p>
+           <motion.div style={{ y: y2 }} className="absolute z-20 left-28 top-6 w-80 p-4 bg-white rounded-[40px] shadow-2xl">
+             <div className="bg-[#0D0D0D] h-[620px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-16 text-center">
+               <div className="w-28 h-28 bg-[#F5C518]/20 rounded-full flex items-center justify-center mb-8 relative">
+                <div className="absolute inset-0 bg-[#F5C518] rounded-full animate-ping opacity-20" />
+                <MapPin size={64} weight="duotone" className="text-[#F5C518]" />
+               </div>
+               <h4 className="text-white font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
+               <p className="text-white/40 text-base leading-relaxed">Verifying location at Campus Library</p>
              </div>
-          </motion.div>
+           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-0 bottom-20 bg-[#F5C518] p-8 rounded-[32px] shadow-2xl text-black">
+           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-8 bottom-12 bg-[#F5C518] p-10 rounded-[36px] shadow-2xl text-black">
              <div className="flex items-center gap-6">
-                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white">
-                  <CheckCircle size={40} weight="duotone" />
-                </div>
-                <div>
-                  <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-1 leading-relaxed">Verified</p>
-                  <p className="font-bold text-lg leading-tight">You're Present ✓</p>
-                </div>
+               <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center text-white">
+                <CheckCircle size={48} weight="duotone" />
+               </div>
+               <div>
+                <p className="text-xs  uppercase tracking-widest opacity-60 mb-1 leading-relaxed">Verified</p>
+                <p className="font-bold text-lg leading-tight">You're Present ✓</p>
+               </div>
              </div>
-          </motion.div>
-        </div>
+           </motion.div>
+          </div>
       </div>
     </section>
   );
@@ -273,11 +274,11 @@ const SocialMarquee = () => (
 
 const FeaturesBento = () => {
   return (
-    <section className="py-64 px-16 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-64 bg-white">
+      <div className="max-w-7xl mx-auto w-[85%]">
         <div className="text-center mb-40">
-          <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block">What's Under the Hood</span>
-          <h2 className="font-display text-5xl md:text-7xl font-black tracking-tighter text-black leading-tight">Powerful features.<br/>Quietly in the background.</h2>
+          <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block">What's Under the Hood</span>
+          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-black leading-tight">Powerful features.<br/>Quietly in the background.</h2>
         </div>
 
         <div className="grid grid-cols-12 gap-8 auto-rows-[280px]">
@@ -365,7 +366,7 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: color }}>
               <Icon size={48} className="text-black" />
             </div>
-            <h3 className="font-display text-4xl font-black text-white mb-6 tracking-tighter leading-tight">{title}</h3>
+            <h3 className="font-display text-4xl  text-white mb-6 tracking-tighter leading-tight">{title}</h3>
             <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-sm">{description}</p>
             
             <div className="grid grid-cols-2 gap-y-8 gap-x-6">
@@ -376,9 +377,9 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
               ))}
             </div>
           </div>
-          <button className="mt-16 group/btn flex items-center gap-2 text-white font-bold text-sm tracking-widest uppercase leading-relaxed">
+          <a href="/features" className="mt-16 group/btn inline-flex items-center gap-2 text-white font-bold text-sm tracking-widest uppercase leading-relaxed">
             Learn More <ArrowUpRight size={18} weight="duotone" style={{ color }} />
-          </button>
+          </a>
         </div>
         <div className="relative h-full flex items-center justify-center min-h-[380px] pl-8">
           {children}
@@ -390,119 +391,121 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
 
 const RoleBasedSection = () => {
   return (
-  <section className="py-64 px-16 bg-[#0D0D0D]">
-      <div className="max-w-7xl mx-auto">
+  <section className="py-64 bg-[#0D0D0D]">
+      <div className="max-w-7xl mx-auto w-[85%]">
         <div className="mb-36">
-          <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block leading-relaxed">Built for everyone in the room</span>
-          <h2 className="font-display text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">Whoever you are,<br/>Presently works for you.</h2>
+          <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block leading-relaxed">Built for everyone in the room</span>
+          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-white leading-tight">Whoever you are,<br/>Presently works for you.</h2>
         </div>
 
-        <div className="flex flex-col gap-14">
-          {/* Card 1: Students - Large Horizontal */}
-          <FeatureCard 
-            title="Focus on Learning."
-            description="Attendance shouldn't be a distraction. We've made it as natural as walking into the classroom."
-            icon={User}
-            color="#F5C518"
-            features={['One-tap Verification', 'Attendance Tracker', 'Missed Class Alerts', 'Academic Calendar']}
-              className="lg:col-span-12 min-h-[500px]"
-          >
-            <div className="w-full h-full flex items-center justify-center py-8">
-              <div className="relative w-64 h-[500px] bg-white rounded-[40px] shadow-2xl p-5 overflow-hidden border-8 border-black">
-                <div className="bg-gray-100 h-full rounded-[30px] p-6 flex flex-col">
-                  <div className="flex justify-between items-center mb-12">
-                    <div className="w-10 h-10 rounded-full bg-[#F5C518]" />
-                    <div className="w-12 h-1.5 bg-black/10 rounded-full" />
-                  </div>
-                  <div className="mb-12">
-                    <p className="text-[11px] font-black uppercase text-black/30 tracking-widest mb-2 leading-relaxed">Weekly Average</p>
-                    <p className="text-5xl font-black text-black tracking-tighter leading-tight">92.4%</p>
-                  </div>
-                  <div className="space-y-5">
-                    {[1,2,3].map(i => (
-                      <div key={i} className="flex items-center gap-4 bg-white p-5 rounded-xl shadow-sm">
-                        <div className="w-10 h-10 bg-gray-50 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-2 w-20 bg-gray-200 rounded-full" />
-                          <div className="h-1.5 w-12 bg-gray-100 rounded-full" />
-                        </div>
-                        <CheckCircle size={24} weight="duotone" className="text-[#F5C518]" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-auto bg-black text-[#F5C518] py-4 rounded-full text-center text-[11px] font-black tracking-widest leading-relaxed">
-                    SESSION ACTIVE
-                  </div>
+         <div className="max-w-7xl mx-auto flex flex-col gap-20"> 
+        
+        {/* Card 1: Students - Large Horizontal */}
+        <FeatureCard 
+          title="Focus on Learning."
+          description="Attendance shouldn't be a distraction. We've made it as natural as walking into the classroom."
+          icon={User}
+          color="#F5C518"
+          features={['One-tap Verification', 'Attendance Tracker', 'Missed Class Alerts', 'Academic Calendar']}
+          className="lg:col-span-12 min-h-[600px]"
+        >
+          <div className="w-full h-full flex items-center justify-center py-10">
+            <div className="relative w-72 h-[520px] bg-white rounded-[48px] shadow-2xl p-6 overflow-hidden border-[10px] border-black transition-transform duration-700 group-hover:-rotate-2">
+              <div className="bg-gray-100 h-full rounded-[38px] p-8 flex flex-col">
+                <div className="flex justify-between items-center mb-14">
+                  <div className="w-12 h-12 rounded-full bg-[#F5C518] shadow-inner" />
+                  <div className="w-16 h-2 bg-black/10 rounded-full" />
                 </div>
+                <div className="mb-14">
+                  <p className="text-[12px] uppercase text-black/40 font-bold tracking-[0.2em] mb-3">Weekly Average</p>
+                  <p className="text-6xl text-black font-bold tracking-tighter">92.4%</p>
+                </div>
+                <div className="space-y-6"> 
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center gap-5 bg-white p-5 rounded-2xl shadow-sm">
+                      <div className="w-12 h-12 bg-gray-50 rounded-xl" />
+                      <div className="flex-1 space-y-3">
+                        <div className="h-2.5 w-24 bg-gray-200 rounded-full" />
+                        <div className="h-2 w-14 bg-gray-100 rounded-full" />
+                      </div>
+                      <CheckCircle size={28} className="text-[#F5C518]" />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-auto bg-black text-[#F5C518] py-5 rounded-full text-center text-[12px] font-bold tracking-widest">
+                  SESSION ACTIVE
+                </div>
+              </div>
+            </div>
+          </div>
+        </FeatureCard>
+
+        <div className="grid md:grid-cols-2 gap-16"> 
+          {/* Card 2: Lecturers */}
+          <FeatureCard 
+            title="Teach. Track. Done."
+            description="No more manual registers. Open a session and let Presently handle the rest while you focus on delivery."
+            icon={ChalkboardSimple}
+            color="#38BDF8"
+            features={['Live Feed', 'Instant Export', 'Auto-Grades', 'Class Analytics']}
+          >
+            <div className="bg-[#1a1a1a] p-10 rounded-[2.5rem] border border-white/10 w-full max-w-sm rotate-3 group-hover:rotate-0 transition-all duration-700 shadow-2xl">
+              <div className="flex items-center justify-between mb-12">
+                 <div className="h-3 w-32 bg-sky-400/20 rounded-full" />
+                 <div className="h-5 w-5 bg-sky-400 rounded-full animate-pulse shadow-[0_0_15px_rgba(56,189,248,0.5)]" />
+              </div>
+              <div className="space-y-8"> 
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-6 border-b border-white/10 pb-6 last:border-0 last:pb-0">
+                    <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10" />
+                    <div className="h-2 flex-1 bg-white/10 rounded-full" />
+                    <div className="w-3 h-3 rounded-full bg-sky-400" />
+                  </div>
+                ))}
               </div>
             </div>
           </FeatureCard>
 
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Card 2: Lecturers */}
-            <FeatureCard 
-              title="Teach. Track. Done."
-              description="No more manual registers. Open a session and let Presently handle the rest while you focus on delivery."
-              icon={ChalkboardSimple}
-              color="#38BDF8"
-              features={['Live Feed', 'Instant Export', 'Auto-Grades', 'Class Analytics']}
-            >
-              <div className="bg-[#1a1a1a] p-8 rounded-3xl border border-white/5 w-full max-w-sm rotate-3 group-hover:rotate-0 transition-transform duration-700 shadow-2xl">
-                <div className="flex items-center justify-between mb-10">
-                   <div className="h-2.5 w-24 bg-sky-400/20 rounded-full" />
-                   <div className="h-4 w-4 bg-sky-400 rounded-full animate-pulse" />
-                </div>
-                <div className="space-y-5">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-4 border-b border-white/5 pb-4">
-                      <div className="w-8 h-8 rounded-full bg-white/5" />
-                      <div className="h-1.5 flex-1 bg-white/10 rounded-full" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-sky-400" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </FeatureCard>
-
-            {/* Card 3: Admins */}
-            <FeatureCard 
-              title="Campus Insights."
-              description="A bird's eye view of your entire institution. Monitor compliance and trends in real-time."
-              icon={Buildings}
-              color="#34D399"
-              features={['Faculty View', 'Trend Reports', 'Data Security', 'Global Search']}
-            >
-              <div className="flex gap-2 items-end h-32 w-full max-w-xs">
-                {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
-                  <motion.div 
-                    key={i} 
-                    initial={{ height: 0 }}
-                    whileInView={{ height: `${h}%` }}
-                    className="flex-1 bg-emerald-400/20 rounded-t-lg relative border-t-2 border-emerald-400"
-                  />
-                ))}
-              </div>
-            </FeatureCard>
-          </div>
+          {/* Card 3: Admins */}
+          <FeatureCard 
+            title="Campus Insights."
+            description="A bird's eye view of your entire institution. Monitor compliance and trends in real-time."
+            icon={Building}
+            color="#34D399"
+            features={['Faculty View', 'Trend Reports', 'Data Security', 'Global Search']}
+          >
+            <div className="flex gap-4 items-end h-48 w-full max-w-xs px-4"> 
+              {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
+                <motion.div 
+                  key={i} 
+                  initial={{ height: 0 }}
+                  whileInView={{ height: `${h}%` }}
+                  transition={{ delay: i * 0.05, duration: 0.8, ease: "easeOut" }}
+                  className="flex-1 bg-emerald-400/20 rounded-t-xl relative border-t-[3px] border-emerald-400 hover:bg-emerald-400/40 transition-colors"
+                />
+              ))}
+            </div>
+          </FeatureCard>
         </div>
+      </div>
       </div>
     </section>
   );
 };
 
 const CTASection = () => (
-      <section className="py-64 px-16 bg-[#0D0D0D] text-center relative overflow-hidden">
+      <section className="py-64 px-24 bg-[#0D0D0D] text-center relative overflow-hidden">
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F5C518]/10 blur-[150px] rounded-full pointer-events-none" />
     <div className="max-w-4xl mx-auto relative z-10">
-      <h2 className="font-display text-6xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
+      <h2 className="font-display text-6xl md:text-8xl  text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
       <p className="text-slate-400 text-2xl mb-20 max-w-xl mx-auto leading-relaxed">Join institutions already running smarter with Presently. Setup takes less than 5 minutes.</p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-10 mb-24">
-        <button className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed">
+        <a href="/signup" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex justify-center">
           Get started for free →
-        </button>
-        <button className="w-full sm:w-auto px-14 py-7 rounded-full font-bold text-xl border-2 border-white/20 text-white hover:bg-white/5 transition-all leading-relaxed">
+        </a>
+        <a href="/demo" className="w-full sm:w-auto px-14 py-7 rounded-full font-bold text-xl border-2 border-white/20 text-white hover:bg-white/5 transition-all leading-relaxed inline-flex justify-center">
           Request a school demo
-        </button>
+        </a>
       </div>
     </div>
   </section>
@@ -510,7 +513,7 @@ const CTASection = () => (
 
 const Footer = () => (
     <footer className="bg-[#141414] pt-40 pb-20 px-8 text-slate-400">
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
+    <div className="max-w-7xl mx-auto w-[85%] grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
       <div className="col-span-1 md:col-span-1">
         <div className="flex items-center gap-3 mb-10">
           <div className="w-8 h-8 bg-[#F5C518] rounded flex items-center justify-center">
@@ -549,7 +552,7 @@ const Footer = () => (
         </ul>
       </div>
     </div>
-    <div className="max-w-7xl mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase font-black leading-relaxed">
+    <div className="max-w-7xl mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase  leading-relaxed">
       <p>© 2025 PREVENTLY. <span className="text-[#F5C518]">GPS-VERIFIED ATTENDANCE.</span></p>
       <p>MADE WITH CARE IN LAGOS, NIGERIA.</p>
     </div>
@@ -571,7 +574,7 @@ export default function App() {
       <Hero />
       <SocialMarquee />
       
-      <section className="bg-[#0D0D0D] py-56 px-16">
+      <section className="bg-[#0D0D0D] py-56 px-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 border-y border-white/5 py-20">
           <StatCounter value="200+" label="Students Enrolled" />
           <StatCounter value="94.7%" label="Avg Attendance Rate" />
@@ -579,7 +582,7 @@ export default function App() {
           <StatCounter value="1" label="University & Growing" />
         </div>
         <div className="max-w-4xl mx-auto text-center mt-40">
-           <p className="font-display text-4xl md:text-6xl font-black text-white italic tracking-tighter leading-relaxed mb-8">
+           <p className="font-display text-4xl md:text-6xl  text-white italic tracking-tighter leading-relaxed mb-8">
              "Presently didn't just fix attendance tracking. It changed how we think about student accountability."
            </p>
            <p className="mt-12 text-slate-500 font-bold uppercase tracking-widest text-base leading-relaxed">— Dr. Adeyemi, Dean of Student Affairs</p>
@@ -592,8 +595,8 @@ export default function App() {
       {/* Mobile App Arc Showcase */}
       <section ref={showcaseRef} className="py-56 px-12 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto text-center mb-40">
-          <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block">Mobile Experience</span>
-          <h2 className="font-display text-5xl md:text-7xl font-black tracking-tighter text-black leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
+          <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block">Mobile Experience</span>
+          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-black leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
         </div>
         
         <div className="relative flex items-center justify-center h-[700px]">
@@ -619,11 +622,11 @@ export default function App() {
         </div>
       </section>
 
-        <section className="py-64 px-16">
+        <section className="py-64 px-24">
         <div className="max-w-3xl mx-auto">
           <div className="mb-36">
-            <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block leading-relaxed">FAQ</span>
-            <h2 className="font-display text-5xl font-black tracking-tighter text-black leading-tight">Questions you'll have.<br/>Answered already.</h2>
+            <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block leading-relaxed">FAQ</span>
+            <h2 className="font-display text-5xl  tracking-tighter text-black leading-tight">Questions you'll have.<br/>Answered already.</h2>
           </div>
           <div className="space-y-0">
             <AccordionItem 
