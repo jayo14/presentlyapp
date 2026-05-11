@@ -1,12 +1,10 @@
 import React from 'react';
 import { cn } from '../src/components/ui/utils';
-
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   icon?: React.ReactNode;
 }
-
 export const Input: React.FC<InputProps> = ({ label, error, icon, className = '', ...props }) => {
   return (
     <div className="w-full space-y-2">

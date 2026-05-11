@@ -128,3 +128,53 @@
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+/* Skeuomorphic Input */
+.skeuo-input {
+  background: linear-gradient(145deg, #f8f9fa, #e8e9eb);
+  border: 2px solid #c5c8d0;
+  border-radius: 16px;
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.15),
+    inset 0 -3px 4px rgba(255, 255, 255, 0.9),
+    0 8px 16px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+}
+
+.skeuo-input:focus {
+  background: linear-gradient(145deg, #ffffff, #f0f2f5);
+  border-color: rgb(var(--primary));
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.1),
+    inset 0 -3px 4px rgba(255, 255, 255, 0.95),
+    0 0 0 4px rgb(var(--primary) / 0.15),
+    0 10px 20px rgba(0, 0, 0, 0.15);
+  outline: none;
+}
+
+/* Skeuomorphic Button */
+.skeuo-button {
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  border: 2px solid #1e40af;
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 16px rgba(37, 99, 235, 0.3),
+    inset 0 2px 4px rgba(255,255,255,0.4),
+    inset 0 -4px 6px rgba(0,0,0,0.2);
+}
+
+.skeuo-button:active {
+  box-shadow: 
+    inset 0 3px 6px rgba(0,0,0,0.3),
+    inset 0 -2px 3px rgba(255,255,255,0.2);
+  transform: translateY(2px);
+}
+
+/* Skeuomorphic Checkbox */
+.skeuo-checkbox {
+  background: linear-gradient(145deg, #f1f3f5, #e2e5e9);
+  box-shadow: 
+    inset 0 2px 4px rgba(0,0,0,0.15),
+    0 2px 5px rgba(0,0,0,0.1);
+}

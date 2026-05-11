@@ -8,7 +8,6 @@ import { Logo } from '../Logo';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { cn } from '../../src/components/ui/utils';
-
 export const Register: React.FC = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
@@ -17,29 +16,23 @@ export const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
-
   const registerMutation = useRegister();
   const { data: user, isLoading } = useCurrentUser();
-
   useEffect(() => {
     if (user && !isLoading) {
       navigate('/onboarding', { replace: true });
     }
   }, [user, isLoading, navigate]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-
     if (!agreeTerms) {
       toast.error('You must agree to the Terms of Service');
       return;
     }
-
     registerMutation.mutate({ fullName, email, password }, {
       onSuccess: () => {
         toast.success('Account created!', {
@@ -54,17 +47,14 @@ export const Register: React.FC = () => {
       }
     });
   };
-
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden">
       <SEO title="Join Presently" description="Create your Presently account." />
-
       {/* Subtle gradient background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
         <div className="absolute top-0 left-[20%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-[10%] w-[300px] h-[300px] bg-primary/3 rounded-full blur-3xl" />
       </div>
-
       <div className="absolute top-6 md:top-8 left-6 md:left-8 z-20">
         <button
           onClick={() => navigate('/')}
@@ -73,19 +63,17 @@ export const Register: React.FC = () => {
           <ArrowLeft size={24} />
         </button>
       </div>
-
       <div className="w-full max-w-md relative z-10 py-8 md:py-12">
         <div className="text-center mb-12 md:mb-16 space-y-3">
           <Logo className="justify-center mb-6" />
           <h2 className="font-display text-4xl md:text-5xl font-bold text-on-surface">Create Account</h2>
           <p className="text-textMuted text-base md:text-lg">Join Nigeria's most trusted academic platform.</p>
         </div>
-
         {/* Skeuomorphic card with shadow and depth */}
         <div className="bg-surface p-8 md:p-10 rounded-3xl shadow-2xl border border-outline/50 relative overflow-hidden">
           {/* Subtle top highlight for skeuomorphism */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-          
+        
           <form onSubmit={handleSubmit} className="space-y-8">
             <Input
               label="Full Name"
@@ -96,7 +84,6 @@ export const Register: React.FC = () => {
               onChange={(e) => setFullName(e.target.value)}
               icon={<User />}
             />
-
             <Input
               label="Email Address"
               type="email"
@@ -106,7 +93,6 @@ export const Register: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               icon={<Mail />}
             />
-
             <div className="space-y-3">
               <label className="text-sm font-semibold text-on-surface px-1">Password</label>
               <div className="relative">
@@ -128,7 +114,6 @@ export const Register: React.FC = () => {
                 </button>
               </div>
             </div>
-
             <Input
               label="Confirm Password"
               type="password"
@@ -138,7 +123,6 @@ export const Register: React.FC = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               icon={<Lock />}
             />
-
             <div className="flex items-start gap-3 px-1 pt-2">
                <button
                   type="button"
@@ -156,7 +140,6 @@ export const Register: React.FC = () => {
                  I agree to the <button type="button" className="text-primary font-bold hover:underline">Terms of Service</button> and <button type="button" className="text-primary font-bold hover:underline">Privacy Policy</button>.
                </span>
             </div>
-
             <Button
               type="submit"
               isLoading={registerMutation.isPending}
@@ -167,7 +150,6 @@ export const Register: React.FC = () => {
             </Button>
           </form>
         </div>
-
         <p className="mt-10 text-center text-sm text-textMuted">
           Already have an account?{' '}
           <button
