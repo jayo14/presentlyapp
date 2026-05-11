@@ -415,7 +415,7 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
             <div className="grid grid-cols-2 gap-y-6 gap-x-4">
               {features.map((f, i) => (
                 <div key={i} className="flex items-center gap-3 text-white/90 text-base font-medium leading-relaxed">
-                  <Icons.CheckCircle size={18} style={{ color }} className="flex-shrink-0" /> {f}
+                  <Icons.CheckCircle style={{ color }} className="flex-shrink-0 text-xl" /> {f}
                 </div>
               ))}
             </div>
@@ -441,7 +441,7 @@ const RoleBasedSection = () => {
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">Whoever you are,<br/>Presently works for you.</h2>
         </div>
 
-        <div className="flex flex-col gap-14 p-8 md:p-16 lg:p-24 bg-[#141414] rounded-[48px] border border-white/5">
+        <div className="flex flex-col gap-14">
           {/* Card 1: Students - Large Horizontal */}
           <FeatureCard 
             title="Focus on Learning."
