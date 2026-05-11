@@ -40,21 +40,21 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="fixed mx-auto top-0 w-full z-50 flex justify-center transition-all duration-700 pointer-events-none">
+    <nav className="fixed mx-auto top-0 w-full z-50 flex justify-center transition-all duration-700 pointer-events-none px-4">
       <div 
         className={`
           transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-auto
           flex items-center justify-between
           ${isScrolled 
-            ? 'mt-6 w-[80%] md:w-[70%] py-3 max-w-6xl rounded-full bg-surface border border-outline shadow-[0_10px_30px_rgba(2,6,23,0.35)]' 
-            : 'mt-0 w-[80%] py-6 bg-transparent border-transparent'
+            ? 'mt-6 w-[85%] md:w-[70%] py-4 max-w-6xl rounded-full bg-surface border border-outline shadow-[0_10px_30px_rgba(2,6,23,0.35)]' 
+            : 'mt-4 w-[85%] md:w-[75%] py-8 bg-transparent border-transparent'
           }
         `}
       >
         <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-[200px] h-[80px] pointer-events-none">
           <div className="absolute left-2 top-0 w-40 h-40 bg-primary/6 rounded-full blur-3xl" />
         </div>
-        <div className="flex items-center gap-2 group cursor-pointer">
+        <div className="flex items-center gap-3 group cursor-pointer">
           <div className="w-8 h-8 bg-surface-container rounded-full flex items-center justify-center transition-transform group-hover:rotate-12">
             <div className="w-4 h-4 bg-primary rounded-full" />
           </div>
@@ -295,7 +295,7 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`group relative overflow-hidden rounded-[48px] bg-[#141414] border border-white/5 p-10 md:p-16 transition-all hover:border-white/10 ${className}`}
+      className={`group relative overflow-hidden rounded-[48px] bg-surface border border-outline p-10 md:p-16 transition-all hover:border-contrast ${className}`}
     >
       <div 
         className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -311,12 +311,12 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
               <Icon size={48} className="text-on-surface" />
             </div>
             <h3 className="font-display text-4xl text-on-surface mb-6 tracking-tighter leading-tight">{title}</h3>
-            <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-sm">{description}</p>
+            <p className="text-textMuted text-lg leading-relaxed mb-10 max-w-sm">{description}</p>
             
             <div className="grid grid-cols-2 gap-y-8 gap-x-6">
               {features.map((f, i) => (
                 <div key={i} className="flex items-center gap-3 text-on-surface opacity-90 text-base font-medium leading-relaxed">
-                  <CheckCircle size={20} weight="duotone" style={{ color }} className="flex-shrink-0" /> {f}
+                  <CheckCircle size={20} weight="duotone" style={{ color }} className="flex-shrink-0 text-on-surface" /> {f}
                 </div>
               ))}
             </div>
@@ -460,44 +460,44 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto w-[85%] grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
       <div className="col-span-1 md:col-span-1">
         <div className="flex items-center gap-3 mb-10">
-          <div className="w-8 h-8 bg-[#F5C518] rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
             <div className="w-2.5 h-2.5 bg-black rounded-full" />
           </div>
-          <span className="text-2xl font-bold text-white tracking-tight leading-relaxed">Presently</span>
+          <span className="text-2xl font-bold text-on-surface tracking-tight leading-relaxed">Presently</span>
         </div>
-        <p className="text-sm leading-relaxed mb-8">The next generation of academic management. Built for the modern university.</p>
+        <p className="text-sm leading-relaxed mb-8 text-textMuted">The next generation of academic management. Built for the modern university.</p>
       </div>
       
       <div>
-        <h4 className="font-display text-white font-bold mb-10">Product</h4>
+        <h4 className="font-display text-on-surface font-bold mb-10">Product</h4>
         <ul className="space-y-8 text-sm font-medium">
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">How it Works</a></li>
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Pricing</a></li>
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Student Guide</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">How it Works</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Pricing</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Student Guide</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 className="font-display text-white font-bold mb-10">Company</h4>
+        <h4 className="font-display text-on-surface font-bold mb-10">Company</h4>
         <ul className="space-y-8 text-sm font-medium">
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">About Us</a></li>
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Contact</a></li>
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Careers</a></li>
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Blog</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">About Us</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Contact</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Careers</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Blog</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 className="font-display text-white font-bold mb-10">Legal</h4>
+        <h4 className="font-display text-on-surface font-bold mb-10">Legal</h4>
         <ul className="space-y-8 text-sm font-medium">
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Privacy Policy</a></li>
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Terms of Service</a></li>
-          <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Cookie Policy</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Privacy Policy</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Terms of Service</a></li>
+          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1">Cookie Policy</a></li>
         </ul>
       </div>
     </div>
     <div className="max-w-7xl w-[80%] mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase  leading-relaxed">
-      <p>© 2025 Presently. <span className="text-[#F5C518]">GPS-VERIFIED ATTENDANCE.</span></p>
+      <p>© 2025 Presently. <span className="text-primary">GPS-VERIFIED ATTENDANCE.</span></p>
       <div className="mt-4 md:mt-0">
         <ThemeToggle />
       </div>
