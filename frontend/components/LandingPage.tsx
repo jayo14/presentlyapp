@@ -43,14 +43,14 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="fixed mx-auto top-0 w-full z-50 flex justify-center transition-all duration-700 pointer-events-none px-4">
+    <nav className="fixed mx-auto top-0 w-full z-50 flex justify-center transition-all duration-700 pointer-events-none">
       <div 
         className={`
           transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-auto
-          flex items-center justify-between
+          flex items-center justify-between px-4
           ${isScrolled 
-            ? 'mt-6 w-[85%] md:w-[70%] py-4 max-w-6xl rounded-full bg-surface border border-outline shadow-[0_10px_30px_rgba(2,6,23,0.35)]' 
-            : 'mt-4 w-[85%] md:w-[75%] py-8 bg-transparent border-transparent'
+            ? 'mt-6 w-[90%] md:w-[80%] py-4  rounded-full bg-surface border border-outline shadow-[0_10px_30px_rgba(2,6,23,0.35)]' 
+            : 'mt-4 w-full md:w-[80%] py-8 bg-transparent border-transparent'
           }
         `}
       >
@@ -480,7 +480,7 @@ const RoleBasedSection = () => {
 };
 
 const CTASection = () => (
-      <section className="py-64 px-24 bg-[#0D0D0D] text-center relative overflow-hidden">
+      <section className="py-64 bg-[#0D0D0D] text-center relative overflow-hidden">
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F5C518]/10 blur-[150px] rounded-full pointer-events-none" />
     <div className="max-w-4xl mx-auto relative z-10">
       <h2 className="font-display text-6xl md:text-8xl  text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
@@ -562,9 +562,9 @@ export default function App() {
       <Hero />
       <SocialMarquee />
       
-      <section className="bg-surface py-56 px-24">
+      <section className="bg-surface py-56">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 border-y border-white/5 py-20">
-          <StatCounter value="200++" label="Students Enrolled" />
+          <StatCounter value="200+" label="Students Enrolled" />
           <StatCounter value="94.7%" label="Avg Attendance Rate" />
           <StatCounter value="3" label="Sec Check-in Time" />
           <StatCounter value="1" label="University & Growing" />
@@ -609,7 +609,7 @@ export default function App() {
         </div>
       </section>
 
-        <section className="py-64 px-24">
+        <section className="py-64">
         <div className="max-w-3xl mx-auto">
           <div className="mb-36">
             <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block leading-relaxed">FAQ</span>
