@@ -10,6 +10,7 @@ import { Dock } from '@/components/magicui/dock';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationInbox from './NotificationInbox';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
+import { DashboardSidebar } from './Dashboard/DashboardSidebar';
 import { cn } from '../src/components/ui/utils';
 
 interface LayoutProps {
@@ -56,65 +57,16 @@ export const Layout: React.FC<LayoutProps> = ({
   const filteredNav = navItems.filter(item => item.roles.includes(userRole as UserRole));
 
   return (
-    <div className="flex min-h-screen bg-background text-on-surface font-sans selection:bg-sungold/30 selection:text-presently-black">
+    <div className="flex min-h-screen bg-background text-on-surface font-sans selection:bg-primary/30 selection:text-on-primary-fixed">
+      {/* Desktop Sidebar - Using shadcn components */}
+      <DashboardSidebar
+        userRole={userRole}
+        userName={userName}
+        onLogout={onLogout}
+        onNavigate={() => setIsSidebarOpen(false)}
+      />
 
-      {/* DESKTOP SIDEBAR */}
-      <aside className="hidden md:flex w-24 lg:w-72 flex-col border-r border-outline bg-surface sticky top-0 h-screen z-30 transition-all duration-300">
-        <div className="p-8">
-          <Logo showText={false} className="lg:hidden mx-auto" />
-          <Logo className="hidden lg:flex" />
-        </div>
-
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          {filteredNav.map((item) => {
-            const isActive = location.pathname.endsWith(item.id) || (item.id === 'dashboard' && location.pathname === '/dashboard');
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={cn(
-                  "w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all duration-300 group",
-                  isActive
-                    ? "bg-sungold text-presently-black shadow-md font-bold"
-                    : "text-on-surface-variant hover:bg-black/5 hover:text-on-surface"
-                )}
-              >
-                <item.icon size={22} className={cn(isActive ? "text-presently-black" : "text-on-surface-variant group-hover:text-on-surface")} />
-                <span className="hidden lg:block truncate text-sm">{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="p-6 mt-auto border-t border-outline space-y-4">
-          <button
-            onClick={() => handleNavClick('profile')}
-            className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-black/5 transition-all group"
-          >
-            <div className="w-12 h-12 rounded-[22%] bg-sungold/10 border border-sungold/20 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-              {currentUser?.avatar_url ? (
-                <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <User size={24} className="text-sungold" />
-              )}
-            </div>
-            <div className="hidden lg:block text-left overflow-hidden">
-              <p className="text-sm font-bold truncate">{userName}</p>
-              <p className="text-xs text-on-surface-variant truncate capitalize">{userRole?.toLowerCase()}</p>
-            </div>
-          </button>
-
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-soft-coral hover:bg-soft-coral/10 transition-all group font-bold text-sm"
-          >
-            <LogOut size={20} />
-            <span className="hidden lg:block">Sign Out</span>
-          </button>
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen md:ml-60 lg:ml-72">
         {/* MOBILE HEADER */}
         <header className="md:hidden h-20 flex items-center justify-between px-6 bg-white/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
           <Logo showText={false} />
