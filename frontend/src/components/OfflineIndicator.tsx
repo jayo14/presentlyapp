@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { WifiOff, Wifi, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { WifiOff, Wifi } from 'lucide-react';
 
 const getConnectionState = () => {
   const connection = (navigator as any).connection;
@@ -17,16 +17,6 @@ export const OfflineIndicator: React.FC = () => {
   const [showIndicator, setShowIndicator] = useState(!navigator.onLine);
   const [isDismissed, setIsDismissed] = useState(false);
   const hideTimerRef = useRef<number | null>(null);
-
-  const isSlowConnection = useMemo(() => {
-    const slowEffectiveType = ['slow-2g', '2g'].includes(connectionState.effectiveType);
-    return connectionState.online && (
-      connectionState.saveData ||
-      slowEffectiveType ||
-      connectionState.downlink <= 1.5 ||
-      connectionState.rtt >= 800
-    );
-  }, [connectionState]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -55,11 +45,6 @@ export const OfflineIndicator: React.FC = () => {
     window.addEventListener('offline', handleOffline);
     connection?.addEventListener?.('change', handleConnectionChange);
 
-    // Show indicator initially if offline or slow
-    if (!navigator.onLine || (connection?.effectiveType && ['slow-2g', '2g'].includes(connection.effectiveType))) {
-      setShowIndicator(true);
-    }
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -71,7 +56,7 @@ export const OfflineIndicator: React.FC = () => {
   }, []);
 
   if (isDismissed) return null;
-  if (!showIndicator && !isSlowConnection) return null;
+  if (!showIndicator) return null;
 
   const getStatusConfig = () => {
     if (!connectionState.online) {
@@ -80,14 +65,6 @@ export const OfflineIndicator: React.FC = () => {
         icon: <WifiOff size={16} className="animate-pulse" />,
         text: 'You are currently offline',
         dismissible: false
-      };
-    }
-    if (isSlowConnection) {
-      return {
-        className: 'bg-amber-500/90 text-white backdrop-blur-md border border-amber-400/30 shadow-[0_0_20px_rgba(245,158,11,0.3)]',
-        icon: <Wifi size={16} />,
-        text: 'Slow network detected',
-        dismissible: true
       };
     }
     return {
@@ -109,20 +86,11 @@ export const OfflineIndicator: React.FC = () => {
         px-6 py-3 rounded-2xl shadow-2xl transition-all duration-500
         flex items-center gap-3 text-sm font-bold tracking-tight
         ${config.className}
-        ${showIndicator || isSlowConnection ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}
+        ${showIndicator ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}
       `}
     >
       {config.icon}
       <span>{config.text}</span>
-      {config.dismissible && (
-        <button
-          onClick={() => setIsDismissed(true)}
-          className="ml-2 p-1 hover:bg-white/20 rounded-full transition-colors"
-          aria-label="Dismiss"
-        >
-          <X size={14} />
-        </button>
-      )}
     </div>
   );
 };
