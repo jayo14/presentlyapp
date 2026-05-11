@@ -44,18 +44,21 @@ const Navbar = () => {
       <div 
         className={`
           transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-auto
-          flex items-center justify-between px-8
+          flex items-center justify-between
           ${isScrolled 
-            ? 'mt-6 w-[90%] md:w-[80%] py-3 max-w-6xl rounded-full bg-white/10 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)]' 
-            : 'mt-0 w-full py-6 bg-transparent border-transparent'
+            ? 'mt-6 w-[80%] md:w-[70%] py-3 max-w-6xl rounded-full bg-surface border border-outline shadow-[0_10px_30px_rgba(2,6,23,0.35)]' 
+            : 'mt-0 w-[80%] py-6 bg-transparent border-transparent'
           }
         `}
       >
+        <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-[200px] h-[80px] pointer-events-none">
+          <div className="absolute left-2 top-0 w-40 h-40 bg-primary/6 rounded-full blur-3xl" />
+        </div>
         <div className="flex items-center gap-2 group cursor-pointer">
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center transition-transform group-hover:rotate-12">
-            <div className="w-4 h-4 bg-[#F5C518] rounded-full" />
+          <div className="w-8 h-8 bg-surface-container rounded-full flex items-center justify-center transition-transform group-hover:rotate-12">
+            <div className="w-4 h-4 bg-primary rounded-full" />
           </div>
-          <span className="text-xl  tracking-tight text-white">
+          <span className="text-xl tracking-tight text-on-surface">
             Presently
           </span>
         </div>
@@ -65,7 +68,7 @@ const Navbar = () => {
             <a 
               key={item} 
               href="#" 
-              className="text-white/80 hover:text-[#F5C518] transition-colors text-[14px] tracking-tight leading-relaxed py-2 px-2"
+              className="text-on-surface/80 hover:text-primary transition-colors text-[14px] tracking-tight leading-relaxed py-2 px-2"
             >
               {item}
             </a>
@@ -73,10 +76,10 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-8">
-          <a href="/login" className="hidden sm:block font-bold text-sm text-white hover:text-[#F5C518] transition-colors py-2 px-4 leading-relaxed">
+          <a href="/login" className="hidden sm:block font-bold text-sm text-on-surface hover:text-primary transition-colors py-2 px-4 leading-relaxed">
             Log In
           </a>
-          <a href="/register" className="bg-[#F5C518] text-black px-7 py-3 rounded-full  hover:shadow-[0_0_25px_rgba(245,197,24,0.4)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
+          <a href="/register" className="bg-primary text-on-primary-fixed px-7 py-3 rounded-full hover:shadow-[0_10px_30px_rgba(245,197,24,0.18)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
             Join <ArrowUpRight size={24} weight="duotone" />
           </a>
         </div>
@@ -123,7 +126,7 @@ const AccordionItem = ({ question, answer }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left group gap-6"
       >
-        <span className="text-xl md:text-2xl font-bold text-black group-hover:text-[#F5C518] transition-colors leading-relaxed">{question}</span>
+        <span className="text-xl md:text-2xl font-bold text-on-surface group-hover:text-primary transition-colors leading-relaxed">{question}</span>
         <div className="bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center text-[#F5C518] flex-shrink-0">
           {isOpen ? <Minus size={28} weight="duotone" /> : <Plus size={28} weight="duotone" />}
         </div>
@@ -155,8 +158,8 @@ const Hero = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-[#0D0D0D] pt-56 pb-40 overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#F5C518]/5 blur-[120px] rounded-full pointer-events-none" />
+    <section ref={containerRef} className="relative min-h-screen bg-surface pt-56 pb-40 overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-center relative w-[85%]">
         <div>
@@ -165,27 +168,27 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-3 mb-10"
           >
-            <span className="text-[#F5C518] text-xs tracking-[0.3em] uppercase leading-relaxed">◆ GPS-Verified Attendance</span>
+            <span className="text-primary text-xs tracking-[0.3em] uppercase leading-relaxed">◆ GPS-Verified Attendance</span>
           </motion.div>
 
           <motion.h1 
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-display text-6xl md:text-8xl text-white leading-[1.1] tracking-tighter mb-12"
+            className="font-display text-6xl md:text-8xl text-on-surface leading-[1.1] tracking-tighter mb-12"
           >
             Attendance<br />
             that actually<br />
-            <span className="text-[#F5C518] relative">
+            <span className="text-primary relative">
               knows you're there.
               <span className="absolute -top-4 -right-8 text-2xl font-light opacity-50 italic">®</span>
             </span>
           </motion.h1>
 
-          <motion.p 
+            <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-slate-400 mb-14 max-w-xl leading-relaxed"
+            className="text-xl text-textMuted mb-14 max-w-xl leading-relaxed"
           >
             Presently ends roll calls, paper sheets, and proxy attendance — for students, lecturers, and institutions that mean business.
           </motion.p>
@@ -196,45 +199,45 @@ const Hero = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center gap-8"
           >
-            <a href="/register" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex">
+            <a href="/register" className="w-full sm:w-auto bg-primary text-on-primary-fixed px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex">
               Start for free <CaretRight size={24} weight="duotone" />
             </a>
-            <a href="/how-it-works" className="group flex items-center gap-4 font-bold text-white text-lg inline-flex">
-              <div className="w-14 h-14 rounded-full border-2 border-white/20 flex items-center justify-center group-hover:border-[#F5C518] transition-colors">
-                <Play size={32} weight="duotone" className="ml-0.5" />
+            <a href="/how-it-works" className="group flex items-center gap-4 font-bold text-on-surface text-lg inline-flex">
+              <div className="w-14 h-14 rounded-full border-2 border-outline flex items-center justify-center group-hover:border-primary transition-colors">
+                <Play size={32} weight="duotone" className="ml-0.5 text-on-surface" />
               </div>
-              <span className="border-b-2 border-white/10 group-hover:border-[#F5C518] transition-colors pb-2">Watch how it works</span>
+              <span className="border-b-2 border-outline group-hover:border-primary transition-colors pb-2">Watch how it works</span>
             </a>
           </motion.div>
         </div>
 
           <div className="relative h-[760px] hidden lg:block">
-           <motion.div style={{ y: y1 }} className="absolute z-10 -left-6 top-28 w-72 p-4 bg-white rounded-[40px] shadow-2xl rotate-[-6deg]">
-             <div className="bg-gray-100 h-[540px] rounded-[32px] overflow-hidden p-8">
-               <div className="w-10 h-10 bg-[#F5C518] rounded-lg mb-6" />
-               <div className="h-4 w-28 bg-gray-300 rounded-full mb-12" />
+           <motion.div style={{ y: y1 }} className="absolute z-10 -left-6 top-28 w-72 p-4 bg-background rounded-[40px] shadow-2xl rotate-[-6deg]">
+             <div className="bg-surface-container h-[540px] rounded-[32px] overflow-hidden p-8">
+               <div className="w-10 h-10 bg-primary rounded-lg mb-6" />
+               <div className="h-4 w-28 bg-surface-variant rounded-full mb-12" />
                <div className="space-y-6">
-                <div className="h-16 w-full bg-white rounded-xl shadow-sm" />
-                <div className="h-16 w-full bg-white rounded-xl shadow-sm" />
-                <div className="h-16 w-full bg-white rounded-xl shadow-sm" />
+                <div className="h-16 w-full bg-background rounded-xl shadow-sm" />
+                <div className="h-16 w-full bg-background rounded-xl shadow-sm" />
+                <div className="h-16 w-full bg-background rounded-xl shadow-sm" />
                </div>
              </div>
            </motion.div>
 
-           <motion.div style={{ y: y2 }} className="absolute z-20 left-28 top-6 w-80 p-4 bg-white rounded-[40px] shadow-2xl">
-             <div className="bg-[#0D0D0D] h-[620px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-16 text-center">
-               <div className="w-28 h-28 bg-[#F5C518]/20 rounded-full flex items-center justify-center mb-8 relative">
-                <div className="absolute inset-0 bg-[#F5C518] rounded-full animate-ping opacity-20" />
-                <MapPin size={64} weight="duotone" className="text-[#F5C518]" />
+           <motion.div style={{ y: y2 }} className="absolute z-20 left-28 top-6 w-80 p-4 bg-background rounded-[40px] shadow-2xl">
+             <div className="bg-surface h-[620px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-16 text-center">
+               <div className="w-28 h-28 bg-primary/20 rounded-full flex items-center justify-center mb-8 relative">
+                <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-20" />
+                <MapPin size={64} weight="duotone" className="text-primary" />
                </div>
-               <h4 className="text-white font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
-               <p className="text-white/40 text-base leading-relaxed">Verifying location at Campus Library</p>
+               <h4 className="text-on-surface font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
+               <p className="text-on-surface opacity-40 text-base leading-relaxed">Verifying location at Campus Library</p>
              </div>
            </motion.div>
 
-           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-8 bottom-12 bg-[#F5C518] p-10 rounded-[36px] shadow-2xl text-black">
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-8 bottom-12 bg-primary p-10 rounded-[36px] shadow-2xl text-on-primary-fixed">
              <div className="flex items-center gap-6">
-               <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center text-white">
+               <div className="w-14 h-14 bg-on-primary-fixed rounded-full flex items-center justify-center text-primary">
                 <CheckCircle size={48} weight="duotone" />
                </div>
                <div>
@@ -250,7 +253,7 @@ const Hero = () => {
 };
 
 const SocialMarquee = () => (
-  <div className="bg-[#0D0D0D] border-y border-white/5 py-20 overflow-hidden flex whitespace-nowrap">
+  <div className="bg-background border-y border-outline py-20 overflow-hidden flex whitespace-nowrap">
     <motion.div 
       initial={{ x: 0 }}
       animate={{ x: "-50%" }}
@@ -259,81 +262,21 @@ const SocialMarquee = () => (
     >
       {[1,2,3].map(i => (
         <React.Fragment key={i}>
-          <span className="text-slate-400 font-medium text-sm italic leading-relaxed">"inally, no more roll calls" — Student</span>
-          <span className="text-[#F5C518]">\u25c6</span>
-          <span className="text-slate-400 font-bold text-sm tracking-widest leading-relaxed">200+ STUDENTS ENROLLED</span>
-          <span className="text-[#F5C518]">\u25c6</span>
-          <span className="text-slate-400 font-medium text-sm italic leading-relaxed">"One click register export" \u2014 Dr. Adeyemi</span>
-          <span className="text-[#F5C518]">\u25c6</span>
-          <span className="text-slate-400 font-bold text-sm tracking-widest leading-relaxed">GPS VERIFIED \u00b7 ALWAYS ACCURATE</span>
-          <span className="text-[#F5C518]">\u25c6</span>
+          <span className="text-on-surface/60 font-medium text-sm italic leading-relaxed">"inally, no more roll calls" — Student</span>
+          <Plus size={12} weight="duotone" className="text-primary mx-4" />
+          <span className="text-on-surface font-bold text-sm tracking-widest leading-relaxed">200+ STUDENTS ENROLLED</span>
+          <Plus size={12} weight="duotone" className="text-primary mx-4" />
+          <span className="text-on-surface/60 font-medium text-sm italic leading-relaxed">"One click register export" — Dr. Adeyemi</span>
+          <Plus size={12} weight="duotone" className="text-primary mx-4" />
+          <span className="text-on-surface font-bold text-sm tracking-widest leading-relaxed">GPS VERIFIED · ALWAYS ACCURATE</span>
+          <Plus size={12} weight="duotone" className="text-primary mx-4" />
         </React.Fragment>
       ))}
     </motion.div>
   </div>
 );
 
-const FeaturesBento = () => {
-  return (
-    <section className="py-64 bg-white">
-      <div className="max-w-7xl mx-auto w-[85%]">
-        <div className="text-center mb-40">
-          <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block">What's Under the Hood</span>
-          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-black leading-tight">Powerful features.<br/>Quietly in the background.</h2>
-        </div>
 
-        <div className="grid grid-cols-12 gap-8 auto-rows-[280px]">
-          <div className="col-span-12 md:col-span-8 bg-[#0D0D0D] rounded-[48px] p-16 text-white flex flex-col justify-between overflow-hidden relative group">
-             <div className="relative z-10">
-                <h3 className="font-display text-4xl font-bold mb-8 leading-tight">You can't check in from your dorm.</h3>
-                <p className="text-slate-400 max-w-sm leading-relaxed text-lg">GPS + Wifi triangulation verifies campus presence. No VPNs, no spoofing, just real presence.</p>
-             </div>
-             <div className="absolute bottom-[-50px] right-[-50px] w-80 h-80 bg-[#F5C518]/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
-             <div className="self-end bg-[#F5C518] p-4 rounded-3xl text-black">
-                <PaperPlaneTilt size={48} weight="duotone" />
-             </div>
-          </div>
-
-          <div className="col-span-12 md:col-span-4 bg-gray-50 rounded-[48px] p-12 flex flex-col justify-between group">
-             <WifiSlash size={56} weight="duotone" className="text-[#F5C518] mb-4" />
-             <div>
-                <h3 className="font-display text-2xl font-bold mb-6 leading-tight">Poor signal? No problem.</h3>
-                <p className="text-gray-600 text-base leading-relaxed">Check-ins queue locally and sync when connection returns.</p>
-             </div>
-          </div>
-
-          <div className="col-span-12 md:col-span-4 bg-gray-50 rounded-[48px] p-12 flex flex-col justify-between">
-             <div className="space-y-5">
-                {[1,2,3].map(i => (
-                  <div key={i} className="flex items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-black/5">
-                    <div className="w-10 h-10 rounded-full bg-gray-100" />
-                    <div className="h-2.5 w-20 bg-gray-200 rounded-full" />
-                    <div className="ml-auto w-2.5 h-2.5 rounded-full bg-green-500" />
-                  </div>
-                ))}
-             </div>
-             <div>
-                <h3 className="font-display text-2xl font-bold mb-6 leading-tight">Watch your class fill up.</h3>
-                <p className="text-gray-600 text-base leading-relaxed">Real-time attendance feed as students walk through the door.</p>
-             </div>
-          </div>
-
-          <div className="col-span-12 md:col-span-8 bg-[#FDF7E7] rounded-[48px] p-16 flex flex-col md:flex-row gap-12 items-center border border-[#F5C518]/20">
-             <div className="flex-1">
-                <h3 className="font-display text-4xl font-bold mb-8 leading-tight">Everyone sees exactly what they should.</h3>
-                <p className="text-gray-700 leading-relaxed text-lg">Students see theirs. Lecturers see their class. Admins see everything. Simple, secure, scoped.</p>
-             </div>
-             <div className="flex flex-col gap-6 w-56">
-                <div className="bg-black text-white p-6 rounded-2xl text-center text-xs font-bold tracking-widest leading-relaxed">ADMIN</div>
-                <div className="bg-white p-6 rounded-2xl text-center text-xs font-bold tracking-widest text-black border border-black/5 leading-relaxed">LECTURER</div>
-                <div className="bg-white p-6 rounded-2xl text-center text-xs font-bold tracking-widest text-black border border-black/5 opacity-50 leading-relaxed">STUDENT</div>
-             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
 
 const FeatureCard = ({ title, description, icon: Icon, color, features, children, className = "" }) => {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -365,20 +308,20 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
         <div className="flex flex-col h-full justify-between py-4 pr-8">
           <div className="space-y-8">
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: color }}>
-              <Icon size={48} className="text-black" />
+              <Icon size={48} className="text-on-surface" />
             </div>
-            <h3 className="font-display text-4xl  text-white mb-6 tracking-tighter leading-tight">{title}</h3>
+            <h3 className="font-display text-4xl text-on-surface mb-6 tracking-tighter leading-tight">{title}</h3>
             <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-sm">{description}</p>
             
             <div className="grid grid-cols-2 gap-y-8 gap-x-6">
               {features.map((f, i) => (
-                <div key={i} className="flex items-center gap-3 text-white/90 text-base font-medium leading-relaxed">
+                <div key={i} className="flex items-center gap-3 text-on-surface opacity-90 text-base font-medium leading-relaxed">
                   <CheckCircle size={20} weight="duotone" style={{ color }} className="flex-shrink-0" /> {f}
                 </div>
               ))}
             </div>
           </div>
-          <a href="/features" className="mt-16 group/btn inline-flex items-center gap-2 text-white font-bold text-sm tracking-widest uppercase leading-relaxed">
+          <a href="/features" className="mt-16 group/btn inline-flex items-center gap-2 text-on-surface font-bold text-sm tracking-widest uppercase leading-relaxed">
             Learn More <ArrowUpRight size={18} weight="duotone" style={{ color }} />
           </a>
         </div>
@@ -392,103 +335,103 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
 
 const RoleBasedSection = () => {
   return (
-  <section className="py-64 bg-[#0D0D0D]">
+    <section className="py-64 bg-surface">
       <div className="max-w-7xl mx-auto w-[85%]">
         <div className="mb-36">
-          <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block leading-relaxed">Built for everyone in the room</span>
-          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-white leading-tight">Whoever you are,<br/>Presently works for you.</h2>
+          <span className="text-primary text-xs tracking-[0.3em] uppercase mb-8 block leading-relaxed">Built for everyone in the room</span>
+          <h2 className="font-display text-5xl md:text-7xl tracking-tighter text-on-surface leading-tight">Whoever you are,<br/>Presently works for you.</h2>
         </div>
 
-         <div className="max-w-7xl mx-auto flex flex-col gap-20"> 
-        
-        {/* Card 1: Students - Large Horizontal */}
-        <FeatureCard 
-          title="Focus on Learning."
-          description="Attendance shouldn't be a distraction. We've made it as natural as walking into the classroom."
-          icon={User}
-          color="#F5C518"
-          features={['One-tap Verification', 'Attendance Tracker', 'Missed Class Alerts', 'Academic Calendar']}
-          className="lg:col-span-12 min-h-[600px]"
-        >
-          <div className="w-full h-full flex items-center justify-center py-10">
-            <div className="relative w-72 h-[520px] bg-white rounded-[48px] shadow-2xl p-6 overflow-hidden border-[10px] border-black transition-transform duration-700 group-hover:-rotate-2">
-              <div className="bg-gray-100 h-full rounded-[38px] p-8 flex flex-col">
-                <div className="flex justify-between items-center mb-14">
-                  <div className="w-12 h-12 rounded-full bg-[#F5C518] shadow-inner" />
-                  <div className="w-16 h-2 bg-black/10 rounded-full" />
-                </div>
-                <div className="mb-14">
-                  <p className="text-[12px] uppercase text-black/40 font-bold tracking-[0.2em] mb-3">Weekly Average</p>
-                  <p className="text-6xl text-black font-bold tracking-tighter">92.4%</p>
-                </div>
-                <div className="space-y-6"> 
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="flex items-center gap-5 bg-white p-5 rounded-2xl shadow-sm">
-                      <div className="w-12 h-12 bg-gray-50 rounded-xl" />
-                      <div className="flex-1 space-y-3">
-                        <div className="h-2.5 w-24 bg-gray-200 rounded-full" />
-                        <div className="h-2 w-14 bg-gray-100 rounded-full" />
+        <div className="max-w-7xl mx-auto flex flex-col gap-20">
+
+          {/* Card 1: Students - Large Horizontal */}
+          <FeatureCard
+            title="Focus on Learning."
+            description="Attendance shouldn't be a distraction. We've made it as natural as walking into the classroom."
+            icon={User}
+            color="#F5C518"
+            features={["One-tap Verification", "Attendance Tracker", "Missed Class Alerts", "Academic Calendar"]}
+            className="lg:col-span-12 min-h-[600px]"
+          >
+            <div className="w-full h-full flex items-center justify-center py-10">
+              <div className="relative w-72 h-[520px] bg-background rounded-[48px] shadow-2xl p-6 overflow-hidden border-[10px] border-outline transition-transform duration-700 group-hover:-rotate-2">
+                <div className="bg-surface h-full rounded-[38px] p-8 flex flex-col">
+                  <div className="flex justify-between items-center mb-14">
+                    <div className="w-12 h-12 rounded-full bg-primary shadow-inner" />
+                    <div className="w-16 h-2 bg-surface-variant rounded-full" />
+                  </div>
+                  <div className="mb-14">
+                    <p className="text-[12px] uppercase text-on-surface opacity-40 font-bold tracking-[0.2em] mb-3">Weekly Average</p>
+                    <p className="text-6xl text-on-surface font-bold tracking-tighter">92.4%</p>
+                  </div>
+                  <div className="space-y-6">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="flex items-center gap-5 bg-surface p-5 rounded-2xl shadow-sm">
+                        <div className="w-12 h-12 bg-surface-container rounded-xl" />
+                        <div className="flex-1 space-y-3">
+                          <div className="h-2.5 w-24 bg-surface-variant rounded-full" />
+                          <div className="h-2 w-14 bg-surface-variant/60 rounded-full" />
+                        </div>
+                        <CheckCircle size={28} className="text-primary" />
                       </div>
-                      <CheckCircle size={28} className="text-[#F5C518]" />
+                    ))}
+                  </div>
+                  <div className="mt-auto bg-primary text-on-primary-fixed py-5 rounded-full text-center text-[12px] font-bold tracking-widest">
+                    SESSION ACTIVE
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FeatureCard>
+
+          <div className="grid md:grid-cols-2 gap-16">
+            {/* Card 2: Lecturers */}
+            <FeatureCard
+              title="Teach. Track. Done."
+              description="No more manual registers. Open a session and let Presently handle the rest while you focus on delivery."
+              icon={ChalkboardSimple}
+              color="#38BDF8"
+              features={["Live Feed", "Instant Export", "Auto-Grades", "Class Analytics"]}
+            >
+              <div className="bg-surface p-10 rounded-[2.5rem] border border-outline w-full max-w-sm rotate-3 group-hover:rotate-0 transition-all duration-700 shadow-2xl">
+                <div className="flex items-center justify-between mb-12">
+                  <div className="h-3 w-32 bg-primary/20 rounded-full" />
+                  <div className="h-5 w-5 bg-primary rounded-full animate-pulse shadow-[0_0_15px_rgba(56,189,248,0.15)]" />
+                </div>
+                <div className="space-y-8">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-6 border-b border-outline/30 pb-6 last:border-0 last:pb-0">
+                      <div className="w-10 h-10 rounded-full bg-surface-container border border-outline" />
+                      <div className="h-2 flex-1 bg-surface-variant rounded-full" />
+                      <div className="w-3 h-3 rounded-full bg-primary" />
                     </div>
                   ))}
                 </div>
-                <div className="mt-auto bg-black text-[#F5C518] py-5 rounded-full text-center text-[12px] font-bold tracking-widest">
-                  SESSION ACTIVE
-                </div>
               </div>
-            </div>
-          </div>
-        </FeatureCard>
+            </FeatureCard>
 
-        <div className="grid md:grid-cols-2 gap-16"> 
-          {/* Card 2: Lecturers */}
-          <FeatureCard 
-            title="Teach. Track. Done."
-            description="No more manual registers. Open a session and let Presently handle the rest while you focus on delivery."
-            icon={ChalkboardSimple}
-            color="#38BDF8"
-            features={['Live Feed', 'Instant Export', 'Auto-Grades', 'Class Analytics']}
-          >
-            <div className="bg-[#1a1a1a] p-10 rounded-[2.5rem] border border-white/10 w-full max-w-sm rotate-3 group-hover:rotate-0 transition-all duration-700 shadow-2xl">
-              <div className="flex items-center justify-between mb-12">
-                 <div className="h-3 w-32 bg-sky-400/20 rounded-full" />
-                 <div className="h-5 w-5 bg-sky-400 rounded-full animate-pulse shadow-[0_0_15px_rgba(56,189,248,0.5)]" />
-              </div>
-              <div className="space-y-8"> 
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-6 border-b border-white/10 pb-6 last:border-0 last:pb-0">
-                    <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10" />
-                    <div className="h-2 flex-1 bg-white/10 rounded-full" />
-                    <div className="w-3 h-3 rounded-full bg-sky-400" />
-                  </div>
+            {/* Card 3: Admins */}
+            <FeatureCard
+              title="Campus Insights."
+              description="A bird's eye view of your entire institution. Monitor compliance and trends in real-time."
+              icon={Building}
+              color="#34D399"
+              features={["Faculty View", "Trend Reports", "Data Security", "Global Search"]}
+            >
+              <div className="flex gap-4 items-end h-48 w-full max-w-xs px-4">
+                {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ height: 0 }}
+                    whileInView={{ height: `${h}%` }}
+                    transition={{ delay: i * 0.05, duration: 0.8, ease: "easeOut" }}
+                    className="flex-1 bg-primary/20 rounded-t-xl relative border-t-[3px] border-primary hover:bg-primary/40 transition-colors"
+                  />
                 ))}
               </div>
-            </div>
-          </FeatureCard>
-
-          {/* Card 3: Admins */}
-          <FeatureCard 
-            title="Campus Insights."
-            description="A bird's eye view of your entire institution. Monitor compliance and trends in real-time."
-            icon={Building}
-            color="#34D399"
-            features={['Faculty View', 'Trend Reports', 'Data Security', 'Global Search']}
-          >
-            <div className="flex gap-4 items-end h-48 w-full max-w-xs px-4"> 
-              {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
-                <motion.div 
-                  key={i} 
-                  initial={{ height: 0 }}
-                  whileInView={{ height: `${h}%` }}
-                  transition={{ delay: i * 0.05, duration: 0.8, ease: "easeOut" }}
-                  className="flex-1 bg-emerald-400/20 rounded-t-xl relative border-t-[3px] border-emerald-400 hover:bg-emerald-400/40 transition-colors"
-                />
-              ))}
-            </div>
-          </FeatureCard>
+            </FeatureCard>
+          </div>
         </div>
-      </div>
       </div>
     </section>
   );
@@ -501,7 +444,7 @@ const CTASection = () => (
       <h2 className="font-display text-6xl md:text-8xl  text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
       <p className="text-slate-400 text-2xl mb-20 max-w-xl mx-auto leading-relaxed">Join institutions already running smarter with Presently. Setup takes less than 5 minutes.</p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-10 mb-24">
-        <a href="/register" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex justify-center">
+        <a href="/register" className="w-full sm:w-auto bg-primary text-on-primary-fixed px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex justify-center">
           Get started for free →
         </a>
         <a href="/demo" className="w-full sm:w-auto px-14 py-7 rounded-full font-bold text-xl border-2 border-white/20 text-white hover:bg-white/5 transition-all leading-relaxed inline-flex justify-center">
@@ -513,7 +456,7 @@ const CTASection = () => (
 );
 
 const Footer = () => (
-    <footer className="bg-[#141414] pt-40 pb-20 px-8 text-slate-400">
+    <footer className="bg-surface pt-40 pb-20 px-8 text-textMuted">
     <div className="max-w-7xl mx-auto w-[85%] grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
       <div className="col-span-1 md:col-span-1">
         <div className="flex items-center gap-3 mb-10">
@@ -553,7 +496,7 @@ const Footer = () => (
         </ul>
       </div>
     </div>
-    <div className="max-w-7xl mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase  leading-relaxed">
+    <div className="max-w-7xl w-[80%] mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase  leading-relaxed">
       <p>© 2025 Presently. <span className="text-[#F5C518]">GPS-VERIFIED ATTENDANCE.</span></p>
       <div className="mt-4 md:mt-0">
         <ThemeToggle />
@@ -572,12 +515,12 @@ export default function App() {
   const xSlide = useTransform(scrollYProgress, [0, 1], [300, -600]);
 
   return (
-    <div className="min-h-screen bg-[#F9F7F3] selection:bg-[#F5C518] selection:text-black font-sans">
+    <div className="min-h-screen bg-background selection:bg-primary selection:text-on-primary-fixed font-sans text-text">
       <Navbar />
       <Hero />
       <SocialMarquee />
       
-      <section className="bg-[#0D0D0D] py-56 px-24">
+      <section className="bg-surface py-56 px-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 border-y border-white/5 py-20">
           <StatCounter value="200+" label="Students Enrolled" />
           <StatCounter value="94.7%" label="Avg Attendance Rate" />
@@ -585,7 +528,7 @@ export default function App() {
           <StatCounter value="1" label="University & Growing" />
         </div>
         <div className="max-w-4xl mx-auto text-center mt-40">
-           <p className="font-display text-4xl md:text-6xl  text-white italic tracking-tighter leading-relaxed mb-8">
+           <p className="font-display text-4xl md:text-6xl  text-on-surface italic tracking-tighter leading-relaxed mb-8">
              "Presently didn't just fix attendance tracking. It changed how we think about student accountability."
            </p>
            <p className="mt-12 text-slate-500 font-bold uppercase tracking-widest text-base leading-relaxed">— Dr. Adeyemi, Dean of Student Affairs</p>
@@ -593,13 +536,12 @@ export default function App() {
       </section>
 
       <RoleBasedSection />
-      <FeaturesBento />
 
       {/* Mobile App Arc Showcase */}
-      <section ref={showcaseRef} className="py-56 px-12 overflow-hidden bg-white">
+      <section ref={showcaseRef} className="py-56 px-12 overflow-hidden bg-background">
         <div className="max-w-7xl mx-auto text-center mb-40">
           <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block">Mobile Experience</span>
-          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-black leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
+          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-on-surface leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
         </div>
         
         <div className="relative flex items-center justify-center h-[700px]">
@@ -629,7 +571,7 @@ export default function App() {
         <div className="max-w-3xl mx-auto">
           <div className="mb-36">
             <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block leading-relaxed">FAQ</span>
-            <h2 className="font-display text-5xl  tracking-tighter text-black leading-tight">Questions you'll have.<br/>Answered already.</h2>
+            <h2 className="font-display text-5xl  tracking-tighter text-on-surface leading-tight">Questions you'll have.<br/>Answered already.</h2>
           </div>
           <div className="space-y-0">
             <AccordionItem 
