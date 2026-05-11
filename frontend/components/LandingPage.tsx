@@ -15,6 +15,12 @@ import {
   Minus,
   List,
   X,
+  WifiHigh,
+  ShieldCheck,
+  CreditCard,
+  Clock,
+  Users,
+  Prohibit,
 } from '@phosphor-icons/react';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -160,17 +166,24 @@ const StatCounter = ({ value, label }) => {
   );
 };
 
-const AccordionItem = ({ question, answer }) => {
+const AccordionItem = ({ question, answer, icon: Icon }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border-b border-gray-100 last:border-0 py-10">
+    <div className="border-b border-outline last:border-0 py-10">
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left group gap-6"
       >
-        <span className="text-xl md:text-2xl font-bold text-on-surface group-hover:text-primary transition-colors leading-relaxed">{question}</span>
-        <div className="bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center text-[#F5C518] flex-shrink-0">
-          {isOpen ? <Minus size={28} weight="duotone" /> : <Plus size={28} weight="duotone" />}
+        <div className="flex items-center gap-4 flex-1">
+          {Icon && (
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Icon size={20} weight="duotone" className="text-primary" />
+            </div>
+          )}
+          <span className="text-lg md:text-xl font-bold text-on-surface group-hover:text-primary transition-colors leading-relaxed">{question}</span>
+        </div>
+        <div className="bg-surface-container w-12 h-12 rounded-full flex items-center justify-center text-primary flex-shrink-0">
+          {isOpen ? <Minus size={24} weight="duotone" /> : <Plus size={24} weight="duotone" />}
         </div>
       </button>
       <AnimatePresence>
@@ -617,16 +630,34 @@ export default function App() {
           </div>
           <div className="space-y-0">
             <AccordionItem 
+              icon={WifiHigh}
               question="Does it work without internet?" 
               answer="Yes! Our offline mode allows students to check in even in dead zones. The record is timestamped locally and synced the moment a connection is re-established."
             />
             <AccordionItem 
+              icon={ShieldCheck}
               question="Can students spoof their GPS location?" 
               answer="Negative. We use high-precision triangulation combining GPS, Wi-Fi hotspots, and cellular towers. Attempts to use VPNs or mock locations are flagged immediately."
             />
             <AccordionItem 
+              icon={CreditCard}
               question="Does my school need to pay for students?" 
               answer="Presently is built to be accessible. We have tailored plans for institutions that cover all students, or standalone lecturer plans for smaller groups."
+            />
+            <AccordionItem 
+              icon={Clock}
+              question="How long does a check-in typically take?" 
+              answer="Check-ins are lightning fast—usually under 3 seconds. Our GPS verification and location triangulation happen in the background, so students just tap and go."
+            />
+            <AccordionItem 
+              icon={Users}
+              question="Can multiple students check in from the same location?" 
+              answer="Absolutely! Presently supports multiple simultaneous check-ins from the same venue. Each student's location and identity are verified independently and securely."
+            />
+            <AccordionItem 
+              icon={Prohibit}
+              question="What happens if a student is marked absent by mistake?" 
+              answer="Our support team can review and adjust attendance records within 48 hours. We keep detailed logs of all check-in attempts so discrepancies are easily identified and resolved."
             />
           </div>
         </div>

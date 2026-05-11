@@ -56,27 +56,37 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden">
       <SEO title="Join Presently" description="Create your Presently account." />
 
-      <div className="absolute top-8 left-8 z-20">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-0 left-[20%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-[10%] w-[300px] h-[300px] bg-primary/3 rounded-full blur-3xl" />
+      </div>
+
+      <div className="absolute top-6 md:top-8 left-6 md:left-8 z-20">
         <button
           onClick={() => navigate('/')}
-          className="p-3 text-on-surface hover:bg-surface-container/40 rounded-full transition-all"
+          className="p-3 text-on-surface hover:bg-surface-container/50 rounded-lg transition-all"
         >
           <ArrowLeft size={24} />
         </button>
       </div>
 
-      <div className="w-full max-w-md relative z-10 py-12">
-        <div className="text-center mb-10">
-          <Logo className="justify-center mb-8" />
-          <h2 className="font-display text-4xl font-bold text-on-surface mb-2">Create Account</h2>
-          <p className="text-textMuted">Join Nigeria's most trusted academic platform.</p>
+      <div className="w-full max-w-md relative z-10 py-8 md:py-12">
+        <div className="text-center mb-12 md:mb-16 space-y-3">
+          <Logo className="justify-center mb-6" />
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-on-surface">Create Account</h2>
+          <p className="text-textMuted text-base md:text-lg">Join Nigeria's most trusted academic platform.</p>
         </div>
 
-        <div className="bg-surface p-8 md:p-10 rounded-[20px] shadow-lg border border-outline">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Skeuomorphic card with shadow and depth */}
+        <div className="bg-surface p-8 md:p-10 rounded-3xl shadow-2xl border border-outline/50 relative overflow-hidden">
+          {/* Subtle top highlight for skeuomorphism */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+          
+          <form onSubmit={handleSubmit} className="space-y-8">
             <Input
               label="Full Name"
               type="text"
@@ -97,8 +107,8 @@ export const Register: React.FC = () => {
               icon={<Mail />}
             />
 
-            <div className="space-y-2">
-              <label className="text-[13px] font-semibold text-on-surface-variant px-1">Password</label>
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-on-surface px-1">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -106,13 +116,13 @@ export const Register: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-[52px] pl-12 pr-12 bg-surface-container border border-outline placeholder:text-textMuted text-on-surface focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-md outline-none transition-all"
+                  className="w-full h-[52px] pl-12 pr-12 bg-surface-container border border-outline placeholder:text-textMuted text-on-surface focus:border-primary focus:ring-4 focus:ring-primary/20 rounded-lg outline-none transition-all"
                 />
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={20} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary transition-colors"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -136,14 +146,14 @@ export const Register: React.FC = () => {
                   className="flex-shrink-0 mt-0.5 group"
                 >
                   <div className={cn(
-                    "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
-                    agreeTerms ? "bg-primary border-primary" : "border-outline group-hover:border-primary"
+                    "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all flex-shrink-0",
+                    agreeTerms ? "bg-primary border-primary shadow-md" : "border-outline group-hover:border-primary"
                   )}>
                     {agreeTerms && <CheckCircle2 size={12} className="text-on-primary-fixed" />}
                   </div>
                </button>
-               <span className="text-xs font-medium text-on-surface-variant leading-relaxed">
-                 I agree to the <button type="button" className="text-sungold font-bold hover:underline">Terms of Service</button> and <button type="button" className="text-sungold font-bold hover:underline">Privacy Policy</button>.
+               <span className="text-xs font-medium text-on-surface leading-relaxed pt-0.5">
+                 I agree to the <button type="button" className="text-primary font-bold hover:underline">Terms of Service</button> and <button type="button" className="text-primary font-bold hover:underline">Privacy Policy</button>.
                </span>
             </div>
 
@@ -151,18 +161,18 @@ export const Register: React.FC = () => {
               type="submit"
               isLoading={registerMutation.isPending}
               fullWidth
-              className="h-14 text-lg mt-4"
+              className="h-14 text-base font-semibold rounded-lg shadow-lg mt-8"
             >
               Get Started
             </Button>
           </form>
         </div>
 
-        <p className="mt-8 text-center text-sm text-textMuted">
+        <p className="mt-10 text-center text-sm text-textMuted">
           Already have an account?{' '}
           <button
             onClick={() => navigate('/login')}
-            className="text-primary font-bold hover:underline"
+            className="text-primary font-bold hover:underline transition-colors"
           >
             Sign in here
           </button>

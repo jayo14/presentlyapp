@@ -9,9 +9,9 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Input: React.FC<InputProps> = ({ label, error, icon, className = '', ...props }) => {
   return (
-    <div className="w-full">
+    <div className="w-full space-y-2">
       {label && (
-        <label className="block text-[13px] font-semibold text-on-surface-variant mb-2 pl-1">
+        <label className="block text-sm font-semibold text-on-surface mb-3 pl-1">
           {label}
         </label>
       )}
@@ -19,23 +19,23 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, className = ''
         <input
           className={cn(
             "w-full h-[48px] md:h-[52px] transition-all duration-300 outline-none",
-            "bg-white border-1.5 border-[#CBD5E1] focus:border-sungold focus:ring-3 focus:ring-sungold/15 rounded-md px-16",
-            "text-on-surface font-medium placeholder:text-on-surface-variant/50",
+            "bg-surface-container border border-outline focus:border-primary focus:ring-4 focus:ring-primary/20 rounded-lg px-12 py-3",
+            "text-on-surface font-medium placeholder:text-textMuted",
             icon ? 'pl-12' : '',
-            error ? 'border-soft-coral focus:border-soft-coral focus:ring-soft-coral/10' : '',
+            error ? 'border-error focus:border-error focus:ring-error/20' : '',
             className,
-            "disabled:opacity-50"
+            "disabled:opacity-50 disabled:bg-surface-variant"
           )}
           {...props}
         />
         {icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant transition-colors">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted transition-colors group-focus-within:text-primary">
             {React.cloneElement(icon as React.ReactElement, { size: 20 })}
           </div>
         )}
       </div>
       {error && (
-        <p className="mt-2 text-xs text-soft-coral font-medium ml-1 animate-in fade-in slide-in-from-top-1">
+        <p className="mt-3 text-xs text-error font-medium ml-1 animate-in fade-in slide-in-from-top-1">
            {error}
         </p>
       )}
