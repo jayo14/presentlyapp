@@ -68,18 +68,18 @@ export const Layout: React.FC<LayoutProps> = ({
 
       <div className="flex-1 flex flex-col min-h-screen md:ml-60 lg:ml-72">
         {/* MOBILE HEADER */}
-        <header className="md:hidden h-20 flex items-center justify-between px-6 bg-white/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
+        <header className="md:hidden h-20 flex items-center justify-between px-6 bg-surface/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
           <Logo showText={false} />
           <div className="flex items-center gap-4">
             <NotificationInbox />
             <button
               onClick={() => handleNavClick('profile')}
-              className="w-10 h-10 rounded-[22%] bg-sungold/10 border border-outline overflow-hidden shadow-sm"
+              className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 overflow-hidden shadow-sm"
             >
               {currentUser?.avatar_url ? (
                 <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-sungold">
+                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-primary">
                   {userName.charAt(0)}
                 </div>
               )}
