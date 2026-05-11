@@ -102,19 +102,8 @@ const Navbar = () => {
 
       {/* Mobile dropdown panel directly under header */}
       <div className="absolute left-0 right-0 top-full flex justify-center pointer-events-none">
-        <div className={`w-[85%] md:w-[75%] mt-2 pointer-events-auto md:hidden transition-all duration-200 ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+        <div className={`w-[85%] md:w-[75%] mt-2 px-2 pointer-events-auto md:hidden transition-all duration-200 ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
           <div className="bg-surface border border-outline rounded-2xl shadow-lg p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-                  <div className="w-2.5 h-2.5 bg-black rounded-full" />
-                </div>
-                <span className="font-bold text-on-surface">Presently</span>
-              </div>
-              <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="p-2 rounded-md hover:bg-surface-container/50">
-                <X size={18} />
-              </button>
-            </div>
 
             <nav className="flex flex-col gap-2 mb-4">
               <a href="#" className="py-2 text-on-surface hover:text-primary">How it Works</a>
@@ -123,8 +112,8 @@ const Navbar = () => {
             </nav>
 
             <div className="flex flex-col gap-3">
-              <a href="/login" className="w-full text-center py-3 rounded-md border border-outline text-on-surface">Log in</a>
-              <a href="/register" className="w-full text-center py-3 rounded-md bg-primary text-on-primary-fixed">Join</a>
+              <a href="/login" className="w-full text-center py-3 rounded-xl border border-outline text-on-surface">Log in</a>
+              <a href="/register" className="w-full text-center py-3 rounded-xl bg-primary text-on-primary-fixed">Join</a>
             </div>
           </div>
         </div>

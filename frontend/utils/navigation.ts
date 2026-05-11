@@ -1,72 +1,63 @@
 import { LucideIcon } from 'lucide-react';
 import {
   Home,
-  BarChart3,
   Users,
-  Settings,
   Calendar,
   CheckCircle2,
   ClipboardList,
   TrendingUp,
   Building2,
-  User,
   MapPin,
   BookOpen,
-  Clock,
   FileText,
+  Bell,
+  Cog,
+  Shield,
+  Newspaper,
 } from 'lucide-react';
 
 export interface NavItem {
   id: string;
   label: string;
   icon: LucideIcon;
-  href?: string;
+  href: string;
   roles: string[];
-  children?: NavItem[];
   badge?: string | number;
+  section?: 'core' | 'management' | 'system';
 }
 
 export const navigationItems: NavItem[] = [
-  // Common items
   {
     id: 'dashboard',
     label: 'Dashboard',
     icon: Home,
     href: '/dashboard',
     roles: ['student', 'lecturer', 'admin', 'class_rep'],
-    badge: undefined,
-  },
-
-  // Student-specific items
-  {
-    id: 'attendance',
-    label: 'My Attendance',
-    icon: CheckCircle2,
-    href: '/dashboard/attendance',
-    roles: ['student', 'class_rep'],
+    section: 'core',
   },
   {
     id: 'courses',
-    label: 'My Courses',
-    icon: BookOpen,
+    label: 'Attendance',
+    icon: CheckCircle2,
     href: '/dashboard/courses',
     roles: ['student', 'class_rep'],
+    section: 'core',
   },
   {
-    id: 'schedule',
+    id: 'timetable',
     label: 'Schedule',
     icon: Calendar,
-    href: '/dashboard/schedule',
+    href: '/dashboard/timetable',
     roles: ['student', 'lecturer', 'class_rep'],
+    section: 'core',
   },
-
-  // Lecturer-specific items
   {
     id: 'sessions',
     label: 'Sessions',
     icon: ClipboardList,
     href: '/dashboard/sessions',
     roles: ['lecturer'],
+    section: 'core',
   },
   {
     id: 'analytics',
@@ -74,6 +65,7 @@ export const navigationItems: NavItem[] = [
     icon: TrendingUp,
     href: '/dashboard/analytics',
     roles: ['student', 'lecturer', 'class_rep'],
+    section: 'core',
   },
   {
     id: 'reports',
@@ -81,83 +73,106 @@ export const navigationItems: NavItem[] = [
     icon: FileText,
     href: '/dashboard/reports',
     roles: ['lecturer'],
+    section: 'core',
   },
-
-  // Admin-specific items - Main sections
   {
-    id: 'admin-system',
-    label: 'System',
-    icon: BarChart3,
+    id: 'institutions',
+    label: 'Institutions',
+    icon: Building2,
+    href: '/dashboard/institutions',
     roles: ['admin'],
-    children: [
-      {
-        id: 'control-center',
-        label: 'Control Center',
-        icon: BarChart3,
-        href: '/dashboard/control-center',
-        roles: ['admin'],
-      },
-      {
-        id: 'system-logs',
-        label: 'System Logs',
-        icon: FileText,
-        href: '/dashboard/system-logs',
-        roles: ['admin'],
-      },
-    ],
+    section: 'management',
   },
   {
-    id: 'admin-management',
-    label: 'Management',
+    id: 'users',
+    label: 'Users',
     icon: Users,
+    href: '/dashboard/users',
     roles: ['admin'],
-    children: [
-      {
-        id: 'institutions',
-        label: 'Institutions',
-        icon: Building2,
-        href: '/dashboard/institutions',
-        roles: ['admin'],
-      },
-      {
-        id: 'users',
-        label: 'Users',
-        icon: Users,
-        href: '/dashboard/users',
-        roles: ['admin'],
-        badge: 2543,
-      },
-      {
-        id: 'venues',
-        label: 'Venues',
-        icon: MapPin,
-        href: '/dashboard/venues',
-        roles: ['admin'],
-      },
-      {
-        id: 'departments',
-        label: 'Departments',
-        icon: Building2,
-        href: '/dashboard/departments',
-        roles: ['admin'],
-      },
-      {
-        id: 'courses',
-        label: 'Courses',
-        icon: BookOpen,
-        href: '/dashboard/courses',
-        roles: ['admin'],
-      },
-    ],
+    section: 'management',
+  },
+  {
+    id: 'venues',
+    label: 'Venues',
+    icon: MapPin,
+    href: '/dashboard/venues',
+    roles: ['admin'],
+    section: 'management',
+  },
+  {
+    id: 'departments',
+    label: 'Departments',
+    icon: Building2,
+    href: '/dashboard/departments',
+    roles: ['admin'],
+    section: 'management',
+  },
+  {
+    id: 'courses-admin',
+    label: 'Courses',
+    icon: BookOpen,
+    href: '/dashboard/courses',
+    roles: ['admin'],
+    section: 'management',
+  },
+  {
+    id: 'blog',
+    label: 'Blog',
+    icon: Newspaper,
+    href: '/dashboard/blog',
+    roles: ['admin'],
+    section: 'management',
+  },
+  {
+    id: 'logs',
+    label: 'System Logs',
+    icon: FileText,
+    href: '/dashboard/logs',
+    roles: ['admin'],
+    section: 'system',
+  },
+  {
+    id: 'config',
+    label: 'Configuration',
+    icon: Cog,
+    href: '/dashboard/config',
+    roles: ['admin'],
+    section: 'system',
+  },
+  {
+    id: 'security',
+    label: 'Security',
+    icon: Shield,
+    href: '/dashboard/security',
+    roles: ['admin'],
+    section: 'system',
+  },
+  {
+    id: 'notifications',
+    label: 'Notifications',
+    icon: Bell,
+    href: '/dashboard/notifications',
+    roles: ['student', 'lecturer', 'admin', 'class_rep'],
+    section: 'system',
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: Cog,
+    href: '/dashboard/settings',
+    roles: ['student', 'lecturer', 'admin', 'class_rep'],
+    section: 'system',
+  },
+  {
+    id: 'profile',
+    label: 'Profile',
+    icon: Users,
+    href: '/dashboard/profile',
+    roles: ['student', 'lecturer', 'admin', 'class_rep'],
+    section: 'system',
   },
 ];
 
 export const getNavItemsForRole = (role: string): NavItem[] => {
-  return navigationItems
-    .filter(item => item.roles.includes(role))
-    .map(item => ({
-      ...item,
-      children: item.children?.filter(child => child.roles.includes(role)),
-    }))
-    .filter(item => !item.children || item.children.length > 0 || !item.children);
+  return navigationItems.filter((item) => item.roles.includes(role));
 };
