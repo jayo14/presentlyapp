@@ -283,7 +283,7 @@ const FeaturesBento = () => {
         <div className="grid grid-cols-12 gap-8 auto-rows-[280px]">
           <div className="col-span-12 md:col-span-8 bg-[#0D0D0D] rounded-[48px] p-16 text-white flex flex-col justify-between overflow-hidden relative group">
              <div className="relative z-10">
-                <h3 className="text-4xl font-bold mb-8 leading-tight">You can't check in from your dorm.</h3>
+                <h3 className="font-display text-4xl font-bold mb-8 leading-tight">You can't check in from your dorm.</h3>
                 <p className="text-slate-400 max-w-sm leading-relaxed text-lg">GPS + Wifi triangulation verifies campus presence. No VPNs, no spoofing, just real presence.</p>
              </div>
              <div className="absolute bottom-[-50px] right-[-50px] w-80 h-80 bg-[#F5C518]/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
@@ -295,7 +295,7 @@ const FeaturesBento = () => {
           <div className="col-span-12 md:col-span-4 bg-gray-50 rounded-[48px] p-12 flex flex-col justify-between group">
              <WifiSlash size={48} weight="duotone" className="text-[#F5C518] mb-4" />
              <div>
-                <h3 className="text-2xl font-bold mb-6 leading-tight">Poor signal? No problem.</h3>
+                <h3 className="font-display text-2xl font-bold mb-6 leading-tight">Poor signal? No problem.</h3>
                 <p className="text-gray-600 text-base leading-relaxed">Check-ins queue locally and sync when connection returns.</p>
              </div>
           </div>
@@ -311,14 +311,14 @@ const FeaturesBento = () => {
                 ))}
              </div>
              <div>
-                <h3 className="text-2xl font-bold mb-6 leading-tight">Watch your class fill up.</h3>
+                <h3 className="font-display text-2xl font-bold mb-6 leading-tight">Watch your class fill up.</h3>
                 <p className="text-gray-600 text-base leading-relaxed">Real-time attendance feed as students walk through the door.</p>
              </div>
           </div>
 
           <div className="col-span-12 md:col-span-8 bg-[#FDF7E7] rounded-[48px] p-16 flex flex-col md:flex-row gap-12 items-center border border-[#F5C518]/20">
              <div className="flex-1">
-                <h3 className="text-4xl font-bold mb-8 leading-tight">Everyone sees exactly what they should.</h3>
+                <h3 className="font-display text-4xl font-bold mb-8 leading-tight">Everyone sees exactly what they should.</h3>
                 <p className="text-gray-700 leading-relaxed text-lg">Students see theirs. Lecturers see their class. Admins see everything. Simple, secure, scoped.</p>
              </div>
              <div className="flex flex-col gap-6 w-56">
@@ -522,7 +522,7 @@ const Footer = () => (
       </div>
       
       <div>
-        <h4 className="text-white font-bold mb-10">Product</h4>
+        <h4 className="font-display text-white font-bold mb-10">Product</h4>
         <ul className="space-y-8 text-sm font-medium">
           <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">How it Works</a></li>
           <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Pricing</a></li>
@@ -531,7 +531,7 @@ const Footer = () => (
       </div>
 
       <div>
-        <h4 className="text-white font-bold mb-10">Company</h4>
+        <h4 className="font-display text-white font-bold mb-10">Company</h4>
         <ul className="space-y-8 text-sm font-medium">
           <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">About Us</a></li>
           <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Contact</a></li>
@@ -541,7 +541,7 @@ const Footer = () => (
       </div>
 
       <div>
-        <h4 className="text-white font-bold mb-10">Legal</h4>
+        <h4 className="font-display text-white font-bold mb-10">Legal</h4>
         <ul className="space-y-8 text-sm font-medium">
           <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Privacy Policy</a></li>
           <li><a href="#" className="hover:text-[#F5C518] transition-colors leading-relaxed py-1">Terms of Service</a></li>
