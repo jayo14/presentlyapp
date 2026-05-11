@@ -76,7 +76,7 @@ const Navbar = () => {
             Log In
           </button>
           <button className="bg-[#F5C518] text-black px-7 py-3 rounded-full font-black hover:shadow-[0_0_25px_rgba(245,197,24,0.4)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed">
-            Join <ArrowUpRight size={18} weight="duotone" />
+            Join <ArrowUpRight size={24} weight="duotone" />
           </button>
         </div>
       </div>
@@ -124,7 +124,7 @@ const AccordionItem = ({ question, answer }) => {
       >
         <span className="text-xl md:text-2xl font-bold text-black group-hover:text-[#F5C518] transition-colors leading-relaxed">{question}</span>
         <div className="bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center text-[#F5C518] flex-shrink-0">
-          {isOpen ? <Minus size={20} weight="duotone" /> : <Plus size={20} weight="duotone" />}
+          {isOpen ? <Minus size={28} weight="duotone" /> : <Plus size={28} weight="duotone" />}
         </div>
       </button>
       <AnimatePresence>
@@ -196,11 +196,11 @@ const Hero = () => {
             className="flex flex-col sm:flex-row items-center gap-8"
           >
             <button className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed">
-              Start for free <CaretRight size={20} weight="duotone" />
+              Start for free <CaretRight size={24} weight="duotone" />
             </button>
             <button className="group flex items-center gap-4 font-bold text-white text-lg">
               <div className="w-14 h-14 rounded-full border-2 border-white/20 flex items-center justify-center group-hover:border-[#F5C518] transition-colors">
-                <Play size={24} weight="duotone" className="ml-0.5" />
+                <Play size={32} weight="duotone" className="ml-0.5" />
               </div>
               <span className="border-b-2 border-white/10 group-hover:border-[#F5C518] transition-colors pb-2">Watch how it works</span>
             </button>
@@ -223,7 +223,7 @@ const Hero = () => {
              <div className="bg-[#0D0D0D] h-[500px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-12 text-center">
                 <div className="w-24 h-24 bg-[#F5C518]/20 rounded-full flex items-center justify-center mb-8 relative">
                   <div className="absolute inset-0 bg-[#F5C518] rounded-full animate-ping opacity-20" />
-                  <MapPin size={40} weight="duotone" className="text-[#F5C518]" />
+                  <MapPin size={56} weight="duotone" className="text-[#F5C518]" />
                 </div>
                 <h4 className="text-white font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
                 <p className="text-white/40 text-base leading-relaxed">Verifying location at Campus Library</p>
@@ -233,7 +233,7 @@ const Hero = () => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-0 bottom-20 bg-[#F5C518] p-8 rounded-[32px] shadow-2xl text-black">
              <div className="flex items-center gap-6">
                 <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white">
-                  <CheckCircle size={28} weight="duotone" />
+                  <CheckCircle size={40} weight="duotone" />
                 </div>
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-1 leading-relaxed">Verified</p>
@@ -288,12 +288,12 @@ const FeaturesBento = () => {
              </div>
              <div className="absolute bottom-[-50px] right-[-50px] w-80 h-80 bg-[#F5C518]/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
              <div className="self-end bg-[#F5C518] p-4 rounded-3xl text-black">
-                <PaperPlaneTilt size={32} weight="duotone" />
+                <PaperPlaneTilt size={48} weight="duotone" />
              </div>
           </div>
 
           <div className="col-span-12 md:col-span-4 bg-gray-50 rounded-[48px] p-12 flex flex-col justify-between group">
-             <WifiSlash size={48} weight="duotone" className="text-[#F5C518] mb-4" />
+             <WifiSlash size={56} weight="duotone" className="text-[#F5C518] mb-4" />
              <div>
                 <h3 className="font-display text-2xl font-bold mb-6 leading-tight">Poor signal? No problem.</h3>
                 <p className="text-gray-600 text-base leading-relaxed">Check-ins queue locally and sync when connection returns.</p>
@@ -360,15 +360,15 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
       />
 
       <div className="relative z-10 grid lg:grid-cols-2 gap-20 items-center h-full">
-        <div className="flex flex-col h-full justify-between">
-          <div>
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10" style={{ backgroundColor: color }}>
-              <Icon size={32} className="text-black" />
+        <div className="flex flex-col h-full justify-between py-4 pr-8">
+          <div className="space-y-8">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: color }}>
+              <Icon size={48} className="text-black" />
             </div>
-            <h3 className="font-display text-4xl font-black text-white mb-8 tracking-tighter leading-tight">{title}</h3>
-            <p className="text-slate-400 text-lg leading-relaxed mb-12 max-w-sm">{description}</p>
+            <h3 className="font-display text-4xl font-black text-white mb-6 tracking-tighter leading-tight">{title}</h3>
+            <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-sm">{description}</p>
             
-            <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+            <div className="grid grid-cols-2 gap-y-8 gap-x-6">
               {features.map((f, i) => (
                 <div key={i} className="flex items-center gap-3 text-white/90 text-base font-medium leading-relaxed">
                   <CheckCircle size={20} weight="duotone" style={{ color }} className="flex-shrink-0" /> {f}
@@ -376,11 +376,11 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
               ))}
             </div>
           </div>
-          <button className="mt-14 group/btn flex items-center gap-2 text-white font-bold text-sm tracking-widest uppercase leading-relaxed">
+          <button className="mt-16 group/btn flex items-center gap-2 text-white font-bold text-sm tracking-widest uppercase leading-relaxed">
             Learn More <ArrowUpRight size={18} weight="duotone" style={{ color }} />
           </button>
         </div>
-        <div className="relative h-full flex items-center justify-center min-h-[380px]">
+        <div className="relative h-full flex items-center justify-center min-h-[380px] pl-8">
           {children}
         </div>
       </div>
@@ -426,7 +426,7 @@ const RoleBasedSection = () => {
                           <div className="h-2 w-20 bg-gray-200 rounded-full" />
                           <div className="h-1.5 w-12 bg-gray-100 rounded-full" />
                         </div>
-                        <CheckCircle size={18} weight="duotone" className="text-[#F5C518]" />
+                        <CheckCircle size={24} weight="duotone" className="text-[#F5C518]" />
                       </div>
                     ))}
                   </div>
