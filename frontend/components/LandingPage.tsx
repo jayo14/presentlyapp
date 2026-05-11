@@ -8,7 +8,7 @@ import {
   CheckCircle,
   PaperPlaneTilt,
   WifiSlash,
-  StudentChair,
+  User,
   ChalkboardSimple,
   Buildings,
   Plus,
@@ -402,7 +402,7 @@ const RoleBasedSection = () => {
           <FeatureCard 
             title="Focus on Learning."
             description="Attendance shouldn't be a distraction. We've made it as natural as walking into the classroom."
-            icon={StudentChair}
+            icon={User}
             color="#F5C518"
             features={['One-tap Verification', 'Attendance Tracker', 'Missed Class Alerts', 'Academic Calendar']}
               className="lg:col-span-12 min-h-[500px]"
@@ -445,7 +445,7 @@ const RoleBasedSection = () => {
               description="No more manual registers. Open a session and let Presently handle the rest while you focus on delivery."
               icon={ChalkboardSimple}
               color="#38BDF8"
-              features={['Live Feed', 'Instant Export', 'Auto-Grades', 'Class Analytics']
+              features={['Live Feed', 'Instant Export', 'Auto-Grades', 'Class Analytics']}
             >
               <div className="bg-[#1a1a1a] p-8 rounded-3xl border border-white/5 w-full max-w-sm rotate-3 group-hover:rotate-0 transition-transform duration-700 shadow-2xl">
                 <div className="flex items-center justify-between mb-10">
@@ -602,7 +602,7 @@ export default function App() {
             className="flex items-center gap-8 md:gap-16 will-change-transform px-[20vw]"
           >
             {[
-              { id: 1, color: 'bg-slate-50', icon: StudentChair },
+              { id: 1, color: 'bg-slate-50', icon: User },
               { id: 2, color: 'bg-slate-100', icon: ChalkboardSimple },
               { id: 3, color: 'bg-[#0D0D0D]', icon: MapPin, active: true },
               { id: 4, color: 'bg-slate-100', icon: PaperPlaneTilt },
