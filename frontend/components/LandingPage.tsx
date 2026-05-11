@@ -154,7 +154,7 @@ const Hero = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-[#0D0D0D] pt-56 pb-32 px-8 overflow-hidden">
+    <section ref={containerRef} className="relative min-h-screen bg-[#0D0D0D] pt-56 pb-40 px-16 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#F5C518]/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-center relative">
@@ -248,7 +248,7 @@ const Hero = () => {
 };
 
 const SocialMarquee = () => (
-  <div className="bg-[#0D0D0D] border-y border-white/5 py-16 overflow-hidden flex whitespace-nowrap">
+  <div className="bg-[#0D0D0D] border-y border-white/5 py-20 overflow-hidden flex whitespace-nowrap">
     <motion.div 
       initial={{ x: 0 }}
       animate={{ x: "-50%" }}
@@ -273,7 +273,7 @@ const SocialMarquee = () => (
 
 const FeaturesBento = () => {
   return (
-    <section className="py-48 px-8 bg-white">
+    <section className="py-64 px-16 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-40">
           <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block">What's Under the Hood</span>
@@ -390,7 +390,7 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
 
 const RoleBasedSection = () => {
   return (
-  <section className="py-48 px-8 bg-[#0D0D0D]">
+  <section className="py-64 px-16 bg-[#0D0D0D]">
       <div className="max-w-7xl mx-auto">
         <div className="mb-36">
           <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block leading-relaxed">Built for everyone in the room</span>
@@ -491,7 +491,7 @@ const RoleBasedSection = () => {
 };
 
 const CTASection = () => (
-      <section className="py-48 px-8 bg-[#0D0D0D] text-center relative overflow-hidden">
+      <section className="py-64 px-16 bg-[#0D0D0D] text-center relative overflow-hidden">
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F5C518]/10 blur-[150px] rounded-full pointer-events-none" />
     <div className="max-w-4xl mx-auto relative z-10">
       <h2 className="font-display text-6xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
@@ -571,7 +571,7 @@ export default function App() {
       <Hero />
       <SocialMarquee />
       
-      <section className="bg-[#0D0D0D] py-40 px-8">
+      <section className="bg-[#0D0D0D] py-56 px-16">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 border-y border-white/5 py-20">
           <StatCounter value="200+" label="Students Enrolled" />
           <StatCounter value="94.7%" label="Avg Attendance Rate" />
@@ -590,7 +590,7 @@ export default function App() {
       <FeaturesBento />
 
       {/* Mobile App Arc Showcase */}
-      <section ref={showcaseRef} className="py-40 px-6 overflow-hidden bg-white">
+      <section ref={showcaseRef} className="py-56 px-12 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto text-center mb-40">
           <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block">Mobile Experience</span>
           <h2 className="font-display text-5xl md:text-7xl font-black tracking-tighter text-black leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
@@ -619,7 +619,7 @@ export default function App() {
         </div>
       </section>
 
-        <section className="py-48 px-8">
+        <section className="py-64 px-16">
         <div className="max-w-3xl mx-auto">
           <div className="mb-36">
             <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block leading-relaxed">FAQ</span>
