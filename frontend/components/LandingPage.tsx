@@ -14,6 +14,7 @@ import {
   Plus,
   Minus,
 } from '@phosphor-icons/react';
+import { ThemeToggle } from './ThemeToggle';
 
 // --- Constants ---
 const SUNGOLD = "#F5C518";
@@ -553,8 +554,10 @@ const Footer = () => (
       </div>
     </div>
     <div className="max-w-7xl mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase  leading-relaxed">
-      <p>© 2025 PREVENTLY. <span className="text-[#F5C518]">GPS-VERIFIED ATTENDANCE.</span></p>
-      <p>MADE WITH CARE IN LAGOS, NIGERIA.</p>
+      <p>© 2025 Presently. <span className="text-[#F5C518]">GPS-VERIFIED ATTENDANCE.</span></p>
+      <div className="mt-4 md:mt-0">
+        <ThemeToggle />
+      </div>
     </div>
   </footer>
 );
