@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } from '@phosphor-icons/react';
 import { Button } from '../Button';
 
 export const LandingCTA: React.FC = () => {
@@ -39,7 +39,7 @@ export const LandingCTA: React.FC = () => {
           className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 sm:gap-6"
         >
           <Button variant="primary" size="lg" className="px-12 h-16 text-lg w-full sm:w-auto">
-            Get started for free <ArrowRight className="ml-2" />
+            Get started for free <ArrowRight size={20} weight="duotone" className="ml-2" />
           </Button>
           <Button variant="outline" size="lg" className="px-12 h-16 text-lg border-white text-white hover:bg-white/10 w-full sm:w-auto">
             Request a school demo

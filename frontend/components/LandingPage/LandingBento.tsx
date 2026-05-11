@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Wifi, Signal, FileDown, ShieldCheck, Users } from 'lucide-react';
+import { MapPin, WifiSlash, ArrowsOut, FileDown, Shield, Users } from '@phosphor-icons/react';
 import { cn } from '../../src/components/ui/utils';
 
 export const LandingBento: React.FC = () => {
@@ -35,7 +35,7 @@ export const LandingBento: React.FC = () => {
                    transition={{ duration: 3, repeat: Infinity }}
                    className="absolute w-24 h-24 bg-sungold/20 rounded-full"
                  />
-                 <MapPin className="text-sungold w-8 h-8 relative z-10" />
+                 <MapPin size={36} weight="duotone" className="text-sungold relative z-10" />
                </div>
             </div>
           </motion.div>
@@ -48,7 +48,7 @@ export const LandingBento: React.FC = () => {
             className="md:col-span-3 bg-pale-honey dark:bg-[#1F1A0F] rounded-[20px] p-8 flex flex-col justify-between"
           >
             <div className="w-12 h-12 bg-white dark:bg-[#2A2418] rounded-full flex items-center justify-center shadow-sm mb-4">
-              <Wifi className="text-sungold w-6 h-6" />
+              <WifiSlash size={24} weight="duotone" className="text-sungold" />
             </div>
             <div>
               <h3 className="font-display text-xl mb-2">Poor signal? No problem.</h3>
@@ -85,7 +85,7 @@ export const LandingBento: React.FC = () => {
             className="md:col-span-3 bg-surface rounded-[20px] p-8 border border-outline flex flex-col items-center justify-center text-center gap-4"
           >
             <div className="w-16 h-16 bg-sungold/10 rounded-2xl flex items-center justify-center text-sungold">
-              <FileDown size={32} />
+              <FileDown size={32} weight="duotone" />
             </div>
             <h3 className="font-display text-xl">One click to PDF.</h3>
           </motion.div>
@@ -102,9 +102,9 @@ export const LandingBento: React.FC = () => {
               <p className="text-on-surface-variant text-sm">Students see theirs. Lecturers see their class. Admins see everything.</p>
             </div>
             <div className="w-48 h-48 bg-white dark:bg-[#141414] rounded-full flex items-center justify-center relative shadow-md">
-               <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-sungold rounded-xl flex items-center justify-center shadow-lg"><ShieldCheck className="text-presently-black w-6 h-6" /></div>
-                <div className="absolute bottom-8 left-4 w-12 h-12 bg-presently-black rounded-xl flex items-center justify-center shadow-lg"><Users className="text-white w-6 h-6" /></div>
-                <div className="absolute bottom-8 right-4 w-12 h-12 bg-presently-black rounded-xl flex items-center justify-center shadow-lg"><Users className="text-white w-6 h-6" /></div>
+               <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-sungold rounded-xl flex items-center justify-center shadow-lg"><Shield size={24} weight="duotone" className="text-presently-black" /></div>
+                <div className="absolute bottom-8 left-4 w-12 h-12 bg-presently-black rounded-xl flex items-center justify-center shadow-lg"><Users size={24} weight="duotone" className="text-white" /></div>
+                <div className="absolute bottom-8 right-4 w-12 h-12 bg-presently-black rounded-xl flex items-center justify-center shadow-lg"><Users size={24} weight="duotone" className="text-white" /></div>
                 <div className="w-24 h-0.5 bg-slate-300 dark:bg-slate-700 absolute rotate-[120deg] origin-center -translate-y-4 -translate-x-6" />
                 <div className="w-24 h-0.5 bg-slate-300 dark:bg-slate-700 absolute rotate-[60deg] origin-center -translate-y-4 translate-x-6" />
              </div>
@@ -117,7 +117,7 @@ export const LandingBento: React.FC = () => {
             viewport={{ once: true }}
             className="md:col-span-3 bg-presently-black rounded-[20px] p-8 text-white flex flex-col justify-center items-center text-center"
           >
-            <Signal className="text-sungold w-12 h-12 mb-4 animate-pulse" />
+            <ArrowsOut size={48} weight="duotone" className="text-sungold mb-4 animate-pulse" />
             <h3 className="font-display text-lg">99.9% Uptime</h3>
           </motion.div>
         </div>

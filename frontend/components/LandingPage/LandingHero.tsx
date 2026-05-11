@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle, XCircle, Clock } from '@phosphor-icons/react';
 import { Button } from '../Button';
 
 interface LandingHeroProps {
@@ -39,7 +39,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
 
               <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
                 <Button variant="primary" size="lg" onClick={onGetStarted} className="w-full sm:w-auto">
-                  Get started for free <ArrowRight className="ml-2 w-5 h-5" />
+                  Get started for free <ArrowRight size={20} weight="duotone" className="ml-2" />
                 </Button>
                 <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white/10">
                   Request a school demo
@@ -119,7 +119,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
                    transition={{ duration: 2, repeat: Infinity }}
                    className="w-24 h-24 rounded-full bg-sungold flex items-center justify-center shadow-gold"
                 >
-                  <CheckCircle2 className="w-12 h-12 text-presently-black" />
+                  <CheckCircle size={48} weight="duotone" className="text-presently-black" />
                 </motion.div>
                 <div className="text-center">
                   <p className="font-display text-xl mb-1">Present</p>
@@ -135,7 +135,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               transition={{ delay: 0.8 }}
               className="absolute top-1/2 -left-10 z-30 bg-[#D1FAE5] text-[#065F46] px-4 py-2 rounded-full flex items-center gap-2 shadow-lg font-semibold text-sm"
             >
-              <CheckCircle2 size={16} /> Present ✓
+              <CheckCircle size={18} weight="duotone" /> Present ✓
             </motion.div>
 
             <motion.div
@@ -144,7 +144,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               transition={{ delay: 1 }}
               className="absolute top-1/4 -right-10 z-30 bg-[#FEE2E2] text-[#991B1B] px-4 py-2 rounded-full flex items-center gap-2 shadow-lg font-semibold text-sm"
             >
-              <XCircle size={16} /> Absent ✗
+              <XCircle size={18} weight="duotone" /> Absent ✗
             </motion.div>
 
             <motion.div
@@ -153,7 +153,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
               transition={{ delay: 1.2 }}
               className="absolute bottom-20 left-0 z-30 bg-[#FEF3C7] text-[#92400E] px-4 py-2 rounded-full flex items-center gap-2 shadow-lg font-semibold text-sm"
             >
-              <Clock size={16} /> Late
+              <Clock size={18} weight="duotone" /> Late
             </motion.div>
           </div>
         </div>

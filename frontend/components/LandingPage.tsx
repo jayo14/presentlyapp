@@ -1,73 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion';
-
-// Phosphor Icons Implementation via SVG paths for reliability in this environment
-const Icons = {
-  ArrowUpRight: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z" />
-    </svg>
-  ),
-  CaretRight: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z" />
-    </svg>
-  ),
-  Play: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M228.23,118.07,84.27,33.15A14,14,0,0,0,62,45.08V210.92a14,14,0,0,0,22.27,11.93l143.96-84.92a14,14,0,0,0,0-23.86Z" />
-    </svg>
-  ),
-  MapPin: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M128,16a88.1,88.1,0,0,0-88,88c0,75.3,80,132.17,83.41,134.55a8,8,0,0,0,9.18,0C136,236.17,216,179.3,216,104A88.1,88.1,0,0,0,128,16Zm0,112a24,24,0,1,1,24-24A24,24,0,0,1,128,128Z" opacity="0.2" />
-      <path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,75.3,80,132.17,83.41,134.55a8,8,0,0,0,9.18,0C136,236.17,216,179.3,216,104A88.1,88.1,0,0,0,128,16Zm0,206.4C113.82,211.51,56,163.2,56,104a72,72,0,0,1,144,0C200,163.2,142.18,211.51,128,222.4Z" />
-    </svg>
-  ),
-  CheckCircle: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z" />
-    </svg>
-  ),
-  NavigationArrow: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M231.25,108.72l-192-80a16,16,0,0,0-21,21l80,192a16,16,0,0,0,29.8,0l30.08-72.2,72.2-30.08A16,16,0,0,0,231.25,108.72Z" />
-    </svg>
-  ),
-  WifiSlash: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M42.34,42.34a8,8,0,0,1,11.32,0l160,160a8,8,0,0,1-11.32,11.32l-160-160A8,8,0,0,1,42.34,42.34ZM235.6,83.9a8,8,0,0,0-11.2,1.5,143,143,0,0,0-15.68,22.18,8,8,0,1,0,13.4,8.83,159.29,159.29,0,0,1,15,21.3,8,8,0,1,0,13.72-8.21A175.09,175.09,0,0,0,235.6,83.9Z" />
-    </svg>
-  ),
-  Student: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M245.86,95.53l-112-64a12,12,0,0,0-11.72,0l-112,64a12,12,0,0,0,0,20.94l47.86,27.35v34.42c0,32,32,57.76,72,57.76s72-25.76,72-57.76V143.82l21.43-12.25V184a8,8,0,0,0,16,0V124.73l7.57-4.33A12,12,0,0,0,245.86,95.53Z" />
-    </svg>
-  ),
-  ChalkboardTeacher: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M224,32H32A16,16,0,0,0,16,48V168a16,16,0,0,0,16,16H96v16a8,8,0,0,0,16,0V184h32v16a8,8,0,0,0,16,0V184h64a16,16,0,0,0,16-16V48A16,16,0,0,0,224,32Zm0,136H32V48H224V168Z" />
-    </svg>
-  ),
-  Buildings: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200Z" />
-    </svg>
-  ),
-  Plus: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z" />
-    </svg>
-  ),
-  Minus: (props) => (
-    <svg viewBox="0 0 256 256" width={props.size || 24} height={props.size || 24} fill="currentColor" {...props}>
-      <path d="M216,136H40a8,8,0,0,1,0-16H216a8,8,0,0,1,0,16Z" />
-    </svg>
-  )
-};
+import {
+  ArrowUpRight,
+  CaretRight,
+  Play,
+  MapPin,
+  CheckCircle,
+  PaperPlaneTilt,
+  WifiSlash,
+  StudentChair,
+  ChalkboardSimple,
+  Buildings,
+  Plus,
+  Minus,
+} from '@phosphor-icons/react';
 
 // --- Constants ---
 const SUNGOLD = "#F5C518";
+
+// Icon wrapper component for consistent sizing and spacing
+const IconWrapper = ({ children, size = 24 }) => (
+  <div className="flex items-center justify-center flex-shrink-0">
+    {React.cloneElement(children, { size, weight: 'duotone' })}
+  </div>
+);
 
 // --- Components ---
 
@@ -120,7 +76,7 @@ const Navbar = () => {
             Log In
           </button>
           <button className="bg-[#F5C518] text-black px-7 py-3 rounded-full font-black hover:shadow-[0_0_25px_rgba(245,197,24,0.4)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed">
-            Join <Icons.ArrowUpRight size={16} />
+            Join <ArrowUpRight size={18} weight="duotone" />
           </button>
         </div>
       </div>
@@ -168,7 +124,7 @@ const AccordionItem = ({ question, answer }) => {
       >
         <span className="text-xl md:text-2xl font-bold text-black group-hover:text-[#F5C518] transition-colors leading-relaxed">{question}</span>
         <div className="bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center text-[#F5C518] flex-shrink-0">
-          {isOpen ? <Icons.Minus size={20} /> : <Icons.Plus size={20} />}
+          {isOpen ? <Minus size={20} weight="duotone" /> : <Plus size={20} weight="duotone" />}
         </div>
       </button>
       <AnimatePresence>
@@ -214,7 +170,7 @@ const Hero = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-8xl font-black text-white leading-[1.1] tracking-tighter mb-12"
+            className="font-display text-6xl md:text-8xl font-black text-white leading-[1.1] tracking-tighter mb-12"
           >
             Attendance<br />
             that actually<br />
@@ -240,11 +196,11 @@ const Hero = () => {
             className="flex flex-col sm:flex-row items-center gap-8"
           >
             <button className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed">
-              Start for free <Icons.CaretRight size={20} />
+              Start for free <CaretRight size={20} weight="duotone" />
             </button>
             <button className="group flex items-center gap-4 font-bold text-white text-lg">
               <div className="w-14 h-14 rounded-full border-2 border-white/20 flex items-center justify-center group-hover:border-[#F5C518] transition-colors">
-                <Icons.Play size={22} className="ml-1" />
+                <Play size={24} weight="duotone" className="ml-0.5" />
               </div>
               <span className="border-b-2 border-white/10 group-hover:border-[#F5C518] transition-colors pb-2">Watch how it works</span>
             </button>
@@ -267,7 +223,7 @@ const Hero = () => {
              <div className="bg-[#0D0D0D] h-[500px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-12 text-center">
                 <div className="w-24 h-24 bg-[#F5C518]/20 rounded-full flex items-center justify-center mb-8 relative">
                   <div className="absolute inset-0 bg-[#F5C518] rounded-full animate-ping opacity-20" />
-                  <Icons.MapPin size={36} className="text-[#F5C518]" />
+                  <MapPin size={40} weight="duotone" className="text-[#F5C518]" />
                 </div>
                 <h4 className="text-white font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
                 <p className="text-white/40 text-base leading-relaxed">Verifying location at Campus Library</p>
@@ -277,7 +233,7 @@ const Hero = () => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-0 bottom-20 bg-[#F5C518] p-8 rounded-[32px] shadow-2xl text-black">
              <div className="flex items-center gap-6">
                 <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white">
-                  <Icons.CheckCircle size={28} />
+                  <CheckCircle size={28} weight="duotone" />
                 </div>
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-1 leading-relaxed">Verified</p>
@@ -321,7 +277,7 @@ const FeaturesBento = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-40">
           <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block">What's Under the Hood</span>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-black leading-tight">Powerful features.<br/>Quietly in the background.</h2>
+          <h2 className="font-display text-5xl md:text-7xl font-black tracking-tighter text-black leading-tight">Powerful features.<br/>Quietly in the background.</h2>
         </div>
 
         <div className="grid grid-cols-12 gap-8 auto-rows-[280px]">
@@ -332,12 +288,12 @@ const FeaturesBento = () => {
              </div>
              <div className="absolute bottom-[-50px] right-[-50px] w-80 h-80 bg-[#F5C518]/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
              <div className="self-end bg-[#F5C518] p-4 rounded-3xl text-black">
-                <Icons.NavigationArrow size={32} />
+                <PaperPlaneTilt size={32} weight="duotone" />
              </div>
           </div>
 
           <div className="col-span-12 md:col-span-4 bg-gray-50 rounded-[48px] p-12 flex flex-col justify-between group">
-             <Icons.WifiSlash size={44} className="text-[#F5C518] mb-4" />
+             <WifiSlash size={48} weight="duotone" className="text-[#F5C518] mb-4" />
              <div>
                 <h3 className="text-2xl font-bold mb-6 leading-tight">Poor signal? No problem.</h3>
                 <p className="text-gray-600 text-base leading-relaxed">Check-ins queue locally and sync when connection returns.</p>
@@ -409,19 +365,19 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10" style={{ backgroundColor: color }}>
               <Icon size={32} className="text-black" />
             </div>
-            <h3 className="text-4xl font-black text-white mb-8 tracking-tighter leading-tight">{title}</h3>
+            <h3 className="font-display text-4xl font-black text-white mb-8 tracking-tighter leading-tight">{title}</h3>
             <p className="text-slate-400 text-lg leading-relaxed mb-12 max-w-sm">{description}</p>
             
             <div className="grid grid-cols-2 gap-y-6 gap-x-4">
               {features.map((f, i) => (
                 <div key={i} className="flex items-center gap-3 text-white/90 text-base font-medium leading-relaxed">
-                  <Icons.CheckCircle style={{ color }} className="flex-shrink-0 text-xl" /> {f}
+                  <CheckCircle size={20} weight="duotone" style={{ color }} className="flex-shrink-0" /> {f}
                 </div>
               ))}
             </div>
           </div>
           <button className="mt-14 group/btn flex items-center gap-2 text-white font-bold text-sm tracking-widest uppercase leading-relaxed">
-            Learn More <Icons.ArrowUpRight size={18} style={{ color }} />
+            Learn More <ArrowUpRight size={18} weight="duotone" style={{ color }} />
           </button>
         </div>
         <div className="relative h-full flex items-center justify-center min-h-[380px]">
@@ -438,7 +394,7 @@ const RoleBasedSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-36">
           <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block leading-relaxed">Built for everyone in the room</span>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">Whoever you are,<br/>Presently works for you.</h2>
+          <h2 className="font-display text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">Whoever you are,<br/>Presently works for you.</h2>
         </div>
 
         <div className="flex flex-col gap-14">
@@ -446,7 +402,7 @@ const RoleBasedSection = () => {
           <FeatureCard 
             title="Focus on Learning."
             description="Attendance shouldn't be a distraction. We've made it as natural as walking into the classroom."
-            icon={Icons.Student}
+            icon={StudentChair}
             color="#F5C518"
             features={['One-tap Verification', 'Attendance Tracker', 'Missed Class Alerts', 'Academic Calendar']}
               className="lg:col-span-12 min-h-[500px]"
@@ -470,7 +426,7 @@ const RoleBasedSection = () => {
                           <div className="h-2 w-20 bg-gray-200 rounded-full" />
                           <div className="h-1.5 w-12 bg-gray-100 rounded-full" />
                         </div>
-                        <Icons.CheckCircle size={18} className="text-[#F5C518]" />
+                        <CheckCircle size={18} weight="duotone" className="text-[#F5C518]" />
                       </div>
                     ))}
                   </div>
@@ -487,9 +443,9 @@ const RoleBasedSection = () => {
             <FeatureCard 
               title="Teach. Track. Done."
               description="No more manual registers. Open a session and let Presently handle the rest while you focus on delivery."
-              icon={Icons.ChalkboardTeacher}
+              icon={ChalkboardSimple}
               color="#38BDF8"
-              features={['Live Feed', 'Instant Export', 'Auto-Grades', 'Class Analytics']}
+              features={['Live Feed', 'Instant Export', 'Auto-Grades', 'Class Analytics']
             >
               <div className="bg-[#1a1a1a] p-8 rounded-3xl border border-white/5 w-full max-w-sm rotate-3 group-hover:rotate-0 transition-transform duration-700 shadow-2xl">
                 <div className="flex items-center justify-between mb-10">
@@ -512,7 +468,7 @@ const RoleBasedSection = () => {
             <FeatureCard 
               title="Campus Insights."
               description="A bird's eye view of your entire institution. Monitor compliance and trends in real-time."
-              icon={Icons.Buildings}
+              icon={Buildings}
               color="#34D399"
               features={['Faculty View', 'Trend Reports', 'Data Security', 'Global Search']}
             >
@@ -538,7 +494,7 @@ const CTASection = () => (
       <section className="py-48 px-8 bg-[#0D0D0D] text-center relative overflow-hidden">
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F5C518]/10 blur-[150px] rounded-full pointer-events-none" />
     <div className="max-w-4xl mx-auto relative z-10">
-      <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
+      <h2 className="font-display text-6xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
       <p className="text-slate-400 text-2xl mb-20 max-w-xl mx-auto leading-relaxed">Join institutions already running smarter with Presently. Setup takes less than 5 minutes.</p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-10 mb-24">
         <button className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed">
@@ -623,7 +579,7 @@ export default function App() {
           <StatCounter value="1" label="University & Growing" />
         </div>
         <div className="max-w-4xl mx-auto text-center mt-40">
-           <p className="text-4xl md:text-6xl font-black text-white italic tracking-tighter leading-relaxed mb-8">
+           <p className="font-display text-4xl md:text-6xl font-black text-white italic tracking-tighter leading-relaxed mb-8">
              "Presently didn't just fix attendance tracking. It changed how we think about student accountability."
            </p>
            <p className="mt-12 text-slate-500 font-bold uppercase tracking-widest text-base leading-relaxed">— Dr. Adeyemi, Dean of Student Affairs</p>
@@ -637,7 +593,7 @@ export default function App() {
       <section ref={showcaseRef} className="py-40 px-6 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto text-center mb-40">
           <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block">Mobile Experience</span>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-black leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
+          <h2 className="font-display text-5xl md:text-7xl font-black tracking-tighter text-black leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
         </div>
         
         <div className="relative flex items-center justify-center h-[700px]">
@@ -646,11 +602,11 @@ export default function App() {
             className="flex items-center gap-8 md:gap-16 will-change-transform px-[20vw]"
           >
             {[
-              { id: 1, color: 'bg-slate-50', icon: Icons.Student },
-              { id: 2, color: 'bg-slate-100', icon: Icons.ChalkboardTeacher },
-              { id: 3, color: 'bg-[#0D0D0D]', icon: Icons.MapPin, active: true },
-              { id: 4, color: 'bg-slate-100', icon: Icons.NavigationArrow },
-              { id: 5, color: 'bg-slate-50', icon: Icons.CheckCircle },
+              { id: 1, color: 'bg-slate-50', icon: StudentChair },
+              { id: 2, color: 'bg-slate-100', icon: ChalkboardSimple },
+              { id: 3, color: 'bg-[#0D0D0D]', icon: MapPin, active: true },
+              { id: 4, color: 'bg-slate-100', icon: PaperPlaneTilt },
+              { id: 5, color: 'bg-slate-50', icon: CheckCircle },
             ].map((item, idx) => (
               <ShowcaseDevice 
                 key={item.id} 
@@ -667,7 +623,7 @@ export default function App() {
         <div className="max-w-3xl mx-auto">
           <div className="mb-36">
             <span className="text-[#F5C518] text-xs font-black tracking-[0.3em] uppercase mb-8 block leading-relaxed">FAQ</span>
-            <h2 className="text-5xl font-black tracking-tighter text-black leading-tight">Questions you'll have.<br/>Answered already.</h2>
+            <h2 className="font-display text-5xl font-black tracking-tighter text-black leading-tight">Questions you'll have.<br/>Answered already.</h2>
           </div>
           <div className="space-y-0">
             <AccordionItem 
@@ -722,7 +678,8 @@ function ShowcaseDevice({ item, scrollProgress, index }) {
         )}
         <div className={`z-10 bg-white/10 backdrop-blur-md p-8 rounded-3xl ${item.active ? 'bg-white/20' : ''}`}>
           <IconComponent
-            size={52} 
+            size={56} 
+            weight="duotone"
             className={item.active ? "text-[#F5C518]" : "text-slate-400"} 
           />
         </div>
