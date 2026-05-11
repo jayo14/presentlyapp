@@ -73,10 +73,10 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-8">
-          <button className="hidden sm:block font-bold text-sm text-white hover:text-[#F5C518] transition-colors py-2 px-4 leading-relaxed">
+          <a href="/login" className="hidden sm:block font-bold text-sm text-white hover:text-[#F5C518] transition-colors py-2 px-4 leading-relaxed">
             Log In
-          </button>
-          <a href="/signup" className="bg-[#F5C518] text-black px-7 py-3 rounded-full  hover:shadow-[0_0_25px_rgba(245,197,24,0.4)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
+          </a>
+          <a href="/register" className="bg-[#F5C518] text-black px-7 py-3 rounded-full  hover:shadow-[0_0_25px_rgba(245,197,24,0.4)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
             Join <ArrowUpRight size={24} weight="duotone" />
           </a>
         </div>
@@ -196,7 +196,7 @@ const Hero = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center gap-8"
           >
-            <a href="/signup" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex">
+            <a href="/register" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-lg flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex">
               Start for free <CaretRight size={24} weight="duotone" />
             </a>
             <a href="/how-it-works" className="group flex items-center gap-4 font-bold text-white text-lg inline-flex">
@@ -501,7 +501,7 @@ const CTASection = () => (
       <h2 className="font-display text-6xl md:text-8xl  text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
       <p className="text-slate-400 text-2xl mb-20 max-w-xl mx-auto leading-relaxed">Join institutions already running smarter with Presently. Setup takes less than 5 minutes.</p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-10 mb-24">
-        <a href="/signup" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex justify-center">
+        <a href="/register" className="w-full sm:w-auto bg-[#F5C518] text-black px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex justify-center">
           Get started for free →
         </a>
         <a href="/demo" className="w-full sm:w-auto px-14 py-7 rounded-full font-bold text-xl border-2 border-white/20 text-white hover:bg-white/5 transition-all leading-relaxed inline-flex justify-center">
