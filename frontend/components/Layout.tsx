@@ -115,7 +115,7 @@ export const Layout: React.FC<LayoutProps> = ({
       <EnhancedAttendanceScanner 
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
-        onVerify={() => {}}
+        onVerify={async () => ({})}
       />
     </div>
   );
