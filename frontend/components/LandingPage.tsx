@@ -351,8 +351,8 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
       <div className="relative z-10 grid lg:grid-cols-2 gap-20 items-center h-full">
         <div className="flex flex-col h-full justify-between py-4 pr-8">
           <div className="space-y-8">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: color }}>
-              <Icon size={48} className="text-on-surface" />
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: color }}>
+              <Icon size={32} weight="duotone" className="text-surface" />
             </div>
             <h3 className="font-display text-4xl text-on-surface mb-6 tracking-tighter leading-tight">{title}</h3>
             <p className="text-textMuted text-lg leading-relaxed mb-10 max-w-sm">{description}</p>
@@ -386,7 +386,7 @@ const RoleBasedSection = () => {
           <h2 className="font-display text-5xl md:text-7xl tracking-tighter text-on-surface leading-tight">Whoever you are,<br/>Presently works for you.</h2>
         </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col gap-20">
+        <div className="max-w-7xl mx-auto flex flex-col gap-32">
 
           {/* Card 1: Students - Large Horizontal */}
           <FeatureCard
@@ -428,7 +428,7 @@ const RoleBasedSection = () => {
             </div>
           </FeatureCard>
 
-          <div className="grid md:grid-cols-2 gap-16">
+          <div className="grid md:grid-cols-2 gap-24">
             {/* Card 2: Lecturers */}
             <FeatureCard
               title="Teach. Track. Done."
