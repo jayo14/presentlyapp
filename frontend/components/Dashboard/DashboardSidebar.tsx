@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, ChevronDown } from 'lucide-react';
+import { LogOut, PanelLeftClose, PanelLeftOpen, User } from 'lucide-react';
 import { Logo } from '../Logo';
 import { UserRole } from '../../types';
 import {
@@ -11,14 +11,11 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarSeparator,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
 } from '../../src/components/ui/sidebar';
-import { getNavItemsForRole, NavItem } from '../../utils/navigation';
+import { getNavItemsForRole } from '../../utils/navigation';
 import { useCurrentUser } from '../../hooks/useAuth';
 import { cn } from '../../src/components/ui/utils';
+import { Separator } from '../../src/components/ui/separator';
 
 interface DashboardSidebarProps {
   userRole?: UserRole;
@@ -36,18 +33,10 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { data: currentUser } = useCurrentUser();
-  const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
-  const roleName = userRole?.toLowerCase().replace('_', ' ') || 'user';
+  const roleName = userRole?.toLowerCase() || 'user';
   const navItems = getNavItemsForRole(roleName);
-
-  const toggleExpand = (itemId: string) => {
-    setExpandedItems(prev =>
-      prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
 
   const isActive = (href?: string): boolean => {
     if (!href) return false;
@@ -61,113 +50,91 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     }
   };
 
-  const NavItemComponent: React.FC<{ item: NavItem; level?: number }> = ({
-    item,
-    level = 0,
-  }) => {
-    const hasChildren = item.children && item.children.length > 0;
-    const isItemActive = isActive(item.href);
-    const isExpanded = expandedItems.includes(item.id);
+  const sectionedItems = navItems.reduce((acc, item) => {
+    const key = item.section || 'core';
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {} as Record<string, typeof navItems>);
 
-    if (hasChildren) {
-      return (
-        <div key={item.id}>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => toggleExpand(item.id)}
-              isActive={false}
-              icon={<item.icon size={18} />}
-              className={cn(
-                'justify-between',
-                expandedItems.includes(item.id) && 'bg-surface-container/50'
-              )}
-            >
-              <div className="flex items-center gap-2 flex-1">
-                <span>{item.label}</span>
-                {item.badge && (
-                  <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary">
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-              <ChevronDown
-                size={16}
-                className={cn(
-                  'transition-transform duration-200',
-                  isExpanded && 'rotate-180'
-                )}
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {isExpanded && (
-            <SidebarMenuSub>
-              {item.children.map(child => (
-                <SidebarMenuSubItem key={child.id}>
-                  <SidebarMenuSubButton
-                    onClick={() => handleNavClick(child.href)}
-                    isActive={isActive(child.href)}
-                    icon={<child.icon size={14} />}
-                  >
-                    {child.label}
-                    {child.badge && (
-                      <span className="ml-auto text-xs font-bold px-1.5 py-0.5 rounded-full bg-primary/20 text-primary">
-                        {child.badge}
-                      </span>
-                    )}
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
-            </SidebarMenuSub>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <SidebarMenuItem key={item.id}>
-        <SidebarMenuButton
-          onClick={() => handleNavClick(item.href)}
-          isActive={isItemActive}
-          icon={<item.icon size={18} />}
-          className="justify-between"
-        >
-          <span>{item.label}</span>
-          {item.badge && (
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary">
-              {item.badge}
-            </span>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    );
-  };
+  const sectionOrder = ['core', 'management', 'system'];
 
   return (
-    <Sidebar className="hidden md:flex md:w-60 lg:w-72 fixed left-0 top-0 h-screen z-30 border-r border-outline bg-surface">
-      {/* Header */}
-      <SidebarHeader className="flex items-center justify-between border-b border-outline p-6">
-        <Logo className="w-full" />
+    <Sidebar
+      collapsible="icon"
+      className={cn(
+        'hidden md:flex h-screen sticky top-0 z-30 border-r border-outline bg-surface transition-all duration-200',
+        isCollapsed ? 'w-20' : 'w-72'
+      )}
+    >
+      <SidebarHeader className="flex items-center justify-between p-4">
+        <div className={cn('transition-opacity duration-200', isCollapsed && 'opacity-0 pointer-events-none w-0 overflow-hidden')}>
+          <Logo />
+        </div>
+        <button
+          onClick={() => setIsCollapsed((s) => !s)}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-outline bg-surface-container/60 hover:bg-surface-container transition-colors"
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+        </button>
       </SidebarHeader>
 
-      {/* Navigation Content */}
-      <SidebarContent className="px-0">
-        <SidebarMenu className="px-3">
-          {navItems.map((item) => (
-            <NavItemComponent key={item.id} item={item} />
-          ))}
-        </SidebarMenu>
+      <SidebarContent className="px-3 py-3">
+        {sectionOrder.map((sectionKey, sectionIndex) => {
+          const items = sectionedItems[sectionKey] || [];
+          if (!items.length) return null;
+
+          return (
+            <div key={sectionKey} className="mb-4">
+              {sectionIndex > 0 && <Separator className="mb-3 bg-outline" />}
+              {!isCollapsed && (
+                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-textMuted">
+                  {sectionKey}
+                </p>
+              )}
+              <SidebarMenu>
+                {items.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        onClick={() => handleNavClick(item.href)}
+                        isActive={active}
+                        icon={<item.icon size={18} />}
+                        className={cn(
+                          'h-10',
+                          isCollapsed ? 'justify-center px-0' : 'justify-between'
+                        )}
+                        tooltip={item.label}
+                      >
+                        {!isCollapsed && <span>{item.label}</span>}
+                        {!isCollapsed && item.badge && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/15 text-primary">
+                            {item.badge}
+                          </span>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </div>
+          );
+        })}
       </SidebarContent>
 
-      {/* Footer */}
-      <SidebarFooter className="border-t border-outline">
-        <div className="space-y-4">
-          {/* Profile Section */}
+      <SidebarFooter className="p-3">
+        <Separator className="mb-3 bg-outline" />
+        <div className="space-y-2">
           <button
             onClick={() => navigate('/dashboard/profile')}
-            className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-surface-container/50 transition-all group"
+            className={cn(
+              'w-full flex items-center rounded-lg hover:bg-surface-container/50 transition-colors',
+              isCollapsed ? 'justify-center p-2.5' : 'gap-3 p-3'
+            )}
           >
-            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
               {currentUser?.avatar_url ? (
                 <img
                   src={currentUser.avatar_url}
@@ -175,30 +142,26 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-xs font-bold text-primary">
-                  {userName.charAt(0).toUpperCase()}
-                </span>
+                <User size={16} className="text-primary" />
               )}
             </div>
-            <div className="text-left min-w-0">
-              <p className="text-sm font-semibold text-on-surface truncate">
-                {userName}
-              </p>
-              <p className="text-xs text-textMuted truncate capitalize">
-                {roleName}
-              </p>
-            </div>
+            {!isCollapsed && (
+              <div className="text-left min-w-0">
+                <p className="text-sm font-semibold text-on-surface truncate">{userName}</p>
+                <p className="text-xs text-textMuted truncate capitalize">{roleName.replace('_', ' ')}</p>
+              </div>
+            )}
           </button>
 
-          <SidebarSeparator />
-
-          {/* Logout Button */}
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-error hover:bg-error/10 transition-all font-medium text-sm"
+            className={cn(
+              'w-full rounded-lg text-error hover:bg-error/10 transition-colors text-sm font-medium',
+              isCollapsed ? 'p-2.5 flex items-center justify-center' : 'px-3 py-2.5 flex items-center gap-3'
+            )}
           >
-            <LogOut size={18} />
-            <span>Sign Out</span>
+            <LogOut size={16} />
+            {!isCollapsed && <span>Sign Out</span>}
           </button>
         </div>
       </SidebarFooter>

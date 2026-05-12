@@ -1,27 +1,43 @@
 import React from 'react';
-import { AlertTriangle, ShieldOff } from 'lucide-react';
-import { Button } from './Button';
+import { AlertTriangle, RefreshCcw, House } from 'lucide-react';
+import { Button } from '../src/components/ui/button';
+import { Separator } from '../src/components/ui/separator';
+import { useNavigate } from 'react-router-dom';
 
 const ErrorPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-surface text-text p-4">
-      <div className="text-center max-w-lg">
-        <ShieldOff className="w-24 h-24 text-red-500 mx-auto mb-6" />
-        <h1 className="font-headline text-4xl font-bold text-red-400 mb-2">Oops! Something went wrong.</h1>
-        <p className="text-lg text-textMuted mb-6">
-          We're sorry for the inconvenience. Our team has been automatically notified and we're working hard to resolve the issue.
+    <div className="min-h-screen bg-background text-on-surface flex items-center justify-center p-6">
+      <div className="w-full max-w-xl rounded-3xl border border-outline bg-surface shadow-xl p-8 md:p-10 text-center">
+        <div className="mx-auto mb-6 h-16 w-16 rounded-full bg-error/10 border border-error/20 flex items-center justify-center">
+          <AlertTriangle size={28} className="text-error" />
+        </div>
+
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-on-surface mb-2">
+          Something Went Wrong
+        </h1>
+        <p className="text-textMuted text-sm md:text-base leading-relaxed">
+          The page crashed unexpectedly. You can refresh this page, or go back to your dashboard safely.
         </p>
-        <p className="text-sm text-textMuted mb-8">
-          Please try refreshing the page or come back in a little while.
+
+        <Separator className="my-6 bg-outline" />
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button onClick={() => window.location.reload()} size="lg" className="w-full sm:w-auto">
+            <RefreshCcw size={16} />
+            Refresh Page
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/dashboard')} size="lg" className="w-full sm:w-auto">
+            <House size={16} />
+            Go to Dashboard
+          </Button>
+        </div>
+
+        <p className="mt-6 text-[11px] tracking-wide uppercase text-textMuted">
+          Error Code: Unexpected Client Error
         </p>
-        <Button onClick={() => window.location.reload()} size="lg">
-          <AlertTriangle className="w-4 h-4 mr-2" />
-          Refresh Page
-        </Button>
       </div>
-      <footer className="absolute bottom-4 text-xs text-textMuted">
-        Error Code: UNEXPECTED_CLIENT_ERROR
-      </footer>
     </div>
   );
 };

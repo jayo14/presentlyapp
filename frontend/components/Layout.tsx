@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Logo } from './Logo';
 import {
-  Home, User, Bell, Settings, Calendar, TrendingUp, QrCode, Plus, LogOut, ClipboardList, Menu, X
+  Home, User, Calendar, QrCode, Plus, ClipboardList
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
@@ -11,7 +11,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NotificationInbox from './NotificationInbox';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
 import { DashboardSidebar } from './Dashboard/DashboardSidebar';
-import { cn } from '../src/components/ui/utils';
 
 interface LayoutProps {
   userRole?: UserRole;
@@ -26,17 +25,14 @@ export const Layout: React.FC<LayoutProps> = ({
   userRole,
   userName = "User",
   onLogout,
-  currentPage,
   children
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: currentUser } = useCurrentUser();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleNavClick = (id: string) => {
-    setIsSidebarOpen(false);
     if (id === 'dashboard') navigate('/dashboard');
     else if (id === 'profile') navigate('/dashboard/profile');
     else if (id === 'courses') navigate('/dashboard/courses');
@@ -46,16 +42,6 @@ export const Layout: React.FC<LayoutProps> = ({
     else navigate(`/dashboard/${id}`);
   };
 
-  const navItems = [
-    { id: 'dashboard', label: 'Home', icon: Home, roles: [UserRole.STUDENT, UserRole.LECTURER, UserRole.ADMIN, UserRole.CLASS_REP] },
-    { id: 'courses', label: 'Attendance', icon: ClipboardList, roles: [UserRole.STUDENT, UserRole.CLASS_REP] },
-    { id: 'sessions', label: 'Attendance', icon: ClipboardList, roles: [UserRole.LECTURER] },
-    { id: 'timetable', label: 'Schedule', icon: Calendar, roles: [UserRole.STUDENT, UserRole.LECTURER, UserRole.CLASS_REP] },
-    { id: 'analytics', label: 'Stats', icon: TrendingUp, roles: [UserRole.STUDENT, UserRole.LECTURER, UserRole.CLASS_REP] },
-  ];
-
-  const filteredNav = navItems.filter(item => item.roles.includes(userRole as UserRole));
-
   return (
     <div className="flex min-h-screen bg-background text-on-surface font-sans selection:bg-primary/30 selection:text-on-primary-fixed">
       {/* Desktop Sidebar - Using shadcn components */}
@@ -63,10 +49,9 @@ export const Layout: React.FC<LayoutProps> = ({
         userRole={userRole}
         userName={userName}
         onLogout={onLogout}
-        onNavigate={() => setIsSidebarOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col min-h-screen md:ml-60 lg:ml-72">
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* MOBILE HEADER */}
         <header className="md:hidden h-20 flex items-center justify-between px-6 bg-surface/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
           <Logo showText={false} />
@@ -87,8 +72,8 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
         </header>
 
-        <main className="flex-1 relative pb-32 md:pb-8">
-          <div className="max-w-7xl mx-auto p-6 md:p-10 lg:p-16">
+        <main className="flex-1 relative pb-32 md:pb-8 bg-gradient-to-b from-background to-surface/30">
+          <div className="max-w-7xl mx-auto p-6 md:p-8 lg:p-10">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
