@@ -54,7 +54,7 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
            <Badge variant="secondary" className="px-3 py-1">LECTURER PORTAL</Badge>
-           <h1 className="font-display text-4xl md:text-5xl font-bold text-presently-black">
+           <h1 className="font-display text-4xl md:text-5xl font-bold text-on-surface">
              Welcome, Prof. {userName.split(' ').pop()}
            </h1>
            <p className="text-on-surface-variant font-medium text-lg italic">
@@ -78,15 +78,15 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
           { label: 'Active Courses', value: dashboardData?.active_courses || 0, icon: BookOpen, variant: 'excused' as const },
           { label: 'Avg. Attendance', value: `${dashboardData?.avg_attendance || 0}%`, icon: TrendingUp, variant: 'present' as const },
         ].map((stat, i) => (
-          <ModernCard key={i} padding="md" className="flex flex-col justify-between min-h-[140px] group hover:border-sungold/30 transition-all">
+               <ModernCard key={i} padding="md" className="flex flex-col justify-between min-h-[140px] group hover:border-primary/30 transition-all bg-surface">
             <div className="flex justify-between items-start">
-               <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-presently-black border border-outline group-hover:bg-sungold/10 transition-colors">
+                      <div className="w-12 h-12 rounded-xl bg-surfaceHigh flex items-center justify-center text-on-surface border border-outline group-hover:bg-primary/10 transition-colors">
                  <stat.icon size={24} />
                </div>
                <Badge variant={stat.variant}>Live Data</Badge>
             </div>
             <div>
-               <p className="font-display text-4xl font-bold text-presently-black">{stat.value}</p>
+               <p className="font-display text-4xl font-bold text-on-surface">{stat.value}</p>
                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em]">{stat.label}</p>
             </div>
           </ModernCard>
@@ -97,16 +97,16 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
       {activeSessions.length > 0 && (
         <section className="space-y-6">
            <div className="flex items-center gap-4">
-              <h2 className="font-display text-2xl font-bold text-presently-black">Active Sessions</h2>
+              <h2 className="font-display text-2xl font-bold text-on-surface">Active Sessions</h2>
               <div className="h-px flex-1 bg-outline" />
            </div>
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {activeSessions.map((session: any) => (
-                <ModernCard key={session.id} variant="gold-accent" className="relative overflow-hidden group cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${session.id}`)}>
+                <ModernCard key={session.id} variant="gold-accent" className="relative overflow-hidden group cursor-pointer bg-surface" onClick={() => navigate(`/dashboard/sessions/${session.id}`)}>
                    <div className="flex justify-between items-start mb-6">
                       <div className="space-y-1">
-                        <div className="text-sungold font-bold text-xs uppercase tracking-widest">{session.course_code}</div>
-                        <h3 className="font-display text-2xl font-bold text-presently-black">{session.course_name}</h3>
+                        <div className="text-primary font-bold text-xs uppercase tracking-widest">{session.course_code}</div>
+                        <h3 className="font-display text-2xl font-bold text-on-surface">{session.course_name}</h3>
                       </div>
                       <Badge variant="present" className="animate-pulse">LIVE</Badge>
                    </div>
@@ -114,7 +114,7 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
                       <div className="flex items-center gap-2"><Users size={18} /> {session.attendee_count} Present</div>
                       <div className="flex items-center gap-2"><Clock size={18} /> Started {new Date(session.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                    </div>
-                   <Button variant="outline" fullWidth className="h-12 border-presently-black group-hover:bg-presently-black group-hover:text-white transition-all">
+                   <Button variant="outline" fullWidth className="h-12 border-outline group-hover:bg-on-surface group-hover:text-background transition-all">
                       Manage Attendance
                    </Button>
                 </ModernCard>
@@ -127,17 +127,17 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <section className="lg:col-span-2 space-y-6">
            <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl font-bold text-presently-black">Recent History</h2>
+              <h2 className="font-display text-2xl font-bold text-on-surface">Recent History</h2>
               <button className="text-sm font-bold text-sungold hover:underline">View All</button>
            </div>
            <div className="space-y-4">
               {sessions.filter((s: any) => !s.is_active).slice(0, 5).map((session: any) => (
-                <div key={session.id} className="flex items-center gap-6 p-4 rounded-2xl border border-outline hover:bg-slate-50 transition-all cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${session.id}`)}>
-                   <div className="w-12 h-12 rounded-xl bg-warm-ivory flex items-center justify-center border border-outline">
+                <div key={session.id} className="flex items-center gap-6 p-4 rounded-2xl border border-outline bg-surface hover:bg-surfaceHigh transition-all cursor-pointer" onClick={() => navigate(`/dashboard/sessions/${session.id}`)}>
+                   <div className="w-12 h-12 rounded-xl bg-surfaceHigh flex items-center justify-center border border-outline">
                       <CourseIcon title={session.course_name} code={session.course_code} className="w-8 h-8" />
                    </div>
                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-presently-black truncate">{session.course_name}</h4>
+                      <h4 className="font-bold text-on-surface truncate">{session.course_name}</h4>
                       <div className="flex items-center gap-3 text-xs text-on-surface-variant mt-1">
                          <span className="font-bold">{session.course_code}</span>
                          <span>•</span>
@@ -145,17 +145,17 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
                       </div>
                    </div>
                    <div className="text-right">
-                      <div className="font-display text-xl font-bold text-presently-black">{session.attendee_count}</div>
+                      <div className="font-display text-xl font-bold text-on-surface">{session.attendee_count}</div>
                       <div className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Students</div>
                    </div>
-                   <ChevronRight size={20} className="text-slate-300" />
+                   <ChevronRight size={20} className="text-outline" />
                 </div>
               ))}
            </div>
         </section>
 
         <section className="space-y-6">
-           <h2 className="font-display text-2xl font-bold text-presently-black">Power Tools</h2>
+           <h2 className="font-display text-2xl font-bold text-on-surface">Power Tools</h2>
            <div className="space-y-4">
               <ModernCard padding="md" className="group cursor-pointer hover:border-sungold/30 transition-all" onClick={() => navigate('/dashboard/reports')}>
                  <div className="flex items-center gap-4">
@@ -163,7 +163,7 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
                        <FileText size={24} />
                     </div>
                     <div>
-                       <h4 className="font-bold text-presently-black">Export Reports</h4>
+                       <h4 className="font-bold text-on-surface">Export Reports</h4>
                        <p className="text-xs text-on-surface-variant">Generate PDF/CSV logs</p>
                     </div>
                  </div>
@@ -174,7 +174,7 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName }) => {
                        <BarChart3 size={24} />
                     </div>
                     <div>
-                       <h4 className="font-bold text-presently-black">View Analytics</h4>
+                       <h4 className="font-bold text-on-surface">View Analytics</h4>
                        <p className="text-xs text-on-surface-variant">Class engagement trends</p>
                     </div>
                  </div>

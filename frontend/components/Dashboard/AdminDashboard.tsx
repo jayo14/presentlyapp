@@ -75,7 +75,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
            <Badge variant="present" className="px-3 py-1 font-bold">SYSTEM OVERSEER</Badge>
-           <h1 className="font-display text-4xl md:text-5xl font-bold text-presently-black">
+           <h1 className="font-display text-4xl md:text-5xl font-bold text-on-surface">
              Control Center
            </h1>
            <p className="text-on-surface-variant font-medium text-lg">
@@ -102,15 +102,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
           { label: 'Total Sessions', value: systemStats.total_sessions, icon: Activity, variant: 'present' as const },
           { label: 'Security Alerts', value: systemStats.security_alerts, icon: ShieldAlert, variant: 'absent' as const },
         ].map((stat, i) => (
-          <ModernCard key={i} padding="md" className="group hover:border-sungold/30 transition-all">
+          <ModernCard key={i} padding="md" className="group hover:border-primary/30 transition-all bg-surface">
             <div className="flex justify-between items-start mb-4">
-               <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-presently-black border border-outline group-hover:bg-sungold/10 transition-colors">
+               <div className="w-12 h-12 rounded-xl bg-surfaceHigh flex items-center justify-center text-on-surface border border-outline group-hover:bg-primary/10 transition-colors">
                  <stat.icon size={24} />
                </div>
                {stat.variant === 'absent' && stat.value > 0 && <Badge variant="absent" className="animate-pulse">CRITICAL</Badge>}
             </div>
             <div>
-               <p className="font-display text-4xl font-bold text-presently-black leading-none mb-1">{stat.value.toLocaleString()}</p>
+               <p className="font-display text-4xl font-bold text-on-surface leading-none mb-1">{stat.value.toLocaleString()}</p>
                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em]">{stat.label}</p>
             </div>
           </ModernCard>
@@ -121,7 +121,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
          {/* ACTIVITY CHART */}
          <ModernCard className="lg:col-span-2 overflow-hidden" padding="lg">
             <div className="flex items-center justify-between mb-8">
-               <h3 className="font-display text-2xl font-bold text-presently-black">Usage Trends</h3>
+               <h3 className="font-display text-2xl font-bold text-on-surface">Usage Trends</h3>
                <div className="flex gap-2">
                   <Badge variant="outline">7 Days</Badge>
                   <Badge variant="secondary">30 Days</Badge>
@@ -167,10 +167,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
 
          {/* SYSTEM ALERTS */}
          <div className="space-y-6">
-            <h3 className="font-display text-2xl font-bold text-presently-black">Live Feed</h3>
+            <h3 className="font-display text-2xl font-bold text-on-surface">Live Feed</h3>
             <div className="space-y-4">
                {logs.slice(0, 6).map((log, i) => (
-                  <div key={log.id} className="flex gap-4 p-4 bg-white border border-outline rounded-2xl hover:bg-slate-50 transition-all cursor-default">
+                  <div key={log.id} className="flex gap-4 p-4 bg-surface border border-outline rounded-2xl hover:bg-surfaceHigh transition-all cursor-default">
                      <div className={cn(
                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
                        log.level === 'ERROR' ? "bg-soft-coral/10 text-soft-coral" : "bg-sungold/10 text-sungold"
@@ -178,7 +178,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                         <Bell size={18} />
                      </div>
                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-presently-black truncate">{log.message}</p>
+                        <p className="text-xs font-bold text-on-surface truncate">{log.message}</p>
                         <p className="text-[10px] text-on-surface-variant font-medium mt-1 uppercase tracking-widest">
                            {new Date(log.timestamp).toLocaleTimeString()} • {log.user_name || 'System'}
                         </p>

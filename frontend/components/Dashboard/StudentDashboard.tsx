@@ -245,7 +245,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
       <CourseRegistrationDialog
         isOpen={isRegistrationOpen}
         onClose={() => setIsRegistrationOpen(false)}
-        onSuccess={refetch}
+        onSuccess={() => refetch()}
       />
     </div>
   );

@@ -123,7 +123,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                     </button>
                     <button
                       onClick={() => setIsTimetableModalOpen(true)}
-                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-on-primary-fixed rounded-lg hover:bg-primary/90 transition-colors"
                     >
                         <Plus size={14} />
                         Add Class
