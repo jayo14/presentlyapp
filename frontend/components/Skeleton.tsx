@@ -15,7 +15,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   height,
   animation = 'pulse'
 }) => {
-  const baseClasses = 'bg-surfaceHigh';
+  const baseClasses = 'bg-surfaceHigh/80 dark:bg-surfaceHigh';
   const animationClass = animation === 'pulse' ? 'animate-pulse' : 'animate-shimmer';
   
   const variantClasses = {
@@ -76,13 +76,13 @@ export const SkeletonStudentDashboard: React.FC = () => (
 
     {/* Hero Card Skeleton */}
     <div className="px-2">
-      <Skeleton variant="rectangular" height="240px" className="rounded-[2.5rem]" />
+      <Skeleton variant="rectangular" height="240px" className="rounded-[2.5rem] bg-surfaceHigh/60 dark:bg-surfaceHigh/50" />
     </div>
 
     {/* Stats Grid Skeleton */}
     <div className="grid grid-cols-2 gap-4 md:gap-6 px-2">
-      <Skeleton variant="rectangular" height="180px" className="rounded-[2.5rem]" />
-      <Skeleton variant="rectangular" height="180px" className="rounded-[2.5rem]" />
+      <Skeleton variant="rectangular" height="180px" className="rounded-[2.5rem] bg-surfaceHigh/60 dark:bg-surfaceHigh/50" />
+      <Skeleton variant="rectangular" height="180px" className="rounded-[2.5rem] bg-surfaceHigh/60 dark:bg-surfaceHigh/50" />
     </div>
 
     {/* Schedule Skeleton */}
@@ -92,8 +92,8 @@ export const SkeletonStudentDashboard: React.FC = () => (
         <Skeleton variant="text" width="80px" height="12px" />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Skeleton variant="rectangular" height="120px" className="rounded-[2.5rem]" />
-        <Skeleton variant="rectangular" height="120px" className="rounded-[2.5rem]" />
+        <Skeleton variant="rectangular" height="120px" className="rounded-[2.5rem] bg-surfaceHigh/60 dark:bg-surfaceHigh/50" />
+        <Skeleton variant="rectangular" height="120px" className="rounded-[2.5rem] bg-surfaceHigh/60 dark:bg-surfaceHigh/50" />
       </div>
     </div>
   </div>

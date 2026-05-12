@@ -9,6 +9,7 @@ import { useCurrentUser } from '../hooks/useAuth';
 import { Dock } from '@/components/magicui/dock';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationInbox from './NotificationInbox';
+import { ThemeToggle } from './ThemeToggle';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
 import { DashboardSidebar } from './Dashboard/DashboardSidebar';
 
@@ -24,6 +25,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({
   userRole,
   userName = "User",
+  currentPage,
   onLogout,
   children
 }) => {
@@ -31,6 +33,22 @@ export const Layout: React.FC<LayoutProps> = ({
   const location = useLocation();
   const { data: currentUser } = useCurrentUser();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  const getPageLabel = (page: string) => {
+    const labels: Record<string, string> = {
+      dashboard: 'Dashboard',
+      profile: 'Profile',
+      courses: 'Attendance',
+      sessions: 'Sessions',
+      analytics: 'Analytics',
+      timetable: 'Timetable',
+      settings: 'Settings',
+      notifications: 'Notifications',
+      reports: 'Reports',
+    };
+
+    return labels[page] || page.charAt(0).toUpperCase() + page.slice(1);
+  };
 
   const handleNavClick = (id: string) => {
     if (id === 'dashboard') navigate('/dashboard');
@@ -52,6 +70,42 @@ export const Layout: React.FC<LayoutProps> = ({
       />
 
       <div className="flex-1 flex flex-col min-h-screen">
+        <header className="hidden md:flex sticky top-0 z-40 items-center justify-between gap-6 border-b border-outline/80 bg-background/85 px-8 py-5 backdrop-blur-xl">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-textMuted">
+              {userRole?.toLowerCase().replace('_', ' ') || 'workspace'}
+            </p>
+            <div className="mt-1 flex items-center gap-3">
+              <h1 className="truncate text-2xl font-display font-bold text-on-surface">
+                {getPageLabel(currentPage)}
+              </h1>
+              <span className="rounded-full border border-outline bg-surface px-3 py-1 text-xs font-semibold capitalize text-textMuted">
+                {currentUser?.full_name || userName}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <NotificationInbox />
+            <button
+              onClick={() => handleNavClick('profile')}
+              className="inline-flex h-11 items-center gap-3 rounded-full border border-outline bg-surface px-3 pr-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surfaceHigh"
+            >
+              <div className="h-7 w-7 overflow-hidden rounded-full border border-outline bg-primary/10">
+                {currentUser?.avatar_url ? (
+                  <img src={currentUser.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-[11px] font-bold text-primary">
+                    {userName.charAt(0)}
+                  </div>
+                )}
+              </div>
+              <span className="max-w-[11rem] truncate">{currentUser?.full_name || userName}</span>
+            </button>
+          </div>
+        </header>
+
         {/* MOBILE HEADER */}
         <header className="md:hidden h-20 flex items-center justify-between px-6 bg-surface/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
           <Logo showText={false} />

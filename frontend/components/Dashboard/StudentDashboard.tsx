@@ -15,6 +15,8 @@ import { Button } from '../Button';
 import CourseIcon from '../Course/CourseIcon';
 import { cn } from '../../src/components/ui/utils';
 import { Badge } from '../../src/components/ui/badge';
+import { useTheme } from '../ThemeProvider';
+import { SkeletonStudentDashboard } from '../Skeleton';
 
 interface StudentDashboardProps {
   userName: string;
@@ -24,6 +26,7 @@ interface StudentDashboardProps {
 const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   const { data: dashboardData, isLoading, refetch } = useQuery({
     queryKey: ['studentDashboard'],
@@ -52,31 +55,42 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col gap-6 animate-pulse">
-        <div className="h-8 w-48 bg-slate-100 rounded-lg" />
-        <div className="h-64 w-full bg-slate-100 rounded-2xl" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1,2,3,4].map(i => <div key={i} className="h-32 bg-slate-100 rounded-2xl" />)}
-        </div>
-      </div>
-    );
+    return <SkeletonStudentDashboard />;
   }
 
+  const shellClasses = cn(
+    'space-y-10 max-w-5xl mx-auto pb-20 rounded-[2.5rem] border border-outline/60 p-4 md:p-0',
+    resolvedTheme === 'dark' ? 'bg-surface/50' : 'bg-transparent'
+  );
+
+  const heroGradient = resolvedTheme === 'dark'
+    ? 'from-surface via-surfaceHigh to-background'
+    : 'from-background via-surface to-surfaceHigh';
+
   return (
-    <div className="space-y-10 max-w-5xl mx-auto pb-20">
+    <div className={shellClasses}>
       {/* 1. WELCOME HEADER */}
-      <header className="flex flex-col gap-2">
-        <h1 className="font-display text-4xl md:text-5xl font-bold text-presently-black">
+      <header className={cn('flex flex-col gap-4 rounded-[2rem] border border-outline bg-gradient-to-br px-6 py-7 md:px-8 md:py-10 shadow-sm', heroGradient)}>
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.28em] text-textMuted">
+          <span className="h-2 w-2 rounded-full bg-primary" />
+          Student dashboard
+        </div>
+        <h1 className="font-display text-4xl md:text-5xl font-bold text-on-surface">
           Hello, {userName.split(' ')[0]}
         </h1>
-        <p className="text-on-surface-variant font-medium text-lg">You're all caught up for today.</p>
+        <p className="max-w-2xl text-on-surface-variant font-medium text-lg">
+          You're all caught up for today. Check live attendance, review your schedule, and jump into scanner mode when class starts.
+        </p>
+        <div className="flex flex-wrap gap-3 pt-2">
+          <Badge variant="secondary" className="px-3 py-1.5">Theme {resolvedTheme}</Badge>
+          <Badge variant="outline" className="px-3 py-1.5">{dashboardData?.enrolled_courses?.length || 0} active courses</Badge>
+        </div>
       </header>
 
       {/* 2. LIVE ATTENDANCE CARD */}
       <section>
         {activeClass ? (
-          <ModernCard variant="gold-accent" padding="none" className="overflow-hidden relative group">
+          <ModernCard variant="gold-accent" padding="none" className="overflow-hidden relative group bg-surface">
             <div className="absolute top-6 right-6">
                <Badge variant="present" className="px-3 py-1.5 gap-2">
                  <span className="relative flex h-2 w-2">
@@ -89,19 +103,19 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
             
             <div className="p-8 md:p-10 space-y-8">
               <div className="space-y-3">
-                <div className="text-sungold font-bold text-sm uppercase tracking-widest">
+                <div className="text-primary font-bold text-sm uppercase tracking-widest">
                   {activeClass.course_code}
                 </div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-presently-black leading-tight">
+                <h2 className="font-display text-3xl md:text-4xl font-bold text-on-surface leading-tight">
                   {activeClass.course_name}
                 </h2>
                 <div className="flex flex-wrap items-center gap-6 text-on-surface-variant font-semibold">
                   <div className="flex items-center gap-2">
-                    <Clock size={18} className="text-sungold" />
+                    <Clock size={18} className="text-primary" />
                     <span>Ends in 45 mins</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin size={18} className="text-sungold" />
+                    <MapPin size={18} className="text-primary" />
                     <span>Room 302, Block B</span>
                   </div>
                 </div>
@@ -125,19 +139,19 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
                <motion.div
                  initial={{ width: 0 }}
                  animate={{ width: '40%' }}
-                 className="h-full bg-sungold"
+                 className="h-full bg-primary"
                />
             </div>
           </ModernCard>
         ) : (
-          <ModernCard padding="lg" className="flex flex-col items-center text-center gap-6 py-16 border-dashed border-2">
-            <div className="w-24 h-24 rounded-full bg-warm-ivory flex items-center justify-center text-on-surface-variant">
-              <CheckCircle2 size={48} className="text-moss-green/40" />
+          <ModernCard padding="lg" className="flex flex-col items-center text-center gap-6 py-16 border-dashed border-2 bg-surface">
+            <div className="w-24 h-24 rounded-full bg-surfaceHigh flex items-center justify-center text-on-surface-variant">
+              <CheckCircle2 size={48} className="text-success/60" />
             </div>
             <div className="space-y-2">
-              <h3 className="font-display text-2xl font-bold text-presently-black">No active classes</h3>
+              <h3 className="font-display text-2xl font-bold text-on-surface">No active classes</h3>
               <p className="text-on-surface-variant max-w-sm mx-auto font-medium">
-                Your schedule is clear. Next class: <span className="text-presently-black font-bold">Introduction to AI</span> at 2:00 PM
+                Your schedule is clear. Next class: <span className="text-on-surface font-bold">Introduction to AI</span> at 2:00 PM
               </p>
             </div>
             <Button variant="secondary" size="lg" onClick={() => setIsScannerOpen(true)}>
@@ -156,15 +170,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
           { label: 'Courses', value: dashboardData?.enrolled_courses?.length || 0, icon: BookOpen, variant: 'excused' as const },
           { label: 'Level', value: 'LVL 4', icon: User, variant: 'secondary' as const },
         ].map((stat, i) => (
-          <ModernCard key={i} padding="md" className="flex flex-col justify-between min-h-[160px] hover:shadow-lg transition-all group">
+          <ModernCard key={i} padding="md" className="flex flex-col justify-between min-h-[160px] hover:shadow-lg transition-all group bg-surface">
             <div className="flex justify-between items-start">
-               <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-presently-black border border-outline group-hover:bg-sungold/10 group-hover:border-sungold/30 transition-colors">
+               <div className="w-12 h-12 rounded-xl bg-surfaceHigh flex items-center justify-center text-on-surface border border-outline group-hover:bg-primary/10 group-hover:border-primary/30 transition-colors">
                  <stat.icon size={24} />
                </div>
                <Badge variant={stat.variant}>Active</Badge>
             </div>
             <div>
-              <p className="font-display text-3xl font-bold text-presently-black leading-none mb-2">{stat.value}</p>
+              <p className="font-display text-3xl font-bold text-on-surface leading-none mb-2">{stat.value}</p>
               <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em]">{stat.label}</p>
             </div>
           </ModernCard>
@@ -183,8 +197,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
         <div className="space-y-4">
           {dashboardData?.recent_activity?.length ? (
             dashboardData.recent_activity.slice(0, 3).map((activity: any, idx: number) => (
-              <ModernCard key={activity.id} padding="sm" className="flex items-center gap-6 hover:border-sungold/30 transition-all cursor-pointer group">
-                <div className="w-14 h-14 rounded-2xl bg-warm-ivory flex items-center justify-center overflow-hidden border border-outline group-hover:border-sungold/20">
+              <ModernCard key={activity.id} padding="sm" className="flex items-center gap-6 hover:border-primary/30 transition-all cursor-pointer group bg-surface">
+                <div className="w-14 h-14 rounded-2xl bg-surfaceHigh flex items-center justify-center overflow-hidden border border-outline group-hover:border-primary/20">
                    <CourseIcon
                     title={activity.course_name}
                     code={activity.course_code}
@@ -193,7 +207,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
-                    <h5 className="font-display text-lg font-bold text-presently-black truncate group-hover:text-sungold transition-colors">
+                    <h5 className="font-display text-lg font-bold text-on-surface truncate group-hover:text-primary transition-colors">
                       {activity.course_code}: {activity.course_name}
                     </h5>
                     <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1">
@@ -209,13 +223,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
                     </span>
                   </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-sungold group-hover:text-presently-black transition-all">
+                <div className="w-10 h-10 rounded-full bg-surfaceHigh flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary-fixed transition-all">
                   <ChevronRight size={20} />
                 </div>
               </ModernCard>
             ))
           ) : (
-            <div className="text-center py-12 text-on-surface-variant bg-slate-50 rounded-3xl border border-dashed border-outline">
+            <div className="text-center py-12 text-on-surface-variant bg-surfaceHigh rounded-3xl border border-dashed border-outline">
               <p className="font-medium">No activity recorded yet.</p>
             </div>
           )}

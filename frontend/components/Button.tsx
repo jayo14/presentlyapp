@@ -25,10 +25,10 @@ export const Button = ({
   const baseStyles = "relative inline-flex items-center justify-center font-semibold transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none";
 
   const variants = {
-    primary: "bg-sungold text-presently-black shadow-gold hover:-translate-y-0.5 hover:shadow-lg",
-    secondary: "bg-presently-black text-white hover:-translate-y-0.5 hover:shadow-md",
-    outline: "bg-transparent border border-presently-black text-presently-black hover:bg-presently-black/5 dark:border-outline dark:text-white dark:hover:bg-white/10",
-    ghost: "bg-transparent text-presently-black hover:underline dark:text-white",
+    primary: "bg-primary text-on-primary-fixed shadow-gold hover:-translate-y-0.5 hover:shadow-lg",
+    secondary: "bg-on-surface text-background hover:-translate-y-0.5 hover:shadow-md",
+    outline: "bg-transparent border border-outline text-on-surface hover:bg-surfaceHigh",
+    ghost: "bg-transparent text-on-surface hover:bg-surfaceHigh",
     error: "bg-soft-coral text-white shadow-md",
     destructive: "bg-soft-coral text-white shadow-md"
   };

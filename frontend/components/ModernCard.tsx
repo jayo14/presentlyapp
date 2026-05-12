@@ -17,12 +17,12 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   ...props
 }) => {
   const variants = {
-    default: "bg-white dark:bg-[#1A1A1A] border border-outline shadow-md",
-    dark: "bg-presently-black border border-[#2A2A2A] shadow-lg",
-    glass: "backdrop-blur-lg bg-white/70 dark:bg-black/40 border border-white/20 dark:border-white/10 shadow-lg",
+    default: "bg-surface border border-outline shadow-md",
+    dark: "bg-surfaceHigh border border-outline shadow-lg",
+    glass: "backdrop-blur-lg bg-surface/80 border border-outline/70 shadow-lg",
     outline: "bg-transparent border border-outline",
-    accent: "bg-sungold/5 border border-sungold/20",
-    'gold-accent': "bg-white dark:bg-[#1A1A1A] border-l-4 border-l-sungold shadow-md"
+    accent: "bg-primary/5 border border-primary/15",
+    'gold-accent': "bg-surface border-l-4 border-l-primary shadow-md"
   };
 
   const paddings = {
