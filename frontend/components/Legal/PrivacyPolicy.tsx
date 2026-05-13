@@ -1,8 +1,9 @@
 import React from 'react';
 import { ChevronRight, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { LandingHeader } from '../LandingHeader';
-import { Logo } from '../Logo';
+// import { LandingHeader } from '../LandingHeader';
+import { Navbar } from "../"
+// import { Logo } from '../Logo';
 import { SEO } from '../SEO';
 
 const PrivacyPolicy: React.FC = () => {
@@ -17,15 +18,15 @@ const PrivacyPolicy: React.FC = () => {
         canonicalPath="/privacy"
       />
       {/* Header */}
-      <LandingHeader onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />
-      
+      <Navbar onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />
+
       {/* Main Content */}
       <div className="flex-1 py-32 sm:py-36">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1 text-sm text-textMuted mb-8">
-            <button 
-              onClick={() => navigate('/')} 
+            <button
+              onClick={() => navigate('/')}
               className="hover:text-primary transition-colors font-medium"
             >
               Home
@@ -51,7 +52,7 @@ const PrivacyPolicy: React.FC = () => {
 
             {/* Content Sections */}
             <div className="flex flex-col gap-8">
-              <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-outline/20 hover-lift">
+              <div className="glass-panel rounded-2xl p-6 sm:p-8 hover-lift">
                 <h2 className="font-headline text-2xl font-bold mb-4 text-primary">
                   1. Information We Collect
                 </h2>
@@ -60,7 +61,7 @@ const PrivacyPolicy: React.FC = () => {
                 </p>
               </div>
 
-              <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-outline/20 hover-lift">
+              <div className="glass-panel rounded-2xl p-6 sm:p-8 hover-lift">
                 <h2 className="font-headline text-2xl font-bold mb-4 text-primary">
                   2. Location Data
                 </h2>
@@ -69,7 +70,7 @@ const PrivacyPolicy: React.FC = () => {
                 </p>
               </div>
 
-              <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-outline/20 hover-lift">
+              <div className="glass-panel rounded-2xl p-6 sm:p-8 hover-lift">
                 <h2 className="font-headline text-2xl font-bold mb-4 text-primary">
                   3. How We Use Your Information
                 </h2>
@@ -78,7 +79,7 @@ const PrivacyPolicy: React.FC = () => {
                 </p>
               </div>
 
-              <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-outline/20 hover-lift">
+              <div className="glass-panel rounded-2xl p-6 sm:p-8 hover-lift">
                 <h2 className="font-headline text-2xl font-bold mb-4 text-primary">
                   4. Data Security
                 </h2>
@@ -87,7 +88,7 @@ const PrivacyPolicy: React.FC = () => {
                 </p>
               </div>
 
-              <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-outline/20 hover-lift">
+              <div className="glass-panel rounded-2xl p-6 sm:p-8 hover-lift">
                 <h2 className="font-headline text-2xl font-bold mb-4 text-primary">
                   5. Your Rights
                 </h2>
@@ -105,7 +106,13 @@ const PrivacyPolicy: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
             <div className="text-center sm:text-left">
-              <Logo className="mb-2 justify-center sm:justify-start" />
+              {/* <Logo className="mb-2 justify-center sm:justify-start" /> */}
+              <div className="flex items-center justify-center gap-3 group cursor-pointer ml-2">
+                <img src="/logo.png" alt="Logo" className="w-32" />
+                <span className="text-xl font-black tracking-tight text-on-surface">
+                  Presently
+                </span>
+              </div>
               <p className="text-sm text-textMuted">
                 © {new Date().getFullYear()} Presently. All rights reserved.
               </p>

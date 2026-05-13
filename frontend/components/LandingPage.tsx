@@ -23,7 +23,7 @@ import {
   Prohibit,
 } from '@phosphor-icons/react';
 import { ThemeToggle } from './ThemeToggle';
-
+import { Navbar } from "./LandingPage/Navbar"
 // --- Constants ---
 const SUNGOLD = "#F5C518";
 
@@ -34,93 +34,6 @@ const IconWrapper = ({ children, size = 24 }) => (
   </div>
 );
 
-// --- Components ---
-
-const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <nav className="fixed mx-auto top-0 w-full z-50 flex justify-center transition-all duration-700 pointer-events-none">
-      <div 
-        className={`
-          transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-auto
-          flex items-center justify-between px-4
-          ${isScrolled 
-            ? 'mt-6 w-[90%] md:w-[80%] py-4  rounded-full bg-surface border border-outline shadow-[0_10px_30px_rgba(2,6,23,0.35)]' 
-            : 'mt-4 w-full md:w-[80%] py-8 bg-transparent border-transparent'
-          }
-        `}
-      >
-        <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-[200px] h-[80px] pointer-events-none">
-          <div className="absolute left-2 top-0 w-40 h-40 bg-primary/6 rounded-full blur-3xl" />
-        </div>
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-8 h-8 bg-surface-container rounded-full flex items-center justify-center transition-transform group-hover:rotate-12">
-            <div className="w-4 h-4 bg-primary rounded-full" />
-          </div>
-          <span className="text-xl tracking-tight text-on-surface">
-            Presently
-          </span>
-        </div>
-        
-        <div className={`hidden md:flex items-center gap-10 font-semibold transition-all duration-500 ${isScrolled ? 'opacity-90 scale-95' : 'opacity-100 scale-100'}`}>
-          {['How it Works', 'Pricing', 'Blog'].map((item) => (
-            <a 
-              key={item} 
-              href="#" 
-              className="text-on-surface/80 hover:text-primary transition-colors text-[14px] tracking-tight leading-relaxed py-2 px-2"
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-
-        <div className="hidden sm:flex items-center gap-8">
-          <a href="/login" className="hidden sm:block font-bold text-sm text-on-surface hover:text-primary transition-colors py-2 px-4 leading-relaxed">
-            Log In
-          </a>
-          <a href="/register" className="bg-primary text-on-primary-fixed px-7 py-3 rounded-full hover:shadow-[0_10px_30px_rgba(245,197,24,0.18)] transition-all active:scale-95 text-[12px] uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
-            Join <ArrowUpRight size={24} weight="duotone" />
-          </a>
-        </div>
-
-        <div className="sm:hidden flex items-center">
-          <button onClick={() => setMobileOpen((s) => !s)} aria-label={mobileOpen ? "Close menu" : "Open menu"} className="p-2 rounded-md bg-transparent hover:bg-surface-container/50">
-            {mobileOpen ? <X size={24} weight="duotone" className="text-on-surface" /> : <List size={24} weight="duotone" className="text-on-surface" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile dropdown panel directly under header */}
-      <div className="absolute left-0 right-0 top-full flex justify-center pointer-events-none">
-        <div className={`w-[85%] md:w-[75%] mt-2 px-2 pointer-events-auto md:hidden transition-all duration-200 ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-          <div className="bg-surface border border-outline rounded-2xl shadow-lg p-4">
-
-            <nav className="flex flex-col gap-2 mb-4">
-              <a href="#" className="py-2 text-on-surface hover:text-primary">How it Works</a>
-              <a href="#" className="py-2 text-on-surface hover:text-primary">Pricing</a>
-              <a href="#" className="py-2 text-on-surface hover:text-primary">Blog</a>
-            </nav>
-
-            <div className="flex flex-col gap-3">
-              <a href="/login" className="w-full text-center py-3 rounded-xl border border-outline text-on-surface">Log in</a>
-              <a href="/register" className="w-full text-center py-3 rounded-xl bg-primary text-on-primary-fixed">Join</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-};
 
 const StatCounter = ({ value, label }) => {
   const ref = useRef(null);
@@ -144,12 +57,9 @@ const StatCounter = ({ value, label }) => {
     }
   }, [isInView, value]);
 
-  // preserve suffix characters like + or % from the original value
-  const suffix = (value.match(/[^0-9.,-]+/g) || []).join('');
-
   return (
     <div ref={ref} className="text-center py-12 md:py-0 px-8">
-      <div className="text-5xl md:text-7xl text-primary font-extrabold tracking-tighter mb-6">{count}{suffix}</div>
+      <div className="text-5xl md:text-7xl text-primary font-extrabold tracking-tighter mb-6">{count}</div>
       <div className="text-textMuted font-semibold text-base uppercase tracking-widest leading-relaxed">{label}</div>
     </div>
   );
@@ -159,25 +69,25 @@ const AccordionItem = ({ question, answer, icon: Icon }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="border-b border-outline last:border-0 py-10">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left group gap-6"
       >
         <div className="flex items-center gap-4 flex-1">
           {Icon && (
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Icon size={20} weight="duotone" className="text-primary" />
+            <div className="w-32 h-32 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Icon size={24} weight="duotone" className="text-primary" />
             </div>
           )}
           <span className="text-lg md:text-xl font-bold text-on-surface group-hover:text-primary transition-colors leading-relaxed">{question}</span>
         </div>
-        <div className="bg-surface-container w-12 h-12 rounded-full flex items-center justify-center text-primary flex-shrink-0">
-          {isOpen ? <Minus size={24} weight="duotone" /> : <Plus size={24} weight="duotone" />}
+        <div className="w-40 h-40 rounded-full flex items-center justify-center text-primary flex-shrink-0">
+          {isOpen ? <Minus size={28} /> : <Plus size={28} />}
         </div>
       </button>
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -205,9 +115,9 @@ const Hero = () => {
     <section ref={containerRef} className="relative min-h-screen bg-surface pt-56 pb-40 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-center relative w-[85%]">
+      <div className="max-w-[80%] mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-center relative">
         <div>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-3 mb-10"
@@ -215,7 +125,7 @@ const Hero = () => {
             <span className="text-primary text-xs tracking-[0.3em] uppercase leading-relaxed">◆ GPS-Verified Attendance</span>
           </motion.div>
 
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             className="font-display text-6xl md:text-8xl text-on-surface leading-[1.1] tracking-tighter mb-12"
@@ -228,7 +138,7 @@ const Hero = () => {
             </span>
           </motion.h1>
 
-            <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -237,7 +147,7 @@ const Hero = () => {
             Presently ends roll calls, paper sheets, and proxy attendance — for students, lecturers, and institutions that mean business.
           </motion.p>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -248,49 +158,49 @@ const Hero = () => {
             </a>
             <a href="/how-it-works" className="group flex items-center gap-4 font-bold text-on-surface text-lg inline-flex">
               <div className="w-14 h-14 rounded-full border-2 border-outline flex items-center justify-center group-hover:border-primary transition-colors">
-                <Play size={32} weight="duotone" className="ml-0.5 text-on-surface" />
+                <Play size={32} weight="duotone" className="ml-0.5 text-on-surface group-hover:text-primary transition-all ease-in-out" />
               </div>
               <span className="border-b-2 border-outline group-hover:border-primary transition-colors pb-2">Watch how it works</span>
             </a>
           </motion.div>
         </div>
 
-          <div className="relative h-[760px] hidden lg:block">
-           <motion.div style={{ y: y1 }} className="absolute z-10 -left-6 top-28 w-72 p-4 bg-background rounded-[40px] shadow-2xl rotate-[-6deg]">
-             <div className="bg-surface-container h-[540px] rounded-[32px] overflow-hidden p-8">
-               <div className="w-10 h-10 bg-primary rounded-lg mb-6" />
-               <div className="h-4 w-28 bg-surface-variant rounded-full mb-12" />
-               <div className="space-y-6">
+        <div className="relative h-[760px] hidden lg:block">
+          <motion.div style={{ y: y1 }} className="absolute z-10 -left-6 top-28 w-72 p-4 bg-background rounded-[40px] shadow-2xl rotate-[-6deg]">
+            <div className="bg-surface-container h-[540px] rounded-[32px] overflow-hidden p-8">
+              <div className="w-10 h-10 bg-primary rounded-lg mb-6" />
+              <div className="h-4 w-28 bg-surface-variant rounded-full mb-12" />
+              <div className="space-y-6">
                 <div className="h-16 w-full bg-background rounded-xl shadow-sm" />
                 <div className="h-16 w-full bg-background rounded-xl shadow-sm" />
                 <div className="h-16 w-full bg-background rounded-xl shadow-sm" />
-               </div>
-             </div>
-           </motion.div>
+              </div>
+            </div>
+          </motion.div>
 
-           <motion.div style={{ y: y2 }} className="absolute z-20 left-28 top-6 w-80 p-4 bg-background rounded-[40px] shadow-2xl">
-             <div className="bg-surface h-[620px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-16 text-center">
-               <div className="w-28 h-28 bg-primary/20 rounded-full flex items-center justify-center mb-8 relative">
+          <motion.div style={{ y: y2 }} className="absolute z-20 left-28 top-6 w-[300px] p-4 bg-background rounded-[40px] shadow-2xl">
+            <div className="bg-surface h-[620px] rounded-[32px] overflow-hidden flex flex-col items-center justify-center p-16 text-center">
+              <div className="w-28 h-28 bg-primary/20 rounded-full flex items-center justify-center mb-8 relative">
                 <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-20" />
                 <MapPin size={64} weight="duotone" className="text-primary" />
-               </div>
-               <h4 className="text-on-surface font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
-               <p className="text-on-surface opacity-40 text-base leading-relaxed">Verifying location at Campus Library</p>
-             </div>
-           </motion.div>
+              </div>
+              <h4 className="text-on-surface font-bold text-2xl mb-4 leading-tight">Scanning...</h4>
+              <p className="text-on-surface opacity-40 text-base leading-relaxed">Verifying location at Lecture Theatre</p>
+            </div>
+          </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-8 bottom-12 bg-primary p-10 rounded-[36px] shadow-2xl text-on-primary-fixed">
-             <div className="flex items-center gap-6">
-               <div className="w-14 h-14 bg-on-primary-fixed rounded-full flex items-center justify-center text-primary">
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="absolute z-30 right-8 bottom-12 bg-primary p-6 rounded-full shadow-2xl text-on-primary-fixed">
+            <div className="flex items-center gap-6">
+              <div className="w-14 h-14 bg-on-primary-fixed rounded-full flex items-center justify-center text-primary">
                 <CheckCircle size={48} weight="duotone" />
-               </div>
-               <div>
-                <p className="text-xs  uppercase tracking-widest opacity-60 mb-1 leading-relaxed">Verified</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-widest opacity-60 mb-1 leading-relaxed">Verified</p>
                 <p className="font-bold text-lg leading-tight">You're Present ✓</p>
-               </div>
-             </div>
-           </motion.div>
-          </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -298,17 +208,17 @@ const Hero = () => {
 
 const SocialMarquee = () => (
   <div className="bg-background border-y border-outline py-20 overflow-hidden flex whitespace-nowrap">
-    <motion.div 
+    <motion.div
       initial={{ x: 0 }}
       animate={{ x: "-50%" }}
       transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
       className="flex items-center gap-16 px-12"
     >
-      {[1,2,3].map(i => (
+      {[1, 2, 3].map(i => (
         <React.Fragment key={i}>
-          <span className="text-on-surface/60 font-medium text-sm italic leading-relaxed">"inally, no more roll calls" — Student</span>
+          <span className="text-on-surface/60 font-medium text-sm italic leading-relaxed">"Finally, no more roll calls" — Student</span>
           <Plus size={12} weight="duotone" className="text-primary mx-4" />
-          <span className="text-on-surface font-bold text-sm tracking-widest leading-relaxed">200+ STUDENTS ENROLLED</span>
+          <span className="text-on-surface font-bold text-sm tracking-widest leading-relaxed">500+ STUDENTS ENROLLED</span>
           <Plus size={12} weight="duotone" className="text-primary mx-4" />
           <span className="text-on-surface/60 font-medium text-sm italic leading-relaxed">"One click register export" — Dr. Adeyemi</span>
           <Plus size={12} weight="duotone" className="text-primary mx-4" />
@@ -333,34 +243,34 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
   };
 
   return (
-    <motion.div 
+    <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`group relative overflow-hidden rounded-[48px] bg-surface border border-outline p-10 md:p-16 transition-all hover:border-contrast ${className}`}
+      className={`group relative overflow-hidden rounded-[48px] bg-surface border border-outline p-8 md:p-16 transition-all hover:border-contrast ${className}`}
     >
-      <div 
+      <div
         className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background: `radial-gradient(600px circle at ${coords.x}px ${coords.y}px, ${color}15, transparent 40%)`
         }}
       />
 
-      <div className="relative z-10 grid lg:grid-cols-2 gap-20 items-center h-full">
+      <div className="relative z-10 grid flex-row gap-20 items-center h-full p-32">
         <div className="flex flex-col h-full justify-between py-4 pr-8">
           <div className="space-y-8">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: color }}>
+            <div className="w-48 h-48 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: color }}>
               <Icon size={32} weight="duotone" className="text-surface" />
             </div>
             <h3 className="font-display text-4xl text-on-surface mb-6 tracking-tighter leading-tight">{title}</h3>
             <p className="text-textMuted text-lg leading-relaxed mb-10 max-w-sm">{description}</p>
-            
+
             <div className="grid grid-cols-2 gap-y-8 gap-x-6">
               {features.map((f, i) => (
                 <div key={i} className="flex items-center gap-3 text-on-surface opacity-90 text-base font-medium leading-relaxed">
-                  <CheckCircle size={20} weight="duotone" style={{ color }} className="flex-shrink-0 text-on-surface" /> {f}
+                  <CheckCircle size={24} weight="duotone" style={{ color }} className="flex-shrink-0 text-on-surface" /> {f}
                 </div>
               ))}
             </div>
@@ -380,13 +290,13 @@ const FeatureCard = ({ title, description, icon: Icon, color, features, children
 const RoleBasedSection = () => {
   return (
     <section className="py-64 bg-surface">
-      <div className="max-w-7xl mx-auto w-[85%]">
-        <div className="mb-36">
+      <div className="max-w-[80%] mx-auto">
+        <div className="mb-28">
           <span className="text-primary text-xs tracking-[0.3em] uppercase mb-8 block leading-relaxed">Built for everyone in the room</span>
-          <h2 className="font-display text-5xl md:text-7xl tracking-tighter text-on-surface leading-tight">Whoever you are,<br/>Presently works for you.</h2>
+          <h2 className="font-display text-5xl md:text-7xl tracking-tighter text-on-surface leading-tight">Whoever you are,<br />Presently works for you.</h2>
         </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col gap-32">
+        <div className="mx-auto flex flex-col gap-24">
 
           {/* Card 1: Students - Large Horizontal */}
           <FeatureCard
@@ -437,7 +347,7 @@ const RoleBasedSection = () => {
               color="#38BDF8"
               features={["Live Feed", "Instant Export", "Auto-Grades", "Class Analytics"]}
             >
-              <div className="bg-surface p-10 rounded-[2.5rem] border border-outline w-full max-w-sm rotate-3 group-hover:rotate-0 transition-all duration-700 shadow-2xl">
+              {/* <div className="bg-surface p-10 rounded-[2.5rem] border border-outline w-full max-w-sm rotate-3 group-hover:rotate-0 transition-all duration-700 shadow-2xl">
                 <div className="flex items-center justify-between mb-12">
                   <div className="h-3 w-32 bg-primary/20 rounded-full" />
                   <div className="h-5 w-5 bg-primary rounded-full animate-pulse shadow-[0_0_15px_rgba(56,189,248,0.15)]" />
@@ -451,7 +361,7 @@ const RoleBasedSection = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
             </FeatureCard>
 
             {/* Card 3: Admins */}
@@ -462,7 +372,7 @@ const RoleBasedSection = () => {
               color="#34D399"
               features={["Faculty View", "Trend Reports", "Data Security", "Global Search"]}
             >
-              <div className="flex gap-4 items-end h-48 w-full max-w-xs px-4">
+              {/* <div className="flex gap-4 items-end h-48 w-full max-w-xs px-4">
                 {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
                   <motion.div
                     key={i}
@@ -472,7 +382,7 @@ const RoleBasedSection = () => {
                     className="flex-1 bg-primary/20 rounded-t-xl relative border-t-[3px] border-primary hover:bg-primary/40 transition-colors"
                   />
                 ))}
-              </div>
+              </div> */}
             </FeatureCard>
           </div>
         </div>
@@ -482,10 +392,10 @@ const RoleBasedSection = () => {
 };
 
 const CTASection = () => (
-      <section className="py-64 bg-[#0D0D0D] text-center relative overflow-hidden">
+  <section className="py-64 bg-[#0D0D0D] text-center relative overflow-hidden">
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F5C518]/10 blur-[150px] rounded-full pointer-events-none" />
     <div className="max-w-4xl mx-auto relative z-10">
-      <h2 className="font-display text-6xl md:text-8xl  text-white tracking-tighter mb-12 leading-tight">Every class.<br/>Every student.<br/><span className="text-[#F5C518]">Present.</span></h2>
+      <h2 className="font-display text-6xl md:text-8xl  text-white tracking-tighter mb-12 leading-tight">Every class.<br />Every student.<br /><span className="text-[#F5C518]">Present.</span></h2>
       <p className="text-slate-400 text-2xl mb-20 max-w-xl mx-auto leading-relaxed">Join institutions already running smarter with Presently. Setup takes less than 5 minutes.</p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-10 mb-24">
         <a href="/register" className="w-full sm:w-auto bg-primary text-on-primary-fixed px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex justify-center">
@@ -500,18 +410,16 @@ const CTASection = () => (
 );
 
 const Footer = () => (
-    <footer className="bg-surface pt-40 pb-20 px-8 text-textMuted">
-    <div className="max-w-7xl mx-auto w-[85%] grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
+  <footer className="bg-surface pt-40 pb-20 px-8 text-textMuted">
+    <div className="max-w-[80%] mx-auto w-[85%] grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
       <div className="col-span-1 md:col-span-1">
         <div className="flex items-center gap-3 mb-10">
-          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-            <div className="w-2.5 h-2.5 bg-black rounded-full" />
-          </div>
+          <img src="/logo.png" alt="Logo" className="w-40" />
           <span className="text-2xl font-bold text-on-surface tracking-tight leading-relaxed">Presently</span>
         </div>
         <p className="text-sm leading-relaxed mb-8 text-textMuted">The next generation of academic management. Built for the modern university.</p>
       </div>
-      
+
       <div>
         <h4 className="font-display text-on-surface font-bold mb-10">Product</h4>
         <ul className="space-y-8 text-sm font-medium">
@@ -540,7 +448,7 @@ const Footer = () => (
         </ul>
       </div>
     </div>
-    <div className="max-w-7xl w-[80%] mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase  leading-relaxed">
+    <div className="max-w-[80%] w-[95%] mx-auto pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10 text-xs tracking-widest uppercase  leading-relaxed">
       <p>© 2025 Presently. <span className="text-primary">GPS-VERIFIED ATTENDANCE.</span></p>
       <div className="mt-4 md:mt-0">
         <ThemeToggle />
@@ -563,19 +471,21 @@ export default function App() {
       <Navbar />
       <Hero />
       <SocialMarquee />
-      
+
       <section className="bg-surface py-56">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 border-y border-white/5 py-20">
-          <StatCounter value="200+" label="Students Enrolled" />
-          <StatCounter value="94.7%" label="Avg Attendance Rate" />
-          <StatCounter value="3" label="Sec Check-in Time" />
-          <StatCounter value="1" label="University & Growing" />
+        <div className="border-y border-white/5 py-20">
+          <div className='grid grid-cols-1 md:grid-cols-4 gap-20 max-w-[80%] mx-auto'>
+            <StatCounter value="200+" label="Students Enrolled" />
+            <StatCounter value="94.7%" label="Avg Attendance Rate" />
+            <StatCounter value="3" label="Sec Check-in Time" />
+            <StatCounter value="1" label="University & Growing" />
+          </div>
         </div>
         <div className="max-w-4xl mx-auto text-center mt-40">
-           <p className="font-display text-4xl md:text-6xl  text-on-surface italic tracking-tighter leading-relaxed mb-8">
-             "Presently didn't just fix attendance tracking. It changed how we think about student accountability."
-           </p>
-           <p className="mt-12 text-slate-500 font-bold uppercase tracking-widest text-base leading-relaxed">— Dr. Adeyemi, Dean of Student Affairs</p>
+          <p className="font-display text-4xl md:text-6xl  text-on-surface italic tracking-tighter leading-relaxed mb-8">
+            "Presently didn't just fix attendance tracking. It changed how we think about student accountability."
+          </p>
+          <p className="mt-12 text-slate-500 font-bold uppercase tracking-widest text-base leading-relaxed">— Dr. </p>
         </div>
       </section>
 
@@ -583,14 +493,14 @@ export default function App() {
 
       {/* Mobile App Arc Showcase */}
       <section ref={showcaseRef} className="py-56 px-12 overflow-hidden bg-background">
-        <div className="max-w-7xl mx-auto text-center mb-40">
+        <div className="max-w-[80%] mx-auto text-center mb-40">
           <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block">Mobile Experience</span>
-          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-on-surface leading-tight">Beautiful on every screen.<br/>Effortless in every pocket.</h2>
+          <h2 className="font-display text-5xl md:text-7xl  tracking-tighter text-on-surface leading-tight">Beautiful on every screen.<br />Effortless in every pocket.</h2>
         </div>
-        
+
         <div className="relative flex items-center justify-center h-[700px]">
-          <motion.div 
-            style={{ x: xSlide }} 
+          <motion.div
+            style={{ x: xSlide }}
             className="flex items-center gap-8 md:gap-16 will-change-transform px-[20vw]"
           >
             {[
@@ -600,10 +510,10 @@ export default function App() {
               { id: 4, color: 'bg-slate-100', icon: PaperPlaneTilt },
               { id: 5, color: 'bg-slate-50', icon: CheckCircle },
             ].map((item, idx) => (
-              <ShowcaseDevice 
-                key={item.id} 
-                item={item} 
-                scrollProgress={scrollYProgress} 
+              <ShowcaseDevice
+                key={item.id}
+                item={item}
+                scrollProgress={scrollYProgress}
                 index={idx}
               />
             ))}
@@ -611,41 +521,41 @@ export default function App() {
         </div>
       </section>
 
-        <section className="py-64">
-        <div className="max-w-3xl mx-auto">
+      <section className="py-64">
+        <div className="max-w-6xl mx-auto">
           <div className="mb-36">
             <span className="text-[#F5C518] text-xs  tracking-[0.3em] uppercase mb-8 block leading-relaxed">FAQ</span>
-            <h2 className="font-display text-5xl  tracking-tighter text-on-surface leading-tight">Questions you'll have.<br/>Answered already.</h2>
+            <h2 className="font-display text-5xl  tracking-tighter text-on-surface leading-tight">Questions you'll have.<br />Answered already.</h2>
           </div>
           <div className="space-y-0">
-            <AccordionItem 
+            <AccordionItem
               icon={WifiHigh}
-              question="Does it work without internet?" 
+              question="Does it work without internet?"
               answer="Yes! Our offline mode allows students to check in even in dead zones. The record is timestamped locally and synced the moment a connection is re-established."
             />
-            <AccordionItem 
+            <AccordionItem
               icon={ShieldCheck}
-              question="Can students spoof their GPS location?" 
+              question="Can students spoof their GPS location?"
               answer="Negative. We use high-precision triangulation combining GPS, Wi-Fi hotspots, and cellular towers. Attempts to use VPNs or mock locations are flagged immediately."
             />
-            <AccordionItem 
+            <AccordionItem
               icon={CreditCard}
-              question="Does my school need to pay for students?" 
+              question="Does my school need to pay for students?"
               answer="Presently is built to be accessible. We have tailored plans for institutions that cover all students, or standalone lecturer plans for smaller groups."
             />
-            <AccordionItem 
+            <AccordionItem
               icon={Clock}
-              question="How long does a check-in typically take?" 
+              question="How long does a check-in typically take?"
               answer="Check-ins are lightning fast—usually under 3 seconds. Our GPS verification and location triangulation happen in the background, so students just tap and go."
             />
-            <AccordionItem 
+            <AccordionItem
               icon={Users}
-              question="Can multiple students check in from the same location?" 
+              question="Can multiple students check in from the same location?"
               answer="Absolutely! Presently supports multiple simultaneous check-ins from the same venue. Each student's location and identity are verified independently and securely."
             />
-            <AccordionItem 
+            <AccordionItem
               icon={Prohibit}
-              question="What happens if a student is marked absent by mistake?" 
+              question="What happens if a student is marked absent by mistake?"
               answer="Our support team can review and adjust attendance records within 48 hours. We keep detailed logs of all check-in attempts so discrepancies are easily identified and resolved."
             />
           </div>
@@ -661,36 +571,36 @@ export default function App() {
 function ShowcaseDevice({ item, scrollProgress, index }) {
   const start = index * 0.15;
   const end = start + 0.3;
-  
-  const scale = useTransform(scrollProgress, [start, (start+end)/2, end], [0.85, 1.15, 0.85]);
-  const y = useTransform(scrollProgress, [start, (start+end)/2, end], [50, -40, 50]);
+
+  const scale = useTransform(scrollProgress, [start, (start + end) / 2, end], [0.85, 1.15, 0.85]);
+  const y = useTransform(scrollProgress, [start, (start + end) / 2, end], [50, -40, 50]);
   const opacity = useTransform(scrollProgress, [start - 0.2, start, end, end + 0.2], [0.4, 1, 1, 0.4]);
   const shadow = useTransform(
-    scrollProgress, 
-    [start, (start+end)/2, end], 
+    scrollProgress,
+    [start, (start + end) / 2, end],
     ["0px 10px 30px rgba(0,0,0,0.1)", "0px 40px 80px rgba(0,0,0,0.2)", "0px 10px 30px rgba(0,0,0,0.1)"]
   );
 
   const IconComponent = item.icon;
 
   return (
-    <motion.div 
+    <motion.div
       style={{ scale, y, opacity, boxShadow: shadow }}
       className={`relative w-[280px] md:w-[320px] aspect-[9/19] ${item.color} rounded-[48px] border-[12px] border-white overflow-hidden flex flex-col items-center justify-center p-10 flex-shrink-0 transition-colors duration-500`}
     >
       {item.active && (
         <div className="absolute inset-0 bg-[#F5C518]/5 animate-pulse pointer-events-none" />
       )}
-      
+
       <div className="relative">
         {item.active && (
           <div className="absolute inset-0 bg-[#F5C518] rounded-full animate-ping opacity-20 scale-150" />
         )}
         <div className={`z-10 bg-white/10 backdrop-blur-md p-8 rounded-3xl ${item.active ? 'bg-white/20' : ''}`}>
           <IconComponent
-            size={56} 
+            size={56}
             weight="duotone"
-            className={item.active ? "text-[#F5C518]" : "text-slate-400"} 
+            className={item.active ? "text-[#F5C518]" : "text-slate-400"}
           />
         </div>
       </div>
@@ -699,7 +609,7 @@ function ShowcaseDevice({ item, scrollProgress, index }) {
         <div className={`h-3 w-28 mx-auto rounded-full mb-4 ${item.active ? 'bg-[#F5C518]' : 'bg-slate-200'}`} />
         <div className={`h-2.5 w-20 mx-auto rounded-full ${item.active ? 'bg-[#F5C518]/40' : 'bg-slate-100'}`} />
       </div>
-      
+
       <div className="absolute top-14 w-20 h-2 bg-slate-200/20 rounded-full" />
       <div className="absolute bottom-14 w-32 h-1.5 bg-slate-200/10 rounded-full" />
     </motion.div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, ArrowLeft, Check } from 'lucide-react';
 import { useRegister, useCurrentUser } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
@@ -73,7 +73,7 @@ export const Register: React.FC = () => {
         <div className="bg-surface p-8 md:p-10 rounded-3xl shadow-2xl border border-outline/50 relative overflow-hidden">
           {/* Subtle top highlight for skeuomorphism */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-        
+
           <form onSubmit={handleSubmit} className="space-y-8">
             <Input
               label="Full Name"
@@ -82,7 +82,6 @@ export const Register: React.FC = () => {
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              icon={<User />}
             />
             <Input
               label="Email Address"
@@ -91,7 +90,6 @@ export const Register: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              icon={<Mail />}
             />
             <div className="space-y-3">
               <label className="text-sm font-semibold text-on-surface px-1">Password</label>
@@ -104,7 +102,6 @@ export const Register: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full h-[52px] pl-12 pr-12 bg-surface-container border border-outline placeholder:text-textMuted text-on-surface focus:border-primary focus:ring-4 focus:ring-primary/20 rounded-lg outline-none transition-all"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={20} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -121,24 +118,23 @@ export const Register: React.FC = () => {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              icon={<Lock />}
             />
-            <div className="flex items-start gap-3 px-1 pt-2">
-               <button
-                  type="button"
-                  onClick={() => setAgreeTerms(!agreeTerms)}
-                  className="flex-shrink-0 mt-0.5 group"
-                >
-                  <div className={cn(
-                    "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all flex-shrink-0",
-                    agreeTerms ? "bg-primary border-primary shadow-md" : "border-outline group-hover:border-primary"
-                  )}>
-                    {agreeTerms && <CheckCircle2 size={12} className="text-on-primary-fixed" />}
-                  </div>
-               </button>
-               <span className="text-xs font-medium text-on-surface leading-relaxed pt-0.5">
-                 I agree to the <button type="button" className="text-primary font-bold hover:underline">Terms of Service</button> and <button type="button" className="text-primary font-bold hover:underline">Privacy Policy</button>.
-               </span>
+            <div className="flex items-center justify-start px-1 pt-2">
+              <button
+                type="button"
+                onClick={() => setAgreeTerms(!agreeTerms)}
+                className="flex-shrink-0 mt-0.5 group"
+              >
+                <div className={cn(
+                  "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all flex-shrink-0",
+                  agreeTerms ? "bg-primary border-primary shadow-md" : "border-outline group-hover:border-primary"
+                )}>
+                  {agreeTerms && <Check size={12} className="text-on-primary-fixed" />}
+                </div>
+              </button>
+              <span className="text-xs font-medium text-on-surface leading-relaxed pt-0.5">
+                I agree to the <button type="button" onClick={() => navigate('/terms')} className="text-primary font-bold hover:underline">Terms of Service</button> and <button type="button" onClick={() => navigate('/privacy')} className="text-primary font-bold hover:underline">Privacy Policy</button>.
+              </span>
             </div>
             <Button
               type="submit"
