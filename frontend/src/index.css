@@ -63,9 +63,16 @@
   h2,
   h3,
   .display-font {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+
+  .font-nimbus {
     font-family: 'Tan Nimbus', serif;
     letter-spacing: -0.03em;
   }
+
 
   .mono-font {
     font-family: 'JetBrains Mono', monospace;

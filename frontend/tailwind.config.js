@@ -14,9 +14,11 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['"Tan Nimbus"', 'serif'],
+        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        nimbus: ['"Tan Nimbus"', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
+
       borderRadius: {
         'xs': '4px',
         'sm': '8px',
