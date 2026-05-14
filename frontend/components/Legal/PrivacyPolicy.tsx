@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronRight, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 // import { LandingHeader } from '../LandingHeader';
-import { Navbar } from "../"
+import { Navbar } from "../LandingPage/Navbar"
 // import { Logo } from '../Logo';
 import { SEO } from '../SEO';
 
@@ -18,7 +18,7 @@ const PrivacyPolicy: React.FC = () => {
         canonicalPath="/privacy"
       />
       {/* Header */}
-      <Navbar onGetStarted={() => navigate('/register')} onLogin={() => navigate('/login')} />
+      <Navbar />
 
       {/* Main Content */}
       <div className="flex-1 py-32 sm:py-36">
