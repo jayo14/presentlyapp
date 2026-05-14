@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, MagnifyingGlass, MapPin, 
-  Navigation, Buildings, CaretRight, 
+  NavigationArrow, Buildings, CaretRight, 
   DotsThreeVertical, Trash, Pencil,
   Sliders
 } from '@phosphor-icons/react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { venuesApi, institutionApi } from '../../../services/api/admin';
 import { Venue, Institution } from '../../../types';
@@ -163,7 +164,7 @@ export const VenueManagementMobile: React.FC = () => {
 
               <div className="p-4 bg-surface-container rounded-2xl flex items-center justify-between">
                  <div className="flex items-center gap-2">
-                    <Navigation size={16} weight="duotone" className="text-primary" />
+                    <NavigationArrow size={16} weight="duotone" className="text-primary" />
                     <span className="text-xs font-bold font-mono">
                       {v.latitude.toFixed(4)}, {v.longitude.toFixed(4)}
                     </span>
