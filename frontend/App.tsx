@@ -14,9 +14,10 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { AnalyticsTracker } from './components/Analytics/AnalyticsTracker';
 
 // Eager load critical components for initial page
-import { Login } from './components/Auth/Login';
-import { Register } from './components/Auth/Register';
+import { LoginMobile as Login } from './components/mobile/auth/LoginMobile';
+import { RegisterMobile as Register } from './components/mobile/auth/RegisterMobile';
 import { Layout } from './components/Layout';
+import { MobileLayout } from './components/mobile/MobileLayout';
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { UniversitiesPage } from './components/universities/UniversitiesPage';
@@ -33,7 +34,22 @@ import { LecturerDashboard } from './components/Dashboard/LecturerDashboard';
 import { AdminDashboard } from './components/Dashboard/AdminDashboard';
 import { ClassRepDashboard } from './components/Dashboard/ClassRepDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { ProfilePage } from './components/Profile/ProfilePage';
+import { ProfileMobile as ProfilePage } from './components/mobile/ProfileMobile';
+
+
+// Mobile Components
+import { MobileDashboardHome } from './components/mobile/MobileDashboardHome';
+import { StudentCoursesMobile } from './components/mobile/student/StudentCoursesMobile';
+import { AttendanceScannerMobile } from './components/mobile/student/AttendanceScannerMobile';
+import { LecturerReportsMobile } from './components/mobile/lecturer/LecturerReportsMobile';
+import { InstitutionManagementMobile } from './components/mobile/admin/InstitutionManagementMobile';
+import { UserManagementMobile } from './components/mobile/admin/UserManagementMobile';
+import { VenueManagementMobile } from './components/mobile/admin/VenueManagementMobile';
+import { DepartmentManagementMobile } from './components/mobile/admin/DepartmentManagementMobile';
+import { CourseManagementMobile } from './components/mobile/admin/CourseManagementMobile';
+
+
+
 
 // Simple lazy loader with no reload on error (show error boundary instead)
 const simpleLazy = (componentImport: () => Promise<any>) =>
@@ -56,10 +72,11 @@ const HowItWorksPage = simpleLazy(() => import('./components/HowItWorksPage').th
 const Onboarding = simpleLazy(() => import('./components/Auth/Onboarding').then(module => ({ default: module.Onboarding })));
 const EmailVerificationSent = simpleLazy(() => import('./components/Auth/EmailVerificationSent').then(module => ({ default: module.EmailVerificationSent })));
 const VerifyEmail = simpleLazy(() => import('./components/Auth/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
-const OTPVerification = simpleLazy(() => import('./components/Auth/OTPVerification').then(module => ({ default: module.OTPVerification })));
+const OTPVerification = simpleLazy(() => import('./components/mobile/auth/OTPVerificationMobile').then(module => ({ default: module.OTPVerificationMobile })));
 const AuthCallback = simpleLazy(() => import('./components/Auth/Callback').then(module => ({ default: module.AuthCallback })));
 const ForgotPassword = simpleLazy(() => import('./components/Auth/ForgotPassword').then(module => ({ default: module.ForgotPassword })));
-const ResetPassword = simpleLazy(() => import('./components/Auth/ResetPassword').then(module => ({ default: module.ResetPassword })));
+const ResetPassword = simpleLazy(() => import('./components/mobile/auth/ResetPasswordMobile').then(module => ({ default: module.ResetPasswordMobile })));
+
 const StudentCoursesPage = simpleLazy(() => import('./components/Student/StudentCoursesPage').then(module => ({ default: module.default })));
 const CreateSessionPage = simpleLazy(() => import('./components/Attendance/CreateSessionPage').then(module => ({ default: module.CreateSessionPage })));
 const SessionsPage = simpleLazy(() => import('./components/Dashboard/SessionsPage').then(module => ({ default: module.SessionsPage })));
@@ -159,36 +176,17 @@ const DashboardLayout: React.FC = () => {
     const activeUser = user as NonNullable<typeof user>;
 
     return (
-        <Layout
-        userRole={activeUser.role}
-        userName={activeUser.full_name}
-            onLogout={handleLogout}
-            currentPage={currentPage}
-            setCurrentPage={handlePageChange}
-        >
+        <MobileLayout>
             <Outlet context={{ onLogout: handleLogout }} />
-        </Layout>
+        </MobileLayout>
     );
 };
 
-const DashboardHome: React.FC = () => {
-    const { data: user } = useCurrentUser();
-    
-    if (!user) return null;
 
-    switch (user.role) {
-        case UserRole.STUDENT:
-            return <StudentDashboard userName={user.full_name} view="dashboard" />;
-        case UserRole.LECTURER:
-            return <LecturerDashboard userName={user.full_name} userProfile={user} view="dashboard" />;
-        case UserRole.ADMIN:
-            return <AdminDashboard userName={user.full_name} view="dashboard" />;
-        case UserRole.CLASS_REP:
-            return <ClassRepDashboard userName={user.full_name} view="dashboard" />;
-        default:
-            return <Navigate to="/unauthorized" replace />;
-    }
+const DashboardHome: React.FC = () => {
+    return <MobileDashboardHome />;
 };
+
 
 // Admin Route Guard
 const AdminRoute: React.FC<{ children: React.ReactNode; requiredPermission?: string }> = ({ children, requiredPermission }) => {
@@ -372,6 +370,10 @@ const AppContent: React.FC = () => {
           >
               <Route index element={<DashboardHome />} />
               <Route path="profile" element={<ProfilePage />} />
+              <Route path="institutions" element={<AdminRoute><InstitutionManagementMobile /></AdminRoute>} />
+              <Route path="users" element={<AdminRoute><UserManagementMobile /></AdminRoute>} />
+              <Route path="venues" element={<AdminRoute><VenueManagementMobile /></AdminRoute>} />
+              <Route path="departments" element={<AdminRoute><DepartmentManagementMobile /></AdminRoute>} />
               <Route path="sessions" element={<SessionsPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
@@ -398,12 +400,13 @@ const AppContent: React.FC = () => {
 
               <Route path="courses" element={
                   user?.role === UserRole.ADMIN ? (
-                      <AdminRoute><CourseManagement /></AdminRoute>
+                      <AdminRoute><CourseManagementMobile /></AdminRoute>
                   ) : user?.role === UserRole.LECTURER ? (
-                      <LecturerRoute><LecturerDashboard userName={user.full_name} userProfile={user} view="courses" /></LecturerRoute>
+                      <LecturerRoute><LecturerCoursesMobile /></LecturerRoute>
                   ) : user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
-                      <ProtectedRoute><StudentCoursesPage userName={user?.full_name || ''} /></ProtectedRoute>
+                      <ProtectedRoute><StudentCoursesMobile /></ProtectedRoute>
                   ) : (
+
                     <Navigate
                       to="/unauthorized"
                       state={{
@@ -416,8 +419,24 @@ const AppContent: React.FC = () => {
                   )
               } />
 
-              <Route path="sessions/new" element={
-                  <LecturerRoute><CreateSessionPage /></LecturerRoute>
+
+              <Route path="scanner" element={<ProtectedRoute><AttendanceScannerMobile /></ProtectedRoute>} />
+
+
+              <Route path="sessions" element={
+                  user?.role === UserRole.LECTURER ? (
+                      <LecturerRoute><LecturerSessionsMobile /></LecturerRoute>
+                  ) : (
+                      <ProtectedRoute><SessionsPage /></ProtectedRoute>
+                  )
+              } />
+
+              <Route path="reports" element={
+                  user?.role === UserRole.LECTURER ? (
+                      <LecturerRoute><LecturerReportsMobile /></LecturerRoute>
+                  ) : (
+                      <ProtectedRoute><ReportsPage /></ProtectedRoute>
+                  )
               } />
 
               <Route path="timetable" element={

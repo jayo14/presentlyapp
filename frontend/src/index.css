@@ -126,8 +126,53 @@
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Advanced Glassmorphism */
+  .glass-morphism {
+    @apply bg-white/70 dark:bg-[#0D0D0D]/70 backdrop-blur-xl border border-white/20 dark:border-white/10;
+  }
+
+  .glass-dock {
+    @apply bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/10 dark:border-white/5;
+  }
+
+  /* Liquid Glass Animation */
+  .liquid-glass {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .liquid-glass::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(245, 197, 24, 0.05) 0%, transparent 70%);
+    animation: liquid-drift 10s infinite linear;
+  }
+
+  @keyframes liquid-drift {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Mobile App Transitions */
+  .slide-up-enter { transform: translateY(100%); }
+  .slide-up-enter-active { transform: translateY(0); transition: transform 300ms var(--ease-out); }
+  
+  .fade-enter { opacity: 0; }
+  .fade-enter-active { opacity: 1; transition: opacity 200ms ease-out; }
+
+  /* Safe Area Utilities */
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .min-h-screen-safe { min-height: -webkit-fill-available; }
+
 
 
 /* Skeuomorphic Input */
