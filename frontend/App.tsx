@@ -35,6 +35,9 @@ import { AdminDashboard } from './components/Dashboard/AdminDashboard';
 import { ClassRepDashboard } from './components/Dashboard/ClassRepDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ProfileMobile as ProfilePage } from './components/mobile/ProfileMobile';
+import { AttendanceReport as ReportsPage } from './components/Dashboard/AttendanceReport';
+import { SessionsPage } from './components/Dashboard/SessionsPage';
+
 
 
 // Mobile Components
@@ -79,8 +82,8 @@ const ResetPassword = simpleLazy(() => import('./components/mobile/auth/ResetPas
 
 const StudentCoursesPage = simpleLazy(() => import('./components/Student/StudentCoursesPage').then(module => ({ default: module.default })));
 const CreateSessionPage = simpleLazy(() => import('./components/Attendance/CreateSessionPage').then(module => ({ default: module.CreateSessionPage })));
-const SessionsPage = simpleLazy(() => import('./components/Dashboard/SessionsPage').then(module => ({ default: module.SessionsPage })));
 const PublicCheckInPage = simpleLazy(() => import('./components/Attendance/PublicCheckInPage').then(module => ({ default: module.PublicCheckInPage })));
+
 const NotificationsPage = simpleLazy(() => import('./components/Notifications/NotificationsPage').then(module => ({ default: module.NotificationsPage })));
 const SettingsPage = simpleLazy(() => import('./components/Settings/SettingsPage').then(module => ({ default: module.SettingsPage })));
 const NotFound = simpleLazy(() => import('./components/NotFound').then(module => ({ default: module.NotFound })));
