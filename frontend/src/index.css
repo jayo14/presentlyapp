@@ -91,8 +91,14 @@
   select,
   textarea {
     font-size: 16px !important;
+    @apply skeuo-input px-4 h-12 rounded-xl transition-all duration-200 outline-none;
+  }
+
+  button {
+    @apply transition-all duration-200 active:scale-[0.98];
   }
 }
+
 
 @layer components {
 
@@ -314,6 +320,35 @@
     -4px -4px 12px rgba(255, 255, 255, 0.1);
 }
 
+/* --- Global Skeuomorphic Elements --- */
+
+/* Primary Buttons */
+button.btn-primary, 
+.btn-gold,
+button[type="submit"]:not(.skeuo-button) {
+  @apply skeuo-button-gold px-8 py-4 rounded-full font-bold flex items-center justify-center gap-2;
+}
+
+/* Secondary / Default Buttons */
+button:not(.skeuo-button-gold):not(.btn-primary):not(.btn-gold):not([type="submit"]),
+.skeuo-button {
+  @apply skeuo-button px-6 py-3 rounded-xl font-semibold;
+}
+
+/* Inputs */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  @apply skeuo-input;
+}
+
+/* Specific Landing Page Headlines */
+.landing-page h1,
+.landing-page h2,
+.landing-page h3,
+.landing-hero-title {
+  @apply font-nimbus;
+}
 
 /* Skeuomorphic Checkbox */
 .skeuo-checkbox {
