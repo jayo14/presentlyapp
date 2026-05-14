@@ -88,70 +88,59 @@ export const RegisterMobile: React.FC = () => {
 
       {/* Register Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              <User size={20} weight="duotone" />
-            </div>
             <input
               type="text"
               placeholder="Full Name"
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full h-16 pl-12 pr-4 bg-surface-container border border-outline rounded-2xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-medium"
+              className="w-full h-20 px-6 bg-surface-container rounded-3xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-bold text-lg skeuo-input"
             />
           </div>
 
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              <Envelope size={20} weight="duotone" />
-            </div>
             <input
               type="email"
               placeholder="Email Address"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-16 pl-12 pr-4 bg-surface-container border border-outline rounded-2xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-medium"
+              className="w-full h-20 px-6 bg-surface-container rounded-3xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-bold text-lg skeuo-input"
             />
           </div>
 
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              <Lock size={20} weight="duotone" />
-            </div>
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-16 pl-12 pr-12 bg-surface-container border border-outline rounded-2xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-medium"
+              className="w-full h-20 pl-6 pr-14 bg-surface-container rounded-3xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-bold text-lg skeuo-input"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant p-2"
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant p-2"
             >
-              {showPassword ? <EyeSlash size={20} weight="duotone" /> : <Eye size={20} weight="duotone" />}
+              {showPassword ? <EyeSlash size={24} weight="duotone" /> : <Eye size={24} weight="duotone" />}
             </button>
           </div>
 
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              <Lock size={20} weight="duotone" />
-            </div>
             <input
               type="password"
               placeholder="Confirm Password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-16 pl-12 pr-4 bg-surface-container border border-outline rounded-2xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-medium"
+              className="w-full h-20 px-6 bg-surface-container rounded-3xl outline-none focus:border-sungold focus:ring-4 focus:ring-sungold/10 transition-all font-bold text-lg skeuo-input"
             />
           </div>
         </div>
+
 
         {/* Terms Agreement */}
         <div className="flex items-start gap-3 px-2 py-2">
@@ -172,16 +161,17 @@ export const RegisterMobile: React.FC = () => {
         <button
           type="submit"
           disabled={registerMutation.isPending}
-          className="w-full h-16 bg-sungold text-presently-black rounded-2xl font-bold shadow-gold flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
+          className="w-full h-20 bg-sungold text-presently-black rounded-3xl font-black text-xl skeuo-button-gold flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
         >
           {registerMutation.isPending ? (
-            <div className="w-6 h-6 border-4 border-black/20 border-t-black rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-black/20 border-t-black rounded-full animate-spin" />
           ) : (
             <>
-              Get Started <CaretRight size={20} weight="bold" />
+              Create Account <CaretRight size={24} weight="bold" />
             </>
           )}
         </button>
+
       </form>
 
       {/* Footer */}

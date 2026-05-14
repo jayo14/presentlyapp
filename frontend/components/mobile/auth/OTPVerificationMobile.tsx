@@ -151,21 +151,23 @@ export const OTPVerificationMobile: React.FC = () => {
           <button
             onClick={() => resendMutation.mutate(email)}
             disabled={resendMutation.isPending}
-            className="w-full h-14 rounded-2xl border border-outline font-bold active:scale-95 transition-all disabled:opacity-50"
+            className="w-full h-14 rounded-2xl border border-outline font-bold active:scale-95 transition-all disabled:opacity-50 skeuo-button"
           >
             {resendMutation.isPending ? 'Resending...' : 'Resend Code'}
           </button>
+
         )}
 
         <button
           onClick={() => verifyMutation.mutate({ email, otp: otp.join('') })}
           disabled={!otp.every(d => d !== '') || verifyMutation.isPending}
-          className="w-full h-16 bg-sungold text-presently-black rounded-2xl font-bold shadow-gold flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
+          className="w-full h-18 bg-sungold text-presently-black rounded-3xl font-black text-xl skeuo-button-gold flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
         >
           {verifyMutation.isPending ? (
-            <div className="w-6 h-6 border-4 border-black/20 border-t-black rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-black/20 border-t-black rounded-full animate-spin" />
           ) : 'Verify Account'}
         </button>
+
       </div>
 
       {/* Visual Decoration */}

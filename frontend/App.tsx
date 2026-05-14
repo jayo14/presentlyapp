@@ -14,12 +14,15 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { AnalyticsTracker } from './components/Analytics/AnalyticsTracker';
 
 // Eager load critical components for initial page
-import { LoginMobile as Login } from './components/mobile/auth/LoginMobile';
-import { RegisterMobile as Register } from './components/mobile/auth/RegisterMobile';
+import { LoginMobile } from './components/mobile/auth/LoginMobile';
+import { RegisterMobile } from './components/mobile/auth/RegisterMobile';
+import { Login as LoginDesktop } from './components/Auth/Login';
+import { Register as RegisterDesktop } from './components/Auth/Register';
 import { Layout } from './components/Layout';
 import { MobileLayout } from './components/mobile/MobileLayout';
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+
 import { UniversitiesPage } from './components/universities/UniversitiesPage';
 import { UniversityLandingPage } from './components/universities/UniversityLandingPage';
 import { BlogListPage } from './components/blog/BlogListPage';
@@ -138,7 +141,21 @@ const LoadingFallback: React.FC = () => <LoadingScreen message="Loading..." show
 // Public routes should not display the preloader.
 const PublicLoadingFallback: React.FC = () => null;
 
+// Responsive Auth Wrapper
+const ResponsiveAuth: React.FC<{ Mobile: React.FC; Desktop: React.FC }> = ({ Mobile, Desktop }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return isMobile ? <Mobile /> : <Desktop />;
+};
+
 const warmUpBackend = () => {
+
   const rawApi = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
   if (!rawApi) return;
 
@@ -341,8 +358,9 @@ const AppContent: React.FC = () => {
           <Route path="/blog" element={<BlogListPage />} />
           <Route path="/blog/page/:page" element={<BlogListPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<ResponsiveAuth Mobile={LoginMobile} Desktop={LoginDesktop} />} />
+          <Route path="/register" element={<ResponsiveAuth Mobile={RegisterMobile} Desktop={RegisterDesktop} />} />
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/otp-verification" element={<OTPVerification />} />
