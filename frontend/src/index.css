@@ -59,7 +59,10 @@
     line-height: 1.65;
   }
 
-  h1, h2, h3, .display-font {
+  h1,
+  h2,
+  h3,
+  .display-font {
     font-family: 'Tan Nimbus', serif;
     letter-spacing: -0.03em;
   }
@@ -69,18 +72,23 @@
   }
 
   /* Accessible touch targets */
-  button, [role='button'], a {
+  button,
+  [role='button'],
+  a {
     min-height: 48px;
     min-width: 48px;
     touch-action: manipulation;
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
 }
 
 @layer components {
+
   /* Premium App Shell Layouts */
   .app-shell {
     @apply flex flex-col min-h-screen bg-background;
@@ -121,57 +129,96 @@
 }
 
 @layer utilities {
-  .text-balance { text-wrap: balance; }
-  .safe-top { padding-top: env(safe-area-inset-top); }
-  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
-  /* Advanced Glassmorphism */
-  .glass-morphism {
-    @apply bg-white/70 dark:bg-[#0D0D0D]/70 backdrop-blur-xl border border-white/20 dark:border-white/10;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Advanced Glassmorphism */
+.glass-morphism {
+  @apply bg-white/70 dark:bg-[#0D0D0D]/70 backdrop-blur-xl border border-white/20 dark:border-white/10;
+}
+
+.glass-dock {
+  @apply bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/10 dark:border-white/5;
+}
+
+/* Liquid Glass Animation */
+.liquid-glass {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(245, 197, 24, 0.05) 0%, transparent 70%);
+  animation: liquid-drift 10s infinite linear;
+}
+
+@keyframes liquid-drift {
+  0% {
+    transform: rotate(0deg);
   }
 
-  .glass-dock {
-    @apply bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/10 dark:border-white/5;
+  100% {
+    transform: rotate(360deg);
   }
+}
 
-  /* Liquid Glass Animation */
-  .liquid-glass {
-    position: relative;
-    overflow: hidden;
-  }
+/* Mobile App Transitions */
+.slide-up-enter {
+  transform: translateY(100%);
+}
 
-  .liquid-glass::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(245, 197, 24, 0.05) 0%, transparent 70%);
-    animation: liquid-drift 10s infinite linear;
-  }
+.slide-up-enter-active {
+  transform: translateY(0);
+  transition: transform 300ms var(--ease-out);
+}
 
-  @keyframes liquid-drift {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+.fade-enter {
+  opacity: 0;
+}
 
-  /* Mobile App Transitions */
-  .slide-up-enter { transform: translateY(100%); }
-  .slide-up-enter-active { transform: translateY(0); transition: transform 300ms var(--ease-out); }
-  
-  .fade-enter { opacity: 0; }
-  .fade-enter-active { opacity: 1; transition: opacity 200ms ease-out; }
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms ease-out;
+}
 
-  /* Safe Area Utilities */
-  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-  .pt-safe { padding-top: env(safe-area-inset-top); }
-  .min-h-screen-safe { min-height: -webkit-fill-available; }
+/* Safe Area Utilities */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.min-h-screen-safe {
+  min-height: -webkit-fill-available;
+}
 
 
 
@@ -180,58 +227,88 @@
   background: linear-gradient(145deg, #f8f9fa, #e8e9eb);
   border: 2px solid #c5c8d0;
   border-radius: 16px;
-  box-shadow: 
+  box-shadow:
     inset 0 3px 6px rgba(0, 0, 0, 0.15),
     inset 0 -3px 4px rgba(255, 255, 255, 0.9),
     0 8px 16px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
 }
 
-.skeuo-input:focus {
-  background: linear-gradient(145deg, #ffffff, #f0f2f5);
-  border-color: rgb(var(--primary));
-  box-shadow: 
-    inset 0 3px 6px rgba(0, 0, 0, 0.1),
-    inset 0 -3px 4px rgba(255, 255, 255, 0.95),
-    0 0 0 4px rgb(var(--primary) / 0.15),
-    0 10px 20px rgba(0, 0, 0, 0.15);
-  outline: none;
-  /* Skeuomorphic Utilities */
-  .skeuo-input {
-    @apply shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,0.05)] border border-outline/30;
-  }
-  
-  .skeuo-button {
-    @apply shadow-[4px_4px_10px_rgba(0,0,0,0.15),-2px_-2px_10px_rgba(255,255,255,0.05)] active:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all duration-200;
-  }
+/* --- Skeuomorphic Design System (Mobile-First) --- */
 
-  .skeuo-button-gold {
-    @apply shadow-[6px_6px_12px_rgba(0,0,0,0.2),-2px_-2px_8px_rgba(255,255,255,0.1)] active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] active:scale-[0.97] transition-all duration-200;
-  }
+.skeuo-input {
+  @apply bg-surface-container transition-all duration-300;
+  background: var(--surface-container);
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.08),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(var(--outline), 0.1);
 }
 
-/* Skeuomorphic Button */
+.dark .skeuo-input {
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.skeuo-input:focus {
+  @apply ring-4 ring-sungold/10 border-sungold;
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.8),
+    0 0 0 4px rgba(245, 197, 24, 0.1);
+}
+
+.skeuo-button-gold {
+  @apply font-black tracking-tight;
+  background: linear-gradient(145deg, #F5C518, #E2B616);
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.15),
+    -4px -4px 12px rgba(255, 255, 255, 0.8);
+  color: #0D0D0D;
+}
+
+.skeuo-button-gold:active {
+  background: linear-gradient(145deg, #E2B616, #F5C518);
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.2),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.2);
+  transform: scale(0.97);
+}
+
 .skeuo-button {
-  background: linear-gradient(145deg, #3b82f6, #2563eb);
-  border: 2px solid #1e40af;
-  border-radius: 16px;
-  box-shadow: 
-    0 8px 16px rgba(37, 99, 235, 0.3),
-    inset 0 2px 4px rgba(255,255,255,0.4),
-    inset 0 -4px 6px rgba(0,0,0,0.2);
+  @apply bg-surface border border-outline/30;
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.08),
+    -4px -4px 10px rgba(255, 255, 255, 0.8);
+}
+
+.dark .skeuo-button {
+  background: linear-gradient(145deg, #1A1A1A, #0D0D0D);
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.4),
+    -4px -4px 12px rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .skeuo-button:active {
-  box-shadow: 
-    inset 0 3px 6px rgba(0,0,0,0.3),
-    inset 0 -2px 3px rgba(255,255,255,0.2);
-  transform: translateY(2px);
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.1);
+  transform: scale(0.98);
 }
+
+.dark .skeuo-button-gold {
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.4),
+    -4px -4px 12px rgba(255, 255, 255, 0.1);
+}
+
 
 /* Skeuomorphic Checkbox */
 .skeuo-checkbox {
   background: linear-gradient(145deg, #f1f3f5, #e2e5e9);
-  box-shadow: 
-    inset 0 2px 4px rgba(0,0,0,0.15),
-    0 2px 5px rgba(0,0,0,0.1);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 2px 5px rgba(0, 0, 0, 0.1);
 }

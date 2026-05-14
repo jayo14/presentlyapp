@@ -125,9 +125,10 @@ export const OTPVerificationMobile: React.FC = () => {
             onChange={(e) => handleChange(index, e.target.value)}
             onKeyDown={(e) => handleKeyDown(index, e)}
             className={`
-              w-full aspect-[2/3] text-center text-3xl font-black rounded-2xl border transition-all
-              ${digit ? 'bg-sungold text-black border-sungold shadow-gold' : 'bg-surface-container border-outline text-on-surface focus:border-sungold focus:ring-4 focus:ring-sungold/10'}
+              w-full aspect-[2/3] text-center text-3xl font-black rounded-2xl transition-all
+              ${digit ? 'bg-sungold text-black skeuo-button-gold' : 'bg-surface-container text-on-surface skeuo-input'}
             `}
+
           />
         ))}
       </div>
