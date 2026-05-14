@@ -235,36 +235,8 @@
 
 
 
-/* Skeuomorphic Input */
-.skeuo-input {
-  background: linear-gradient(145deg, #f8f9fa, #e8e9eb);
-  border: 2px solid #c5c8d0;
-  border-radius: 16px;
-  box-shadow:
-    inset 0 3px 6px rgba(0, 0, 0, 0.15),
-    inset 0 -3px 4px rgba(255, 255, 255, 0.9),
-    0 8px 16px rgba(0, 0, 0, 0.12);
-  transition: all 0.2s ease;
-}
 
 /* --- Skeuomorphic Design System (Mobile-First) --- */
-
-.skeuo-input {
-  @apply bg-surface-container transition-all duration-300;
-  background: var(--surface-container);
-  box-shadow:
-    inset 4px 4px 8px rgba(0, 0, 0, 0.08),
-    inset -4px -4px 8px rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-
-}
-
-.dark .skeuo-input {
-  box-shadow:
-    inset 4px 4px 8px rgba(0, 0, 0, 0.4),
-    inset -2px -2px 6px rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
 
 .skeuo-input:focus {
   @apply ring-4 ring-sungold/10 border-sungold;
@@ -272,15 +244,6 @@
     inset 2px 2px 4px rgba(0, 0, 0, 0.1),
     inset -2px -2px 4px rgba(255, 255, 255, 0.8),
     0 0 0 4px rgba(245, 197, 24, 0.1);
-}
-
-.skeuo-button-gold {
-  @apply font-black tracking-tight;
-  background: linear-gradient(145deg, #F5C518, #E2B616);
-  box-shadow:
-    6px 6px 12px rgba(0, 0, 0, 0.15),
-    -4px -4px 12px rgba(255, 255, 255, 0.8);
-  color: #0D0D0D;
 }
 
 .skeuo-button-gold:active {
@@ -291,28 +254,12 @@
   transform: scale(0.97);
 }
 
-.skeuo-button {
-  @apply bg-surface border border-slate-200/60;
-
-
-  box-shadow:
-    4px 4px 10px rgba(0, 0, 0, 0.08),
-    -4px -4px 10px rgba(255, 255, 255, 0.8);
-}
-
-.dark .skeuo-button {
-  background: linear-gradient(145deg, #1A1A1A, #0D0D0D);
-  box-shadow:
-    8px 8px 16px rgba(0, 0, 0, 0.4),
-    -4px -4px 12px rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .skeuo-button:active {
   box-shadow:
     inset 4px 4px 8px rgba(0, 0, 0, 0.1);
   transform: scale(0.98);
 }
+
 
 .dark .skeuo-button-gold {
   box-shadow:
@@ -322,25 +269,49 @@
 
 /* --- Global Skeuomorphic Elements --- */
 
+.skeuo-button-gold-base {
+  @apply font-black tracking-tight;
+  background: linear-gradient(145deg, #F5C518, #E2B616);
+  box-shadow: 
+    6px 6px 12px rgba(0, 0, 0, 0.15), 
+    -4px -4px 12px rgba(255, 255, 255, 0.8);
+  color: #0D0D0D;
+}
+
+.skeuo-button-base {
+  @apply bg-surface border border-slate-200/60;
+  box-shadow: 
+    4px 4px 10px rgba(0, 0, 0, 0.08), 
+    -4px -4px 10px rgba(255, 255, 255, 0.8);
+}
+
 /* Primary Buttons */
 button.btn-primary, 
 .btn-gold,
-button[type="submit"]:not(.skeuo-button) {
-  @apply skeuo-button-gold px-8 py-4 rounded-full font-bold flex items-center justify-center gap-2;
+button[type="submit"]:not(.skeuo-button),
+.skeuo-button-gold {
+  @apply skeuo-button-gold-base px-8 py-4 rounded-full font-bold flex items-center justify-center gap-2;
 }
 
 /* Secondary / Default Buttons */
-button:not(.skeuo-button-gold):not(.btn-primary):not(.btn-gold):not([type="submit"]),
+button:not(.skeuo-button-gold):not(.btn-primary):not(.btn-gold):not([type="submit"]):not(.skeuo-button-gold-base),
 .skeuo-button {
-  @apply skeuo-button px-6 py-3 rounded-xl font-semibold;
+  @apply skeuo-button-base px-6 py-3 rounded-xl font-semibold;
 }
 
 /* Inputs */
 input:not([type="checkbox"]):not([type="radio"]),
 select,
-textarea {
-  @apply skeuo-input;
+textarea,
+.skeuo-input {
+  @apply bg-surface-container transition-all duration-300;
+  background: var(--surface-container);
+  box-shadow: 
+    inset 4px 4px 8px rgba(0, 0, 0, 0.08), 
+    inset -4px -4px 8px rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
+
 
 /* Specific Landing Page Headlines */
 .landing-page h1,

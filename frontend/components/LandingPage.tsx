@@ -467,7 +467,8 @@ export default function App() {
   const xSlide = useTransform(scrollYProgress, [0, 1], [300, -600]);
 
   return (
-    <div className="min-h-screen bg-background selection:bg-primary selection:text-on-primary-fixed font-sans text-text">
+    <div className="min-h-screen bg-background selection:bg-primary selection:text-on-primary-fixed font-sans text-text landing-page">
+
       <Navbar />
       <Hero />
       <SocialMarquee />

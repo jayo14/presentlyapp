@@ -16,14 +16,15 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, className = ''
       <div className="relative">
         <input
           className={cn(
-            "w-full h-[48px] md:h-[52px] transition-all duration-300 outline-none",
-            "bg-surface-container border border-outline focus:border-primary focus:ring-4 focus:ring-primary/20 rounded-lg px-12 py-3",
-            "text-on-surface font-medium placeholder:text-textMuted",
-            icon ? 'pl-12' : '',
+            "w-full h-16 transition-all duration-300 outline-none skeuo-input",
+            "bg-surface-container rounded-2xl px-6 py-4",
+            "text-on-surface font-bold text-lg placeholder:text-textMuted",
+            icon ? 'pl-14' : '',
             error ? 'border-error focus:border-error focus:ring-error/20' : '',
             className,
             "disabled:opacity-50 disabled:bg-surface-variant"
           )}
+
           {...props}
         />
         {icon && (
