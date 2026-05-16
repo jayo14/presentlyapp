@@ -14,8 +14,8 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { AnalyticsTracker } from './components/Analytics/AnalyticsTracker';
 
 // Eager load critical components for initial page
-import { LoginMobile } from './components/mobile/auth/LoginMobile.tsx';
-import { RegisterMobile } from './components/mobile/auth/RegisterMobile.tsx';
+import { LoginMobile } from './components/mobile/auth/LoginMobile';
+import { RegisterMobile } from './components/mobile/auth/RegisterMobile';
 import { Login as LoginDesktop } from './components/Auth/Login';
 import { Register as RegisterDesktop } from './components/Auth/Register';
 import { Layout } from './components/Layout';
