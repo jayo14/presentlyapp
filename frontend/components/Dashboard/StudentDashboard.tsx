@@ -1,48 +1,41 @@
-import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Activity, BookOpen, Trophy,
-  ChevronRight, Calendar, MapPin,
-  User, Clock, CheckCircle2, QrCode
+  Users, BookOpen, Clock, Plus,
+  Calendar, FileText, ChevronRight,
+  TrendingUp, BarChart3, Activity, Trophy, User, QrCode, MapPin, CheckCircle2
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { studentApi } from '../../services/api/attendance';
-import { attendanceApi } from '../../services/api/attendance';
-import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScanner';
-import CourseRegistrationDialog from '../Student/CourseRegistrationDialog';
-import { ModernCard } from '../ModernCard';
+import { studentApi } from '../../services/api/student';
+import { DashboardCard } from './DashboardCard';
+import { PageContainer } from './PageContainer';
 import { Button } from '../Button';
 import CourseIcon from '../Course/CourseIcon';
 import { cn } from '../../src/components/ui/utils';
 import { Badge } from '../../src/components/ui/badge';
-import { useTheme } from '../ThemeProvider';
-import { SkeletonStudentDashboard } from '../Skeleton';
+import { EnhancedAttendanceScanner } from '../Attendance/EnhancedAttendanceScanner';
+import { CourseRegistrationDialog } from '../Student/CourseRegistrationDialog';
 
 interface StudentDashboardProps {
   userName: string;
-  view?: 'default' | 'analytics' | 'timetable';
+  view?: string;
 }
 
 const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
+  const navigate = useNavigate();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const { resolvedTheme } = useTheme();
 
   const { data: dashboardData, isLoading, refetch } = useQuery({
     queryKey: ['studentDashboard'],
-    queryFn: () => studentApi.getDashboardData(),
-    refetchInterval: 30000
-  });
-
-  const { data: statsData } = useQuery({
-    queryKey: ['attendanceStats'],
-    queryFn: () => attendanceApi.getAttendanceStats(),
+    queryFn: () => studentApi.getStudentDashboard(),
   });
 
   const activeClass = useMemo(() => {
-    if (!dashboardData?.upcoming_sessions?.length) return null;
+    if (!dashboardData?.active_sessions) return null;
     const now = new Date();
-    return dashboardData.upcoming_sessions.find((s: any) => {
+    return dashboardData.active_sessions.find((s: any) => {
       const start = new Date(s.start_time);
       const end = new Date(s.end_time);
       return now >= start && now <= end;
@@ -55,182 +48,199 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
   };
 
   if (isLoading) {
-    return <SkeletonStudentDashboard />;
+    return (
+      <PageContainer>
+        <div className="space-y-8 animate-pulse">
+          <div className="h-48 bg-surface-highest rounded-[2rem]" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[1,2,3,4].map(i => <div key={i} className="h-32 bg-surface-highest rounded-2xl" />)}
+          </div>
+          <div className="h-64 bg-surface-highest rounded-2xl" />
+        </div>
+      </PageContainer>
+    );
   }
 
-  const shellClasses = cn(
-    'space-y-10 max-w-5xl mx-auto pb-20 rounded-[2.5rem] border border-outline/60 p-4 md:p-0',
-    resolvedTheme === 'dark' ? 'bg-surface/50' : 'bg-transparent'
-  );
-
-  const heroGradient = resolvedTheme === 'dark'
-    ? 'from-surface via-surfaceHigh to-background'
-    : 'from-background via-surface to-surfaceHigh';
-
   return (
-    <div className={shellClasses}>
+    <PageContainer>
       {/* 1. WELCOME HEADER */}
-      <header className={cn('flex flex-col gap-4 rounded-[2rem] border border-outline bg-gradient-to-br px-6 py-7 md:px-8 md:py-10 shadow-sm', heroGradient)}>
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.28em] text-textMuted">
-          <span className="h-2 w-2 rounded-full bg-primary" />
-          Student dashboard
-        </div>
-        <h1 className="font-display text-4xl md:text-5xl font-bold text-on-surface">
-          Hello, {userName.split(' ')[0]}
-        </h1>
-        <p className="max-w-2xl text-on-surface-variant font-medium text-lg">
-          You're all caught up for today. Check live attendance, review your schedule, and jump into scanner mode when class starts.
-        </p>
-        <div className="flex flex-wrap gap-3 pt-2">
-          <Badge variant="secondary" className="px-3 py-1.5">Theme {resolvedTheme}</Badge>
-          <Badge variant="outline" className="px-3 py-1.5">{dashboardData?.enrolled_courses?.length || 0} active courses</Badge>
-        </div>
-      </header>
-
-      {/* 2. LIVE ATTENDANCE CARD */}
-      <section>
-        {activeClass ? (
-          <ModernCard variant="gold-accent" padding="none" className="overflow-hidden relative group bg-surface">
-            <div className="absolute top-6 right-6">
-               <Badge variant="present" className="px-3 py-1.5 gap-2">
-                 <span className="relative flex h-2 w-2">
-                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-moss-green opacity-75"></span>
-                   <span className="relative inline-flex rounded-full h-2 w-2 bg-moss-green"></span>
-                 </span>
-                 Live Now
-               </Badge>
-            </div>
-            
-            <div className="p-8 md:p-10 space-y-8">
-              <div className="space-y-3">
-                <div className="text-primary font-bold text-sm uppercase tracking-widest">
-                  {activeClass.course_code}
-                </div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-on-surface leading-tight">
-                  {activeClass.course_name}
-                </h2>
-                <div className="flex flex-wrap items-center gap-6 text-on-surface-variant font-semibold">
-                  <div className="flex items-center gap-2">
-                    <Clock size={18} className="text-primary" />
-                    <span>Ends in 45 mins</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin size={18} className="text-primary" />
-                    <span>Room 302, Block B</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  onClick={() => setIsScannerOpen(true)}
-                  className="h-16 px-10 text-lg shadow-gold"
-                >
-                  <QrCode size={24} className="mr-2" />
-                  Mark Attendance
-                </Button>
-                <Button variant="outline" className="h-16 px-10 text-lg">
-                  View Details
-                </Button>
-              </div>
-            </div>
-
-            <div className="h-2 w-full bg-slate-100">
-               <motion.div
-                 initial={{ width: 0 }}
-                 animate={{ width: '40%' }}
-                 className="h-full bg-primary"
-               />
-            </div>
-          </ModernCard>
-        ) : (
-          <ModernCard padding="lg" className="flex flex-col items-center text-center gap-6 py-16 border-dashed border-2 bg-surface">
-            <div className="w-24 h-24 rounded-full bg-surfaceHigh flex items-center justify-center text-on-surface-variant">
-              <CheckCircle2 size={48} className="text-success/60" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-display text-2xl font-bold text-on-surface">No active classes</h3>
-              <p className="text-on-surface-variant max-w-sm mx-auto font-medium">
-                Your schedule is clear. Next class: <span className="text-on-surface font-bold">Introduction to AI</span> at 2:00 PM
-              </p>
-            </div>
-            <Button variant="secondary" size="lg" onClick={() => setIsScannerOpen(true)}>
-              <QrCode size={20} className="mr-2" />
+      <section className="relative overflow-hidden rounded-[2.5rem] border border-outline/50 bg-gradient-to-br from-sungold/20 via-surface to-surface p-8 md:p-12">
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-sungold">
+            <span className="h-2 w-2 rounded-full bg-sungold animate-pulse" />
+            Student Portal
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-on-surface tracking-tight">
+            Hello, {userName.split(' ')[0]}
+          </h2>
+          <p className="max-w-xl text-on-surface-variant font-medium text-lg leading-relaxed">
+            You're all caught up for today. Join live classes or review your progress below.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-4">
+            <Button
+              onClick={() => setIsScannerOpen(true)}
+              className="h-14 px-8 bg-on-surface text-background rounded-2xl font-bold shadow-lg flex items-center gap-2 group"
+            >
+              <QrCode size={20} className="group-hover:rotate-12 transition-transform" />
               Quick Scan
             </Button>
-          </ModernCard>
+            <Button
+              variant="outline"
+              onClick={() => setIsRegistrationOpen(true)}
+              className="h-14 px-8 border-outline/50 bg-surface/50 backdrop-blur-sm rounded-2xl font-bold"
+            >
+              Add Course
+            </Button>
+          </div>
+        </div>
+
+        {/* Background Decorative Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-sungold/10 blur-[100px] -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-sky-teal/5 blur-[80px] -ml-24 -mb-24" />
+      </section>
+
+      {/* 2. LIVE ATTENDANCE OR EMPTY STATE */}
+      <section>
+        {activeClass ? (
+          <DashboardCard className="overflow-hidden relative group border-l-4 border-l-sungold" padding="none">
+            <div className="p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+              <div className="space-y-4 flex-1">
+                <div className="flex items-center gap-3">
+                   <Badge variant="present" className="px-3 py-1 gap-2 bg-sungold/10 text-sungold border-sungold/20 font-bold uppercase tracking-widest text-[10px]">
+                     <span className="relative flex h-2 w-2">
+                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sungold opacity-75"></span>
+                       <span className="relative inline-flex rounded-full h-2 w-2 bg-sungold"></span>
+                     </span>
+                     Live Now
+                   </Badge>
+                   <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+                     {activeClass.course_code}
+                   </span>
+                </div>
+                <h3 className="text-3xl font-bold text-on-surface tracking-tight leading-tight">
+                  {activeClass.course_name}
+                </h3>
+                <div className="flex flex-wrap items-center gap-6 text-on-surface-variant font-bold text-xs uppercase tracking-widest opacity-80">
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} className="text-sungold" />
+                    <span>Ends in 45m</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-sungold" />
+                    <span>Hall B, Room 204</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => setIsScannerOpen(true)}
+                className="h-16 px-10 text-lg bg-sungold text-presently-black rounded-2xl font-bold shadow-gold group relative overflow-hidden"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <QrCode size={24} />
+                  Check In
+                </span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+              </Button>
+            </div>
+
+            <div className="h-1.5 w-full bg-surface-highest">
+               <motion.div
+                 initial={{ width: 0 }}
+                 animate={{ width: '65%' }}
+                 transition={{ duration: 1.5, ease: "easeOut" }}
+                 className="h-full bg-sungold shadow-[0_0_10px_rgba(245,197,24,0.5)]"
+               />
+            </div>
+          </DashboardCard>
+        ) : (
+          <DashboardCard padding="lg" className="flex flex-col items-center text-center gap-6 py-16 border-dashed border-2 bg-surface-highest/20 hover:bg-surface-highest/40 transition-colors">
+            <div className="w-20 h-20 rounded-full bg-surface-highest flex items-center justify-center text-on-surface-variant">
+              <CheckCircle2 size={40} className="text-moss-green opacity-40" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-2xl font-bold text-on-surface tracking-tight">Schedule is clear</h3>
+              <p className="text-on-surface-variant max-w-sm mx-auto font-medium text-sm">
+                No active classes right now. Enjoy your break or review your upcoming schedule.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="rounded-xl border-outline/50 h-11 px-6 font-bold text-xs uppercase tracking-[0.2em]"
+              onClick={() => navigate('/dashboard/timetable')}
+            >
+              View Timetable
+            </Button>
+          </DashboardCard>
         )}
       </section>
 
       {/* 3. QUICK STATS GRID */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {[
-          { label: 'Attendance', value: `${dashboardData?.attendance_stats?.average_attendance || 0}%`, icon: Activity, variant: 'present' as const },
-          { label: 'Streak', value: '12 Days', icon: Trophy, variant: 'default' as const },
-          { label: 'Courses', value: dashboardData?.enrolled_courses?.length || 0, icon: BookOpen, variant: 'excused' as const },
-          { label: 'Level', value: 'LVL 4', icon: User, variant: 'secondary' as const },
+          { label: 'Attendance', value: `${dashboardData?.attendance_stats?.average_attendance || 0}%`, icon: Activity, color: 'text-sungold', bg: 'bg-sungold/10' },
+          { label: 'Streak', value: '12 Days', icon: Trophy, color: 'text-moss-green', bg: 'bg-moss-green/10' },
+          { label: 'Courses', value: dashboardData?.enrolled_courses?.length || 0, icon: BookOpen, color: 'text-sky-teal', bg: 'bg-sky-teal/10' },
+          { label: 'Ranking', value: '#12', icon: Trophy, color: 'text-sungold', bg: 'bg-sungold/10' },
         ].map((stat, i) => (
-          <ModernCard key={i} padding="md" className="flex flex-col justify-between min-h-[160px] hover:shadow-lg transition-all group bg-surface">
+          <DashboardCard key={i} className="group relative overflow-hidden">
             <div className="flex justify-between items-start">
-               <div className="w-12 h-12 rounded-xl bg-surfaceHigh flex items-center justify-center text-on-surface border border-outline group-hover:bg-primary/10 group-hover:border-primary/30 transition-colors">
-                 <stat.icon size={24} />
+               <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500", stat.bg, stat.color)}>
+                 <stat.icon size={22} />
                </div>
-               <Badge variant={stat.variant}>Active</Badge>
             </div>
-            <div>
-              <p className="font-display text-3xl font-bold text-on-surface leading-none mb-2">{stat.value}</p>
-              <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em]">{stat.label}</p>
+            <div className="mt-6">
+              <p className="text-3xl font-bold text-on-surface tracking-tight leading-none mb-1">{stat.value}</p>
+              <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{stat.label}</p>
             </div>
-          </ModernCard>
+          </DashboardCard>
         ))}
       </section>
 
       {/* 4. RECENT ACTIVITY */}
       <section className="space-y-6">
         <div className="flex items-center justify-between px-1">
-          <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-on-surface-variant">Recent Activity</h4>
-          <button className="text-sm font-bold text-sungold hover:underline">
-            View All History
+          <h3 className="text-xl font-bold text-on-surface tracking-tight">Recent Activity</h3>
+          <button className="text-xs font-bold text-sungold hover:opacity-80 uppercase tracking-widest">
+            History
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {dashboardData?.recent_activity?.length ? (
-            dashboardData.recent_activity.slice(0, 3).map((activity: any, idx: number) => (
-              <ModernCard key={activity.id} padding="sm" className="flex items-center gap-6 hover:border-primary/30 transition-all cursor-pointer group bg-surface">
-                <div className="w-14 h-14 rounded-2xl bg-surfaceHigh flex items-center justify-center overflow-hidden border border-outline group-hover:border-primary/20">
+            dashboardData.recent_activity.slice(0, 4).map((activity: any, idx: number) => (
+              <div key={activity.id} className="flex items-center gap-5 p-4 rounded-2xl border border-outline/50 bg-surface-highest/20 hover:bg-surface-highest/50 transition-all cursor-pointer group" onClick={() => navigate(`/dashboard/courses/${activity.course_id}`)}>
+                <div className="w-12 h-12 rounded-xl bg-surface-highest flex items-center justify-center overflow-hidden border border-outline/50 group-hover:scale-105 transition-transform">
                    <CourseIcon
                     title={activity.course_name}
                     code={activity.course_code}
-                    className="w-10 h-10"
+                    className="w-8 h-8"
                    />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
-                    <h5 className="font-display text-lg font-bold text-on-surface truncate group-hover:text-primary transition-colors">
-                      {activity.course_code}: {activity.course_name}
+                    <h5 className="font-bold text-on-surface truncate text-sm group-hover:text-sungold transition-colors">
+                      {activity.course_name}
                     </h5>
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mt-1">
-                      {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+                      {new Date(activity.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 mt-1">
-                    <Badge variant={activity.status === 'PRESENT' ? 'present' : 'absent'}>
+                  <div className="flex items-center gap-3 mt-1 font-bold text-[10px] uppercase tracking-wider">
+                    <Badge variant={activity.status === 'PRESENT' ? 'present' : 'absent'} className="text-[8px] py-0 px-2">
                       {activity.status}
                     </Badge>
-                    <span className="text-xs text-on-surface-variant font-medium truncate uppercase tracking-widest">
-                      {activity.lecturer_name}
+                    <span className="text-on-surface-variant opacity-60 truncate">
+                      {activity.course_code}
                     </span>
                   </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-surfaceHigh flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary-fixed transition-all">
-                  <ChevronRight size={20} />
-                </div>
-              </ModernCard>
+                <ChevronRight size={18} className="text-outline-variant group-hover:translate-x-1 transition-transform" />
+              </div>
             ))
           ) : (
-            <div className="text-center py-12 text-on-surface-variant bg-surfaceHigh rounded-3xl border border-dashed border-outline">
-              <p className="font-medium">No activity recorded yet.</p>
+            <div className="md:col-span-2 text-center py-12 bg-surface-highest/10 rounded-3xl border border-dashed border-outline/50">
+              <p className="font-bold text-sm text-on-surface-variant uppercase tracking-widest opacity-40">No recent activity</p>
             </div>
           )}
         </div>
@@ -247,7 +257,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
         onClose={() => setIsRegistrationOpen(false)}
         onSuccess={() => refetch()}
       />
-    </div>
+    </PageContainer>
   );
 };
 
