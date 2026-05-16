@@ -25,6 +25,8 @@ export default {
         'md': '12px',
         'lg': '20px',
         'xl': '24px',
+        '2xl': '32px',
+        '3xl': '40px',
         'full': '9999px',
       },
       spacing: {
@@ -56,6 +58,7 @@ export default {
           surfaceContainer: "var(--surface-container)",
           'surface-container': "var(--surface-container)",
           'surface-variant': "var(--surface-variant)",
+          'surface-highest': "var(--surface-highest)",
 
           text: "var(--on-surface)",
           textMuted: "var(--on-surface-variant)",
@@ -67,9 +70,13 @@ export default {
           'on-primary-fixed': "var(--on-primary-fixed)",
   
           outline: "var(--outline)",
+          'outline-variant': "var(--outline-variant)",
           error: "var(--error)",
           success: "var(--success)",
         warning: "var(--warning)",
+      },
+      transitionTimingFunction: {
+        'premium': 'cubic-bezier(0.2, 0.8, 0.2, 1)',
       },
       keyframes: {
         'float': {
@@ -95,6 +102,7 @@ export default {
         'md': '0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)',
         'lg': '0 16px 40px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.08)',
         'gold': '0 8px 32px rgba(245,197,24,0.22)',
+        'premium': '0 20px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)',
       }
     },
   },
