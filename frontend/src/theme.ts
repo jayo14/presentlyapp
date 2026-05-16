@@ -1,5 +1,5 @@
 /**
- * Presently Design System v1.0
+ * Presently Design System v1.1 - Redesign Update
  * Custom theme configuration for the rebranded Presently app
  */
 
@@ -18,7 +18,8 @@ export const colors = {
   // UI Surfaces (Light Mode)
   background: '#FFFFFF',
   surface: '#F9F7F3',
-  surfaceCard: '#FFFFFF',
+  surfaceContainer: '#F3F0EA',
+  surfaceHighest: '#EBE7DF',
 
   // Text
   onSurface: '#0D0D0D',
@@ -43,7 +44,7 @@ export const semanticTokens = {
   },
 
   // Card styles
-  cardBackground: colors.surfaceCard,
+  cardBackground: colors.surfaceContainer,
   cardText: colors.onSurface,
   cardBorder: '#E2E8F0',
 
@@ -61,44 +62,8 @@ export const semanticTokens = {
   shadowMd: '0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)',
   shadowLg: '0 16px 40px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.08)',
   shadowGold: '0 8px 32px rgba(245,197,24,0.22)',
+  shadowPremium: '0 20px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)',
 }
-
-export const themeStyles = `
-  :root {
-    --sungold: ${colors.sungold};
-    --presently-black: ${colors.presentlyBlack};
-    --pale-honey: ${colors.paleHoney};
-    --warm-ivory: ${colors.warmIvory};
-    --moss-green: ${colors.mossGreen};
-    --soft-coral: ${colors.softCoral};
-    --sky-teal: ${colors.skyTeal};
-    
-    --background: ${colors.background};
-    --surface: ${colors.surface};
-    --on-surface: ${colors.onSurface};
-    --on-surface-variant: ${colors.onSurfaceVariant};
-    
-    --primary: ${colors.sungold};
-    --on-primary: ${colors.presentlyBlack};
-    --outline: #E2E8F0;
-    --error: ${colors.error};
-    --success: ${colors.success};
-
-    --radius-sm: 4px;
-    --radius-md: 12px;
-    --radius-lg: 20px;
-    --radius-xl: 24px;
-    --radius-full: 9999px;
-  }
-
-  .dark {
-    --background: #0D0D0D;
-    --surface: #141414;
-    --on-surface: #FFFFFF;
-    --on-surface-variant: #94A3B8;
-    --outline: #2A2A2A;
-  }
-` as const
 
 export type Colors = typeof colors
 export type SemanticTokens = typeof semanticTokens

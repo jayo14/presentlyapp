@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Logo } from './Logo';
-import {
-  Home, User, Calendar, QrCode, Plus, ClipboardList
-} from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
-import { Dock } from '@/components/magicui/dock';
-import { motion, AnimatePresence } from 'framer-motion';
-import NotificationInbox from './NotificationInbox';
-import { ThemeToggle } from './ThemeToggle';
+import { DashboardShell } from './Dashboard/DashboardShell';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
-import { DashboardSidebar } from './Dashboard/DashboardSidebar';
 
 interface LayoutProps {
   userRole?: UserRole;
@@ -29,7 +21,6 @@ export const Layout: React.FC<LayoutProps> = ({
   onLogout,
   children
 }) => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { data: currentUser } = useCurrentUser();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -45,132 +36,46 @@ export const Layout: React.FC<LayoutProps> = ({
       settings: 'Settings',
       notifications: 'Notifications',
       reports: 'Reports',
+      institutions: 'Institutions',
+      users: 'User Management',
+      venues: 'Venue Management',
+      departments: 'Departments',
+      staff: 'Staff Management',
+      blog: 'Blog Management',
     };
 
     return labels[page] || page.charAt(0).toUpperCase() + page.slice(1);
   };
 
-  const handleNavClick = (id: string) => {
-    if (id === 'dashboard') navigate('/dashboard');
-    else if (id === 'profile') navigate('/dashboard/profile');
-    else if (id === 'courses') navigate('/dashboard/courses');
-    else if (id === 'sessions') navigate('/dashboard/sessions');
-    else if (id === 'analytics') navigate('/dashboard/analytics');
-    else if (id === 'timetable') navigate('/dashboard/timetable');
-    else navigate(`/dashboard/${id}`);
+  const getPageDescription = (page: string) => {
+    const descriptions: Record<string, string> = {
+      dashboard: 'Overview of your recent activity and stats.',
+      profile: 'Manage your personal information and preferences.',
+      courses: 'View and manage your enrolled courses.',
+      sessions: 'Track and manage your attendance sessions.',
+      analytics: 'Deep dive into your performance data.',
+      institutions: 'System-wide institution management.',
+    };
+    return descriptions[page] || 'Manage your Presently experience.';
   };
 
   return (
-    <div className="flex min-h-screen bg-background text-on-surface font-sans selection:bg-primary/30 selection:text-on-primary-fixed">
-      {/* Desktop Sidebar - Using shadcn components */}
-      <DashboardSidebar
+    <>
+      <DashboardShell
         userRole={userRole}
-        userName={userName}
+        userName={currentUser?.full_name || userName}
         onLogout={onLogout}
-      />
-
-      <div className="flex-1 flex flex-col min-h-screen">
-        <header className="hidden md:flex sticky top-0 z-40 items-center justify-between gap-6 border-b border-outline/80 bg-background/85 px-8 py-5 backdrop-blur-xl">
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-textMuted">
-              {userRole?.toLowerCase().replace('_', ' ') || 'workspace'}
-            </p>
-            <div className="mt-1 flex items-center gap-3">
-              <h1 className="truncate text-2xl font-display font-bold text-on-surface">
-                {getPageLabel(currentPage)}
-              </h1>
-              <span className="rounded-full border border-outline bg-surface px-3 py-1 text-xs font-semibold capitalize text-textMuted">
-                {currentUser?.full_name || userName}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <NotificationInbox />
-            <button
-              onClick={() => handleNavClick('profile')}
-              className="inline-flex h-11 items-center gap-3 rounded-full border border-outline bg-surface px-3 pr-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surfaceHigh"
-            >
-              <div className="h-7 w-7 overflow-hidden rounded-full border border-outline bg-primary/10">
-                {currentUser?.avatar_url ? (
-                  <img src={currentUser.avatar_url} alt="Profile" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-[11px] font-bold text-primary">
-                    {userName.charAt(0)}
-                  </div>
-                )}
-              </div>
-              <span className="max-w-[11rem] truncate">{currentUser?.full_name || userName}</span>
-            </button>
-          </div>
-        </header>
-
-        {/* MOBILE HEADER */}
-        <header className="md:hidden h-20 flex items-center justify-between px-6 bg-surface/80 backdrop-blur-xl border-b border-outline sticky top-0 z-40">
-          <Logo showText={false} />
-          <div className="flex items-center gap-4">
-            <NotificationInbox />
-            <button
-              onClick={() => handleNavClick('profile')}
-              className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 overflow-hidden shadow-sm"
-            >
-              {currentUser?.avatar_url ? (
-                <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-primary">
-                  {userName.charAt(0)}
-                </div>
-              )}
-            </button>
-          </div>
-        </header>
-
-        <main className="flex-1 relative pb-32 md:pb-8 bg-gradient-to-b from-background to-surface/30">
-          <div className="max-w-7xl mx-auto p-6 md:p-8 lg:p-10">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </main>
-
-        {/* MOBILE DOCK */}
-        <div className="md:hidden">
-          <Dock
-            items={(() => {
-              const base = [
-                { id: 'dashboard', label: 'Home', active: location.pathname === '/dashboard', onClick: () => handleNavClick('dashboard'), icon: <Home size={22} /> },
-                { id: 'attendance', label: 'History', active: location.pathname.includes('courses') || location.pathname.includes('sessions'), onClick: () => handleNavClick(userRole === UserRole.LECTURER ? 'sessions' : 'courses'), icon: <ClipboardList size={22} /> },
-              ];
-
-              const action = userRole === UserRole.LECTURER
-                ? { id: 'create', label: 'New', isAccent: true, onClick: () => navigate('/dashboard/sessions/new'), icon: <Plus size={28} /> }
-                : { id: 'scan', label: 'Scan', isAccent: true, onClick: () => setIsScannerOpen(true), icon: <QrCode size={28} /> };
-
-              const end = [
-                { id: 'timetable', label: 'Schedule', active: location.pathname.includes('timetable'), onClick: () => handleNavClick('timetable'), icon: <Calendar size={22} /> },
-                { id: 'profile', label: 'Profile', active: location.pathname.includes('profile'), onClick: () => handleNavClick('profile'), icon: <User size={22} /> },
-              ];
-
-              return [...base, action, ...end];
-            })()}
-          />
-        </div>
-      </div>
+        title={getPageLabel(currentPage)}
+        description={getPageDescription(currentPage)}
+      >
+        {children}
+      </DashboardShell>
 
       <EnhancedAttendanceScanner 
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
         onVerify={async () => ({})}
       />
-    </div>
+    </>
   );
 };
