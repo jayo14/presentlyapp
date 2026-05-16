@@ -83,8 +83,8 @@ export const SessionInputSheet: React.FC<SessionInputSheetProps> = ({ isOpen, on
             maxLength={8}
             autoFocus
             className={`
-              w-full h-20 bg-off-white dark:bg-charcoal/60 rounded-[20px] 
-              border-2 text-center text-5xl font-mono tracking-[0.3em] 
+              w-full h-[120px] bg-off-white dark:bg-charcoal/60 rounded-[24px] 
+              border-2 text-center text-[56px] font-mono tracking-[0.3em] 
               text-presently-black dark:text-white uppercase outline-none transition-all
               ${status === 'error' 
                 ? 'border-soft-coral animate-[shake_0.4s_ease-in-out]' 
