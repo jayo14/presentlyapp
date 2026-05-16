@@ -23,7 +23,7 @@ export const MobileLayout: React.FC = () => {
         return [
           { label: 'Home', icon: House, path: '/dashboard' },
           { label: 'Courses', icon: BookOpen, path: '/dashboard/courses' },
-          { label: 'Stats', icon: ChartLineUp, path: '/dashboard/analytics' },
+          { label: 'Analytics', icon: ChartLineUp, path: '/dashboard/analytics' },
           { label: 'Profile', icon: User, path: '/dashboard/profile' },
         ];
       case UserRole.LECTURER:
@@ -48,8 +48,8 @@ export const MobileLayout: React.FC = () => {
   const getFABActions = () => {
     if (user?.role === UserRole.STUDENT) {
       return [
-        { icon: Scan, label: 'Scan QR', onClick: () => navigate('/dashboard/scanner') },
         { icon: Keyboard, label: 'Enter Code', onClick: () => console.log('Open manual entry') },
+        { icon: Scan, label: 'Scan QR', onClick: () => navigate('/dashboard/scanner') },
       ];
     }
     if (user?.role === UserRole.LECTURER) {
@@ -61,13 +61,19 @@ export const MobileLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-on-surface">
+    <div 
+      className="flex flex-col min-h-screen bg-off-white dark:bg-presently-black text-on-surface overflow-x-hidden"
+      style={{
+        scrollBehavior: 'smooth',
+        overscrollBehavior: 'contain',
+      }}
+    >
       <MobileHeader 
+        isSidebarOpen={isSidebarOpen}
         onOpenSidebar={() => setIsSidebarOpen(true)}
-        onOpenNotifications={() => navigate('/dashboard/notifications')}
       />
 
-      <main className="flex-1 px-4 py-6 mb-32 overflow-y-auto no-scrollbar pt-safe">
+      <main className="flex-1 overflow-y-auto no-scrollbar pb-[140px] pt-4" style={{ paddingBottom: 'calc(140px + env(safe-area-inset-bottom))' }}>
         <Outlet />
       </main>
 

@@ -4,6 +4,8 @@ import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
 import { DashboardShell } from './Dashboard/DashboardShell';
 import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanner';
+import { MobileLayout } from './mobile/MobileLayout';
+import { useBreakpoint } from '../hooks/useBreakpoint';
 
 interface LayoutProps {
   userRole?: UserRole;
@@ -24,6 +26,7 @@ export const Layout: React.FC<LayoutProps> = ({
   const location = useLocation();
   const { data: currentUser } = useCurrentUser();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const isMobile = useBreakpoint('md');
 
   const getPageLabel = (page: string) => {
     const labels: Record<string, string> = {
@@ -58,6 +61,10 @@ export const Layout: React.FC<LayoutProps> = ({
     };
     return descriptions[page] || 'Manage your Presently experience.';
   };
+
+  if (isMobile) {
+    return <MobileLayout />;
+  }
 
   return (
     <>

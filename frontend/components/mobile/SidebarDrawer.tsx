@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  X, SignOut, Gear, Shield, Question,
+  SignOut, Gear, Shield, Question,
   House, BookOpen, ChartLineUp, Users,
-  MapPin, Buildings, Article, ListChecks
+  MapPin, Buildings, Article, ListChecks, Bell
 } from '@phosphor-icons/react';
 import { NavLink } from 'react-router-dom';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth';
@@ -19,39 +19,34 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ isOpen, onClose })
   const logout = useLogout();
 
   const getNavItems = () => {
-    const common = [
-      { label: 'Profile', path: '/dashboard/profile', icon: Gear },
-      { label: 'Security', path: '/dashboard/security', icon: Shield },
-      { label: 'Help & Support', path: '/documentation', icon: Question },
-    ];
-
     switch (user?.role) {
       case UserRole.STUDENT:
         return [
           { label: 'Home', path: '/dashboard', icon: House },
-          { label: 'My Courses', path: '/dashboard/courses', icon: BookOpen },
+          { label: 'Courses', path: '/dashboard/courses', icon: BookOpen },
           { label: 'Analytics', path: '/dashboard/analytics', icon: ChartLineUp },
-          ...common
+          { label: 'Notifications', path: '/dashboard/notifications', icon: Bell },
+          { label: 'Settings', path: '/dashboard/settings', icon: Gear },
         ];
       case UserRole.LECTURER:
         return [
           { label: 'Home', path: '/dashboard', icon: House },
-          { label: 'Manage Courses', path: '/dashboard/courses', icon: BookOpen },
-          { label: 'Live Sessions', path: '/dashboard/sessions', icon: ListChecks },
-          { label: 'Attendance Reports', path: '/dashboard/reports', icon: ChartLineUp },
-          ...common
+          { label: 'Courses', path: '/dashboard/courses', icon: BookOpen },
+          { label: 'Sessions', path: '/dashboard/sessions', icon: ListChecks },
+          { label: 'Reports', path: '/dashboard/reports', icon: ChartLineUp },
+          { label: 'Settings', path: '/dashboard/settings', icon: Gear },
         ];
       case UserRole.ADMIN:
         return [
           { label: 'System Overview', path: '/dashboard', icon: House },
           { label: 'Institutions', path: '/dashboard/institutions', icon: Buildings },
-          { label: 'User Management', path: '/dashboard/users', icon: Users },
-          { label: 'Venue Management', path: '/dashboard/venues', icon: MapPin },
+          { label: 'Users', path: '/dashboard/users', icon: Users },
+          { label: 'Venues', path: '/dashboard/venues', icon: MapPin },
           { label: 'Blog CMS', path: '/dashboard/blog', icon: Article },
-          ...common
+          { label: 'Settings', path: '/dashboard/settings', icon: Gear },
         ];
       default:
-        return common;
+        return [];
     }
   };
 
@@ -65,7 +60,7 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ isOpen, onClose })
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200]"
           />
 
           {/* Drawer Content */}
@@ -73,41 +68,40 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ isOpen, onClose })
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-surface dark:bg-[#0D0D0D] z-[101] shadow-2xl flex flex-col pt-safe pb-safe"
+            transition={{ type: 'tween', ease: [0.16, 1, 0.3, 1], duration: 0.35 }}
+            className="fixed inset-y-0 left-0 w-[85vw] max-w-[320px] bg-off-white dark:bg-charcoal z-[201] rounded-r-3xl flex flex-col overflow-hidden shadow-lg"
           >
             {/* Header / Profile Section */}
-            <div className="p-8 pb-12 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4">
-                <button onClick={onClose} className="p-2 rounded-xl bg-surface-container active:scale-90 transition-transform">
-                  <X size={20} weight="bold" />
-                </button>
-              </div>
-
-              <div className="relative z-10">
-                <div className="w-20 h-20 rounded-3xl bg-sungold/10 border border-sungold/20 flex items-center justify-center mb-6">
+            <div className="pt-10 px-6 pb-6 border-b border-slate-100 dark:border-white/5">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full border-2 border-sungold overflow-hidden bg-pale-honey flex items-center justify-center text-presently-black shrink-0">
                   {user?.avatar_url ? (
-                    <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover rounded-3xl" />
+                    <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-3xl font-bold text-sungold">
+                    <span className="text-lg font-bold">
                       {user?.full_name?.charAt(0) || 'P'}
                     </span>
                   )}
                 </div>
-                <h2 className="text-2xl font-bold tracking-tight text-on-surface mb-1">
-                  {user?.full_name || 'User'}
-                </h2>
-                <p className="text-sm text-on-surface-variant font-medium">
-                  {user?.role?.toLowerCase().replace('_', ' ')} • {user?.email}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-[20px] font-bold text-presently-black dark:text-white truncate">
+                    {user?.full_name || 'User'}
+                  </h2>
+                  <div className="flex items-center mt-0.5">
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-sungold/15 text-sungold whitespace-nowrap">
+                      {user?.role?.toLowerCase().replace('_', ' ')}
+                    </span>
+                  </div>
+                  {/* University Name could go here if available */}
+                  <p className="text-[13px] text-slate-400 mt-1 truncate">
+                    My University
+                  </p>
+                </div>
               </div>
-
-              {/* Decorative Background Element */}
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-sungold/5 rounded-full blur-3xl pointer-events-none" />
             </div>
 
             {/* Navigation Items */}
-            <nav className="flex-1 px-4 overflow-y-auto no-scrollbar py-4">
+            <nav className="flex-1 px-4 py-6 overflow-y-auto">
               <div className="space-y-1">
                 {getNavItems().map((item) => (
                   <NavLink
@@ -115,36 +109,45 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ isOpen, onClose })
                     to={item.path}
                     onClick={onClose}
                     className={({ isActive }) => `
-                      flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-200
+                      flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors
                       ${isActive
-                        ? 'bg-sungold text-presently-black font-bold shadow-gold'
-                        : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'}
+                        ? 'bg-sungold/12 text-sungold'
+                        : 'text-presently-black dark:text-white hover:bg-slate-100 dark:hover:bg-white/5'}
                     `}
                   >
-                    <item.icon size={24} weight="duotone" />
-                    <span>{item.label}</span>
+                    {({ isActive }) => (
+                      <>
+                        <item.icon size={20} weight={isActive ? "duotone" : "regular"} className={isActive ? "text-sungold" : "text-slate-400"} />
+                        <span className="font-bold text-[15px]">{item.label}</span>
+                      </>
+                    )}
                   </NavLink>
                 ))}
               </div>
             </nav>
 
-            {/* Footer / Logout */}
-            <div className="p-4 border-t border-outline/50">
-              <button
-                onClick={() => {
-                  logout.mutate();
-                  onClose();
-                }}
-                className="flex items-center gap-4 w-full px-6 py-5 rounded-2xl text-error font-bold hover:bg-error/5 active:scale-[0.98] transition-all"
-              >
-                <SignOut size={24} weight="duotone" />
-                <span>Sign Out</span>
-              </button>
+            {/* Footer / Account */}
+            <div className="p-4 border-t border-slate-100 dark:border-white/5 sticky bottom-0 bg-off-white dark:bg-charcoal">
+              <div className="space-y-1">
+                <NavLink
+                  to="/dashboard/profile"
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors text-presently-black dark:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                >
+                  <Gear size={20} weight="regular" className="text-slate-400" />
+                  <span className="font-bold text-[15px]">Profile</span>
+                </NavLink>
 
-              <div className="mt-4 text-center">
-                <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest opacity-50">
-                  Presently
-                </p>
+                <button
+                  onClick={() => {
+                    logout.mutate();
+                    onClose();
+                  }}
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-soft-coral hover:bg-soft-coral/10 transition-colors"
+                >
+                  <SignOut size={20} weight="regular" className="text-soft-coral" />
+                  <span className="font-bold text-[15px]">Log Out</span>
+                </button>
               </div>
             </div>
           </motion.div>

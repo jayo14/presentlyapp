@@ -15,42 +15,40 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ items }) => {
   return (
-    <nav className="fixed bottom-8 left-0 right-0 z-50 flex justify-center pointer-events-none px-6 pb-safe">
-      <div className="glass-dock liquid-glass pointer-events-auto flex items-center justify-between gap-1 px-4 py-2.5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] max-w-sm w-full">
+    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none pb-safe">
+      <div 
+        className="pointer-events-auto flex items-center justify-between gap-1 px-3 py-2.5 rounded-full w-max min-w-[320px] max-w-[380px] md:max-w-[480px]"
+        style={{
+          background: 'var(--bottom-nav-bg, rgba(255,255,255,0.72))',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          border: '1px solid var(--bottom-nav-border, rgba(255,255,255,0.3))',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.10)',
+        }}
+      >
         {items.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) => `
-              relative flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl transition-all duration-300
-              ${isActive ? 'text-sungold' : 'text-on-surface-variant hover:text-on-surface'}
-            `}
+            className="relative flex flex-col items-center justify-center gap-0.5 w-12 h-12 min-w-[48px]"
           >
             {({ isActive }) => (
               <>
                 {isActive && (
                   <motion.div
-                    layoutId="nav-glow"
-                    className="absolute inset-0 bg-sungold/10 rounded-2xl"
-                    transition={{ type: 'spring', bounce: 0.25, duration: 0.5 }}
+                    layoutId="nav-pill"
+                    className="absolute inset-0 bg-sungold/12 rounded-full"
+                    transition={{ type: 'spring', stiffness: 300, damping: 25, duration: 0.4 }}
                   />
                 )}
                 <item.icon 
-                  size={24} 
+                  size={22} 
                   weight={isActive ? "duotone" : "regular"} 
-                  className="relative z-10"
+                  className={`relative z-10 ${isActive ? 'text-sungold' : 'text-slate-400'}`}
                 />
-                <span className="text-[10px] font-bold uppercase tracking-widest relative z-10">
+                <span className={`text-[9px] font-black uppercase tracking-[0.12em] relative z-10 ${isActive ? 'text-sungold' : 'text-slate-400'}`}>
                   {item.label}
                 </span>
-                
-                {isActive && (
-                  <motion.div
-                    layoutId="nav-dot"
-                    className="absolute -bottom-1 w-1 h-1 bg-sungold rounded-full"
-                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
               </>
             )}
           </NavLink>
