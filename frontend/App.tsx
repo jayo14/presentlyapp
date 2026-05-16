@@ -384,16 +384,16 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute requireEmailVerified>
                 <Onboarding />
-              </div>
+              </ProtectedRoute>
             }
           />
           
           <Route
             path="/dashboard"
             element={
-              <div data-testid="protected-bypass">
+              <ProtectedRoute requireEmailVerified requireOnboardingComplete>
                 <DashboardLayout />
-              </div>
+              </ProtectedRoute>
             }
           >
               <Route index element={<DashboardHome />} />
@@ -412,7 +412,7 @@ const AppContent: React.FC = () => {
                   user?.role === UserRole.LECTURER ? (
                       <div><LecturerDashboard userName={user.full_name} userProfile={user} view="analytics" /></div>
                   ) : user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
-                      <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="analytics" /></div>
+                      <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="analytics" /></ProtectedRoute>
                   ) : (
                     <Navigate
                       to="/unauthorized"
@@ -432,7 +432,7 @@ const AppContent: React.FC = () => {
                   ) : user?.role === UserRole.LECTURER ? (
                       <div><LecturerCoursesMobile /></div>
                   ) : user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
-                      <ProtectedRoute><StudentCoursesMobile /></div>
+                      <ProtectedRoute><StudentCoursesMobile /></ProtectedRoute>
                   ) : (
 
                     <Navigate
@@ -448,14 +448,14 @@ const AppContent: React.FC = () => {
               } />
 
 
-              <Route path="scanner" element={<ProtectedRoute><AttendanceScannerMobile /></div>} />
+              <Route path="scanner" element={<ProtectedRoute><AttendanceScannerMobile /></ProtectedRoute>} />
 
 
               <Route path="sessions" element={
                   user?.role === UserRole.LECTURER ? (
                       <div><LecturerSessionsMobile /></div>
                   ) : (
-                      <ProtectedRoute><SessionsPage /></div>
+                      <ProtectedRoute><SessionsPage /></ProtectedRoute>
                   )
               } />
 
@@ -463,7 +463,7 @@ const AppContent: React.FC = () => {
                   user?.role === UserRole.LECTURER ? (
                       <div><LecturerReportsMobile /></div>
                   ) : (
-                      <ProtectedRoute><ReportsPage /></div>
+                      <ProtectedRoute><ReportsPage /></ProtectedRoute>
                   )
               } />
 
@@ -473,7 +473,7 @@ const AppContent: React.FC = () => {
                   ) : user?.role === UserRole.CLASS_REP ? (
                       <ClassRepRoute><ClassRepDashboard userName={user.full_name} view="timetable" /></ClassRepRoute>
                   ) : user?.role === UserRole.STUDENT ? (
-                      <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="timetable" /></div>
+                      <ProtectedRoute><StudentDashboard userName={user?.full_name || ''} view="timetable" /></ProtectedRoute>
                   ) : (
                     <Navigate
                       to="/unauthorized"
