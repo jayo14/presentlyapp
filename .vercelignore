@@ -6,11 +6,11 @@ render.yaml
 docker-compose.yml
 bin/
 
-# Ignore mobile files
-mobile/
-android/
-ios/
-capacitor.config.ts
+# Ignore top-level mobile files
+/mobile/
+/android/
+/ios/
+/capacitor.config.ts
 
 # Other ignore patterns
 .git/
