@@ -15,7 +15,6 @@ export const StudentCoursesMobile: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [courseToDrop, setCourseToDrop] = useState<any>(null);
 
   useEffect(() => { loadCourses(); }, []);
@@ -48,7 +47,7 @@ export const StudentCoursesMobile: React.FC = () => {
            <p className="text-on-surface-variant font-medium">Manage your active enrollments.</p>
         </div>
         <button 
-          onClick={() => setIsRegistrationOpen(true)}
+          onClick={() => navigate('/dashboard/courses/register')}
           className="w-12 h-12 rounded-2xl bg-sungold text-black flex items-center justify-center shadow-gold active:scale-90 transition-transform"
         >
           <Plus size={24} weight="bold" />
@@ -145,7 +144,7 @@ export const StudentCoursesMobile: React.FC = () => {
              <h3 className="text-xl font-bold mb-2">No courses found</h3>
              <p className="text-on-surface-variant font-medium px-10 mb-8">Ready to add something to your list?</p>
              <button 
-               onClick={() => setIsRegistrationOpen(true)}
+               onClick={() => navigate('/dashboard/courses/register')}
                className="h-14 px-8 bg-sungold text-black rounded-2xl font-bold shadow-gold active:scale-95 transition-all"
              >
                 Enroll Now

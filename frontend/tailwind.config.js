@@ -14,7 +14,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        display: ['Lexend', '"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
         nimbus: ['"Tan Nimbus"', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
@@ -52,6 +52,14 @@ export default {
         'moss-green': '#4A7C59',
         'soft-coral': '#E87461',
         'sky-teal': '#2E9CCA',
+
+        "background-light": "#f8f8f5",
+        "background-dark": "#231e0f",
+        "surface-light": "#ffffff",
+        "surface-dark": "#352e18",
+        "surface-highlight": "#4a4121",
+        "text-secondary": "#ccbf8e",
+        "text-secondary-light": "#666666",
 
           background: "var(--background)",
           surface: "var(--surface)",

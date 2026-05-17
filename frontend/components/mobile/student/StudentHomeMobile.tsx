@@ -1,122 +1,192 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '../../../hooks/useAuth';
-import { CalendarBlank, ArrowRight } from '@phosphor-icons/react';
+import { Bell, QrCode, Check, X } from '@phosphor-icons/react';
 
 export const StudentHomeMobile: React.FC = () => {
   const { data: user } = useCurrentUser();
   const navigate = useNavigate();
 
-  // Mock data for the UI
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-  const dayStr = now.toLocaleDateString('en-US', { weekday: 'long' });
-  const hour = now.getHours();
-  
-  let timeOfDay = 'morning';
-  if (hour >= 12 && hour < 17) timeOfDay = 'afternoon';
-  else if (hour >= 17) timeOfDay = 'evening';
-
   const firstName = user?.full_name?.split(' ')[0] || 'Student';
 
-  const activeSession = {
-    courseCode: 'CSC 401',
-    courseName: 'Intro to Artificial Intelligence',
-    venue: 'Main Auditorium',
-    timeRemaining: '45 mins left',
-  };
-
-  const upcomingSessions = [
-    { id: 1, day: 'Tomorrow', time: '10:00 AM', name: 'Software Engineering', venue: 'Lab 2', code: 'SWE 404' },
-    { id: 2, day: 'Tomorrow', time: '2:00 PM', name: 'Database Systems', venue: 'Hall B', code: 'CSC 302' },
-  ];
-
   return (
-    <div className="space-y-[72px] pb-[120px]">
-      
-      {/* 1. Greeting */}
-      <div className="px-8 pt-12">
-        <div className="inline-block px-4 py-2 bg-slate-100 dark:bg-white/5 rounded-full mb-6">
-          <p className="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-            {dayStr}, {dateStr}
-          </p>
-        </div>
-        <h1 className="text-[44px] font-bold text-presently-black dark:text-white tracking-tighter leading-[1.05]">
-          Good {timeOfDay},<br/>{firstName} 👋
-        </h1>
-      </div>
-
-      {/* 2. Active Session Card */}
-      <div className="px-8">
-        <div className="flex items-center justify-between mb-8">
-           <h2 className="text-[22px] font-bold text-presently-black dark:text-white">Right Now</h2>
-        </div>
-        
-        {activeSession ? (
-          <div className="relative rounded-[48px] bg-presently-black dark:bg-charcoal p-10 shadow-2xl overflow-hidden">
-            {/* Decorative background glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-sungold/15 rounded-full blur-[60px] -mr-20 -mt-20 pointer-events-none" />
-            
-            <div className="flex items-center gap-3 mb-8">
-              <div className="relative flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sungold opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-sungold"></span>
-              </div>
-              <span className="text-[14px] font-black uppercase tracking-widest text-sungold">
-                Live Class
-              </span>
+    <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased overflow-x-hidden pb-24 min-h-screen">
+      {/* Top App Bar */}
+      <header className="sticky top-0 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
+        <div className="flex items-center px-4 py-3 justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div
+                className="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 border-2 border-primary"
+                title="Profile picture"
+                style={{ backgroundImage: `url(${user?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + firstName})` }}
+              />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background-light dark:border-background-dark"></div>
             </div>
-
-            <h3 className="text-white text-[32px] font-bold tracking-tight mb-4 leading-tight">
-              {activeSession.courseName}
-            </h3>
-            <p className="text-slate-400 text-[18px] font-medium mb-12 flex items-center gap-2">
-              {activeSession.venue} <span className="w-1 h-1 rounded-full bg-slate-600" /> {activeSession.timeRemaining}
-            </p>
-
-            <button 
-              onClick={() => navigate('/dashboard/scanner')}
-              className="w-full h-[76px] bg-sungold text-presently-black rounded-[28px] font-black text-xl active:scale-[0.98] transition-transform shadow-lg flex items-center justify-center gap-3"
-            >
-              Mark Attendance <ArrowRight size={24} weight="bold" />
-            </button>
+            <div>
+              <p className="text-xs text-text-secondary-light dark:text-text-secondary font-medium">Welcome back</p>
+              <h2 className="text-lg font-bold leading-tight tracking-tight">Hello, {firstName}!</h2>
+            </div>
           </div>
-        ) : (
-           <div className="rounded-[48px] border-[3px] border-dashed border-slate-200 dark:border-white/10 p-16 flex flex-col items-center justify-center text-center">
-             <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-8">
-                <CalendarBlank size={40} weight="duotone" className="text-slate-400 dark:text-slate-500" />
-             </div>
-             <h3 className="text-presently-black dark:text-white font-bold text-[24px] mb-2 tracking-tight">No active class right now</h3>
-             <p className="text-slate-500 text-[18px] font-medium">Enjoy your free time!</p>
-           </div>
-        )}
-      </div>
-
-      {/* 3. Upcoming Sessions */}
-      <div className="px-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-[22px] font-bold text-presently-black dark:text-white">Upcoming Schedule</h2>
+          <button className="relative p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+            <Bell size={24} weight="bold" />
+            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
         </div>
-        
-        <div className="space-y-6">
-          {upcomingSessions.map(session => (
-            <div key={session.id} onClick={() => navigate(`/dashboard/courses/${session.code}`)} className="bg-white dark:bg-charcoal rounded-[40px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] flex items-center gap-6 border border-slate-100 dark:border-white/5 active:scale-[0.98] transition-transform cursor-pointer">
-              <div className="w-[84px] h-[84px] bg-slate-50 dark:bg-white/5 text-slate-500 rounded-[24px] flex flex-col items-center justify-center shrink-0 border border-slate-100 dark:border-white/5">
-                <span className="text-[12px] font-black uppercase tracking-wider text-slate-400">{session.day}</span>
-                <span className="text-[16px] font-bold text-presently-black dark:text-white mt-1.5">{session.time}</span>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex flex-col gap-6 p-4">
+        {/* Live Class Card */}
+        <section>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary">Happening Now</h3>
+            <span className="flex items-center gap-1.5 text-xs font-bold text-red-500 animate-pulse">
+              <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+              LIVE
+            </span>
+          </div>
+          <div className="relative overflow-hidden rounded-2xl bg-surface-light dark:bg-surface-dark shadow-xl border border-gray-100 dark:border-white/5">
+            {/* Background Image Overlay */}
+            <div
+              className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none"
+              style={{
+                backgroundImage: 'url("https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            ></div>
+            <div className="relative p-5 flex flex-col gap-4 z-10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/20 text-yellow-700 dark:text-yellow-400 text-xs font-bold mb-2">
+                    Lecture Hall B
+                  </div>
+                  <h2 className="text-2xl font-bold leading-tight">CS101 - Algorithm Design</h2>
+                  <p className="text-text-secondary-light dark:text-text-secondary text-sm mt-1">Prof. Sarah Jenkins • 10:00 AM - 11:30 AM</p>
+                </div>
+                <div className="bg-surface-highlight/30 rounded-lg p-2 text-center min-w-[60px]">
+                  <span className="block text-xs uppercase opacity-70">Rem</span>
+                  <span className="block text-lg font-bold font-mono">15m</span>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[20px] font-bold text-presently-black dark:text-white truncate tracking-tight">{session.name}</p>
-                <p className="text-[16px] text-slate-500 font-medium mt-2">{session.venue}</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center shrink-0">
-                 <ArrowRight size={20} weight="bold" className="text-slate-400" />
+
+              <div className="mt-2">
+                <button
+                  onClick={() => navigate('/dashboard/scanner')}
+                  className="w-full relative group overflow-hidden rounded-xl bg-primary hover:bg-yellow-400 text-black font-bold h-12 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(249,196,6,0.3)] transition-all transform active:scale-[0.98]"
+                >
+                  <QrCode size={24} weight="bold" />
+                  <span>Mark Attendance</span>
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent z-20 w-1/2 h-full skew-x-12"></div>
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
+          </div>
+        </section>
+
+        {/* Attendance Summary */}
+        <section>
+          <h3 className="text-lg font-bold px-1 mb-3">Attendance Summary</h3>
+          <div className="rounded-2xl bg-surface-light dark:bg-surface-dark shadow-md p-5 border border-gray-100 dark:border-white/5">
+            <div className="flex flex-col md:flex-row gap-6 items-center">
+              {/* Circular Progress */}
+              {/* <div className="relative w-36 h-36 shrink-0">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                  <circle className="text-gray-200 dark:text-surface-highlight" cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="8"></circle>
+              <circle className="text-primary transition-all duration-1000 ease-out" cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="8" strokeDasharray="227.3 251.2" strokeLinecap="round"></circle>
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-3xl font-bold tracking-tight">90.5%</span>
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-text-secondary-light dark:text-text-secondary">Overall</span>
+            </div>
+          </div> */}
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-3 gap-3 w-full">
+                <div className="flex flex-col gap-1 items-center justify-center p-3 rounded-xl bg-background-light dark:bg-background-dark border border-gray-200 dark:border-surface-highlight">
+                  <span className="text-2xl font-bold text-slate-800 dark:text-white">42</span>
+                  <span className="text-xs text-text-secondary-light dark:text-text-secondary">Classes</span>
+                </div>
+                <div className="flex flex-col gap-1 items-center justify-center p-3 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30">
+                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">38</span>
+                  <span className="text-xs text-green-700/70 dark:text-green-400/70">Attended</span>
+                </div>
+                <div className="flex flex-col gap-1 items-center justify-center p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30">
+                  <span className="text-2xl font-bold text-red-600 dark:text-red-400">4</span>
+                  <span className="text-xs text-red-700/70 dark:text-red-400/70">Missed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section >
+
+        {/* Recent Activity List */}
+        < section >
+          <div className="flex justify-between items-end mb-3 px-1">
+            <h3 className="text-lg font-bold">Recent Activity</h3>
+            <button className="text-sm font-medium text-primary hover:text-yellow-500 transition-colors">View All</button>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {/* Item 1 */}
+            <div className="group flex items-center justify-between p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
+                  <Check size={20} weight="bold" />
+                </div>
+                <div className="flex flex-col">
+                  <p className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-primary transition-colors">ENG202 - Adv. Composition</p>
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary">Today, 09:00 AM</p>
+                </div>
+              </div>
+              <div className="px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400">
+                Present
+              </div>
+            </div>
+
+            {/* Item 2 */}
+            <div className="group flex items-center justify-between p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
+                  <Check size={20} weight="bold" />
+                </div>
+                <div className="flex flex-col">
+                  <p className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-primary transition-colors">HIS101 - World History</p>
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary">Yesterday, 2:00 PM</p>
+                </div>
+              </div>
+              <div className="px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400">
+                Present
+              </div>
+            </div>
+
+            {/* Item 3 */}
+            <div className="group flex items-center justify-between p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center">
+                  <X size={20} weight="bold" />
+                </div>
+                <div className="flex flex-col">
+                  <p className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-primary transition-colors">MAT104 - Calculus I</p>
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary">Mon, 11:00 AM</p>
+                </div>
+              </div>
+              <div className="px-2 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400">
+                Missed
+              </div>
+            </div>
+          </div>
+        </section >
+      </main >
+
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-150%) skewX(12deg) }
+          100% { transform: translateX(150%) skewX(12deg) }
+        }
+      `}</style>
+    </div >
   );
 };
-

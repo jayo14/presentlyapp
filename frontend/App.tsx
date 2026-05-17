@@ -54,6 +54,7 @@ import { UserManagementMobile } from './components/mobile/admin/UserManagementMo
 import { VenueManagementMobile } from './components/mobile/admin/VenueManagementMobile';
 import { DepartmentManagementMobile } from './components/mobile/admin/DepartmentManagementMobile';
 import { CourseManagementMobile } from './components/mobile/admin/CourseManagementMobile';
+import { CourseRegistrationMobile } from './components/mobile/student/CourseRegistrationMobile';
 
 
 
@@ -449,6 +450,14 @@ const AppContent: React.FC = () => {
                       }}
                       replace
                     />
+                  )
+              } />
+
+              <Route path="courses/register" element={
+                  user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP ? (
+                      <ProtectedRoute><CourseRegistrationMobile /></ProtectedRoute>
+                  ) : (
+                    <Navigate to="/unauthorized" replace />
                   )
               } />
 
