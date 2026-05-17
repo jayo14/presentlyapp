@@ -1,117 +1,157 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ChartLineUp, CaretRight, Info, TrendUp, Warning, Trophy } from '@phosphor-icons/react';
-import { SEO } from '../../SEO';
+import { useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft,
+  CaretDown,
+  TrendUp,
+  Calculator,
+  Science,
+  Palette,
+  Code
+} from '@phosphor-icons/react';
 
 export const AnalyticsMobile: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="space-y-8 px-4 pt-4 pb-12">
-      <SEO title="Analytics | Presently" />
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-         <h1 className="text-[32px] font-bold tracking-tight text-presently-black dark:text-white">Analytics</h1>
+    <div className="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white pb-24 min-h-screen">
+      {/* Top App Bar */}
+      <div className="sticky top-0 z-50 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-gray-900 dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full active:bg-gray-200 dark:active:bg-white/10 transition-colors cursor-pointer"
+        >
+          <ArrowLeft size={24} />
+        </button>
+        <h2 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Attendance Analytics</h2>
       </div>
 
-      {/* Overview Card */}
-      <section className="bg-presently-black dark:bg-charcoal rounded-[32px] p-6 shadow-gold relative overflow-hidden">
-         <div className="absolute top-0 right-0 w-32 h-32 bg-sungold/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-         
-         <div className="flex items-center gap-2 mb-6 text-sungold">
-            <Trophy size={20} weight="fill" />
-            <span className="text-[12px] font-black uppercase tracking-[0.2em]">Top 10% of class</span>
-         </div>
-
-         <div className="flex items-end justify-between">
-            <div>
-               <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-1">Overall Attendance</p>
-               <h2 className="text-[48px] font-black text-white leading-none tracking-tighter">88<span className="text-sungold text-[24px]">%</span></h2>
-            </div>
-            <div className="w-16 h-16 rounded-full border-4 border-sungold border-t-white/10 flex items-center justify-center transform -rotate-45">
-               <span className="text-white font-bold text-sm transform rotate-45">Good</span>
-            </div>
-         </div>
-      </section>
-
-      {/* Insight Pills */}
-      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-         <div className="bg-white dark:bg-charcoal border border-slate-100 dark:border-white/10 rounded-2xl p-4 min-w-[140px] shadow-sm">
-            <TrendUp size={24} className="text-moss-green mb-2" weight="duotone" />
-            <p className="text-[20px] font-black text-presently-black dark:text-white leading-none">12</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Perfect Weeks</p>
-         </div>
-         <div className="bg-white dark:bg-charcoal border border-slate-100 dark:border-white/10 rounded-2xl p-4 min-w-[140px] shadow-sm">
-            <ChartLineUp size={24} className="text-sky-teal mb-2" weight="duotone" />
-            <p className="text-[20px] font-black text-presently-black dark:text-white leading-none">45</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Total Classes</p>
-         </div>
-         <div className="bg-white dark:bg-charcoal border border-slate-100 dark:border-white/10 rounded-2xl p-4 min-w-[140px] shadow-sm">
-            <Warning size={24} className="text-soft-coral mb-2" weight="duotone" />
-            <p className="text-[20px] font-black text-presently-black dark:text-white leading-none">3</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Missed</p>
-         </div>
+      {/* Filters (Chips) */}
+      <div className="flex gap-3 px-4 py-2 overflow-x-auto no-scrollbar">
+        <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-gray-200 dark:bg-[#4a4121] pl-4 pr-3 transition-colors active:scale-95">
+          <p className="text-gray-900 dark:text-white text-sm font-medium leading-normal">Semester 1</p>
+          <CaretDown size={18} />
+        </button>
+        <button className="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-gray-200 dark:bg-[#4a4121] pl-4 pr-3 transition-colors active:scale-95">
+          <p className="text-gray-900 dark:text-white text-sm font-medium leading-normal">All Courses</p>
+          <CaretDown size={18} />
+        </button>
       </div>
 
-      {/* Course Breakdown */}
-      <section className="space-y-4">
-         <div className="flex items-center justify-between px-2">
-            <h3 className="text-[15px] font-bold text-presently-black dark:text-white">Course Breakdown</h3>
-         </div>
+      {/* Hero Section: Circular Chart */}
+      <div className="px-4 py-6 flex flex-col items-center justify-center">
+        <div className="relative size-64">
+          {/* SVG Ring */}
+          <svg className="size-full -rotate-90" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+            {/* Background Ring */}
+            <path
+              className="text-gray-200 dark:text-[#4a4121]"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none" stroke="currentColor" strokeWidth="3"
+            />
+            {/* Progress Ring (92%) */}
+            <path
+              className="text-primary drop-shadow-[0_0_10px_rgba(249,196,6,0.5)]"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none" stroke="currentColor" strokeDasharray="92, 100" strokeLinecap="round" strokeWidth="3"
+            />
+          </svg>
+          {/* Center Text */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span className="text-5xl font-bold text-gray-900 dark:text-white tracking-tighter">92%</span>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Overall Attendance</span>
+          </div>
+        </div>
+        {/* Quick Stat */}
+        <div className="flex items-center gap-2 mt-4 bg-green-500/10 dark:bg-green-500/20 px-3 py-1.5 rounded-lg">
+          <TrendUp size={16} className="text-green-600 dark:text-green-400" />
+          <p className="text-green-700 dark:text-green-400 text-sm font-medium">+2% vs last month</p>
+        </div>
+      </div>
 
-         <div className="space-y-3">
-            {[
-               { code: 'CSC 401', name: 'Intro to AI', att: 95, color: 'bg-moss-green' },
-               { code: 'MTH 302', name: 'Advanced Calculus', att: 82, color: 'bg-sungold' },
-               { code: 'PHY 205', name: 'Quantum Mechanics', att: 70, color: 'bg-soft-coral' },
-            ].map(course => (
-               <div key={course.code} className="bg-white dark:bg-charcoal rounded-[24px] p-5 shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                     <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">{course.code}</p>
-                        <p className="text-[15px] font-bold text-presently-black dark:text-white mt-0.5">{course.name}</p>
-                     </div>
-                     <span className="text-[18px] font-black text-presently-black dark:text-white">{course.att}%</span>
+      {/* Weekly Trends Chart */}
+      <div className="mt-2">
+        <h2 className="text-gray-900 dark:text-white tracking-tight text-[22px] font-bold leading-tight px-4 text-left pb-3 pt-2">Weekly Trends</h2>
+        <div className="px-4">
+          <div className="bg-white dark:bg-surface-dark rounded-2xl p-5 shadow-sm">
+            <div className="flex justify-between items-end mb-6">
+              <div>
+                <p className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider">Average</p>
+                <p className="text-gray-900 dark:text-white text-2xl font-bold">18.5 hrs</p>
+              </div>
+              <div className="bg-primary/20 text-yellow-700 dark:text-primary px-2 py-1 rounded text-xs font-bold">
+                Last 4 Weeks
+              </div>
+            </div>
+            {/* Bar Chart Implementation */}
+            <div className="grid grid-cols-4 gap-4 h-40 items-end">
+              {[
+                { label: 'W1', height: '65%', active: false },
+                { label: 'W2', height: '85%', active: false },
+                { label: 'W3', height: '45%', active: false },
+                { label: 'W4', height: '92%', active: true }
+              ].map((week) => (
+                <div key={week.label} className="flex flex-col items-center gap-2 h-full justify-end group">
+                  <div className="w-full bg-gray-100 dark:bg-[#4a4121] rounded-t-lg relative h-full overflow-hidden flex items-end">
+                    <div
+                      className={`w-full transition-all duration-300 rounded-t-lg ${
+                        week.active
+                          ? 'bg-primary group-hover:bg-[#ffdc48] shadow-[0_0_15px_rgba(249,196,6,0.3)]'
+                          : 'bg-primary/60 group-hover:bg-primary'
+                      } ${week.label === 'W3' ? 'bg-gray-300 dark:bg-gray-600' : ''}`}
+                      style={{ height: week.height }}
+                    ></div>
                   </div>
-                  {/* Progress Bar */}
-                  <div className="h-2.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                     <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${course.att}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className={`h-full ${course.color}`}
-                     />
-                  </div>
-               </div>
-            ))}
-         </div>
-      </section>
+                  <span className={`text-xs font-medium ${week.active ? 'text-primary font-bold' : 'text-gray-500 dark:text-gray-400'}`}>
+                    {week.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
-      {/* Weekly Trend (Placeholder for Recharts) */}
-      <section className="bg-white dark:bg-charcoal rounded-[24px] p-5 shadow-sm space-y-4">
-         <div className="flex justify-between items-center">
-            <h3 className="text-[15px] font-bold text-presently-black dark:text-white">Weekly Trend</h3>
-            <Info size={20} className="text-slate-400" />
-         </div>
-         <div className="h-40 flex items-end justify-between gap-2 px-2 pb-2">
-            {[60, 80, 100, 90, 100].map((h, i) => (
-               <div key={i} className="flex-1 bg-slate-100 dark:bg-white/5 rounded-t-lg relative group">
-                  <motion.div 
-                     initial={{ height: 0 }}
-                     animate={{ height: `${h}%` }}
-                     transition={{ duration: 0.8, delay: i * 0.1 }}
-                     className="absolute bottom-0 w-full bg-sungold rounded-t-lg"
-                  />
-               </div>
-            ))}
-         </div>
-         <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
-            <span>W1</span>
-            <span>W2</span>
-            <span>W3</span>
-            <span>W4</span>
-            <span>W5</span>
-         </div>
-      </section>
+      {/* Course List */}
+      <div className="mt-6 mb-8">
+        <div className="flex items-center justify-between px-4 pb-3 pt-2">
+          <h2 className="text-gray-900 dark:text-white tracking-tight text-[22px] font-bold leading-tight text-left">Course Breakdown</h2>
+          <button className="text-primary text-sm font-medium">See All</button>
+        </div>
+        <div className="flex flex-col gap-3 px-4">
+          {[
+            { name: 'Advanced Calculus', icon: Calculator, progress: 95, color: 'primary' },
+            { name: 'Physics II', icon: Science, progress: 88, color: 'blue' },
+            { name: 'History of Art', icon: Palette, progress: 65, color: 'gray' },
+            { name: 'Comp Sci 101', icon: Code, progress: 98, color: 'purple' }
+          ].map((course) => (
+            <div key={course.name} className="flex items-center gap-4 bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-transparent dark:border-[#4a4121]">
+              <div className={`size-10 rounded-full flex items-center justify-center ${
+                course.color === 'primary' ? 'bg-primary/20 text-yellow-700 dark:text-primary' :
+                course.color === 'blue' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
+                course.color === 'purple' ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400' :
+                'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+              }`}>
+                <course.icon size={20} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-center mb-1">
+                  <h3 className="text-gray-900 dark:text-white font-semibold truncate">{course.name}</h3>
+                  <span className={`font-bold ${course.progress < 70 ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'}`}>
+                    {course.progress}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-100 dark:bg-[#4a4121] rounded-full h-1.5">
+                  <div
+                    className={`h-1.5 rounded-full ${course.progress < 70 ? 'bg-gray-400 dark:bg-gray-500' : 'bg-primary'}`}
+                    style={{ width: `${course.progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

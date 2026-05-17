@@ -19,34 +19,34 @@ export const ResetPasswordMobile: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isValid) navigate('/auth/login');
+    if (isValid) navigate('/login');
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-presently-black text-white relative overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-background-light dark:bg-presently-black text-slate-900 dark:text-white relative overflow-hidden">
       <SEO title="Reset Password | Presently" />
       
       <div className="absolute top-0 left-0 p-6 pt-safe z-50">
          <button 
            onClick={() => navigate(-1)}
-           className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+           className="w-10 h-10 bg-black/5 dark:bg-white/10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
          >
            <CaretLeft size={20} weight="bold" />
          </button>
       </div>
 
-      <div className="absolute top-[-10%] right-[-10%] w-[120vw] h-[50vh] bg-sungold/20 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[120vw] h-[50vh] bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
       
       <div className="flex-1 flex flex-col items-center justify-center p-6 pt-12 pb-8 relative z-10">
          <h1 className="text-4xl font-bold tracking-tight mb-2 text-center">New Password</h1>
-         <p className="text-white/60 font-medium text-center px-4">Create a strong password for your account.</p>
+         <p className="text-slate-500 dark:text-white/60 font-medium text-center px-4">Create a strong password for your account.</p>
       </div>
 
       <motion.div 
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200, delay: 0.1 }}
-        className="w-full bg-white dark:bg-charcoal rounded-t-[40px] px-6 pt-10 pb-12 shadow-2xl relative z-20 flex-shrink-0"
+        className="w-full bg-white dark:bg-surface-dark rounded-t-[40px] px-6 pt-10 pb-12 shadow-2xl relative z-20 flex-shrink-0"
       >
          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-1.5">
@@ -61,7 +61,7 @@ export const ResetPasswordMobile: React.FC = () => {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full h-[52px] pl-12 pr-12 bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/10 rounded-[20px] outline-none focus:border-sungold focus:shadow-[0_0_0_4px_rgba(245,197,24,0.15)] transition-all text-[15px] font-bold text-presently-black dark:text-white placeholder:font-medium placeholder:text-slate-400 font-mono tracking-widest"
+                    className="w-full h-[52px] pl-12 pr-12 bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/10 rounded-[20px] outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(249,196,6,0.15)] transition-all text-[15px] font-bold text-slate-900 dark:text-white placeholder:font-medium placeholder:text-slate-400 font-mono tracking-widest"
                   />
                   <button 
                     type="button"
@@ -77,7 +77,7 @@ export const ResetPasswordMobile: React.FC = () => {
                {rules.map((rule, i) => (
                  <div key={i} className="flex items-center gap-2">
                     <CheckCircle size={16} weight="bold" className={rule.valid ? 'text-moss-green' : 'text-slate-300 dark:text-slate-600'} />
-                    <span className={`text-[13px] font-medium transition-colors ${rule.valid ? 'text-presently-black dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <span className={`text-[13px] font-medium transition-colors ${rule.valid ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>
                        {rule.label}
                     </span>
                  </div>
@@ -87,7 +87,7 @@ export const ResetPasswordMobile: React.FC = () => {
             <button 
               type="submit"
               disabled={!isValid}
-              className="w-full h-[56px] mt-4 bg-sungold text-presently-black rounded-2xl font-black text-lg shadow-gold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-40"
+              className="w-full h-[56px] mt-4 bg-primary text-background-dark rounded-2xl font-black text-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-40"
             >
               Update Password <ArrowRight size={20} weight="bold" />
             </button>
