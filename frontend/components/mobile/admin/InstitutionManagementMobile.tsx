@@ -159,7 +159,7 @@ export const InstitutionManagementMobile: React.FC = () => {
                 </div>
               </motion.div>
             );
-          }))
+          })
         ) : (
           <div className="text-center py-20 bg-surface-container rounded-[40px] border border-dashed border-outline">
              <Buildings size={64} weight="duotone" className="mx-auto text-on-surface-variant opacity-20 mb-4" />
