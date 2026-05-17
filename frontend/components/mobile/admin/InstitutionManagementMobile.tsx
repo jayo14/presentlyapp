@@ -35,8 +35,8 @@ export const InstitutionManagementMobile: React.FC = () => {
   };
 
   const filteredInstitutions = institutions.filter(inst => {
-    const name = inst.name || inst.full_name || '';
-    const shortName = inst.short_name || inst.abbreviation || '';
+    const name = (inst as any).name || inst.full_name || '';
+    const shortName = (inst as any).short_name || inst.abbreviation || '';
     return name.toLowerCase().includes(searchTerm.toLowerCase()) ||
            shortName.toLowerCase().includes(searchTerm.toLowerCase());
   });
@@ -106,31 +106,37 @@ export const InstitutionManagementMobile: React.FC = () => {
         {loading ? (
           [1,2,3].map(i => <div key={i} className="h-28 bg-surface-container animate-pulse rounded-3xl" />)
         ) : filteredInstitutions.length > 0 ? (
-          filteredInstitutions.map((inst) => (
-            <motion.div 
-              key={inst.id}
-              layout
-              className="p-5 rounded-[32px] bg-surface border border-outline shadow-sm space-y-4"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-surface-container border border-outline/50 flex items-center justify-center text-sungold font-bold">
-                   {inst.short_name}
-                </div>
-                <div className="flex-1 min-w-0">
-                   <h3 className="font-bold text-lg leading-tight truncate">{inst.name}</h3>
-                   <div className="flex items-center gap-3 mt-1">
-                      <div className="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
-                         <MapPin size={12} weight="fill" className="text-sungold" />
-                         {inst.location || 'N/A'}
-                      </div>
-                      {inst.website && (
-                         <a href={inst.website} target="_blank" rel="noreferrer" className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1">
-                            <Globe size={12} />
-                            Site
-                         </a>
-                      )}
-                   </div>
-                </div>
+          filteredInstitutions.map((inst) => {
+            const shortName = (inst as any).short_name || inst.abbreviation || 'INST';
+            const name = (inst as any).name || inst.full_name || 'Institution';
+            const location = (inst as any).location || [inst.city, inst.state_province, inst.country].filter(Boolean).join(', ') || 'N/A';
+            const website = (inst as any).website || inst.website_url;
+
+            return (
+              <motion.div 
+                key={inst.id}
+                layout
+                className="p-5 rounded-[32px] bg-surface border border-outline shadow-sm space-y-4"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-surface-container border border-outline/50 flex items-center justify-center text-sungold font-bold">
+                     {shortName}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                     <h3 className="font-bold text-lg leading-tight truncate">{name}</h3>
+                     <div className="flex items-center gap-3 mt-1">
+                        <div className="flex items-center gap-1 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
+                           <MapPin size={12} weight="fill" className="text-sungold" />
+                           {location}
+                        </div>
+                        {website && (
+                           <a href={website} target="_blank" rel="noreferrer" className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1">
+                              <Globe size={12} />
+                              Site
+                           </a>
+                        )}
+                     </div>
+                  </div>
                 <button className="p-2 text-on-surface-variant">
                    <DotsThreeVertical size={24} weight="bold" />
                 </button>
@@ -149,10 +155,11 @@ export const InstitutionManagementMobile: React.FC = () => {
                    className="w-11 h-11 flex items-center justify-center rounded-xl text-error bg-error/5 border border-error/10 active:scale-90 transition-all"
                  >
                     <Trash size={18} weight="duotone" />
-                 </button>
-              </div>
-            </motion.div>
-          ))
+                  </button>
+                </div>
+              </motion.div>
+            );
+          }))
         ) : (
           <div className="text-center py-20 bg-surface-container rounded-[40px] border border-dashed border-outline">
              <Buildings size={64} weight="duotone" className="mx-auto text-on-surface-variant opacity-20 mb-4" />

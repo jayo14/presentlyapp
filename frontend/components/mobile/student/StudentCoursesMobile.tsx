@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   Plus,
   QrCode,
@@ -67,14 +67,14 @@ export const StudentCoursesMobile: React.FC = () => {
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white antialiased min-h-screen flex flex-col overflow-hidden pb-24">
       {/* Top App Bar */}
       <header className="flex items-center justify-between px-4 py-3 bg-background-light dark:bg-background-dark sticky top-0 z-10">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-white/10 cursor-pointer text-gray-900 dark:text-white"
         >
           <ArrowLeft size={24} />
         </button>
         <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center text-gray-900 dark:text-white">My Courses</h2>
-        <button 
+        <button
           onClick={() => navigate('/dashboard/courses/register')}
           className="flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-white/10 cursor-pointer text-gray-900 dark:text-white"
         >
@@ -90,17 +90,16 @@ export const StudentCoursesMobile: React.FC = () => {
             <div key={course.id} className="flex flex-col p-6 bg-surface-light dark:bg-surface-dark rounded-[24px] shadow-sm border border-gray-200 dark:border-white/5">
               <div className="flex gap-4">
                 <div
-                  className="bg-center bg-no-repeat bg-cover rounded-xl w-20 h-20 shrink-0"
+                  className="bg-center bg-no-repeat bg-cover rounded-xl w-[80px] h-[80px] shrink-0"
                   style={{ backgroundImage: `url(${course.image})` }}
                 ></div>
                 <div className="flex flex-1 flex-col justify-center min-w-0">
                   <div className="flex justify-between items-start">
                     <h3 className="text-gray-900 dark:text-white text-base font-bold leading-normal truncate">{course.name}</h3>
-                    <span className={`text-xs font-bold px-2 py-1 rounded ${
-                      course.status === 'Active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                    <span className={`text-xs font-bold px-2 py-1 rounded ${course.status === 'Active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                       course.status === 'Warning' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                    }`}>
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      }`}>
                       {course.status}
                     </span>
                   </div>
