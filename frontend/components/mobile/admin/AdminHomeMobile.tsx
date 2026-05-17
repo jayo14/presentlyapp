@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Terminal, ShieldWarning, Activity, 
+  Terminal, ShieldWarning, Pulse,
   Users, MapPin, ArrowsClockwise,
   CaretRight, Bell, Sparkle,
   TrendUp

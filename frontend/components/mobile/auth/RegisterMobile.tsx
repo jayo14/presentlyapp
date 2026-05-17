@@ -14,10 +14,9 @@ export const RegisterMobile: React.FC = () => {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     registerMutation.mutate({
-      full_name: formData.name,
+      full_name: formData.name, password2: formData.password,
       email: formData.email,
       password: formData.password,
-      role: UserRole.STUDENT
     });
   };
 

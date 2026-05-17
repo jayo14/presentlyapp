@@ -1,148 +1,152 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CaretLeft, Bell, WarningCircle, CheckCircle, Info, CalendarBlank } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
-import { SEO } from '../../SEO';
-
-type FilterType = 'all' | 'attendance' | 'courses' | 'system';
+import {
+  CaretLeft,
+  DotsThree,
+  CheckCircle,
+  Clock,
+  Warning,
+  FileText,
+  Calendar,
+  Circle
+} from '@phosphor-icons/react';
 
 export const NotificationsMobile: React.FC = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<FilterType>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
 
   const notifications = [
     {
       id: 1,
-      type: 'attendance',
-      title: 'Absence Warning',
-      message: 'You have missed 2 consecutive classes for CSC 401.',
-      time: '2 hours ago',
+      title: 'Attendance marked successfully',
+      desc: 'Mathematics 101 • 10:30 AM',
+      time: 'Today',
+      icon: CheckCircle,
       unread: true,
-      icon: WarningCircle,
-      color: 'text-soft-coral bg-soft-coral/10'
+      type: 'success'
     },
     {
       id: 2,
-      type: 'attendance',
-      title: 'Attendance Logged',
-      message: 'Successfully marked present for MTH 302.',
-      time: 'Yesterday, 10:45 AM',
-      unread: false,
-      icon: CheckCircle,
-      color: 'text-moss-green bg-moss-green/10'
+      title: 'Session ending soon',
+      desc: 'CS Lab • 09:45 AM',
+      time: 'Today',
+      icon: Clock,
+      unread: true,
+      type: 'info'
     },
     {
       id: 3,
-      type: 'courses',
-      title: 'New Assignment',
-      message: 'Prof. Adeyemi uploaded a new assignment for CSC 401.',
-      time: 'Yesterday, 2:00 PM',
-      unread: true,
-      icon: CalendarBlank,
-      color: 'text-sky-teal bg-sky-teal/10'
+      title: 'Attendance Warning',
+      desc: 'Physics - Attendance below 75%',
+      time: 'Yesterday',
+      icon: Warning,
+      unread: false,
+      type: 'warning'
     },
     {
       id: 4,
-      type: 'system',
-      title: 'System Maintenance',
-      message: 'Presently will be offline for maintenance on Sunday 2AM.',
-      time: 'Oct 12, 2023',
+      title: 'New Assignment Posted',
+      desc: 'World History • Yesterday',
+      time: 'Yesterday',
+      icon: FileText,
       unread: false,
-      icon: Info,
-      color: 'text-sungold bg-sungold/10'
+      type: 'info'
+    },
+    {
+      id: 5,
+      title: 'Holiday Announcement',
+      desc: 'Oct 12th is a University Holiday',
+      time: 'Last Week',
+      icon: Calendar,
+      unread: false,
+      type: 'neutral'
     }
   ];
 
-  const filtered = filter === 'all' 
-    ? notifications 
-    : notifications.filter(n => n.type === filter);
-
   return (
-    <div className="flex flex-col min-h-screen bg-off-white dark:bg-presently-black text-presently-black dark:text-white">
-      <SEO title="Notifications | Presently" />
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-off-white/80 dark:bg-presently-black/80 backdrop-blur-xl border-b border-slate-100 dark:border-white/5 pt-safe">
-        <div className="h-14 px-4 flex items-center justify-between">
+    <div className="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white min-h-screen">
+      <div className="relative flex h-full min-h-screen w-full flex-col max-w-[430px] mx-auto bg-background-light dark:bg-background-dark overflow-x-hidden border-x border-gray-200 dark:border-gray-800 pb-24">
+        {/* TopAppBar */}
+        <div className="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
           <button 
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full bg-white dark:bg-charcoal flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+            className="text-gray-900 dark:text-white flex size-12 shrink-0 items-center justify-start"
           >
-            <CaretLeft size={20} weight="bold" />
+            <CaretLeft size={24} />
           </button>
-          <span className="font-bold text-[17px]">Notifications</span>
-          <button className="text-[12px] font-bold text-sungold">
-            Mark all read
-          </button>
-        </div>
-        
-        {/* Filters */}
-        <div className="flex overflow-x-auto no-scrollbar gap-2 px-4 py-3">
-          {(['all', 'attendance', 'courses', 'system'] as FilterType[]).map((type) => (
-            <button
-              key={type}
-              onClick={() => setFilter(type)}
-              className={`
-                px-4 py-2 rounded-full text-[12px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors
-                ${filter === type 
-                  ? 'bg-sungold text-presently-black' 
-                  : 'bg-white dark:bg-charcoal text-slate-400 border border-slate-100 dark:border-white/5'
-                }
-              `}
-            >
-              {type}
+          <h2 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Notifications</h2>
+          <div className="flex w-12 items-center justify-end">
+            <button className="flex items-center justify-center rounded-xl h-12 bg-transparent text-gray-900 dark:text-white">
+              <DotsThree size={24} weight="bold" />
             </button>
-          ))}
+          </div>
         </div>
-      </header>
 
-      <main className="flex-1 overflow-y-auto px-4 py-6 space-y-3 pb-32">
-        <AnimatePresence mode="popLayout">
-          {filtered.length > 0 ? (
-            filtered.map((notification) => (
-              <motion.div
-                key={notification.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className={`
-                  bg-white dark:bg-charcoal p-4 rounded-[24px] flex gap-4 shadow-sm
-                  ${notification.unread ? 'border-2 border-sungold/50' : 'border border-slate-100 dark:border-white/5'}
-                `}
-              >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${notification.color}`}>
-                  <notification.icon size={24} weight="duotone" />
+        {/* Tabs */}
+        <div className="pb-1">
+          <div className="flex border-b border-gray-200 dark:border-[#6a5d2f] px-4 gap-8">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 ${activeTab === 'all' ? 'border-b-primary text-gray-900 dark:text-white' : 'border-b-transparent text-gray-500 dark:text-[#ccbf8e]'}`}
+            >
+              <p className="text-sm font-bold leading-normal tracking-[0.015em]">All</p>
+            </button>
+            <button
+              onClick={() => setActiveTab('unread')}
+              className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 ${activeTab === 'unread' ? 'border-b-primary text-gray-900 dark:text-white' : 'border-b-transparent text-gray-500 dark:text-[#ccbf8e]'}`}
+            >
+              <p className="text-sm font-bold leading-normal tracking-[0.015em]">Unread</p>
+            </button>
+          </div>
+        </div>
+
+        {/* Notification List */}
+        <div className="flex flex-col flex-1 overflow-y-auto">
+          {['Today', 'Yesterday', 'Last Week'].map((group) => {
+            const groupNotifications = notifications.filter(n => n.time === group && (activeTab === 'all' || n.unread));
+            if (groupNotifications.length === 0) return null;
+
+            return (
+              <React.Fragment key={group}>
+                <div className="px-4 pt-6 pb-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-[#ccbf8e]">{group}</h3>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-bold text-[15px] leading-tight pr-2">{notification.title}</h3>
-                    {notification.unread && (
-                      <span className="w-2 h-2 rounded-full bg-sungold shrink-0 mt-1" />
+                {groupNotifications.map((n) => (
+                  <div
+                    key={n.id}
+                    className="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 min-h-[80px] py-3 justify-between hover:bg-gray-100 dark:hover:bg-primary/5 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`flex items-center justify-center rounded-xl shrink-0 size-12 ${
+                        n.type === 'neutral'
+                          ? 'bg-gray-100 dark:bg-[#322d1a] text-gray-400 dark:text-[#6a5d2f]'
+                          : 'bg-primary/10 dark:bg-[#4a4121] text-primary'
+                      }`}>
+                        <n.icon size={24} weight={n.unread ? 'fill' : 'regular'} />
+                      </div>
+                      <div className="flex flex-col justify-center">
+                        <p className={`text-base font-medium leading-normal line-clamp-1 ${n.type === 'neutral' ? 'text-gray-400 dark:text-[#ccbf8e]' : 'text-gray-900 dark:text-white'}`}>
+                          {n.title}
+                        </p>
+                        <p className={`text-sm font-normal leading-normal line-clamp-2 ${n.type === 'neutral' ? 'text-gray-400/80 dark:text-[#ccbf8e]/60' : 'text-gray-500 dark:text-[#ccbf8e]'}`}>
+                          {n.desc}
+                        </p>
+                      </div>
+                    </div>
+                    {n.unread && (
+                      <div className="shrink-0">
+                        <div className="text-primary flex size-7 items-center justify-center">
+                          <Circle size={10} weight="fill" />
+                        </div>
+                      </div>
                     )}
                   </div>
-                  <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-snug mb-2">
-                    {notification.message}
-                  </p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-300 dark:text-slate-500">
-                    {notification.time}
-                  </p>
-                </div>
-              </motion.div>
-            ))
-          ) : (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-20"
-            >
-              <Bell size={48} weight="duotone" className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-              <h3 className="font-bold text-[16px]">All caught up!</h3>
-              <p className="text-[14px] text-slate-400 mt-1">No notifications in this category.</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+                ))}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

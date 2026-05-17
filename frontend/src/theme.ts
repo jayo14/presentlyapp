@@ -1,5 +1,5 @@
 /**
- * Presently Design System v1.1 - Redesign Update
+ * Presently Design System v1.2 - Rebranded Mobile Update
  * Custom theme configuration for the rebranded Presently app
  */
 
@@ -7,6 +7,7 @@ export const colors = {
   // Brand Colors
   sungold: '#F5C518',
   presentlyBlack: '#0D0D0D',
+  primary: '#f9c406',
 
   // Secondary / Semantic
   paleHoney: '#FBF6E9',
@@ -15,17 +16,26 @@ export const colors = {
   softCoral: '#E87461',
   skyTeal: '#2E9CCA',
 
-  // UI Surfaces (Light Mode)
-  background: '#FFFFFF',
-  surface: '#F9F7F3',
-  surfaceContainer: '#F3F0EA',
-  surfaceHighest: '#EBE7DF',
+  // UI Surfaces (New Design)
+  backgroundLight: '#f8f8f5',
+  backgroundDark: '#231e0f',
+  surfaceLight: '#ffffff',
+  surfaceDark: '#352e18',
+  surfaceHighlight: '#4a4121',
 
   // Text
+  textSecondary: '#ccbf8e',
+  textSecondaryLight: '#666666',
   onSurface: '#0D0D0D',
   onSurfaceVariant: '#64748B',
 
-  // Status (Matches semantic rules in design.md)
+  // Legacy/Compatibility (Mapped to new design)
+  background: '#f8f8f5',
+  surface: '#ffffff',
+  surfaceContainer: '#f8f8f5',
+  surfaceHighest: '#EBE7DF',
+
+  // Status
   success: '#4A7C59',
   error: '#E87461',
   info: '#2E9CCA',
@@ -35,7 +45,7 @@ export const colors = {
 export const semanticTokens = {
   // Button styles
   buttonPrimary: {
-    background: colors.sungold,
+    background: colors.primary,
     color: colors.presentlyBlack,
   },
   buttonSecondary: {
@@ -44,7 +54,7 @@ export const semanticTokens = {
   },
 
   // Card styles
-  cardBackground: colors.surfaceContainer,
+  cardBackground: colors.surfaceLight,
   cardText: colors.onSurface,
   cardBorder: '#E2E8F0',
 
@@ -55,7 +65,7 @@ export const semanticTokens = {
 
   // Text colors
   textPrimary: colors.onSurface,
-  textSecondary: colors.onSurfaceVariant,
+  textSecondary: colors.textSecondaryLight,
 
   // Shadows
   shadowSm: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',

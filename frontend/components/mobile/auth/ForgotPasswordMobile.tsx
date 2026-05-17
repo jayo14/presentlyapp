@@ -15,19 +15,19 @@ export const ForgotPasswordMobile: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-presently-black text-white relative overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-background-light dark:bg-presently-black text-slate-900 dark:text-white relative overflow-hidden">
       <SEO title="Forgot Password | Presently" />
       
       <div className="absolute top-0 left-0 p-6 pt-safe z-50">
          <button 
            onClick={() => navigate(-1)}
-           className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+           className="w-10 h-10 bg-black/5 dark:bg-white/10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
          >
            <CaretLeft size={20} weight="bold" />
          </button>
       </div>
 
-      <div className="absolute top-[-10%] right-[-10%] w-[120vw] h-[50vh] bg-sungold/20 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[120vw] h-[50vh] bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
       
       <AnimatePresence mode="wait">
         {step === 'input' ? (
@@ -40,10 +40,15 @@ export const ForgotPasswordMobile: React.FC = () => {
           >
             <div className="flex-1 flex flex-col items-center justify-center p-6 pt-12 pb-8 relative z-10">
                <h1 className="text-4xl font-bold tracking-tight mb-2 text-center">Reset Password</h1>
-               <p className="text-white/60 font-medium text-center px-4">Enter your email and we'll send you a recovery link.</p>
+               <p className="text-slate-500 dark:text-white/60 font-medium text-center px-4">Enter your email and we'll send you a recovery link.</p>
             </div>
 
-            <div className="w-full bg-white dark:bg-charcoal rounded-t-[40px] px-6 pt-10 pb-12 shadow-2xl relative z-20 flex-shrink-0">
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200, delay: 0.1 }}
+              className="w-full bg-white dark:bg-surface-dark rounded-t-[40px] px-6 pt-10 pb-12 shadow-2xl relative z-20 flex-shrink-0"
+            >
                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-1.5">
                      <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/50 pl-2">Institution Email</label>
@@ -57,19 +62,19 @@ export const ForgotPasswordMobile: React.FC = () => {
                           value={email}
                           onChange={e => setEmail(e.target.value)}
                           placeholder="student@university.edu"
-                          className="w-full h-[52px] pl-12 pr-4 bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/10 rounded-[20px] outline-none focus:border-sungold focus:shadow-[0_0_0_4px_rgba(245,197,24,0.15)] transition-all text-[15px] font-bold text-presently-black dark:text-white placeholder:font-medium placeholder:text-slate-400"
+                          className="w-full h-[52px] pl-12 pr-4 bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/10 rounded-[20px] outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(249,196,6,0.15)] transition-all text-[15px] font-bold text-slate-900 dark:text-white placeholder:font-medium placeholder:text-slate-400"
                         />
                      </div>
                   </div>
 
                   <button 
                     type="submit"
-                    className="w-full h-[56px] bg-sungold text-presently-black rounded-2xl font-black text-lg shadow-gold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+                    className="w-full h-[56px] bg-primary text-background-dark rounded-2xl font-black text-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
                   >
                     Send Link <ArrowRight size={20} weight="bold" />
                   </button>
                </form>
-            </div>
+            </motion.div>
           </motion.div>
         ) : (
           <motion.div
@@ -78,17 +83,17 @@ export const ForgotPasswordMobile: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center justify-center flex-1 p-6 relative z-10"
           >
-            <div className="w-24 h-24 rounded-full bg-sungold/20 flex items-center justify-center mb-8">
-               <PaperPlaneRight size={48} weight="duotone" className="text-sungold" />
+            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mb-8">
+               <PaperPlaneRight size={48} weight="duotone" className="text-primary" />
             </div>
             <h2 className="text-3xl font-bold tracking-tight mb-4 text-center">Check your inbox</h2>
-            <p className="text-white/60 font-medium text-center mb-8">
+            <p className="text-slate-500 dark:text-white/60 font-medium text-center mb-8">
                We sent a recovery link to<br/>
-               <span className="text-white font-bold">{email}</span>
+               <span className="text-slate-900 dark:text-white font-bold">{email}</span>
             </p>
             <button 
-              onClick={() => navigate('/auth/login')}
-              className="w-full max-w-[280px] h-[56px] bg-white text-presently-black rounded-2xl font-black text-lg shadow-sm active:scale-[0.98] transition-transform"
+              onClick={() => navigate('/login')}
+              className="w-full max-w-[280px] h-[56px] bg-primary dark:bg-white text-background-dark rounded-2xl font-black text-lg shadow-sm active:scale-[0.98] transition-transform"
             >
               Back to Login
             </button>

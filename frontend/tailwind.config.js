@@ -44,15 +44,16 @@ export default {
         '96': '96px',
         '128': '128px',
       },
-        colors: {
-          sungold: '#F5C518',
-          'presently-black': '#0D0D0D',
-          'pale-honey': '#FBF6E9',
-          'warm-ivory': '#FAF5EB',
+      colors: {
+        sungold: '#F5C518',
+        'presently-black': '#0D0D0D',
+        'pale-honey': '#FBF6E9',
+        'warm-ivory': '#FAF5EB',
         'moss-green': '#4A7C59',
         'soft-coral': '#E87461',
         'sky-teal': '#2E9CCA',
 
+        "primary": "#f9c406",
         "background-light": "#f8f8f5",
         "background-dark": "#231e0f",
         "surface-light": "#ffffff",
@@ -61,26 +62,25 @@ export default {
         "text-secondary": "#ccbf8e",
         "text-secondary-light": "#666666",
 
-          background: "var(--background)",
-          surface: "var(--surface)",
-          surfaceContainer: "var(--surface-container)",
-          'surface-container': "var(--surface-container)",
-          'surface-variant': "var(--surface-variant)",
-          'surface-highest': "var(--surface-highest)",
+        background: "var(--background)",
+        surface: "var(--surface)",
+        surfaceContainer: "var(--surface-container)",
+        'surface-container': "var(--surface-container)",
+        'surface-variant': "var(--surface-variant)",
+        'surface-highest': "var(--surface-highest)",
 
-          text: "var(--on-surface)",
-          textMuted: "var(--on-surface-variant)",
-          'on-surface': "var(--on-surface)",
-          'on-surface-variant': "var(--on-surface-variant)",
-  
-          primary: "var(--primary)",
-          'primary-foreground': "var(--on-primary)",
-          'on-primary-fixed': "var(--on-primary-fixed)",
-  
-          outline: "var(--outline)",
-          'outline-variant': "var(--outline-variant)",
-          error: "var(--error)",
-          success: "var(--success)",
+        text: "var(--on-surface)",
+        textMuted: "var(--on-surface-variant)",
+        'on-surface': "var(--on-surface)",
+        'on-surface-variant': "var(--on-surface-variant)",
+
+        'primary-foreground': "var(--on-primary)",
+        'on-primary-fixed': "var(--on-primary-fixed)",
+
+        outline: "var(--outline)",
+        'outline-variant': "var(--outline-variant)",
+        error: "var(--error)",
+        success: "var(--success)",
         warning: "var(--warning)",
       },
       transitionTimingFunction: {
@@ -99,11 +99,16 @@ export default {
           '0%': { transform: 'translateY(24px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        'shimmer': {
+          '0%': { transform: 'translateX(-150%) skewX(12deg)' },
+          '100%': { transform: 'translateX(150%) skewX(12deg)' }
+        }
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
         'reveal': 'reveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'shimmer': 'shimmer 1.5s infinite',
       },
       boxShadow: {
         'sm': '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
