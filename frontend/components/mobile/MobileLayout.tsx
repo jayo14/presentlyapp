@@ -7,7 +7,6 @@ import {
 } from '@phosphor-icons/react';
 import { MobileHeader } from './MobileHeader';
 import { BottomNav, NavItem } from './BottomNav';
-import { FAB } from './FAB';
 import { SidebarDrawer } from './SidebarDrawer';
 import { useCurrentUser } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
@@ -45,19 +44,20 @@ export const MobileLayout: React.FC = () => {
     }
   };
 
-  const getFABActions = () => {
+  const getMainAction = () => {
     if (user?.role === UserRole.STUDENT) {
-      return [
-        { icon: Keyboard, label: 'Enter Code', onClick: () => console.log('Open manual entry') },
-        { icon: Scan, label: 'Scan QR', onClick: () => navigate('/dashboard/scanner') },
-      ];
+      return {
+        icon: Scan,
+        onClick: () => navigate('/dashboard/scanner')
+      };
     }
     if (user?.role === UserRole.LECTURER) {
-       return [
-         { icon: Plus, label: 'New Session', onClick: () => navigate('/dashboard/sessions/new') },
-       ];
+       return {
+         icon: Plus,
+         onClick: () => navigate('/dashboard/sessions/new')
+       };
     }
-    return [];
+    return undefined;
   };
 
   return (
@@ -77,12 +77,10 @@ export const MobileLayout: React.FC = () => {
         <Outlet />
       </main>
 
-      <FAB 
-        mainIcon={user?.role === UserRole.STUDENT ? Scan : Plus}
-        actions={getFABActions()}
+      <BottomNav 
+        items={getNavItems()} 
+        mainAction={getMainAction()}
       />
-
-      <BottomNav items={getNavItems()} />
 
       <SidebarDrawer 
         isOpen={isSidebarOpen}

@@ -12,6 +12,7 @@ import { OfflineIndicator } from './src/components/OfflineIndicator';
 import { Loader2 } from 'lucide-react';
 import { ThemeProvider } from './components/ThemeProvider';
 import { AnalyticsTracker } from './components/Analytics/AnalyticsTracker';
+import { useBreakpoint } from './hooks/useBreakpoint';
 
 // Eager load critical components for initial page
 import { LoginMobile } from './components/mobile/auth/LoginMobile';
@@ -210,10 +211,14 @@ const DashboardLayout: React.FC = () => {
 
 const DashboardHome: React.FC = () => {
     const { data: user } = useCurrentUser();
+    const isMobile = useBreakpoint('md');
+
+    if (isMobile) return <MobileDashboardHome />;
+
     if (user?.role === UserRole.ADMIN) return <AdminDashboard userName={user.full_name} />;
     if (user?.role === UserRole.LECTURER) return <LecturerDashboard userName={user.full_name} />;
     if (user?.role === UserRole.STUDENT || user?.role === UserRole.CLASS_REP) return <StudentDashboard userName={user.full_name} />;
-    return <MobileDashboardHome />;
+    return null;
 };
 
 const AdminRoute: React.FC<{ children: React.ReactNode; requiredPermission?: string }> = ({ children, requiredPermission }) => {
