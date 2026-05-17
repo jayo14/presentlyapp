@@ -35,11 +35,11 @@ export const CourseRegistrationMobile: React.FC = () => {
     if (courseCode.toUpperCase() === 'CS401') {
       setView('enrolled');
     } else if (courseCode.toUpperCase() === 'CS40') {
-        setView('searching');
-        setSearchQuery('CS40');
+      setView('searching');
+      setSearchQuery('CS40');
     } else {
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 5000);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
     }
   };
 
@@ -59,7 +59,7 @@ export const CourseRegistrationMobile: React.FC = () => {
               </div>
             </div>
             <h1 className="text-3xl font-bold text-center tracking-tight leading-tight">
-              Successfully Enrolled<br/>in <span className="text-primary">CS401</span>
+              Successfully Enrolled<br />in <span className="text-primary">CS401</span>
             </h1>
             <p className="text-slate-400 mt-3 text-center text-sm font-light tracking-wide uppercase">Course Registration Confirmed</p>
           </div>
@@ -124,7 +124,7 @@ export const CourseRegistrationMobile: React.FC = () => {
       <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased transition-colors duration-200 min-h-screen">
         <div className="relative flex h-full w-full flex-col min-h-screen pb-32 overflow-x-hidden">
           <div className="flex items-center px-4 py-4 justify-between sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-slate-200 dark:border-white/5">
-            <button 
+            <button
               onClick={() => setView('idle')}
               className="flex size-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
             >
@@ -146,54 +146,54 @@ export const CourseRegistrationMobile: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex flex-col gap-6 px-5 pt-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Search Results (3)</h2>
-              <span className="text-xs font-medium text-primary cursor-pointer">Clear all</span>
+          <div className="flex flex-col gap-8 px-6 pt-8 pb-12">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-xs font-black uppercase tracking-widest text-slate-400">Search Results (3)</h2>
+              <span className="text-xs font-bold text-primary hover:text-yellow-500 cursor-pointer transition-colors">Clear all</span>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
               {[
                 { code: 'CS401', name: 'Operating Systems', prof: 'Dr. Alexander Wright' },
                 { code: 'CS402', name: 'Computer Networks', prof: 'Prof. Elena Rodriguez' },
                 { code: 'CS405', name: 'Cyber Security', prof: 'Dr. Marcus Thorne' }
               ].map((c) => (
-                <div key={c.code} className="bg-white dark:bg-surface-dark rounded-2xl p-5 border border-slate-100 dark:border-white/5 shadow-sm">
-                  <div className="flex justify-between items-start mb-4">
+                <div key={c.code} className="bg-white dark:bg-surface-dark rounded-3xl p-6 border border-slate-100 dark:border-white/5 shadow-md hover:border-primary/30 transition-all duration-300">
+                  <div className="flex justify-between items-start mb-5">
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-primary tracking-wider mb-1 uppercase">Computer Science</span>
-                      <h3 className="text-lg font-bold leading-tight">
-                        <span className="bg-primary/20 text-primary px-0.5 rounded">{c.code.slice(0, 4)}</span>{c.code.slice(4)}: {c.name}
+                      <span className="text-[10px] font-black text-primary tracking-widest mb-1.5 uppercase">Computer Science</span>
+                      <h3 className="text-lg font-extrabold leading-tight text-slate-900 dark:text-white">
+                        <span className="bg-primary/20 text-primary px-1 rounded mr-1 font-bold">{c.code.slice(0, 4)}</span>{c.code.slice(4)}: {c.name}
                       </h3>
                     </div>
-                    <div className="size-10 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center">
-                      <BookmarkSimple size={20} className="text-slate-400" />
+                    <div className="size-11 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center border border-slate-100 dark:border-white/5">
+                      <BookmarkSimple size={22} className="text-slate-400" />
                     </div>
                   </div>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="size-8 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center overflow-hidden">
-                      <User size={20} />
+                    <div className="size-9 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center overflow-hidden border border-slate-300 dark:border-white/10">
+                      <User size={22} />
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{c.prof}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold">{c.prof}</p>
                   </div>
                   <button
                     onClick={() => { setCourseCode(c.code); setView('enrolled'); }}
-                    className="w-full h-12 bg-primary hover:bg-yellow-400 text-background-dark font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                    className="w-full h-14 bg-primary hover:bg-yellow-400 text-background-dark font-bold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 hover:-translate-y-0.5"
                   >
                     Enroll Now
-                    <PlusCircle size={20} />
+                    <PlusCircle size={22} />
                   </button>
                 </div>
               ))}
             </div>
 
-            <div className="mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-start gap-4">
-              <div className="size-10 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
-                <WarningCircle size={24} className="text-red-500" />
+            <div className="mt-4 p-5 rounded-3xl bg-red-500/10 border border-red-500/20 flex items-start gap-4">
+              <div className="size-11 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                <WarningCircle size={26} className="text-red-500" />
               </div>
               <div>
-                <h4 className="font-bold text-red-500">Invalid course code</h4>
-                <p className="text-xs text-red-400/80 leading-relaxed mt-0.5">
+                <h4 className="font-extrabold text-red-500 text-sm">Invalid course code</h4>
+                <p className="text-xs text-red-400/80 leading-relaxed mt-1">
                   The code "{searchQuery}" is not a direct entry code. Please select a specific section from the results above or check your code again.
                 </p>
               </div>
@@ -219,7 +219,7 @@ export const CourseRegistrationMobile: React.FC = () => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex flex-col gap-8 px-5 pt-4">
+        <div className="flex flex-col gap-10 px-6 pt-8 pb-12">
           {/* Success State Mockup (Dismissible) */}
           <AnimatePresence>
             {showToast && (
@@ -227,16 +227,16 @@ export const CourseRegistrationMobile: React.FC = () => {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="relative flex items-start gap-3 p-4 bg-green-50 dark:bg-[#122e18] border border-green-200 dark:border-green-800/50 rounded-2xl shadow-sm"
+                className="relative flex items-start gap-4 p-5 bg-green-50 dark:bg-[#122e18] border border-green-200 dark:border-green-800/50 rounded-2xl shadow-sm"
               >
-                <div className="flex items-center justify-center size-6 rounded-full bg-green-500 text-white shrink-0 mt-0.5">
-                  <Check size={14} weight="bold" />
+                <div className="flex items-center justify-center size-7 rounded-full bg-green-500 text-white shrink-0 mt-0.5 animate-bounce">
+                  <Check size={16} weight="bold" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-green-800 dark:text-green-400">Course Added Successfully</p>
-                  <p className="text-xs text-green-700 dark:text-green-500/80 leading-relaxed mt-0.5">Basic Statistics (STAT201) has been added to your schedule.</p>
+                  <p className="text-xs text-green-700 dark:text-green-500/80 leading-relaxed mt-1">Basic Statistics (STAT201) has been added to your schedule.</p>
                 </div>
-                <button onClick={() => setShowToast(false)} className="text-green-700 dark:text-green-500 hover:text-green-900 dark:hover:text-green-300">
+                <button onClick={() => setShowToast(false)} className="text-green-700 dark:text-green-500 hover:text-green-900 dark:hover:text-green-300 ml-2">
                   <X size={18} />
                 </button>
               </motion.div>
@@ -244,64 +244,64 @@ export const CourseRegistrationMobile: React.FC = () => {
           </AnimatePresence>
 
           {/* Method 1: Code Entry */}
-          <section className="flex flex-col gap-5">
+          <section className="flex flex-col gap-6">
             <div>
-              <h2 className="text-2xl font-bold leading-tight tracking-tight">Add via Code</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-base font-normal mt-2 leading-relaxed">Enter the unique 6-digit code provided by your course instructor.</p>
+              <h2 className="text-2xl font-black leading-tight tracking-tight">Add via Code</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-normal mt-2 leading-relaxed">Enter the unique 6-digit code provided by your course instructor.</p>
             </div>
-            <form onSubmit={handleRegister} className="flex flex-col gap-5">
+            <form onSubmit={handleRegister} className="flex flex-col gap-6">
               <label className="flex flex-col w-full group">
-                <span className="text-sm font-semibold leading-normal pb-2 ml-1 text-slate-700 dark:text-slate-300 group-focus-within:text-primary transition-colors">Course Code</span>
+                <span className="text-xs font-black uppercase tracking-wider pb-3 ml-1 text-slate-500 dark:text-slate-400 group-focus-within:text-primary transition-colors">Course Code</span>
                 <div className="relative">
                   <input
-                    className="w-full rounded-2xl border-2 border-slate-200 dark:border-[#352e18] bg-white dark:bg-[#352e18] h-16 pl-5 pr-14 text-xl tracking-wide font-medium placeholder:text-slate-300 dark:placeholder:text-[#6a5d2f] focus:ring-0 focus:border-primary dark:focus:border-primary transition-all shadow-sm"
+                    className="w-full rounded-2xl border-2 border-slate-200 dark:border-[#352e18] bg-white dark:bg-[#352e18] h-16 pl-6 pr-14 py-6 text-xl tracking-widest font-bold placeholder:text-slate-300 dark:placeholder:text-[#6a5d2f] focus:ring-0 focus:border-primary dark:focus:border-primary transition-all shadow-sm uppercase"
                     placeholder="e.g. CS101"
                     type="text"
                     value={courseCode}
                     onChange={(e) => setCourseCode(e.target.value)}
                   />
                   <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#ccbf8e] pointer-events-none">
-                    <QrCode size={24} />
+                    <QrCode size={26} />
                   </div>
                 </div>
               </label>
               <button
                 type="submit"
-                className="w-full cursor-pointer flex items-center justify-center gap-2 rounded-2xl h-14 bg-primary hover:bg-yellow-400 text-[#231f10] text-base font-bold tracking-wide shadow-lg shadow-primary/20 transition-transform active:scale-[0.98]"
+                className="w-full cursor-pointer flex items-center justify-center gap-3 rounded-2xl h-20 bg-primary hover:bg-yellow-400 text-[#231f10] text-base font-bold tracking-wide shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 <span>Register Course</span>
-                <ArrowRight size={20} weight="bold" />
+                <ArrowRight size={22} weight="bold" />
               </button>
             </form>
           </section>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 py-2 opacity-80">
+          <div className="flex items-center gap-5 py-4 opacity-80">
             <div className="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
-            <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500">Or browse</span>
+            <span className="text-[10px] font-black tracking-widest uppercase text-slate-400 dark:text-slate-500">Or browse</span>
             <div className="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
           </div>
 
           {/* Method 2: Browse Department */}
-          <section className="flex flex-col gap-5">
+          <section className="flex flex-col gap-6">
             <div className="flex justify-between items-end">
               <div>
-                <h2 className="text-xl font-bold leading-tight tracking-tight">Browse Department</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-normal mt-1">Find open electives and major courses.</p>
+                <h2 className="text-2xl font-black leading-tight tracking-tight">Browse Department</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-normal mt-2 leading-relaxed">Find open electives and major courses.</p>
               </div>
             </div>
             {/* Search Bar */}
             <div className="relative group">
-              <MagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <MagnifyingGlass size={22} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
               <input
-                className="w-full rounded-xl border-none bg-slate-100 dark:bg-[#1e1a0d] h-12 pl-12 pr-4 text-base placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full rounded-2xl border-none bg-slate-100 dark:bg-[#1e1a0d] h-14 pl-12 pr-4 text-base placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-primary/50 transition-all"
                 placeholder="Search for departments..."
                 type="text"
               />
             </div>
 
             {/* Department List */}
-            <div className="grid gap-3 mb-6">
+            <div className="grid gap-4 mb-10">
               {[
                 { name: 'Computer Science', code: 'CS', courses: 12, icon: Terminal, color: 'blue' },
                 { name: 'Arts & Design', code: 'AD', courses: 8, icon: Palette, color: 'purple' },
@@ -310,18 +310,18 @@ export const CourseRegistrationMobile: React.FC = () => {
                 <button
                   key={dept.code}
                   onClick={() => setView('searching')}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-[#2c2614] border border-slate-100 dark:border-white/5 shadow-sm hover:border-primary/50 dark:hover:border-primary/50 transition-all group text-left"
+                  className="flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-[#2c2614] border border-slate-100 dark:border-white/5 shadow-sm hover:border-primary/50 dark:hover:border-primary/50 transition-all group text-left"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`size-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform bg-${dept.color}-50 dark:bg-${dept.color}-900/20 text-${dept.color}-600 dark:text-${dept.color}-400`}>
-                      <dept.icon size={24} weight="fill" />
+                    <div className={`size-14 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform bg-${dept.color}-50 dark:bg-${dept.color}-900/20 text-${dept.color}-600 dark:text-${dept.color}-400`}>
+                      <dept.icon size={26} weight="fill" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base text-slate-900 dark:text-white">{dept.name}</h3>
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">{dept.code} • {dept.courses} Courses Open</p>
+                      <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-primary transition-colors">{dept.name}</h3>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{dept.code} • {dept.courses} Courses Open</p>
                     </div>
                   </div>
-                  <CaretRight size={20} className="text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors" />
+                  <CaretRight size={20} className="text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors translate-x-0 group-hover:translate-x-1 duration-200" />
                 </button>
               ))}
             </div>

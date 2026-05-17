@@ -62,10 +62,10 @@ export const MobileLayout: React.FC = () => {
 
   return (
     <div 
-      className="flex flex-col min-h-screen bg-off-white dark:bg-presently-black text-on-surface overflow-x-hidden"
+      className="flex flex-col h-[100dvh] bg-off-white dark:bg-presently-black text-on-surface overflow-hidden"
       style={{
         scrollBehavior: 'smooth',
-        overscrollBehavior: 'contain',
+        overscrollBehavior: 'none',
       }}
     >
       {user?.role !== UserRole.STUDENT && user?.role !== UserRole.CLASS_REP && (
@@ -75,7 +75,13 @@ export const MobileLayout: React.FC = () => {
         />
       )}
 
-      <main className="flex-1 overflow-y-auto no-scrollbar pb-[140px] pt-4" style={{ paddingBottom: 'calc(140px + env(safe-area-inset-bottom))' }}>
+      <main 
+        className="flex-1 overflow-y-auto pb-[140px] pt-4 scrollbar-none" 
+        style={{ 
+          paddingBottom: 'calc(140px + env(safe-area-inset-bottom))',
+          WebkitOverflowScrolling: 'touch' 
+        }}
+      >
         <Outlet />
       </main>
 
