@@ -30,7 +30,7 @@ export const CourseRegistrationMobile: React.FC = () => {
 
   // Home View
   const renderHome = () => (
-    <div className="flex flex-col h-full w-full min-h-screen pb-32 overflow-x-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200">
+    <div className="flex flex-col w-full min-h-screen pb-32 overflow-x-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200">
       {/* Top App Bar */}
       <div className="flex items-center px-6 py-5 justify-between sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-transparent dark:border-white/5">
         <button 
@@ -168,7 +168,7 @@ export const CourseRegistrationMobile: React.FC = () => {
 
   // Results View
   const renderResults = () => (
-    <div className="flex flex-col h-full w-full min-h-screen pb-32 overflow-x-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200">
+    <div className="flex flex-col w-full min-h-screen pb-32 overflow-x-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200">
       <div className="flex items-center px-6 py-5 justify-between sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-slate-200 dark:border-white/5">
         <button 
           onClick={() => setCurrentView('HOME')}
@@ -302,7 +302,7 @@ export const CourseRegistrationMobile: React.FC = () => {
 
   // Success View
   const renderSuccess = () => (
-    <div className="flex flex-col h-screen w-full items-center justify-between pb-32 pt-16 overflow-hidden bg-[#12110a] text-white">
+    <div className="flex flex-col min-h-screen w-full items-center justify-between pb-32 pt-16 overflow-x-hidden bg-[#12110a] text-white relative">
       {/* Decorative Glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-[250px] h-[250px] bg-primary/5 rounded-full blur-[80px] pointer-events-none"></div>
