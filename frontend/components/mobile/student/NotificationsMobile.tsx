@@ -6,7 +6,7 @@ import {
   CheckCircle,
   Clock,
   Warning,
-  Assignment,
+  FileText,
   Calendar,
   Circle
 } from '@phosphor-icons/react';
@@ -48,7 +48,7 @@ export const NotificationsMobile: React.FC = () => {
       title: 'New Assignment Posted',
       desc: 'World History • Yesterday',
       time: 'Yesterday',
-      icon: Assignment,
+      icon: FileText,
       unread: false,
       type: 'info'
     },

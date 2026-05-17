@@ -8,7 +8,7 @@ import {
   MagnifyingGlass,
   Terminal,
   Palette,
-  Engine,
+  Toolbox,
   CaretRight,
   PlusCircle,
   BookmarkSimple,
@@ -305,7 +305,7 @@ export const CourseRegistrationMobile: React.FC = () => {
               {[
                 { name: 'Computer Science', code: 'CS', courses: 12, icon: Terminal, color: 'blue' },
                 { name: 'Arts & Design', code: 'AD', courses: 8, icon: Palette, color: 'purple' },
-                { name: 'Engineering', code: 'ENG', courses: 15, icon: Engine, color: 'orange' }
+                { name: 'Engineering', code: 'ENG', courses: 15, icon: Toolbox, color: 'orange' }
               ].map((dept) => (
                 <button
                   key={dept.code}

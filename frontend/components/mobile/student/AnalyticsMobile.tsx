@@ -4,8 +4,8 @@ import {
   ArrowLeft,
   CaretDown,
   TrendUp,
-  Calculator,
-  Science,
+  MathOperations,
+  Atom,
   Palette,
   Code
 } from '@phosphor-icons/react';
@@ -120,8 +120,8 @@ export const AnalyticsMobile: React.FC = () => {
         </div>
         <div className="flex flex-col gap-3 px-4">
           {[
-            { name: 'Advanced Calculus', icon: Calculator, progress: 95, color: 'primary' },
-            { name: 'Physics II', icon: Science, progress: 88, color: 'blue' },
+            { name: 'Advanced Calculus', icon: MathOperations, progress: 95, color: 'primary' },
+            { name: 'Physics II', icon: Atom, progress: 88, color: 'blue' },
             { name: 'History of Art', icon: Palette, progress: 65, color: 'gray' },
             { name: 'Comp Sci 101', icon: Code, progress: 98, color: 'purple' }
           ].map((course) => (

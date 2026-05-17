@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   CaretLeft,
-  Settings,
+  Gear,
   Bell,
   Question,
   CaretRight,
@@ -65,7 +65,7 @@ export const ProfileMobile: React.FC = () => {
         {/* ListItems */}
         <div className="mt-4 flex flex-col gap-1">
           {[
-            { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
+            { label: 'Settings', icon: Gear, path: '/dashboard/settings' },
             { label: 'Notifications', icon: Bell, path: '/dashboard/notifications' },
             { label: 'Help & Support', icon: Question, path: '/help' }
           ].map((item) => (
