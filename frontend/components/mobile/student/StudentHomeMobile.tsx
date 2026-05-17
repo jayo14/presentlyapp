@@ -23,7 +23,7 @@ export const StudentHomeMobile: React.FC = () => {
             <div className="relative">
               <div
                 className="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-primary"
-                style={{ backgroundImage: `url(${user?.profile_picture || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=256&h=256&auto=format&fit=crop'})` }}
+                style={{ backgroundImage: `url(${user?.avatar_url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=256&h=256&auto=format&fit=crop'})` }}
               />
               <div className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-background-light dark:border-background-dark"></div>
             </div>

@@ -36,7 +36,7 @@ export const ProfileMobile: React.FC = () => {
             <div className="flex gap-4 flex-col items-center">
               <div
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full border-4 border-primary/20 min-h-32 w-32"
-                style={{ backgroundImage: `url(${user?.profile_picture || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=256&h=256&auto=format&fit=crop'})` }}
+                style={{ backgroundImage: `url(${user?.avatar_url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=256&h=256&auto=format&fit=crop'})` }}
               />
               <div className="flex flex-col items-center justify-center">
                 <p className="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] text-center">{user?.full_name || 'Alex Johnson'}</p>
