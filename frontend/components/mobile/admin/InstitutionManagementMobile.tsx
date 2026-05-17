@@ -34,10 +34,12 @@ export const InstitutionManagementMobile: React.FC = () => {
     }
   };
 
-  const filteredInstitutions = institutions.filter(inst =>
-    inst.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inst.short_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInstitutions = institutions.filter(inst => {
+    const name = inst.name || inst.full_name || '';
+    const shortName = inst.short_name || inst.abbreviation || '';
+    return name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           shortName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const handleSaveInstitution = async (formData: Partial<Institution>) => {
     try {

@@ -73,18 +73,24 @@ export const StudentCoursesMobile: React.FC = () => {
         >
           <ArrowLeft size={24} />
         </button>
-        <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12 text-gray-900 dark:text-white">My Courses</h2>
+        <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center text-gray-900 dark:text-white">My Courses</h2>
+        <button 
+          onClick={() => navigate('/dashboard/courses/register')}
+          className="flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-white/10 cursor-pointer text-gray-900 dark:text-white"
+        >
+          <Plus size={24} />
+        </button>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto px-4">
+      <main className="flex-1 overflow-y-auto px-6">
         {/* Course List */}
-        <div className="flex flex-col gap-4 py-2">
+        <div className="flex flex-col gap-6 py-3">
           {courses.map((course) => (
-            <div key={course.id} className="flex flex-col p-4 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-white/5">
+            <div key={course.id} className="flex flex-col p-6 bg-surface-light dark:bg-surface-dark rounded-[24px] shadow-sm border border-gray-200 dark:border-white/5">
               <div className="flex gap-4">
                 <div
-                  className="bg-center bg-no-repeat bg-cover rounded-lg w-[70px] h-[70px] shrink-0"
+                  className="bg-center bg-no-repeat bg-cover rounded-xl w-20 h-20 shrink-0"
                   style={{ backgroundImage: `url(${course.image})` }}
                 ></div>
                 <div className="flex flex-1 flex-col justify-center min-w-0">
@@ -101,7 +107,7 @@ export const StudentCoursesMobile: React.FC = () => {
                   <p className="text-gray-500 dark:text-[#ccbf8e] text-sm font-normal leading-normal truncate">{course.code} • {course.prof}</p>
                 </div>
               </div>
-              <div className="mt-4">
+              <div className="mt-5">
                 <div className="flex justify-between items-end mb-1">
                   <span className="text-gray-500 dark:text-[#ccbf8e] text-xs font-medium">Attendance</span>
                   <span className="text-gray-900 dark:text-white text-sm font-bold">{course.attendance}%</span>

@@ -68,10 +68,12 @@ export const MobileLayout: React.FC = () => {
         overscrollBehavior: 'contain',
       }}
     >
-      <MobileHeader 
-        isSidebarOpen={isSidebarOpen}
-        onOpenSidebar={() => setIsSidebarOpen(true)}
-      />
+      {user?.role !== UserRole.STUDENT && user?.role !== UserRole.CLASS_REP && (
+        <MobileHeader 
+          isSidebarOpen={isSidebarOpen}
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+        />
+      )}
 
       <main className="flex-1 overflow-y-auto no-scrollbar pb-[140px] pt-4" style={{ paddingBottom: 'calc(140px + env(safe-area-inset-bottom))' }}>
         <Outlet />

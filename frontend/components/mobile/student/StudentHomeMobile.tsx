@@ -43,7 +43,7 @@ export const StudentHomeMobile: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex flex-col gap-6 p-4">
+      <main className="flex flex-col gap-8 px-6 py-5">
         {/* Live Class Card */}
         <section>
           <div className="flex items-center justify-between mb-2 px-1">
@@ -53,7 +53,7 @@ export const StudentHomeMobile: React.FC = () => {
               LIVE
             </span>
           </div>
-          <div className="relative overflow-hidden rounded-2xl bg-surface-light dark:bg-surface-dark shadow-xl border border-gray-100 dark:border-white/5">
+          <div className="relative overflow-hidden rounded-[28px] bg-surface-light dark:bg-surface-dark shadow-xl border border-gray-100 dark:border-white/5">
             {/* Background Image Overlay */}
             <div
               className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none"
@@ -63,7 +63,7 @@ export const StudentHomeMobile: React.FC = () => {
                 backgroundPosition: 'center'
               }}
             />
-            <div className="relative p-5 flex flex-col gap-4 z-10">
+            <div className="relative p-6 flex flex-col gap-5 z-10">
               <div className="flex justify-between items-start">
                 <div>
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/20 text-yellow-700 dark:text-yellow-400 text-xs font-bold mb-2">
@@ -95,8 +95,8 @@ export const StudentHomeMobile: React.FC = () => {
         {/* Attendance Summary */}
         <section>
           <h3 className="text-lg font-bold px-1 mb-3">Attendance Summary</h3>
-          <div className="rounded-2xl bg-surface-light dark:bg-surface-dark shadow-md p-5 border border-gray-100 dark:border-white/5">
-            <div className="flex flex-col gap-6 items-center">
+          <div className="rounded-[28px] bg-surface-light dark:bg-surface-dark shadow-md p-6 border border-gray-100 dark:border-white/5">
+            <div className="flex flex-col gap-8 items-center">
               {/* Circular Progress */}
               <div className="relative size-36 shrink-0">
                 <svg className="size-full rotate-[-90deg]" viewBox="0 0 100 100">
@@ -121,15 +121,15 @@ export const StudentHomeMobile: React.FC = () => {
               </div>
               {/* Stats Grid */}
               <div className="grid grid-cols-3 gap-3 w-full">
-                <div className="flex flex-col gap-1 items-center justify-center p-3 rounded-xl bg-background-light dark:bg-background-dark border border-gray-200 dark:border-surface-highlight">
+                <div className="flex flex-col gap-1.5 items-center justify-center p-4 rounded-2xl bg-background-light dark:bg-background-dark border border-gray-200 dark:border-surface-highlight">
                   <span className="text-2xl font-bold text-slate-800 dark:text-white">42</span>
                   <span className="text-xs text-text-secondary-light dark:text-text-secondary">Classes</span>
                 </div>
-                <div className="flex flex-col gap-1 items-center justify-center p-3 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30">
+                <div className="flex flex-col gap-1.5 items-center justify-center p-4 rounded-2xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30">
                   <span className="text-2xl font-bold text-green-600 dark:text-green-400">38</span>
                   <span className="text-xs text-green-700/70 dark:text-green-400/70">Attended</span>
                 </div>
-                <div className="flex flex-col gap-1 items-center justify-center p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30">
+                <div className="flex flex-col gap-1.5 items-center justify-center p-4 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30">
                   <span className="text-2xl font-bold text-red-600 dark:text-red-400">4</span>
                   <span className="text-xs text-red-700/70 dark:text-red-400/70">Missed</span>
                 </div>
@@ -149,9 +149,9 @@ export const StudentHomeMobile: React.FC = () => {
               View All
             </button>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {/* Item 1 */}
-            <div className="group flex items-center justify-between p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
+            <div className="group flex items-center justify-between p-5 rounded-2xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
               <div className="flex items-center gap-4">
                 <div className="size-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
                   <Check size={20} weight="bold" />
@@ -161,12 +161,12 @@ export const StudentHomeMobile: React.FC = () => {
                   <p className="text-xs text-text-secondary-light dark:text-text-secondary">Today, 09:00 AM</p>
                 </div>
               </div>
-              <div className="px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400">
+              <div className="px-2.5 py-1 rounded-lg text-xs font-bold bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400">
                 Present
               </div>
             </div>
             {/* Item 2 */}
-            <div className="group flex items-center justify-between p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
+            <div className="group flex items-center justify-between p-5 rounded-2xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
               <div className="flex items-center gap-4">
                 <div className="size-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
                   <Check size={20} weight="bold" />
@@ -176,12 +176,12 @@ export const StudentHomeMobile: React.FC = () => {
                   <p className="text-xs text-text-secondary-light dark:text-text-secondary">Yesterday, 2:00 PM</p>
                 </div>
               </div>
-              <div className="px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400">
+              <div className="px-2.5 py-1 rounded-lg text-xs font-bold bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400">
                 Present
               </div>
             </div>
             {/* Item 3 */}
-            <div className="group flex items-center justify-between p-4 rounded-xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
+            <div className="group flex items-center justify-between p-5 rounded-2xl bg-surface-light dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors">
               <div className="flex items-center gap-4">
                 <div className="size-10 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center">
                   <X size={20} weight="bold" />
@@ -191,7 +191,7 @@ export const StudentHomeMobile: React.FC = () => {
                   <p className="text-xs text-text-secondary-light dark:text-text-secondary">Mon, 11:00 AM</p>
                 </div>
               </div>
-              <div className="px-2 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400">
+              <div className="px-2.5 py-1 rounded-lg text-xs font-bold bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400">
                 Missed
               </div>
             </div>

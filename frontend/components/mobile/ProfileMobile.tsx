@@ -6,97 +6,142 @@ import {
   Bell,
   Question,
   CaretRight,
-  User,
-  SignOut
+  SignOut,
+  GraduationCap,
+  ShieldCheck
 } from '@phosphor-icons/react';
 import { useCurrentUser, useLogout } from '../../hooks/useAuth';
+import { motion } from 'framer-motion';
 
 export const ProfileMobile: React.FC = () => {
   const navigate = useNavigate();
   const { data: user } = useCurrentUser();
   const logout = useLogout();
 
+  const menuItems = [
+    { label: 'Settings', icon: Gear, path: '/dashboard/settings', color: 'bg-sungold/15 text-sungold dark:bg-sungold/20' },
+    { label: 'Notifications', icon: Bell, path: '/dashboard/notifications', color: 'bg-blue-500/15 text-blue-500 dark:bg-blue-500/20' },
+    { label: 'Security & Devices', icon: ShieldCheck, path: '/dashboard/security', color: 'bg-emerald-500/15 text-emerald-500 dark:bg-emerald-500/20' },
+    { label: 'Help & Support', icon: Question, path: '/help', color: 'bg-purple-500/15 text-purple-500 dark:bg-purple-500/20' }
+  ];
+
   return (
-    <div className="bg-background-light dark:bg-background-dark min-h-screen pb-24">
-      <div className="relative flex h-full min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
-        {/* TopAppBar */}
-        <div className="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-gray-900 dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full active:bg-gray-200 dark:active:bg-white/10 transition-colors"
-          >
-            <CaretLeft size={24} weight="bold" />
-          </button>
-          <h2 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Profile</h2>
+    <div className="bg-background-light dark:bg-background-dark min-h-screen pb-32">
+      {/* Premium Profile Header with Top Banner */}
+      <div className="relative w-full overflow-hidden">
+        {/* Colorful Elegant Brand Gradient Banner */}
+        <div className="h-44 w-full bg-gradient-to-tr from-amber-400 via-sungold to-yellow-300 dark:from-amber-500 dark:via-sungold dark:to-yellow-400 relative">
+          <div className="absolute inset-0 bg-black/5 dark:bg-black/10 backdrop-blur-[1px]" />
+          {/* Symmetrical Header Back Button */}
+          <div className="absolute top-4 left-4 z-20">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex size-11 items-center justify-center rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-md text-white border border-white/20 active:scale-90 transition-transform"
+            >
+              <CaretLeft size={24} weight="bold" />
+            </button>
+          </div>
+          <div className="absolute top-7 left-0 right-0 text-center z-10">
+            <h2 className="text-white text-lg font-bold tracking-tight">Profile</h2>
+          </div>
         </div>
 
-        {/* ProfileHeader */}
-        <div className="flex p-4">
-          <div className="flex w-full flex-col gap-4 items-center">
-            <div className="flex gap-4 flex-col items-center">
+        {/* User Card overlap */}
+        <div className="px-6 -mt-16 relative z-10">
+          <div className="bg-white dark:bg-surface-dark rounded-[32px] p-6 shadow-xl border border-gray-100 dark:border-white/5 flex flex-col items-center">
+            {/* Avatar overlapping top with golden border and shadow */}
+            <motion.div
+              whileTap={{ scale: 0.96 }}
+              className="relative -mt-20 mb-4"
+            >
               <div
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full border-4 border-primary/20 min-h-32 w-32"
+                className="bg-center bg-no-repeat bg-cover rounded-full border-4 border-white dark:border-surface-dark shadow-2xl size-28"
                 style={{ backgroundImage: `url(${user?.avatar_url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=256&h=256&auto=format&fit=crop'})` }}
               />
-              <div className="flex flex-col items-center justify-center">
-                <p className="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] text-center">{user?.full_name || 'Alex Johnson'}</p>
-                <p className="text-gray-600 dark:text-[#ccbf8e] text-base font-normal leading-normal text-center">U2023-4452</p>
+              <div className="absolute bottom-1 right-1 size-5 bg-green-500 rounded-full border-2 border-white dark:border-surface-dark shadow-md" />
+            </motion.div>
+
+            {/* Profile Info */}
+            <div className="text-center w-full">
+              <h2 className="text-gray-900 dark:text-white text-2xl font-black tracking-tight mb-1">
+                {user?.full_name || 'Alex Johnson'}
+              </h2>
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sungold/15 text-sungold">
+                  {user?.role?.replace('_', ' ') || 'Student'}
+                </span>
+                <span className="text-gray-400 dark:text-[#ccbf8e]/70 text-xs font-bold font-mono">
+                  {user?.matric_number || 'U2023/4452'}
+                </span>
+              </div>
+              <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                <GraduationCap size={16} className="text-sungold" />
+                <span className="font-semibold truncate max-w-[200px]">
+                  {user?.department || 'Computer Science'}
+                </span>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ProfileStats */}
-        <div className="flex flex-wrap gap-3 px-4 py-3">
-          <div className="flex min-w-[111px] flex-1 basis-[fit-content] flex-col gap-2 rounded-xl border border-gray-200 dark:border-[#6a5d2f] p-4 items-center text-center bg-white dark:bg-transparent">
-            <p className="text-primary tracking-light text-2xl font-bold leading-tight">92%</p>
-            <div className="flex items-center gap-2">
-              <p className="text-gray-600 dark:text-[#ccbf8e] text-sm font-normal leading-normal">Avg Attendance</p>
-            </div>
+      {/* Spaced Bento Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 px-6 mt-6">
+        <motion.div 
+          whileTap={{ scale: 0.98 }}
+          className="flex flex-col gap-2 rounded-[24px] border border-gray-100 dark:border-white/5 p-5 bg-white dark:bg-surface-dark shadow-sm"
+        >
+          <p className="text-sungold tracking-tight text-3xl font-black">92.5%</p>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-[#ccbf8e]">
+            <span className="size-2 bg-green-500 rounded-full" />
+            Avg Attendance
           </div>
-          <div className="flex min-w-[111px] flex-1 basis-[fit-content] flex-col gap-2 rounded-xl border border-gray-200 dark:border-[#6a5d2f] p-4 items-center text-center bg-white dark:bg-transparent">
-            <p className="text-primary tracking-light text-2xl font-bold leading-tight">6</p>
-            <div className="flex items-center gap-2">
-              <p className="text-gray-600 dark:text-[#ccbf8e] text-sm font-normal leading-normal">Courses</p>
-            </div>
+        </motion.div>
+        
+        <motion.div 
+          whileTap={{ scale: 0.98 }}
+          className="flex flex-col gap-2 rounded-[24px] border border-gray-100 dark:border-white/5 p-5 bg-white dark:bg-surface-dark shadow-sm"
+        >
+          <p className="text-sungold tracking-tight text-3xl font-black">6</p>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-[#ccbf8e]">
+            <span className="size-2 bg-sungold rounded-full" />
+            Enrolled Courses
           </div>
-        </div>
+        </motion.div>
+      </div>
 
-        {/* ListItems */}
-        <div className="mt-4 flex flex-col gap-1">
-          {[
-            { label: 'Settings', icon: Gear, path: '/dashboard/settings' },
-            { label: 'Notifications', icon: Bell, path: '/dashboard/notifications' },
-            { label: 'Help & Support', icon: Question, path: '/help' }
-          ].map((item) => (
-            <button
-              key={item.label}
-              onClick={() => navigate(item.path)}
-              className="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 min-h-16 justify-between active:bg-gray-100 dark:active:bg-white/5 transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <div className="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-11">
-                  <item.icon size={22} weight="duotone" />
-                </div>
-                <p className="text-gray-900 dark:text-white text-base font-medium leading-normal flex-1 truncate">{item.label}</p>
-              </div>
-              <div className="shrink-0 text-gray-400 dark:text-white/50">
-                <CaretRight size={20} />
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Logout Button */}
-        <div className="mt-8 px-4">
-          <button
-            onClick={() => logout.mutate()}
-            className="w-full py-4 text-red-500 dark:text-red-400 font-semibold text-center rounded-xl bg-red-50 dark:bg-red-500/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+      {/* Redesigned Premium Options List */}
+      <div className="mt-8 px-6 flex flex-col gap-3">
+        {menuItems.map((item, index) => (
+          <motion.button
+            key={item.label}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate(item.path)}
+            className="flex items-center gap-4 bg-white dark:bg-surface-dark px-5 py-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm justify-between active:bg-gray-50 dark:active:bg-white/5 transition-all"
           >
-            <SignOut size={20} weight="bold" />
-            Logout
-          </button>
-        </div>
+            <div className="flex items-center gap-4">
+              <div className={`flex items-center justify-center rounded-xl shrink-0 size-11 ${item.color}`}>
+                <item.icon size={22} weight="duotone" />
+              </div>
+              <p className="text-gray-900 dark:text-white text-base font-bold tracking-tight">{item.label}</p>
+            </div>
+            <div className="shrink-0 text-gray-400 dark:text-white/40">
+              <CaretRight size={20} weight="bold" />
+            </div>
+          </motion.button>
+        ))}
+      </div>
+
+      {/* Styled Tactile Logout Button */}
+      <div className="mt-8 px-6">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => logout.mutate()}
+          className="w-full py-4 text-red-600 dark:text-red-400 font-bold text-center rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-900/20 active:bg-red-100 dark:active:bg-red-500/20 transition-all flex items-center justify-center gap-2 shadow-sm"
+        >
+          <SignOut size={20} weight="bold" />
+          Log Out
+        </motion.button>
       </div>
     </div>
   );

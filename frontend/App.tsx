@@ -172,7 +172,7 @@ warmUpBackend();
 
 // Wrapper for Layout to handle props from context/hooks
 const DashboardLayout: React.FC = () => {
-    const { data: user, isLoading } = { data: { role: "ADMIN", full_name: "Jules Engineer", avatar_url: null }, isLoading: false };
+    const { data: user, isLoading } = useCurrentUser();
     const logoutMutation = useLogout();
     const location = useLocation();
     const navigate = useNavigate();
@@ -223,7 +223,7 @@ const DashboardHome: React.FC = () => {
 };
 
 const AdminRoute: React.FC<{ children: React.ReactNode; requiredPermission?: string }> = ({ children, requiredPermission }) => {
-    const { data: user, isLoading } = { data: { role: "ADMIN", full_name: "Jules Engineer", avatar_url: null }, isLoading: false };
+    const { data: user, isLoading } = useCurrentUser();
   const location = useLocation();
     
     if (isLoading) return <LoadingFallback />;
@@ -264,7 +264,7 @@ const AdminRoute: React.FC<{ children: React.ReactNode; requiredPermission?: str
 
 // Lecturer Route Guard
 const LecturerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { data: user, isLoading } = { data: { role: "ADMIN", full_name: "Jules Engineer", avatar_url: null }, isLoading: false };
+    const { data: user, isLoading } = useCurrentUser();
   const location = useLocation();
     
     if (isLoading) return <LoadingFallback />;
@@ -287,7 +287,7 @@ const LecturerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
 // Class Rep Route Guard
 const ClassRepRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { data: user, isLoading } = { data: { role: "ADMIN", full_name: "Jules Engineer", avatar_url: null }, isLoading: false };
+    const { data: user, isLoading } = useCurrentUser();
   const location = useLocation();
     
     if (isLoading) return <LoadingFallback />;
