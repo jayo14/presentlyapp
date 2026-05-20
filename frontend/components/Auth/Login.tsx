@@ -9,6 +9,7 @@ import { Logo } from '../Logo';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { cn } from '../../src/components/ui/utils';
+import { getGoogleAuthRedirectUri } from '../../utils/authRedirect';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -65,12 +66,6 @@ export const Login: React.FC = () => {
         });
       }
     });
-  };
-
-  const getGoogleAuthRedirectUri = () => {
-    const rawApi = (import.meta.env.VITE_API_URL || 'http://localhost:8000').trim().replace(/\/+$/, '');
-    const apiBase = /\/api$/i.test(rawApi) ? rawApi : `${rawApi}/api`;
-    return `${apiBase}/auth/google/callback/`;
   };
 
   const handleGoogleLogin = () => {
