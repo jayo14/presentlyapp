@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 import {
   Home,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                Users,
+  Users,
   Calendar,
   CheckCircle2,
   ClipboardList,

@@ -1,8 +1,5 @@
 import * as React from "react"
-
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
+import { useNavigate, useLocation } from "react-router-dom"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -12,193 +9,97 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
 } from "@/components/ui/sidebar"
-import { SquaresFourIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, GearIcon, QuestionIcon, MagnifyingGlassIcon, DatabaseIcon, ChartLineIcon, FileIcon, CommandIcon } from "@phosphor-icons/react"
+import { Logo } from "../../components/Logo"
+import { getNavItemsForRole, NavItem } from "../../utils/navigation"
+import { useCurrentUser } from "../../hooks/useAuth"
+import { cn } from "@/components/ui/utils"
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: (
-        <SquaresFourIcon
-        />
-      ),
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: (
-        <ListIcon
-        />
-      ),
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: (
-        <ChartBarIcon
-        />
-      ),
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: (
-        <FolderIcon
-        />
-      ),
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: (
-        <UsersIcon
-        />
-      ),
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: (
-        <CameraIcon
-        />
-      ),
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: (
-        <GearIcon
-        />
-      ),
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: (
-        <QuestionIcon
-        />
-      ),
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: (
-        <MagnifyingGlassIcon
-        />
-      ),
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: (
-        <ChartLineIcon
-        />
-      ),
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: (
-        <FileIcon
-        />
-      ),
-    },
-  ],
-}
+export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof Sidebar> & { onLogout?: () => void }) {
+  const { data: currentUser } = useCurrentUser()
+  const navigate = useNavigate()
+  const location = useLocation()
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const role = currentUser?.role?.toLowerCase() || "student"
+  const navItems = getNavItemsForRole(role)
+
+  const coreItems = navItems.filter(item => item.section === 'core')
+  const managementItems = navItems.filter(item => item.section === 'management')
+  const systemItems = navItems.filter(item => item.section === 'system')
+
+  const renderNavGroup = (label: string, items: NavItem[]) => {
+    if (items.length === 0) return null
+    return (
+      <SidebarGroup>
+        <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/70 px-4 mb-2">
+          {label}
+        </SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu className="px-2 gap-1">
+            {items.map((item) => {
+              const Icon = item.icon
+              const active = location.pathname === item.href || location.pathname.startsWith(item.href + '/')
+              return (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    isActive={active}
+                    onClick={() => navigate(item.href)}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 ease-premium font-bold",
+                      active
+                        ? "bg-sungold text-presently-black shadow-gold hover:bg-sungold hover:text-presently-black"
+                        : "text-on-surface-variant hover:bg-surface-highest hover:text-on-surface"
+                    )}
+                  >
+                    <Icon size={20} className={cn("shrink-0", active ? "text-presently-black" : "group-hover:scale-110 transition-transform")} />
+                    <span className="text-sm tracking-tight">{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            })}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    )
+  }
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+    <Sidebar collapsible="offcanvas" className="border-r border-outline/50 bg-surface" {...props}>
+      <SidebarHeader className="p-6">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              size="lg"
+              className="hover:bg-transparent focus:bg-transparent"
+              onClick={() => navigate('/dashboard')}
             >
-              <a href="#">
-                <CommandIcon className="size-5!" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
+              <Logo showText={true} />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+
+      <SidebarContent className="gap-6 py-4">
+        {renderNavGroup("Core", coreItems)}
+        {renderNavGroup("Management", managementItems)}
+        {renderNavGroup("System", systemItems)}
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
+
+      <SidebarFooter className="p-4 border-t border-outline/30">
+        {currentUser && (
+          <NavUser
+            user={{
+              name: currentUser.full_name || "User",
+              email: currentUser.email || "",
+              avatar: currentUser.avatar_url,
+              role: currentUser.role
+            }}
+            onLogout={onLogout || (() => {})}
+          />
+        )}
       </SidebarFooter>
     </Sidebar>
   )
