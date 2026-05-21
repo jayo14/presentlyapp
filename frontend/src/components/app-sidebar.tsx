@@ -17,6 +17,7 @@ import { Logo } from "../../components/Logo"
 import { getNavItemsForRole, NavItem } from "../../utils/navigation"
 import { useCurrentUser } from "../../hooks/useAuth"
 import { cn } from "@/components/ui/utils"
+import { motion } from "framer-motion"
 
 export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof Sidebar> & { onLogout?: () => void }) {
   const { data: currentUser } = useCurrentUser()
@@ -33,29 +34,41 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
   const renderNavGroup = (label: string, items: NavItem[]) => {
     if (items.length === 0) return null
     return (
-      <SidebarGroup>
-        <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/70 px-4 mb-2">
+      <SidebarGroup className="px-3">
+        <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.2em] font-black text-on-surface-variant/50 px-4 mb-3">
           {label}
         </SidebarGroupLabel>
         <SidebarGroupContent>
-          <SidebarMenu className="px-2 gap-1">
+          <SidebarMenu className="gap-1.5">
             {items.map((item) => {
               const Icon = item.icon
-              const active = location.pathname === item.href || location.pathname.startsWith(item.href + '/')
+              const active = location.pathname === item.href || (item.href !== '/dashboard' && location.pathname.startsWith(item.href))
               return (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     isActive={active}
                     onClick={() => navigate(item.href)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 ease-premium font-bold",
+                      "flex items-center gap-3.5 px-4 py-6 rounded-2xl transition-all duration-500 ease-premium font-bold border border-transparent",
                       active
-                        ? "bg-sungold text-presently-black shadow-gold hover:bg-sungold hover:text-presently-black"
-                        : "text-on-surface-variant hover:bg-surface-highest hover:text-on-surface"
+                        ? "bg-sungold text-presently-black shadow-gold border-sungold/50 hover:bg-sungold hover:text-presently-black scale-[1.02]"
+                        : "text-on-surface-variant/80 hover:bg-surface-highest/80 hover:text-on-surface hover:border-outline/30 hover:translate-x-1"
                     )}
                   >
-                    <Icon size={20} className={cn("shrink-0", active ? "text-presently-black" : "group-hover:scale-110 transition-transform")} />
-                    <span className="text-sm tracking-tight">{item.label}</span>
+                    <div className={cn(
+                      "flex items-center justify-center rounded-xl transition-all duration-500",
+                      active ? "text-presently-black" : "text-on-surface-variant group-hover:scale-110"
+                    )}>
+                      <Icon size={20} strokeWidth={active ? 2.5 : 2} />
+                    </div>
+                    <span className="text-[13px] tracking-tight">{item.label}</span>
+                    {active && (
+                      <motion.div
+                        layoutId="active-indicator"
+                        className="absolute right-3 w-1.5 h-1.5 rounded-full bg-presently-black"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )
@@ -67,8 +80,8 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
   }
 
   return (
-    <Sidebar collapsible="offcanvas" className="border-r border-outline/50 bg-surface" {...props}>
-      <SidebarHeader className="p-6">
+    <Sidebar collapsible="offcanvas" className="border-r border-outline/40 bg-surface selection:bg-sungold/30" {...props}>
+      <SidebarHeader className="p-8 pb-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
