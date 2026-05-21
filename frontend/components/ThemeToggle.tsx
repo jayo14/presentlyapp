@@ -9,36 +9,39 @@ export const ThemeToggle: React.FC = () => {
     <div className="flex items-center gap-1 p-1 bg-surface-container rounded-full border border-outline/20">
       <button
         onClick={() => setTheme('light')}
-        className={`p-1 rounded-full transition-all ${
+        className={`p-1.5 rounded-full transition-all ${
           theme === 'light' 
-            ? 'bg-primary text-on-primary-fixed shadow-sm' 
-            : 'text-textMuted hover:bg-surface-variant'
+            ? 'bg-sungold text-presently-black shadow-sm'
+            : 'text-on-surface-variant hover:bg-surface-highest'
         }`}
         title="Light Mode"
+        aria-label="Switch to light theme"
       >
-        <Sun size={14} />
+        <Sun size={14} weight={theme === 'light' ? 'bold' : 'regular'} />
       </button>
       <button
         onClick={() => setTheme('dark')}
-        className={`p-1 rounded-full transition-all ${
+        className={`p-1.5 rounded-full transition-all ${
           theme === 'dark' 
-            ? 'bg-primary text-on-primary-fixed shadow-sm' 
-            : 'text-textMuted hover:bg-surface-variant'
+            ? 'bg-sungold text-presently-black shadow-sm'
+            : 'text-on-surface-variant hover:bg-surface-highest'
         }`}
         title="Dark Mode"
+        aria-label="Switch to dark theme"
       >
-        <Moon size={14} />
+        <Moon size={14} weight={theme === 'dark' ? 'bold' : 'regular'} />
       </button>
       <button
         onClick={() => setTheme('system')}
-        className={`rounded-full transition-all ${
+        className={`p-1.5 rounded-full transition-all ${
           theme === 'system' 
-            ? 'bg-primary text-on-primary-fixed shadow-sm' 
-            : 'text-textMuted hover:bg-surface-variant'
+            ? 'bg-sungold text-presently-black shadow-sm'
+            : 'text-on-surface-variant hover:bg-surface-highest'
         }`}
         title="System Theme"
+        aria-label="Switch to system theme"
       >
-        <Monitor size={14} />
+        <Monitor size={14} weight={theme === 'system' ? 'bold' : 'regular'} />
       </button>
     </div>
   );

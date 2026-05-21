@@ -35,7 +35,10 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
 
           <div className="hidden sm:flex items-center gap-2">
             <ThemeToggle />
-            <button className="p-2.5 hover:bg-surface-highest rounded-full transition-colors relative group">
+            <button
+              aria-label="View notifications"
+              className="p-2.5 hover:bg-surface-highest rounded-full transition-colors relative group"
+            >
               <Bell size={18} className="text-on-surface-variant group-hover:text-on-surface transition-colors" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-sungold rounded-full border-2 border-surface shadow-gold" />
             </button>
@@ -43,16 +46,16 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
 
           <div className="h-8 w-[1px] bg-outline/30 mx-1 hidden lg:block" />
 
-          <div className="flex items-center gap-3 pl-2">
+          <div className="flex items-center gap-4 pl-2">
             <div className="text-right hidden lg:block">
-              <p className="text-xs font-bold text-on-surface">
+              <p className="text-sm font-black text-on-surface leading-none mb-1">
                 {currentUser?.full_name?.split(' ')[0] || 'User'}
               </p>
-              <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-[0.15em] opacity-60">
                 {currentUser?.role?.replace('_', ' ') || 'Guest'}
               </p>
             </div>
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-outline bg-primary/10 flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-outline/50 bg-primary/10 flex-shrink-0 transition-transform hover:scale-105 duration-300">
               {currentUser?.avatar_url ? (
                 <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
               ) : (
