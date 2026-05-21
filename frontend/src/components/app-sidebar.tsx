@@ -17,6 +17,7 @@ import { Logo } from "../../components/Logo"
 import { getNavItemsForRole, NavItem } from "../../utils/navigation"
 import { useCurrentUser } from "../../hooks/useAuth"
 import { cn } from "@/components/ui/utils"
+import { motion } from "framer-motion"
 
 export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof Sidebar> & { onLogout?: () => void }) {
   const { data: currentUser } = useCurrentUser()
@@ -58,7 +59,7 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
                       "flex items-center justify-center rounded-xl transition-all duration-500",
                       active ? "text-presently-black" : "text-on-surface-variant group-hover:scale-110"
                     )}>
-                      <Icon size={20} weight={active ? "bold" : "regular"} />
+                      <Icon size={20} strokeWidth={active ? 2.5 : 2} />
                     </div>
                     <span className="text-[13px] tracking-tight">{item.label}</span>
                     {active && (

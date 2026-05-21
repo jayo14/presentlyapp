@@ -17,7 +17,7 @@ export const ThemeToggle: React.FC = () => {
         title="Light Mode"
         aria-label="Switch to light theme"
       >
-        <Sun size={14} weight={theme === 'light' ? 'bold' : 'regular'} />
+        <Sun size={14} strokeWidth={theme === 'light' ? 2.5 : 2} />
       </button>
       <button
         onClick={() => setTheme('dark')}
@@ -29,7 +29,7 @@ export const ThemeToggle: React.FC = () => {
         title="Dark Mode"
         aria-label="Switch to dark theme"
       >
-        <Moon size={14} weight={theme === 'dark' ? 'bold' : 'regular'} />
+        <Moon size={14} strokeWidth={theme === 'dark' ? 2.5 : 2} />
       </button>
       <button
         onClick={() => setTheme('system')}
@@ -41,7 +41,7 @@ export const ThemeToggle: React.FC = () => {
         title="System Theme"
         aria-label="Switch to system theme"
       >
-        <Monitor size={14} weight={theme === 'system' ? 'bold' : 'regular'} />
+        <Monitor size={14} strokeWidth={theme === 'system' ? 2.5 : 2} />
       </button>
     </div>
   );
