@@ -1,12 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "presentlyapp",
-  "compatibility_date": "2025-11-01",
+  "compatibility_date": "2024-11-01",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": "frontend/dist"
+    "directory": "./frontend/dist"
   },
   "build": {
     "command": "cd frontend && pnpm install && pnpm build"
