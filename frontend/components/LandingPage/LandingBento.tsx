@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, WifiSlash, ArrowsOut, FileDown, Shield, Users } from '@phosphor-icons/react';
+import { MapPin, WifiSlash, ArrowsOut, FileDoc, Shield, Users } from '@phosphor-icons/react';
 import { cn } from '../../src/components/ui/utils';
 
 export const LandingBento: React.FC = () => {
@@ -85,7 +85,7 @@ export const LandingBento: React.FC = () => {
             className="md:col-span-3 bg-surface rounded-[20px] p-8 border border-outline flex flex-col items-center justify-center text-center gap-4"
           >
             <div className="w-16 h-16 bg-sungold/10 rounded-2xl flex items-center justify-center text-sungold">
-              <FileDown size={32} weight="duotone" />
+              <FileDoc size={32} weight="duotone" />
             </div>
             <h3 className="font-display text-xl">One click to PDF.</h3>
           </motion.div>

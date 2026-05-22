@@ -8,6 +8,9 @@ interface SEOProps {
   image?: string;
   url?: string;
   canonicalPath?: string;
+  noIndex?: boolean;
+  type?: string;
+  jsonLd?: Record<string, any>;
 }
 
 export const SEO: React.FC<SEOProps> = ({
@@ -16,7 +19,9 @@ export const SEO: React.FC<SEOProps> = ({
   keywords = 'nigerian university attendance, anti proxy system, gps attendance tracking, campus technology, lecture integrity, Presently app',
   image = 'https://getpresently.com.ng/og-image.png',
   url = 'https://getpresently.com.ng',
-  canonicalPath
+  canonicalPath,
+  noIndex = false,
+  type = 'website'
 }) => {
   const fullUrl = canonicalPath ? `${url}${canonicalPath}` : url;
 
@@ -31,7 +36,9 @@ export const SEO: React.FC<SEOProps> = ({
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
       <meta property="og:url" content={fullUrl} />
-      <meta property="og:type" content="website" />
+      <meta property="og:type" content={type} />
+
+      {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
