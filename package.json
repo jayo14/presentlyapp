@@ -1,0 +1,12 @@
+{
+  "name": "presently-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@10.30.3",
+  "scripts": {
+    "build": "cd frontend && pnpm build",
+    "test": "cd frontend && pnpm test"
+  }
+}

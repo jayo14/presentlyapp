@@ -25,13 +25,19 @@ const CONFETTI_COLORS = [
 
 const RAY_COUNT = 12;
 
-const rand = (a, b) => a + Math.random() * (b - a);
-const randI = (a, b) => Math.floor(rand(a, b));
+const rand = (a: number, b: number) => a + Math.random() * (b - a);
+const randI = (a: number, b: number) => Math.floor(rand(a, b));
 
 /* ─────────────────────────────────────────
    QR pattern — used inside phone & target
 ───────────────────────────────────────── */
-function QRPattern({ tint = '#1a1033', bgFill = 'white', opacity = 1 }) {
+interface QRPatternProps {
+  tint?: string;
+  bgFill?: string;
+  opacity?: number;
+}
+
+function QRPattern({ tint = '#1a1033', bgFill = 'white', opacity = 1 }: QRPatternProps) {
   return (
     <svg width="60" height="60" viewBox="0 0 60 60" fill="none" style={{ opacity }} aria-hidden="true">
       <rect x="4" y="4" width="22" height="22" rx="3" fill={tint} />
@@ -149,7 +155,11 @@ const Scene1 = memo(() => {
 /* ─────────────────────────────────────────
    Scene 2 — Confirm Identity
 ───────────────────────────────────────── */
-const Scene2 = memo(({ liveTime }) => {
+interface Scene2Props {
+  liveTime: string;
+}
+
+const Scene2 = memo(({ liveTime }: Scene2Props) => {
   return (
     <div className="pi-card pi-clay">
       {/* avatar with spinning gradient ring */}
@@ -208,7 +218,11 @@ const Scene2 = memo(({ liveTime }) => {
 /* ─────────────────────────────────────────
    Scene 3 — Success
 ───────────────────────────────────────── */
-const Scene3 = memo(({ isActive }) => {
+interface Scene3Props {
+  isActive: boolean;
+}
+
+const Scene3 = memo(({ isActive }: Scene3Props) => {
   return (
     <div className="pi-s3">
       <div className="pi-medal-wrap">
@@ -221,7 +235,7 @@ const Scene3 = memo(({ isActive }) => {
               style={{
                 '--r': `${i * 30}deg`,
                 animationDelay: `${0.52 + (i % 4) * 0.04}s`,
-              }}
+              } as React.CSSProperties}
             />
           ))}
         </div>
@@ -258,8 +272,24 @@ const Scene3 = memo(({ isActive }) => {
 /* ─────────────────────────────────────────
    Confetti layer
 ───────────────────────────────────────── */
-function Confetti({ burst }) {
-  const [particles, setParticles] = useState([]);
+interface Particle {
+  id: number;
+  left: number;
+  top: number;
+  color: string;
+  w: number;
+  h: number;
+  circle: boolean;
+  dur: number;
+  delay: number;
+}
+
+interface ConfettiProps {
+  burst: number;
+}
+
+function Confetti({ burst }: ConfettiProps) {
+  const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
     if (!burst) return;
@@ -307,7 +337,11 @@ function Confetti({ burst }) {
 /* ─────────────────────────────────────────
    Main export
 ───────────────────────────────────────── */
-export default function PresentlyIllustration({ className = '' }) {
+interface PresentlyIllustrationProps {
+  className?: string;
+}
+
+export default function PresentlyIllustration({ className = '' }: PresentlyIllustrationProps) {
   const [cur, setCur] = useState(0);
   const [exit, setExit] = useState(-1);
   const [burst, setBurst] = useState(0);

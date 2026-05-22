@@ -16,8 +16,8 @@
 
 @layer base {
   :root {
-    --background: oklch(1 0 0);
-    --surface: #F9F7F3;
+    --background: #F9F7F3;
+    --surface: #FFFFFF;
     --surface-container: #F3F0EA;
     --surface-highest: #EBE7DF;
     --surface-variant: #EAF0F7;
@@ -70,8 +70,8 @@
   }
 
   .dark {
-    --background: oklch(0.145 0 0);
-    --surface: #0D0D0D;
+    --background: #0D0D0D;
+    --surface: #1A1A1A;
     --surface-container: #141414;
     --surface-highest: #1A1A1A;
     --surface-variant: #242424;
