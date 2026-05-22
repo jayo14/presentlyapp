@@ -35,7 +35,7 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
     if (items.length === 0) return null
     return (
       <SidebarGroup className="px-3">
-        <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.2em] font-black text-on-surface-variant/50 px-4 mb-3">
+        <SidebarGroupLabel className="text-[11px] uppercase tracking-[0.25em] font-bold text-on-surface-variant/40 px-4 mb-3">
           {label}
         </SidebarGroupLabel>
         <SidebarGroupContent>
@@ -49,10 +49,10 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
                     isActive={active}
                     onClick={() => navigate(item.href)}
                     className={cn(
-                      "flex items-center gap-3.5 px-4 py-6 rounded-2xl transition-all duration-500 ease-premium font-bold border border-transparent",
+                      "flex items-center gap-3.5 px-5 py-6 rounded-2xl transition-all duration-500 ease-premium font-bold border border-transparent",
                       active
                         ? "bg-sungold text-presently-black shadow-gold border-sungold/50 hover:bg-sungold hover:text-presently-black scale-[1.02]"
-                        : "text-on-surface-variant/80 hover:bg-surface-highest/80 hover:text-on-surface hover:border-outline/30 hover:translate-x-1"
+                        : "text-on-surface-variant/70 hover:bg-surface-highest/60 hover:text-on-surface hover:border-outline/20 hover:translate-x-1"
                     )}
                   >
                     <div className={cn(

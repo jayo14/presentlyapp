@@ -14,8 +14,8 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
   const { data: currentUser } = useCurrentUser()
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 shrink-0 items-center gap-2 bg-surface/40 backdrop-blur-md border-b border-outline/50 transition-[width,height] ease-linear">
-      <div className="flex w-full items-center justify-between px-6">
+    <header className="sticky top-0 z-30 flex h-20 shrink-0 items-center gap-2 bg-surface/60 backdrop-blur-lg border-b border-outline/30 transition-all duration-500 ease-premium">
+      <div className="flex w-full items-center justify-between px-8">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="-ml-1 text-on-surface-variant hover:bg-surface-highest rounded-xl" />
           <Separator
@@ -48,10 +48,10 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
 
           <div className="flex items-center gap-4 pl-2">
             <div className="text-right hidden lg:block">
-              <p className="text-sm font-black text-on-surface leading-none mb-1">
+              <p className="text-sm font-bold text-on-surface leading-none mb-1">
                 {currentUser?.full_name?.split(' ')[0] || 'User'}
               </p>
-              <p className="text-[10px] text-on-surface-variant font-black uppercase tracking-[0.15em] opacity-60">
+              <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-[0.15em] opacity-60">
                 {currentUser?.role?.replace('_', ' ') || 'Guest'}
               </p>
             </div>

@@ -30,8 +30,8 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
       <div className="flex min-h-screen w-full bg-background selection:bg-sungold/30">
         <AppSidebar onLogout={onLogout} />
 
-        <SidebarInset className="flex flex-col min-h-screen bg-background md:p-4 md:ml-0 transition-all duration-500 ease-premium">
-          <div className="flex flex-col flex-1 bg-surface md:rounded-[2.5rem] border border-outline/60 shadow-premium overflow-hidden transition-all duration-500 ease-premium relative">
+        <SidebarInset className="flex flex-col min-h-screen bg-background md:p-6 md:ml-0 transition-all duration-500 ease-premium">
+          <div className="flex flex-col flex-1 bg-surface md:rounded-[2.5rem] border border-outline/40 shadow-premium overflow-hidden transition-all duration-500 ease-premium relative">
             <SiteHeader title={title} description={description} />
 
             <main className="flex-1 overflow-y-auto no-scrollbar relative z-10">
