@@ -49,7 +49,7 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
                     isActive={active}
                     onClick={() => navigate(item.href)}
                     className={cn(
-                      "flex items-center gap-3.5 px-5 py-6 rounded-2xl transition-all duration-500 ease-premium font-bold border border-transparent",
+                      "flex items-center gap-3.5 px-5 py-[16px] rounded-2xl transition-all duration-500 ease-premium font-bold border border-transparent relative group/nav-item",
                       active
                         ? "bg-sungold text-presently-black shadow-gold border-sungold/50 hover:bg-sungold hover:text-presently-black scale-[1.02]"
                         : "text-on-surface-variant/70 hover:bg-surface-highest/60 hover:text-on-surface hover:border-outline/20 hover:translate-x-1"
@@ -65,7 +65,7 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
                     {active && (
                       <motion.div
                         layoutId="active-indicator"
-                        className="absolute right-3 w-1.5 h-1.5 rounded-full bg-presently-black"
+                        className="absolute right-4 w-1.5 h-1.5 rounded-full bg-presently-black shadow-sm"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}

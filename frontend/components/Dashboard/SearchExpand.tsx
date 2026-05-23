@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import { cn } from '../../src/components/ui/utils';
 
 export const SearchExpand: React.FC = () => {
@@ -30,14 +30,24 @@ export const SearchExpand: React.FC = () => {
   return (
     <div className="relative flex items-center">
       <div
+        role="button"
+        aria-label="Search"
+        tabIndex={0}
         className={cn(
           "flex items-center bg-surface-highest/50 border border-outline rounded-full transition-all duration-500 ease-premium overflow-hidden",
           isExpanded ? "w-64 md:w-80 px-4" : "w-11 px-0 justify-center cursor-pointer hover:bg-surface-highest"
         )}
         onClick={() => !isExpanded && setIsExpanded(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded(true);
+          }
+        }}
       >
-        <Search
+        <MagnifyingGlass
           size={18}
+          weight="bold"
           className={cn(
             "shrink-0 transition-colors duration-300",
             isExpanded ? "text-on-surface-variant" : "text-on-surface"
@@ -63,7 +73,7 @@ export const SearchExpand: React.FC = () => {
             }}
             className="p-1 hover:bg-surface-variant rounded-full transition-colors"
           >
-            <X size={14} className="text-on-surface-variant" />
+            <X size={14} weight="bold" className="text-on-surface-variant" />
           </button>
         )}
       </div>

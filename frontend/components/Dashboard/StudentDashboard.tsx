@@ -2,9 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, BookOpen, Clock, Plus,
-  Calendar, FileText, ChevronRight,
-  TrendingUp, BarChart3, Activity, Trophy, User, QrCode, MapPin, CheckCircle2
-} from 'lucide-react';
+  Calendar, FileText, CaretRight,
+  ChartLineUp, ChartBar, Pulse, Trophy, User, QrCode, MapPin, CheckCircle
+} from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { studentApi } from '../../services/api/student';
@@ -64,7 +64,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
   return (
     <PageContainer>
       {/* 1. WELCOME HEADER */}
-      <section className="relative overflow-hidden rounded-[2.5rem] border border-outline/50 bg-gradient-to-br from-sungold/20 via-surface to-surface p-8 md:p-12">
+      <section className="relative overflow-hidden rounded-[2.5rem] border border-outline/50 bg-gradient-to-br from-sungold/20 via-surface to-surface p-[40px] md:p-[64px]">
         <div className="relative z-10 space-y-4">
           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-sungold">
             <span className="h-2 w-2 rounded-full bg-sungold animate-pulse" />
@@ -81,7 +81,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
               onClick={() => setIsScannerOpen(true)}
               className="h-14 px-8 bg-on-surface text-background rounded-2xl font-bold shadow-lg flex items-center gap-2 group"
             >
-              <QrCode size={20} className="group-hover:rotate-12 transition-transform" />
+              <QrCode size={20} weight="bold" className="group-hover:rotate-12 transition-transform" />
               Quick Scan
             </Button>
             <Button
@@ -122,11 +122,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
                 </h3>
                 <div className="flex flex-wrap items-center gap-6 text-on-surface-variant font-bold text-xs uppercase tracking-widest opacity-80">
                   <div className="flex items-center gap-2">
-                    <Clock size={16} className="text-sungold" />
+                    <Clock size={16} weight="bold" className="text-sungold" />
                     <span>Ends in 45m</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin size={16} className="text-sungold" />
+                    <MapPin size={16} weight="bold" className="text-sungold" />
                     <span>Hall B, Room 204</span>
                   </div>
                 </div>
@@ -137,7 +137,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
                 className="h-16 px-10 text-lg bg-sungold text-presently-black rounded-2xl font-bold shadow-gold group relative overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-3">
-                  <QrCode size={24} />
+                  <QrCode size={24} weight="bold" />
                   Check In
                 </span>
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -156,7 +156,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
         ) : (
           <DashboardCard padding="lg" className="flex flex-col items-center text-center gap-6 py-16 border-dashed border-2 bg-surface-highest/20 hover:bg-surface-highest/40 transition-colors">
             <div className="w-20 h-20 rounded-full bg-surface-highest flex items-center justify-center text-on-surface-variant">
-              <CheckCircle2 size={40} className="text-moss-green opacity-40" />
+              <CheckCircle size={40} weight="bold" className="text-moss-green opacity-40" />
             </div>
             <div className="space-y-2">
               <h3 className="text-2xl font-bold text-on-surface tracking-tight">Schedule is clear</h3>
@@ -176,17 +176,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
       </section>
 
       {/* 3. QUICK STATS GRID */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-[24px] md:gap-[32px]">
         {[
-          { label: 'Attendance', value: `${dashboardData?.attendance_stats?.average_attendance || 0}%`, icon: Activity, color: 'text-sungold', bg: 'bg-sungold/10' },
+          { label: 'Attendance', value: `${dashboardData?.attendance_stats?.average_attendance || 0}%`, icon: Pulse, color: 'text-sungold', bg: 'bg-sungold/10' },
           { label: 'Streak', value: '12 Days', icon: Trophy, color: 'text-moss-green', bg: 'bg-moss-green/10' },
           { label: 'Courses', value: dashboardData?.enrolled_courses?.length || 0, icon: BookOpen, color: 'text-sky-teal', bg: 'bg-sky-teal/10' },
-          { label: 'Ranking', value: '#12', icon: Trophy, color: 'text-sungold', bg: 'bg-sungold/10' },
+          { label: 'Ranking', value: '#12', icon: ChartBar, color: 'text-sungold', bg: 'bg-sungold/10' },
         ].map((stat, i) => (
           <DashboardCard key={i} className="group relative overflow-hidden">
             <div className="flex justify-between items-start">
                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500", stat.bg, stat.color)}>
-                 <stat.icon size={22} />
+                 <stat.icon size={22} weight="bold" />
                </div>
             </div>
             <div className="mt-6">
@@ -235,7 +235,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName }) => {
                     </span>
                   </div>
                 </div>
-                <ChevronRight size={18} className="text-outline-variant group-hover:translate-x-1 transition-transform" />
+                <CaretRight size={18} weight="bold" className="text-outline-variant group-hover:translate-x-1 transition-transform" />
               </div>
             ))
           ) : (
