@@ -1,25 +1,25 @@
-import { LucideIcon } from 'lucide-react';
 import {
-  Home,
+  House,
   Users,
   Calendar,
-  CheckCircle2,
-  ClipboardList,
-  TrendingUp,
-  Building2,
+  CheckCircle,
+  ClipboardText,
+  ChartLineUp,
+  Buildings,
   MapPin,
   BookOpen,
   FileText,
   Bell,
-  Cog,
-  Shield,
+  Gear,
+  ShieldCheck,
   Newspaper,
-} from 'lucide-react';
+  Icon
+} from '@phosphor-icons/react';
 
 export interface NavItem {
   id: string;
   label: string;
-  icon: LucideIcon;
+  icon: Icon;
   href: string;
   roles: string[];
   badge?: string | number;
@@ -30,7 +30,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'dashboard',
     label: 'Dashboard',
-    icon: Home,
+    icon: House,
     href: '/dashboard',
     roles: ['student', 'lecturer', 'admin', 'class_rep'],
     section: 'core',
@@ -38,7 +38,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'courses',
     label: 'Attendance',
-    icon: CheckCircle2,
+    icon: CheckCircle,
     href: '/dashboard/courses',
     roles: ['student', 'class_rep'],
     section: 'core',
@@ -54,7 +54,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'sessions',
     label: 'Sessions',
-    icon: ClipboardList,
+    icon: ClipboardText,
     href: '/dashboard/sessions',
     roles: ['lecturer'],
     section: 'core',
@@ -62,7 +62,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'analytics',
     label: 'Analytics',
-    icon: TrendingUp,
+    icon: ChartLineUp,
     href: '/dashboard/analytics',
     roles: ['student', 'lecturer', 'class_rep'],
     section: 'core',
@@ -78,7 +78,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'institutions',
     label: 'Institutions',
-    icon: Building2,
+    icon: Buildings,
     href: '/dashboard/institutions',
     roles: ['admin'],
     section: 'management',
@@ -102,7 +102,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'departments',
     label: 'Departments',
-    icon: Building2,
+    icon: Buildings,
     href: '/dashboard/departments',
     roles: ['admin'],
     section: 'management',
@@ -134,7 +134,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'config',
     label: 'Configuration',
-    icon: Cog,
+    icon: Gear,
     href: '/dashboard/config',
     roles: ['admin'],
     section: 'system',
@@ -142,7 +142,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'security',
     label: 'Security',
-    icon: Shield,
+    icon: ShieldCheck,
     href: '/dashboard/security',
     roles: ['admin'],
     section: 'system',
@@ -158,7 +158,7 @@ export const navigationItems: NavItem[] = [
   {
     id: 'settings',
     label: 'Settings',
-    icon: Cog,
+    icon: Gear,
     href: '/dashboard/settings',
     roles: ['student', 'lecturer', 'admin', 'class_rep'],
     section: 'system',

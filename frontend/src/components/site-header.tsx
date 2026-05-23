@@ -14,10 +14,13 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
   const { data: currentUser } = useCurrentUser()
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 shrink-0 items-center gap-2 bg-surface/60 backdrop-blur-lg border-b border-outline/30 transition-all duration-500 ease-premium">
+    <header className="sticky top-0 z-30 flex h-[80px] shrink-0 items-center gap-2 bg-surface/60 backdrop-blur-lg border-b border-outline/30 transition-all duration-500 ease-premium">
       <div className="flex w-full items-center justify-between px-8">
         <div className="flex items-center gap-4">
-          <SidebarTrigger className="-ml-1 text-on-surface-variant hover:bg-surface-highest rounded-xl" />
+          <SidebarTrigger
+            aria-label="Toggle sidebar"
+            className="-ml-1 text-on-surface-variant hover:bg-surface-highest rounded-xl"
+          />
           <Separator
             orientation="vertical"
             className="mx-2 h-4 bg-outline/50"
