@@ -7,13 +7,11 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  retryKey: number;
 }
 
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
-    retryKey: 0,
   };
 
   public static getDerivedStateFromError(_: Error): Pick<State, 'hasError'> {
@@ -31,13 +29,13 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <ErrorPage
-          onRetry={() => this.setState((prev) => ({ hasError: false, retryKey: prev.retryKey + 1 }))}
+          onRetry={() => this.setState({ hasError: false })}
           onGoHome={() => window.location.assign('/')}
         />
       );
     }
 
-    return <React.Fragment key={this.state.retryKey}>{this.props.children}</React.Fragment>;
+    return this.props.children;
   }
 }
 
