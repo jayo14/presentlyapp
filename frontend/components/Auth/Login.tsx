@@ -54,12 +54,12 @@ export const Login: React.FC = () => {
     window.location.href = authUrl;
   };
 
-  if (user && isLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
         <Logo variant="dark" className="mb-8 scale-125" />
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-        <p className="mt-4 text-textMuted font-display">Redirecting to dashboard...</p>
+        <p className="mt-4 text-textMuted font-display">Checking session...</p>
       </div>
     );
   }

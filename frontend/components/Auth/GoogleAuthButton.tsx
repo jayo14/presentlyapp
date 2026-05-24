@@ -21,7 +21,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       onClick={onClick}
       disabled={isLoading}
       className={cn(
-        'w-full h-12 sm:h-14 px-4 rounded-xl border border-[#DADCE0] bg-white text-[#1F1F1F]',
+        'w-full h-12 sm:h-14 px-4 rounded-xl border border-[#DADCE0] bg-white text-[#1F1F1F] dark:bg-white dark:text-[#1F1F1F]',
         'dark:border-white/20 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]',
         'font-semibold text-sm sm:text-base inline-flex items-center justify-center gap-3',
         'hover:bg-[#F8F9FA] active:bg-[#F1F3F4] transition-colors disabled:opacity-60 disabled:cursor-not-allowed',
