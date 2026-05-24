@@ -16,7 +16,7 @@ class ErrorBoundary extends Component<Props, State> {
     retryKey: 0,
   };
 
-  public static getDerivedStateFromError(_: Error): State {
+  public static getDerivedStateFromError(_: Error): Pick<State, 'hasError'> {
     // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }

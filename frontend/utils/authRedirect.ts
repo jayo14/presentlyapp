@@ -16,7 +16,7 @@ export const getCanonicalSiteOrigin = (): string => {
   }
 
   if (typeof window !== 'undefined') {
-    return window.location.origin.replace(/\/$/, '');
+    return window.location.origin;
   }
 
   return DEFAULT_SITE_URL;
