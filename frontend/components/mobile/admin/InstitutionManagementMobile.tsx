@@ -31,6 +31,9 @@ const getInstitutionWebsite = (inst: Institution) =>
 const getInstitutionLocation = (inst: Institution) =>
   (inst as any).location || [inst.city, inst.state_province, inst.country].filter(Boolean).join(', ') || 'N/A';
 
+const getCollegeDepartmentCount = (college: College) =>
+  (college as any).departments_count ?? college.departmentCount ?? 0;
+
 export const InstitutionManagementMobile: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('institutions');
   const [institutions, setInstitutions] = useState<Institution[]>([]);
@@ -55,7 +58,8 @@ export const InstitutionManagementMobile: React.FC = () => {
       setLoading(true);
       const data = await institutionApi.getAll();
       setInstitutions(data);
-    } catch {
+    } catch (error) {
+      console.error('Failed to load institutions', error);
       toast.error('Failed to load institutions');
     } finally {
       setLoading(false);
@@ -73,7 +77,8 @@ export const InstitutionManagementMobile: React.FC = () => {
       setSearchTerm('');
       setStatusFilter('all');
       setViewMode('colleges');
-    } catch {
+    } catch (error) {
+      console.error('Failed to load colleges', error);
       toast.error('Failed to load colleges');
     } finally {
       setLoadingChildren(false);
@@ -89,7 +94,8 @@ export const InstitutionManagementMobile: React.FC = () => {
       setSearchTerm('');
       setStatusFilter('all');
       setViewMode('departments');
-    } catch {
+    } catch (error) {
+      console.error('Failed to load departments', error);
       toast.error('Failed to load departments');
     } finally {
       setLoadingChildren(false);
@@ -119,7 +125,8 @@ export const InstitutionManagementMobile: React.FC = () => {
       await institutionApi.deleteInstitution(id);
       toast.success('Deleted');
       await loadInstitutions();
-    } catch {
+    } catch (error) {
+      console.error('Failed to delete institution', error);
       toast.error('Failed to delete');
     }
   };
@@ -344,6 +351,7 @@ export const InstitutionManagementMobile: React.FC = () => {
                   key={college.id}
                   type="button"
                   onClick={() => loadDepartments(college)}
+                  aria-label={`View departments in ${college.name}`}
                   className="w-full p-5 rounded-[32px] bg-surface border border-outline shadow-sm space-y-4 text-left active:scale-[0.99] transition-all"
                 >
                   <div className="flex items-center gap-4">
@@ -358,8 +366,8 @@ export const InstitutionManagementMobile: React.FC = () => {
                     </div>
                   </div>
                   <div className="h-11 px-4 rounded-xl bg-surface-container border border-outline/60 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-                    <span>{(college as any).departments_count || college.departmentCount || 0} Departments</span>
-                    <span className="text-primary">Open</span>
+                    <span>{getCollegeDepartmentCount(college)} Departments</span>
+                    <span className="text-primary">View</span>
                   </div>
                 </button>
               ))

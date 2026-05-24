@@ -718,8 +718,9 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       tooltip.remove();
       clearVenueMarkers();
-      map.remove();
+      const mapToRemove = mapRef.current ?? map;
       mapRef.current = null;
+      mapToRemove.remove();
       setMapReady(false);
     };
   }, [addSourcesAndLayers, clearVenueMarkers, renderVenueMarkers]);

@@ -229,7 +229,7 @@ export const VenueManagementMobile: React.FC = () => {
         isOpen={showMapSheet}
         onClose={() => setShowMapSheet(false)}
         side="bottom"
-        title={selectedMapVenue ? `${selectedMapVenue.name} Map` : 'Venue Map'}
+        title="Venue Map"
         description="Tap markers to inspect mapped venues."
         className="h-[88vh] max-h-[88vh]"
       >
