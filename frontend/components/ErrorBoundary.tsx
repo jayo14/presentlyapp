@@ -14,7 +14,7 @@ class ErrorBoundary extends Component<Props, State> {
     hasError: false,
   };
 
-  public static getDerivedStateFromError(_: Error): Pick<State, 'hasError'> {
+  public static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
@@ -29,7 +29,7 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <ErrorPage
-          onRetry={() => this.setState({ hasError: false })}
+          onRetry={() => window.location.reload()}
           onGoHome={() => window.location.assign('/')}
         />
       );
