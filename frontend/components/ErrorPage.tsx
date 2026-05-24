@@ -3,7 +3,12 @@ import { AlertTriangle, RefreshCcw, House } from 'lucide-react';
 import { Button } from '../src/components/ui/button';
 import { Separator } from '../src/components/ui/separator';
 
-const ErrorPage: React.FC = () => {
+interface ErrorPageProps {
+  onRetry: () => void;
+  onGoHome: () => void;
+}
+
+const ErrorPage: React.FC<ErrorPageProps> = ({ onRetry, onGoHome }) => {
 
   return (
     <div className="min-h-screen bg-background text-on-surface flex items-center justify-center p-6">
@@ -22,16 +27,14 @@ const ErrorPage: React.FC = () => {
         <Separator className="my-6 bg-outline" />
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button onClick={() => window.location.reload()} size="lg" className="w-full sm:w-auto">
+          <Button onClick={onRetry} size="lg" className="w-full sm:w-auto">
             <RefreshCcw size={16} />
-            Refresh Page
+            Try Again
           </Button>
-          <a href="/dashboard">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">
-              <House size={16} />
-              Go to Dashboard
-            </Button>
-          </a>
+          <Button variant="outline" size="lg" className="w-full sm:w-auto" onClick={onGoHome}>
+            <House size={16} />
+            Go to Home
+          </Button>
         </div>
 
         <p className="mt-6 text-[11px] tracking-wide uppercase text-textMuted">
