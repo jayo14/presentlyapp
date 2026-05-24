@@ -592,7 +592,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   // Initialise map once
   useEffect(() => {
     const container = mapContainerRef.current;
-    if (!container) return;
+    if (!container || mapRef.current) return;
 
     // No explicit style changes needed if container uses absolute layout below,
     // but ensure container is never 0-height during init if possible.
@@ -707,11 +707,20 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
     mapRef.current = map;
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        window.requestAnimationFrame(() => map.resize());
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       tooltip.remove();
       clearVenueMarkers();
-      map.remove();
+      const mapToRemove = mapRef.current ?? map;
       mapRef.current = null;
+      mapToRemove.remove();
       setMapReady(false);
     };
   }, [addSourcesAndLayers, clearVenueMarkers, renderVenueMarkers]);

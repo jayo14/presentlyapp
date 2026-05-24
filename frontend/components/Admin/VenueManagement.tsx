@@ -10,6 +10,7 @@ import { ModernCard } from '../ModernCard';
 import { Badge } from '../../src/components/ui/badge';
 import { cn } from '../../src/components/ui/utils';
 import { VenueModal } from './VenueModal';
+import { VenueMap } from './VenueMap';
 
 export const VenueManagement: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -20,6 +21,7 @@ export const VenueManagement: React.FC = () => {
   const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null);
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
 
   useEffect(() => {
     loadInitialData();
@@ -95,6 +97,12 @@ export const VenueManagement: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (selectedVenue && !filteredVenues.some((venue) => venue.id === selectedVenue.id)) {
+      setSelectedVenue(null);
+    }
+  }, [filteredVenues, selectedVenue]);
+
   return (
     <div className="space-y-10 max-w-7xl mx-auto pb-20">
       <SEO title="Physical Venues | Presently Admin" />
@@ -148,6 +156,30 @@ export const VenueManagement: React.FC = () => {
         </select>
       </div>
 
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-sm md:text-base font-bold uppercase tracking-widest text-on-surface-variant">
+            Venue Map
+          </h2>
+          {selectedVenue && (
+            <Button
+              variant="outline"
+              className="h-11 px-5 rounded-xl text-xs font-bold uppercase tracking-widest"
+              onClick={() => setSelectedVenue(null)}
+            >
+              Clear Focus
+            </Button>
+          )}
+        </div>
+        <div className="h-[420px] md:h-[520px] rounded-[2rem] overflow-hidden border border-outline bg-surface">
+          <VenueMap
+            venues={filteredVenues}
+            selectedVenue={selectedVenue}
+            onVenueClick={setSelectedVenue}
+          />
+        </div>
+      </section>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {loading && venues.length === 0 ? (
           Array.from({ length: 6 }).map((_, i) => (
@@ -158,7 +190,10 @@ export const VenueManagement: React.FC = () => {
             <ModernCard
               key={venue.id}
               padding="lg"
-              className="group hover:border-sungold/40 transition-all flex flex-col justify-between"
+              className={cn(
+                "group hover:border-sungold/40 transition-all flex flex-col justify-between",
+                selectedVenue?.id === venue.id && "border-sungold/50 shadow-gold"
+              )}
             >
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
@@ -182,7 +217,15 @@ export const VenueManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-display text-xl font-bold text-presently-black leading-tight mb-1">{venue.name}</h3>
+                  <button
+                    type="button"
+                    className="text-left w-full"
+                    onClick={() => setSelectedVenue(venue)}
+                  >
+                    <h3 className="font-display text-xl font-bold text-presently-black leading-tight mb-1 hover:text-sungold transition-colors">
+                      {venue.name}
+                    </h3>
+                  </button>
                   <div className="flex items-center gap-2">
                     <Building size={14} className="text-sungold" />
                     <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{venue.institution_name}</span>
