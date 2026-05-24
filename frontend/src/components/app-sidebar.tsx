@@ -86,6 +86,7 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
+              aria-label="Go to Dashboard"
               className="hover:bg-transparent focus:bg-transparent"
               onClick={() => navigate('/dashboard')}
             >
