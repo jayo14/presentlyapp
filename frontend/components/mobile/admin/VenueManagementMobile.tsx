@@ -3,7 +3,7 @@ import {
   Plus, MagnifyingGlass, MapPin, 
   NavigationArrow, Buildings, CaretRight, 
   DotsThreeVertical, Trash, Pencil,
-  Sliders
+  Sliders, MapTrifold
 } from '@phosphor-icons/react';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +11,8 @@ import { venuesApi, institutionApi } from '../../../services/api/admin';
 import { Venue, Institution } from '../../../types';
 import { toast } from 'sonner';
 import { SEO } from '../../SEO';
+import { Sheet } from '../../Sheet';
+import { VenueMap } from '../../Admin/VenueMap';
 
 import { VenueModal } from '../../Admin/VenueModal';
 
@@ -23,6 +25,8 @@ export const VenueManagementMobile: React.FC = () => {
   const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null);
+  const [showMapSheet, setShowMapSheet] = useState(false);
+  const [selectedMapVenue, setSelectedMapVenue] = useState<Venue | null>(null);
 
   useEffect(() => { loadInitialData(); }, []);
 
@@ -75,6 +79,11 @@ export const VenueManagementMobile: React.FC = () => {
     } catch (e) {
       toast.error('Failed to delete');
     }
+  };
+
+  const openMapForVenue = (venue: Venue) => {
+    setSelectedMapVenue(venue);
+    setShowMapSheet(true);
   };
 
   return (
@@ -177,6 +186,13 @@ export const VenueManagementMobile: React.FC = () => {
 
               <div className="flex gap-2">
                  <button 
+                  onClick={() => openMapForVenue(v)}
+                  className="flex-1 h-11 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-primary active:scale-95 transition-all"
+                 >
+                   <MapTrifold size={18} weight="duotone" />
+                   Map
+                 </button>
+                 <button 
                    onClick={() => { setEditingVenue(v); setShowModal(true); }}
                    className="flex-1 h-11 bg-surface-container rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest active:scale-95 transition-all"
                  >
@@ -208,6 +224,23 @@ export const VenueManagementMobile: React.FC = () => {
           onClose={() => setShowModal(false)}
         />
       )}
+
+      <Sheet
+        isOpen={showMapSheet}
+        onClose={() => setShowMapSheet(false)}
+        side="bottom"
+        title={selectedMapVenue ? `${selectedMapVenue.name} Map` : 'Venue Map'}
+        description="Tap markers to inspect mapped venues."
+        className="h-[88vh] max-h-[88vh]"
+      >
+        <div className="h-full min-h-[420px] rounded-2xl overflow-hidden border border-outline">
+          <VenueMap
+            venues={filteredVenues}
+            selectedVenue={selectedMapVenue}
+            onVenueClick={setSelectedMapVenue}
+          />
+        </div>
+      </Sheet>
     </div>
   );
 };
