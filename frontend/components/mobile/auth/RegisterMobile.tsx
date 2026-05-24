@@ -23,7 +23,7 @@ export const RegisterMobile: React.FC = () => {
     });
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleSignUp = () => {
     const authUrl = getGoogleOAuthUrl();
     if (!authUrl) {
       toast.error('Google Auth Error', {
@@ -114,7 +114,7 @@ export const RegisterMobile: React.FC = () => {
           <div className="h-px bg-slate-200 dark:bg-white/10 flex-1" />
         </div>
 
-        <GoogleAuthButton onClick={handleGoogleLogin} label="Sign up with Google" className="h-[56px] rounded-2xl" />
+        <GoogleAuthButton onClick={handleGoogleSignUp} label="Sign up with Google" className="h-[56px] rounded-2xl" />
 
         <p className="text-center text-[14px] font-medium text-slate-500 dark:text-slate-400 mt-10">
           Already have an account? <Link to="/login" className="font-bold text-presently-black dark:text-white underline decoration-sungold decoration-2 underline-offset-4">Log in</Link>

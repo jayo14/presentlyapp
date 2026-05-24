@@ -50,7 +50,7 @@ export const Register: React.FC = () => {
     });
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleSignUp = () => {
     const authUrl = getGoogleOAuthUrl();
     if (!authUrl) {
       toast.error('Google Auth Error', {
@@ -166,7 +166,7 @@ export const Register: React.FC = () => {
             <div className="h-px bg-outline/40 flex-1" />
           </div>
 
-          <GoogleAuthButton onClick={handleGoogleLogin} label="Sign up with Google" />
+          <GoogleAuthButton onClick={handleGoogleSignUp} label="Sign up with Google" />
         </div>
         <p className="mt-10 text-center text-sm text-textMuted">
           Already have an account?{' '}
