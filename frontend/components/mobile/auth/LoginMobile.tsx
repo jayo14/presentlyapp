@@ -4,6 +4,9 @@ import { ArrowRight, Eye, EyeSlash, Fingerprint, CircleNotch } from '@phosphor-i
 import { Link } from 'react-router-dom';
 import { useLogin } from '../../../hooks/useAuth';
 import { SEO } from '../../SEO';
+import { toast } from 'sonner';
+import { GoogleAuthButton } from '../../Auth/GoogleAuthButton';
+import { getGoogleOAuthUrl } from '../../../utils/authRedirect';
 
 export const LoginMobile: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +18,18 @@ export const LoginMobile: React.FC = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     loginMutation.mutate({ email, password });
+  };
+
+  const handleGoogleLogin = () => {
+    const authUrl = getGoogleOAuthUrl();
+    if (!authUrl) {
+      toast.error('Google Auth Error', {
+        description: 'Google Client ID is not configured.',
+      });
+      return;
+    }
+
+    window.location.href = authUrl;
   };
 
   return (
@@ -89,6 +104,14 @@ export const LoginMobile: React.FC = () => {
             )}
           </button>
         </form>
+
+        <div className="flex items-center gap-3 my-6">
+          <div className="h-px bg-slate-200 dark:bg-white/10 flex-1" />
+          <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">or</span>
+          <div className="h-px bg-slate-200 dark:bg-white/10 flex-1" />
+        </div>
+
+        <GoogleAuthButton onClick={handleGoogleLogin} label="Sign in with Google" className="h-[56px] rounded-2xl" />
 
         <p className="text-center text-[14px] font-medium text-slate-500 dark:text-slate-400 mt-10">
           Don't have an account? <Link to="/register" className="font-bold text-presently-black dark:text-white underline decoration-sungold decoration-2 underline-offset-4">Register here</Link>

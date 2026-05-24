@@ -7,6 +7,8 @@ import { SEO } from '../SEO';
 import { Logo } from '../Logo';
 import { Button } from '../Button';
 import { Input } from '../Input';
+import { GoogleAuthButton } from './GoogleAuthButton';
+import { getGoogleOAuthUrl } from '../../utils/authRedirect';
 import { cn } from '../../src/components/ui/utils';
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +48,18 @@ export const Register: React.FC = () => {
         });
       }
     });
+  };
+
+  const handleGoogleSignUp = () => {
+    const authUrl = getGoogleOAuthUrl();
+    if (!authUrl) {
+      toast.error('Google Auth Error', {
+        description: 'Google Client ID is not configured.',
+      });
+      return;
+    }
+
+    window.location.href = authUrl;
   };
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden">
@@ -145,6 +159,14 @@ export const Register: React.FC = () => {
               Get Started
             </Button>
           </form>
+
+          <div className="flex items-center gap-4 my-8">
+            <div className="h-px bg-outline/40 flex-1" />
+            <span className="text-xs text-textMuted uppercase font-bold tracking-widest">Or continue with</span>
+            <div className="h-px bg-outline/40 flex-1" />
+          </div>
+
+          <GoogleAuthButton onClick={handleGoogleSignUp} label="Sign up with Google" />
         </div>
         <p className="mt-10 text-center text-sm text-textMuted">
           Already have an account?{' '}

@@ -11,7 +11,7 @@ interface State {
 
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
   };
 
   public static getDerivedStateFromError(_: Error): State {
@@ -27,7 +27,12 @@ class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      return <ErrorPage />;
+      return (
+        <ErrorPage
+          onRetry={() => window.location.reload()}
+          onGoHome={() => window.location.assign('/')}
+        />
+      );
     }
 
     return this.props.children;
