@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react';
 import { cn } from '../../src/components/ui/utils';
 
 export const SearchExpand: React.FC = () => {
@@ -45,7 +45,7 @@ export const SearchExpand: React.FC = () => {
           }
         }}
       >
-        <MagnifyingGlass
+        <MagnifyingGlassIcon
           size={20}
           weight="bold"
           className={cn(
@@ -74,7 +74,7 @@ export const SearchExpand: React.FC = () => {
             }}
             className="p-1 hover:bg-surface-variant rounded-full transition-colors"
           >
-            <X size={14} weight="bold" className="text-on-surface-variant" />
+            <XIcon size={14} weight="bold" className="text-on-surface-variant" />
           </button>
         )}
       </div>
