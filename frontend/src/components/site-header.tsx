@@ -1,6 +1,7 @@
-import { Bell } from "lucide-react"
+import { Bell } from "@phosphor-icons/react"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { useNavigate } from "react-router-dom"
 import { SearchExpand } from "../../components/Dashboard/SearchExpand"
 import { ThemeToggle } from "../../components/ThemeToggle"
 import { useCurrentUser } from "../../hooks/useAuth"
@@ -12,6 +13,7 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ title, description }: SiteHeaderProps) {
   const { data: currentUser } = useCurrentUser()
+  const navigate = useNavigate()
 
   return (
     <header className="sticky top-0 z-30 flex h-[80px] shrink-0 items-center gap-2 bg-surface/60 backdrop-blur-lg border-b border-outline/30 transition-all duration-500 ease-premium">
@@ -42,7 +44,7 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
               aria-label="View notifications"
               className="p-2.5 hover:bg-surface-highest rounded-full transition-colors relative group"
             >
-              <Bell size={18} className="text-on-surface-variant group-hover:text-on-surface transition-colors" />
+              <Bell size={20} weight="bold" className="text-on-surface-variant group-hover:text-on-surface transition-colors" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-sungold rounded-full border-2 border-surface shadow-gold" />
             </button>
           </div>
@@ -58,7 +60,11 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
                 {currentUser?.role?.replace('_', ' ') || 'Guest'}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-outline/50 bg-primary/10 flex-shrink-0 transition-transform hover:scale-105 duration-300">
+            <button
+              aria-label="View profile settings"
+              onClick={() => navigate('/dashboard/profile')}
+              className="w-10 h-10 rounded-xl overflow-hidden border-2 border-outline/50 bg-primary/10 flex-shrink-0 transition-transform hover:scale-105 duration-300 focus-visible:ring-2 focus-visible:ring-sungold outline-none"
+            >
               {currentUser?.avatar_url ? (
                 <img src={currentUser.avatar_url} alt="Profile" className="w-full h-full object-cover" />
               ) : (
@@ -66,7 +72,7 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
                   {currentUser?.full_name?.charAt(0) || 'U'}
                 </div>
               )}
-            </div>
+            </button>
           </div>
         </div>
       </div>
