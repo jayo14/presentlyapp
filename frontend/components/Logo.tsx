@@ -15,7 +15,7 @@ export const Logo: React.FC<{ className?: string, showText?: boolean, variant?: 
         isDark ? "bg-presently-black" : "bg-sungold"
       )}>
         <span className={cn(
-          "font-display font-bold text-2xl select-none relative",
+          "font-nimbus font-bold text-2xl select-none relative",
           isDark ? "text-sungold" : "text-presently-black"
         )}>
           P
