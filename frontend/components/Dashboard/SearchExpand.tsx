@@ -66,6 +66,7 @@ export const SearchExpand: React.FC = () => {
         />
         {isExpanded && (
           <button
+            aria-label={query ? "Clear search" : "Close search"}
             onClick={(e) => {
               e.stopPropagation();
               if (query) setQuery('');

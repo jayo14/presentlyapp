@@ -24,7 +24,7 @@ export const Logo: React.FC<{ className?: string, showText?: boolean, variant?: 
       </div>
       {showText && (
         <span className={cn(
-          "font-display font-bold tracking-[-0.02em] text-2xl transition-colors",
+          "font-nimbus font-bold tracking-[-0.02em] text-2xl transition-colors",
           isDark ? "text-white" : "text-presently-black"
         )}>
           Presently

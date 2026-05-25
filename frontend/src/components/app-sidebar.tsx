@@ -52,7 +52,7 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
                       "flex items-center gap-3.5 px-5 py-[16px] rounded-2xl transition-all duration-500 ease-premium font-bold border border-transparent relative group/nav-item",
                       active
                         ? "bg-sungold text-presently-black shadow-gold border-sungold/50 hover:bg-sungold hover:text-presently-black scale-[1.02]"
-                        : "text-on-surface-variant/70 hover:bg-surface-highest/60 hover:text-on-surface hover:border-outline/20 hover:translate-x-1"
+                        : "text-on-surface-variant/70 hover:bg-surface-highest/40 hover:text-on-surface hover:border-outline/10 hover:translate-x-1"
                     )}
                   >
                     <div className={cn(

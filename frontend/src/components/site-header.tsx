@@ -1,4 +1,4 @@
-import { Bell } from "lucide-react"
+import { Bell } from "@phosphor-icons/react"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { SearchExpand } from "../../components/Dashboard/SearchExpand"
