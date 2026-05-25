@@ -42,7 +42,7 @@ export function SiteHeader({ title, description }: SiteHeaderProps) {
               aria-label="View notifications"
               className="p-2.5 hover:bg-surface-highest rounded-full transition-colors relative group"
             >
-              <Bell size={18} className="text-on-surface-variant group-hover:text-on-surface transition-colors" />
+              <Bell size={20} weight="bold" className="text-on-surface-variant group-hover:text-on-surface transition-colors" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-sungold rounded-full border-2 border-surface shadow-gold" />
             </button>
           </div>

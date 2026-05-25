@@ -46,7 +46,7 @@ export const SearchExpand: React.FC = () => {
         }}
       >
         <MagnifyingGlass
-          size={18}
+          size={20}
           weight="bold"
           className={cn(
             "shrink-0 transition-colors duration-300",
