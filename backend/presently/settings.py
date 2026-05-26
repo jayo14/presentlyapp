@@ -59,6 +59,11 @@ INSTALLED_APPS = [
     'exam_clearance',
     'accounts',
     'system',
+    'summa_content',
+    'summa_ai',
+    'summa_scheduling',
+    'summa_tasks',
+    'summa_learning',
 ]
 
 MIDDLEWARE = [
