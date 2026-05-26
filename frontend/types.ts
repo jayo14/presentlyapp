@@ -8,14 +8,12 @@ export enum UserRole {
 export interface Institution {
   id: number;
   full_name: string;
-  short_name: string; // Abbreviation (e.g., "OAU", "UNILAG")
+  short_name: string;
   abbreviation: string;
   description?: string;
   website_url?: string;
   contact_email?: string;
   contact_phone?: string;
-  
-  // Location and Size
   country: string;
   state_province?: string;
   city: string;
@@ -23,15 +21,11 @@ export interface Institution {
   latitude?: number;
   longitude?: number;
   postal_code?: string;
-  
-  // Institution details
   established_year?: number;
-  institution_type?: string; // 'UNIVERSITY', 'POLYTECHNIC', 'COLLEGE', 'INSTITUTE'
+  institution_type?: string;
   accreditation_status?: string;
   logo_url?: string;
   cover_image_url?: string;
-  
-  // Metadata
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -42,27 +36,20 @@ export interface College {
   institution: number;
   institution_id?: number;
   name: string;
-  code: string; // Abbreviation (e.g., "COS", "COLENG")
+  code: string;
   abbreviation: string;
   description?: string;
-  
-  // Contact Information
   dean_name?: string;
   dean_email?: string;
   contact_email?: string;
   contact_phone?: string;
   website_url?: string;
-  
-  // Location within institution
   building_block?: string;
   office_location?: string;
-  
-  // Status & Settings
   established_year?: number;
   logo_url?: string;
   is_active: boolean;
   departmentCount?: number;
-  
   created_at: string;
   updated_at: string;
 }
@@ -77,24 +64,21 @@ export interface Department {
   code: string;
   abbreviation: string;
   description?: string;
-  
-  // Contact
   head_of_department_name?: string;
   head_of_department_email?: string;
   contact_email?: string;
   contact_phone?: string;
   office_location?: string;
   website_url?: string;
-  
-  // Academic details
   established_year?: number;
   accreditation_status?: string;
-  
-  // Metadata
   logo_url?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  // Extended fields for UI
+  college_name?: string;
+  courses_count?: number;
 }
 
 export interface Course {
@@ -103,6 +87,7 @@ export interface Course {
   department_name?: string;
   code: string;
   title: string;
+  name?: string; // Compatibility alias
   description?: string;
   lecturer?: number;
   lecturer_name?: string;
@@ -127,26 +112,14 @@ export interface Venue {
   floor_number?: string;
   room_number?: string;
   capacity?: number;
-  
-  // Precise geolocation with elevation
   latitude: number;
   longitude: number;
   elevation?: number;
-  
-  // Boundary/polygon for precise location mapping.
-  // Coordinates are stored as **[latitude, longitude]** pairs (Python/backend convention).
-  // MapLibre requires [longitude, latitude] — convert when rendering.
   boundary_coordinates?: number[][];
-
-  // Location verification settings
   verification_radius: number;
-
-  // Visual display settings (configurable per-venue)
-  venue_color?: string;    // hex colour, e.g. "#6366f1"
-  venue_opacity?: number;  // 0.0 – 1.0
-  border_width?: number;   // stroke width in px
-  
-  // Metadata
+  venue_color?: string;
+  venue_opacity?: number;
+  border_width?: number;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -164,12 +137,12 @@ export interface User {
   matric_number?: string;
   level?: string;
   department?: string;
-
-  // Institutional Affiliation
   institution?: number;
   institution_id?: number;
+  institution_name?: string;
   college?: number;
   college_id?: number;
+  email_verified?: boolean;
 }
 
 export interface Session {
