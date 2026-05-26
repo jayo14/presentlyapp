@@ -53,15 +53,6 @@ export default {
         'soft-coral': '#E87461',
         'sky-teal': '#2E9CCA',
 
-        "primary": "#f9c406",
-        "background-light": "#f8f8f5",
-        "background-dark": "#231e0f",
-        "surface-light": "#ffffff",
-        "surface-dark": "#352e18",
-        "surface-highlight": "#4a4121",
-        "text-secondary": "#ccbf8e",
-        "text-secondary-light": "#666666",
-
         background: "var(--background)",
         foreground: "var(--foreground)",
 
@@ -103,8 +94,6 @@ export default {
         'surface-variant': "var(--surface-variant)",
         'surface-highest': "var(--surface-highest)",
 
-        text: "var(--on-surface)",
-        textMuted: "var(--on-surface-variant)",
         'on-surface': "var(--on-surface)",
         'on-surface-variant': "var(--on-surface-variant)",
 

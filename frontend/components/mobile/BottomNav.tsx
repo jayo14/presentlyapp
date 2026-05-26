@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { IconProps } from '@phosphor-icons/react';
+import { cn } from '../../src/components/ui/utils';
 
 export interface NavItem {
   label: string;
@@ -13,8 +14,9 @@ interface BottomNavProps {
   items: NavItem[];
   mainAction?: {
     icon: React.ElementType<IconProps>;
+    label?: string;
     onClick: () => void;
-  };
+  } | null;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ items, mainAction }) => {
@@ -23,22 +25,22 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, mainAction }) => {
   const rightItems = items.slice(midPoint);
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-surface-light dark:bg-background-dark border-t border-slate-200 dark:border-white/5 px-2 pb-10 pt-4 z-50">
-      <nav className="flex justify-around items-center">
+    <div className="fixed bottom-0 left-0 w-full px-6 pb-8 pt-4 z-50 pointer-events-none">
+      <div className="max-w-md mx-auto h-[88px] bg-surface/80 backdrop-blur-xl border border-outline/30 rounded-[2.5rem] shadow-premium flex items-center justify-around px-4 pointer-events-auto">
         {leftItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            className="flex flex-col items-center gap-2 p-2 w-20 group outline-none"
+            className="flex flex-col items-center gap-1.5 px-3 py-2 transition-all active:scale-90"
           >
             {({ isActive }) => (
               <>
                 <item.icon 
-                  size={28} 
-                  weight={isActive ? "fill" : "regular"} 
-                  className={`group-hover:scale-110 transition-transform ${isActive ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}
+                  size={24}
+                  weight={isActive ? "bold" : "regular"}
+                  className={cn("transition-colors", isActive ? 'text-sungold' : 'text-on-surface-variant/60')}
                 />
-                <span className={`text-[11px] font-bold ${isActive ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}>
+                <span className={cn("text-[9px] font-bold uppercase tracking-widest", isActive ? 'text-on-surface' : 'text-on-surface-variant/40')}>
                   {item.label}
                 </span>
               </>
@@ -48,41 +50,37 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, mainAction }) => {
 
         {/* Central Raised Action Button */}
         {mainAction && (
-          <div className="relative -top-10 group">
-            <button
-              onClick={mainAction.onClick}
-              className="w-[76px] h-[76px] bg-primary rounded-[2rem] shadow-[0_8px_30px_rgba(249,196,6,0.35)] flex items-center justify-center text-[#231f10] transform transition-all active:scale-95 group-hover:-translate-y-1.5 border-[6px] border-background-light dark:border-background-dark"
-            >
-              <mainAction.icon size={36} weight="fill" />
-            </button>
-            {/* Label for the FAB visually */}
-            <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[11px] font-bold w-max text-slate-500 dark:text-slate-400">
-              Mark Attendance
-            </span>
-          </div>
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={mainAction.onClick}
+            className="relative -top-8 w-16 h-16 bg-sungold text-presently-black rounded-[35%] flex items-center justify-center shadow-gold border-4 border-surface group"
+          >
+            <mainAction.icon size={28} weight="bold" />
+            <div className="absolute inset-0 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+          </motion.button>
         )}
 
         {rightItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            className="flex flex-col items-center gap-2 p-2 w-20 group outline-none"
+            className="flex flex-col items-center gap-1.5 px-3 py-2 transition-all active:scale-90"
           >
             {({ isActive }) => (
               <>
                 <item.icon 
-                  size={28} 
-                  weight={isActive ? "fill" : "regular"} 
-                  className={`group-hover:scale-110 transition-transform ${isActive ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}
+                  size={24}
+                  weight={isActive ? "bold" : "regular"}
+                  className={cn("transition-colors", isActive ? 'text-sungold' : 'text-on-surface-variant/60')}
                 />
-                <span className={`text-[11px] font-bold ${isActive ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}>
+                <span className={cn("text-[9px] font-bold uppercase tracking-widest", isActive ? 'text-on-surface' : 'text-on-surface-variant/40')}>
                   {item.label}
                 </span>
               </>
             )}
           </NavLink>
         ))}
-      </nav>
+      </div>
     </div>
   );
 };

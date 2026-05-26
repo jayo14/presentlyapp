@@ -1,36 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, MagnifyingGlass, GraduationCap, 
-  BookOpen, Buildings, CaretRight, 
-  DotsThreeVertical, Trash, Pencil,
-  Funnel
+  BookOpen, Buildings
 } from '@phosphor-icons/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { departmentApi, institutionApi, collegeApi } from '../../../services/api/admin';
-import { Department, Institution, College } from '../../../types';
+import { departmentApi, institutionApi } from '../../../services/api/admin';
+import { Department, Institution } from '../../../types';
 import { toast } from 'sonner';
 import { SEO } from '../../SEO';
-
-import { DepartmentModal } from '../../Admin/DepartmentModal';
-
+import { useBreakpoint } from '../../../hooks/useBreakpoint';
+import { DepartmentManagement } from '../../Admin/DepartmentManagement';
+import { Badge } from '../../../src/components/ui/badge';
 
 export const DepartmentManagementMobile: React.FC = () => {
+  const isDesktop = !useBreakpoint('md');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [colleges, setColleges] = useState<College[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
-  const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
 
   useEffect(() => { loadInitialData(); }, []);
-
-  useEffect(() => {
-    if (selectedInstitution) loadColleges(selectedInstitution);
-  }, [selectedInstitution]);
 
   const loadInitialData = async () => {
     try {
@@ -48,150 +37,68 @@ export const DepartmentManagementMobile: React.FC = () => {
     }
   };
 
-  const loadColleges = async (id: number) => {
-    try {
-      const data = await collegeApi.getByInstitution(id);
-      setColleges(data);
-    } catch (e) {}
-  };
-
   const filteredDepartments = departments.filter(dept =>
     dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     dept.college_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSaveDepartment = async (formData: Partial<Department>) => {
-    try {
-      if (editingDepartment) {
-        await departmentApi.updateDepartment(editingDepartment.id, formData);
-        toast.success('Department updated');
-      } else {
-        await departmentApi.createDepartment(formData as any);
-        toast.success('Department created');
-      }
-      loadInitialData();
-      setShowModal(false);
-    } catch (err: any) {
-      toast.error('Failed to save');
-      throw err;
-    }
-  };
+  if (isDesktop) return <DepartmentManagement />;
 
   return (
-    <div className="space-y-8 pb-12">
-      <SEO title="Academic Units | Presently Admin" />
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
+      <SEO title="Academic Units | Presently Mobile" />
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-           <h1 className="text-3xl font-bold tracking-tight">Units</h1>
-           <p className="text-on-surface-variant font-medium">Manage departments.</p>
-        </div>
-        <button 
-          onClick={() => { setEditingDepartment(null); setShowModal(true); }}
-          className="w-12 h-12 rounded-2xl bg-sungold text-black flex items-center justify-center shadow-gold active:scale-90 transition-transform"
-        >
-          <Plus size={24} weight="bold" />
-        </button>
+      <div className="flex flex-col gap-1">
+         <h1 className="text-3xl font-display font-bold text-presently-black">Units</h1>
+         <p className="text-on-surface-variant font-medium text-sm">Departments and curriculum units</p>
       </div>
 
-      {/* Filters Overlay Toggle */}
-      <div className="space-y-4">
-        <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-            <MagnifyingGlass size={20} weight="bold" />
-          </div>
-          <input 
-            type="text"
-            placeholder="Search units..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-14 pl-12 pr-4 bg-surface-container border border-outline rounded-2xl outline-none focus:border-sungold transition-all"
-          />
-        </div>
-
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-           <select 
-             value={selectedInstitution || ''} 
-             onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-             className="px-4 py-2.5 bg-surface-container border border-outline rounded-full text-[10px] font-black uppercase tracking-widest outline-none"
-           >
-              <option value="">All Uni</option>
-              {institutions.map(i => <option key={i.id} value={i.id}>{i.short_name}</option>)}
-           </select>
-           <select 
-             value={selectedCollege || ''} 
-             onChange={(e) => setSelectedCollege(e.target.value ? Number(e.target.value) : null)}
-             disabled={!selectedInstitution}
-             className="px-4 py-2.5 bg-surface-container border border-outline rounded-full text-[10px] font-black uppercase tracking-widest outline-none disabled:opacity-50"
-           >
-              <option value="">All Colleges</option>
-              {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-           </select>
-        </div>
+      <div className="flex items-center gap-3">
+         <div className="relative flex-1 group">
+            <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant transition-colors group-focus-within:text-sungold" size={18} />
+            <input
+              placeholder="Search units..."
+              className="w-full h-12 pl-11 pr-4 bg-surface border border-outline rounded-2xl text-sm font-bold focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+         </div>
+         <button className="w-12 h-12 flex items-center justify-center rounded-2xl bg-sungold text-presently-black shadow-gold active:scale-95 transition-all">
+            <Plus size={20} weight="bold" />
+         </button>
       </div>
 
-      {/* List */}
-      <div className="space-y-4">
-        {loading ? (
-          [1,2,3].map(i => <div key={i} className="h-28 bg-surface-container animate-pulse rounded-3xl" />)
-        ) : filteredDepartments.length > 0 ? (
-          filteredDepartments.map((dept) => (
-            <motion.div 
-              key={dept.id}
-              layout
-              className="p-5 rounded-[32px] bg-surface border border-outline shadow-sm space-y-4"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-surface-container border border-outline/50 flex items-center justify-center text-sungold">
-                   <GraduationCap size={28} weight="duotone" />
+      <div className="space-y-4 pb-24">
+         {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-40 bg-slate-100 animate-pulse rounded-[2rem]" />
+            ))
+         ) : (
+           filteredDepartments.map(dept => (
+             <div key={dept.id} className="p-6 bg-surface border border-outline rounded-[2.5rem] shadow-sm">
+                <div className="flex items-start gap-4 mb-6">
+                   <div className="w-14 h-14 rounded-[30%] bg-moss-green/10 text-moss-green border border-outline flex items-center justify-center shadow-sm">
+                      <GraduationCap size={28} weight="bold" />
+                   </div>
+                   <div className="flex-1 min-w-0 pt-1">
+                      <h3 className="font-bold text-presently-black text-lg line-clamp-1">{dept.name}</h3>
+                      <div className="flex items-center gap-2 text-on-surface-variant font-bold text-[10px] uppercase tracking-widest mt-1">
+                         <Buildings size={14} className="text-sungold" />
+                         <span className="truncate">{dept.college_name}</span>
+                      </div>
+                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                   <h3 className="font-bold text-lg leading-tight truncate">{dept.name}</h3>
-                   <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest truncate">{dept.college_name}</p>
+
+                <div className="flex items-center justify-between border-t border-outline/40 pt-5">
+                   <div className="flex items-center gap-2 text-on-surface-variant">
+                      <BookOpen size={16} weight="bold" className="text-sungold" />
+                      <span className="text-xs font-bold tabular-nums">{dept.courses_count || 0} active courses</span>
+                   </div>
                 </div>
-                <button className="p-2 text-on-surface-variant">
-                   <DotsThreeVertical size={24} weight="bold" />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                 <div className="flex items-center gap-2">
-                    <BookOpen size={16} weight="duotone" className="text-primary" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">{dept.courses_count || 0} Courses</span>
-                 </div>
-                 <div className="flex gap-2">
-                    <button 
-                      onClick={() => { setEditingDepartment(dept); setShowModal(true); }}
-                      className="p-2.5 rounded-xl bg-surface-container border border-outline text-on-surface-variant active:scale-90 transition-all"
-                    >
-                       <Pencil size={18} weight="duotone" />
-                    </button>
-                    <button 
-                      className="p-2.5 rounded-xl bg-error/5 border border-error/10 text-error active:scale-90 transition-all"
-                    >
-                       <Trash size={18} weight="duotone" />
-                    </button>
-                 </div>
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <div className="text-center py-20 bg-surface-container rounded-[40px] border border-dashed border-outline">
-             <GraduationCap size={64} weight="duotone" className="mx-auto text-on-surface-variant opacity-20 mb-4" />
-             <p className="text-sm text-on-surface-variant font-medium">No units found.</p>
-          </div>
-        )}
+             </div>
+           ))
+         )}
       </div>
-
-      {showModal && (
-        <DepartmentModal
-          department={editingDepartment || undefined}
-          colleges={colleges}
-          onSave={handleSaveDepartment}
-          onClose={() => setShowModal(false)}
-        />
-      )}
     </div>
   );
 };

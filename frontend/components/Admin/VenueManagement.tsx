@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Plus, Search, Edit2, Trash2, Building, Navigation, Loader, AlertCircle, X } from 'lucide-react';
+import { Building, Plus, Search, Edit2, Trash2, MapPin, Navigation, AlertCircle } from 'lucide-react';
 import { Button } from '../Button';
-import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
 import { venuesApi, institutionApi } from '../../services/api/admin';
 import { toast } from 'sonner';
-import { SEO } from '../SEO';
 import { ModernCard } from '../ModernCard';
 import { Badge } from '../../src/components/ui/badge';
 import { cn } from '../../src/components/ui/utils';
 import { VenueModal } from './VenueModal';
 import { VenueMap } from './VenueMap';
+import { DashboardPage } from '../../src/components/layout-primitives/DashboardPage';
+import { ResponsiveGrid } from '../../src/components/layout-primitives/ResponsiveGrid';
 
 export const VenueManagement: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -104,158 +104,152 @@ export const VenueManagement: React.FC = () => {
   }, [filteredVenues, selectedVenue]);
 
   return (
-    <div className="space-y-10 max-w-7xl mx-auto pb-20">
-      <SEO title="Physical Venues | Presently Admin" />
-
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-           <Badge variant="secondary" className="px-3 py-1">GEOSPATIAL ASSETS</Badge>
-           <h1 className="font-display text-4xl md:text-5xl font-bold text-presently-black">
-             Physical Venues
-           </h1>
-           <p className="text-on-surface-variant font-medium text-lg">
-             Configure GPS coordinates and attendance geofences.
-           </p>
-        </div>
-        <Button size="lg" className="h-16 px-10 shadow-gold" onClick={handleCreateVenue}>
+    <DashboardPage
+      title="Physical Venues"
+      description="Configure GPS coordinates and attendance geofences for campuses."
+      seoTitle="Physical Venues | Presently Admin"
+      action={
+        <Button size="lg" className="shadow-gold" onClick={handleCreateVenue}>
           <Plus size={24} className="mr-2" />
           Add Venue
         </Button>
-      </header>
-
-      {error && (
-        <div className="p-6 bg-soft-coral/10 border border-soft-coral/30 rounded-2xl flex items-start gap-4">
-          <AlertCircle className="w-6 h-6 text-soft-coral mt-0.5" />
-          <div>
-            <p className="text-soft-coral font-bold uppercase tracking-widest text-xs mb-1">System Error</p>
-            <p className="text-presently-black font-medium">{error}</p>
+      }
+    >
+      <div className="space-y-16 lg:space-y-32">
+        {error && (
+          <div className="p-6 bg-soft-coral/10 border border-soft-coral/30 rounded-2xl flex items-start gap-4">
+            <AlertCircle className="w-6 h-6 text-soft-coral mt-0.5" />
+            <div>
+              <p className="text-soft-coral font-bold uppercase tracking-widest text-xs mb-1">System Error</p>
+              <p className="text-presently-black font-medium">{error}</p>
+            </div>
           </div>
+        )}
+
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant transition-colors group-focus-within:text-sungold" size={20} />
+            <input
+              type="text"
+              placeholder="Search venues by name or institution..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full h-16 pl-14 pr-6 bg-white border border-outline rounded-2xl text-presently-black font-bold text-sm focus:ring-4 focus:ring-sungold/10 outline-none transition-all shadow-sm"
+            />
+          </div>
+          <select
+            value={selectedInstitution || ''}
+            onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
+            className="h-16 px-8 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none appearance-none min-w-[280px] cursor-pointer"
+          >
+            <option value="">All Institutions</option>
+            {institutions.map(inst => (
+              <option key={inst.id} value={inst.id}>{inst.short_name}</option>
+            ))}
+          </select>
         </div>
-      )}
 
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant" size={20} />
-          <input
-            type="text"
-            placeholder="Search venues by name or institution..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-16 pl-14 pr-6 bg-white border border-outline rounded-2xl text-presently-black font-medium focus:ring-2 focus:ring-sungold/20 outline-none"
-          />
-        </div>
-        <select
-          value={selectedInstitution || ''}
-          onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-          className="h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-2 focus:ring-sungold/20 outline-none appearance-none min-w-[240px]"
-        >
-          <option value="">All Institutions</option>
-          {institutions.map(inst => (
-            <option key={inst.id} value={inst.id}>{inst.short_name}</option>
-          ))}
-        </select>
-      </div>
+        <section className="space-y-8">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-on-surface-variant/60">
+              Campus Geospatial Assets
+            </h2>
+            {selectedVenue && (
+              <Button
+                variant="outline"
+                className="h-10 px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest"
+                onClick={() => setSelectedVenue(null)}
+              >
+                Clear Focus
+              </Button>
+            )}
+          </div>
+          <div className="h-[460px] md:h-[600px] rounded-[2.5rem] overflow-hidden border border-outline/30 bg-surface relative z-0 shadow-premium">
+            <VenueMap
+              venues={filteredVenues}
+              selectedVenue={selectedVenue}
+              onVenueClick={setSelectedVenue}
+            />
+          </div>
+        </section>
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-sm md:text-base font-bold uppercase tracking-widest text-on-surface-variant">
-            Venue Map
-          </h2>
-          {selectedVenue && (
-            <Button
-              variant="outline"
-              className="h-11 px-5 rounded-xl text-xs font-bold uppercase tracking-widest"
-              onClick={() => setSelectedVenue(null)}
-            >
-              Clear Focus
-            </Button>
-          )}
-        </div>
-        <div className="h-[420px] md:h-[520px] rounded-[2rem] overflow-hidden border border-outline bg-surface">
-          <VenueMap
-            venues={filteredVenues}
-            selectedVenue={selectedVenue}
-            onVenueClick={setSelectedVenue}
-          />
-        </div>
-      </section>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {loading && venues.length === 0 ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-3xl" />
-          ))
-        ) : (
-          filteredVenues.map(venue => (
-            <ModernCard
-              key={venue.id}
-              padding="lg"
-              className={cn(
-                "group hover:border-sungold/40 transition-all flex flex-col justify-between",
-                selectedVenue?.id === venue.id && "border-sungold/50 shadow-gold"
-              )}
-            >
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-warm-ivory border border-outline flex items-center justify-center text-sungold">
-                    <MapPin size={24} />
-                  </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleEditVenue(venue)}
-                      className="p-2 hover:bg-slate-50 rounded-xl border border-outline text-on-surface-variant"
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteVenue(venue.id)}
-                      className="p-2 hover:bg-red-50 rounded-xl border border-outline text-soft-coral"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <button
-                    type="button"
-                    className="text-left w-full"
-                    onClick={() => setSelectedVenue(venue)}
-                  >
-                    <h3 className="font-display text-xl font-bold text-presently-black leading-tight mb-1 hover:text-sungold transition-colors">
-                      {venue.name}
-                    </h3>
-                  </button>
-                  <div className="flex items-center gap-2">
-                    <Building size={14} className="text-sungold" />
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{venue.institution_name}</span>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-outline space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Navigation size={14} className="text-sungold" />
-                      <span className="text-xs font-medium text-on-surface-variant">
-                        {venue.latitude.toFixed(4)}, {venue.longitude.toFixed(4)}
-                      </span>
+        <ResponsiveGrid columns={3} gap={32}>
+          {loading && venues.length === 0 ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-[2rem]" />
+            ))
+          ) : (
+            filteredVenues.map(venue => (
+              <ModernCard
+                key={venue.id}
+                padding="lg"
+                className={cn(
+                  "group transition-all flex flex-col justify-between h-full border border-outline/30 hover:border-sungold/40",
+                  selectedVenue?.id === venue.id && "border-sungold shadow-gold"
+                )}
+              >
+                <div className="space-y-6 flex flex-col h-full">
+                  <div className="flex items-start justify-between">
+                    <div className="w-14 h-14 rounded-[30%] bg-warm-ivory border border-outline flex items-center justify-center text-sungold shadow-sm">
+                      <MapPin size={28} weight="bold" />
                     </div>
-                    <Badge variant="secondary" className="text-[10px]">RADIUS: {venue.radius}M</Badge>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleEditVenue(venue)}
+                        className="p-3 hover:bg-surface-highest/40 rounded-xl border border-outline text-on-surface-variant transition-colors"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteVenue(venue.id)}
+                        className="p-3 hover:bg-soft-coral/10 rounded-xl border border-outline text-soft-coral transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex-grow">
+                    <button
+                      type="button"
+                      className="text-left w-full group/title"
+                      onClick={() => setSelectedVenue(venue)}
+                    >
+                      <h3 className="font-display text-2xl font-bold text-presently-black leading-tight mb-2 group-hover/title:text-sungold transition-colors">
+                        {venue.name}
+                      </h3>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <Building size={16} weight="bold" className="text-sungold" />
+                      <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{venue.institution_name}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-outline/40 space-y-4 mt-auto">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Navigation size={16} weight="bold" className="text-sungold" />
+                        <span className="text-xs font-bold text-on-surface-variant tabular-nums">
+                          {venue.latitude.toFixed(4)}, {venue.longitude.toFixed(4)}
+                        </span>
+                      </div>
+                      <Badge variant="secondary" className="font-bold">RADIUS: {venue.verification_radius}M</Badge>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ModernCard>
-          ))
+              </ModernCard>
+            ))
+          )}
+        </ResponsiveGrid>
+
+        {!loading && filteredVenues.length === 0 && (
+          <div className="text-center py-32 bg-surface-highest/20 rounded-[3rem] border-2 border-dashed border-outline/40">
+            <MapPin className="w-24 h-24 text-outline mx-auto mb-6 opacity-20" />
+            <h4 className="font-display text-3xl font-bold text-presently-black">No Venues Found</h4>
+            <p className="text-on-surface-variant font-medium mt-3 max-w-sm mx-auto">Create a physical venue to enable geospatial attendance tracking.</p>
+          </div>
         )}
       </div>
-
-      {!loading && filteredVenues.length === 0 && (
-        <div className="text-center py-24 bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-outline">
-          <MapPin className="w-20 h-20 text-slate-200 mx-auto mb-6" />
-          <h4 className="font-display text-2xl font-bold text-presently-black">No Venues Found</h4>
-          <p className="text-on-surface-variant font-medium mt-2">Create a physical venue to enable attendance tracking.</p>
-        </div>
-      )}
 
       {showModal && (
         <VenueModal
@@ -265,7 +259,7 @@ export const VenueManagement: React.FC = () => {
           onClose={() => setShowModal(false)}
         />
       )}
-    </div>
+    </DashboardPage>
   );
 };
 

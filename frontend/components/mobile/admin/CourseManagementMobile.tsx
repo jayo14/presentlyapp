@@ -1,42 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, MagnifyingGlass, BookOpen, 
-  GraduationCap, Users, CaretRight, 
-  DotsThreeVertical, Trash, Pencil,
-  Tag
+  GraduationCap
 } from '@phosphor-icons/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { coursesApi, institutionApi, collegeApi, departmentApi } from '../../../services/api/admin';
-import { Course, Institution, College, Department } from '../../../types';
+import { coursesApi, institutionApi } from '../../../services/api/admin';
+import { Course, Institution } from '../../../types';
 import { toast } from 'sonner';
 import { SEO } from '../../SEO';
-
-import { CourseModal } from '../../Admin/CourseModal';
-
+import { useBreakpoint } from '../../../hooks/useBreakpoint';
+import { CourseManagement } from '../../Admin/CourseManagement';
+import { Badge } from '../../../src/components/ui/badge';
 
 export const CourseManagementMobile: React.FC = () => {
+  const isDesktop = !useBreakpoint('md');
   const [courses, setCourses] = useState<Course[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [colleges, setColleges] = useState<College[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedInstitution, setSelectedInstitution] = useState<number | null>(null);
-  const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
-  const [selectedDepartment, setSelectedDepartment] = useState<number | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   useEffect(() => { loadInitialData(); }, []);
-
-  useEffect(() => {
-    if (selectedInstitution) loadColleges(selectedInstitution);
-  }, [selectedInstitution]);
-
-  useEffect(() => {
-    if (selectedCollege) loadDepartments(selectedCollege);
-  }, [selectedCollege]);
 
   const loadInitialData = async () => {
     try {
@@ -48,171 +31,73 @@ export const CourseManagementMobile: React.FC = () => {
       setInstitutions(instRes);
       setCourses(courseRes);
     } catch (err) {
-      toast.error('Failed to load catalog');
+      toast.error('Failed to load courses');
     } finally {
       setLoading(false);
     }
   };
 
-  const loadColleges = async (id: number) => {
-    try {
-      const data = await collegeApi.getByInstitution(id);
-      setColleges(data);
-    } catch (e) {}
-  };
-
-  const loadDepartments = async (id: number) => {
-    try {
-      const data = await departmentApi.getByCollege(id);
-      setDepartments(data);
-    } catch (e) {}
-  };
-
-  const filteredCourses = courses.filter(c =>
-    c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.code.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCourses = courses.filter(course =>
+    course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSaveCourse = async (formData: Partial<Course>) => {
-    try {
-      if (editingCourse) {
-        await coursesApi.updateCourse(editingCourse.id, formData);
-        toast.success('Course updated');
-      } else {
-        await coursesApi.createCourse(formData as any);
-        toast.success('Course created');
-      }
-      loadInitialData();
-      setShowModal(false);
-    } catch (err: any) {
-      toast.error('Failed to save');
-      throw err;
-    }
-  };
+  if (isDesktop) return <CourseManagement />;
 
   return (
-    <div className="space-y-8 pb-12">
-      <SEO title="Course Catalog | Presently Admin" />
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
+      <SEO title="Course Catalog | Presently Mobile" />
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-           <h1 className="text-3xl font-bold tracking-tight">Catalog</h1>
-           <p className="text-on-surface-variant font-medium">Academic inventory.</p>
-        </div>
-        <button 
-          onClick={() => { setEditingCourse(null); setShowModal(true); }}
-          className="w-12 h-12 rounded-2xl bg-sungold text-black flex items-center justify-center shadow-gold active:scale-90 transition-transform"
-        >
-          <Plus size={24} weight="bold" />
-        </button>
+      <div className="flex flex-col gap-1">
+         <h1 className="text-3xl font-display font-bold text-presently-black">Catalog</h1>
+         <p className="text-on-surface-variant font-medium text-sm">Academic courses and codes</p>
       </div>
 
-      {/* Filters */}
-      <div className="space-y-4">
-        <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-            <MagnifyingGlass size={20} weight="bold" />
-          </div>
-          <input 
-            type="text"
-            placeholder="Search title, code..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-14 pl-12 pr-4 bg-surface-container border border-outline rounded-2xl outline-none focus:border-sungold transition-all"
-          />
-        </div>
-
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-           <select 
-             value={selectedInstitution || ''} 
-             onChange={(e) => setSelectedInstitution(e.target.value ? Number(e.target.value) : null)}
-             className="px-4 py-2.5 bg-surface-container border border-outline rounded-full text-[10px] font-black uppercase tracking-widest outline-none"
-           >
-              <option value="">Institution</option>
-              {institutions.map(i => <option key={i.id} value={i.id}>{i.short_name}</option>)}
-           </select>
-           <select 
-             value={selectedDepartment || ''} 
-             onChange={(e) => setSelectedDepartment(e.target.value ? Number(e.target.value) : null)}
-             disabled={!selectedCollege}
-             className="px-4 py-2.5 bg-surface-container border border-outline rounded-full text-[10px] font-black uppercase tracking-widest outline-none disabled:opacity-50"
-           >
-              <option value="">Dept</option>
-              {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-           </select>
-        </div>
+      <div className="flex items-center gap-3">
+         <div className="relative flex-1 group">
+            <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant transition-colors group-focus-within:text-sungold" size={18} />
+            <input
+              placeholder="Search code or name..."
+              className="w-full h-12 pl-11 pr-4 bg-surface border border-outline rounded-2xl text-sm font-bold focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+         </div>
+         <button className="w-12 h-12 flex items-center justify-center rounded-2xl bg-sungold text-presently-black shadow-gold active:scale-95 transition-all">
+            <Plus size={20} weight="bold" />
+         </button>
       </div>
 
-      {/* List */}
-      <div className="space-y-4">
-        {loading ? (
-          [1,2,3].map(i => <div key={i} className="h-36 bg-surface-container animate-pulse rounded-3xl" />)
-        ) : filteredCourses.length > 0 ? (
-          filteredCourses.map((course) => (
-            <motion.div 
-              key={course.id}
-              layout
-              className="p-5 rounded-[32px] bg-surface border border-outline shadow-sm space-y-4"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-surface-container border border-outline/50 flex items-center justify-center text-sungold">
-                   <BookOpen size={28} weight="duotone" />
-                </div>
-                <div className="flex-1 min-w-0">
-                   <h3 className="font-bold text-lg leading-tight truncate">{course.title}</h3>
-                   <div className="flex items-center gap-2 mt-1">
-                      <Tag size={12} weight="bold" className="text-sungold" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-presently-black">{course.code}</span>
-                      <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-50">• {course.credit_units} Units</span>
+      <div className="space-y-4 pb-24">
+         {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-40 bg-slate-100 animate-pulse rounded-[2rem]" />
+            ))
+         ) : (
+           filteredCourses.map(course => (
+             <div key={course.id} className="p-6 bg-surface border border-outline rounded-[2.5rem] shadow-sm">
+                <div className="flex items-start gap-4 mb-6">
+                   <div className="w-14 h-14 rounded-[30%] bg-sungold/10 text-sungold border border-outline flex items-center justify-center shadow-sm shrink-0">
+                      <BookOpen size={28} weight="bold" />
+                   </div>
+                   <div className="flex-1 min-w-0 pt-1">
+                      <div className="flex items-center gap-2 mb-1">
+                         <Badge variant="secondary" className="font-black px-2 py-0.5">{course.code}</Badge>
+                      </div>
+                      <h3 className="font-bold text-presently-black text-lg line-clamp-1">{course.name}</h3>
                    </div>
                 </div>
-                <button className="p-2 text-on-surface-variant">
-                   <DotsThreeVertical size={24} weight="bold" />
-                </button>
-              </div>
 
-              <div className="space-y-2">
-                 <div className="flex items-center gap-2 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
-                    <GraduationCap size={14} weight="duotone" />
-                    <span className="truncate">{course.department_name}</span>
-                 </div>
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
-                       <Users size={14} weight="duotone" />
-                       {course.enrolled_students_count || 0} Enrolled
-                    </div>
-                    <div className="flex gap-2">
-                       <button 
-                         onClick={() => { setEditingCourse(course); setShowModal(true); }}
-                         className="p-2.5 rounded-xl bg-surface-container border border-outline text-on-surface-variant active:scale-90 transition-all"
-                       >
-                          <Pencil size={18} weight="duotone" />
-                       </button>
-                       <button className="p-2.5 rounded-xl bg-error/5 border border-error/10 text-error active:scale-90 transition-all">
-                          <Trash size={18} weight="duotone" />
-                       </button>
-                    </div>
-                 </div>
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <div className="text-center py-20 bg-surface-container rounded-[40px] border border-dashed border-outline">
-             <BookOpen size={64} weight="duotone" className="mx-auto text-on-surface-variant opacity-20 mb-4" />
-             <p className="text-sm text-on-surface-variant font-medium">Course catalog is empty.</p>
-          </div>
-        )}
+                <div className="flex items-center justify-between border-t border-outline/40 pt-5">
+                   <div className="flex items-center gap-2 text-on-surface-variant">
+                      <GraduationCap size={16} weight="bold" className="text-sungold" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest truncate max-w-[200px]">{course.department_name}</span>
+                   </div>
+                </div>
+             </div>
+           ))
+         )}
       </div>
-
-      {showModal && (
-        <CourseModal
-          course={editingCourse || undefined}
-          departments={departments}
-          onSave={handleSaveCourse}
-          onClose={() => setShowModal(false)}
-        />
-      )}
     </div>
   );
 };

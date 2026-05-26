@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import {
-  ArrowLeft, Settings, Bell, Clock, Info, AlertTriangle, CheckCircle2, Calendar,
-  Loader2, Play, FileText, RefreshCw, ChevronRight, Circle, Trash2, Check, X
+  Bell, Clock, RefreshCw, ChevronRight, Trash2, CheckCircle2
 } from 'lucide-react';
 import { Button } from '../Button';
 import { notificationsApi, Notification as ApiNotification } from '../../services/api/notifications';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
-import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 import { SEO } from '../SEO';
+import { DashboardPage } from '../../src/components/layout-primitives/DashboardPage';
+import { ModernCard } from '../ModernCard';
+import { Badge } from '../../src/components/ui/badge';
+import { cn } from '../../src/components/ui/utils';
 
-type TabType = 'all' | 'unread' | 'important' | 'system';
+type TabType = 'all' | 'unread' | 'important';
 
 export const NotificationsPage: React.FC = () => {
   const [notifications, setNotifications] = useState<ApiNotification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('all');
-  const [selectedNotifications, setSelectedNotifications] = useState<number[]>([]);
-  const [bulkMode, setBulkMode] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     loadNotifications();
@@ -30,10 +27,7 @@ export const NotificationsPage: React.FC = () => {
       setLoading(true);
       const data = await notificationsApi.getAll();
       setNotifications(data);
-      setError(null);
     } catch (err) {
-      console.error('Failed to load notifications:', err);
-      setError('Failed to load notifications');
       toast.error('Failed to load notifications');
     } finally {
       setLoading(false);
@@ -44,429 +38,113 @@ export const NotificationsPage: React.FC = () => {
     try {
       await notificationsApi.markAllAsRead();
       setNotifications(notifications.map(n => ({ ...n, is_read: true })));
-      toast.success('All notifications marked as read');
+      toast.success('All marked as read');
     } catch (err) {
-      toast.error('Failed to mark notifications as read');
+      toast.error('Operation failed');
     }
   };
 
-  const toggleReadStatus = async (id: number, currentStatus: boolean) => {
-    try {
-      await notificationsApi.toggleReadStatus(id, currentStatus);
-      setNotifications(notifications.map(n => 
-        n.id === id ? { ...n, is_read: !currentStatus } : n
-      ));
-      toast.success(currentStatus ? 'Marked as unread' : 'Marked as read');
-    } catch (err) {
-      toast.error('Failed to update notification status');
-    }
-  };
-
-  const clearAll = async () => {
-    if (!confirm('Are you sure you want to clear all notifications?')) return;
-    try {
-      // Assuming API has a clear all method
-      await notificationsApi.clearAll?.();
-      setNotifications([]);
-      toast.success('All notifications cleared');
-    } catch (err) {
-      toast.error('Failed to clear notifications');
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedNotifications.length === 0) {
-      toast.error('No notifications selected');
-      return;
-    }
-
-    if (!confirm(`Delete ${selectedNotifications.length} notification(s)?`)) return;
-
-    try {
-      // Delete selected notifications
-      await Promise.all(
-        selectedNotifications.map(id => notificationsApi.delete?.(id))
-      );
-      setNotifications(notifications.filter(n => !selectedNotifications.includes(n.id)));
-      setSelectedNotifications([]);
-      setBulkMode(false);
-      toast.success(`${selectedNotifications.length} notification(s) deleted`);
-    } catch (err) {
-      toast.error('Failed to delete notifications');
-    }
-  };
-
-  const handleSelectNotification = (id: number) => {
-    setSelectedNotifications(prev =>
-      prev.includes(id) ? prev.filter(nId => nId !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = () => {
-    if (selectedNotifications.length === filteredNotifications.length) {
-      setSelectedNotifications([]);
-    } else {
-      setSelectedNotifications(filteredNotifications.map(n => n.id));
-    }
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'ALERT': return <AlertTriangle className="text-red-500" size={24} />;
-      case 'ATTENDANCE': return <Play className="text-primary" size={24} />;
-      case 'CLASS_REMINDER': return <Calendar className="text-primary" size={24} />;
-      case 'ANNOUNCEMENT': return <FileText className="text-primary" size={24} />;
-      case 'SYSTEM': return <RefreshCw className="text-primary" size={24} />;
-      default: return <Bell className="text-primary" size={24} />;
-    }
-  };
-
-  const getIconBg = (type: string) => {
-    return type === 'ALERT' ? 'bg-red-500/10 dark:bg-red-500/20' : 'bg-primary/10 dark:bg-primary/20';
-  };
-
-  const formatTimeAgo = (dateString: string) => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    return date.toLocaleDateString();
-  };
-
-  const filteredNotifications = notifications.filter(notif => {
-    if (activeTab === 'unread') return !notif.is_read;
-    if (activeTab === 'important') return notif.type === 'ALERT';
-    if (activeTab === 'system') return notif.type === 'SYSTEM';
+  const filteredNotifications = notifications.filter(n => {
+    if (activeTab === 'unread') return !n.is_read;
+    if (activeTab === 'important') return n.importance === 'high';
     return true;
   });
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
-
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // Mobile Layout (matching the dark theme design)
-  const mobileLayout = (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Mobile Header */}
-      {/* <div className="sticky top-0 z-10 bg-background border-b border-outline">
-        <div className="flex items-center justify-between p-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
-          >
-            <ArrowLeft size={24} className="text-text" />
-          </button>
-          <h1 className="font-headline text-xl font-bold text-text">Notifications</h1>
-          <button
-            onClick={() => navigate('/dashboard/settings#notifications')}
-            className="p-2 hover:bg-surfaceHigh rounded-lg transition-colors"
-            aria-label="Notification Settings"
-          >
-            <Settings size={24} className="text-textMuted" />
-          </button>
-        </div>
-
-
-        <div className="flex gap-6 px-4 pb-3 overflow-x-auto">
-          {[
-            { id: 'all', label: 'All' },
-            { id: 'unread', label: 'Unread' },
-            { id: 'important', label: 'Important' },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as TabType)}
-              className={`pb-2 text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-muted-foreground'
-                }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div> */}
-
-      {/* Mobile Notifications List */}
-      <div className="p-4 space-y-3">
-        {filteredNotifications.length > 0 ? (
-          filteredNotifications.map((notification) => (
-            <div
-              key={notification.id}
-              className="bg-surface rounded-xl p-4 flex items-start gap-3 cursor-pointer"
-              onClick={() => toggleReadStatus(notification.id, notification.is_read)}
-            >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
-                {getIcon(notification.type)}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-headline font-semibold text-text text-base leading-tight">
-                    {notification.title}
-                  </h3>
-                  {!notification.is_read && (
-                    <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
-                  )}
-                </div>
-                <p className="text-textMuted text-sm mb-2">
-                  {formatTimeAgo(notification.created_at)}
-                </p>
-                {notification.message && (
-                  <p className="text-textMuted text-sm leading-relaxed line-clamp-2">
-                    {notification.message}
-                  </p>
-                )}
-              </div>
-
-              {notification.type === 'ALERT' && (
-                <ChevronRight size={20} className="text-textMuted shrink-0 mt-1" />
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="text-center py-20">
-            <Bell size={48} className="mx-auto text-textMuted mb-4" />
-            <h3 className="font-headline text-lg font-semibold text-text mb-2">No notifications</h3>
-            <p className="text-textMuted">You're all caught up!</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  // Desktop Layout (unchanged)
-  const desktopLayout = (
-    <div className="max-w-4xl mx-auto animate-in fade-in duration-500 pb-24 md:pb-8">
-      {/* Header */}
-      {/* <div className="flex items-center justify-between mb-6 pt-4 pb-4 border-b border-outline px-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-surface rounded-lg transition-colors"
-          >
-            <ArrowLeft size={24} className="text-primary" />
-          </button>
-          <div>
-            <h1 className="font-headline text-2xl font-bold text-primary flex items-center gap-2">
-              <Bell size={28} className="text-primary" />
-              Notifications
-            </h1>
-            {unreadCount > 0 && (
-              <p className="text-sm text-textMuted">{unreadCount} unread</p>
-            )}
-          </div>
-        </div>
-        <button
-          onClick={() => navigate('/dashboard/settings#notifications')}
-          className="p-2 hover:bg-surface rounded-lg transition-colors"
-          aria-label="Notification Settings"
-        >
-          <Settings size={24} className="text-textMuted hover:text-primary transition-colors" />
-        </button>
-      </div> */}
-
-      {/* Filter Tabs */}
-      <div className="flex items-center justify-between mb-6 px-4">
-        <div className="flex gap-2 md:gap-4 overflow-x-auto">
-          {[
-            { id: 'all', label: 'All', count: notifications.length },
-            { id: 'unread', label: 'Unread', count: unreadCount },
-            { id: 'important', label: 'Important', count: notifications.filter(n => n.type === 'ALERT').length },
-            { id: 'system', label: 'System', count: notifications.filter(n => n.type === 'SYSTEM').length },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as TabType)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${activeTab === tab.id
-                ? 'bg-primary text-background shadow-md'
-                : 'bg-surface dark:bg-zinc-900 text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground'
-                }`}
-            >
-              {tab.label}
-              {tab.count > 0 && (
-                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id
-                  ? 'bg-white/20'
-                  : 'bg-zinc-200 dark:bg-surfaceHigh'
-                  }`}>
-                  {tab.count}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Bulk Actions */}
-      <div className="flex items-center justify-between mb-4 px-4">
-        <div className="flex items-center gap-3">
-          {bulkMode && (
-            <>
-              <button
-                onClick={handleSelectAll}
-                className="text-primary hover:underline text-sm font-medium"
-              >
-                {selectedNotifications.length === filteredNotifications.length ? 'Deselect All' : 'Select All'}
-              </button>
-              <span className="text-textMuted text-sm">
-                {selectedNotifications.length} selected
-              </span>
-            </>
-          )}
-          {!bulkMode && (
-            <button
-              onClick={() => setBulkMode(true)}
-              className="text-primary hover:underline text-sm font-medium"
-            >
-              Select
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          {bulkMode && selectedNotifications.length > 0 ? (
-            <>
-              <Button
-                onClick={handleBulkDelete}
-                variant="secondary"
-                size="sm"
-                className="text-red-500 hover:bg-red-500/10"
-              >
-                <Trash2 size={16} className="mr-1" />
-                Delete
-              </Button>
-              <Button
-                onClick={() => {
-                  setBulkMode(false);
-                  setSelectedNotifications([]);
-                }}
-                variant="secondary"
-                size="sm"
-              >
-                <X size={16} className="mr-1" />
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                onClick={markAllAsRead}
-                variant="secondary"
-                size="sm"
-                disabled={unreadCount === 0}
-              >
-                <Check size={16} className="mr-1" />
-                Mark all read
-              </Button>
-              <Button
-                onClick={clearAll}
-                variant="secondary"
-                size="sm"
-                disabled={notifications.length === 0}
-                className="text-red-500 hover:bg-red-500/10"
-              >
-                <Trash2 size={16} className="mr-1" />
-                Clear all
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Notifications List */}
-      <div className="space-y-3 px-4">
-        {filteredNotifications.length > 0 ? (
-          filteredNotifications.map((notification) => (
-            <div
-              key={notification.id}
-              className={`bg-surface dark:bg-zinc-900 border border-border dark:border-zinc-800 rounded-2xl p-4 flex items-center gap-4 transition-all cursor-pointer ${!notification.is_read ? 'border-l-4 border-l-primary' : ''
-                } ${bulkMode ? 'hover:bg-inputccent hover:text-muted-foregroundccent-foreground' : 'hover:shadow-md'
-                }`}
-              onClick={() => bulkMode ? handleSelectNotification(notification.id) : toggleReadStatus(notification.id, notification.is_read)}
-            >
-              {bulkMode && (
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedNotifications.includes(notification.id)}
-                    onChange={() => handleSelectNotification(notification.id)}
-                    className="w-5 h-5 rounded border-outline border-outline text-primary focus:ring-primary"
-                  />
-                </div>
-              )}
-
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getIconBg(notification.type)} shrink-0`}>
-                {getIcon(notification.type)}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="font-headline font-semibold text-primary text-base leading-tight">
-                    {notification.title}
-                  </h3>
-                  <span className="text-textMuted text-xs whitespace-nowrap">
-                    {formatTimeAgo(notification.created_at)}
-                  </span>
-                </div>
-                {notification.message && (
-                  <p className="text-textMuted text-sm leading-relaxed line-clamp-2 mb-2">
-                    {notification.message}
-                  </p>
-                )}
-                {/* Action buttons if needed */}
-                {notification.type === 'ATTENDANCE' && (
-                  <button className="text-primary text-sm font-medium hover:underline mt-1">
-                    View Session →
-                  </button>
-                )}
-              </div>
-
-              {/* Status Indicator */}
-              {!bulkMode && (
-                <div className="ml-2 shrink-0">
-                  {!notification.is_read && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                  )}
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="text-center py-20 bg-surface rounded-2xl border border-outline">
-            <Bell size={48} className="mx-auto text-textMuted mb-4" />
-            <h3 className="font-headline text-lg font-semibold text-primary mb-2">No notifications</h3>
-            <p className="text-textMuted">You're all caught up!</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   return (
-    <>
-      <SEO
-        title="Notifications | Dashboard"
-        description="View all your Presently notifications, attendance alerts and system messages."
-        noIndex
-      />
-      <ResponsiveContainer
-        mobileChildren={mobileLayout}
-      >
-        {desktopLayout}
-      </ResponsiveContainer>
-    </>
+    <DashboardPage
+      title="Alerts & Activity"
+      description="Stay updated with system announcements, session invites, and account security alerts."
+      seoTitle="Notifications | Presently"
+      action={
+        <div className="flex gap-4">
+           <Button variant="outline" className="h-14 px-8" onClick={markAllAsRead}>
+             Mark all as read
+           </Button>
+           <Button variant="secondary" className="h-14 px-8" onClick={loadNotifications}>
+             <RefreshCw size={18} className={cn("mr-2", loading && "animate-spin")} /> Refresh
+           </Button>
+        </div>
+      }
+    >
+      <div className="space-y-12 lg:space-y-24">
+        {/* Tab Navigation */}
+        <div className="flex bg-surface-highest/20 p-2 rounded-[2rem] w-fit border border-outline/30">
+           {(['all', 'unread', 'important'] as TabType[]).map(tab => (
+             <button
+               key={tab}
+               onClick={() => setActiveTab(tab)}
+               className={cn(
+                 "px-10 py-3 rounded-[1.5rem] text-xs font-bold uppercase tracking-widest transition-all",
+                 activeTab === tab
+                  ? "bg-white text-presently-black shadow-premium"
+                  : "text-on-surface-variant hover:text-on-surface"
+               )}
+             >
+               {tab}
+             </button>
+           ))}
+        </div>
+
+        <div className="max-w-5xl space-y-4">
+           {loading && notifications.length === 0 ? (
+             Array.from({ length: 4 }).map((_, i) => (
+               <div key={i} className="h-24 bg-slate-100 animate-pulse rounded-3xl" />
+             ))
+           ) : (
+             filteredNotifications.map((n) => (
+               <ModernCard key={n.id} padding="none" className={cn(
+                 "group border border-outline/30 transition-all hover:border-sungold/30 hover:bg-sungold/[0.01]",
+                 !n.is_read && "border-l-4 border-l-sungold bg-sungold/[0.02]"
+               )}>
+                  <div className="flex items-center gap-8 p-8">
+                     <div className={cn(
+                       "w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm shrink-0",
+                       !n.is_read ? "bg-sungold text-presently-black" : "bg-surface-highest/40 text-on-surface-variant"
+                     )}>
+                        <Bell size={24} weight={!n.is_read ? "bold" : "regular"} />
+                     </div>
+
+                     <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1">
+                           <h4 className="font-bold text-presently-black text-lg">{n.title}</h4>
+                           {!n.is_read && <div className="w-2 h-2 bg-sungold rounded-full" />}
+                        </div>
+                        <p className="text-on-surface-variant font-medium text-sm line-clamp-1">{n.message}</p>
+                     </div>
+
+                     <div className="flex items-center gap-8 shrink-0">
+                        <div className="text-right">
+                           <div className="flex items-center gap-2 justify-end">
+                              <Clock size={12} className="text-on-surface-variant/40" />
+                              <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest tabular-nums">
+                                {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                           </div>
+                           <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest opacity-40 mt-1">
+                             {new Date(n.created_at).toLocaleDateString()}
+                           </p>
+                        </div>
+                        <button className="p-3 rounded-xl hover:bg-soft-coral/10 text-on-surface-variant/20 hover:text-soft-coral transition-all opacity-0 group-hover:opacity-100">
+                           <Trash2 size={18} />
+                        </button>
+                        <ChevronRight size={20} className="text-outline transition-transform group-hover:translate-x-1" />
+                     </div>
+                  </div>
+               </ModernCard>
+             ))
+           )}
+
+           {!loading && filteredNotifications.length === 0 && (
+             <div className="py-32 text-center bg-surface-highest/10 rounded-[3rem] border-2 border-dashed border-outline/30">
+                <CheckCircle2 className="w-20 h-20 text-outline mx-auto mb-6 opacity-20" />
+                <h4 className="font-display text-2xl font-bold text-presently-black">Clear Inbox</h4>
+                <p className="text-on-surface-variant font-medium mt-2">You're all caught up with the Presently network.</p>
+             </div>
+           )}
+        </div>
+      </div>
+    </DashboardPage>
   );
 };
+
+export default NotificationsPage;

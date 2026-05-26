@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { 
   House, BookOpen, ChartLineUp, User, 
   ListChecks, FileText, Buildings, Users,
-  Scan, Keyboard, Plus
+  Scan, Plus
 } from '@phosphor-icons/react';
 import { MobileHeader } from './MobileHeader';
 import { BottomNav, NavItem } from './BottomNav';
@@ -48,41 +48,28 @@ export const MobileLayout: React.FC = () => {
     if (user?.role === UserRole.STUDENT) {
       return {
         icon: Scan,
-        onClick: () => navigate('/dashboard/scanner')
+        label: 'Scan',
+        onClick: () => navigate('/dashboard/scan')
       };
     }
     if (user?.role === UserRole.LECTURER) {
-       return {
-         icon: Plus,
-         onClick: () => navigate('/dashboard/sessions/new')
-       };
+      return {
+        icon: Plus,
+        label: 'Start',
+        onClick: () => navigate('/dashboard/sessions/new')
+      };
     }
-    return undefined;
+    return null;
   };
 
   return (
-    <div 
-      className="flex flex-col h-[100dvh] bg-off-white dark:bg-presently-black text-on-surface overflow-hidden"
-      style={{
-        scrollBehavior: 'smooth',
-        overscrollBehavior: 'none',
-      }}
-    >
-      {user?.role !== UserRole.STUDENT && user?.role !== UserRole.CLASS_REP && (
-        <MobileHeader 
-          isSidebarOpen={isSidebarOpen}
-          onOpenSidebar={() => setIsSidebarOpen(true)}
-        />
-      )}
+    <div className="flex flex-col min-h-screen bg-background pb-safe">
+      <MobileHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
-      <main 
-        className="flex-1 overflow-y-auto pb-[140px] pt-4 scrollbar-none" 
-        style={{ 
-          paddingBottom: 'calc(140px + env(safe-area-inset-bottom))',
-          WebkitOverflowScrolling: 'touch' 
-        }}
-      >
-        <Outlet />
+      <main className="flex-1 overflow-x-hidden pt-safe">
+        <div className="p-6 pb-32 max-w-lg mx-auto">
+          <Outlet />
+        </div>
       </main>
 
       <BottomNav 

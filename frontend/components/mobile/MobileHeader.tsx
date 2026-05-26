@@ -1,97 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { List, X, Bell, UserCircle } from '@phosphor-icons/react';
+import { List, Bell } from '@phosphor-icons/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCurrentUser } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { Logo } from '../Logo';
 
 interface MobileHeaderProps {
-  onOpenSidebar: () => void;
-  isSidebarOpen: boolean;
+  onMenuClick: () => void;
 }
 
-export const MobileHeader: React.FC<MobileHeaderProps> = ({ onOpenSidebar, isSidebarOpen }) => {
+export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuClick }) => {
   const { data: user } = useCurrentUser();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Assuming unread notifications exist for demo purposes
-  const hasUnread = true; 
-
   return (
     <header 
-      className={`sticky top-0 z-[60] w-full pt-safe transition-all duration-300 ${
+      className={`sticky top-0 z-[60] w-full pt-safe transition-all duration-500 ease-premium ${
         scrolled 
-          ? 'bg-off-white/80 dark:bg-charcoal/80 backdrop-blur-xl shadow-md' 
-          : 'bg-transparent shadow-none'
+          ? 'bg-surface/80 backdrop-blur-xl shadow-lg border-b border-outline/10'
+          : 'bg-background'
       }`}
     >
-      <div className="flex items-center justify-between h-16 px-4">
-        {/* Left: Menu Toggle */}
+      <div className="flex items-center justify-between h-[72px] px-6">
         <button 
-          onClick={onOpenSidebar}
-          className="w-11 h-11 flex items-center justify-center rounded-xl active:scale-92 transition-transform"
-          aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
+          onClick={onMenuClick}
+          className="w-12 h-12 flex items-center justify-center rounded-2xl bg-surface border border-outline/40 shadow-sm active:scale-95 transition-all"
+          aria-label="Open menu"
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={isSidebarOpen ? "close" : "open"}
-              initial={{ opacity: 0, rotate: -90 }}
-              animate={{ opacity: 1, rotate: 0 }}
-              exit={{ opacity: 0, rotate: 90 }}
-              transition={{ duration: 0.15 }}
-            >
-              {isSidebarOpen ? (
-                <X size={24} weight="regular" className="text-presently-black dark:text-white" />
-              ) : (
-                <List size={24} weight="regular" className="text-presently-black dark:text-white" />
-              )}
-            </motion.div>
-          </AnimatePresence>
+          <List size={24} weight="bold" className="text-on-surface" />
         </button>
 
-        {/* Center: App Brand/Logo */}
-        <div className="flex items-center gap-2">
-           <span className="font-display text-xl font-bold tracking-tight text-presently-black dark:text-white">
-             Presently
-           </span>
+        <div className="flex-1 flex justify-center">
+           <Logo showText={false} className="scale-90" />
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate('/dashboard/notifications')}
-            className="relative w-11 h-11 flex items-center justify-center rounded-xl active:scale-95 transition-transform"
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-surface border border-outline/40 shadow-sm active:scale-95 transition-all relative"
             aria-label="Notifications"
           >
-            <Bell size={24} weight={hasUnread ? "duotone" : "regular"} className="text-presently-black dark:text-white" />
-            <AnimatePresence>
-              {hasUnread && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  className="absolute top-2.5 right-2.5 w-2 h-2 bg-soft-coral rounded-full" 
-                />
-              )}
-            </AnimatePresence>
+            <Bell size={24} weight="bold" className="text-on-surface" />
+            <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-sungold rounded-full border-2 border-surface shadow-gold" />
           </button>
           
           <button 
             onClick={() => navigate('/dashboard/profile')}
-            className="w-9 h-9 rounded-full border-2 border-sungold/40 overflow-hidden active:scale-[0.94] transition-transform flex items-center justify-center bg-pale-honey text-presently-black"
+            className="w-10 h-10 rounded-2xl border-2 border-sungold/40 overflow-hidden active:scale-95 transition-all flex items-center justify-center bg-surface shadow-sm"
           >
             {user?.avatar_url ? (
               <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-sm font-bold">
+              <span className="text-sm font-bold text-presently-black">
                 {user?.full_name?.charAt(0) || 'P'}
               </span>
             )}

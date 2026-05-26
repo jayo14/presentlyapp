@@ -1,47 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Save, AlertCircle, Building2, Globe, Mail, Phone, Calendar, Award, CheckCircle2, XCircle } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Save, Building2, Globe, Mail, Phone, Calendar, Award, MapPin, Hash, ShieldCheck, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../Button';
-import { Input } from '../Input';
 import { Institution } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
 import { toast } from 'sonner';
-
-interface ValidationErrors {
-  full_name?: string;
-  short_name?: string;
-  country?: string;
-  city?: string;
-  address?: string;
-  website_url?: string;
-  contact_email?: string;
-  contact_phone?: string;
-}
+import { DashboardPage } from '../../src/components/layout-primitives/DashboardPage';
+import { ModernCard } from '../ModernCard';
+import { ResponsiveGrid } from '../../src/components/layout-primitives/ResponsiveGrid';
 
 export const InstitutionFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
   
   const [formData, setFormData] = useState<Partial<Institution>>({
     full_name: '',
     short_name: '',
     abbreviation: '',
+    description: '',
+    website_url: '',
+    contact_email: '',
+    contact_phone: '',
     country: '',
     state_province: '',
     city: '',
     address: '',
-    postal_code: '',
+    established_year: undefined,
     institution_type: 'UNIVERSITY',
-    website_url: '',
-    contact_email: '',
-    contact_phone: '',
-    established_year: new Date().getFullYear(),
-    accreditation_status: 'ACCREDITED',
+    accreditation_status: '',
     is_active: true,
   });
 
@@ -54,546 +42,278 @@ export const InstitutionFormPage: React.FC = () => {
   const loadInstitution = async (instId: number) => {
     try {
       setFetching(true);
-      const data = await institutionsApi.getAllInstitutions(); // We need a getById ideally
-      const inst = (data as any).results?.find((i: Institution) => i.id === instId) || data.find((i: Institution) => i.id === instId);
-      
-      if (inst) {
-        setFormData({
-          ...inst,
-        });
-      } else {
-        setError('Institution not found');
-      }
+      const data = await institutionsApi.getById(instId);
+      setFormData(data);
     } catch (err) {
-      setError('Failed to load institution details');
-      console.error(err);
+      toast.error('Failed to load institution details');
+      navigate('/dashboard/institutions');
     } finally {
       setFetching(false);
     }
   };
 
-  const handleChange = (field: keyof Institution, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Real-time validation
-    const error = validateField(field, value);
-    setValidationErrors(prev => ({
-      ...prev,
-      [field]: error
-    }));
-  };
-
-  const handleBlur = (field: keyof Institution) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-  };
-
-  // Real-time validation function
-  const validateField = (field: keyof Institution, value: any): string | undefined => {
-    switch (field) {
-      case 'full_name':
-        if (!value || !value.trim()) return 'Institution name is required';
-        if (value.trim().length < 3) return 'Name must be at least 3 characters';
-        if (value.trim().length > 255) return 'Name must be less than 255 characters';
-        break;
-      
-      case 'short_name':
-        if (!value || !value.trim()) return 'Display name is required';
-        if (value.trim().length < 2) return 'Display name must be at least 2 characters';
-        break;
-      
-      case 'country':
-        if (!value || !value.trim()) return 'Country is required';
-        break;
-      
-      case 'city':
-        if (!value || !value.trim()) return 'City is required';
-        break;
-      
-      case 'address':
-        if (!value || !value.trim()) return 'Address is required';
-        if (value.trim().length < 5) return 'Address must be at least 5 characters';
-        break;
-      
-      case 'website_url':
-        if (value && value.trim()) {
-          try {
-            new URL(value);
-          } catch {
-            return 'Please enter a valid URL';
-          }
-        }
-        break;
-      
-      case 'contact_email':
-        if (value && value.trim()) {
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-            return 'Please enter a valid email address';
-          }
-        }
-        break;
-      
-      case 'contact_phone':
-        if (value && value.trim()) {
-          const digitsOnly = value.replace(/\D/g, '');
-          if (digitsOnly.length < 10) {
-            return 'Phone number must be at least 10 digits';
-          }
-        }
-        break;
-    }
-    return undefined;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate all required fields
-    const errors: ValidationErrors = {};
-    errors.full_name = validateField('full_name', formData.full_name);
-    errors.short_name = validateField('short_name', formData.short_name);
-    errors.country = validateField('country', formData.country);
-    errors.city = validateField('city', formData.city);
-    errors.address = validateField('address', formData.address);
-    errors.website_url = validateField('website_url', formData.website_url);
-    errors.contact_email = validateField('contact_email', formData.contact_email);
-    errors.contact_phone = validateField('contact_phone', formData.contact_phone);
-    
-    // Filter out undefined errors
-    const hasErrors = Object.values(errors).some(error => error !== undefined);
-    
-    if (hasErrors) {
-      setValidationErrors(errors);
-      setTouched({
-        full_name: true,
-        short_name: true,
-        country: true,
-        city: true,
-        address: true,
-        website_url: true,
-        contact_email: true,
-        contact_phone: true,
-      });
-      toast.error('Please fix all validation errors');
-      return;
-    }
-    
-    if (!formData.full_name?.trim()) {
-      toast.error('Institution name is required');
-      return;
-    }
-
     try {
       setLoading(true);
-      setError(null);
-      
       if (id && id !== 'new') {
-        await institutionsApi.updateInstitution(Number(id), formData);
+        await institutionsApi.update(Number(id), formData);
         toast.success('Institution updated successfully');
       } else {
-        await institutionsApi.createInstitution(formData as Omit<Institution, 'id'>);
-        toast.success('Institution created successfully');
+        await institutionsApi.create(formData as any);
+        toast.success('Institution registered successfully');
       }
-      
       navigate('/dashboard/institutions');
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Failed to save institution';
-      setError(msg);
-      toast.error(msg);
+    } catch (err) {
+      toast.error('Failed to save institution');
     } finally {
       setLoading(false);
     }
   };
 
   if (fetching) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-textMuted animate-pulse">Loading institution data...</p>
-      </div>
-    );
+    return <div className="h-96 flex items-center justify-center">Loading...</div>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-      {/* Header */}
-      <div className="flex flex-col gap-4">
-        <button 
-          onClick={() => navigate('/dashboard/institutions')}
-          className="flex items-center gap-2 text-sm text-textMuted hover:text-primary transition-colors w-fit"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Institutions
-        </button>
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-primaryContainer/20 editorial-shadow flex items-center justify-center text-primary">
-              <Building2 className="w-8 h-8" />
-            </div>
-            <div>
-              <h1 className="font-headline text-3xl font-bold text-text">
-                {id && id !== 'new' ? 'Edit Institution' : 'New Institution'}
-              </h1>
-              <p className="text-textMuted">Configure institutional profile and settings</p>
-            </div>
+    <DashboardPage
+      title={id && id !== 'new' ? 'Edit Institution' : 'Register Institution'}
+      description="Define the identity and global configuration for an academic partner."
+      seoTitle="Institution Management | Admin"
+      action={
+        <Button variant="outline" onClick={() => navigate('/dashboard/institutions')} className="h-14 px-8">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Directory
+        </Button>
+      }
+    >
+      <form onSubmit={handleSave} className="max-w-6xl space-y-16 pb-32">
+        {/* Core Identity */}
+        <ModernCard padding="lg" className="space-y-10">
+          <div className="flex items-center gap-4 border-b border-outline/40 pb-6">
+            <Building2 className="w-6 h-6 text-sungold" />
+            <h3 className="text-2xl font-bold font-display text-presently-black">Core Identity</h3>
           </div>
-          <div className="hidden md:flex gap-3">
-             <Button variant="secondary" onClick={() => navigate('/dashboard/institutions')}>Cancel</Button>
-             <Button onClick={handleSubmit} disabled={loading} className="gap-2">
-                <Save className="w-4 h-4" />
-                {loading ? 'Saving...' : 'Save Changes'}
-             </Button>
-          </div>
-        </div>
-      </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-8">
-        {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3 text-red-500">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
-
-        {/* Basic Information Section */}
-        <section className="glass-panel border border-outline/20 rounded-2xl editorial-shadow overflow-hidden">
-          <div className="p-6 border-b border-outline bg-surfaceContainer">
-            <h3 className="font-headline font-bold text-text flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-primary" />
-              Basic Profile
-            </h3>
-          </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-text mb-2">Full Legal Name *</label>
-              <div className="relative">
-                <Input
-                  value={formData.full_name || ''}
-                  onChange={(e) => handleChange('full_name', e.target.value)}
-                  onBlur={() => handleBlur('full_name')}
-                  placeholder="e.g., Lagos State University of Science and Technology"
-                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
-                    touched.full_name && validationErrors.full_name ? 'border-red-500' : ''
-                  } ${touched.full_name && !validationErrors.full_name && formData.full_name ? 'border-green-500' : ''}`}
-                  required
-                />
-                {touched.full_name && !validationErrors.full_name && formData.full_name && (
-                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-                {touched.full_name && validationErrors.full_name && (
-                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                )}
-              </div>
-              {touched.full_name && validationErrors.full_name && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.full_name}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Display Name / Abbreviation *</label>
-              <div className="relative">
-                <Input
-                  value={formData.short_name || ''}
-                  onChange={(e) => handleChange('short_name', e.target.value)}
-                  onBlur={() => handleBlur('short_name')}
-                  placeholder="e.g., LASUSTECH"
-                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
-                    touched.short_name && validationErrors.short_name ? 'border-red-500' : ''
-                  } ${touched.short_name && !validationErrors.short_name && formData.short_name ? 'border-green-500' : ''}`}
-                  required
-                />
-                {touched.short_name && !validationErrors.short_name && formData.short_name && (
-                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-                {touched.short_name && validationErrors.short_name && (
-                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                )}
-              </div>
-              {touched.short_name && validationErrors.short_name && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.short_name}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Alternative Code</label>
-              <Input
-                value={formData.abbreviation || ''}
-                onChange={(e) => handleChange('abbreviation', e.target.value)}
-                placeholder="e.g., LST"
-                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
+          <ResponsiveGrid columns={2} gap={32}>
+            <div className="space-y-3 col-span-2 md:col-span-1">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Full Institution Name</label>
+              <input
+                value={formData.full_name}
+                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                placeholder="e.g. University of Lagos"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                required
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Institution Type *</label>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Abbreviation</label>
+              <input
+                value={formData.abbreviation}
+                onChange={(e) => setFormData({ ...formData, abbreviation: e.target.value })}
+                placeholder="e.g. UNILAG"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                required
+              />
+            </div>
+            <div className="space-y-3 col-span-2">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Brief overview of the institution..."
+                className="w-full min-h-[120px] p-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all resize-none"
+              />
+            </div>
+          </ResponsiveGrid>
+        </ModernCard>
+
+        {/* Contact & Web */}
+        <ModernCard padding="lg" className="space-y-10">
+          <div className="flex items-center gap-4 border-b border-outline/40 pb-6">
+            <Globe className="w-6 h-6 text-sky-teal" />
+            <h3 className="text-2xl font-bold font-display text-presently-black">Contact & Web</h3>
+          </div>
+
+          <ResponsiveGrid columns={3} gap={32}>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Official Website</label>
+              <div className="relative">
+                <Globe className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4" />
+                <input
+                  value={formData.website_url}
+                  onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full h-16 pl-14 pr-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                />
+              </div>
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Contact Email</label>
+              <div className="relative">
+                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4" />
+                <input
+                  type="email"
+                  value={formData.contact_email}
+                  onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
+                  placeholder="admin@univ.edu"
+                  className="w-full h-16 pl-14 pr-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                />
+              </div>
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Contact Phone</label>
+              <div className="relative">
+                <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4" />
+                <input
+                  value={formData.contact_phone}
+                  onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
+                  placeholder="+234..."
+                  className="w-full h-16 pl-14 pr-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                />
+              </div>
+            </div>
+          </ResponsiveGrid>
+        </ModernCard>
+
+        {/* Location Details */}
+        <ModernCard padding="lg" className="space-y-10 bg-warm-ivory/5">
+          <div className="flex items-center gap-4 border-b border-outline/40 pb-6">
+            <MapPin className="w-6 h-6 text-sungold" />
+            <h3 className="text-2xl font-bold font-display text-presently-black">Location Details</h3>
+          </div>
+
+          <ResponsiveGrid columns={2} gap={32}>
+             <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Country</label>
+              <input
+                value={formData.country}
+                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                placeholder="Nigeria"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                required
+              />
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">State / Province</label>
+              <input
+                value={formData.state_province}
+                onChange={(e) => setFormData({ ...formData, state_province: e.target.value })}
+                placeholder="Lagos"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+              />
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">City</label>
+              <input
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                placeholder="Akoka"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                required
+              />
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Postal Code</label>
+              <input
+                value={formData.postal_code}
+                onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+                placeholder="100001"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+              />
+            </div>
+            <div className="space-y-3 col-span-2">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Full Address</label>
+              <input
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="University of Lagos, Akoka, Yaba..."
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                required
+              />
+            </div>
+          </ResponsiveGrid>
+        </ModernCard>
+
+        {/* Academic Details */}
+        <ModernCard padding="lg" className="space-y-10">
+           <div className="flex items-center gap-4 border-b border-outline/40 pb-6">
+            <Award className="w-6 h-6 text-sky-teal" />
+            <h3 className="text-2xl font-bold font-display text-presently-black">Institutional Status</h3>
+          </div>
+
+          <ResponsiveGrid columns={3} gap={32}>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Institution Type</label>
               <select
-                value={formData.institution_type || ''}
-                onChange={(e) => handleChange('institution_type', e.target.value)}
-                className="w-full h-12 px-4 bg-white dark:bg-surfaceLow text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
+                value={formData.institution_type}
+                onChange={(e) => setFormData({ ...formData, institution_type: e.target.value })}
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none appearance-none cursor-pointer"
               >
                 <option value="UNIVERSITY">University</option>
                 <option value="POLYTECHNIC">Polytechnic</option>
-                <option value="COLLEGE">College</option>
-                <option value="INSTITUTE">Institute</option>
+                <option value="COLLEGE">College of Education</option>
+                <option value="INSTITUTE">Research Institute</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Established Year</label>
-              <Input
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Established Year</label>
+              <input
                 type="number"
                 value={formData.established_year || ''}
-                onChange={(e) => handleChange('established_year', parseInt(e.target.value))}
-                placeholder="e.g., 2021"
-                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
+                onChange={(e) => setFormData({ ...formData, established_year: Number(e.target.value) })}
+                placeholder="1962"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
               />
             </div>
-          </div>
-        </section>
-
-        {/* Location & Contact Section */}
-        <section className="glass-panel border border-outline/20 rounded-2xl editorial-shadow overflow-hidden">
-          <div className="p-6 border-b border-outline bg-surfaceContainer">
-            <h3 className="font-headline font-bold text-text flex items-center gap-2">
-              <Globe className="w-4 h-4 text-primary" />
-              Location & Connectivity
-            </h3>
-          </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Country *</label>
-              <div className="relative">
-                <Input
-                  value={formData.country || ''}
-                  onChange={(e) => handleChange('country', e.target.value)}
-                  onBlur={() => handleBlur('country')}
-                  placeholder="e.g., Nigeria"
-                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
-                    touched.country && validationErrors.country ? 'border-red-500' : ''
-                  } ${touched.country && !validationErrors.country && formData.country ? 'border-green-500' : ''}`}
-                  required
-                />
-                {touched.country && !validationErrors.country && formData.country && (
-                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-                {touched.country && validationErrors.country && (
-                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                )}
-              </div>
-              {touched.country && validationErrors.country && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.country}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">State / Province</label>
-              <Input
-                value={formData.state_province || ''}
-                onChange={(e) => handleChange('state_province', e.target.value)}
-                placeholder="e.g., Lagos"
-                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Accreditation Status</label>
+              <input
+                value={formData.accreditation_status}
+                onChange={(e) => setFormData({ ...formData, accreditation_status: e.target.value })}
+                placeholder="Full Accreditation"
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">City *</label>
-              <div className="relative">
-                <Input
-                  value={formData.city || ''}
-                  onChange={(e) => handleChange('city', e.target.value)}
-                  onBlur={() => handleBlur('city')}
-                  placeholder="e.g., Ikorodu"
-                  className={`h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
-                    touched.city && validationErrors.city ? 'border-red-500' : ''
-                  } ${touched.city && !validationErrors.city && formData.city ? 'border-green-500' : ''}`}
-                  required
-                />
-                {touched.city && !validationErrors.city && formData.city && (
-                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-                {touched.city && validationErrors.city && (
-                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                )}
-              </div>
-              {touched.city && validationErrors.city && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.city}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Postal Code</label>
-              <Input
-                value={formData.postal_code || ''}
-                onChange={(e) => handleChange('postal_code', e.target.value)}
-                placeholder="e.g., 100001"
-                className="h-12 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary"
+          </ResponsiveGrid>
+        </ModernCard>
+
+        {/* Assets */}
+        <ModernCard padding="lg" className="space-y-10">
+           <div className="flex items-center gap-4 border-b border-outline/40 pb-6">
+            <ImageIcon className="w-6 h-6 text-sungold" />
+            <h3 className="text-2xl font-bold font-display text-presently-black">Branding Assets</h3>
+          </div>
+
+          <ResponsiveGrid columns={2} gap={32}>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Logo URL</label>
+              <input
+                value={formData.logo_url}
+                onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                placeholder="https://..."
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
               />
             </div>
-            <div className="md:col-span-2">
-              <label htmlFor="institution-address" className="block text-sm font-semibold text-text mb-2">Street Address *</label>
-              <div className="relative">
-                <textarea
-                  id="institution-address"
-                  value={formData.address || ''}
-                  onChange={(e) => handleChange('address', e.target.value)}
-                  onBlur={() => handleBlur('address')}
-                  placeholder="Full street address, building name, etc."
-                  rows={3}
-                  className={`w-full px-4 py-3 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border border-outline rounded-xl text-sm focus:outline-none focus:border-primary transition-colors resize-none ${
-                    touched.address && validationErrors.address ? 'border-red-500' : ''
-                  } ${touched.address && !validationErrors.address && formData.address ? 'border-green-500' : ''}`}
-                  required
-                />
-              </div>
-              {touched.address && validationErrors.address && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.address}
-                </p>
-              )}
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Cover Image URL</label>
+              <input
+                value={formData.cover_image_url}
+                onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
+                placeholder="https://..."
+                className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+              />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Website URL</label>
-              <div className="relative">
-                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
-                <Input
-                  type="url"
-                  value={formData.website_url || ''}
-                  onChange={(e) => handleChange('website_url', e.target.value)}
-                  onBlur={() => handleBlur('website_url')}
-                  placeholder="https://lasustech.edu.ng"
-                  className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
-                    touched.website_url && validationErrors.website_url ? 'border-red-500' : ''
-                  } ${touched.website_url && !validationErrors.website_url && formData.website_url ? 'border-green-500' : ''}`}
-                />
-                {touched.website_url && !validationErrors.website_url && formData.website_url && (
-                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-                {touched.website_url && validationErrors.website_url && (
-                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                )}
-              </div>
-              {touched.website_url && validationErrors.website_url && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.website_url}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Official Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
-                <Input
-                  type="email"
-                  value={formData.contact_email || ''}
-                  onChange={(e) => handleChange('contact_email', e.target.value)}
-                  onBlur={() => handleBlur('contact_email')}
-                  placeholder="info@lasustech.edu.ng"
-                  className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
-                    touched.contact_email && validationErrors.contact_email ? 'border-red-500' : ''
-                  } ${touched.contact_email && !validationErrors.contact_email && formData.contact_email ? 'border-green-500' : ''}`}
-                />
-                {touched.contact_email && !validationErrors.contact_email && formData.contact_email && (
-                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-                {touched.contact_email && validationErrors.contact_email && (
-                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                )}
-              </div>
-              {touched.contact_email && validationErrors.contact_email && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.contact_email}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Contact Phone</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
-                <Input
-                  type="tel"
-                  value={formData.contact_phone || ''}
-                  onChange={(e) => handleChange('contact_phone', e.target.value)}
-                  onBlur={() => handleBlur('contact_phone')}
-                  placeholder="+234..."
-                  className={`h-12 pl-10 bg-white dark:bg-surfaceLow text-text placeholder:text-textMuted border-outline focus:border-primary ${
-                    touched.contact_phone && validationErrors.contact_phone ? 'border-red-500' : ''
-                  } ${touched.contact_phone && !validationErrors.contact_phone && formData.contact_phone ? 'border-green-500' : ''}`}
-                />
-                {touched.contact_phone && !validationErrors.contact_phone && formData.contact_phone && (
-                  <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                )}
-                {touched.contact_phone && validationErrors.contact_phone && (
-                  <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
-                )}
-              </div>
-              {touched.contact_phone && validationErrors.contact_phone && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {validationErrors.contact_phone}
-                </p>
-              )}
-            </div>
-          </div>
-        </section>
+          </ResponsiveGrid>
+        </ModernCard>
 
-        {/* Accreditation & Status Section */}
-        <section className="glass-panel border border-outline/20 rounded-2xl editorial-shadow overflow-hidden">
-          <div className="p-6 border-b border-outline bg-surfaceContainer">
-            <h3 className="font-headline font-bold text-text flex items-center gap-2">
-              <Award className="w-4 h-4 text-primary" />
-              Compliance & Visibility
-            </h3>
-          </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2">Accreditation Status</label>
-              <select
-                value={formData.accreditation_status || ''}
-                onChange={(e) => handleChange('accreditation_status', e.target.value)}
-                className="w-full h-12 px-4 bg-white dark:bg-surfaceLow text-text border border-outline rounded-xl focus:outline-none focus:border-primary transition-colors"
-              >
-                <option value="ACCREDITED">Fully Accredited</option>
-                <option value="PROVISIONAL">Provisional</option>
-                <option value="PENDING">Pending Review</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-4 h-12 mt-8">
-               <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className={`w-10 h-6 rounded-full p-1 transition-colors ${formData.is_active ? 'bg-primary' : 'bg-surfaceHigh'}`}>
-                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${formData.is_active ? 'translate-x-4' : 'translate-x-0'}`} />
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={(e) => handleChange('is_active', e.target.checked)}
-                    className="hidden"
-                  />
-                  <span className="text-sm font-bold text-textMuted group-hover:text-primary transition-colors">Active Status</span>
-               </label>
-            </div>
-          </div>
-        </section>
-
-        {/* Mobile Action Buttons */}
-        <div className="flex flex-col gap-3 md:hidden">
-           <Button onClick={handleSubmit} disabled={loading} className="h-12 text-lg">
-              {loading ? 'Saving...' : 'Save Institution'}
+        <div className="flex justify-end pt-8">
+           <Button type="submit" size="lg" className="h-20 px-16 shadow-gold" disabled={loading}>
+             <Save className="w-5 h-5 mr-3" />
+             {loading ? 'Committing...' : 'Commit Configuration'}
            </Button>
-           <Button variant="secondary" onClick={() => navigate('/dashboard/institutions')} className="h-12 text-lg">Cancel</Button>
         </div>
       </form>
-    </div>
+    </DashboardPage>
   );
 };
 
