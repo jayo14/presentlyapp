@@ -139,6 +139,10 @@ export const systemApi = {
     }
   },
 
+  getActivityHistory: async (): Promise<SystemActivity[]> => {
+    return systemApi.getActivity();
+  },
+
   // Get recent alerts
   getAlerts: async (): Promise<SystemAlert[]> => {
     try {
@@ -202,16 +206,10 @@ export const systemApi = {
   },
 
   // Get system logs
-  getLogs: async (filters?: {
-    event_type?: string;
-    start_date?: string;
-    end_date?: string;
-    limit?: number;
-    page?: number;
-    action?: string;
-  }): Promise<PaginatedResponse<SystemLog>> => {
+  getLogs: async (filtersOrPage?: any): Promise<PaginatedResponse<SystemLog>> => {
     try {
-      const response = await apiClient.get('/system/logs/', { params: filters });
+      const params = typeof filtersOrPage === 'number' ? { page: filtersOrPage } : filtersOrPage;
+      const response = await apiClient.get('/system/logs/', { params });
       // Handle both paginated and non-paginated responses for backward compatibility
       if (response.data.results) {
         return response.data;

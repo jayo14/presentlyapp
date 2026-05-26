@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, RefreshCw, Users, BookOpen, Clock, Trash2, Calendar } from 'lucide-react';
+import {
+  Plus,
+  MagnifyingGlass as Search,
+  ArrowsClockwise as RefreshCw,
+  Users,
+  BookOpen,
+  Clock,
+  Trash as Trash2,
+  Calendar
+} from '@phosphor-icons/react';
 import { sessionApi } from '../../services/api/attendance';
 import { Session } from '../../types';
 import { toast } from 'sonner';
@@ -26,7 +35,7 @@ export const SessionsPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await sessionApi.getAll();
-      setSessions(data);
+      setSessions(data as any);
     } catch (err) {
       toast.error('Failed to load sessions');
     } finally {
@@ -74,7 +83,7 @@ export const SessionsPage: React.FC = () => {
              ))
            ) : (
              filteredSessions.map((session) => (
-               <ModernCard key={session.id} padding="lg" className="hoverable border border-outline/30 flex flex-col justify-between h-full">
+               <ModernCard key={session.id} padding="lg" hoverable border className="flex flex-col justify-between h-full">
                   <div className="space-y-6 flex flex-col h-full">
                      <div className="flex items-start justify-between">
                         <div className="w-14 h-14 rounded-[30%] bg-sungold/10 text-sungold flex items-center justify-center shadow-sm">

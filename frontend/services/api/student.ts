@@ -158,6 +158,11 @@ export const studentApi = {
     return legacyData;
   },
 
+  // Backward compatibility alias
+  getStudentDashboard: async (): Promise<StudentDashboardData> => {
+    return studentApi.getDashboard();
+  },
+
   // Get enrolled courses
   getEnrolledCourses: async (): Promise<EnrolledCourse[]> => {
     const response = await apiClient.get('/course-enrollments/');

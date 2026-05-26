@@ -1,12 +1,14 @@
 import React from 'react';
 import { cn } from '../src/components/ui/utils';
 
-interface ModernCardProps {
+export interface ModernCardProps {
   children: React.ReactNode;
   className?: string;
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   onClick?: () => void;
   hoverable?: boolean;
+  variant?: string; // Compatibility alias
+  border?: boolean; // Visibility/style flag
 }
 
 export const ModernCard: React.FC<ModernCardProps> = ({
@@ -14,7 +16,9 @@ export const ModernCard: React.FC<ModernCardProps> = ({
   className = "",
   padding = "md",
   onClick,
-  hoverable = false
+  hoverable = false,
+  variant,
+  border = false
 }) => {
   const paddings = {
     none: "p-0",
@@ -31,6 +35,7 @@ export const ModernCard: React.FC<ModernCardProps> = ({
         "bg-surface border border-outline/30 rounded-[2rem] shadow-sm overflow-hidden transition-all duration-500 ease-premium",
         hoverable && "hover:border-sungold/40 hover:shadow-premium hover:-translate-y-1 cursor-pointer",
         onClick && "cursor-pointer active:scale-[0.99]",
+        border && "border-2 border-outline",
         paddings[padding],
         className
       )}

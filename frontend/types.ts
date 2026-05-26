@@ -147,13 +147,22 @@ export interface User {
 
 export interface Session {
   id: string;
-  courseName: string;
-  courseCode: string;
-  startTime: Date;
-  endTime: Date;
-  active: boolean;
-  attendees: number;
-  sessionCode: string;
+  course_name: string;
+  course_code: string;
+  venue_name: string;
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+  attendance_count: number;
+  session_code: string;
+  // Legacy aliases
+  courseName?: string;
+  courseCode?: string;
+  startTime?: string | Date;
+  endTime?: string | Date;
+  active?: boolean;
+  attendees?: number;
+  sessionCode?: string;
 }
 
 export interface ChatMessage {

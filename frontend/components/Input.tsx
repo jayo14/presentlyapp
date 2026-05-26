@@ -30,7 +30,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon, className = ''
         />
         {icon && (
           <div className="absolute left-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 transition-colors group-focus-within:text-sungold">
-            {React.cloneElement(icon as React.ReactElement, { size: 20, weight: "bold" })}
+            {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 20, weight: "bold" }) : icon}
           </div>
         )}
       </div>
