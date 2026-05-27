@@ -29,9 +29,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               </h2>
             )}
             {description && (
-              <p className="text-base md:text-lg lg:text-xl text-on-surface-variant font-medium opacity-70 max-w-3xl leading-relaxed">
+              <div className="text-base md:text-lg lg:text-xl text-on-surface-variant font-medium opacity-70 max-w-3xl leading-relaxed">
                 {description}
-              </p>
+              </div>
             )}
           </div>
           {action && (
