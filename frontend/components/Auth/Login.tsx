@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, ArrowLeft, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
 import { useLogin, useCurrentUser } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
