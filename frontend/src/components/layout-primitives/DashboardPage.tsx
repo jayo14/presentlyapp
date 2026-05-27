@@ -4,7 +4,7 @@ import { SEO } from '../../../components/SEO';
 
 interface DashboardPageProps {
   title?: string;
-  description?: string;
+  description?: React.ReactNode;
   children: React.ReactNode;
   action?: React.ReactNode;
   seoTitle?: string;
