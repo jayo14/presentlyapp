@@ -1,19 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, RefreshCw, Shield, Users } from 'lucide-react';
+import { AlertCircle, CheckCircle2, RefreshCw, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '../Button';
-import { Input } from '../Input';
-import { SEO } from '../SEO';
 import { staffApi, StaffInvitation, StaffProfile, StaffRole } from '../../services/api/staff';
+import { DashboardPage } from '../../src/components/layout-primitives/DashboardPage';
+import { ModernCard } from '../ModernCard';
+import { Badge } from '../../src/components/ui/badge';
+import { cn } from '../../src/components/ui/utils';
 
 const STATUS_BADGE: Record<string, string> = {
-  ACTIVE: 'bg-green-500/15 text-green-600 dark:text-green-400',
-  PENDING: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-  SUSPENDED: 'bg-red-500/15 text-red-600 dark:text-red-400',
-  REVOKED: 'bg-red-500/15 text-red-600 dark:text-red-400',
-  ACCEPTED: 'bg-green-500/15 text-green-600 dark:text-green-400',
-  EXPIRED: 'bg-surface text-textMuted',
+  ACTIVE: 'bg-green-500/15 text-green-600',
+  PENDING: 'bg-amber-500/15 text-amber-600',
+  SUSPENDED: 'bg-red-500/15 text-red-600',
+  REVOKED: 'bg-red-500/15 text-red-600',
+  ACCEPTED: 'bg-green-500/15 text-green-600',
+  EXPIRED: 'bg-slate-100 text-slate-500',
 };
 
 export const StaffManagement: React.FC = () => {
@@ -47,44 +49,40 @@ export const StaffManagement: React.FC = () => {
       setProfiles(staff.results || []);
       setInvitations(invites.results || []);
     } catch (error: any) {
-      toast.error('Failed to load staff data', {
-        description: error?.response?.data?.error || 'Please try again.',
-      });
+      toast.error('Failed to load staff data');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    void loadData();
+    loadData();
   }, []);
 
-  const togglePermission = (code: string) => {
+  const togglePermission = (perm: string) => {
     setForm((prev) => ({
       ...prev,
-      permissions: prev.permissions.includes(code)
-        ? prev.permissions.filter((item) => item !== code)
-        : [...prev.permissions, code],
+      permissions: prev.permissions.includes(perm)
+        ? prev.permissions.filter((p) => p !== perm)
+        : [...prev.permissions, perm],
     }));
   };
 
-  const handleInvite = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       setSubmitting(true);
       await staffApi.inviteStaff({
-        email: form.email,
-        full_name: form.full_name,
-        role_id: form.role_id ? Number(form.role_id) : undefined,
-        permissions: form.permissions,
+        ...form,
+        role_id: form.role_id ? parseInt(form.role_id) : undefined,
       });
 
-      toast.success('Staff invitation sent');
+      toast.success('Invitation sent');
       setForm({ email: '', full_name: '', role_id: '', permissions: [] });
       await loadData();
     } catch (error: any) {
       toast.error('Failed to send invitation', {
-        description: error?.response?.data?.error || 'Please check fields and try again.',
+        description: error?.response?.data?.error || 'Please try again.',
       });
     } finally {
       setSubmitting(false);
@@ -97,9 +95,7 @@ export const StaffManagement: React.FC = () => {
       toast.success('Invitation resent');
       await loadData();
     } catch (error: any) {
-      toast.error('Failed to resend invitation', {
-        description: error?.response?.data?.error || 'Please try again.',
-      });
+      toast.error('Failed to resend invitation');
     }
   };
 
@@ -109,205 +105,246 @@ export const StaffManagement: React.FC = () => {
       toast.success('Invitation revoked');
       await loadData();
     } catch (error: any) {
-      toast.error('Failed to revoke invitation', {
-        description: error?.response?.data?.error || 'Please try again.',
-      });
+      toast.error('Failed to revoke invitation');
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-[280px] flex items-center justify-center text-textMuted">
-        <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Loading staff data...
+      <div className="h-96 flex items-center justify-center text-on-surface-variant">
+        <RefreshCw className="w-6 h-6 mr-3 animate-spin" />
+        <span className="font-bold uppercase tracking-widest text-xs">Loading Secure Directory...</span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <SEO title="Staff Management | Admin | Presently" description="Invite and manage staff roles and permissions." />
-
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Shield className="w-8 h-8 text-primary" />
-          <div>
-            <h2 className="font-headline text-2xl font-bold text-text">Staff Management</h2>
-            <p className="text-sm text-textMuted">Invite staff, assign role presets, and override permissions.</p>
-          </div>
-        </div>
-        <Button variant="secondary" onClick={() => void loadData()} className="gap-2">
-          <RefreshCw className="w-4 h-4" /> Refresh
+    <DashboardPage
+      title="Staff & Permissions"
+      description="Invite staff, assign role presets, and override access permissions."
+      seoTitle="Staff Management | Presently Admin"
+      action={
+        <Button variant="outline" size="lg" onClick={() => void loadData()} className="h-16 px-8">
+          <RefreshCw className="w-5 h-5 mr-2" /> Refresh
         </Button>
-      </div>
+      }
+    >
+      <div className="space-y-16 lg:space-y-32">
+        {/* Invite Form */}
+        <ModernCard padding="lg" className="bg-warm-ivory/10 border-outline/40">
+          <form onSubmit={handleInvite} className="space-y-12">
+            <div className="flex items-center gap-3 mb-4">
+              <Plus className="w-5 h-5 text-sungold" />
+              <h3 className="text-2xl font-bold text-presently-black font-display">Invite New Staff</h3>
+            </div>
 
-      {/* Invite Form */}
-      <form onSubmit={handleInvite} className="bg-surface border border-outline rounded-lg p-4 space-y-4">
-        <h3 className="text-base font-semibold text-text flex items-center gap-2">
-          <Users className="w-4 h-4" /> Invite New Staff
-        </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Full Name</label>
+                <input
+                  placeholder="John Doe"
+                  value={form.full_name}
+                  onChange={(e) => setForm((prev) => ({ ...prev, full_name: e.target.value }))}
+                  required
+                  className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="staff@university.edu"
+                  value={form.email}
+                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                  required
+                  className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Role Preset</label>
+                <select
+                  value={form.role_id}
+                  onChange={(e) => setForm((prev) => ({ ...prev, role_id: e.target.value }))}
+                  className="w-full h-16 px-6 bg-white border border-outline rounded-2xl text-sm font-bold text-presently-black focus:ring-4 focus:ring-sungold/10 outline-none appearance-none cursor-pointer transition-all"
+                >
+                  <option value="">Custom role (permissions only)</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <Input
-            placeholder="Full name"
-            value={form.full_name}
-            onChange={(e) => setForm((prev) => ({ ...prev, full_name: e.target.value }))}
-            required
-          />
-          <Input
-            type="email"
-            placeholder="Email address"
-            value={form.email}
-            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-            required
-          />
-          <select
-            value={form.role_id}
-            onChange={(e) => setForm((prev) => ({ ...prev, role_id: e.target.value }))}
-            className="px-3 py-2 bg-surfaceHigh border border-outline rounded-lg text-text"
-          >
-            <option value="">Custom role (permissions only)</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-text">Permission Overrides</p>
-          {Object.entries(groupedPermissions).map(([group, perms]) => (
-            <div key={group} className="border border-outline/70 rounded-md p-3">
-              <p className="text-xs uppercase tracking-wide text-textMuted mb-2">{group.replaceAll('_', ' ')}</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {perms.map((perm) => (
-                  <label key={perm.codename} className="flex items-center gap-2 text-sm text-text">
-                    <input
-                      type="checkbox"
-                      checked={form.permissions.includes(perm.codename)}
-                      onChange={() => togglePermission(perm.codename)}
-                    />
-                    <span>{perm.name}</span>
-                    {perm.dangerous ? <AlertCircle className="w-3 h-3 text-amber-500" /> : null}
-                  </label>
+            <div className="space-y-6">
+              <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1">Permission Overrides</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Object.entries(groupedPermissions).map(([group, perms]) => (
+                  <div key={group} className="bg-white border border-outline rounded-3xl p-8 shadow-sm">
+                    <p className="text-[10px] font-bold text-sungold uppercase tracking-[0.2em] mb-6 border-b border-outline/50 pb-4">
+                      {group.replaceAll('_', ' ')}
+                    </p>
+                    <div className="space-y-4">
+                      {perms.map((perm) => (
+                        <label key={perm.codename} className="flex items-center gap-4 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={form.permissions.includes(perm.codename)}
+                            onChange={() => togglePermission(perm.codename)}
+                            className="w-5 h-5 rounded-lg border-outline text-sungold focus:ring-sungold/20"
+                          />
+                          <span className="text-xs font-bold text-on-surface group-hover:text-presently-black transition-colors">{perm.name}</span>
+                          {perm.dangerous ? <AlertCircle className="w-3.5 h-3.5 text-soft-coral" /> : null}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-          ))}
+
+            <div className="flex justify-end pt-4">
+              <Button type="submit" disabled={submitting} className="h-20 px-16 shadow-gold">
+                {submitting ? 'Processing...' : 'Send Invitation'}
+              </Button>
+            </div>
+          </form>
+        </ModernCard>
+
+        {/* Staff Directory */}
+        <div className="space-y-8">
+          <div className="flex items-center justify-between border-b border-outline/40 pb-6">
+            <h3 className="font-display text-3xl font-bold text-presently-black">Active Staff Directory</h3>
+            <Badge variant="secondary" className="px-5 py-1.5 font-bold tracking-widest">{profiles.length} MEMBERS</Badge>
+          </div>
+
+          <ModernCard padding="none" className="overflow-hidden border-outline/30 shadow-xl">
+             <div className="overflow-x-auto no-scrollbar">
+                <table className="w-full border-collapse">
+                   <thead>
+                      <tr className="bg-slate-50/50 border-b border-outline/40">
+                         <th className="px-10 py-6 text-left text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Profile</th>
+                         <th className="px-10 py-6 text-left text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Access Role</th>
+                         <th className="px-10 py-6 text-left text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Status</th>
+                      </tr>
+                   </thead>
+                   <tbody className="divide-y divide-outline/30">
+                      {profiles.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="px-10 py-20 text-center text-on-surface-variant font-medium">
+                            No registered staff members found.
+                          </td>
+                        </tr>
+                      ) : (
+                        profiles.map((profile) => (
+                          <tr key={profile.user.id} className="hover:bg-slate-50/50 transition-colors group">
+                            <td className="px-10 py-6">
+                               <div className="flex items-center gap-5">
+                                  <div className="w-12 h-12 rounded-[30%] bg-warm-ivory border border-outline flex items-center justify-center font-display text-lg font-bold text-sungold uppercase shadow-sm">
+                                     {profile.user.full_name?.charAt(0) || profile.user.email.charAt(0)}
+                                  </div>
+                                  <div>
+                                     <p className="font-bold text-presently-black">{profile.user.full_name}</p>
+                                     <p className="text-xs font-medium text-on-surface-variant">{profile.user.email}</p>
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="px-10 py-6">
+                               <Badge variant="secondary" className="bg-slate-100 text-[10px] tracking-widest font-bold">
+                                  {profile.role?.name ?? 'CUSTOM'}
+                                </Badge>
+                            </td>
+                            <td className="px-10 py-6">
+                               <span className={cn("inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase", STATUS_BADGE[profile.status])}>
+                                  {profile.status}
+                               </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                   </tbody>
+                </table>
+             </div>
+          </ModernCard>
         </div>
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={submitting}>
-            {submitting ? 'Sending...' : 'Send Invitation'}
-          </Button>
-        </div>
-      </form>
+        {/* Pending Invitations */}
+        <div className="space-y-8">
+          <div className="flex items-center justify-between border-b border-outline/40 pb-6">
+            <h3 className="font-display text-3xl font-bold text-presently-black">Pending Invitations</h3>
+            <Badge variant="secondary" className="px-5 py-1.5 font-bold tracking-widest">{invitations.length} TOTAL</Badge>
+          </div>
 
-      {/* Staff Data Table */}
-      <div className="bg-surface border border-outline rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-outline">
-          <h3 className="text-base font-semibold text-text">Active Staff</h3>
-          <p className="text-xs text-textMuted mt-0.5">{profiles.length} member{profiles.length !== 1 ? 's' : ''}</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-outline bg-surfaceHigh">
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Name</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Email</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Role</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {profiles.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-textMuted text-sm">
-                    No staff members yet.
-                  </td>
-                </tr>
-              ) : (
-                profiles.map((profile) => (
-                  <tr key={profile.user.id} className="border-b border-outline/50 last:border-0 hover:bg-surfaceHigh/50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-text">{profile.user.full_name}</td>
-                    <td className="px-4 py-3 text-textMuted">{profile.user.email}</td>
-                    <td className="px-4 py-3 text-textMuted">{profile.role?.name ?? <span className="italic text-textMuted/60">No role</span>}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[profile.status] ?? 'bg-surface text-textMuted'}`}>
-                        {profile.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <ModernCard padding="none" className="overflow-hidden border-outline/30 shadow-xl">
+             <div className="overflow-x-auto no-scrollbar">
+                <table className="w-full border-collapse">
+                   <thead>
+                      <tr className="bg-slate-50/50 border-b border-outline/40">
+                         <th className="px-10 py-6 text-left text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Candidate</th>
+                         <th className="px-10 py-6 text-left text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Target Role</th>
+                         <th className="px-10 py-6 text-left text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Status</th>
+                         <th className="px-10 py-6 text-right text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Actions</th>
+                      </tr>
+                   </thead>
+                   <tbody className="divide-y divide-outline/30">
+                      {invitations.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-10 py-20 text-center text-on-surface-variant font-medium">
+                            No active invitations.
+                          </td>
+                        </tr>
+                      ) : (
+                        invitations.map((invitation) => (
+                          <tr key={invitation.id} className="hover:bg-slate-50/50 transition-colors group">
+                            <td className="px-10 py-6">
+                               <div>
+                                  <p className="font-bold text-presently-black">{invitation.full_name}</p>
+                                  <p className="text-xs font-medium text-on-surface-variant">{invitation.email}</p>
+                               </div>
+                            </td>
+                            <td className="px-10 py-6">
+                               <Badge variant="secondary" className="bg-slate-100 text-[10px] tracking-widest font-bold">
+                                  {invitation.role?.name ?? 'CUSTOM'}
+                                </Badge>
+                            </td>
+                            <td className="px-10 py-6">
+                               <span className={cn("inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase", STATUS_BADGE[invitation.status])}>
+                                  {invitation.status === 'ACCEPTED' && <CheckCircle2 className="w-3.5 h-3.5" />}
+                                  {invitation.status}
+                               </span>
+                            </td>
+                            <td className="px-10 py-6 text-right">
+                              <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-11 px-6 text-[10px] font-bold tracking-widest uppercase"
+                                  onClick={() => void handleResend(invitation.id)}
+                                  disabled={invitation.status !== 'PENDING'}
+                                >
+                                  Resend
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-11 px-6 text-[10px] font-bold tracking-widest uppercase text-soft-coral hover:bg-soft-coral/10"
+                                  onClick={() => void handleRevoke(invitation.id)}
+                                  disabled={invitation.status !== 'PENDING'}
+                                >
+                                  Revoke
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                   </tbody>
+                </table>
+             </div>
+          </ModernCard>
         </div>
       </div>
-
-      {/* Invitations Table */}
-      <div className="bg-surface border border-outline rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-outline">
-          <h3 className="text-base font-semibold text-text">Invitations</h3>
-          <p className="text-xs text-textMuted mt-0.5">{invitations.length} total</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-outline bg-surfaceHigh">
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Name</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Email</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Role</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Status</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-textMuted">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invitations.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-textMuted text-sm">
-                    No invitations found.
-                  </td>
-                </tr>
-              ) : (
-                invitations.map((invitation) => (
-                  <tr key={invitation.id} className="border-b border-outline/50 last:border-0 hover:bg-surfaceHigh/50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-text">{invitation.full_name}</td>
-                    <td className="px-4 py-3 text-textMuted">{invitation.email}</td>
-                    <td className="px-4 py-3 text-textMuted">{invitation.role?.name ?? <span className="italic text-textMuted/60">Custom</span>}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[invitation.status] ?? 'bg-surface text-textMuted'}`}>
-                        {invitation.status === 'ACCEPTED' && <CheckCircle2 className="w-3 h-3" />}
-                        {invitation.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="secondary"
-                          className="text-xs py-1 px-2 h-auto"
-                          onClick={() => void handleResend(invitation.id)}
-                          disabled={invitation.status !== 'PENDING'}
-                        >
-                          Resend
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          className="text-xs py-1 px-2 h-auto"
-                          onClick={() => void handleRevoke(invitation.id)}
-                          disabled={invitation.status !== 'PENDING'}
-                        >
-                          Revoke
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    </DashboardPage>
   );
 };

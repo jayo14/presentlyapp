@@ -9,22 +9,22 @@ export const Logo: React.FC<{ className?: string, showText?: boolean, variant?: 
   const isDark = variant === 'dark';
 
   return (
-    <div className={cn("flex items-center gap-2 tracking-tight", className)}>
+    <div className={cn("flex items-center gap-2", className)}>
       <div className={cn(
-        "relative flex items-center justify-center w-10 h-10 rounded-[22%] transition-all shadow-md group",
+        "relative flex items-center justify-center w-10 h-10 rounded-[28%] transition-all shadow-md group overflow-hidden",
         isDark ? "bg-presently-black" : "bg-sungold"
       )}>
         <span className={cn(
-          "font-display font-bold text-2xl select-none relative",
+          "font-display font-bold text-2xl select-none relative z-10",
           isDark ? "text-sungold" : "text-presently-black"
         )}>
           P
-          <span className="absolute -right-0.5 bottom-1 text-[10px]">◆</span>
         </span>
+        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
       {showText && (
         <span className={cn(
-          "font-display font-bold tracking-[-0.02em] text-2xl transition-colors",
+          "font-nimbus text-2xl transition-colors tracking-tight",
           isDark ? "text-white" : "text-presently-black"
         )}>
           Presently

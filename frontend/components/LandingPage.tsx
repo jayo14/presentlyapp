@@ -23,22 +23,24 @@ import {
   Prohibit,
 } from '@phosphor-icons/react';
 import { ThemeToggle } from './ThemeToggle';
-import { Navbar } from "./LandingPage/Navbar"
+import { Navbar } from "./LandingPage/Navbar";
+import { StatCounterProps, AccordionItemProps } from './LandingPage/types';
+
 // --- Constants ---
 const SUNGOLD = "#F5C518";
 
 // Icon wrapper component for consistent sizing and spacing
-const IconWrapper = ({ children, size = 24 }) => (
+const IconWrapper: React.FC<{ children: React.ReactElement, size?: number }> = ({ children, size = 24 }) => (
   <div className="flex items-center justify-center flex-shrink-0">
     {React.cloneElement(children, { size, weight: 'duotone' })}
   </div>
 );
 
 
-const StatCounter = ({ value, label }) => {
+const StatCounter: React.FC<StatCounterProps> = ({ value, label }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<string | number>(0);
 
   useEffect(() => {
     if (isInView) {
@@ -65,7 +67,7 @@ const StatCounter = ({ value, label }) => {
   );
 };
 
-const AccordionItem = ({ question, answer, icon: Icon }) => {
+const AccordionItem: React.FC<AccordionItemProps> = ({ question, answer, icon: Icon }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="border-b border-outline last:border-0 py-10">
@@ -230,13 +232,21 @@ const SocialMarquee = () => (
   </div>
 );
 
+interface FeatureCardProps {
+  title: string;
+  description: string;
+  icon: any;
+  color: string;
+  features: string[];
+  children: React.ReactNode;
+  className?: string;
+}
 
-
-const FeatureCard = ({ title, description, icon: Icon, color, features, children, className = "" }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon: Icon, color, features, children, className = "" }) => {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const cardRef = useRef(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return;
     const { left, top } = cardRef.current.getBoundingClientRect();
     setCoords({ x: e.clientX - left, y: e.clientY - top });
@@ -297,94 +307,52 @@ const RoleBasedSection = () => {
         </div>
 
         <div className="mx-auto flex flex-col gap-24">
-
-          {/* Card 1: Students - Large Horizontal */}
           <FeatureCard
-            title="Focus on Learning."
-            description="Attendance shouldn't be a distraction. We've made it as natural as walking into the classroom."
+            title="For Students"
+            description="Focus on learning, not on proving you showed up. Check in from your phone in seconds."
             icon={User}
-            color="#F5C518"
-            features={["One-tap Verification", "Attendance Tracker", "Missed Class Alerts", "Academic Calendar"]}
-            className="lg:col-span-12 min-h-[600px]"
+            color="#34D399"
+            features={["Lightning check-in", "Offline support", "History tracking", "Unit reminders"]}
           >
-            <div className="w-full h-full flex items-center justify-center py-10">
-              <div className="relative w-72 h-[520px] bg-background rounded-[48px] shadow-2xl p-6 overflow-hidden border-[10px] border-outline transition-transform duration-700 group-hover:-rotate-2">
-                <div className="bg-surface h-full rounded-[38px] p-8 flex flex-col">
-                  <div className="flex justify-between items-center mb-14">
-                    <div className="w-12 h-12 rounded-full bg-primary shadow-inner" />
-                    <div className="w-16 h-2 bg-surface-variant rounded-full" />
-                  </div>
-                  <div className="mb-14">
-                    <p className="text-[12px] uppercase text-on-surface opacity-40 font-bold tracking-[0.2em] mb-3">Weekly Average</p>
-                    <p className="text-6xl text-on-surface font-bold tracking-tighter">92.4%</p>
-                  </div>
-                  <div className="space-y-6">
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className="flex items-center gap-5 bg-surface p-5 rounded-2xl shadow-sm">
-                        <div className="w-12 h-12 bg-surface-container rounded-xl" />
-                        <div className="flex-1 space-y-3">
-                          <div className="h-2.5 w-24 bg-surface-variant rounded-full" />
-                          <div className="h-2 w-14 bg-surface-variant/60 rounded-full" />
-                        </div>
-                        <CheckCircle size={28} className="text-primary" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-auto bg-primary text-on-primary-fixed py-5 rounded-full text-center text-[12px] font-bold tracking-widest">
-                    SESSION ACTIVE
-                  </div>
+             <div className="relative w-full h-full flex items-center justify-center">
+                <div className="w-[300px] h-[580px] bg-background rounded-[40px] border-8 border-outline shadow-2xl p-6 overflow-hidden">
+                    <div className="h-24 bg-primary/10 rounded-2xl mb-8 flex items-center justify-center">
+                         <div className="w-12 h-12 bg-primary rounded-full animate-pulse" />
+                    </div>
+                    <div className="space-y-6">
+                        {[1,2,3,4].map(i => <div key={i} className="h-16 bg-surface-container rounded-xl" />)}
+                    </div>
                 </div>
-              </div>
-            </div>
+             </div>
           </FeatureCard>
 
-          <div className="grid md:grid-cols-2 gap-24">
-            {/* Card 2: Lecturers */}
-            <FeatureCard
-              title="Teach. Track. Done."
-              description="No more manual registers. Open a session and let Presently handle the rest while you focus on delivery."
-              icon={ChalkboardSimple}
-              color="#38BDF8"
-              features={["Live Feed", "Instant Export", "Auto-Grades", "Class Analytics"]}
-            >
-              {/* <div className="bg-surface p-10 rounded-[2.5rem] border border-outline w-full max-w-sm rotate-3 group-hover:rotate-0 transition-all duration-700 shadow-2xl">
-                <div className="flex items-center justify-between mb-12">
-                  <div className="h-3 w-32 bg-primary/20 rounded-full" />
-                  <div className="h-5 w-5 bg-primary rounded-full animate-pulse shadow-[0_0_15px_rgba(56,189,248,0.15)]" />
-                </div>
-                <div className="space-y-8">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-6 border-b border-outline/30 pb-6 last:border-0 last:pb-0">
-                      <div className="w-10 h-10 rounded-full bg-surface-container border border-outline" />
-                      <div className="h-2 flex-1 bg-surface-variant rounded-full" />
-                      <div className="w-3 h-3 rounded-full bg-primary" />
+          <FeatureCard
+            title="For Lecturers"
+            description="Automate the most tedious part of your lecture. Get instant accuracy without distraction."
+            icon={ChalkboardSimple}
+            color="#F5C518"
+            features={["Live attendance view", "One-tap export", "Venue geofencing", "Anti-proxy shield"]}
+            className="md:flex-row-reverse"
+          >
+             <div className="relative w-full h-full flex items-center justify-center">
+                 <div className="w-[440px] bg-background rounded-[32px] border-8 border-outline shadow-2xl p-10">
+                    <div className="flex items-center justify-between mb-10">
+                        <div className="h-6 w-32 bg-slate-200 rounded-full" />
+                        <div className="h-10 w-24 bg-primary rounded-lg" />
                     </div>
-                  ))}
-                </div>
-              </div> */}
-            </FeatureCard>
-
-            {/* Card 3: Admins */}
-            <FeatureCard
-              title="Campus Insights."
-              description="A bird's eye view of your entire institution. Monitor compliance and trends in real-time."
-              icon={Building}
-              color="#34D399"
-              features={["Faculty View", "Trend Reports", "Data Security", "Global Search"]}
-            >
-              {/* <div className="flex gap-4 items-end h-48 w-full max-w-xs px-4">
-                {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ height: 0 }}
-                    whileInView={{ height: `${h}%` }}
-                    transition={{ delay: i * 0.05, duration: 0.8, ease: "easeOut" }}
-                    className="flex-1 bg-primary/20 rounded-t-xl relative border-t-[3px] border-primary hover:bg-primary/40 transition-colors"
-                  />
-                ))}
-              </div> */}
-            </FeatureCard>
-          </div>
+                    <div className="grid grid-cols-2 gap-6">
+                         <div className="h-28 bg-surface-container rounded-2xl p-4 flex flex-col justify-end gap-2">
+                             <div className="h-2 w-12 bg-slate-200 rounded-full" />
+                             <div className="h-4 w-16 bg-slate-400 rounded-full" />
+                         </div>
+                         <div className="h-28 bg-surface-container rounded-2xl p-4 flex flex-col justify-end gap-2">
+                             <div className="h-2 w-12 bg-slate-200 rounded-full" />
+                             <div className="h-4 w-16 bg-slate-400 rounded-full" />
+                         </div>
+                    </div>
+                 </div>
+             </div>
+          </FeatureCard>
         </div>
       </div>
     </section>
@@ -392,17 +360,17 @@ const RoleBasedSection = () => {
 };
 
 const CTASection = () => (
-  <section className="py-64 bg-[#0D0D0D] text-center relative overflow-hidden">
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F5C518]/10 blur-[150px] rounded-full pointer-events-none" />
-    <div className="max-w-4xl mx-auto relative z-10">
-      <h2 className="font-display text-6xl md:text-8xl  text-white tracking-tighter mb-12 leading-tight">Every class.<br />Every student.<br /><span className="text-[#F5C518]">Present.</span></h2>
-      <p className="text-slate-400 text-2xl mb-20 max-w-xl mx-auto leading-relaxed">Join institutions already running smarter with Presently. Setup takes less than 5 minutes.</p>
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-10 mb-24">
-        <a href="/register" className="w-full sm:w-auto bg-primary text-on-primary-fixed px-14 py-7 rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl leading-relaxed inline-flex justify-center">
-          Get started for free →
+  <section className="py-64 bg-[#0D0D0D] text-white relative overflow-hidden">
+    <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[160px] rounded-full translate-x-1/2 -translate-y-1/2" />
+    <div className="max-w-6xl mx-auto text-center relative z-10">
+      <h2 className="font-display text-6xl md:text-9xl tracking-tighter mb-16 leading-[0.9]">Ready to go<br />digital?</h2>
+      <p className="text-2xl text-white/60 mb-20 max-w-2xl mx-auto leading-relaxed">Join hundreds of students and forward-thinking lecturers using Presently today.</p>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-10">
+        <a href="/register" className="w-full sm:w-auto bg-primary text-on-primary-fixed px-16 py-8 rounded-full font-bold text-xl hover:scale-105 transition-transform leading-relaxed inline-flex items-center justify-center">
+          Get Started Now
         </a>
-        <a href="/demo" className="w-full sm:w-auto px-14 py-7 rounded-full font-bold text-xl border-2 border-white/20 text-white hover:bg-white/5 transition-all leading-relaxed inline-flex justify-center">
-          Request a school demo
+        <a href="/contact" className="group font-bold text-white text-xl flex items-center gap-3 leading-relaxed inline-flex items-center justify-center">
+          Schedule a Demo <ArrowUpRight size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
         </a>
       </div>
     </div>
@@ -410,7 +378,7 @@ const CTASection = () => (
 );
 
 const Footer = () => (
-  <footer className="bg-surface pt-40 pb-20 px-8 text-textMuted">
+  <footer className="bg-background pt-56 pb-24 border-t border-outline">
     <div className="max-w-[80%] mx-auto w-[85%] grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
       <div className="col-span-1 md:col-span-1">
         <div className="flex items-center gap-3 mb-10">
@@ -513,7 +481,7 @@ export default function App() {
             ].map((item, idx) => (
               <ShowcaseDevice
                 key={item.id}
-                item={item}
+                item={item as any}
                 scrollProgress={scrollYProgress}
                 index={idx}
               />
@@ -569,7 +537,18 @@ export default function App() {
   );
 }
 
-function ShowcaseDevice({ item, scrollProgress, index }) {
+interface ShowcaseDeviceProps {
+  item: {
+    id: number;
+    color: string;
+    icon: any;
+    active?: boolean;
+  };
+  scrollProgress: any;
+  index: number;
+}
+
+function ShowcaseDevice({ item, scrollProgress, index }: ShowcaseDeviceProps) {
   const start = index * 0.15;
   const end = start + 0.3;
 

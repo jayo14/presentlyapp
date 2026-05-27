@@ -17,7 +17,6 @@ import { Logo } from "../../components/Logo"
 import { getNavItemsForRole, NavItem } from "../../utils/navigation"
 import { useCurrentUser } from "../../hooks/useAuth"
 import { cn } from "@/components/ui/utils"
-import { motion } from "framer-motion"
 
 export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof Sidebar> & { onLogout?: () => void }) {
   const { data: currentUser } = useCurrentUser()
@@ -35,11 +34,11 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
     if (items.length === 0) return null
     return (
       <SidebarGroup className="px-3">
-        <SidebarGroupLabel className="text-[11px] uppercase tracking-[0.25em] font-bold text-on-surface-variant/40 px-4 mb-3">
+        <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.2em] font-bold text-on-surface-variant/40 px-4 mb-4">
           {label}
         </SidebarGroupLabel>
         <SidebarGroupContent>
-          <SidebarMenu className="gap-1.5">
+          <SidebarMenu className="gap-2">
             {items.map((item) => {
               const Icon = item.icon
               const active = location.pathname === item.href || (item.href !== '/dashboard' && location.pathname.startsWith(item.href))
@@ -49,26 +48,14 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
                     isActive={active}
                     onClick={() => navigate(item.href)}
                     className={cn(
-                      "flex items-center gap-3.5 px-5 py-[16px] rounded-2xl transition-all duration-500 ease-premium font-bold border border-transparent relative group/nav-item",
+                      "h-12 px-4 rounded-xl transition-all duration-300",
                       active
-                        ? "bg-sungold text-presently-black shadow-gold border-sungold/50 hover:bg-sungold hover:text-presently-black scale-[1.02]"
-                        : "text-on-surface-variant/70 hover:bg-surface-highest/60 hover:text-on-surface hover:border-outline/20 hover:translate-x-1"
+                        ? "bg-sungold text-presently-black shadow-gold font-bold"
+                        : "text-on-surface-variant hover:bg-surface-highest/40 hover:translate-x-1"
                     )}
                   >
-                    <div className={cn(
-                      "flex items-center justify-center rounded-xl transition-all duration-500",
-                      active ? "text-presently-black" : "text-on-surface-variant group-hover:scale-110"
-                    )}>
-                      <Icon size={20} strokeWidth={active ? 2.5 : 2} />
-                    </div>
-                    <span className="text-[13px] tracking-tight">{item.label}</span>
-                    {active && (
-                      <motion.div
-                        layoutId="active-indicator"
-                        className="absolute right-4 w-1.5 h-1.5 rounded-full bg-presently-black shadow-sm"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
+                    <Icon size={20} weight={active ? "bold" : "regular"} className={active ? "text-presently-black" : "text-on-surface-variant"} />
+                    <span className="text-sm">{item.label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )
@@ -80,40 +67,25 @@ export function AppSidebar({ onLogout, ...props }: React.ComponentProps<typeof S
   }
 
   return (
-    <Sidebar collapsible="offcanvas" className="border-r border-outline/40 bg-surface selection:bg-sungold/30" {...props}>
-      <SidebarHeader className="p-8 pb-4">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              aria-label="Go to Dashboard"
-              className="hover:bg-transparent focus:bg-transparent"
-              onClick={() => navigate('/dashboard')}
-            >
-              <Logo showText={true} />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+    <Sidebar variant="inset" className="border-r-0 bg-background" {...props}>
+      <SidebarHeader className="h-[80px] flex items-center px-8 border-b border-outline/10">
+        <Logo showText={true} />
       </SidebarHeader>
-
-      <SidebarContent className="gap-6 py-4">
-        {renderNavGroup("Core", coreItems)}
+      <SidebarContent className="py-8 gap-10">
+        {renderNavGroup("General", coreItems)}
         {renderNavGroup("Management", managementItems)}
-        {renderNavGroup("System", systemItems)}
+        {renderNavGroup("Infrastructure", systemItems)}
       </SidebarContent>
-
-      <SidebarFooter className="p-4 border-t border-outline/30">
-        {currentUser && (
-          <NavUser
-            user={{
-              name: currentUser.full_name || "User",
-              email: currentUser.email || "",
-              avatar: currentUser.avatar_url,
-              role: currentUser.role
-            }}
-            onLogout={onLogout || (() => {})}
-          />
-        )}
+      <SidebarFooter className="p-4 border-t border-outline/10">
+        <NavUser
+          user={{
+            name: currentUser?.full_name || "User",
+            email: currentUser?.email || "",
+            avatar: "",
+            role: currentUser?.role
+          }}
+          onLogout={onLogout}
+        />
       </SidebarFooter>
     </Sidebar>
   )

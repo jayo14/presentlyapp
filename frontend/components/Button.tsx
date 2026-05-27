@@ -22,24 +22,23 @@ export const Button = ({
   fullWidth = false,
   ...props
 }: ButtonProps) => {
-  const baseStyles = "relative inline-flex items-center justify-center font-semibold transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none";
+  const baseStyles = "relative inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none uppercase tracking-widest";
 
   const variants = {
-    primary: "bg-primary text-on-primary-fixed skeuo-button-gold hover:-translate-y-0.5",
-    secondary: "bg-on-surface text-background skeuo-button hover:-translate-y-0.5",
-    outline: "bg-transparent border border-outline text-on-surface hover:bg-surfaceHigh skeuo-button",
-    ghost: "bg-transparent text-on-surface hover:bg-surfaceHigh",
+    primary: "bg-sungold text-presently-black skeuo-button-gold hover:-translate-y-0.5 shadow-gold",
+    secondary: "bg-on-surface text-surface skeuo-button hover:-translate-y-0.5",
+    outline: "bg-transparent border border-outline text-on-surface hover:bg-surface-highest/40 skeuo-button",
+    ghost: "bg-transparent text-on-surface hover:bg-surface-highest/20",
     error: "bg-soft-coral text-white shadow-md",
     destructive: "bg-soft-coral text-white shadow-md"
   };
 
   const sizes = {
-    sm: "h-14 px-6 text-sm rounded-full",
-    md: "h-18 px-10 text-base rounded-full",
-    lg: "h-22 px-12 text-lg rounded-full",
-    icon: "h-16 w-16 p-0 rounded-full",
+    sm: "h-12 px-6 text-[10px] rounded-2xl",
+    md: "h-16 px-10 text-xs rounded-2xl",
+    lg: "h-20 px-12 text-sm rounded-2xl",
+    icon: "h-16 w-16 p-0 rounded-2xl",
   };
-
 
   return (
     <motion.button

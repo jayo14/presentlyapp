@@ -1,51 +1,46 @@
 import React from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '../src/components/ui/utils';
 
-interface ModernCardProps extends HTMLMotionProps<"div"> {
+export interface ModernCardProps {
   children: React.ReactNode;
-  variant?: 'default' | 'glass' | 'outline' | 'accent' | 'dark' | 'gold-accent';
-  padding?: 'none' | 'sm' | 'md' | 'lg';
   className?: string;
+  padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  onClick?: () => void;
   hoverable?: boolean;
+  variant?: string; // Compatibility alias
+  border?: boolean; // Visibility/style flag
 }
 
 export const ModernCard: React.FC<ModernCardProps> = ({
   children,
-  variant = 'default',
-  padding = 'md',
-  className = '',
-  hoverable = true,
-  ...props
+  className = "",
+  padding = "md",
+  onClick,
+  hoverable = false,
+  variant,
+  border = false
 }) => {
-  const variants = {
-    default: "bg-surface-highest/40 backdrop-blur-md border border-outline shadow-sm",
-    dark: "bg-presently-black text-white border border-outline shadow-xl",
-    glass: "backdrop-blur-xl bg-surface/40 border border-outline/50 shadow-lg",
-    outline: "bg-transparent border border-outline",
-    accent: "bg-sungold/10 border border-sungold/20",
-    'gold-accent': "bg-surface-highest/50 border-l-4 border-l-sungold shadow-md"
-  };
-
   const paddings = {
     none: "p-0",
     sm: "p-4",
     md: "p-6",
-    lg: "p-8"
+    lg: "p-10",
+    xl: "p-16"
   };
 
   return (
-    <motion.div
+    <div
+      onClick={onClick}
       className={cn(
-        "rounded-2xl transition-all duration-500 ease-premium",
-        variants[variant],
+        "bg-surface border border-outline/30 rounded-[2rem] shadow-sm overflow-hidden transition-all duration-500 ease-premium",
+        hoverable && "hover:border-sungold/40 hover:shadow-premium hover:-translate-y-1 cursor-pointer",
+        onClick && "cursor-pointer active:scale-[0.99]",
+        border && "border-2 border-outline",
         paddings[padding],
-        hoverable && "hover:border-outline-variant hover:shadow-md hover:-translate-y-1",
         className
       )}
-      {...props}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };
