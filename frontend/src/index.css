@@ -149,6 +149,10 @@
   }
   
   .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  .font-nimbus {
+    font-family: 'Tan Nimbus', 'Outfit', serif;
+  }
 }
 
 @layer components {

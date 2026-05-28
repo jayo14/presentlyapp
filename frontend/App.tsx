@@ -30,7 +30,7 @@ import { LoadingScreen } from './components/LoadingScreen';
 // Eager load critical dashboard components (no lazy loading to avoid infinite reload loops)
 import { StudentDashboard } from './components/Dashboard/StudentDashboard';
 import { LecturerDashboard } from './components/Dashboard/LecturerDashboard';
-import { AdminDashboard } from './components/Dashboard/AdminDashboard';
+const AdminDashboard = simpleLazy(() => import('./components/Dashboard/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 import { ClassRepDashboard } from './components/Dashboard/ClassRepDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ProfilePage } from './components/Profile/ProfilePage';

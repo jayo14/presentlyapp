@@ -5,7 +5,8 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Institution, College } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
-import { DepartmentManagement } from './DepartmentManagement';
+
+const DepartmentManagement = React.lazy(() => import('./DepartmentManagement').then(m => ({ default: m.DepartmentManagement })));
 
 interface CollegeWithStats extends College {
   departmentCount?: number;
@@ -121,13 +122,15 @@ export const CollegeManagement: React.FC<CollegeManagementProps> = ({
 
   if (selectedCollege) {
     return (
-      <DepartmentManagement 
-        institution={institution}
-        college={selectedCollege}
-        onBack={() => {
-          navigate(`/dashboard/institutions/${id}`);
-        }}
-      />
+      <React.Suspense fallback={<div className="p-8 text-center text-textMuted">Loading departments...</div>}>
+        <DepartmentManagement
+          institution={institution}
+          college={selectedCollege}
+          onBack={() => {
+            navigate(`/dashboard/institutions/${id}`);
+          }}
+        />
+      </React.Suspense>
     );
   }
 

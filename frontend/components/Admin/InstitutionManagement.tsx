@@ -5,7 +5,7 @@ import { Button } from '../Button';
 import { Input } from '../Input';
 import { Institution } from '../../types';
 import { institutionsApi } from '../../services/api/institutions';
-import CollegeManagement from './CollegeManagement';
+const CollegeManagement = React.lazy(() => import('./CollegeManagement'));
 import { SEO } from '../SEO';
 
 interface InstitutionWithStats extends Institution {
@@ -120,12 +120,14 @@ export const InstitutionManagement: React.FC = () => {
 
   if (showCollegeTab && selectedInstitution) {
     return (
-      <CollegeManagement 
-        institution={selectedInstitution}
-        onBack={() => {
-          navigate('/dashboard/institutions');
-        }}
-      />
+      <React.Suspense fallback={<div className="p-8 text-center text-textMuted">Loading colleges...</div>}>
+        <CollegeManagement
+          institution={selectedInstitution}
+          onBack={() => {
+            navigate('/dashboard/institutions');
+          }}
+        />
+      </React.Suspense>
     );
   }
 
