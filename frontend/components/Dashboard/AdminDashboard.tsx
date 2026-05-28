@@ -18,11 +18,6 @@ import {
   DotsThreeOutline,
   ArrowsClockwise
 } from '@phosphor-icons/react';
-import { InstitutionManagement } from '../Admin/InstitutionManagement';
-import UserManagement from '../Admin/UserManagement';
-import VenueManagement from '../Admin/VenueManagement';
-import DepartmentManagement from '../Admin/DepartmentManagement';
-import CourseManagement from '../Admin/CourseManagement';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '../../services/api/system';
 import { SEO } from '../SEO';
@@ -33,6 +28,12 @@ interface AdminDashboardProps {
   userName: string;
   view?: string;
 }
+
+const InstitutionManagement = React.lazy(() => import('../Admin/InstitutionManagement').then(m => ({ default: m.InstitutionManagement })));
+const UserManagement = React.lazy(() => import('../Admin/UserManagement'));
+const VenueManagement = React.lazy(() => import('../Admin/VenueManagement'));
+const DepartmentManagement = React.lazy(() => import('../Admin/DepartmentManagement'));
+const CourseManagement = React.lazy(() => import('../Admin/CourseManagement'));
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view = 'dashboard' }) => {
   const [systemStats, setSystemStats] = useState<SystemStats>({
@@ -100,7 +101,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     return (
       <React.Fragment>
         <SEO title="Institutions | Admin | Presently" description="Manage educational institutions on Presently." />
-        <InstitutionManagement />
+        <React.Suspense fallback={<div className="p-8 text-center text-textMuted">Loading institutions...</div>}>
+          <InstitutionManagement />
+        </React.Suspense>
       </React.Fragment>
     );
   }
@@ -109,7 +112,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     return (
       <React.Fragment>
         <SEO title="Users | Admin | Presently" description="Manage users and roles on Presently." />
-        <UserManagement />
+        <React.Suspense fallback={<div className="p-8 text-center text-textMuted">Loading users...</div>}>
+          <UserManagement />
+        </React.Suspense>
       </React.Fragment>
     );
   }
@@ -118,7 +123,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     return (
       <React.Fragment>
         <SEO title="Venues | Admin | Presently" description="Manage and map campus venues on Presently." />
-        <VenueManagement />
+        <React.Suspense fallback={<div className="p-8 text-center text-textMuted">Loading venues...</div>}>
+          <VenueManagement />
+        </React.Suspense>
       </React.Fragment>
     );
   }
@@ -127,7 +134,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     return (
       <React.Fragment>
         <SEO title="Departments | Admin | Presently" description="Manage academic departments on Presently." />
-        <DepartmentManagement />
+        <React.Suspense fallback={<div className="p-8 text-center text-textMuted">Loading departments...</div>}>
+          <DepartmentManagement />
+        </React.Suspense>
       </React.Fragment>
     );
   }
@@ -136,7 +145,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
     return (
       <React.Fragment>
         <SEO title="Courses | Admin | Presently" description="Manage courses offered on Presently." />
-        <CourseManagement />
+        <React.Suspense fallback={<div className="p-8 text-center text-textMuted">Loading courses...</div>}>
+          <CourseManagement />
+        </React.Suspense>
       </React.Fragment>
     );
   }

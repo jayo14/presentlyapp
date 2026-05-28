@@ -30,6 +30,7 @@ export default {
         textMuted: "var(--on-surface-variant)",
   
         primary: "var(--primary)",
+        "primary-container": "var(--primary-container)",
         primaryContainer: "var(--primary-container)",
   
         outline: "var(--outline-variant)",

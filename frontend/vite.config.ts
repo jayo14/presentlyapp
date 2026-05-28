@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
               id.includes('remark-gfm') ||
               id.includes('rehype-slug') ||
               id.includes('rehype-highlight') ||
+              id.includes('highlight.js') ||
               id.includes('mdast-util-') ||
               id.includes('unified') ||
               id.includes('micromark')) {
@@ -77,15 +78,6 @@ export default defineConfig(({ mode }) => {
               return 'vendor-motion';
             }
 
-            // Admin dashboard - admin only
-            if (id.includes('components/Dashboard/AdminDashboard')) {
-              return 'chunk-admin';
-            }
-
-            // Auth routes - loaded on demand
-            if (id.includes('components/Auth')) {
-              return 'chunk-auth';
-            }
 
             // Leaflet/map libraries - lazy load
             if (id.includes('leaflet') || id.includes('react-leaflet')) {
