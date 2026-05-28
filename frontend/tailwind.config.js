@@ -15,6 +15,8 @@ export default {
       fontFamily: {
         sans: ['Outfit', 'Lexend', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         headline: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        nimbus: ['Tan Nimbus', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
         background: "var(--background)",
@@ -22,7 +24,7 @@ export default {
         surfaceContainer: "var(--surface-container)",
         surfaceLow: "var(--surface-container-low)",
         surfaceHigh: "var(--surface-container-high)",
-        surfaceHighest: "var(--surface-container-highest)",
+        "surface-highest": "var(--surface-container-highest)",
   
         text: "var(--on-surface)",
         textMuted: "var(--on-surface-variant)",
@@ -35,6 +37,15 @@ export default {
         error: "var(--error)",
         success: "var(--success)",
         warning: "var(--warning)",
+
+        // Brand colors
+        sungold: "#F5C518",
+        "presently-black": "#0D0D0D",
+        "soft-cream": "#FDF9F0",
+        paper: "#F5F5F5",
+      },
+      transitionTimingFunction: {
+        'premium': 'cubic-bezier(0.2, 0.8, 0.2, 1)',
       },
       keyframes: {
         'float': {

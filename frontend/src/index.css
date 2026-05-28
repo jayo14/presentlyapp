@@ -61,6 +61,7 @@
     --ring: var(--primary-container);
     --radius: 0.625rem;
     --foreground: var(--on-surface);
+    --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .dark {
@@ -267,9 +268,46 @@
     padding: 1rem 2rem !important;
     border-radius: 0.875rem !important;
   }
+
+  .skeuo-input {
+    background: var(--surface);
+    border: 1px solid var(--outline-variant);
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s var(--ease-premium);
+  }
+
+  .skeuo-input:focus {
+    border-color: var(--primary);
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05), 0 0 0 4px var(--primary-container);
+  }
+
+  .skeuo-button-gold {
+    background: linear-gradient(180deg, #F5C518 0%, #D4A914 100%);
+    border: 1px solid #B89211;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    color: #0D0D0D;
+    font-weight: 700;
+    transition: all 0.2s var(--ease-premium);
+  }
+
+  .skeuo-button-gold:hover {
+    background: linear-gradient(180deg, #FFD12B 0%, #E6B816 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .skeuo-button-gold:active {
+    background: #D4A914;
+    transform: translateY(0);
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  }
 }
 
 @layer utilities {
+  .ease-premium {
+    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
   @keyframes pulse-orb {
     0%,100% { opacity:0.1; transform:scale(1) translate(0, 0); }
     50%      { opacity:0.15; transform:scale(1.1) translate(2%, 2%); }
