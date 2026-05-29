@@ -169,7 +169,6 @@ test.describe('Attendance Flow – Student marks attendance', () => {
     await page.context().setGeolocation({ latitude: 7.5197, longitude: 4.5267 });
     await page.context().grantPermissions(['geolocation']);
     await page.goto(`/check-in/${SESSION_CODE}`);
-    await page.goto(`/check-in/${SESSION_CODE}`);
 
     const checkInBtn = page.getByRole('button', { name: /mark attendance/i });
     await expect(checkInBtn).toBeVisible({ timeout: 10000 });

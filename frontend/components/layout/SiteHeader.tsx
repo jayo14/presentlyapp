@@ -6,7 +6,7 @@ import {
   List,
   Plus
 } from '@phosphor-icons/react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 import { SearchExpand } from '../Dashboard/SearchExpand';
 
 interface SiteHeaderProps {
