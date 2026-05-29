@@ -24,7 +24,7 @@ import {
 } from '@phosphor-icons/react';
 import { UserRole } from '../../types';
 import { useTheme } from '../ThemeProvider';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 interface AppSidebarProps {
   userRole?: UserRole;
