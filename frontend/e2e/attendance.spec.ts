@@ -137,6 +137,7 @@ test.describe('Attendance Flow – Student marks attendance', () => {
 
   test('student can mark attendance (click check-in button)', async ({ page }) => {
     let checkInCalled = false;
+    let checkInPayload: any = null;
 
     await page.route(`**/api/check-in/${SESSION_CODE}/`, async (route) => {
       if (route.request().method() === 'GET') {
@@ -147,6 +148,7 @@ test.describe('Attendance Flow – Student marks attendance', () => {
         });
       } else {
         checkInCalled = true;
+        checkInPayload = route.request().postDataJSON();
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
@@ -166,18 +168,16 @@ test.describe('Attendance Flow – Student marks attendance', () => {
     // Mock geolocation so the browser doesn't block location access
     await page.context().setGeolocation({ latitude: 7.5197, longitude: 4.5267 });
     await page.context().grantPermissions(['geolocation']);
-
     await page.goto(`/check-in/${SESSION_CODE}`);
 
-    // Wait for check-in button
-    const checkInBtn = page.getByRole('button', { name: /mark.*attendance|check.*in|confirm/i });
-    if (await checkInBtn.count() > 0) {
-      await checkInBtn.first().click();
-      // After successful check-in the page should show success state or "PRESENT"
-      await expect(
-        page.getByText(/present|success|checked in|attendance marked/i)
-      ).toBeVisible({ timeout: 10000 });
-    }
+    const checkInBtn = page.getByRole('button', { name: /mark attendance/i });
+    await expect(checkInBtn).toBeVisible({ timeout: 10000 });
+    await checkInBtn.click();
+
+    await expect.poll(() => checkInCalled).toBe(true);
+    expect(checkInPayload?.latitude).toBeDefined();
+    expect(checkInPayload?.longitude).toBeDefined();
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 12000 });
   });
 
   test('unauthenticated student is redirected to /login for check-in', async ({ page }) => {
