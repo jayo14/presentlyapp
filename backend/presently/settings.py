@@ -19,7 +19,16 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$zkoz6=hl_t6%s8(yh7f@
 # Default to True for development, False for production
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+
+def _csv_env(*names, default='*'):
+    for name in names:
+        raw = os.environ.get(name)
+        if raw:
+            return [host.strip() for host in raw.split(',') if host.strip()]
+    return [host.strip() for host in default.split(',') if host.strip()]
+
+
+ALLOWED_HOSTS = _csv_env('ALLOWED_HOSTS', 'DJANGO_ALLOWED_HOSTS', default='*')
 
 # Site Configuration
 SITE_NAME = os.environ.get('SITE_NAME', 'Presently')
