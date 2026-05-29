@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 export const SearchExpand: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
