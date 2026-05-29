@@ -31,7 +31,7 @@ import { EnhancedAttendanceScanner } from './Attendance/EnhancedAttendanceScanne
 import { sessionApi } from '../services/api/attendance';
 import { AppSidebar } from './layout/AppSidebar';
 import { SiteHeader } from './layout/SiteHeader';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 interface LayoutProps {
   children?: React.ReactNode;

@@ -12,6 +12,36 @@ import { test, expect } from '@playwright/test';
 import { loginAs, mockApiForUser, STUDENT_USER, STUDENT_DASHBOARD_DATA } from './helpers';
 
 test.describe('Student – Login', () => {
+  test('student can sign up and is redirected to onboarding', async ({ page }) => {
+    await page.route('**/api/auth/me/', async (route) => {
+      await route.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"Unauthorized"}' });
+    });
+    await page.route('**/api/auth/register/', async (route) => {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          requires_onboarding: true,
+          user: {
+            ...STUDENT_USER,
+            onboarding_complete: false,
+            email_verified: true,
+          },
+          tokens: { access: 'mock-access-token', refresh: 'mock-refresh-token' },
+        }),
+      });
+    });
+
+    await page.goto('/register');
+    await page.locator('input[type="text"]').first().fill('New Student');
+    await page.locator('input[type="email"]').fill('new.student@presently.test');
+    await page.locator('input[type="password"]').fill('StrongPass123!');
+    await page.getByRole('button', { name: /create account/i }).click();
+
+    await expect(page).toHaveURL(/\/onboarding/, { timeout: 10000 });
+  });
+
   test('login page renders email and password fields', async ({ page }) => {
     await mockApiForUser(page, STUDENT_USER);
     await page.goto('/login');

@@ -56,6 +56,61 @@ test.describe('Lecturer – Dashboard', () => {
     // Should render the create session page (not redirected away)
     await expect(page).toHaveURL(/\/dashboard\/sessions\/new/, { timeout: 8000 });
   });
+
+  test('lecturer can create a session from the dashboard flow', async ({ page }) => {
+    await page.route('**/api/venues/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 10,
+            name: 'Main Hall',
+            code: 'MH-01',
+            capacity: 200,
+            latitude: 7.5197,
+            longitude: 4.5267,
+          },
+        ]),
+      });
+    });
+
+    let createdPayload: any = null;
+    await page.route('**/api/sessions/**', async (route) => {
+      if (route.request().method() === 'POST') {
+        createdPayload = route.request().postDataJSON();
+        await route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify({ ...MOCK_SESSION, id: 99, session_code: 'LECTFLOW1' }),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ results: [MOCK_SESSION], count: 1 }),
+      });
+    });
+
+    await page.goto('/dashboard/sessions/new');
+    await expect(page.getByRole('heading', { name: /create session|new attendance session/i })).toBeVisible({ timeout: 10000 });
+
+    await page.getByLabel('Select Course *').click();
+    await page.getByRole('option', { name: /CS301 - Data Structures/i }).click();
+
+    await page.getByLabel('Lecture Hall *').click();
+    await page.getByRole('option', { name: /Main Hall/i }).click();
+
+    await page.getByRole('button', { name: /Create Session/i }).click();
+
+    await expect(page.getByText(/Session Code/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('LECTFLOW1')).toBeVisible({ timeout: 10000 });
+    expect(createdPayload).toBeTruthy();
+    expect(createdPayload.course).toBe(1);
+    expect(createdPayload.venue).toBe(10);
+  });
 });
 
 test.describe('Lecturer – Route Protection', () => {

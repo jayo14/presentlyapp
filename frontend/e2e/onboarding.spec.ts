@@ -318,6 +318,98 @@ test.describe('Onboarding – API Submission', () => {
         }),
       });
     });
+
+    test.describe('Onboarding – End-to-end completion by role', () => {
+      async function bootstrapNewUser(page: Page) {
+        await mockApiForUser(page, NEW_USER);
+        await page.route('**/api/auth/me/', async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ user: NEW_USER }),
+          });
+        });
+        await mockInstitutionEndpoints(page);
+        await page.route('**/api/auth/upload-avatar/', async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ success: true, avatar_url: 'https://example.com/avatar.png' }),
+          });
+        });
+        await page.addInitScript(() => {
+          localStorage.setItem('access_token', 'mock-access-token');
+          localStorage.setItem('refresh_token', 'mock-refresh-token');
+        });
+      }
+
+      async function completeCommonAcademicStep(page: Page) {
+        await page.selectOption('#institution-select', '1');
+        await page.selectOption('#college-select', '1');
+        await page.selectOption('#department-select', '1');
+      }
+
+      test('student can complete onboarding and land on dashboard', async ({ page }) => {
+        await bootstrapNewUser(page);
+
+        let onboardingPayload: any = null;
+        await page.route('**/api/auth/onboarding/', async (route) => {
+          onboardingPayload = route.request().postDataJSON();
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              user: { ...ONBOARDED_STUDENT, email_verified: true, onboarding_complete: true },
+            }),
+          });
+        });
+
+        await page.goto('/onboarding');
+        await page.getByRole('button', { name: /student/i }).first().click();
+        await page.getByRole('button', { name: /next step/i }).click();
+        await page.getByRole('button', { name: /next step/i }).click();
+        await completeCommonAcademicStep(page);
+        await page.getByLabel('Matriculation Number').fill('ENG/2021/001');
+        await page.getByLabel('Level').fill('300');
+        await page.getByRole('button', { name: /next step/i }).click();
+        await page.getByRole('button', { name: /next step/i }).click();
+        await page.getByRole('button', { name: /complete profile/i }).click();
+
+        await expect(page).toHaveURL(/\/dashboard/, { timeout: 12000 });
+        expect(onboardingPayload?.role).toBe('STUDENT');
+        expect(onboardingPayload?.matric_number).toBe('ENG/2021/001');
+        expect(onboardingPayload?.level).toBe('300');
+      });
+
+      test('lecturer can complete onboarding and land on dashboard', async ({ page }) => {
+        await bootstrapNewUser(page);
+
+        let onboardingPayload: any = null;
+        await page.route('**/api/auth/onboarding/', async (route) => {
+          onboardingPayload = route.request().postDataJSON();
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              user: { ...ONBOARDED_LECTURER, email_verified: true, onboarding_complete: true },
+            }),
+          });
+        });
+
+        await page.goto('/onboarding');
+        await page.getByRole('button', { name: /lecturer/i }).first().click();
+        await page.getByRole('button', { name: /next step/i }).click();
+        await page.getByRole('button', { name: /next step/i }).click();
+        await completeCommonAcademicStep(page);
+        await page.getByLabel('Staff ID').fill('STF/001');
+        await page.getByRole('button', { name: /next step/i }).click();
+        await page.getByRole('button', { name: /complete profile/i }).click();
+
+        await expect(page).toHaveURL(/\/dashboard/, { timeout: 12000 });
+        expect(onboardingPayload?.role).toBe('LECTURER');
+        expect(onboardingPayload?.staff_id).toBe('STF/001');
+      });
+    });
     await mockInstitutionEndpoints(page);
     await mockOnboardingComplete(page, ONBOARDED_STUDENT);
 
