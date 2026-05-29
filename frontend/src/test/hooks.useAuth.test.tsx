@@ -52,6 +52,7 @@ const STUDENT_USER = {
   email: 'student@test.com',
   full_name: 'Test Student',
   role: UserRole.STUDENT,
+  email_verified: true,
   onboarding_complete: true,
   notifications_enabled: true,
   location_enabled: false,
