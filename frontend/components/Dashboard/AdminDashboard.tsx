@@ -17,11 +17,6 @@ import {
   DotsThree,
   ArrowsClockwise
 } from '@phosphor-icons/react';
-import { InstitutionManagement } from '../Admin/InstitutionManagement';
-import UserManagement from '../Admin/UserManagement';
-import VenueManagement from '../Admin/VenueManagement';
-import DepartmentManagement from '../Admin/DepartmentManagement';
-import CourseManagement from '../Admin/CourseManagement';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '../../services/api/system';
 import { SEO } from '../SEO';
@@ -93,52 +88,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       setLogsLoading(false);
     }
   };
-
-  // Delegate to sub-components for management views
-  if (view === 'institutions') {
-    return (
-      <React.Fragment>
-        <SEO title="Institutions | Admin | Presently" description="Manage educational institutions on Presently." />
-        <InstitutionManagement />
-      </React.Fragment>
-    );
-  }
-
-  if (view === 'users') {
-    return (
-      <React.Fragment>
-        <SEO title="Users | Admin | Presently" description="Manage users and roles on Presently." />
-        <UserManagement />
-      </React.Fragment>
-    );
-  }
-
-  if (view === 'venues') {
-    return (
-      <React.Fragment>
-        <SEO title="Venues | Admin | Presently" description="Manage and map campus venues on Presently." />
-        <VenueManagement />
-      </React.Fragment>
-    );
-  }
-
-  if (view === 'departments') {
-    return (
-      <React.Fragment>
-        <SEO title="Departments | Admin | Presently" description="Manage academic departments on Presently." />
-        <DepartmentManagement />
-      </React.Fragment>
-    );
-  }
-
-  if (view === 'courses') {
-    return (
-      <React.Fragment>
-        <SEO title="Courses | Admin | Presently" description="Manage courses offered on Presently." />
-        <CourseManagement />
-      </React.Fragment>
-    );
-  }
 
   // Audit Logs View
   if (view === 'logs') {
