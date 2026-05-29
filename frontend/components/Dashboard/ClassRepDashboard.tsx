@@ -1,8 +1,26 @@
 import React, { useState, useRef } from 'react';
 import { StudentDashboard } from './StudentDashboard';
-import { Users, CheckCircle2, XCircle, Search, FileText, Calendar, Plus, Trash2, Clock, MapPin, Upload, Sparkles, Loader2, Save, X } from 'lucide-react';
+import {
+  Users,
+  CheckCircle,
+  XCircle,
+  MagnifyingGlass,
+  FileText,
+  Calendar,
+  Plus,
+  Trash,
+  Clock,
+  MapPin,
+  UploadSimple,
+  Sparkle,
+  CircleNotch,
+  FloppyDisk,
+  X
+} from '@phosphor-icons/react';
 import { analyzeTimetableImage } from '../../services/geminiService';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
+import { DashboardPage } from '../layout-primitives/DashboardPage';
+import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
 
 interface ClassRepDashboardProps {
   userName: string;
@@ -107,37 +125,35 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   // Timetable view (editable for class rep)
   if (view === 'timetable') {
       return (
-        <div className="h-full overflow-y-auto space-y-6 animate-in fade-in duration-300">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 className="font-headline text-xl font-semibold text-text">Manage Class Timetable</h2>
-                    <p className="text-sm text-textMuted mt-0.5">View, edit, or auto-generate your class schedule.</p>
-                </div>
+        <DashboardPage
+            title="Manage Class Timetable"
+            description="View, edit, or auto-generate your class schedule."
+            actions={
                 <div className="flex gap-2">
                     <button
                       onClick={() => setIsAiScanOpen(true)}
                       className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
                     >
-                        <Sparkles size={14} className="text-primary" />
+                        <Sparkle size={14} weight="bold" className="text-primary" />
                         AI Scan
                     </button>
                     <button
                       onClick={() => setIsTimetableModalOpen(true)}
                       className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
                     >
-                        <Plus size={14} />
+                        <Plus size={14} weight="bold" />
                         Add Class
                     </button>
                     <button
                       onClick={handleSaveTimetable}
                       className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
                     >
-                        <Save size={14} />
+                        <FloppyDisk size={14} weight="bold" />
                         Save
                     </button>
                 </div>
-            </div>
-
+            }
+        >
             <div className="grid gap-4">
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => {
                     const dayEntries = timetable.filter(t => t.day === day).sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -172,7 +188,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                                                 onClick={() => handleDeleteEntry(entry.id)}
                                                 className="ml-2 p-1.5 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                                             >
-                                                <Trash2 size={14} />
+                                                <Trash size={14} weight="bold" />
                                             </button>
                                         </div>
                                     ))}
@@ -278,7 +294,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                         </div>
                         <div className="mb-5">
                             <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 text-primary">
-                                <Sparkles size={28} />
+                                <Sparkle size={28} weight="bold" />
                             </div>
                             <h3 id="ai-scan-title" className="font-headline text-base font-semibold text-text mb-1">Scan Timetable</h3>
                             <p className="text-sm text-textMuted">Upload a photo of your class schedule, and AI will extract the details.</p>
@@ -286,7 +302,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
 
                         {isScanning ? (
                             <div className="py-8">
-                                <Loader2 size={36} className="animate-spin text-primary mx-auto mb-3" />
+                                <CircleNotch size={36} className="animate-spin text-primary mx-auto mb-3" />
                                 <p className="text-sm font-medium text-text">Analyzing Image...</p>
                                 <p className="text-xs text-textMuted mt-1">Using Gemini Pro Vision</p>
                             </div>
@@ -295,7 +311,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                                 onClick={() => fileInputRef.current?.click()}
                                 className="border-outline border-dashed border-outline bg-surfaceLow/50 rounded-xl p-8 cursor-pointer hover:bg-surfaceHigh hover:text-text hover:border-primary/50 transition-all group"
                             >
-                                <Upload size={28} className="text-textMuted group-hover:text-primary mx-auto mb-3 transition-colors" />
+                                <UploadSimple size={28} weight="bold" className="text-textMuted group-hover:text-primary mx-auto mb-3 transition-colors" />
                                 <p className="text-sm font-medium text-text">Click to Upload Image</p>
                                 <p className="text-xs text-textMuted mt-1">Supports JPG, PNG</p>
                                 <input
@@ -311,25 +327,23 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                     </div>
                 </div>
             )}
-        </div>
+        </DashboardPage>
       );
   }
 
   // Class Management view
   if (view === 'class-mgmt') {
       return (
-          <div className="h-full overflow-y-auto space-y-6 animate-in fade-in duration-300">
-              <div>
-                  <h2 className="font-headline text-xl font-semibold text-text">Class Management</h2>
-                  <p className="text-sm text-textMuted mt-0.5">Manage attendance and reports for your class.</p>
-              </div>
-
+          <DashboardPage
+            title="Class Management"
+            description="Manage attendance and reports for your class."
+          >
               {/* Mark Attendance Card */}
               <div className="bg-surface text-text border border-outline rounded-xl p-5">
                   <h3 className="font-headline text-sm font-semibold text-text mb-3">Mark Attendance for Absent Students</h3>
                   <div className="flex gap-3 mb-4">
                       <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
+                        <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
                         <input
                           type="text"
                           placeholder="Search student by name or matric..."
@@ -353,11 +367,11 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                               </div>
                               <div className="flex gap-2">
                                   <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                                      <CheckCircle2 size={13} />
+                                      <CheckCircle size={13} weight="bold" />
                                       Present
                                   </button>
                                   <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-                                      <XCircle size={13} />
+                                      <XCircle size={13} weight="bold" />
                                       Absent
                                   </button>
                               </div>
@@ -375,7 +389,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                       <FileText size={16} className="text-textMuted" />
                   </button>
               </div>
-          </div>
+          </DashboardPage>
       );
   }
 
