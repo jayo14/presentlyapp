@@ -35,25 +35,25 @@ class OnboardingSlide {
 
 const onboardingSlides = <OnboardingSlide>[
   OnboardingSlide(
-    title: 'GPS-Verified\nAttendance',
+    title: 'GPS-Verified Attendance',
     description: 'Ensuring your presence where it matters most.',
     imageUrl:
         'https://github.com/user-attachments/assets/05ec0147-a91d-4081-b888-5684cd4d8192',
   ),
   OnboardingSlide(
-    title: 'Real-time Class\nValidation',
+    title: 'Real-time Class Validation',
     description: 'Instant updates for students and lecturers every check-in.',
     imageUrl:
         'https://github.com/user-attachments/assets/f55f0aa0-bd6e-4157-ba38-5b0777588245',
   ),
   OnboardingSlide(
-    title: 'No Proxy,\nNo Stress',
+    title: 'No Proxy, No Stress',
     description: 'Secure, fraud-proof attendance tracking built for trust.',
     imageUrl:
         'https://github.com/user-attachments/assets/8a4f227f-2eb1-465b-b471-ae5371dfa134',
   ),
   OnboardingSlide(
-    title: 'Smart Campus\nInsights',
+    title: 'Smart Campus Insights',
     description: 'Attendance intelligence that helps lecturers act faster.',
     imageUrl:
         'https://github.com/user-attachments/assets/f0c38637-472e-4f5f-90d6-568a534c34a4',
@@ -137,14 +137,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) => Container(
                                     color: AppColors.surfaceSoft,
-                                  ),
-                                  errorWidget: (context, url, error) => Container(
-                                    color: AppColors.surfaceSoft,
                                     alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.broken_image_outlined,
-                                      color: AppColors.accent,
-                                      size: 82,
+                                    child: const SizedBox(
+                                      width: 34,
+                                      height: 34,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        color: AppColors.accent,
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) => Semantics(
+                                    label: 'Image failed to load',
+                                    child: Container(
+                                      color: AppColors.surfaceSoft,
+                                      alignment: Alignment.center,
+                                      child: const Icon(
+                                        Icons.broken_image_outlined,
+                                        color: AppColors.accent,
+                                        size: 82,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -156,6 +168,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           slide.title,
                           textAlign: TextAlign.center,
+                          maxLines: 2,
                           style: textTheme.titleLarge,
                         ),
                         const SizedBox(height: 12),
@@ -197,10 +210,14 @@ class ReadyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text(
-          'Onboarding complete',
-          style: Theme.of(context).textTheme.headlineMedium,
-          textAlign: TextAlign.center,
+        child: Semantics(
+          label: 'Onboarding complete',
+          header: true,
+          child: Text(
+            'Onboarding complete',
+            style: Theme.of(context).textTheme.headlineMedium,
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
