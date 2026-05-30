@@ -239,30 +239,33 @@ class _Paginator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(length, (index) {
-        final isActive = index == currentIndex;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          margin: const EdgeInsets.symmetric(horizontal: 7),
-          width: isActive ? 20 : 14,
-          height: isActive ? 20 : 14,
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.accent : AppColors.dotInactive,
-            shape: BoxShape.circle,
-            boxShadow: isActive
-                ? const [
-                    BoxShadow(
-                      color: Color(0xAAE0B611),
-                      blurRadius: 12,
-                      spreadRadius: 1,
-                    ),
-                  ]
-                : null,
-          ),
-        );
-      }),
+    return Semantics(
+      label: 'Page ${currentIndex + 1} of $length',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(length, (index) {
+          final isActive = index == currentIndex;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            margin: const EdgeInsets.symmetric(horizontal: 7),
+            width: isActive ? 20 : 14,
+            height: isActive ? 20 : 14,
+            decoration: BoxDecoration(
+              color: isActive ? AppColors.accent : AppColors.dotInactive,
+              shape: BoxShape.circle,
+              boxShadow: isActive
+                  ? const [
+                      BoxShadow(
+                        color: Color(0xAAE0B611),
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
+          );
+        }),
+      ),
     );
   }
 }
@@ -299,22 +302,26 @@ class _SkeuomorphicButton extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(38),
-          onTap: onTap,
-          child: SizedBox(
-            width: double.infinity,
-            height: 88,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  label,
-                  style: textTheme.labelLarge?.copyWith(color: AppColors.accent),
-                ),
-                const SizedBox(width: 10),
-                const Icon(Icons.arrow_forward, color: AppColors.accent, size: 34),
-              ],
+        child: Semantics(
+          label: '$label button',
+          button: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(38),
+            onTap: onTap,
+            child: SizedBox(
+              width: double.infinity,
+              height: 88,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    label,
+                    style: textTheme.labelLarge?.copyWith(color: AppColors.accent),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.arrow_forward, color: AppColors.accent, size: 34),
+                ],
+              ),
             ),
           ),
         ),
