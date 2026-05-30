@@ -64,13 +64,13 @@ ThemeData buildAppTheme() {
     scaffoldBackgroundColor: AppColors.background,
     textTheme: const TextTheme(
       headlineMedium: TextStyle(
-        fontSize: 50,
+        fontSize: 52,
         fontWeight: FontWeight.w800,
         color: AppColors.textPrimary,
         height: 1.08,
       ),
       titleLarge: TextStyle(
-        fontSize: 52,
+        fontSize: 50,
         fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
         height: 1.06,
