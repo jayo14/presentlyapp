@@ -142,7 +142,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     color: AppColors.surfaceSoft,
                                     alignment: Alignment.center,
                                     child: const Icon(
-                                      Icons.location_pin,
+                                      Icons.broken_image_outlined,
                                       color: AppColors.accent,
                                       size: 82,
                                     ),
