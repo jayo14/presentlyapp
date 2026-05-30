@@ -62,7 +62,6 @@ ThemeData buildAppTheme() {
     useMaterial3: true,
     colorScheme: colorScheme,
     scaffoldBackgroundColor: AppColors.background,
-    fontFamily: 'Lexend',
     textTheme: const TextTheme(
       headlineMedium: TextStyle(
         fontSize: 50,
