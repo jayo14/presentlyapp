@@ -113,7 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPageChanged: (index) {
                     setState(() => _currentIndex = index);
                     SemanticsService.announce(
-                      'Page ${index + 1} of ${onboardingSlides.length}',
+                      'Page ${index + 1} of ${onboardingSlides.length}: ${onboardingSlides[index].title}',
                       Directionality.of(context),
                     );
                   },
@@ -142,34 +142,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               padding: const EdgeInsets.all(8),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(AppRadii.lg),
-                                child: CachedNetworkImage(
-                                  imageUrl: slide.imageUrl,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Semantics(
-                                    label: 'Loading onboarding image',
-                                    child: Container(
-                                      color: AppColors.surfaceSoft,
-                                      alignment: Alignment.center,
-                                      child: const SizedBox(
-                                        width: 34,
-                                        height: 34,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 3,
-                                          color: AppColors.accent,
+                                child: Semantics(
+                                  label: 'Onboarding image: ${slide.title}',
+                                  image: true,
+                                  child: CachedNetworkImage(
+                                    imageUrl: slide.imageUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Semantics(
+                                      label: 'Loading onboarding image',
+                                      child: Container(
+                                        color: AppColors.surfaceSoft,
+                                        alignment: Alignment.center,
+                                        child: const SizedBox(
+                                          width: 34,
+                                          height: 34,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 3,
+                                            color: AppColors.accent,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  errorWidget: (context, url, error) => Semantics(
-                                    label: 'Onboarding image failed to load',
-                                    focusable: true,
-                                    child: Container(
-                                      color: AppColors.surfaceSoft,
-                                      alignment: Alignment.center,
-                                      child: const Icon(
-                                        Icons.broken_image_outlined,
-                                        color: AppColors.accent,
-                                        size: 82,
+                                    errorWidget: (context, url, error) => Semantics(
+                                      label: 'Onboarding image failed to load',
+                                      focusable: true,
+                                      child: Container(
+                                        color: AppColors.surfaceSoft,
+                                        alignment: Alignment.center,
+                                        child: const Icon(
+                                          Icons.broken_image_outlined,
+                                          color: AppColors.accent,
+                                          size: 82,
+                                        ),
                                       ),
                                     ),
                                   ),
