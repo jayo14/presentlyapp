@@ -72,6 +72,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageController = PageController();
   int _currentIndex = 0;
 
+  bool get _isLastSlide => _currentIndex == onboardingSlides.length - 1;
+  String get _buttonLabel => _isLastSlide ? 'Get Started' : 'Next';
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -79,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _onNext() {
-    if (_currentIndex >= onboardingSlides.length - 1) {
+    if (_isLastSlide) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
           builder: (_) => const ReadyScreen(),
@@ -200,9 +203,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               _Paginator(currentIndex: _currentIndex, length: onboardingSlides.length),
               const SizedBox(height: 28),
               _SkeuomorphicButton(
-                label: _currentIndex == onboardingSlides.length - 1
-                    ? 'Get Started'
-                    : 'Next',
+                label: _buttonLabel,
                 onTap: _onNext,
               ),
               const SizedBox(height: 20),
