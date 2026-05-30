@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'theme/app_tokens.dart';
@@ -106,7 +107,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: PageView.builder(
                   controller: _pageController,
                   itemCount: onboardingSlides.length,
-                  onPageChanged: (index) => setState(() => _currentIndex = index),
+                  onPageChanged: (index) {
+                    setState(() => _currentIndex = index);
+                    SemanticsService.announce(
+                      'Page ${index + 1} of ${onboardingSlides.length}',
+                      Directionality.of(context),
+                    );
+                  },
                   itemBuilder: (context, index) {
                     final slide = onboardingSlides[index];
                     return Column(
@@ -245,23 +252,25 @@ class _Paginator extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(length, (index) {
           final isActive = index == currentIndex;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            margin: const EdgeInsets.symmetric(horizontal: 7),
-            width: isActive ? 20 : 14,
-            height: isActive ? 20 : 14,
-            decoration: BoxDecoration(
-              color: isActive ? AppColors.accent : AppColors.dotInactive,
-              shape: BoxShape.circle,
-              boxShadow: isActive
-                  ? const [
-                      BoxShadow(
-                        color: Color(0xAAE0B611),
-                        blurRadius: 12,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : null,
+          return ExcludeSemantics(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              margin: const EdgeInsets.symmetric(horizontal: 7),
+              width: isActive ? 20 : 14,
+              height: isActive ? 20 : 14,
+              decoration: BoxDecoration(
+                color: isActive ? AppColors.accent : AppColors.dotInactive,
+                shape: BoxShape.circle,
+                boxShadow: isActive
+                    ? const [
+                        BoxShadow(
+                          color: Color(0xAAE0B611),
+                          blurRadius: 12,
+                          spreadRadius: 1,
+                        ),
+                      ]
+                    : null,
+              ),
             ),
           );
         }),
