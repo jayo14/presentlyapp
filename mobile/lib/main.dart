@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/semantics.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'theme/app_tokens.dart';
@@ -112,7 +112,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   itemCount: onboardingSlides.length,
                   onPageChanged: (index) {
                     setState(() => _currentIndex = index);
-                    SemanticsService.announce(
+                    SemanticsService.sendAnnouncement(
+                      View.of(context),
                       'Page ${index + 1} of ${onboardingSlides.length}: ${onboardingSlides[index].title}',
                       Directionality.of(context),
                     );
