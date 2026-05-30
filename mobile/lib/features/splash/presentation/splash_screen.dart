@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -95,9 +96,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               const SizedBox(height: 24),
               Text(
                 'Presently',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontSize: 40,
-                    ),
+                style: AppTheme.manropeDisplay.copyWith(
+                  fontSize: 40,
+                ),
               ),
               const Spacer(),
               Container(

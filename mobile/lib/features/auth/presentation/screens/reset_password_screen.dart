@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/core/theme/app_colors.dart';
+import 'package:mobile/core/theme/app_theme.dart';
 import 'package:mobile/shared/widgets/skeuo_button.dart';
 import 'package:mobile/shared/widgets/skeuo_text_field.dart';
 
@@ -24,9 +25,9 @@ class ResetPasswordScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Create new password',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+              style: AppTheme.manropeDisplay.copyWith(fontSize: 28),
             ),
             const SizedBox(height: 8),
             Text(

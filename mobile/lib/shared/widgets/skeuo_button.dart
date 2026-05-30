@@ -49,9 +49,7 @@ class SkeuoButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.primary, width: 2),
             )
-          : AppTheme.skeuoButton.copyWith(
-              color: color ?? AppColors.primary,
-            ),
+          : AppTheme.getSkeuoButtonDecoration(color: color),
       child: Material(
         color: Colors.transparent,
         child: InkWell(

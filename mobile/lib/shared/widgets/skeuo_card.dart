@@ -25,7 +25,7 @@ class SkeuoCard extends StatelessWidget {
       width: width,
       height: height,
       padding: padding ?? const EdgeInsets.all(24),
-      decoration: AppTheme.skeuoCard.copyWith(
+      decoration: AppTheme.getSkeuoCardDecoration(
         color: color,
         borderRadius: borderRadius,
       ),

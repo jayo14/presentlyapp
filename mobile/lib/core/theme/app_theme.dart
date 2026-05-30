@@ -1,22 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTheme {
   static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.backgroundDark,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
-        onPrimary: AppColors.backgroundDark,
-        surface: AppColors.surfaceDark,
-        onSurface: AppColors.textLight,
-        outline: AppColors.outline,
-      ),
-      fontFamily: 'Lexend',
-      textTheme: const TextTheme(
+    final textTheme = GoogleFonts.lexendTextTheme(
+      const TextTheme(
         displayLarge: TextStyle(
           fontSize: 40,
           fontWeight: FontWeight.w800,
@@ -56,6 +45,21 @@ class AppTheme {
           color: AppColors.backgroundDark,
         ),
       ),
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: AppColors.backgroundDark,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primary,
+        onPrimary: AppColors.backgroundDark,
+        surface: AppColors.surfaceDark,
+        onSurface: AppColors.textLight,
+        outline: AppColors.outline,
+      ),
+      textTheme: textTheme,
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceHighest,
@@ -76,6 +80,11 @@ class AppTheme {
       ),
     );
   }
+
+  static TextStyle get manropeDisplay => GoogleFonts.manrope(
+        fontWeight: FontWeight.w800,
+        color: AppColors.textLight,
+      );
 
   static BoxDecoration skeuoContainer({
     Color? color,
@@ -103,34 +112,38 @@ class AppTheme {
     );
   }
 
-  static BoxDecoration skeuoButton = BoxDecoration(
-    color: AppColors.primary,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [
-      BoxShadow(
-        color: AppColors.primary.withOpacity(0.3),
-        offset: const Offset(0, 8),
-        blurRadius: 20,
-      ),
-      BoxShadow(
-        color: Colors.white.withOpacity(0.2),
-        offset: const Offset(0, -2),
-        blurRadius: 4,
-        spreadRadius: 0,
-      ),
-    ],
-  );
+  static BoxDecoration getSkeuoButtonDecoration({Color? color}) {
+    return BoxDecoration(
+      color: color ?? AppColors.primary,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: (color ?? AppColors.primary).withOpacity(0.3),
+          offset: const Offset(0, 8),
+          blurRadius: 20,
+        ),
+        BoxShadow(
+          color: Colors.white.withOpacity(0.2),
+          offset: const Offset(0, -2),
+          blurRadius: 4,
+          spreadRadius: 0,
+        ),
+      ],
+    );
+  }
 
-  static BoxDecoration skeuoCard = BoxDecoration(
-    color: AppColors.surfaceDark,
-    borderRadius: BorderRadius.circular(24),
-    border: Border.all(color: AppColors.outline.withOpacity(0.3)),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.4),
-        offset: const Offset(0, 12),
-        blurRadius: 24,
-      ),
-    ],
-  );
+  static BoxDecoration getSkeuoCardDecoration({Color? color, BorderRadius? borderRadius}) {
+    return BoxDecoration(
+      color: color ?? AppColors.surfaceDark,
+      borderRadius: borderRadius ?? BorderRadius.circular(24),
+      border: Border.all(color: AppColors.outline.withOpacity(0.3)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.4),
+          offset: const Offset(0, 12),
+          blurRadius: 24,
+        ),
+      ],
+    );
+  }
 }
