@@ -1,0 +1,136 @@
+import 'package:flutter/material.dart';
+import 'app_colors.dart';
+
+class AppTheme {
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: AppColors.backgroundDark,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primary,
+        onPrimary: AppColors.backgroundDark,
+        surface: AppColors.surfaceDark,
+        onSurface: AppColors.textLight,
+        outline: AppColors.outline,
+      ),
+      fontFamily: 'Lexend',
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 40,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.015,
+          color: AppColors.textLight,
+        ),
+        headlineLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          letterSpacing: -0.015,
+          color: AppColors.textLight,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textLight,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textLight,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: AppColors.textLight,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: AppColors.textMuted,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.015,
+          color: AppColors.backgroundDark,
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.surfaceHighest,
+        contentPadding: const EdgeInsets.all(16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
+        hintStyle: const TextStyle(color: AppColors.textMuted),
+      ),
+    );
+  }
+
+  static BoxDecoration skeuoContainer({
+    Color? color,
+    BorderRadius? borderRadius,
+    bool hasShadow = true,
+  }) {
+    return BoxDecoration(
+      color: color ?? AppColors.surfaceHighest,
+      borderRadius: borderRadius ?? BorderRadius.circular(16),
+      border: Border.all(color: AppColors.outline.withOpacity(0.5)),
+      boxShadow: hasShadow
+          ? [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                offset: const Offset(0, 4),
+                blurRadius: 10,
+              ),
+              BoxShadow(
+                color: Colors.white.withOpacity(0.05),
+                offset: const Offset(-2, -2),
+                blurRadius: 4,
+              ),
+            ]
+          : null,
+    );
+  }
+
+  static BoxDecoration skeuoButton = BoxDecoration(
+    color: AppColors.primary,
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: [
+      BoxShadow(
+        color: AppColors.primary.withOpacity(0.3),
+        offset: const Offset(0, 8),
+        blurRadius: 20,
+      ),
+      BoxShadow(
+        color: Colors.white.withOpacity(0.2),
+        offset: const Offset(0, -2),
+        blurRadius: 4,
+        spreadRadius: 0,
+      ),
+    ],
+  );
+
+  static BoxDecoration skeuoCard = BoxDecoration(
+    color: AppColors.surfaceDark,
+    borderRadius: BorderRadius.circular(24),
+    border: Border.all(color: AppColors.outline.withOpacity(0.3)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.4),
+        offset: const Offset(0, 12),
+        blurRadius: 24,
+      ),
+    ],
+  );
+}

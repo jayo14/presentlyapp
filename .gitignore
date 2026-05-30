@@ -41,7 +41,7 @@ venv_new
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.class
 *.so
 .Python
 build/
@@ -51,6 +51,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!mobile/lib/
 !frontend/src/lib/
 lib64/
 parts/
