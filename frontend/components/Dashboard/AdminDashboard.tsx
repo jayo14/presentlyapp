@@ -240,7 +240,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   return (
     <DashboardPage
       title={`Welcome back, ${userName.split(' ')[0]}`}
-      description="Here's what's happening with your platform."
+      description={
+        <>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-sungold/20 text-presently-black text-[10px] font-bold tracking-widest uppercase">
+            System Overseer
+          </span>
+          <span className="opacity-60">•</span>
+          <span>Here's what's happening with your platform.</span>
+        </>
+      }
     >
       <SEO title="Admin Dashboard | Presently" description="System overview and health check for Presently administrators." />
 

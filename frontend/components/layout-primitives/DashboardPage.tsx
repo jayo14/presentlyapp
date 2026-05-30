@@ -22,7 +22,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-text font-headline">{title}</h1>
           {description && (
-            <div className="text-textMuted mt-1 flex items-center gap-2">
+            <div className="text-textMuted mt-1 flex items-center gap-2 text-sm font-medium">
               {description}
             </div>
           )}

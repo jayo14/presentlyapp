@@ -1,15 +1,15 @@
-## 2024-05-24 - Modern Sidebar + Inset Content Architecture
+## 2025-05-24 - Standardizing Dashboard Layout Primitives
 
 **Learning:**
-The "Sidebar + Inset Content" architecture provides a premium SaaS feel for desktop while allowing for clear separation from the mobile-native experience. Standardizing layout primitives like `DashboardPage` and `ResponsiveGrid` ensures consistency in spacing and structure across different user roles.
+Refactoring specific dashboards (like `StudentDashboard`) to use the `DashboardPage` layout primitive ensures architectural consistency across the platform. This centralizes the "sidebar + inset content" logic and makes it easier to maintain a premium SaaS feel on desktop while protecting the mobile-native illusion.
 
 **Action:**
-Use `DashboardPage` for structural headers and `ResponsiveGrid` for adaptive content layouts. Ensure desktop-specific layout changes are scoped with Tailwind's `md:` prefix to protect the mobile app illusion.
+Always wrap dashboard content in the `DashboardPage` primitive. Use the `description` prop to handle sub-headers, badges (like the 'SYSTEM OVERSEER' badge), and other contextual metadata.
 
-## 2024-05-24 - Phosphor Icon Migration
+## 2025-05-24 - Accessibility and Visual Refinement
 
 **Learning:**
-Migrating from Lucide to Phosphor icons elevates the aesthetic to a more "University-grade" professional level. Using bold weights (`weight="bold"`) and consistent sizing (`size={20}`) for primary actions maintains a cohesive visual language.
+Icon-only buttons must have descriptive `aria-label` attributes. Small visual tweaks, such as standardizing icon weights to `bold` and using brand-specific color tokens (e.g., `sungold`), significantly compound into a more professional and trustworthy university-grade system.
 
 **Action:**
-Standardize on Phosphor icons for all new UI components. Prefer `bold` weight for primary dashboard actions and navigation.
+Audit all icon-only buttons for `aria-label`. Standardize Phosphor icons to `weight="bold"` and `size={20}` for primary header actions. Use `sungold` (#F9C406) for accent elements like notification dots and admin badges.

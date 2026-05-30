@@ -29,6 +29,8 @@ export default {
   
         primary: "var(--primary)",
         primaryContainer: "var(--primary-container)",
+        sungold: "#F9C406",
+        "presently-black": "#231F0F",
   
         outline: "var(--outline-variant)",
         foreground: "var(--foreground)",
