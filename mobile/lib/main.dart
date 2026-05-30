@@ -148,7 +148,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     ),
                                   ),
                                   errorWidget: (context, url, error) => Semantics(
-                                    label: 'Image failed to load',
+                                    label: 'Onboarding image failed to load: $error',
+                                    focusable: true,
                                     child: Container(
                                       color: AppColors.surfaceSoft,
                                       alignment: Alignment.center,
