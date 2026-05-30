@@ -135,20 +135,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 child: CachedNetworkImage(
                                   imageUrl: slide.imageUrl,
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    color: AppColors.surfaceSoft,
-                                    alignment: Alignment.center,
-                                    child: const SizedBox(
-                                      width: 34,
-                                      height: 34,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 3,
-                                        color: AppColors.accent,
+                                  placeholder: (context, url) => Semantics(
+                                    label: 'Loading onboarding image',
+                                    child: Container(
+                                      color: AppColors.surfaceSoft,
+                                      alignment: Alignment.center,
+                                      child: const SizedBox(
+                                        width: 34,
+                                        height: 34,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3,
+                                          color: AppColors.accent,
+                                        ),
                                       ),
                                     ),
                                   ),
                                   errorWidget: (context, url, error) => Semantics(
-                                    label: 'Onboarding image failed to load: $error',
+                                    label: 'Onboarding image failed to load',
                                     focusable: true,
                                     child: Container(
                                       color: AppColors.surfaceSoft,
