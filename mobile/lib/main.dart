@@ -139,14 +139,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     color: AppColors.surfaceSoft,
                                   ),
                                   errorWidget: (context, url, error) => Container(
-                                      color: AppColors.surfaceSoft,
-                                      alignment: Alignment.center,
-                                      child: const Icon(
-                                        Icons.location_pin,
-                                        color: AppColors.accent,
-                                        size: 82,
-                                      ),
+                                    color: AppColors.surfaceSoft,
+                                    alignment: Alignment.center,
+                                    child: const Icon(
+                                      Icons.location_pin,
+                                      color: AppColors.accent,
+                                      size: 82,
                                     ),
+                                  ),
                                 ),
                               ),
                             ),
