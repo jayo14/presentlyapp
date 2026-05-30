@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'theme/app_tokens.dart';
 
@@ -78,6 +79,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _onNext() {
     if (_currentIndex >= onboardingSlides.length - 1) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => const ReadyScreen(),
+        ),
+      );
       return;
     }
     _pageController.nextPage(
@@ -126,18 +132,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               padding: const EdgeInsets.all(8),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(AppRadii.lg),
-                                child: Image.network(
-                                  slide.imageUrl,
+                                child: CachedNetworkImage(
+                                  imageUrl: slide.imageUrl,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
+                                  placeholder: (context, url) => Container(
                                     color: AppColors.surfaceSoft,
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.location_pin,
-                                      color: AppColors.accent,
-                                      size: 82,
-                                    ),
                                   ),
+                                  errorWidget: (context, url, error) => Container(
+                                      color: AppColors.surfaceSoft,
+                                      alignment: Alignment.center,
+                                      child: const Icon(
+                                        Icons.location_pin,
+                                        color: AppColors.accent,
+                                        size: 82,
+                                      ),
+                                    ),
                                 ),
                               ),
                             ),
@@ -175,6 +184,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               const SizedBox(height: 20),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ReadyScreen extends StatelessWidget {
+  const ReadyScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'Onboarding complete',
+          style: Theme.of(context).textTheme.headlineMedium,
+          textAlign: TextAlign.center,
         ),
       ),
     );
