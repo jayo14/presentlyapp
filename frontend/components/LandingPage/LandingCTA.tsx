@@ -1,99 +1,38 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { ArrowUpRight } from '@phosphor-icons/react';
 
-interface LandingCTAProps {
-  onRegister: () => void;
-}
+export const CTASection = () => (
+  <section className="py-64 bg-presently-black text-center relative overflow-hidden">
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/15 blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
 
-export const LandingCTA: React.FC<LandingCTAProps> = ({ onRegister }) => {
-  return (
-    <section id="pricing" style={{ padding: '8rem 2rem' }}>
-      <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-        <div
-          className="fade-up"
-          style={{
-            background: 'var(--inverse-surface)',
-            borderRadius: '4rem',
-            padding: 'clamp(3rem,8vw,8rem)',
-            position: 'relative',
-            overflow: 'hidden',
-            textAlign: 'center',
-          }}
-        >
-          {[800, 600, 400].map((size) => (
-            <div
-              key={size}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%,-50%)',
-                width: size,
-                height: size,
-                borderRadius: '50%',
-                border: '1px solid var(--background)',
-                opacity: 0.15,
-                pointerEvents: 'none',
-              }}
-            />
-          ))}
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              maxWidth: 700,
-              margin: '0 auto',
-            }}
-          >
-            <h2
-              className="font-headline"
-              style={{
-                fontSize: 'clamp(2.5rem,6vw,4.5rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-                color: 'var(--surface)',
-                marginBottom: '2rem',
-              }}
-            >
-              Ready to Elevate Your Institution?
-            </h2>
-            <p
-              style={{
-                color: 'var(--surface-variant)',
-                fontSize: '1.2rem',
-                marginBottom: '3rem',
-                opacity: 0.8,
-                lineHeight: 1.6,
-              }}
-            >
-              Join over 400 world-class universities using Presently
-              to curate their daily presence.
-            </p>
-            <div
-              style={{
-                display: 'flex',
-                gap: '1.5rem',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-              }}
-            >
-              <Button
-                onClick={onRegister}
-                className="btn-presently-primary btn-lg"
-              >
-                Request Access
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onRegister}
-                className="btn-presently-outline btn-lg btn-light"
-              >
-                Contact Sales
-              </Button>
-            </div>
-          </div>
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="max-w-5xl mx-auto relative z-10 px-8"
+    >
+      <h2 className="font-headline text-6xl md:text-8xl lg:text-[100px] text-white tracking-tighter mb-12 leading-[0.9] font-black">
+        Every class.<br />
+        Every student.<br />
+        <span className="text-primary">Present.</span>
+      </h2>
+      <p className="text-white/60 text-xl md:text-2xl mb-20 max-w-2xl mx-auto leading-relaxed font-black tracking-tight">
+        Join institutions already running smarter with Presently. Setup takes less than 5 minutes.
+      </p>
+
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
+        <a href="/register" className="w-full sm:w-auto skeuo-button-gold px-14 py-7 rounded-3xl font-black text-xl hover:scale-105 transition-all flex items-center justify-center gap-3">
+          Get started for free <ArrowUpRight size={28} weight="bold" />
+        </a>
+        <a href="/demo" className="w-full sm:w-auto px-14 py-7 rounded-3xl font-black text-xl border-2 border-white/10 text-white hover:bg-white/5 transition-all backdrop-blur-sm flex items-center justify-center gap-3">
+          Request a demo
+        </a>
       </div>
-    </section>
-  );
-};
+    </motion.div>
+
+    {/* Background Decorative Elements */}
+    <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+  </section>
+);
