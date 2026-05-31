@@ -1,193 +1,123 @@
-import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowRight, BadgeCheck } from 'lucide-react';
-import PresentlyIllustration from './illustrations/PresentlyIllustration';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { CaretRight, Play } from '@phosphor-icons/react';
 
-interface LandingHeroProps {
-  onGetStarted: () => void;
-}
+export const Hero = () => {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
 
-export const LandingHero: React.FC<LandingHeroProps> = ({ onGetStarted }) => {
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -80]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
   return (
-    <section
-      id="platform"
-      className="px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20 lg:py-24"
-      style={{
-        position: 'relative',
-        maxWidth: 1440,
-        margin: '0 auto',
-        overflow: 'visible',
-      }}
-    >
-      {/* Background orb */}
-      <div
-        className="orb-animate"
-        style={{
-          position: 'absolute',
-          top: '5%',
-          right: '3%',
-          width: 600,
-          height: 600,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, var(--primary-container), transparent 68%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
+    <section ref={containerRef} className="relative min-h-screen bg-surface pt-56 pb-40 overflow-hidden">
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/10 blur-[140px] rounded-full pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
 
-      <div
-        className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
-        style={{
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        {/* Copy */}
-        <div className="lg:col-span-7 text-center lg:text-left">
-          <Badge
-            variant="secondary"
-            style={{
-              background: 'var(--surface-container-low)',
-              color: 'var(--primary)',
-              fontWeight: 700,
-              fontSize: '0.7rem',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginBottom: '1.5rem',
-              display: 'inline-flex',
-              borderRadius: 999,
-              padding: '0.375rem 1rem',
-            }}
+      <div className="max-w-[85%] md:max-w-[80%] mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-20 items-center relative z-10">
+        <motion.div style={{ opacity }}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-3 mb-10 px-4 py-2 bg-primary/10 rounded-full border border-primary/20"
           >
-            The Precision Curator
-          </Badge>
+            <span className="text-primary text-xs font-black tracking-[0.3em] uppercase">GPS-Verified Attendance</span>
+          </motion.div>
 
-          <h1
-            className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
-            style={{
-              lineHeight: 1.05,
-              fontWeight: 800,
-              letterSpacing: '-0.04em',
-              color: 'var(--on-surface)',
-              marginBottom: '1.5rem',
-            }}
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="font-headline text-6xl md:text-8xl lg:text-[110px] text-on-surface leading-[0.95] tracking-tighter mb-12 font-black"
           >
-            GPS-Verified <br />
-            <em style={{ color: 'var(--primary)', fontStyle: 'italic' }}>
-              Attendance.
-            </em>
-          </h1>
+            Attendance<br />
+            that actually<br />
+            <span className="text-primary relative inline-block">
+              knows you're there.
+              <motion.span
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ delay: 1, duration: 1 }}
+                className="absolute -bottom-2 left-0 h-2 bg-primary/30 rounded-full"
+              />
+            </span>
+          </motion.h1>
 
-          <p
-            className="text-base sm:text-lg md:text-xl mx-auto lg:mx-0"
-            style={{
-              color: 'var(--on-surface-variant)',
-              maxWidth: 520,
-              marginBottom: '2rem',
-              lineHeight: 1.65,
-            }}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-xl md:text-2xl text-textMuted mb-16 max-w-xl leading-relaxed font-medium"
           >
-            GPS-verified attendance tracking with geofence precision. Real-time verification, zero proxies, maximum transparency.
-          </p>
+            Presently ends roll calls, paper sheets, and proxy attendance — for students, lecturers, and institutions that mean business.
+          </motion.p>
 
-          <div
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start"
-            style={{ flexWrap: 'wrap' }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-col sm:flex-row items-center gap-8"
           >
-            <Button
-              onClick={onGetStarted}
-              className="btn-presently-primary btn-lg"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-            >
-              Get started <ArrowRight size={20} strokeWidth={2.5} />
-            </Button>
-            <Button
-              variant="outline"
-              className="btn-presently-outline btn-lg"
-              onClick={() =>
-                document.getElementById('solutions')?.scrollIntoView({ behavior: 'smooth' })
-              }
-            >
-              View Demo
-            </Button>
-          </div>
-        </div>
+            <a href="/register" className="w-full sm:w-auto skeuo-button-gold px-12 py-7 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all">
+              Start for free <CaretRight size={28} weight="bold" />
+            </a>
+            <a href="/how-it-works" className="group flex items-center gap-4 font-bold text-on-surface text-lg">
+              <div className="w-16 h-16 rounded-full border-2 border-outline flex items-center justify-center group-hover:border-primary transition-all duration-300 group-hover:scale-110 bg-surface/50 backdrop-blur shadow-sm">
+                <Play size={24} weight="fill" className="ml-1 text-primary transition-transform group-hover:scale-110" />
+              </div>
+              <span className="border-b-2 border-transparent group-hover:border-primary transition-all pb-1">Watch how it works</span>
+            </a>
+          </motion.div>
+        </motion.div>
 
-        {/* Hero visual */}
-        <div className="lg:col-span-5 hidden lg:block" style={{ position: 'relative' }}>
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, var(--primary-container), transparent 70%)',
-                opacity: 0.12,
-                filter: 'blur(40px)',
-              }}
-            />
-            {/* New SVG Illustration with animation */}
-            <div className="hero-card relative z-[2] transition-transform duration-700 hover:rotate-2 hover:scale-[1.02]">
-              <PresentlyIllustration className="w-full h-auto" />
-              <div className="sr-only">
-                Smart Campus illustration showing a university building with geofencing signals, students with smartphones, and verified checkmark indicating GPS-verified attendance tracking technology.
+        <div className="relative h-[700px] hidden lg:block perspective-1000">
+          {/* Mockup 1 */}
+          <motion.div
+            style={{ y: y1 }}
+            initial={{ opacity: 0, rotate: -15, x: -50 }}
+            animate={{ opacity: 1, rotate: -6, x: 0 }}
+            transition={{ duration: 1.2, delay: 0.4 }}
+            className="absolute z-10 -left-10 top-20 w-72 p-4 bg-surface rounded-[48px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] border border-outline/20 skeuo-card"
+          >
+            <div className="bg-background h-[500px] rounded-[36px] overflow-hidden p-8 border border-outline/10">
+              <div className="w-12 h-12 bg-primary/20 rounded-xl mb-8 flex items-center justify-center">
+                 <div className="w-6 h-6 bg-primary rounded-md" />
+              </div>
+              <div className="h-5 w-32 bg-surface-variant rounded-full mb-12" />
+              <div className="space-y-6">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="h-14 w-full bg-surface-container/50 rounded-2xl border border-outline/5" />
+                ))}
               </div>
             </div>
+          </motion.div>
 
-            {/* Spillover badge */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className="glass-panel editorial-shadow mobile-hide"
-                  style={{
-                    position: 'absolute',
-                    bottom: -32,
-                    left: -32,
-                    padding: '1.25rem 1.5rem',
-                    borderRadius: '1.25rem',
-                    border: '1px solid rgba(210,197,171,0.18)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    zIndex: 3,
-                    cursor: 'default',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: '0.75rem',
-                      background: 'var(--primary-container)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <BadgeCheck size={22} color="#241a00" />
+          {/* Mockup 2 - Primary */}
+          <motion.div
+            style={{ y: y2 }}
+            initial={{ opacity: 0, scale: 0.8, y: 100 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="absolute z-20 left-32 top-0 w-[320px] p-4 bg-surface rounded-[54px] shadow-[0_60px_120px_-30px_rgba(0,0,0,0.3)] border border-outline/30 skeuo-card"
+          >
+            <div className="bg-background h-[600px] rounded-[42px] overflow-hidden flex flex-col items-center justify-center p-12 text-center border border-outline/10 relative">
+               <div className="absolute top-8 w-20 h-1.5 bg-outline/20 rounded-full" />
+               <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center mb-10 relative">
+                  <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-20" />
+                  <div className="relative z-10 w-20 h-20 bg-primary rounded-3xl flex items-center justify-center shadow-lg">
+                    <Play size={40} weight="fill" className="text-white ml-1" />
                   </div>
-                  <div>
-                    <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>Accuracy Rank</p>
-                    <p
-                      className="font-headline"
-                      style={{
-                        fontSize: '1.1rem',
-                        fontWeight: 900,
-                        color: 'var(--primary)',
-                      }}
-                    >
-                      Global #1
-                    </p>
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                Verified by independent audit bodies
-              </TooltipContent>
-            </Tooltip>
-          </div>
+               </div>
+               <div className="h-4 w-40 bg-surface-variant rounded-full mb-4" />
+               <div className="h-3 w-24 bg-surface-variant/40 rounded-full mb-12" />
+               <div className="w-full h-14 skeuo-button-gold rounded-2xl" />
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
