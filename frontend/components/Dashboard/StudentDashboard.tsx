@@ -36,6 +36,7 @@ import CourseIcon from '../Course/CourseIcon';
 import { StudentAnalytics } from '../Analytics/StudentAnalytics';
 import { offlineSyncManager } from '../../src/utils/offlineSync';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardPage } from '../layout-primitives/DashboardPage';
 
 interface StudentDashboardProps {
   userName: string;
@@ -123,18 +124,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     <>
       <SEO title="Presently | Home" />
 
-      <div className="min-h-screen pb-24 text-slate-900 dark:text-white font-sans selection:bg-primary/20 overflow-x-hidden">
-        <main className="max-w-4xl mx-auto px-6 pt-4 space-y-8">
-            {/* GREETING - PRESERVING MOBILE-NATIVE STYLE */}
-            <header className="max-w-md md:max-w-none">
-                <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60 mb-1">
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
-                </p>
-                <h2 className="text-3xl font-black tracking-tighter leading-tight">
-                Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
-                </h2>
-            </header>
-
+      <DashboardPage
+        title={`Hey ${userName.split(' ')[0]}, you're on track.`}
+        titleClassName="text-3xl font-black tracking-tighter"
+        description={
+          <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] opacity-70">
+            {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+          </span>
+        }
+      >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-12 space-y-8">
 
@@ -319,8 +317,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 </section>
                 </div>
             </div>
-        </main>
-      </div>
+      </DashboardPage>
 
       {/* Modals */}
       <EnhancedAttendanceScanner
