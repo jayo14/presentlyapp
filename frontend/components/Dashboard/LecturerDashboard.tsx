@@ -252,27 +252,27 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
       {/* Stats Cards */}
       <ResponsiveGrid>
         <DashboardCard
-            subtitle="My Courses"
-            icon={BookOpen}
-            iconClassName="bg-blue-50 text-blue-600"
+          subtitle="My Courses"
+          icon={BookOpen}
+          iconClassName="bg-blue-50 text-blue-600"
         >
-            <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
+          <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
         </DashboardCard>
 
         <DashboardCard
-            subtitle="Active Sessions"
-            icon={Clock}
-            iconClassName="bg-emerald-50 text-emerald-600"
+          subtitle="Active Sessions"
+          icon={Clock}
+          iconClassName="bg-emerald-50 text-emerald-600"
         >
-            <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
+          <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
         </DashboardCard>
 
         <DashboardCard
-            subtitle="Total Students"
-            icon={Users}
-            iconClassName="bg-violet-50 text-violet-600"
+          subtitle="Total Students"
+          icon={Users}
+          iconClassName="bg-violet-50 text-violet-600"
         >
-            <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
+          <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
         </DashboardCard>
       </ResponsiveGrid>
 
@@ -365,6 +365,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                           setIsDeleteModalOpen(true);
                         }}
                         className="p-2 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        aria-label="Delete session"
                       >
                         <Trash size={14} weight="bold" />
                       </button>

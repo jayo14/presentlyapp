@@ -1,6 +1,6 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "presentlyapp",
-  "main": "frontend/dist/index.html",
   "compatibility_date": "2024-01-01",
   "assets": {
     "directory": "frontend/dist",

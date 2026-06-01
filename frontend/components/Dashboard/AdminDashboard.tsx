@@ -269,6 +269,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
           <button
             onClick={loadSystemData}
             className="p-2 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
+            aria-label="Refresh system activity"
           >
             <ArrowsClockwise size={14} weight="bold" />
           </button>

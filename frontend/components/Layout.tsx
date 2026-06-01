@@ -306,6 +306,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           <button
             onClick={() => setIsMobileMenuOpen(false)}
             className="p-2 text-textMuted hover:bg-surface-highest/40 rounded-xl"
+            aria-label="Close menu"
           >
             <X size={20} />
           </button>
