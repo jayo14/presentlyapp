@@ -36,6 +36,8 @@ import CourseIcon from '../Course/CourseIcon';
 import { StudentAnalytics } from '../Analytics/StudentAnalytics';
 import { offlineSyncManager } from '../../src/utils/offlineSync';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardPage } from '../layout-primitives/DashboardPage';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface StudentDashboardProps {
   userName: string;
@@ -123,18 +125,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     <>
       <SEO title="Presently | Home" />
 
-      <div className="min-h-screen pb-24 text-slate-900 dark:text-white font-sans selection:bg-primary/20 overflow-x-hidden">
-        <main className="max-w-4xl mx-auto px-6 pt-4 space-y-8">
-            {/* GREETING - PRESERVING MOBILE-NATIVE STYLE */}
-            <header className="max-w-md md:max-w-none">
+      <DashboardPage
+        title={`Hey ${userName.split(' ')[0]},`}
+        titleClassName="text-3xl font-black tracking-tighter"
+        description={
+            <div className="flex flex-col">
                 <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60 mb-1">
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                    {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
                 </p>
-                <h2 className="text-3xl font-black tracking-tighter leading-tight">
-                Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
-                </h2>
-            </header>
-
+                <span className="text-textMuted font-medium">You're on track.</span>
+            </div>
+        }
+      >
+        <div className="max-w-4xl mx-auto space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-12 space-y-8">
 
@@ -204,52 +207,45 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 {/* COMPACT STATS GRID */}
                 <ResponsiveGrid cols={3}>
                     {/* ATTENDANCE CARD */}
-                    <div className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                        <Pulse size={18} weight="bold" />
-                    </div>
-                    <div>
+                    <DashboardCard
+                        subtitle="Attendance"
+                        icon={Pulse}
+                        iconClassName="bg-emerald-500/10 text-emerald-500"
+                    >
                         <div className="flex items-end gap-1">
-                        <span className="text-xl font-black tracking-tighter">{(dashboardData?.attendance_stats?.average_attendance || 0)}%</span>
-                        <ArrowUpRight size={14} weight="bold" className="text-emerald-500 mb-1" />
+                            <span className="text-xl font-black tracking-tighter">{(dashboardData?.attendance_stats?.average_attendance || 0)}%</span>
+                            <ArrowUpRight size={14} weight="bold" className="text-emerald-500 mb-1" />
                         </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Attendance</p>
-                    </div>
-                    </div>
+                    </DashboardCard>
 
                     {/* ACADEMIC LEVEL CARD */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] shadow-lg shadow-primary/10 group cursor-default">
-                    <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
-                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                        <Trophy size={18} weight="bold" />
-                    </div>
-                    <div className="space-y-1">
-                        <div className="flex items-baseline gap-1.5">
-                        <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
-                        <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
+                    <div className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-5 rounded-[2rem] flex flex-col justify-between min-h-[140px] shadow-lg shadow-primary/10 group cursor-default">
+                        <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
+                        <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                            <Trophy size={18} weight="bold" />
                         </div>
-                        <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <div className="h-full bg-white w-[65%]" />
+                        <div className="space-y-1 mt-4">
+                            <div className="flex items-baseline gap-1.5">
+                                <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
+                                <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+                                <div className="h-full bg-white w-[65%]" />
+                            </div>
+                            <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">Next: Dean's List</p>
                         </div>
-                        <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">Next: Dean's List</p>
-                    </div>
                     </div>
 
                     {/* COURSES CARD */}
-                    <div
-                    onClick={() => window.location.href = '/dashboard/courses'}
-                    className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all cursor-pointer group"
+                    <DashboardCard
+                        subtitle="Active Courses"
+                        icon={BookOpen}
+                        onClick={() => window.location.href = '/dashboard/courses'}
                     >
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                        <BookOpen size={18} weight="bold" />
-                    </div>
-                    <div>
                         <div className="flex items-end gap-1">
-                        <span className="text-xl font-black tracking-tighter">{dashboardData?.enrolled_courses?.length || 0}</span>
+                            <span className="text-xl font-black tracking-tighter">{dashboardData?.enrolled_courses?.length || 0}</span>
                         </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Active Courses</p>
-                    </div>
-                    </div>
+                    </DashboardCard>
                 </ResponsiveGrid>
 
                 {/* ACTIVITY FEED */}
@@ -264,7 +260,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {dashboardData?.recent_activity?.length ? (
                         dashboardData.recent_activity.slice(0, 4).map((activity, idx) => (
                         <motion.div
@@ -319,8 +315,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 </section>
                 </div>
             </div>
-        </main>
-      </div>
+        </div>
+      </DashboardPage>
 
       {/* Modals */}
       <EnhancedAttendanceScanner

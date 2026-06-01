@@ -179,6 +179,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-medium text-textMuted hover:bg-surface-highest/40 hover:text-text transition-all duration-200",
             collapsed ? "justify-center" : "gap-3"
           )}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
           {isDark ? <Moon size={20} /> : <Sun size={20} />}
           {!collapsed && <span className="flex-1 text-left">{isDark ? 'Dark mode' : 'Light mode'}</span>}
@@ -193,6 +194,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               collapsed ? "justify-center" : "gap-3"
             )}
             title={collapsed ? 'Install App' : undefined}
+            aria-label="Install App"
           >
             <Download size={20} weight="bold" />
             {!collapsed && <span className="truncate">Install App</span>}
@@ -200,10 +202,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         )}
 
         {/* User Card */}
-        <div className={cn(
-          "flex items-center rounded-2xl bg-surface-low border border-outline/5 p-2 transition-all duration-300",
-          collapsed ? "justify-center" : "gap-3"
-        )}>
+        <div
+          role="region"
+          aria-label="User profile summary"
+          className={cn(
+            "flex items-center rounded-2xl bg-surface-low border border-outline/5 p-2 transition-all duration-300",
+            collapsed ? "justify-center" : "gap-3"
+          )}
+        >
           <div className="w-10 h-10 rounded-xl overflow-hidden bg-surface-highest border border-outline/10 flex-shrink-0 flex items-center justify-center font-bold text-xs text-textMuted">
             {userAvatar ? (
               <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
@@ -224,6 +230,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-500/5 transition-all duration-200",
             collapsed ? "justify-center" : "gap-3"
           )}
+          aria-label="Sign out"
         >
           <SignOut size={20} weight="bold" />
           {!collapsed && <span className="flex-1 text-left uppercase tracking-widest text-[10px]">Sign out</span>}
@@ -234,6 +241,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-24 z-40 w-6 h-6 rounded-full bg-surface border border-outline/10 shadow-premium flex items-center justify-center text-textMuted hover:text-primary transition-colors"
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {collapsed ? <CaretRight size={12} weight="bold" /> : <CaretLeft size={12} weight="bold" />}
       </button>

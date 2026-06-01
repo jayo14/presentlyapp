@@ -22,6 +22,7 @@ import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface AdminDashboardProps {
   userName: string;
@@ -247,15 +248,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       {/* Stats Grid */}
       <ResponsiveGrid>
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                <stat.icon size={18} weight="bold" className={stat.color} />
-              </div>
-            </div>
+          <DashboardCard
+            key={i}
+            subtitle={stat.label}
+            icon={stat.icon}
+            iconClassName={`${stat.bg} ${stat.color}`}
+          >
             <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
-            <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
-          </div>
+          </DashboardCard>
         ))}
       </ResponsiveGrid>
 
