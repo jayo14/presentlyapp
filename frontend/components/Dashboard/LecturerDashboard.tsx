@@ -38,6 +38,7 @@ import { LoadingScreen } from '../LoadingScreen';
 import { useLecturerDashboard } from '../../services/api/dashboard';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -167,47 +168,47 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
         ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
-            const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
-            const dayClasses = timetableData.filter(t => t.day_of_week === dayUpper && t.is_active);
+                const dayUpper = day.toUpperCase() as TimetableEntry['day_of_week'];
+                const dayClasses = timetableData.filter(t => t.day_of_week === dayUpper && t.is_active);
 
-            return (
-                <div key={day} className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    <h3 className="font-headline text-xs font-semibold text-text uppercase tracking-wider">{day}</h3>
-                    <span className="text-[10px] font-semibold bg-surfaceHigh text-textMuted px-1.5 py-0.5 rounded ml-auto">
-                    {dayClasses.length}
-                    </span>
-                </div>
-                {dayClasses.length > 0 ? (
-                    dayClasses.map((t) => (
-                    <div
-                        key={t.id}
-                        className="bg-surface text-text border border-outline p-3.5 rounded-xl hover:border-outline transition-colors"
-                    >
-                        <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">{t.course_code}</span>
-                        <h4 className="font-headline text-sm font-medium text-text mt-1 line-clamp-2">{t.course_name}</h4>
-                        <div className="mt-2.5 space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-xs text-textMuted">
-                            <Timer size={12} weight="bold" />
-                            <span>{t.start_time} – {t.end_time}</span>
+                return (
+                    <div key={day} className="space-y-3">
+                        <div className="flex items-center gap-2 px-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            <h3 className="font-headline text-xs font-semibold text-text uppercase tracking-wider">{day}</h3>
+                            <span className="text-[10px] font-semibold bg-surfaceHigh text-textMuted px-1.5 py-0.5 rounded ml-auto">
+                                {dayClasses.length}
+                            </span>
                         </div>
-                        {t.venue_name && (
-                            <div className="flex items-center gap-1.5 text-xs text-textMuted">
-                            <MapPin size={12} weight="bold" />
-                            <span className="truncate">{t.venue_name}</span>
+                        {dayClasses.length > 0 ? (
+                            dayClasses.map((t) => (
+                                <DashboardCard
+                                    key={t.id}
+                                    className="p-3.5"
+                                >
+                                    <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">{t.course_code}</span>
+                                    <h4 className="font-headline text-sm font-medium text-text mt-1 line-clamp-2">{t.course_name}</h4>
+                                    <div className="mt-2.5 space-y-1.5">
+                                        <div className="flex items-center gap-1.5 text-xs text-textMuted">
+                                            <Timer size={12} weight="bold" />
+                                            <span>{t.start_time} – {t.end_time}</span>
+                                        </div>
+                                        {t.venue_name && (
+                                            <div className="flex items-center gap-1.5 text-xs text-textMuted">
+                                                <MapPin size={12} weight="bold" />
+                                                <span className="truncate">{t.venue_name}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </DashboardCard>
+                            ))
+                        ) : (
+                            <div className="bg-surfaceLow/50 border border-dashed border-outline rounded-xl p-5 text-center">
+                                <p className="text-xs text-textMuted">No classes</p>
                             </div>
                         )}
-                        </div>
                     </div>
-                    ))
-                ) : (
-                    <div className="bg-surfaceLow/50 border border-dashed border-outline rounded-xl p-5 text-center">
-                    <p className="text-xs text-textMuted">No classes</p>
-                    </div>
-                )}
-                </div>
-            );
+                );
             })}
         </div>
         )}
@@ -250,7 +251,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
       {/* Stats Cards */}
       <ResponsiveGrid>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
               <BookOpen size={18} weight="bold" className="text-blue-600" />
@@ -258,8 +259,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
           <p className="text-xs text-textMuted mt-0.5">My Courses</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
               <Clock size={18} weight="bold" className="text-emerald-600" />
@@ -267,8 +268,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
           <p className="text-xs text-textMuted mt-0.5">Active Sessions</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
               <Users size={18} weight="bold" className="text-violet-600" />
@@ -276,7 +277,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
           <p className="text-xs text-textMuted mt-0.5">Total Students</p>
-        </div>
+        </DashboardCard>
       </ResponsiveGrid>
 
       {/* Sessions */}
@@ -318,10 +319,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 };
 
                 return (
-                  <div
+                  <DashboardCard
                     key={session.id}
                     onClick={() => setSelectedSession(session)}
-                    className="bg-surfaceLow/50 border border-outline rounded-xl p-4 hover:border-outline cursor-pointer transition-all group"
+                    className="p-4 group"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -372,7 +373,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                         <Trash size={14} weight="bold" />
                       </button>
                     </div>
-                  </div>
+                  </DashboardCard>
                 );
               })}
             </div>

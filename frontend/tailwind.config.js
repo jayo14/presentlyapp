@@ -11,10 +11,23 @@ export default {
   ],
   darkMode: 'class',
   theme: {
+    screens: {
+      'xs': '480px',
+      'mobile': { 'max': '767px' },
+      'tablet': '768px',
+      'md': '768px',
+      'desktop': '1024px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       fontFamily: {
         sans: ['Outfit', 'Lexend', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         headline: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+      },
+      spacing: {
+        '44': '44px',
       },
       colors: {
         background: "var(--background)",
@@ -35,6 +48,10 @@ export default {
         error: "var(--error)",
         success: "var(--success)",
         warning: "var(--warning)",
+
+        // Brand Colors
+        'sungold': '#F9C406',
+        'presently-black': '#231F0F',
       },
       keyframes: {
         'float': {

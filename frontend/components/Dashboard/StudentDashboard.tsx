@@ -36,6 +36,8 @@ import CourseIcon from '../Course/CourseIcon';
 import { StudentAnalytics } from '../Analytics/StudentAnalytics';
 import { offlineSyncManager } from '../../src/utils/offlineSync';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardPage } from '../layout-primitives/DashboardPage';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface StudentDashboardProps {
   userName: string;
@@ -123,31 +125,29 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     <>
       <SEO title="Presently | Home" />
 
-      <div className="min-h-screen pb-24 text-slate-900 dark:text-white font-sans selection:bg-primary/20 overflow-x-hidden">
-        <main className="max-w-4xl mx-auto px-6 pt-4 space-y-8">
-            {/* GREETING - PRESERVING MOBILE-NATIVE STYLE */}
-            <header className="max-w-md md:max-w-none">
-                <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60 mb-1">
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
-                </p>
-                <h2 className="text-3xl font-black tracking-tighter leading-tight">
-                Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
-                </h2>
-            </header>
+      <DashboardPage
+        title={`Hey ${userName.split(' ')[0]}, you're on track.`}
+        titleClassName="text-3xl font-black tracking-tighter leading-tight"
+        className="max-w-4xl mx-auto"
+        description={
+          <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60">
+            {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+          </p>
+        }
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-12 space-y-8">
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-12 space-y-8">
-
-                {/* MAIN ACTION CARD */}
-                <section>
-                    <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setIsAttendanceModalOpen(true)}
-                    className="relative aspect-[16/9] md:aspect-[3/1] rounded-[2.5rem] overflow-hidden bg-slate-900 shadow-xl shadow-primary/5 group cursor-pointer border border-white/5"
-                    >
+            {/* MAIN ACTION CARD */}
+            <section>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setIsAttendanceModalOpen(true)}
+                className="relative aspect-[16/9] md:aspect-[3/1] rounded-[2.5rem] overflow-hidden bg-slate-900 shadow-xl shadow-primary/5 group cursor-pointer border border-white/5"
+              >
                     {isImageTransitioning ? (
                         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
                         <CircleNotch className="w-6 h-6 text-primary animate-spin" />
@@ -201,56 +201,56 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     </motion.div>
                 </section>
 
-                {/* COMPACT STATS GRID */}
-                <ResponsiveGrid cols={3}>
-                    {/* ATTENDANCE CARD */}
-                    <div className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                        <Pulse size={18} weight="bold" />
-                    </div>
-                    <div>
-                        <div className="flex items-end gap-1">
-                        <span className="text-xl font-black tracking-tighter">{(dashboardData?.attendance_stats?.average_attendance || 0)}%</span>
-                        <ArrowUpRight size={14} weight="bold" className="text-emerald-500 mb-1" />
-                        </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Attendance</p>
-                    </div>
-                    </div>
+            {/* COMPACT STATS GRID */}
+            <ResponsiveGrid cols={3}>
+              {/* ATTENDANCE CARD */}
+              <DashboardCard className="p-4 min-h-[120px] justify-between">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                  <Pulse size={18} weight="bold" />
+                </div>
+                <div>
+                  <div className="flex items-end gap-1">
+                    <span className="text-xl font-black tracking-tighter">{(dashboardData?.attendance_stats?.average_attendance || 0)}%</span>
+                    <ArrowUpRight size={14} weight="bold" className="text-emerald-500 mb-1" />
+                  </div>
+                  <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Attendance</p>
+                </div>
+              </DashboardCard>
 
-                    {/* ACADEMIC LEVEL CARD */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] shadow-lg shadow-primary/10 group cursor-default">
-                    <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
-                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                        <Trophy size={18} weight="bold" />
-                    </div>
-                    <div className="space-y-1">
-                        <div className="flex items-baseline gap-1.5">
-                        <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
-                        <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <div className="h-full bg-white w-[65%]" />
-                        </div>
-                        <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">Next: Dean's List</p>
-                    </div>
-                    </div>
+              {/* ACADEMIC LEVEL CARD */}
+              <DashboardCard className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-4 min-h-[120px] shadow-lg shadow-primary/10 group cursor-default border-none">
+                <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
+                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                  <Trophy size={18} weight="bold" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
+                    <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full bg-white w-[65%]" />
+                  </div>
+                  <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">Next: Dean's List</p>
+                </div>
+              </DashboardCard>
 
-                    {/* COURSES CARD */}
-                    <div
-                    onClick={() => window.location.href = '/dashboard/courses'}
-                    className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all cursor-pointer group"
-                    >
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                        <BookOpen size={18} weight="bold" />
-                    </div>
-                    <div>
-                        <div className="flex items-end gap-1">
-                        <span className="text-xl font-black tracking-tighter">{dashboardData?.enrolled_courses?.length || 0}</span>
-                        </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Active Courses</p>
-                    </div>
-                    </div>
-                </ResponsiveGrid>
+              {/* COURSES CARD */}
+              <DashboardCard
+                onClick={() => window.location.href = '/dashboard/courses'}
+                className="p-4 min-h-[120px] justify-between group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                  <BookOpen size={18} weight="bold" />
+                </div>
+                <div>
+                  <div className="flex items-end gap-1">
+                    <span className="text-xl font-black tracking-tighter">{dashboardData?.enrolled_courses?.length || 0}</span>
+                  </div>
+                  <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Active Courses</p>
+                </div>
+              </DashboardCard>
+            </ResponsiveGrid>
 
                 {/* ACTIVITY FEED */}
                 <section className="space-y-5">
@@ -264,63 +264,65 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {dashboardData?.recent_activity?.length ? (
-                        dashboardData.recent_activity.slice(0, 4).map((activity, idx) => (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            key={activity.id}
-                            className="bg-surface text-text border border-outline p-4 rounded-[1.75rem] flex items-center gap-4 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group"
-                        >
-                            <CourseIcon
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {dashboardData?.recent_activity?.length ? (
+                dashboardData.recent_activity.slice(0, 4).map((activity, idx) => (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    key={activity.id}
+                  >
+                    <DashboardCard
+                      onClick={() => {}} // Could navigate to session details
+                      className="p-4 flex-row items-center gap-4 group"
+                    >
+                      <CourseIcon
                             title={activity.course_name}
                             code={activity.course_code}
                             className={`w-12 h-12 flex-shrink-0 ${activity.status === 'PRESENT' ? 'ring-4 ring-emerald-500/20' : 'ring-4 ring-rose-500/20'
                                 }`}
                             />
-                            <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start text-xs">
-                                <div className="flex items-center gap-1.5 line-clamp-1">
-                                {['present', 'late', 'flagged'].includes(activity.status.toLowerCase()) ? (
-                                    <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
-                                    activity.status.toLowerCase() === 'present' ? 'text-emerald-500 bg-emerald-500/5 border-emerald-500/10' :
-                                    activity.status.toLowerCase() === 'late' ? 'text-amber-500 bg-amber-500/5 border-amber-500/10' :
-                                    'text-blue-500 bg-blue-500/5 border-blue-500/10'
-                                    }`}>
-                                    {activity.status}
-                                    </span>
-                                ) : (
-                                    <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest bg-rose-500/5 px-2 py-0.5 rounded-full border border-rose-500/10">Absent</span>
-                                )}
-                                </div>
-                                <p className="text-[8px] font-bold text-textMuted uppercase whitespace-nowrap ml-2">
-                                {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                            </div>
-                            <h5 className="font-bold text-sm tracking-tight truncate mt-0.5 group-hover:text-primary transition-colors">
-                                {activity.course_code} <span className="opacity-30 mx-0.5">/</span> {activity.course_name}
-                            </h5>
-                            {activity.lecturer_name && (
-                                <p className="text-[10px] font-medium text-textMuted mt-0.5 truncate uppercase tracking-wider">
-                                {activity.lecturer_name}
-                                </p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start text-xs">
+                          <div className="flex items-center gap-1.5 line-clamp-1">
+                            {['present', 'late', 'flagged'].includes(activity.status.toLowerCase()) ? (
+                              <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${activity.status.toLowerCase() === 'present' ? 'text-emerald-500 bg-emerald-500/5 border-emerald-500/10' :
+                                activity.status.toLowerCase() === 'late' ? 'text-amber-500 bg-amber-500/5 border-amber-500/10' :
+                                  'text-blue-500 bg-blue-500/5 border-blue-500/10'
+                                }`}>
+                                {activity.status}
+                              </span>
+                            ) : (
+                              <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest bg-rose-500/5 px-2 py-0.5 rounded-full border border-rose-500/10">Absent</span>
                             )}
-                            </div>
-                        </motion.div>
-                        ))
-                    ) : (
-                        <div className="col-span-full py-12 text-center text-textMuted">
-                        <p className="text-xs font-bold uppercase tracking-widest">No recent activity detected</p>
+                          </div>
+                          <p className="text-[8px] font-bold text-textMuted uppercase whitespace-nowrap ml-2">
+                            {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
                         </div>
-                    )}
-                    </div>
-                </section>
+                        <h5 className="font-bold text-sm tracking-tight truncate mt-0.5 group-hover:text-primary transition-colors">
+                          {activity.course_code} <span className="opacity-30 mx-0.5">/</span> {activity.course_name}
+                        </h5>
+                        {activity.lecturer_name && (
+                          <p className="text-[10px] font-medium text-textMuted mt-0.5 truncate uppercase tracking-wider">
+                            {activity.lecturer_name}
+                          </p>
+                        )}
+                      </div>
+                    </DashboardCard>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full py-12 text-center text-textMuted">
+                  <p className="text-xs font-bold uppercase tracking-widest">No recent activity detected</p>
                 </div>
+              )}
             </div>
-        </main>
-      </div>
+            </section>
+          </div>
+        </div>
+      </DashboardPage>
 
       {/* Modals */}
       <EnhancedAttendanceScanner

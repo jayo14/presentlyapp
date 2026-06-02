@@ -22,6 +22,8 @@ import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
+import { Badge } from '@/components/ui/badge';
 
 interface AdminDashboardProps {
   userName: string;
@@ -240,14 +242,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   return (
     <DashboardPage
       title={`Welcome back, ${userName.split(' ')[0]}`}
-      description="Here's what's happening with your platform."
+      description={
+        <div className="flex items-center gap-3">
+          <span className="text-textMuted">Here's what's happening with your platform.</span>
+          <Badge className="bg-sungold/20 text-presently-black border-none tracking-widest text-[10px] font-black uppercase py-0.5">
+            SYSTEM OVERSEER
+          </Badge>
+        </div>
+      }
     >
       <SEO title="Admin Dashboard | Presently" description="System overview and health check for Presently administrators." />
 
       {/* Stats Grid */}
       <ResponsiveGrid>
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
+          <DashboardCard key={i} className="p-4 transition-shadow hover:shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
                 <stat.icon size={18} weight="bold" className={stat.color} />
@@ -255,7 +264,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             </div>
             <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
             <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
-          </div>
+          </DashboardCard>
         ))}
       </ResponsiveGrid>
 
