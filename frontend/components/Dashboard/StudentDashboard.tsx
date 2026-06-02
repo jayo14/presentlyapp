@@ -126,9 +126,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       <SEO title="Presently | Home" />
 
       <DashboardPage
-        title={`Hey ${userName.split(' ')[0]}, you're on track.`}
+        title={
+          <>Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span></>
+        }
         titleClassName="text-3xl font-black tracking-tighter leading-tight"
-        className="max-w-4xl mx-auto"
+        className="max-w-4xl mx-auto px-6 pb-24"
         description={
           <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60">
             {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
