@@ -1,10 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "presentlyapp",
-  "main": "worker.js",
+  "main": "worker.mjs",
   "compatibility_date": "2024-05-22",
   "assets": {
     "directory": "./frontend/dist",
     "binding": "ASSETS"
+  },
+  "build": {
+    "command": "cd frontend && pnpm install && pnpm build"
   }
 }
