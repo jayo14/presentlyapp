@@ -41,7 +41,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   const [logCount, setLogCount] = useState(0);
   const [logPage, setLogPage] = useState(1);
   const [logType, setLogType] = useState('All Events');
-  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [logsLoading, setLogsLoading] = useState(false);
   const [logSearch, setLogSearch] = useState('');
 

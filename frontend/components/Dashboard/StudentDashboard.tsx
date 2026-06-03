@@ -137,7 +137,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
               {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
             </span>
         }
-        className="max-w-4xl mx-auto px-6 pb-24"
+        className="max-w-4xl mx-auto"
       >
         <div className="space-y-8">
             {/* MAIN ACTION CARD */}

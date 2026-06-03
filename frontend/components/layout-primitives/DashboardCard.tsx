@@ -51,7 +51,7 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
           </div>
         )}
 
-        {decoration && !Icon && (
+        {decoration && (
           <div className="text-textMuted">
             {decoration}
           </div>

@@ -1,6 +1,7 @@
 {
   "name": "presentlyapp",
   "compatibility_date": "2024-04-01",
+  "pages_build_output_dir": "frontend/dist",
   "assets": {
     "directory": "frontend/dist",
     "binding": "ASSETS"
