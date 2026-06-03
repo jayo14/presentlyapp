@@ -22,6 +22,7 @@ import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface AdminDashboardProps {
   userName: string;
@@ -40,7 +41,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   const [logCount, setLogCount] = useState(0);
   const [logPage, setLogPage] = useState(1);
   const [logType, setLogType] = useState('All Events');
-  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [logsLoading, setLogsLoading] = useState(false);
   const [logSearch, setLogSearch] = useState('');
 
@@ -59,12 +60,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
         systemApi.getStats(),
         systemApi.getActivity(),
       ]);
-      setSystemStats(stats);
-      setActivityData(activity);
+      if (stats) setSystemStats(stats);
+      if (activity) setActivityData(activity);
     } catch (error) {
       console.error('Failed to load system data:', error);
     } finally {
-      setStatsLoading(false);
+      setTimeout(() => setStatsLoading(false), 800);
     }
   };
 
@@ -101,7 +102,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
               onClick={() => loadLogs()}
               className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
             >
-              <ArrowsClockwise size={14} weight="bold" />
+              <ArrowsClockwise size={14} weight="bold" className={logsLoading ? "animate-spin" : ""} />
               Refresh
             </button>
             <button className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors">
@@ -231,31 +232,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
 
   // Default Admin Dashboard Overview
   const statCards = [
-    { label: "Total Users", value: systemStats.total_users.toLocaleString(), icon: Users, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10" },
-    { label: "Active Venues", value: systemStats.active_venues.toString(), icon: Buildings, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
-    { label: "Total Sessions", value: systemStats.total_sessions.toLocaleString(), icon: Pulse, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10" },
-    { label: "Security Alerts", value: systemStats.security_alerts.toString(), icon: ShieldWarning, color: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-500/10" },
+    { label: "Total Users", value: systemStats.total_users.toLocaleString(), icon: Users, iconClassName: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400" },
+    { label: "Active Venues", value: systemStats.active_venues.toString(), icon: Buildings, iconClassName: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" },
+    { label: "Total Sessions", value: systemStats.total_sessions.toLocaleString(), icon: Pulse, iconClassName: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400" },
+    { label: "Security Alerts", value: systemStats.security_alerts.toString(), icon: ShieldWarning, iconClassName: "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400" },
   ];
 
   return (
     <DashboardPage
       title={`Welcome back, ${userName.split(' ')[0]}`}
-      description="Here's what's happening with your platform."
+      description={
+        <>
+          <span>Here's what's happening with your platform.</span>
+          <span className="ml-2 px-2 py-0.5 text-[10px] font-black bg-sungold/20 text-presently-black rounded-full tracking-widest uppercase">
+            SYSTEM OVERSEER
+          </span>
+        </>
+      }
     >
       <SEO title="Admin Dashboard | Presently" description="System overview and health check for Presently administrators." />
 
       {/* Stats Grid */}
       <ResponsiveGrid>
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                <stat.icon size={18} weight="bold" className={stat.color} />
-              </div>
-            </div>
-            <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
-            <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
-          </div>
+          <DashboardCard
+            key={i}
+            title={stat.label}
+            value={stat.value}
+            icon={stat.icon}
+            iconClassName={stat.iconClassName}
+          />
         ))}
       </ResponsiveGrid>
 
@@ -270,7 +276,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             onClick={loadSystemData}
             className="p-2 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
           >
-            <ArrowsClockwise size={14} weight="bold" />
+            <ArrowsClockwise size={14} weight="bold" className={statsLoading ? "animate-spin" : ""} />
           </button>
         </div>
         <div className="p-5">

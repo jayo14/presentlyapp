@@ -21,6 +21,7 @@ import { analyzeTimetableImage } from '../../services/geminiService';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface ClassRepDashboardProps {
   userName: string;
@@ -107,13 +108,13 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   // Dashboard/history: reuse student view with class rep banner
   if (view === 'dashboard' || view === 'history') {
       return (
-          <div className="h-full overflow-y-auto space-y-6">
-              <div className="bg-primary/5 border border-primary/15 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="h-full overflow-y-auto">
+              <div className="mx-6 mt-4 p-4 bg-primary/5 border border-primary/15 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                      <h3 className="font-headline text-sm font-semibold text-primary">Class Representative Mode</h3>
+                      <h3 className="font-headline text-sm font-bold text-primary">Class Representative Mode</h3>
                       <p className="text-xs text-textMuted mt-0.5">You have extra privileges to manage class attendance and timetables.</p>
                   </div>
-                  <button className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors">
+                  <button className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-textMuted bg-surface text-text border border-outline rounded-xl hover:bg-surfaceHigh hover:text-text transition-colors skeuo-button">
                       View Class Report
                   </button>
               </div>
@@ -132,21 +133,21 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                 <div className="flex gap-2">
                     <button
                       onClick={() => setIsAiScanOpen(true)}
-                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-xl hover:bg-surfaceHigh hover:text-text transition-colors skeuo-button"
                     >
                         <Sparkle size={14} weight="bold" className="text-primary" />
                         AI Scan
                     </button>
                     <button
                       onClick={() => setIsTimetableModalOpen(true)}
-                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-black rounded-xl hover:bg-primary/90 transition-colors skeuo-button"
                     >
                         <Plus size={14} weight="bold" />
                         Add Class
                     </button>
                     <button
                       onClick={handleSaveTimetable}
-                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
+                      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-xl hover:bg-surfaceHigh hover:text-text transition-colors skeuo-button"
                     >
                         <FloppyDisk size={14} weight="bold" />
                         Save
@@ -154,52 +155,53 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                 </div>
             }
         >
-            <div className="grid gap-4">
+            <ResponsiveGrid cols={1}>
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => {
                     const dayEntries = timetable.filter(t => t.day === day).sort((a, b) => a.startTime.localeCompare(b.startTime));
                     return (
-                        <div key={day} className="bg-surface text-text border border-outline rounded-xl p-4">
-                            <h3 className="font-headline text-xs font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-2">
-                                <Calendar size={14} />
+                        <div key={day} className="bg-surface text-text border border-outline rounded-3xl p-5 skeuo-card">
+                            <h3 className="font-headline text-xs font-bold text-primary uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <Calendar size={16} weight="bold" />
                                 {day}
                             </h3>
                             {dayEntries.length > 0 ? (
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     {dayEntries.map(entry => (
-                                        <div key={entry.id} className="bg-surfaceLow/50 border border-outline p-3 rounded-lg flex items-center justify-between group">
-                                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                <div className="w-8 h-8 rounded-lg bg-surfaceHigh flex items-center justify-center text-textMuted">
-                                                    <Clock size={14} />
+                                        <div key={entry.id} className="bg-surfaceLow border border-outline p-4 rounded-2xl flex items-center justify-between group transition-colors hover:border-primary/20">
+                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                <div className="w-10 h-10 rounded-xl bg-surfaceHigh flex items-center justify-center text-textMuted">
+                                                    <Clock size={18} weight="bold" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-text">{entry.courseCode}</p>
-                                                    <p className="text-xs text-textMuted">{entry.startTime} – {entry.endTime}</p>
+                                                    <p className="text-sm font-bold text-text tracking-tight">{entry.courseCode}</p>
+                                                    <p className="text-xs text-textMuted font-medium">{entry.startTime} – {entry.endTime}</p>
                                                 </div>
-                                                <div className="hidden sm:flex items-center text-textMuted text-xs gap-1">
-                                                    <MapPin size={12} />
+                                                <div className="hidden sm:flex items-center text-textMuted text-xs font-medium gap-1.5 px-3 py-1 bg-surfaceHigh rounded-lg">
+                                                    <MapPin size={14} weight="bold" />
                                                     {entry.venue}
                                                 </div>
                                                 {/* Mobile venue */}
-                                                <p className="sm:hidden text-xs text-textMuted flex items-center gap-1">
-                                                    <MapPin size={10} /> {entry.venue}
+                                                <p className="sm:hidden text-[10px] text-textMuted font-medium flex items-center gap-1">
+                                                    <MapPin size={12} weight="bold" /> {entry.venue}
                                                 </p>
                                             </div>
                                             <button
                                                 onClick={() => handleDeleteEntry(entry.id)}
-                                                className="ml-2 p-1.5 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                                className="ml-3 p-2 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                                aria-label={`Delete ${entry.courseCode} from ${day}`}
                                             >
-                                                <Trash size={14} weight="bold" />
+                                                <Trash size={16} weight="bold" />
                                             </button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-xs text-textMuted italic">No classes scheduled.</p>
+                                <p className="text-xs text-textMuted italic font-medium py-2">No classes scheduled.</p>
                             )}
                         </div>
                     );
                 })}
-            </div>
+            </ResponsiveGrid>
 
             {/* Manual Entry Modal */}
             {isTimetableModalOpen && (
@@ -338,57 +340,61 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
             title="Class Management"
             description="Manage attendance and reports for your class."
           >
-              {/* Mark Attendance Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
-                  <h3 className="font-headline text-sm font-semibold text-text mb-3">Mark Attendance for Absent Students</h3>
-                  <div className="flex gap-3 mb-4">
-                      <div className="relative flex-1">
-                        <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
-                        <input
-                          type="text"
-                          placeholder="Search student by name or matric..."
-                          className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                        />
-                      </div>
-                      <button className="px-4 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
-                        Search
-                      </button>
-                  </div>
+              <ResponsiveGrid cols={1} className="gap-8">
+                {/* Mark Attendance Card */}
+                <div className="bg-surface text-text border border-outline rounded-3xl p-6 skeuo-card">
+                    <h3 className="font-headline text-base font-bold text-text mb-4 tracking-tight">Manual Attendance Entry</h3>
+                    <div className="flex gap-3 mb-6">
+                        <div className="relative flex-1">
+                          <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" size={18} />
+                          <input
+                            type="text"
+                            placeholder="Search by name or matric..."
+                            className="w-full h-14 bg-surfaceLow border border-outline rounded-2xl pl-11 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none skeuo-input"
+                          />
+                        </div>
+                        <button className="h-14 px-6 text-sm font-bold bg-primary text-black rounded-2xl hover:bg-primary/90 transition-colors skeuo-button">
+                          Search
+                        </button>
+                    </div>
 
-                  <div className="space-y-2">
-                      {[1, 2, 3].map(i => (
-                          <div key={i} className="flex items-center justify-between p-3 bg-surfaceLow/50 rounded-lg border border-outline">
-                              <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-full bg-surfaceHigh flex items-center justify-center text-xs font-bold text-textMuted">JD</div>
-                                  <div>
-                                      <p className="text-sm font-medium text-text">John Doe</p>
-                                      <p className="text-xs text-textMuted">ENG/2021/00{i}</p>
-                                  </div>
-                              </div>
-                              <div className="flex gap-2">
-                                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                                      <CheckCircle size={13} weight="bold" />
-                                      Present
-                                  </button>
-                                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-                                      <XCircle size={13} weight="bold" />
-                                      Absent
-                                  </button>
-                              </div>
-                          </div>
-                      ))}
-                  </div>
-              </div>
+                    <div className="space-y-3">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="flex items-center justify-between p-4 bg-surfaceLow rounded-2xl border border-outline transition-colors hover:border-primary/20">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-surfaceHigh flex items-center justify-center text-sm font-bold text-textMuted border border-outline">JD</div>
+                                    <div>
+                                        <p className="text-sm font-bold text-text tracking-tight">John Doe</p>
+                                        <p className="text-xs text-textMuted font-medium">ENG/2021/00{i}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors border border-emerald-200/50">
+                                        <CheckCircle size={16} weight="bold" />
+                                        Present
+                                    </button>
+                                    <button className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-red-700 bg-red-50 rounded-xl hover:bg-red-100 transition-colors border border-red-200/50">
+                                        <XCircle size={16} weight="bold" />
+                                        Absent
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-              {/* Class Reports Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
-                  <h3 className="font-headline text-sm font-semibold text-text mb-1">Class Reports</h3>
-                  <p className="text-xs text-textMuted mb-4">Generate attendance sheets for lecturers.</p>
-                  <button className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-textMuted bg-surfaceLow border border-outline rounded-lg hover:bg-surfaceLow transition-colors">
+                {/* Class Reports Card */}
+                <DashboardCard
+                  title="Class Reports"
+                  description="Generate attendance sheets for lecturers."
+                  icon={FileText}
+                >
+                  <button className="w-full flex items-center justify-between h-14 px-5 text-sm font-bold text-textMuted bg-surfaceLow border border-outline rounded-2xl hover:bg-surfaceHigh transition-all skeuo-button mt-2">
                       <span>Download Weekly Summary (PDF)</span>
-                      <FileText size={16} className="text-textMuted" />
+                      <DownloadSimple size={20} weight="bold" />
                   </button>
-              </div>
+                </DashboardCard>
+              </ResponsiveGrid>
           </DashboardPage>
       );
   }
