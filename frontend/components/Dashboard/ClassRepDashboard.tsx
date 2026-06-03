@@ -109,7 +109,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
   if (view === 'dashboard' || view === 'history') {
       return (
           <div className="h-full overflow-y-auto">
-              <div className="mx-6 mt-4 p-4 bg-primary/5 border border-primary/15 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="mt-4 p-4 bg-primary/5 border border-primary/15 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mx-6 md:mx-0">
                   <div>
                       <h3 className="font-headline text-sm font-bold text-primary">Class Representative Mode</h3>
                       <p className="text-xs text-textMuted mt-0.5">You have extra privileges to manage class attendance and timetables.</p>

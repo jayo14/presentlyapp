@@ -5,7 +5,7 @@ interface DashboardCardProps {
   title: string;
   value?: string | number;
   description?: string;
-  icon?: any;
+  icon?: React.ElementType;
   iconClassName?: string;
   className?: string;
   onClick?: () => void;
