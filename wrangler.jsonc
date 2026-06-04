@@ -1,7 +1,17 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "presentlyapp",
-  "compatibility_date": "2024-01-01",
+  "compatibility_date": "2026-05-31",
+  "observability": {
+    "enabled": true
+  },
   "assets": {
     "directory": "frontend/dist"
-  }
+  },
+  "build": {
+    "command": "cd frontend && pnpm install && pnpm build"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
 }
