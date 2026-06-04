@@ -49,7 +49,7 @@ export const SiteHeader: React.FC<SiteHeaderProps> = ({
           aria-label="View notifications"
         >
           <Bell size={20} weight="bold" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-sungold rounded-full border-2 border-surface" />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-sungold rounded-full border-2 border-surface" aria-hidden="true" />
         </button>
 
         <div className="h-8 w-px bg-outline/10 mx-1 hidden md:block" />

@@ -38,6 +38,7 @@ import { LoadingScreen } from '../LoadingScreen';
 import { useLecturerDashboard } from '../../services/api/dashboard';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -250,33 +251,24 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
       {/* Stats Cards */}
       <ResponsiveGrid>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-              <BookOpen size={18} weight="bold" className="text-blue-600" />
-            </div>
-          </div>
+        <DashboardCard
+          description="My Courses"
+          icon={<BookOpen size={18} weight="bold" className="text-blue-600" />}
+        >
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
-          <p className="text-xs text-textMuted mt-0.5">My Courses</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <Clock size={18} weight="bold" className="text-emerald-600" />
-            </div>
-          </div>
+        </DashboardCard>
+        <DashboardCard
+          description="Active Sessions"
+          icon={<Clock size={18} weight="bold" className="text-emerald-600" />}
+        >
           <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
-          <p className="text-xs text-textMuted mt-0.5">Active Sessions</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-              <Users size={18} weight="bold" className="text-violet-600" />
-            </div>
-          </div>
+        </DashboardCard>
+        <DashboardCard
+          description="Total Students"
+          icon={<Users size={18} weight="bold" className="text-violet-600" />}
+        >
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
-          <p className="text-xs text-textMuted mt-0.5">Total Students</p>
-        </div>
+        </DashboardCard>
       </ResponsiveGrid>
 
       {/* Sessions */}

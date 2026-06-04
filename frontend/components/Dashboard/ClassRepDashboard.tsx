@@ -21,6 +21,7 @@ import { analyzeTimetableImage } from '../../services/geminiService';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface ClassRepDashboardProps {
   userName: string;
@@ -339,8 +340,10 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
             description="Manage attendance and reports for your class."
           >
               {/* Mark Attendance Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
-                  <h3 className="font-headline text-sm font-semibold text-text mb-3">Mark Attendance for Absent Students</h3>
+                <DashboardCard
+                    title="Mark Attendance for Absent Students"
+                    className="min-h-0"
+                >
                   <div className="flex gap-3 mb-4">
                       <div className="relative flex-1">
                         <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
@@ -378,17 +381,19 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                           </div>
                       ))}
                   </div>
-              </div>
+                </DashboardCard>
 
               {/* Class Reports Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
-                  <h3 className="font-headline text-sm font-semibold text-text mb-1">Class Reports</h3>
-                  <p className="text-xs text-textMuted mb-4">Generate attendance sheets for lecturers.</p>
+                <DashboardCard
+                    title="Class Reports"
+                    description="Generate attendance sheets for lecturers."
+                    className="min-h-0"
+                >
                   <button className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-textMuted bg-surfaceLow border border-outline rounded-lg hover:bg-surfaceLow transition-colors">
                       <span>Download Weekly Summary (PDF)</span>
                       <FileText size={16} className="text-textMuted" />
                   </button>
-              </div>
+                </DashboardCard>
           </DashboardPage>
       );
   }

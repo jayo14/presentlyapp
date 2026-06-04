@@ -22,6 +22,7 @@ import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface AdminDashboardProps {
   userName: string;
@@ -240,22 +241,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   return (
     <DashboardPage
       title={`Welcome back, ${userName.split(' ')[0]}`}
-      description="Here's what's happening with your platform."
+      description={
+        <>
+          Here's what's happening with your platform.
+          <span className="ml-2 px-2 py-0.5 bg-sungold/20 text-presently-black rounded-full text-[10px] font-black tracking-widest uppercase">
+            System Overseer
+          </span>
+        </>
+      }
     >
       <SEO title="Admin Dashboard | Presently" description="System overview and health check for Presently administrators." />
 
       {/* Stats Grid */}
       <ResponsiveGrid>
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                <stat.icon size={18} weight="bold" className={stat.color} />
-              </div>
-            </div>
+          <DashboardCard
+            key={i}
+            description={stat.label}
+            icon={<stat.icon size={18} weight="bold" className={stat.color} />}
+          >
             <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
-            <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
-          </div>
+          </DashboardCard>
         ))}
       </ResponsiveGrid>
 

@@ -36,6 +36,7 @@ import CourseIcon from '../Course/CourseIcon';
 import { StudentAnalytics } from '../Analytics/StudentAnalytics';
 import { offlineSyncManager } from '../../src/utils/offlineSync';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface StudentDashboardProps {
   userName: string;
@@ -204,52 +205,44 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 {/* COMPACT STATS GRID */}
                 <ResponsiveGrid cols={3}>
                     {/* ATTENDANCE CARD */}
-                    <div className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                        <Pulse size={18} weight="bold" />
-                    </div>
-                    <div>
-                        <div className="flex items-end gap-1">
+                    <DashboardCard
+                      description="Attendance"
+                      icon={<Pulse size={18} weight="bold" className="text-emerald-500" />}
+                    >
+                      <div className="flex items-end gap-1">
                         <span className="text-xl font-black tracking-tighter">{(dashboardData?.attendance_stats?.average_attendance || 0)}%</span>
                         <ArrowUpRight size={14} weight="bold" className="text-emerald-500 mb-1" />
-                        </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Attendance</p>
-                    </div>
-                    </div>
+                      </div>
+                    </DashboardCard>
 
                     {/* ACADEMIC LEVEL CARD */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] shadow-lg shadow-primary/10 group cursor-default">
-                    <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
-                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                        <Trophy size={18} weight="bold" />
-                    </div>
-                    <div className="space-y-1">
+                    <DashboardCard
+                      className="bg-gradient-to-br from-[#755b00cc] to-primary border-none"
+                      icon={<Trophy size={18} weight="bold" className="text-white" />}
+                    >
+                      <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12 text-white" />
+                      <div className="space-y-1">
                         <div className="flex items-baseline gap-1.5">
-                        <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
-                        <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
+                          <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
+                          <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
                         </div>
                         <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <div className="h-full bg-white w-[65%]" />
+                          <div className="h-full bg-white w-[65%]" />
                         </div>
                         <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">Next: Dean's List</p>
-                    </div>
-                    </div>
+                      </div>
+                    </DashboardCard>
 
                     {/* COURSES CARD */}
-                    <div
-                    onClick={() => window.location.href = '/dashboard/courses'}
-                    className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all cursor-pointer group"
+                    <DashboardCard
+                      description="Active Courses"
+                      onClick={() => window.location.href = '/dashboard/courses'}
+                      icon={<BookOpen size={18} weight="bold" className="text-primary" />}
                     >
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                        <BookOpen size={18} weight="bold" />
-                    </div>
-                    <div>
-                        <div className="flex items-end gap-1">
+                      <div className="flex items-end gap-1">
                         <span className="text-xl font-black tracking-tighter">{dashboardData?.enrolled_courses?.length || 0}</span>
-                        </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Active Courses</p>
-                    </div>
-                    </div>
+                      </div>
+                    </DashboardCard>
                 </ResponsiveGrid>
 
                 {/* ACTIVITY FEED */}
