@@ -1,7 +1,7 @@
 {
   "name": "presentlyapp",
   "main": "worker.mjs",
-  "compatibility_date": "2024-01-01",
+  "compatibility_date": "2024-11-01",
   "build": {
     "command": "cd frontend && pnpm install && pnpm build"
   },
