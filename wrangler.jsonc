@@ -1,0 +1,12 @@
+{
+  "name": "presentlyapp",
+  "main": "worker.mjs",
+  "compatibility_date": "2024-01-01",
+  "build": {
+    "command": "cd frontend && pnpm install && pnpm build"
+  },
+  "assets": {
+    "directory": "frontend/dist",
+    "binding": "ASSETS"
+  }
+}
