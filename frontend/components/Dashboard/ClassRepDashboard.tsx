@@ -21,6 +21,7 @@ import { analyzeTimetableImage } from '../../services/geminiService';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface ClassRepDashboardProps {
   userName: string;
@@ -133,6 +134,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                     <button
                       onClick={() => setIsAiScanOpen(true)}
                       className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
+                      aria-label="Scan timetable with AI"
                     >
                         <Sparkle size={14} weight="bold" className="text-primary" />
                         AI Scan
@@ -140,6 +142,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                     <button
                       onClick={() => setIsTimetableModalOpen(true)}
                       className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
+                      aria-label="Add new class entry"
                     >
                         <Plus size={14} weight="bold" />
                         Add Class
@@ -147,6 +150,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                     <button
                       onClick={handleSaveTimetable}
                       className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
+                      aria-label="Save timetable changes"
                     >
                         <FloppyDisk size={14} weight="bold" />
                         Save
@@ -158,13 +162,18 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => {
                     const dayEntries = timetable.filter(t => t.day === day).sort((a, b) => a.startTime.localeCompare(b.startTime));
                     return (
-                        <div key={day} className="bg-surface text-text border border-outline rounded-xl p-4">
-                            <h3 className="font-headline text-xs font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-2">
-                                <Calendar size={14} />
-                                {day}
-                            </h3>
+                        <DashboardCard
+                            key={day}
+                            title={
+                                <span className="flex items-center gap-2">
+                                    <Calendar size={14} />
+                                    {day}
+                                </span>
+                            }
+                            titleClassName="uppercase tracking-wider"
+                        >
                             {dayEntries.length > 0 ? (
-                                <div className="space-y-2">
+                                <div className="space-y-2 mt-3">
                                     {dayEntries.map(entry => (
                                         <div key={entry.id} className="bg-surfaceLow/50 border border-outline p-3 rounded-lg flex items-center justify-between group">
                                             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -187,6 +196,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                                             <button
                                                 onClick={() => handleDeleteEntry(entry.id)}
                                                 className="ml-2 p-1.5 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                                aria-label={`Delete ${entry.courseCode} on ${day}`}
                                             >
                                                 <Trash size={14} weight="bold" />
                                             </button>
@@ -194,9 +204,9 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-xs text-textMuted italic">No classes scheduled.</p>
+                                <p className="text-xs text-textMuted italic mt-2">No classes scheduled.</p>
                             )}
-                        </div>
+                        </DashboardCard>
                     );
                 })}
             </div>
@@ -338,56 +348,68 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
             title="Class Management"
             description="Manage attendance and reports for your class."
           >
-              {/* Mark Attendance Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
-                  <h3 className="font-headline text-sm font-semibold text-text mb-3">Mark Attendance for Absent Students</h3>
-                  <div className="flex gap-3 mb-4">
-                      <div className="relative flex-1">
-                        <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
-                        <input
-                          type="text"
-                          placeholder="Search student by name or matric..."
-                          className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                        />
-                      </div>
-                      <button className="px-4 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
-                        Search
-                      </button>
-                  </div>
+              <div className="grid gap-6">
+                {/* Mark Attendance Card */}
+                <DashboardCard title="Mark Attendance for Absent Students">
+                    <div className="flex gap-3 mb-4 mt-3">
+                        <div className="relative flex-1">
+                            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
+                            <input
+                            type="text"
+                            placeholder="Search student by name or matric..."
+                            className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                            aria-label="Search student by name or matric number"
+                            />
+                        </div>
+                        <button className="px-4 py-2 text-sm font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors">
+                            Search
+                        </button>
+                    </div>
 
-                  <div className="space-y-2">
-                      {[1, 2, 3].map(i => (
-                          <div key={i} className="flex items-center justify-between p-3 bg-surfaceLow/50 rounded-lg border border-outline">
-                              <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-full bg-surfaceHigh flex items-center justify-center text-xs font-bold text-textMuted">JD</div>
-                                  <div>
-                                      <p className="text-sm font-medium text-text">John Doe</p>
-                                      <p className="text-xs text-textMuted">ENG/2021/00{i}</p>
-                                  </div>
-                              </div>
-                              <div className="flex gap-2">
-                                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                                      <CheckCircle size={13} weight="bold" />
-                                      Present
-                                  </button>
-                                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-                                      <XCircle size={13} weight="bold" />
-                                      Absent
-                                  </button>
-                              </div>
-                          </div>
-                      ))}
-                  </div>
-              </div>
+                    <div className="space-y-2">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="flex items-center justify-between p-3 bg-surfaceLow/50 rounded-lg border border-outline">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-full bg-surfaceHigh flex items-center justify-center text-xs font-bold text-textMuted">JD</div>
+                                    <div>
+                                        <p className="text-sm font-medium text-text">John Doe</p>
+                                        <p className="text-xs text-textMuted">ENG/2021/00{i}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                                        aria-label={`Mark John Doe ENG/2021/00${i} as present`}
+                                    >
+                                        <CheckCircle size={13} weight="bold" />
+                                        Present
+                                    </button>
+                                    <button
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                                        aria-label={`Mark John Doe ENG/2021/00${i} as absent`}
+                                    >
+                                        <XCircle size={13} weight="bold" />
+                                        Absent
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </DashboardCard>
 
-              {/* Class Reports Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
-                  <h3 className="font-headline text-sm font-semibold text-text mb-1">Class Reports</h3>
-                  <p className="text-xs text-textMuted mb-4">Generate attendance sheets for lecturers.</p>
-                  <button className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-textMuted bg-surfaceLow border border-outline rounded-lg hover:bg-surfaceLow transition-colors">
-                      <span>Download Weekly Summary (PDF)</span>
-                      <FileText size={16} className="text-textMuted" />
-                  </button>
+                {/* Class Reports Card */}
+                <DashboardCard
+                    title="Class Reports"
+                    description="Generate attendance sheets for lecturers."
+                >
+                    <button
+                        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-textMuted bg-surfaceLow border border-outline rounded-lg hover:bg-surfaceLow transition-colors mt-3"
+                        aria-label="Download Weekly Summary as PDF"
+                    >
+                        <span>Download Weekly Summary (PDF)</span>
+                        <FileText size={16} className="text-textMuted" />
+                    </button>
+                </DashboardCard>
               </div>
           </DashboardPage>
       );

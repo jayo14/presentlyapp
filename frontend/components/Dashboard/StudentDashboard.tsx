@@ -36,6 +36,8 @@ import CourseIcon from '../Course/CourseIcon';
 import { StudentAnalytics } from '../Analytics/StudentAnalytics';
 import { offlineSyncManager } from '../../src/utils/offlineSync';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardPage } from '../layout-primitives/DashboardPage';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface StudentDashboardProps {
   userName: string;
@@ -123,21 +125,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
     <>
       <SEO title="Presently | Home" />
 
-      <div className="min-h-screen pb-24 text-slate-900 dark:text-white font-sans selection:bg-primary/20 overflow-x-hidden">
-        <main className="max-w-4xl mx-auto px-6 pt-4 space-y-8">
-            {/* GREETING - PRESERVING MOBILE-NATIVE STYLE */}
-            <header className="max-w-md md:max-w-none">
-                <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60 mb-1">
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
-                </p>
-                <h2 className="text-3xl font-black tracking-tighter leading-tight">
-                Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
-                </h2>
-            </header>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-12 space-y-8">
-
+      <DashboardPage
+        subtitle={new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+        title={
+          <>
+            Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
+          </>
+        }
+        titleClassName="text-3xl font-black tracking-tighter leading-tight"
+        className="max-w-4xl mx-auto px-6"
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-12 space-y-8">
                 {/* MAIN ACTION CARD */}
                 <section>
                     <motion.div
@@ -204,52 +203,53 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 {/* COMPACT STATS GRID */}
                 <ResponsiveGrid cols={3}>
                     {/* ATTENDANCE CARD */}
-                    <div className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                        <Pulse size={18} weight="bold" />
-                    </div>
-                    <div>
-                        <div className="flex items-end gap-1">
-                        <span className="text-xl font-black tracking-tighter">{(dashboardData?.attendance_stats?.average_attendance || 0)}%</span>
-                        <ArrowUpRight size={14} weight="bold" className="text-emerald-500 mb-1" />
+                    <DashboardCard className="p-4" aria-label={`Average attendance is ${(dashboardData?.attendance_stats?.average_attendance || 0)} percent`}>
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                            <Pulse size={18} weight="bold" />
                         </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Attendance</p>
-                    </div>
-                    </div>
+                        <div className="mt-auto">
+                            <div className="flex items-end gap-1">
+                            <span className="text-xl font-black tracking-tighter">{(dashboardData?.attendance_stats?.average_attendance || 0)}%</span>
+                            <ArrowUpRight size={14} weight="bold" className="text-emerald-500 mb-1" />
+                            </div>
+                            <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Attendance</p>
+                        </div>
+                    </DashboardCard>
 
                     {/* ACADEMIC LEVEL CARD */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] shadow-lg shadow-primary/10 group cursor-default">
-                    <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
-                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                        <Trophy size={18} weight="bold" />
-                    </div>
-                    <div className="space-y-1">
-                        <div className="flex items-baseline gap-1.5">
-                        <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
-                        <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
+                    <DashboardCard className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-4 border-none shadow-lg shadow-primary/10 group cursor-default" interactive={false}>
+                        <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
+                        <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                            <Trophy size={18} weight="bold" />
                         </div>
-                        <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <div className="h-full bg-white w-[65%]" />
+                        <div className="mt-auto space-y-1">
+                            <div className="flex items-baseline gap-1.5">
+                            <span className="text-xl font-black tracking-tighter text-white">LVL 4</span>
+                            <span className="text-[8px] font-bold text-white/80 uppercase">Scholar</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+                            <div className="h-full bg-white w-[65%]" />
+                            </div>
+                            <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">Next: Dean's List</p>
                         </div>
-                        <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">Next: Dean's List</p>
-                    </div>
-                    </div>
+                    </DashboardCard>
 
                     {/* COURSES CARD */}
-                    <div
-                    onClick={() => window.location.href = '/dashboard/courses'}
-                    className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all cursor-pointer group"
+                    <DashboardCard
+                        onClick={() => window.location.href = '/dashboard/courses'}
+                        className="p-4 group"
+                        aria-label={`View your ${dashboardData?.enrolled_courses?.length || 0} active courses`}
                     >
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                        <BookOpen size={18} weight="bold" />
-                    </div>
-                    <div>
-                        <div className="flex items-end gap-1">
-                        <span className="text-xl font-black tracking-tighter">{dashboardData?.enrolled_courses?.length || 0}</span>
+                        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                            <BookOpen size={18} weight="bold" />
                         </div>
-                        <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Active Courses</p>
-                    </div>
-                    </div>
+                        <div className="mt-auto">
+                            <div className="flex items-end gap-1">
+                            <span className="text-xl font-black tracking-tighter">{dashboardData?.enrolled_courses?.length || 0}</span>
+                            </div>
+                            <p className="text-[9px] font-black text-textMuted uppercase tracking-widest">Active Courses</p>
+                        </div>
+                    </DashboardCard>
                 </ResponsiveGrid>
 
                 {/* ACTIVITY FEED */}
@@ -317,10 +317,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     )}
                     </div>
                 </section>
-                </div>
             </div>
-        </main>
-      </div>
+        </div>
+      </DashboardPage>
 
       {/* Modals */}
       <EnhancedAttendanceScanner
