@@ -3,7 +3,10 @@ import { cn } from '@/lib/utils';
 
 interface DashboardCardProps {
   children: React.ReactNode;
+  title?: React.ReactNode;
+  description?: string;
   className?: string;
+  titleClassName?: string;
   onClick?: () => void;
   interactive?: boolean;
   role?: string;
@@ -12,7 +15,10 @@ interface DashboardCardProps {
 
 export const DashboardCard: React.FC<DashboardCardProps> = ({
   children,
+  title,
+  description,
   className,
+  titleClassName,
   onClick,
   interactive = false,
   role,
@@ -40,6 +46,20 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
       role={role || (isClickable ? 'button' : undefined)}
       aria-label={ariaLabel}
     >
+      {(title || description) && (
+        <div className="mb-1">
+          {title && (
+            <h3 className={cn("font-headline text-sm font-semibold text-text", titleClassName)}>
+              {title}
+            </h3>
+          )}
+          {description && (
+            <p className="text-xs text-textMuted leading-relaxed">
+              {description}
+            </p>
+          )}
+        </div>
+      )}
       {children}
     </div>
   );
