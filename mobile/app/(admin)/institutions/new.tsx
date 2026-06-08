@@ -27,7 +27,7 @@ export default function NewInstitutionScreen() {
     setLoading(true);
     try {
       await api.institutions.create(formData);
-      router.back();
+      router.canGoBack() ? router.back() : router.replace("/");
     } catch (error) {
       console.error('Error creating institution:', error);
       Alert.alert('Error', 'Failed to create institution');
@@ -39,7 +39,7 @@ export default function NewInstitutionScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: isDark ? '#27272a' : '#f4f4f5', borderBottomWidth: 1 }]}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.canGoBack() ? router.back() : router.replace("/")}>
           <ChevronLeft size={28} color={colors.primary} />
           <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
         </TouchableOpacity>

@@ -57,7 +57,7 @@ export default function AttendanceRecordsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Top Navigation Bar */}
       <View style={[styles.header, { borderBottomColor: isDark ? '#4a4121' : '#E2E8F0' }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
           <ChevronLeft size={24} color={colors.primary} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>{session.courseCode} - {session.courseName}</Text>
