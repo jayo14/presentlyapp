@@ -80,6 +80,13 @@ export default function AdminMoreScreen() {
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>SYSTEM MANAGEMENT</Text>
           <View style={[styles.configBox, { backgroundColor: colors.cardBg, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
             <ConfigRow
+            <ConfigRow
+              icon={<BookOpen size={20} color="#8B5CF6" />}
+              title="University Blog"
+              subtitle="Read latest news & updates"
+              onPress={() => router.push("/blog")}
+              colors={colors}
+            />
               icon={<Building size={20} color="#3B82F6" />}
               title="Institution Hierarchy"
               subtitle="Colleges, faculties & departments"

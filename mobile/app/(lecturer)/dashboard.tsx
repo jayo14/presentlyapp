@@ -706,6 +706,27 @@ export default function LecturerDashboard() {
             </ScrollView>
         </View>
 
+        {/* Quick Actions */}
+        <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statsScroll}>
+                <TouchableOpacity
+                    style={[styles.quickActionBtn, { backgroundColor: isDark ? "#352e18" : "#FFFFFF", borderColor: colors.border }]}
+                    onPress={() => router.push("/blog")}
+                >
+                    <BookOpen size={20} color={colors.primary} />
+                    <Text style={[styles.quickActionText, { color: colors.text }]}>University Blog</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.quickActionBtn, { backgroundColor: isDark ? "#352e18" : "#FFFFFF", borderColor: colors.border }]}
+                    onPress={() => router.push("/(lecturer)/analytics")}
+                >
+                    <TrendingUp size={20} color={colors.primary} />
+                    <Text style={[styles.quickActionText, { color: colors.text }]}>Analytics</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        </View>
+
         {/* Recent Activity Section */}
         <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
@@ -779,6 +800,20 @@ function ActivityItem({ icon, title, subtitle, badge, action, chevron, colors, i
 }
 
 const styles = StyleSheet.create({
+  quickActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginRight: 12,
+    gap: 8,
+  },
+  quickActionText: {
+    fontSize: 14,
+    fontFamily: Fonts.lexend.bold,
+  },
   container: {
     flex: 1,
   },

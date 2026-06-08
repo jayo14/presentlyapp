@@ -68,7 +68,7 @@ export default function CourseDetailsScreen() {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
                     <ArrowLeft size={24} color={isDark ? '#FFFFFF' : '#111418'} />
                 </TouchableOpacity>
                 <Text style={[styles.headerTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>NOT FOUND</Text>
@@ -87,7 +87,7 @@ export default function CourseDetailsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} edges={['top']}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: isDark ? 'rgba(26, 22, 11, 0.8)' : 'rgba(248, 248, 245, 0.8)', borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
             <ArrowLeft size={24} color={isDark ? '#FFFFFF' : '#111418'} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>COURSE DETAILS</Text>

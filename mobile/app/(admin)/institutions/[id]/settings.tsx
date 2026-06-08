@@ -41,7 +41,7 @@ export default function InstitutionalSettingsScreen() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.primary + '1A', borderBottomWidth: 1 }]}>
         <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")}>
             <ChevronLeft size={24} color={colors.primary} />
           </TouchableOpacity>
           <View style={[styles.saveBadge, { backgroundColor: '#10B9811A' }]}>

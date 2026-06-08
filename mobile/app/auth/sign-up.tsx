@@ -92,7 +92,7 @@ export default function SignUpScreen() {
       >
         <View style={styles.headerBar}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
             style={styles.backButton}
             activeOpacity={0.7}
           >
@@ -184,7 +184,7 @@ export default function SignUpScreen() {
               Already have an account?{' '}
             </Text>
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
               activeOpacity={0.7}
             >
               <Text style={[styles.signInText, { color: colors.primary }]}>

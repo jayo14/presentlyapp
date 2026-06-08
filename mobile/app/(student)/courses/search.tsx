@@ -51,7 +51,7 @@ export default function SearchResultsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} edges={['top']}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: isDark ? 'rgba(26, 22, 8, 0.95)' : 'rgba(248, 248, 245, 0.95)', borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
             <ArrowLeft size={24} color={isDark ? '#FFFFFF' : '#111418'} />
         </TouchableOpacity>
         <View style={styles.searchBarContainer}>

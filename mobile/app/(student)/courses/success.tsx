@@ -104,7 +104,7 @@ export default function EnrollmentSuccessScreen() {
 
                 <TouchableOpacity
                     style={[styles.secondaryBtn, { borderColor: 'rgba(249, 196, 6, 0.3)', backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'transparent' }]}
-                    onPress={() => router.back()}
+                    onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
                 >
                     <Text style={styles.secondaryBtnText}>Add Another Course</Text>
                 </TouchableOpacity>

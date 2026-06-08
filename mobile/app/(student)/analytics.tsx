@@ -77,7 +77,7 @@ export default function StudentAnalyticsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
             style={styles.backButton}
         >
           <ChevronLeft size={24} color={colors.text} />
