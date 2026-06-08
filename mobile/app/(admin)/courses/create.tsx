@@ -60,7 +60,7 @@ export default function CreateCourseScreen() {
 
   const handleBack = () => {
     if (step > 1) setStep(step - 1);
-    else router.back();
+    else router.canGoBack() ? router.back() : router.replace("/");
   };
 
   const handleCreate = async () => {
@@ -77,7 +77,7 @@ export default function CreateCourseScreen() {
       };
       await api.courses.create(payload);
       Alert.alert('Success', 'Course created successfully');
-      router.back();
+      router.canGoBack() ? router.back() : router.replace("/");
     } catch (e) {
       console.error(e);
       Alert.alert('Error', 'Failed to create course');

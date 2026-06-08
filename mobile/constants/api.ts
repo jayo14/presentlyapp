@@ -193,4 +193,30 @@ export const API_ENDPOINTS = {
     CERTIFICATE: (id: string) => `/exam-clearance/${id}/certificate/`,
     COURSE: (courseId: string) => `/exam-clearance/course/${courseId}/`,
   },
+  // Blog
+  BLOG: {
+    POSTS: '/blog/posts/',
+    POST_DETAIL: (slug: string) => `/blog/posts/${slug}/`,
+    TAGS: '/blog/tags/',
+    CATEGORIES: '/blog/categories/',
+    SUBSCRIBE: '/blog/newsletter/subscribe/',
+    ADMIN_POSTS: '/blog/admin/posts/',
+    ADMIN_CATEGORIES: '/blog/admin/categories/',
+    ADMIN_TAGS: '/blog/admin/tags/',
+    ADMIN_SUBSCRIBERS: '/blog/admin/subscribers/',
+  },
+  // RBAC & Staff
+  RBAC: {
+    PERMISSIONS: '/rbac/permissions/',
+    ROLES: '/rbac/roles/',
+  },
+  STAFF: {
+    PROFILES: '/staff/',
+    UPDATE: (id: string) => `/staff/${id}/`,
+    INVITATIONS: '/staff/invitations/',
+    INVITE: '/staff/invitations/invite/',
+    RESEND_INVITE: (id: number) => `/staff/invitations/${id}/resend/`,
+    REVOKE_INVITE: (id: number) => `/staff/invitations/${id}/revoke/`,
+    ACCEPT_INVITE: '/auth/staff-invitations/accept/',
+  },
 };

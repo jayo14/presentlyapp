@@ -63,7 +63,7 @@ export default function EditPhotoScreen() {
       const response: any = await api.auth.uploadAvatar(formData);
       if (response?.avatar_url) {
         await updateProfilePicture(response.avatar_url);
-        router.back();
+        router.canGoBack() ? router.back() : router.replace("/");
       } else {
         Alert.alert('Upload Failed', 'Could not save profile photo. Please try again.');
       }
@@ -80,7 +80,7 @@ export default function EditPhotoScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
           <ChevronLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Edit Photo</Text>

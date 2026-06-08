@@ -30,7 +30,7 @@ export default function AdminAccessControlScreen() {
       <View style={[styles.header, { borderBottomColor: colors.primary + '1A', borderBottomWidth: 1 }]}>
         <View style={styles.headerTop}>
           <View style={styles.headerTitleGroup}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")}>
               <ChevronLeft size={24} color={colors.primary} />
             </TouchableOpacity>
             <Text style={[styles.headerTitle, { color: colors.text }]}>Admin Management</Text>

@@ -96,7 +96,7 @@ export default function ManualOverrideScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }]}>
         <View style={styles.headerTop}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backBtn}>
                 <MaterialIcons name="arrow-back-ios" size={24} color={colors.primary} />
             </TouchableOpacity>
             <Text style={[styles.headerTitle, { color: colors.text }]}>Manual Override</Text>

@@ -550,3 +550,106 @@ export const useStudentsByCourse = (courseId: string) => {
     enabled: !!courseId,
   });
 };
+
+// Blog hooks
+export const useBlogPosts = (params?: any) => {
+  return useQuery({
+    queryKey: ['blog-posts', params],
+    queryFn: () => api.blog.getPosts(params),
+  });
+};
+
+export const useBlogPost = (slug: string) => {
+  return useQuery({
+    queryKey: ['blog-post', slug],
+    queryFn: () => api.blog.getPostDetail(slug),
+    enabled: !!slug,
+  });
+};
+
+export const useBlogTags = () => {
+  return useQuery({
+    queryKey: ['blog-tags'],
+    queryFn: () => api.blog.getTags(),
+  });
+};
+
+export const useBlogCategories = () => {
+  return useQuery({
+    queryKey: ['blog-categories'],
+    queryFn: () => api.blog.getCategories(),
+  });
+};
+
+export const useSubscribeNewsletter = () => {
+  return useMutation({
+    mutationFn: (email: string) => api.blog.subscribeNewsletter(email),
+  });
+};
+
+// Staff hooks
+export const useStaffProfiles = () => {
+  return useQuery({
+    queryKey: ['staff-profiles'],
+    queryFn: () => api.staff.getProfiles(),
+  });
+};
+
+export const useUpdateStaffProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => api.staff.updateProfile(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff-profiles'] });
+    },
+  });
+};
+
+export const useStaffInvitations = () => {
+  return useQuery({
+    queryKey: ['staff-invitations'],
+    queryFn: () => api.staff.getInvitations(),
+  });
+};
+
+export const useInviteStaff = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ email, role, departmentId }: { email: string; role: string; departmentId?: string }) =>
+      api.staff.inviteStaff(email, role, departmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff-invitations'] });
+    },
+  });
+};
+
+export const useResendStaffInvitation = () => {
+  return useMutation({
+    mutationFn: (id: number) => api.staff.resendInvitation(id),
+  });
+};
+
+export const useRevokeStaffInvitation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.staff.revokeInvitation(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff-invitations'] });
+    },
+  });
+};
+
+// RBAC hooks
+export const usePermissions = () => {
+  return useQuery({
+    queryKey: ['rbac-permissions'],
+    queryFn: () => api.rbac.getPermissions(),
+  });
+};
+
+export const useRoles = () => {
+  return useQuery({
+    queryKey: ['rbac-roles'],
+    queryFn: () => api.rbac.getRoles(),
+  });
+};

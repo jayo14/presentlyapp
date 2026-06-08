@@ -29,7 +29,7 @@ export default function FacultiesManagementScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.canGoBack() ? router.back() : router.replace("/")}>
             <ChevronLeft size={28} color={colors.primary} />
             <Text style={[styles.backText, { color: colors.primary }]}>Institutions</Text>
           </TouchableOpacity>

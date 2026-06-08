@@ -27,7 +27,7 @@ export default function InstitutionCommandCenter() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border + '33', borderBottomWidth: 1 }]}>
         <View style={styles.headerLeft}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")}>
             <ChevronLeft size={24} color={colors.primary} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Command Center</Text>

@@ -92,7 +92,7 @@ export default function MarkAttendanceScreen() {
       });
     } else if (status === 'queued') {
         showAlert('Saved Offline', 'You are offline. Your attendance has been queued and will be submitted once you are back online.', 'success');
-        router.back();
+        router.canGoBack() ? router.back() : router.replace("/");
     }
   }, [status]);
 
@@ -214,7 +214,7 @@ export default function MarkAttendanceScreen() {
                 >
                     <Text style={styles.verifyBtnText}>Enable Location</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ marginTop: 20 }} onPress={() => router.back()}>
+                <TouchableOpacity style={{ marginTop: 20 }} onPress={() => router.canGoBack() ? router.back() : router.replace("/")}>
                     <Text style={{ color: colors.primary, fontFamily: Fonts.lexend.bold }}>Maybe Later</Text>
                 </TouchableOpacity>
             </View>
@@ -286,7 +286,7 @@ export default function MarkAttendanceScreen() {
 
         <SafeAreaView style={styles.qrOverlay}>
           <View style={styles.qrHeader}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.iconCircle}>
+            <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.iconCircle}>
               <ChevronLeft size={24} color="#FFF" />
             </TouchableOpacity>
             <Text style={styles.qrTitle}>Scan QR Code</Text>
@@ -333,7 +333,7 @@ export default function MarkAttendanceScreen() {
       />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
           <ChevronLeft size={28} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Session Code</Text>

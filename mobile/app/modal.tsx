@@ -17,9 +17,9 @@ export default function ModalScreen() {
       animationType="fade"
       transparent={true}
       visible={true}
-      onRequestClose={() => router.back()}
+      onRequestClose={() => router.canGoBack() ? router.back() : router.replace("/")}
     >
-      <Pressable style={styles.overlay} onPress={() => router.back()}>
+      <Pressable style={styles.overlay} onPress={() => router.canGoBack() ? router.back() : router.replace("/")}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Modal</Text>
           <Text style={styles.description}>
@@ -29,7 +29,7 @@ export default function ModalScreen() {
 
           <TouchableOpacity
             style={styles.closeButton}
-            onPress={() => router.back()}
+            onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
           >
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>

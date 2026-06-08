@@ -55,7 +55,7 @@ function HistoryContent() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={styles.headerBar}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
           style={styles.backButton}
           activeOpacity={0.7}
         >
