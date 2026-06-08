@@ -34,7 +34,7 @@ export default function DropCourseConfirmationScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
             <ChevronLeft size={24} color={isDark ? '#FFFFFF' : '#111418'} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: isDark ? '#FFFFFF' : colors.text }]}>Course Management</Text>
@@ -69,7 +69,7 @@ export default function DropCourseConfirmationScreen() {
             <View style={styles.buttonGroup}>
                 <TouchableOpacity
                     style={styles.keepBtn}
-                    onPress={() => router.back()}
+                    onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
                 >
                     <Text style={styles.keepBtnText}>Keep Course</Text>
                 </TouchableOpacity>

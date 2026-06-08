@@ -87,7 +87,7 @@ export default function ResetPasswordScreen() {
         style={styles.keyboardView}
       >
         <View style={styles.headerBar}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
             <ChevronLeft size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Reset Password</Text>

@@ -122,7 +122,7 @@ export default function CreateCourseScreen() {
     if (step > 1) {
         setStep(step - 1);
     } else {
-        router.back();
+        router.canGoBack() ? router.back() : router.replace("/");
     }
   };
 

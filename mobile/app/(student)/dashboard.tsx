@@ -179,6 +179,7 @@ export default function StudentDashboard() {
             <View style={styles.quickActionsGrid}>
                 {[
                     { id: 'timetable', icon: <Calendar color="#f9c406" size={24} />, label: 'Timetable', route: '/(student)/timetable' },
+                    { id: 'blog', icon: <BookOpen color="#8B5CF6" size={24} />, label: 'University Blog', route: '/blog' },
                 ].map((action) => (
                     <TouchableOpacity 
                         key={action.id}

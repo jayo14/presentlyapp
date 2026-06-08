@@ -183,7 +183,7 @@ export default function SchoolInfoScreen() {
       >
         <View style={styles.headerBar}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
             style={[styles.backButton, { backgroundColor: isDark ? colors.cardBg : '#FFFFFF' }]}
             activeOpacity={0.7}
           >

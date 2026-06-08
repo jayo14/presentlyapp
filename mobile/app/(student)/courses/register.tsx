@@ -85,7 +85,7 @@ export default function RegistrationHubScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={styles.backButton}>
                 <ArrowLeft size={24} color={isDark ? "#FFFFFF" : colors.text} />
             </TouchableOpacity>
             <View>

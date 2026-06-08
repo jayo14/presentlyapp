@@ -15,6 +15,8 @@ import { checkInService } from './checkin';
 import { adminService } from './admin';
 import { usersService } from './users';
 import { systemService } from './system';
+import { blogService } from './blog';
+import { staffService, rbacService } from './staff';
 
 // Re-export services under a single api object for compatibility
 export const api = {
@@ -37,6 +39,9 @@ export const api = {
   users: usersService,
   checkIn: checkInService,
   system: systemService,
+  blog: blogService,
+  staff: staffService,
+  rbac: rbacService,
   // Backward compatibility mappings
   attendance: analyticsService,
 };
