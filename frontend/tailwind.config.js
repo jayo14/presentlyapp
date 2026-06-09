@@ -13,47 +13,37 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'Lexend', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['Outfit', 'Lexend', 'system-ui', 'sans-serif'],
         headline: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         background: "var(--background)",
         surface: "var(--surface)",
-        surfaceContainer: "var(--surface-container)",
-        surfaceLow: "var(--surface-container-low)",
-        surfaceHigh: "var(--surface-container-high)",
-        surfaceHighest: "var(--surface-container-highest)",
+        "surface-container-low": "var(--surface-container-low)",
+        "surface-container-high": "var(--surface-container-high)",
+        "surface-container-highest": "var(--surface-container-highest)",
+        "presently-black": "#231F0F",
+        "sungold": "#F9C406",
   
         text: "var(--on-surface)",
         textMuted: "var(--on-surface-variant)",
   
         primary: "var(--primary)",
-        primaryContainer: "var(--primary-container)",
+        "primary-container": "var(--primary-container)",
+        "on-primary-fixed": "var(--on-primary-fixed)",
   
-        outline: "var(--outline-variant)",
-        foreground: "var(--foreground)",
-        error: "var(--error)",
+        outline: "var(--outline)",
         success: "var(--success)",
-        warning: "var(--warning)",
+        error: "var(--error)",
       },
       keyframes: {
-        'float': {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
         'pulse-glow': {
-          '0%, 100%': { opacity: '0.5', transform: 'scale(1)' },
-          '50%': { opacity: '0.8', transform: 'scale(1.05)' },
-        },
-        'reveal': {
-          '0%': { transform: 'translateY(100%)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+          '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+          '50%': { opacity: '0.6', transform: 'scale(1.1)' },
         }
       },
       animation: {
-        'float': 'float 6s ease-in-out infinite',
-        'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
-        'reveal': 'reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'pulse-glow': 'pulse-glow 8s ease-in-out infinite',
       }
     },
   },

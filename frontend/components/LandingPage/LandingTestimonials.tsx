@@ -1,136 +1,98 @@
 import React from 'react';
-import { Quote } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { IconQuote, IconCircleCheck } from '@tabler/icons-react';
 
 const TESTIMONIALS = [
   {
-    quote:
-      '"The level of precision Presently provides has completely transformed our faculty oversight. It\'s not just a tool; it\'s an editorial standard for data."',
-    name: 'Dr. Alistair Thorne',
-    role: 'Dean of Sciences, Oakhaven',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA9COqM4fJRsMreUnVWeh12TR5PdxZdzG1I9fC6lFkKmkjk5_VCGgj2TzHp2Iazhal4OWk9nKEpCPLlrE-2rh_hW_a3uJgTpQrQSxu2w8K6FZmDQfj56CAYV8oJajR1hehYzwyhkLTxXQN5mrPfv27TeJfeq1sRoU4RdpmL_qO-91MfxFC_koJNIamvXbkodHlBGL8DCKouB9PHtB2_wPZrTbHEsBtKOJLAqMaRMWB0GQz0CvOn5ozoEzfPfGLw-n-GWXLC-4mKSdo',
+    quote: "Presently transformed our NUC accreditation from a manual nightmare into a gold standard of automated integrity.",
+    name: "Prof. Ifeanyi K.",
+    role: "Deputy vice chancellor",
+    institution: "Federal University of Technology",
+    img: "https://i.pravatar.cc/200?img=11",
   },
   {
-    quote:
-      '"Finally, a system that respects the sophistication of modern administrative needs. The real-time visual analytics are simply unparalleled."',
-    name: 'Marcus Vane',
-    role: "Registrar, St. Jude's",
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDto_i1wsGaAj6EdsEnBX_Kmgk-ZpJ7jv3fAkqmPvruCetikQTfZXaNtvX5YCvb4ukLcoW2xLjWarhnVBsXTaNAF1zLGHvlyXVnOwKHLp0USyjJtKm-NCPjZ9ShyUxTD16La9m5xD4pqS_oNM7iJ8ro8jGVXx6UbdvtaGsPATON6bLgbQ9oh09apBYh0nNK_EBtVap8YahyY-0XFMUw0Wa9vuSt5JsrawEp3e0Oej_QCwJG7YBuOemCGR7K5RhhEYtpnMYn2mIq-0g',
+    quote: "The proxy attendance problem vanished overnight. Lecturers have reclaimed nearly 20% of their contact hours.",
+    name: "Dr. Amaka O.",
+    role: "Dean of science",
+    institution: "University of Lagos",
+    img: "https://i.pravatar.cc/200?img=32",
   },
   {
-    quote:
-      '"Integration was seamless. Our staff loves the mobile app companion, and the accuracy of the biometric sync is truly world-class."',
-    name: 'Sarah Jenkins',
-    role: 'COO, Global Academy',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAj4c7d2--Y4NdiBDRXmMLJSwdxbKvJwC-eYht_x_5GUncR_KcPnLyKHyMq2aaQzVHyH05UIWPQpntoQcmJbsOU3TXHQsHwL7Jkm5yOVjvzwfjbmsMPg_T0AY3MRiD0yM_UM3SDMeYVzuDx3xEofVj91Bj2TMa1f88ub8nfoSE5D8vI_9GL6Gk5m1m1fcJPVuO3dHZCyfGJy8mXw-O98XWWPrfrB_X-cke8AY_MkX6SWjSoHUrnbFG-6ad0oBypOTx9oNbtVJplh5s',
+    quote: "As an administrator, having cryptographically signed attendance records gives us absolute confidence during audits.",
+    name: "Musa Ibrahim",
+    role: "Registrar",
+    institution: "Ahmadu Bello University",
+    img: "https://i.pravatar.cc/200?img=53",
   },
 ];
 
 export const LandingTestimonials: React.FC = () => {
   return (
-    <section style={{ background: 'var(--surface)', padding: '8rem 2rem' }}>
-      <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-        <div className="fade-up" style={{ textAlign: 'center', marginBottom: '5rem' }}>
-          <span
-            style={{
-              display: 'block',
-              color: 'var(--primary)',
-              fontWeight: 700,
-              fontSize: '0.7rem',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              marginBottom: '1rem',
-            }}
-          >
-            Institutional Trust
-          </span>
-          <h2
-            className="font-headline"
-            style={{
-              fontSize: 'clamp(2rem,4vw,3.25rem)',
-              fontWeight: 700,
-              letterSpacing: '-0.03em',
-              color: 'var(--on-surface)',
-            }}
-          >
-            Trusted by Leading Institutions
-          </h2>
+    <section className="py-40 bg-[#FDF9F0] relative overflow-hidden">
+      {/* Background Accent */}
+      <div className="orb w-[800px] h-[800px] bg-sungold/5 bottom-0 right-0" />
+
+      <div className="max-w-[1440px] mx-auto px-8 md:px-16 relative z-10">
+
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-16 mb-24">
+          <div className="max-w-4xl">
+            <motion.div
+               initial={{ opacity: 0, x: -20 }}
+               whileInView={{ opacity: 1, x: 0 }}
+               className="flex items-center gap-4 mb-8"
+            >
+               <div className="w-10 h-px bg-sungold" />
+               <span className="text-sungold font-medium text-[11px] tracking-tight">Voices of authority</span>
+            </motion.div>
+            <h2 className="text-[clamp(2.5rem,5vw,5rem)] tracking-[-0.04em] text-neutral-900 leading-[0.9] font-medium">
+              Validated by<br />
+              <span className="text-neutral-400 italic ">academic leadership.</span>
+            </h2>
+          </div>
+          <p className="text-xl text-neutral-500 max-w-md leading-relaxed  lg:mb-4">
+            Institutional integrity is the core of our mission. Read how Presently is reshaping Nigerian academia.
+          </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '2rem',
-          }}
-        >
-          {TESTIMONIALS.map(({ quote, name, role, img }) => (
-            <div
-              key={name}
-              className="fade-up testimonial-card editorial-shadow"
-              style={{
-                background: 'var(--surface-container-low)',
-                padding: '2.5rem',
-                borderRadius: '1.5rem',
-                border: '1px solid rgba(210,197,171,0.12)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '2.5rem',
-              }}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {TESTIMONIALS.map((t, i) => (
+            <motion.div
+              key={t.name}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: i * 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-white p-12 rounded-[2.5rem] border border-black/5 flex flex-col justify-between group hover:border-sungold/40 transition-all duration-700 hover:shadow-2xl relative overflow-hidden"
             >
-              <div>
-                <div style={{ marginBottom: '2rem' }}>
-                  <Quote size={36} color="#ffca0d" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-sungold/10 flex items-center justify-center mb-10">
+                   <IconQuote size={28} className="text-sungold fill-sungold" />
                 </div>
-                <p
-                  style={{
-                    fontSize: '1.05rem',
-                    color: 'var(--on-surface)',
-                    lineHeight: 1.7,
-                    fontStyle: 'italic',
-                    fontWeight: 500,
-                  }}
-                >
-                  {quote}
+                <p className="text-xl font-medium text-neutral-900 leading-relaxed italic mb-12">
+                  "{t.quote}"
                 </p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <img
-                  src={img}
-                  alt={name}
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    filter: 'grayscale(1)',
-                    transition: 'filter 0.5s',
-                  }}
-                  onMouseEnter={(e) => ((e.target as HTMLImageElement).style.filter = 'grayscale(0)')}
-                  onMouseLeave={(e) => ((e.target as HTMLImageElement).style.filter = 'grayscale(1)')}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
+
+              <div className="flex items-center gap-5 relative z-10">
+                <div className="w-16 h-16 rounded-[1.5rem] border-2 border-neutral-100 overflow-hidden">
+                  <img src={t.img} alt={t.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                </div>
                 <div>
-                  <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--on-surface)' }}>
-                    {name}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: '0.7rem',
-                      color: 'var(--secondary)',
-                      fontWeight: 600,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {role}
+                  <h4 className="font-medium text-lg text-neutral-900 tracking-tight mb-0.5">{t.name}</h4>
+                  <p className="text-[11px] font-medium text-sungold tracking-tight mb-0.5">{t.role}</p>
+                  <p className="text-[11px] font-medium text-neutral-400 tracking-tight flex items-center gap-1.5">
+                     <IconCircleCheck size={14} className="text-green-500" /> {t.institution}
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
+        </div>
+
+        <div className="mt-32 pt-16 border-t border-black/5 flex flex-wrap justify-center items-center gap-16 opacity-30 grayscale contrast-125">
+           {['Fut minna', 'Unilag', 'Abu zaria', 'Ui ibadan', 'Oau ife'].map(uni => (
+             <span key={uni} className="font-medium text-xl tracking-tighter text-neutral-400">{uni}</span>
+           ))}
         </div>
       </div>
     </section>
