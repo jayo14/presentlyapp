@@ -1,255 +1,170 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion';
+import React, { useRef, useEffect, useState } from 'react';
+import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import {
-  ArrowUpRight,
-  CaretRight,
-  Play,
-  MapPin,
-  CheckCircle,
-  PaperPlaneTilt,
-  WifiSlash,
-  User,
-  ChalkboardSimple,
-  Building,
-  Plus,
-  Minus,
-  List,
-  X,
-  WifiHigh,
-  ShieldCheck,
-  CreditCard,
-  Clock,
-  Users,
-  Prohibit,
-} from '@phosphor-icons/react';
-import { Logo } from "./Logo";
-import { ThemeToggle } from './ThemeToggle';
+  IconWifi,
+  IconShieldCheck,
+  IconCreditCard,
+  IconClock,
+  IconUsers,
+  IconBan,
+  IconPlus,
+  IconMinus,
+} from '@tabler/icons-react';
 import { Navbar } from "./LandingPage/Navbar";
 import { Hero } from "./LandingPage/LandingHero";
-import { RoleBasedSection } from "./LandingPage/RoleBasedSection";
+import { LandingBento } from "./LandingPage/LandingBento";
 import { LandingMobileApp } from "./LandingPage/LandingMobileApp";
+import { LandingEngineRoom } from "./LandingPage/LandingEngineRoom";
+import { RoleBasedSection } from "./LandingPage/RoleBasedSection";
+import { LandingTestimonials } from "./LandingPage/LandingTestimonials";
 import { CTASection } from "./LandingPage/LandingCTA";
+import { Footer } from "./LandingPage/LandingFooter";
+import { StatCounter as AnimatedStat } from "./LandingPage/StatCounter";
 
-// --- Constants ---
-const SUNGOLD = "#F5C518";
-
-const StatCounter = ({ value, label }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (isInView) {
-      let start = 0;
-      const end = parseFloat(value);
-      const duration = 2000;
-      let timer = setInterval(() => {
-        start += end / (duration / 16);
-        if (start >= end) {
-          setCount(value);
-          clearInterval(timer);
-        } else {
-          setCount(start.toFixed(value.includes('.') ? 1 : 0));
-        }
-      }, 16);
-    }
-  }, [isInView, value]);
+const StatCounterWrapper = ({ value, label }: { value: string, label: string }) => {
+  // Parse numeric value and suffix
+  const numericValue = parseFloat(value.replace(/[^0-9.]/g, ''));
+  const suffix = value.replace(/[0-9.]/g, '');
+  const decimals = value.includes('.') ? value.split('.')[1].replace(/[^0-9]/g, '').length : 0;
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="text-center py-12 md:py-0 px-8"
-    >
-      <div className="text-5xl md:text-7xl text-primary font-black tracking-tighter mb-6">{count}</div>
-      <div className="text-textMuted font-bold text-base uppercase tracking-widest leading-relaxed">{label}</div>
-    </motion.div>
+    <div className="text-center">
+      <p className="text-5xl md:text-6xl font-medium text-neutral-900 tracking-tighter mb-4">
+        <AnimatedStat value={numericValue} suffix={suffix} decimals={decimals} />
+      </p>
+      <p className="text-[11px] font-medium tracking-tight text-neutral-400">{label}</p>
+    </div>
   );
 };
 
-const AccordionItem = ({ question, answer, icon: Icon }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const AccordionItem = ({ question, answer, icon: Icon }: { question: string, answer: string, icon: any }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
   return (
-    <div className="border-b border-outline last:border-0 py-10">
+    <div className="border-b border-black/5 last:border-0 py-10">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left group gap-6"
       >
         <div className="flex items-center gap-6 flex-1">
           {Icon && (
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-              <Icon size={28} weight="duotone" className="text-primary" />
+            <div className="w-14 h-14 rounded-2xl bg-neutral-50 border border-black/5 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-sm">
+              <Icon size={24} className="text-sungold" />
             </div>
           )}
-          <span className="text-xl md:text-2xl font-black text-on-surface group-hover:text-primary transition-colors leading-relaxed tracking-tight">{question}</span>
+          <span className="text-xl md:text-2xl font-medium text-neutral-900 group-hover:text-sungold transition-colors tracking-tight">{question}</span>
         </div>
-        <div className="w-12 h-12 rounded-full flex items-center justify-center text-primary flex-shrink-0 bg-surface border border-outline/50 shadow-sm">
-          {isOpen ? <Minus size={24} weight="bold" /> : <Plus size={24} weight="bold" />}
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sungold flex-shrink-0 bg-white border border-black/10 shadow-sm transition-transform duration-300" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+          {isOpen ? <IconMinus size={20} /> : <IconPlus size={20} />}
         </div>
       </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <p className="pt-8 text-textMuted leading-relaxed max-w-3xl text-lg md:text-xl font-medium">{answer}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <motion.div
+        initial={false}
+        animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+        className="overflow-hidden"
+      >
+        <p className="pt-8 text-neutral-500 leading-relaxed max-w-4xl text-lg ">{answer}</p>
+      </motion.div>
     </div>
   );
 };
 
 const SocialMarquee = () => (
-  <div className="bg-surface/30 border-y border-outline/10 py-16 overflow-hidden flex whitespace-nowrap">
+  <div className="bg-white border-y border-black/5 py-16 overflow-hidden flex whitespace-nowrap">
     <motion.div
-      initial={{ x: 0 }}
       animate={{ x: "-50%" }}
-      transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-      className="flex items-center gap-24 px-12"
+      transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+      className="flex items-center gap-32 px-16"
     >
-      {[1, 2].map(i => (
+      {[1, 2, 3].map(i => (
         <React.Fragment key={i}>
-          <span className="text-on-surface/50 font-bold text-lg italic tracking-tight leading-relaxed">"Finally, no more roll calls"</span>
-          <div className="w-2 h-2 rounded-full bg-primary/40" />
-          <span className="text-on-surface font-black text-lg tracking-widest leading-relaxed uppercase">500+ STUDENTS ENROLLED</span>
-          <div className="w-2 h-2 rounded-full bg-primary/40" />
-          <span className="text-on-surface/50 font-bold text-lg italic tracking-tight leading-relaxed">"One click register export"</span>
-          <div className="w-2 h-2 rounded-full bg-primary/40" />
-          <span className="text-on-surface font-black text-lg tracking-widest leading-relaxed uppercase">GPS VERIFIED · ALWAYS ACCURATE</span>
-          <div className="w-2 h-2 rounded-full bg-primary/40" />
+          <span className="text-neutral-400 font-medium text-lg italic tracking-tight">"The NUC audit was a breeze with presently reports."</span>
+          <div className="w-2 h-2 rounded-full bg-sungold/30" />
+          <span className="text-neutral-500 font-medium text-lg tracking-tight">ISO 27001 certified data storage</span>
+          <div className="w-2 h-2 rounded-full bg-sungold/30" />
+          <span className="text-neutral-400 font-medium text-lg italic tracking-tight">"Proxy attendance dropped to zero in our faculty."</span>
+          <div className="w-2 h-2 rounded-full bg-sungold/30" />
+          <span className="text-neutral-500 font-medium text-lg tracking-tight">Trusted by 14+ federal institutions</span>
+          <div className="w-2 h-2 rounded-full bg-sungold/30" />
         </React.Fragment>
       ))}
     </motion.div>
   </div>
 );
 
-const Footer = () => (
-  <footer className="bg-surface/50 pt-40 pb-20 px-8 text-textMuted border-t border-outline/10">
-    <div className="max-w-[80%] mx-auto w-[85%] grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
-      <div className="col-span-1 md:col-span-1">
-        <div className="flex items-center gap-3 mb-10">
-          <Logo className="scale-125" />
-        </div>
-        <p className="text-sm leading-relaxed mb-8 text-textMuted/80 max-w-xs font-medium">The next generation of academic management. Built for the modern university with GPS-precision.</p>
-      </div>
-
-      <div>
-        <h4 className="font-headline text-on-surface font-black mb-10 tracking-tight uppercase text-xs">Product</h4>
-        <ul className="space-y-6 text-sm font-bold">
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">How it Works</a></li>
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Pricing</a></li>
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Student Guide</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 className="font-headline text-on-surface font-black mb-10 tracking-tight uppercase text-xs">Company</h4>
-        <ul className="space-y-6 text-sm font-bold">
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">About Us</a></li>
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Contact</a></li>
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Careers</a></li>
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Blog</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 className="font-headline text-on-surface font-black mb-10 tracking-tight uppercase text-xs">Legal</h4>
-        <ul className="space-y-6 text-sm font-bold">
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Privacy Policy</a></li>
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Terms of Service</a></li>
-          <li><a href="#" className="hover:text-primary transition-colors leading-relaxed py-1 block">Cookie Policy</a></li>
-        </ul>
-      </div>
-    </div>
-    <div className="max-w-[80%] w-[95%] mx-auto pt-16 border-t border-outline/5 flex flex-col md:flex-row justify-between items-center gap-10 text-[10px] tracking-[0.3em] uppercase font-black text-textMuted/40">
-      <p>© 2025 Presently. <span className="text-primary/60">GPS-VERIFIED ATTENDANCE.</span></p>
-      <div className="mt-4 md:mt-0">
-        <ThemeToggle />
-      </div>
-    </div>
-  </footer>
-);
-
-export default function App() {
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background selection:bg-primary selection:text-on-primary-fixed font-sans text-text landing-page">
-
+    <div className="min-h-screen bg-[#FDF9F0] selection:bg-sungold/30 selection:text-neutral-900 font-sans text-neutral-900 landing-page overflow-x-hidden">
       <Navbar />
       <Hero />
       <SocialMarquee />
 
-      <section className="bg-surface/20 py-56">
-        <div className="border-y border-outline/5 py-24 bg-surface/30 backdrop-blur-sm">
-          <div className='grid grid-cols-1 md:grid-cols-4 gap-20 max-w-[80%] mx-auto'>
-            <StatCounter value="200+" label="Students Enrolled" />
-            <StatCounter value="94.7%" label="Avg Attendance Rate" />
-            <StatCounter value="3" label="Sec Check-in Time" />
-            <StatCounter value="1" label="University & Growing" />
+      <section className="bg-white py-40 relative overflow-hidden">
+        {/* Background Accent */}
+        <div className="orb w-[800px] h-[800px] bg-sungold/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+
+        <div className="max-w-[1440px] mx-auto px-8 md:px-16 relative z-10">
+          <div className='grid grid-cols-1 md:grid-cols-4 gap-16 py-24 border-y border-black/5'>
+            <StatCounterWrapper value="14+" label="Federal institutions" />
+            <StatCounterWrapper value="99.9%" label="Security fidelity" />
+            <StatCounterWrapper value="3.2s" label="Avg. latency" />
+            <StatCounterWrapper value="500k+" label="Daily verified check-ins" />
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-5xl mx-auto text-center mt-40"
+          >
+            <p className="text-[clamp(2rem,4vw,3.5rem)] text-neutral-900 font-medium tracking-tight leading-tight mb-12">
+              "Presently transformed our NUC accreditation process from a <span className="italic  text-neutral-400">manual nightmare</span> into an automated gold standard."
+            </p>
+            <div className="flex items-center justify-center gap-6">
+               <div className="w-12 h-px bg-black/5" />
+               <p className="text-neutral-500 font-medium tracking-tight text-sm">Prof. Ifeanyi · Deputy vice chancellor</p>
+               <div className="w-12 h-px bg-black/5" />
+            </div>
+          </motion.div>
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-5xl mx-auto text-center mt-48 px-8"
-        >
-          <p className="font-headline text-4xl md:text-6xl text-on-surface font-black tracking-tighter leading-[1.1] mb-12">
-            "Presently didn't just fix attendance tracking. It changed how we think about <span className="text-primary italic">accountability.</span>"
-          </p>
-          <div className="flex items-center justify-center gap-4">
-             <div className="w-12 h-px bg-outline" />
-             <p className="text-textMuted font-black uppercase tracking-[0.3em] text-sm leading-relaxed">Dr. Emmanuel · Vice Chancellor</p>
-             <div className="w-12 h-px bg-outline" />
-          </div>
-        </motion.div>
       </section>
 
+      <LandingBento />
+      <LandingEngineRoom />
       <RoleBasedSection />
       <LandingMobileApp />
+      <LandingTestimonials />
 
-      <section className="py-64 bg-surface/10">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="mb-40">
-            <span className="text-primary text-xs font-black tracking-[0.4em] uppercase mb-8 block leading-relaxed">FAQ</span>
-            <h2 className="font-headline text-6xl md:text-8xl tracking-tighter text-on-surface leading-[0.9] font-black">Questions you'll have.<br />Answered already.</h2>
+      <section className="py-40 bg-[#FDF9F0]">
+        <div className="max-w-7xl mx-auto px-8 md:px-16">
+          <div className="mb-32">
+            <span className="text-sungold text-[11px] font-medium tracking-tight mb-8 block">Executive FAQ</span>
+            <h2 className="text-[clamp(3rem,6vw,5.5rem)] tracking-[-0.04em] text-neutral-900 leading-[0.9] font-medium">Institutional<br />questions.</h2>
           </div>
-          <div className="space-y-4">
+          <div className="max-w-4xl">
             <AccordionItem
-              icon={WifiHigh}
-              question="Does it work without internet?"
-              answer="Yes! Our offline mode allows students to check in even in dead zones. The record is timestamped locally and synced the moment a connection is re-established."
+              icon={IconShieldCheck}
+              question="How does this align with NUC minimum standards?"
+              answer="Presently is built around the BMAS/CCMAS requirements. It enforces the 75% attendance rule automatically, generating verified eligibility reports that satisfy NUC quality assurance audits without manual intervention."
             />
             <AccordionItem
-              icon={ShieldCheck}
-              question="Can students spoof their GPS location?"
-              answer="Negative. We use high-precision triangulation combining GPS, Wi-Fi hotspots, and cellular towers. Attempts to use VPNs or mock locations are flagged immediately."
+              icon={IconWifi}
+              question="Does it function in low-connectivity zones?"
+              answer="Our 'Sovereign sync' technology allows students to check-in offline. The record is cryptographically signed and timestamped on-device, then synchronized once a secure connection is established."
             />
             <AccordionItem
-              icon={CreditCard}
-              question="Does my school need to pay for students?"
-              answer="Presently is built to be accessible. We have tailored plans for institutions that cover all students, or standalone lecturer plans for smaller groups."
+              icon={IconUsers}
+              question="Can it handle 10,000+ students simultaneously?"
+              answer="Our distributed edge architecture is tested for massive concurrency. Whether it's a 50-person seminar or a 5,000-seat lecture theatre, check-ins remain under 4 seconds per student."
             />
             <AccordionItem
-              icon={Clock}
-              question="How long does a check-in typically take?"
-              answer="Check-ins are lightning fast—usually under 3 seconds. Our GPS verification and location triangulation happen in the background, so students just tap and go."
+              icon={IconClock}
+              question="What is the implementation timeline?"
+              answer="A typical institutional rollout takes 14-21 days. This includes data migration, lecturer training, and GPS mapping of all physical venues across the campus."
             />
             <AccordionItem
-              icon={Users}
-              question="Can multiple students check in from the same location?"
-              answer="Absolutely! Presently supports multiple simultaneous check-ins from the same venue. Each student's location and identity are verified independently and securely."
-            />
-            <AccordionItem
-              icon={Prohibit}
-              question="What happens if a student is marked absent by mistake?"
-              answer="Our support team can review and adjust attendance records within 48 hours. We keep detailed logs of all check-in attempts so discrepancies are easily identified and resolved."
+              icon={IconBan}
+              question="How do you handle proxy attendance?"
+              answer="We use high-fidelity triangulation. By correlating GPS data with Wi-Fi signal signatures and hardware-bound device ids, we make it virtually impossible for one student to check-in for another from a remote location."
             />
           </div>
         </div>
@@ -260,4 +175,3 @@ export default function App() {
     </div>
   );
 }
-

@@ -1,323 +1,177 @@
-import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Zap } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { IconCpu, IconShieldCheck, IconMapPin, IconShare, IconFingerprint, IconSettings, IconCircleCheck } from '@tabler/icons-react';
 
-const PERFORMANCE_AVATARS = [
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuA69CK06yBXhX-9zvZDOSe-r9kxYPijksP_9HwS946RH-VFtx20ZuslvOrjUpvVXTUb4TBEu14SAqBnS37z7Y7aJT4Rn5Uml39f9IVcmJ-MmAO-sAhWKvkJfv4ftJ6hkQjwdPqNj4qM7WmdWz5HAwOWAZKPIl9jRad6tQDZ3UstJ5S2W63IlaPEeqUFQvKrUApF9rYtFIO0f0sl1oTM2xDrvPQfS3s9FXAsDTzeIyyDpALwxrWKvV2129ttVKYPOzb1s1fur6bAY10',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuCju0PTXJpKR8npJOvITxZcT7JKcQq5nBWe94L3MOfqpcd_7ElhHE1JTBoagdsd7Wp68asXcN0c_A3cy6qo_Ngb4832OC7EpE_YAToOF5vWjdCMpmDslOwI1EP4fQAob6PGfl-v6-0SvTYDYcc_5rxrWPrlYQwI8xUmY_VjkIg0jVSkkxnJFrZZwmHYBVnkbDPFCU4Xiid6J7MNsI3EnEmTB9F0sZWBF-PuQJcxBJS60WrBLvBYT6ELVJiV-TP5rbqbMzz7z1AidCQ',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuCLS-w3Q67dG_LhvX6Kk69SdgRSLSH_r0OExsM_PkKYYsKEpJXXybMuEih5fQZ6ihDMKzjPNi-c3h2UdhE1DSEhimKtiEaxolywmTUD3WZsHxANqxTZEQ0aBql8Ay9WcZvGiwNe9rAH_WOGSBkqoiq-_TOEegNDuEKFK5lkf6Crzqs5JcO6YkUXRdKE5lxLZ1NLHAnubC-3rdAHb1vBe7PjyglTGHLsFmApOXosApB0dFrqi4UdgDbgEmGEm5PNxCGbHVdrAjLgvio',
+const STAGES = [
+  {
+    id: 'gps',
+    title: 'Precision lock',
+    desc: 'Multi-source GPS & Wi-Fi triangulation verifies the student is physically within the lecture hall boundary.',
+    icon: IconMapPin,
+    color: '#F9C406'
+  },
+  {
+    id: 'bio',
+    title: 'Biometric handshake',
+    desc: 'On-device hardware-backed authentication ensures the identity of the student is immutable.',
+    icon: IconFingerprint,
+    color: '#22C55E'
+  },
+  {
+    id: 'sync',
+    title: 'Sovereign sync',
+    desc: 'Records are cryptographically signed and synchronized with the institutional data lake.',
+    icon: IconShare,
+    color: '#3B82F6'
+  }
 ];
 
 export const LandingEngineRoom: React.FC = () => {
+  const [activeStage, setActiveStage] = useState(0);
+
   return (
-    <section
-      id="resources"
-      style={{
-        padding: '8rem 2rem',
-        maxWidth: 1440,
-        margin: '0 auto',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          gap: '5rem',
-        }}
-      >
-        {/* Copy */}
-        <div style={{ flex: '1 1 400px' }}>
-          <h2
-            className="font-headline fade-up"
-            style={{
-              fontSize: 'clamp(2.25rem,5vw,4rem)',
-              fontWeight: 800,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.1,
-              color: 'var(--on-surface)',
-              marginBottom: '3rem',
-            }}
+    <section id="governance" className="py-40 bg-white relative overflow-hidden">
+      {/* Background Accent */}
+      <div className="orb w-[1000px] h-[1000px] bg-sungold/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+
+      <div className="max-w-[1440px] mx-auto px-8 md:px-16 grid lg:grid-cols-2 gap-24 items-center relative z-10">
+
+        {/* Content Side */}
+        <div>
+          <motion.div
+             initial={{ opacity: 0, x: -20 }}
+             whileInView={{ opacity: 1, x: 0 }}
+             className="flex items-center gap-4 mb-8"
           >
-            The Engine Room of{' '}
-            <span style={{ color: 'var(--primary)' }}>Engagement.</span>
+             <div className="w-10 h-px bg-sungold" />
+             <span className="text-sungold font-medium text-[11px] tracking-tight">The verification protocol</span>
+          </motion.div>
+
+          <h2 className="text-[clamp(2.5rem,4vw,4.5rem)] tracking-[-0.04em] text-neutral-900 leading-[0.9] font-medium mb-12">
+            Zero-trust<br />
+            <span className="text-neutral-400 italic ">architecture.</span>
           </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-            {[
-              {
-                num: '01',
-                title: 'Intelligent Scheduling',
-                desc: 'Our engine predicts attendance trends based on historical data, allowing you to optimize staff allocation.',
-              },
-              {
-                num: '02',
-                title: 'Automated Compliance',
-                desc: 'Stay audit-ready with automated reporting that meets the highest regulatory standards.',
-              },
-            ].map(({ num, title, desc }) => (
-              <div
-                key={num}
-                className="fade-up"
-                style={{ display: 'flex', gap: '1.5rem' }}
+
+          <div className="space-y-6 mb-16">
+            {STAGES.map((stage, i) => (
+              <button
+                key={stage.id}
+                onClick={() => setActiveStage(i)}
+                className={`w-full flex gap-8 p-8 rounded-[2rem] border transition-all duration-700 text-left group ${
+                  activeStage === i
+                    ? 'bg-neutral-50 border-black/5 shadow-xl scale-[1.02]'
+                    : 'bg-transparent border-transparent opacity-40 hover:opacity-100'
+                }`}
               >
-                <div
-                  style={{
-                    flexShrink: 0,
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    background: 'var(--surface-container-high)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <span
-                    className="font-headline"
-                    style={{ fontWeight: 700, color: 'var(--primary)' }}
-                  >
-                    {num}
-                  </span>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-700 ${
+                  activeStage === i ? 'bg-sungold text-neutral-900 shadow-lg shadow-sungold/20' : 'bg-neutral-100 text-neutral-400'
+                }`}>
+                  <stage.icon size={28} />
                 </div>
                 <div>
-                  <h4
-                    className="font-headline"
-                    style={{
-                      fontSize: '1.1rem',
-                      fontWeight: 700,
-                      marginBottom: '0.5rem',
-                      color: 'var(--on-surface)',
-                    }}
-                  >
-                    {title}
+                  <h4 className={`text-xl font-medium mb-2 tracking-tight ${activeStage === i ? 'text-neutral-900' : 'text-neutral-500'}`}>
+                    {stage.title}
                   </h4>
-                  <p style={{ color: 'var(--on-surface-variant)', lineHeight: 1.65 }}>
-                    {desc}
+                  <p className="text-neutral-500 leading-relaxed  text-base max-w-sm">
+                    {stage.desc}
                   </p>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Chart card */}
-        <div style={{ flex: '1 1 400px', position: 'relative' }}>
-          <div
-            className="fade-up"
-            style={{
-              background: 'var(--surface-container-low)',
-              borderRadius: '3rem',
-              padding: '3rem',
-              border: '1px solid rgba(210,197,171,0.12)',
-            }}
+        {/* Interactive Visual Side */}
+        <div className="relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-neutral-50 rounded-[3rem] p-12 border border-black/5 shadow-2xl relative overflow-hidden aspect-square flex items-center justify-center"
           >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '2.5rem',
-              }}
-            >
-              <div>
-                <h5
-                  className="font-headline"
-                  style={{
-                    fontSize: '1.5rem',
-                    fontWeight: 900,
-                    color: 'var(--on-surface)',
-                  }}
-                >
-                  Daily Volume
-                </h5>
-                <p style={{ fontSize: '0.875rem', color: 'var(--secondary)' }}>
-                  Week 42 · Faculty of Science
-                </p>
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                {[
-                  {
-                    label: 'LIVE',
-                    bg: 'var(--primary-container)',
-                    color: 'var(--on-primary-fixed)',
-                  },
-                  {
-                    label: 'REPORT',
-                    bg: 'var(--surface-container-highest)',
-                    color: 'var(--on-surface)',
-                  },
-                ].map(({ label, bg, color }) => (
-                  <Badge
-                    key={label}
-                    style={{
-                      background: bg,
-                      color,
-                      fontSize: '0.65rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      borderRadius: 999,
-                    }}
-                  >
-                    {label}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div
-              style={{
-                position: 'relative',
-                height: 224,
-                display: 'flex',
-                alignItems: 'flex-end',
-                gap: '0.75rem',
-              }}
-            >
-              {[30, 50, 80, 60, 40, 70].map((h, i) => (
-                <div
-                  key={i}
-                  style={{
-                    flex: 1,
-                    height: `${h}%`,
-                    background: 'var(--surface-container-high)',
-                    borderRadius: '0.75rem',
-                    position: 'relative',
-                    overflow: 'visible',
-                  }}
-                >
-                  <div
-                    className="bar-animate"
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: i === 2 ? '100%' : '72%',
-                      background: i === 2 ? 'var(--primary-container)' : 'var(--primary)',
-                      borderRadius: '0.75rem',
-                    }}
-                  />
-                  {i === 2 && (
-                    <span
-                      style={{
-                        position: 'absolute',
-                        top: -28,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        fontSize: '0.65rem',
-                        fontWeight: 900,
-                        color: 'var(--primary)',
-                        letterSpacing: '0.1em',
-                      }}
-                    >
-                      PEAK
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginTop: '1.5rem',
-              }}
-            >
-              {['08:00', '12:00', '16:00', '20:00'].map((t) => (
-                <span
-                  key={t}
-                  style={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    color: 'var(--secondary)',
-                    opacity: 0.5,
-                  }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
+            <AnimatePresence mode="wait">
+               <motion.div
+                 key={activeStage}
+                 initial={{ opacity: 0, scale: 0.8 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 1.1 }}
+                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                 className="relative z-10 w-full flex flex-col items-center"
+               >
+                  <div className="relative w-64 h-64 flex items-center justify-center">
+                     {/* Concentric Pulse Rings */}
+                     {[1, 0.7, 0.4].map((s, i) => (
+                       <motion.div
+                         key={i}
+                         initial={{ scale: 0.5, opacity: 0 }}
+                         animate={{
+                           scale: [s, s * 1.6],
+                           opacity: [0.1, 0]
+                         }}
+                         transition={{
+                           duration: 4,
+                           repeat: Infinity,
+                           delay: i * 0.8,
+                           ease: "easeOut"
+                         }}
+                         className="absolute inset-0 border-[2px] border-sungold rounded-full"
+                       />
+                     ))}
 
-          {/* Floating performance card */}
-          <div
-            className="glass-panel editorial-shadow mobile-hide"
-            style={{
-              position: 'absolute',
-              bottom: -32,
-              right: -24,
-              padding: '2rem',
-              borderRadius: '1.5rem',
-              border: '1px solid rgba(210,197,171,0.2)',
-              maxWidth: 280,
-              zIndex: 2,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1rem',
-              }}
+                     <div className="relative w-40 h-40 rounded-[2.5rem] bg-white border border-black/5 flex items-center justify-center shadow-2xl">
+                        <motion.div
+                          animate={{ rotate: [0, 5, 0, -5, 0] }}
+                          transition={{ duration: 4, repeat: Infinity }}
+                        >
+                          {React.createElement(STAGES[activeStage].icon, {
+                            size: 80,
+                            className: "text-sungold"
+                          })}
+                        </motion.div>
+                     </div>
+                  </div>
+
+                  <div className="mt-16 text-center">
+                     <p className="text-[11px] font-medium tracking-tight text-sungold mb-3">Protocol active</p>
+                     <h3 className="text-3xl font-medium text-neutral-900 tracking-tight">
+                        {STAGES[activeStage].title}
+                     </h3>
+                     <div className="mt-8 flex items-center justify-center gap-3 py-3 px-6 bg-white rounded-full border border-black/5 shadow-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-xs font-medium tracking-tight text-neutral-500">Verified verification</span>
+                     </div>
+                  </div>
+               </motion.div>
+            </AnimatePresence>
+
+            {/* Floating Telemetry - Glass Effect */}
+            <motion.div
+               animate={{ y: [0, -10, 0] }}
+               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+               className="absolute top-10 right-10 glass p-5 rounded-2xl shadow-xl z-20"
             >
-              <Zap size={20} color="#755b00" />
-              <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>
-                System Performance
-              </span>
-            </div>
-            <p
-              style={{
-                fontSize: '0.78rem',
-                color: 'var(--on-surface-variant)',
-                lineHeight: 1.6,
-                marginBottom: '1rem',
-              }}
+               <div className="flex items-center gap-2 mb-1">
+                  <IconCpu size={18} className="text-sungold" />
+                  <span className="font-medium text-[10px] tracking-tight text-neutral-400">Telemetry</span>
+               </div>
+               <p className="text-[12px] font-medium text-neutral-600">14ms response</p>
+            </motion.div>
+
+            <motion.div
+               animate={{ y: [0, 10, 0] }}
+               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+               className="absolute bottom-10 left-10 glass p-5 rounded-2xl shadow-xl z-20"
             >
-              The core engine is currently processing 14k events per
-              second with zero latency degradation.
-            </p>
-            <div style={{ display: 'flex' }}>
-              {PERFORMANCE_AVATARS.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: '2px solid var(--surface)',
-                    marginLeft: i > 0 ? -10 : 0,
-                  }}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.background = '#ccc';
-                  }}
-                />
-              ))}
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  background: 'var(--primary-container)',
-                  border: '2px solid var(--surface)',
-                  marginLeft: -10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.6rem',
-                  fontWeight: 700,
-                  color: 'var(--on-primary-fixed)',
-                }}
-              >
-                +12
-              </div>
-            </div>
-          </div>
+               <div className="flex items-center gap-2 mb-1">
+                  <IconShieldCheck size={18} className="text-green-500" />
+                  <span className="font-medium text-[10px] tracking-tight text-neutral-400">Integrity</span>
+               </div>
+               <p className="text-[12px] font-medium text-neutral-600">AES-256 validated</p>
+            </motion.div>
+          </motion.div>
         </div>
+
       </div>
     </section>
   );
