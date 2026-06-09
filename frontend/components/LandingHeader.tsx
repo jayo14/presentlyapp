@@ -152,8 +152,8 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
             );
           })}
           <div className="h-4 w-px bg-outline/20 mx-1" />
-          <Button variant="ghost" className="text-text hover:text-primary px-3 lg:px-4 text-sm" onClick={handleLogin}>Sign In</Button>
-          <Button className="bg-primary text-on-primary-fixed hover:opacity-90 px-4 lg:px-6 font-bold text-sm transition-opacity" onClick={handleGetStarted}>Get Started</Button>
+          <Button variant="ghost" className="text-text hover:text-primary px-3 lg:px-4 text-sm" onClick={handleLogin}>Sign in</Button>
+          <Button className="bg-primary text-on-primary-fixed hover:opacity-90 px-4 lg:px-6 font-medium text-sm transition-opacity" onClick={handleGetStarted}>Get started</Button>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -198,16 +198,16 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
               <div className="flex flex-col gap-3 sm:gap-4">
                 <Button
                   variant="outline"
-                  className="w-full h-12 sm:h-14 border-outline/20 text-text hover:bg-surfaceHigh text-base font-semibold"
+                  className="w-full h-12 sm:h-14 border-outline/20 text-text hover:bg-surfaceHigh text-base font-medium"
                   onClick={handleLogin}
                 >
-                  Sign In
+                  Sign in
                 </Button>
                 <Button
-                  className="w-full h-12 sm:h-14 bg-primary text-on-primary-fixed font-bold text-base hover:opacity-90 transition-opacity"
+                  className="w-full h-12 sm:h-14 bg-primary text-on-primary-fixed font-medium text-base hover:opacity-90 transition-opacity"
                   onClick={handleGetStarted}
                 >
-                  Get Started
+                  Get started
                 </Button>
               </div>
             </div>

@@ -12,9 +12,9 @@ import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 const SCENE_DURATIONS = [3200, 3200, 3400];
 
 const SCENE_LABELS = [
-  'Scanning QR Code',
-  'Confirming Identity',
-  'Attendance Recorded',
+  'Scanning QR code',
+  'Confirming identity',
+  'Attendance recorded',
 ];
 
 const CONFETTI_COLORS = [
@@ -245,7 +245,7 @@ const Scene3 = memo(({ isActive }) => {
 
       {/* text reveal */}
       <div className={`pi-success-text${isActive ? ' pi-reveal' : ''}`}>
-        <div className="pi-success-title">Attendance Recorded</div>
+        <div className="pi-success-title">Attendance recorded</div>
         <div className="pi-success-sub">
           <div className="pi-sync-dot" aria-hidden="true" />
           Synced to cloud
@@ -483,7 +483,7 @@ const STYLES = `
 /* ── scene label ── */
 .pi-scene-label{
   position:absolute;top:20px;left:50%;transform:translateX(-50%);
-  font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  font-size:9px;font-weight:500;letter-spacing:.16em;;
   color:rgba(255,255,255,.24);z-index:10;white-space:nowrap;
 }
 
@@ -515,7 +515,7 @@ const STYLES = `
 }
 .pi-clay-btn{
   border-radius:20px;border:none;
-  font-family:'DM Sans',sans-serif;font-weight:800;
+  font-family:'DM Sans',sans-serif;font-weight:500;
   cursor:pointer;position:relative;overflow:hidden;
   background:linear-gradient(175deg,#9b88ff 0%,#6c58ff 40%,#4e38e8 100%);
   color:#fff;
@@ -577,8 +577,8 @@ const STYLES = `
   display:flex;align-items:center;justify-content:center;
 }
 .pi-app-name{
-  font-size:7px;font-weight:800;letter-spacing:.2em;
-  color:rgba(255,255,255,.42);text-transform:uppercase;
+  font-size:7px;font-weight:500;letter-spacing:.2em;
+  color:rgba(255,255,255,.42);;
 }
 .pi-screen-body{
   position:absolute;inset:0;
@@ -646,8 +646,8 @@ const STYLES = `
   100%{box-shadow:0 0 0 0 rgba(34,211,165,0)}
 }
 .pi-gps-label{
-  font-size:9px;font-weight:700;color:#22d3a5;
-  letter-spacing:.1em;text-transform:uppercase;opacity:.85;
+  font-size:9px;font-weight:500;color:#22d3a5;
+  letter-spacing:.1em;;opacity:.85;
 }
 
 /* ══════════════════════════
@@ -683,15 +683,15 @@ const STYLES = `
   display:flex;align-items:center;justify-content:center;z-index:3;
 }
 .pi-identity{text-align:center}
-.pi-name{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.015em}
+.pi-name{font-size:15px;font-weight:500;color:#fff;letter-spacing:-.015em}
 .pi-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:6px}
-.pi-tag{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.pi-tag{font-size:9px;font-weight:500;letter-spacing:.08em;;padding:3px 9px;border-radius:20px}
 .pi-tag-violet{background:rgba(124,92,252,.22);color:#c4b2ff;border:1px solid rgba(124,92,252,.28)}
 .pi-tag-green{background:rgba(34,211,165,.16);color:#6effd4;border:1px solid rgba(34,211,165,.22)}
 .pi-sep{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)}
 .pi-row{display:flex;justify-content:space-between;align-items:center;width:100%}
-.pi-rk{font-size:11px;font-weight:600;color:rgba(255,255,255,.32)}
-.pi-rv{font-size:11px;font-weight:700;color:rgba(255,255,255,.82)}
+.pi-rk{font-size:11px;font-weight:500;color:rgba(255,255,255,.32)}
+.pi-rv{font-size:11px;font-weight:500;color:rgba(255,255,255,.82)}
 .pi-rv.pi-green{color:#22d3a5}
 .pi-btn{
   width:100%;padding:15px 0;font-size:13px;letter-spacing:.04em;
@@ -773,11 +773,11 @@ const STYLES = `
   transition:opacity .5s ease .96s,transform .5s ease .96s;
 }
 .pi-success-text.pi-reveal{opacity:1;transform:translateY(0)}
-.pi-success-title{font-size:19px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.pi-success-title{font-size:19px;font-weight:500;color:#fff;letter-spacing:-.02em}
 .pi-success-sub{
   display:flex;align-items:center;gap:5px;
-  font-size:10px;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:#22d3a5;
+  font-size:10px;font-weight:500;letter-spacing:.12em;
+  ;color:#22d3a5;
 }
 .pi-sync-dot{
   width:6px;height:6px;border-radius:50%;background:#22d3a5;
