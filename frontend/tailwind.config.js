@@ -35,6 +35,8 @@ export default {
         error: "var(--error)",
         success: "var(--success)",
         warning: "var(--warning)",
+        info: "#3b82f6",
+        "on-surface": "var(--on-surface)",
       },
       keyframes: {
         'float': {

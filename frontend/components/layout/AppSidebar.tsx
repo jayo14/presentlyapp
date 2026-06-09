@@ -171,10 +171,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </nav>
 
       {/* Sidebar Footer */}
-      <div className="p-4 mt-auto border-t border-outline/5 space-y-2">
+      <div className="p-4 mt-auto border-t border-outline/5 space-y-2" role="region" aria-label="User and settings">
         {/* Theme Toggle */}
         <button
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
           className={cn(
             "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-medium text-textMuted hover:bg-surface-highest/40 hover:text-text transition-all duration-200",
             collapsed ? "justify-center" : "gap-3"
@@ -188,6 +189,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         {installPrompt && !isAppInstalled && (
           <button
             onClick={onInstallClick}
+            aria-label="Install App"
             className={cn(
               "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-bold text-primary hover:bg-primary/5 transition-all duration-200",
               collapsed ? "justify-center" : "gap-3"
@@ -200,10 +202,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         )}
 
         {/* User Card */}
-        <div className={cn(
-          "flex items-center rounded-2xl bg-surface-low border border-outline/5 p-2 transition-all duration-300",
-          collapsed ? "justify-center" : "gap-3"
-        )}>
+        <div
+          className={cn(
+            "flex items-center rounded-2xl bg-surface-low border border-outline/5 p-2 transition-all duration-300",
+            collapsed ? "justify-center" : "gap-3"
+          )}
+          role="region"
+          aria-label="User summary"
+        >
           <div className="w-10 h-10 rounded-xl overflow-hidden bg-surface-highest border border-outline/10 flex-shrink-0 flex items-center justify-center font-bold text-xs text-textMuted">
             {userAvatar ? (
               <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
@@ -220,6 +226,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         {/* Sign Out */}
         <button
           onClick={onLogout}
+          aria-label="Sign out"
           className={cn(
             "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-500/5 transition-all duration-200",
             collapsed ? "justify-center" : "gap-3"
@@ -233,6 +240,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       {/* Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         className="absolute -right-3 top-24 z-40 w-6 h-6 rounded-full bg-surface border border-outline/10 shadow-premium flex items-center justify-center text-textMuted hover:text-primary transition-colors"
       >
         {collapsed ? <CaretRight size={12} weight="bold" /> : <CaretLeft size={12} weight="bold" />}
