@@ -1,5 +1,7 @@
-import { ArrowUpRight, List, X } from "@phosphor-icons/react";
+import { IconArrowUpRight, IconMenu2, IconX } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
+import { Logo } from "../Logo";
+import { cn } from "@/lib/utils";
 
 export const Navbar: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -13,71 +15,85 @@ export const Navbar: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const navLinks = [
+        { label: 'Governance', href: '#governance' },
+        { label: 'Infrastructure', href: '#infrastructure' },
+        { label: 'Pricing', href: '#pricing' },
+        { label: 'Blog', href: '#blog' },
+    ];
+
     return (
         <nav className="fixed mx-auto top-0 w-full z-50 flex justify-center transition-all duration-700 pointer-events-none">
             <div
-                className={`
-          transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-auto
-          flex items-center justify-between px-4
-          ${isScrolled
-                        ? 'mt-6 w-[90%] md:w-[80%] py-4  rounded-full bg-surface border border-outline shadow-[0_10px_30px_rgba(2,6,23,0.35)]'
-                        : 'mt-4 w-full md:w-[90%] py-8 bg-transparent border-transparent'
-                    }
-        `}
+                className={cn(
+                  "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-auto flex items-center justify-between px-8 md:px-12",
+                  isScrolled
+                    ? "mt-6 w-[95%] md:w-[85%] py-4 rounded-full bg-white/70 backdrop-blur-xl border border-black/5 shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
+                    : "mt-0 w-full py-10 bg-transparent border-transparent"
+                )}
             >
-                <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-[200px] h-[80px] pointer-events-none">
-                    <div className="absolute left-2 top-0 w-40 h-40 bg-primary/6 rounded-full blur-3xl" />
-                </div>
-                <div className="flex items-center gap-3 group cursor-pointer ml-2">
-                    <img src="/logo.png" alt="Logo" className="w-32" />
-                    <span className="text-xl font-black tracking-tight text-on-surface">
-                        Presently
-                    </span>
+                <div className="flex items-center gap-4 group cursor-pointer">
+                    <Logo className="scale-110" />
                 </div>
 
-                <div className={`hidden md:flex items-center gap-10 font-semibold transition-all duration-500 ${isScrolled ? 'opacity-90 scale-95' : 'opacity-100 scale-100'}`}>
-                    {['How it Works', 'Pricing', 'Blog'].map((item) => (
+                <div className={cn(
+                  "hidden lg:flex items-center gap-10 font-medium transition-all duration-500",
+                  isScrolled ? "opacity-90 scale-95" : "opacity-100 scale-100"
+                )}>
+                    {navLinks.map((item) => (
                         <a
-                            key={item}
-                            href="#"
-                            className="text-on-surface/80 hover:text-primary transition-colors text-[14px] tracking-tight leading-relaxed py-2 px-2"
+                            key={item.label}
+                            href={item.href}
+                            className="text-neutral-600 hover:text-neutral-900 transition-colors text-[13px] tracking-tight"
                         >
-                            {item}
+                            {item.label}
                         </a>
                     ))}
                 </div>
 
                 <div className="hidden sm:flex items-center gap-8">
-                    <a href="/login" className="hidden sm:block font-bold text-sm text-on-surface hover:text-primary transition-colors py-2 px-4 leading-relaxed">
-                        Log In
+                    <a href="/login" className="font-medium text-[13px] text-neutral-600 hover:text-neutral-900 transition-colors px-2">
+                        Log in
                     </a>
-                    <a href="/register" className="bg-primary text-on-primary-fixed px-7 py-3 rounded-full hover:shadow-[0_10px_30px_rgba(245,197,24,0.18)] transition-all active:scale-95 text-sm uppercase tracking-tighter flex items-center gap-2 leading-relaxed inline-flex">
-                        Join <ArrowUpRight size={24} weight="duotone" />
+                    <a href="/register" className="bg-[#231F0F] text-white px-6 py-3 rounded-full hover:bg-sungold hover:text-neutral-900 transition-all active:scale-95 text-[12px] font-medium tracking-tight flex items-center gap-2 shadow-lg border border-white/5">
+                        Deploy infrastructure <IconArrowUpRight size={18} />
                     </a>
                 </div>
 
-                <div className="sm:hidden flex items-center">
-                    <button onClick={() => setMobileOpen((s) => !s)} aria-label={mobileOpen ? "Close menu" : "Open menu"} className="p-2 rounded-md bg-transparent hover:bg-surface-container/50">
-                        {mobileOpen ? <X size={24} weight="duotone" className="text-on-surface" /> : <List size={24} weight="duotone" className="text-on-surface" />}
+                <div className="lg:hidden flex items-center">
+                    <button
+                      onClick={() => setMobileOpen((s) => !s)}
+                      aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                      className="p-2 rounded-full bg-neutral-100 border border-black/5"
+                    >
+                        {mobileOpen ? <IconX size={20} /> : <IconMenu2 size={20} />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile dropdown panel directly under header */}
-            <div className="absolute left-0 right-0 top-full flex justify-center pointer-events-none">
-                <div className={`w-[85%] md:w-[75%] mt-2 px-2 pointer-events-auto md:hidden transition-all duration-200 ${mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-                    <div className="bg-surface border border-outline rounded-2xl shadow-lg p-">
-
-                        <nav className="flex flex-col gap-2 mb-4 p-4">
-                            <a href="#" className="py-2 text-on-surface hover:text-primary">How it Works</a>
-                            <a href="#" className="py-2 text-on-surface hover:text-primary">Pricing</a>
-                            <a href="#" className="py-2 text-on-surface hover:text-primary">Blog</a>
+            {/* Mobile dropdown panel */}
+            <div className={cn(
+              "absolute left-0 right-0 top-full flex justify-center pointer-events-none transition-all duration-500",
+              mobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
+            )}>
+                <div className="w-[95%] mt-4 pointer-events-auto lg:hidden">
+                    <div className="bg-white/95 backdrop-blur-2xl border border-black/5 rounded-[2rem] shadow-2xl p-8">
+                        <nav className="flex flex-col gap-4 mb-8">
+                            {navLinks.map((item) => (
+                                <a
+                                  key={item.label}
+                                  href={item.href}
+                                  className="text-2xl font-medium text-neutral-900 hover:text-sungold tracking-tight"
+                                  onClick={() => setMobileOpen(false)}
+                                >
+                                  {item.label}
+                                </a>
+                            ))}
                         </nav>
-
-                        <div className="flex flex-col gap-3 px-2">
-                            <a href="/login" className="w-full text-center py-3 rounded-xl border border-outline text-on-surface">Log in</a>
-                            <a href="/register" className="bg-primary text-on-primary-fixed px-7 py-3 rounded-full hover:shadow-[0_10px_30px_rgba(245,197,24,0.18)] transition-all active:scale-95 text-sm uppercase tracking-tighter flex items-center justify-center gap-2 leading-relaxed inline-flex">
-                                Join <ArrowUpRight size={24} weight="duotone" />
+                        <div className="flex flex-col gap-3">
+                            <a href="/login" className="w-full text-center py-4 rounded-2xl border border-black/5 text-neutral-900 font-medium tracking-tight text-sm">Log in</a>
+                            <a href="/register" className="bg-sungold text-neutral-900 px-6 py-4 rounded-2xl text-sm font-medium tracking-tight flex items-center justify-center gap-2">
+                                Deploy <IconArrowUpRight size={18} />
                             </a>
                         </div>
                     </div>

@@ -79,7 +79,7 @@ export const LandingFooter: React.FC = () => {
         </div>
 
         <div>
-          <h4 className="font-headline font-bold mb-4" style={{ color: 'var(--on-surface)' }}>Product</h4>
+          <h4 className="font-headline font-medium mb-4" style={{ color: 'var(--on-surface)' }}>Product</h4>
           <ul className="space-y-3">
             <li><Link to="#solutions" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Solutions</Link></li>
             <li><Link to="#pricing" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Pricing</Link></li>
@@ -88,7 +88,7 @@ export const LandingFooter: React.FC = () => {
         </div>
 
         <div>
-          <h4 className="font-headline font-bold mb-4" style={{ color: 'var(--on-surface)' }}>Resources</h4>
+          <h4 className="font-headline font-medium mb-4" style={{ color: 'var(--on-surface)' }}>Resources</h4>
           <ul className="space-y-3">
             <li><Link to="/documentation" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Documentation</Link></li>
             <li><Link to="/volunteers" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Volunteers</Link></li>
@@ -98,7 +98,7 @@ export const LandingFooter: React.FC = () => {
         </div>
 
         <div>
-          <h4 className="font-headline font-bold mb-4" style={{ color: 'var(--on-surface)' }}>Company</h4>
+          <h4 className="font-headline font-medium mb-4" style={{ color: 'var(--on-surface)' }}>Company</h4>
           <ul className="space-y-3">
             <li><Link to="/about" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">About Us</Link></li>
             <li><Link to="/contact" className="text-sm text-[var(--on-surface-variant)] hover:text-primary transition-colors">Contact</Link></li>

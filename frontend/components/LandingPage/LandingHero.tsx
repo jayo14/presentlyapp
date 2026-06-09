@@ -1,124 +1,265 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { CaretRight, Play } from '@phosphor-icons/react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { IconChevronRight, IconShieldCheck, IconMapPin, IconUsers, IconFingerprint, IconBell, IconArrowRight } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
 export const Hero = () => {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
+  const [activeTab, setActiveTab] = useState('attendance');
 
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -150]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [0, -80]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-surface pt-56 pb-40 overflow-hidden">
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/10 blur-[140px] rounded-full pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
+    <section className="relative min-h-screen bg-[#FDF9F0] pt-40 pb-20 overflow-hidden flex items-center selection:bg-sungold/30">
+      {/* Savage Background Orbs */}
+      <div className="orb w-[800px] h-[800px] bg-sungold/10 -top-40 -right-40" />
+      <div className="orb w-[600px] h-[600px] bg-blue-400/5 bottom-0 -left-20" />
 
-      <div className="max-w-[85%] md:max-w-[80%] mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-20 items-center relative z-10">
-        <motion.div style={{ opacity }}>
+      <div className="max-w-[1440px] mx-auto px-8 md:px-16 w-full grid lg:grid-cols-[1fr_1.1fr] gap-16 relative z-10">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col justify-center"
+        >
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-3 mb-10 px-4 py-2 bg-primary/10 rounded-full border border-primary/20"
+            variants={itemVariants}
+            className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 bg-white border border-black/5 rounded-full shadow-sm w-fit"
           >
-            <span className="text-primary text-xs font-black tracking-[0.3em] uppercase">GPS-Verified Attendance</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-sungold animate-pulse" />
+            <span className="text-[11px] font-medium tracking-tight text-neutral-600">NUC accreditation protocol v2.4</span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="font-headline text-6xl md:text-8xl lg:text-[110px] text-on-surface leading-[0.95] tracking-tighter mb-12 font-black"
+            variants={itemVariants}
+            className="text-[clamp(3rem,6vw,5.5rem)] text-neutral-900 leading-[0.9] tracking-[-0.04em] mb-8 font-medium"
           >
-            Attendance<br />
-            that actually<br />
-            <span className="text-primary relative inline-block">
-              knows you're there.
-              <motion.span
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ delay: 1, duration: 1 }}
-                className="absolute -bottom-2 left-0 h-2 bg-primary/30 rounded-full"
-              />
-            </span>
+            Sovereign academic<br />
+            <span className="italic  text-neutral-400">infrastructure.</span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-xl md:text-2xl text-textMuted mb-16 max-w-xl leading-relaxed font-medium"
+            variants={itemVariants}
+            className="text-lg md:text-xl text-neutral-500 mb-12 max-w-xl leading-relaxed "
           >
-            Presently ends roll calls, paper sheets, and proxy attendance — for students, lecturers, and institutions that mean business.
+            Eliminate proxy attendance and institutional chaos. Presently provides the location-verified accountability Nigerian universities need for excellence.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center gap-8"
+            variants={itemVariants}
+            className="flex flex-wrap items-center gap-6 mb-16"
           >
-            <a href="/register" className="w-full sm:w-auto skeuo-button-gold px-12 py-7 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all">
-              Start for free <CaretRight size={28} weight="bold" />
-            </a>
-            <a href="/how-it-works" className="group flex items-center gap-4 font-bold text-on-surface text-lg">
-              <div className="w-16 h-16 rounded-full border-2 border-outline flex items-center justify-center group-hover:border-primary transition-all duration-300 group-hover:scale-110 bg-surface/50 backdrop-blur shadow-sm">
-                <Play size={24} weight="fill" className="ml-1 text-primary transition-transform group-hover:scale-110" />
-              </div>
-              <span className="border-b-2 border-transparent group-hover:border-primary transition-all pb-1">Watch how it works</span>
-            </a>
+            <button className="skeuo-button-gold px-10 py-5 font-medium text-lg flex items-center gap-3 group">
+              Deploy presently
+              <IconArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="px-8 py-5 font-medium text-lg border border-black/10 rounded-[2rem] hover:bg-white/50 transition-colors">
+              Watch the protocol
+            </button>
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-4 text-neutral-400"
+          >
+            <div className="flex -space-x-3">
+               {[1,2,3].map(i => (
+                 <div key={i} className="w-10 h-10 rounded-full border-2 border-[#FDF9F0] bg-neutral-200 overflow-hidden">
+                    <img src={`https://i.pravatar.cc/100?img=${i + 20}`} alt="User" />
+                 </div>
+               ))}
+            </div>
+            <p className="text-sm font-medium">Trusted by 14+ institutions across Nigeria</p>
           </motion.div>
         </motion.div>
 
-        <div className="relative h-[700px] hidden lg:block perspective-1000">
-          {/* Mockup 1 */}
-          <motion.div
-            style={{ y: y1 }}
-            initial={{ opacity: 0, rotate: -15, x: -50 }}
-            animate={{ opacity: 1, rotate: -6, x: 0 }}
-            transition={{ duration: 1.2, delay: 0.4 }}
-            className="absolute z-10 -left-10 top-20 w-72 p-4 bg-surface rounded-[48px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] border border-outline/20 skeuo-card"
-          >
-            <div className="bg-background h-[500px] rounded-[36px] overflow-hidden p-8 border border-outline/10">
-              <div className="w-12 h-12 bg-primary/20 rounded-xl mb-8 flex items-center justify-center">
-                 <div className="w-6 h-6 bg-primary rounded-md" />
+        {/* Interactive Dashboard Mockup - Appvia/NeuroAI Inspired */}
+        <motion.div
+          initial={{ opacity: 0, x: 40, rotateY: -10 }}
+          animate={{ opacity: 1, x: 0, rotateY: 0 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="relative perspective-2000"
+        >
+          <div className="skeuo-card w-full h-[640px] p-6 bg-white overflow-hidden flex flex-col">
+            {/* Mockup Header */}
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-black/5">
+              <div className="flex gap-2">
+                {['#FF5F56', '#FFBD2E', '#27C93F'].map(c => (
+                  <div key={c} className="w-3 h-3 rounded-full" style={{ backgroundColor: c }} />
+                ))}
               </div>
-              <div className="h-5 w-32 bg-surface-variant rounded-full mb-12" />
-              <div className="space-y-6">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="h-14 w-full bg-surface-container/50 rounded-2xl border border-outline/5" />
+              <div className="flex bg-neutral-100 p-1 rounded-full border border-black/5">
+                {['attendance', 'analytics', 'verification'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={cn(
+                      "px-5 py-1.5 rounded-full text-[11px] font-medium transition-all duration-300",
+                      activeTab === tab ? "bg-white shadow-sm text-neutral-900" : "text-neutral-400"
+                    )}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
                 ))}
               </div>
             </div>
-          </motion.div>
 
-          {/* Mockup 2 - Primary */}
+            {/* Dynamic Content Area */}
+            <div className="flex-1 relative">
+              <AnimatePresence mode="wait">
+                {activeTab === 'attendance' && (
+                  <motion.div
+                    key="attendance"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="grid grid-cols-2 gap-6 h-full"
+                  >
+                    <div className="space-y-6">
+                      <div className="p-6 rounded-3xl bg-neutral-50 border border-black/5">
+                        <div className="flex items-center gap-3 mb-4">
+                          <IconMapPin size={20} className="text-sungold" />
+                          <span className="text-xs font-medium text-neutral-400">Live checkpoint</span>
+                        </div>
+                        <h4 className="text-2xl font-medium mb-1">Lecture Hall 7</h4>
+                        <p className="text-[11px] text-neutral-400">Computer Science Dept</p>
+                      </div>
+                      <div className="p-6 rounded-3xl bg-neutral-50 border border-black/5">
+                        <IconUsers size={20} className="text-blue-500 mb-4" />
+                        <h4 className="text-2xl font-medium mb-1">428 / 500</h4>
+                        <p className="text-[11px] text-neutral-400">Students checked-in</p>
+                      </div>
+                    </div>
+                    <div className="p-6 rounded-3xl bg-neutral-900 text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
+                       <div className="w-32 h-32 rounded-full border border-white/10 flex items-center justify-center mb-6">
+                          <div className="w-24 h-24 rounded-full bg-sungold flex items-center justify-center shadow-[0_0_40px_rgba(249,196,6,0.4)]">
+                            <IconFingerprint size={48} className="text-neutral-900" />
+                          </div>
+                       </div>
+                       <p className="text-xs font-medium text-neutral-400 mb-2">Biometric gateway</p>
+                       <p className="text-lg font-medium">Scanning identity...</p>
+                       <div className="absolute bottom-0 left-0 w-full h-1 bg-white/5">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: "100%" }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="h-full bg-sungold"
+                          />
+                       </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'analytics' && (
+                  <motion.div
+                    key="analytics"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="space-y-6 h-full"
+                  >
+                    <div className="grid grid-cols-3 gap-4">
+                       {[1,2,3].map(i => (
+                         <div key={i} className="h-32 rounded-2xl bg-neutral-50 border border-black/5" />
+                       ))}
+                    </div>
+                    <div className="flex-1 rounded-3xl bg-neutral-50 border border-black/5 p-8">
+                       <div className="flex items-center justify-between mb-8">
+                          <h4 className="font-medium text-lg">Weekly engagement</h4>
+                          <IconBell size={20} className="text-neutral-400" />
+                       </div>
+                       <div className="flex items-end gap-3 h-40">
+                          {[60, 80, 45, 90, 70, 85, 95].map((h, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ height: 0 }}
+                              animate={{ height: `${h}%` }}
+                              transition={{ delay: i * 0.1, duration: 1 }}
+                              className="flex-1 bg-sungold/20 rounded-t-lg relative group"
+                            >
+                               <div className="absolute inset-0 bg-sungold opacity-0 group-hover:opacity-100 transition-opacity rounded-t-lg" />
+                            </motion.div>
+                          ))}
+                       </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'verification' && (
+                  <motion.div
+                    key="verification"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="flex flex-col items-center justify-center h-full text-center p-12"
+                  >
+                    <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mb-8">
+                       <IconShieldCheck size={40} className="text-green-500" />
+                    </div>
+                    <h4 className="text-3xl font-medium mb-4">Integrity verified</h4>
+                    <p className="text-neutral-400 max-w-sm mb-12">Institutional protocol successfully cross-referenced with GPS, Biometrics, and Fingerprinting.</p>
+                    <button className="px-8 py-3 bg-neutral-900 text-white rounded-full text-sm font-medium hover:scale-105 transition-transform">
+                      Generate NUC Report
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Floating Glass Cards */}
           <motion.div
-            style={{ y: y2 }}
-            initial={{ opacity: 0, scale: 0.8, y: 100 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="absolute z-20 left-32 top-0 w-[320px] p-4 bg-surface rounded-[54px] shadow-[0_60px_120px_-30px_rgba(0,0,0,0.3)] border border-outline/30 skeuo-card"
+            initial={{ opacity: 0, x: -60, y: 100 }}
+            animate={{ opacity: 1, x: -80, y: 140 }}
+            transition={{ delay: 0.8, duration: 1.5 }}
+            className="absolute -left-12 bottom-12 w-64 glass p-6 rounded-3xl shadow-2xl z-40"
           >
-            <div className="bg-background h-[600px] rounded-[42px] overflow-hidden flex flex-col items-center justify-center p-12 text-center border border-outline/10 relative">
-               <div className="absolute top-8 w-20 h-1.5 bg-outline/20 rounded-full" />
-               <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center mb-10 relative">
-                  <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-20" />
-                  <div className="relative z-10 w-20 h-20 bg-primary rounded-3xl flex items-center justify-center shadow-lg">
-                    <Play size={40} weight="fill" className="text-white ml-1" />
-                  </div>
-               </div>
-               <div className="h-4 w-40 bg-surface-variant rounded-full mb-4" />
-               <div className="h-3 w-24 bg-surface-variant/40 rounded-full mb-12" />
-               <div className="w-full h-14 skeuo-button-gold rounded-2xl" />
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <IconUsers size={20} className="text-blue-500" />
+              </div>
+              <div>
+                <p className="text-[10px] font-medium text-neutral-400">Total verified</p>
+                <p className="text-xl font-medium">124,802</p>
+              </div>
+            </div>
+            <div className="flex gap-1 h-1.5 w-full">
+              <div className="flex-[3] bg-sungold rounded-full" />
+              <div className="flex-[1] bg-neutral-200 rounded-full" />
             </div>
           </motion.div>
-        </div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 60, y: -40 }}
+            animate={{ opacity: 1, x: 80, y: -80 }}
+            transition={{ delay: 1, duration: 1.5 }}
+            className="absolute -right-8 top-20 w-56 glass p-6 rounded-3xl shadow-2xl z-40"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-[10px] font-medium text-neutral-400">NUC standard met</span>
+            </div>
+            <p className="text-sm font-medium leading-tight">Encryption layer v3.0 successfully active.</p>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

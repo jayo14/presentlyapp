@@ -48,7 +48,7 @@ const simpleLazy = (componentImport: () => Promise<any>) =>
     }
   });
 
-const LandingPage = simpleLazy(() => import('./components/EnhancedLandingPage').then(m => ({ default: m.default || m })));
+const LandingPage = simpleLazy(() => import('./components/LandingPage').then(m => ({ default: m.default || m })));
 const DocumentationPage = simpleLazy(() => import('./components/DocumentationPage').then(m => ({ default: m.DocumentationPage })));
 const VolunteersPage = simpleLazy(() => import('./components/VolunteersPage').then(m => ({ default: m.VolunteersPage })));
 const FeaturesPage = simpleLazy(() => import('./components/FeaturesPage').then(m => ({ default: m.FeaturesPage })));
