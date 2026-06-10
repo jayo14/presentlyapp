@@ -116,17 +116,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       <SEO title="Presently | Home" />
 
       <DashboardPage
+        subtitle={
+          <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] opacity-60">
+            {currentDate}
+          </p>
+        }
         title={
           <div className="max-w-md md:max-w-none">
             <h1 className="text-3xl font-black tracking-tighter leading-tight">
               Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
             </h1>
           </div>
-        }
-        description={
-          <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] opacity-60">
-            {currentDate}
-          </p>
         }
         className="pb-24"
       >
@@ -216,7 +216,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
             <DashboardCard
               variant="primary"
               padding="sm"
-              className="relative overflow-hidden flex flex-col justify-between min-h-[120px] group cursor-default"
+              className="relative overflow-hidden flex flex-col justify-between min-h-[120px] group cursor-default bg-gradient-to-br from-[#755b00cc] to-primary border-none"
             >
               <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
               <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
