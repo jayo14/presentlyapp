@@ -118,9 +118,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       <DashboardPage
         title={
           <div className="max-w-md md:max-w-none">
-            <h2 className="text-3xl font-black tracking-tighter leading-tight">
+            <h1 className="text-3xl font-black tracking-tighter leading-tight">
               Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
-            </h2>
+            </h1>
           </div>
         }
         description={

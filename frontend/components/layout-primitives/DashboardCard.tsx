@@ -35,15 +35,15 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
     lg: 'p-8',
   };
 
-  const isInteractive = !!props.onClick || !!props.whileTap;
+  const isInteractive = !!props.onClick || !!props.whileTap || !!props.whileHover;
 
   return (
     <motion.div
       className={cn(
-        'rounded-[2rem] border transition-all duration-300',
+        'rounded-[2rem] border',
         variants[variant],
         paddings[padding],
-        isInteractive && 'cursor-pointer hover:shadow-lg hover:translate-y-[-2px] active:translate-y-[0px]',
+        isInteractive && 'cursor-pointer',
         className
       )}
       role={isInteractive ? 'button' : undefined}
