@@ -1,10 +1,8 @@
 import React from 'react';
 import {
-  MagnifyingGlass,
   Bell,
   UserCircle,
   List,
-  Plus
 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { SearchExpand } from '../Dashboard/SearchExpand';
@@ -24,7 +22,6 @@ export const SiteHeader: React.FC<SiteHeaderProps> = ({
   userAvatar,
   userInitials,
   onProfileClick,
-  isAdmin
 }) => {
   return (
     <header className="h-[80px] flex items-center justify-between px-6 md:px-8 border-b border-outline/5 bg-surface/80 backdrop-blur-md sticky top-0 z-20">
@@ -48,8 +45,8 @@ export const SiteHeader: React.FC<SiteHeaderProps> = ({
           className="p-2 text-textMuted hover:bg-surface-highest/40 hover:text-text rounded-xl transition-all relative"
           aria-label="View notifications"
         >
-          <Bell size={20} weight="bold" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-sungold rounded-full border-2 border-surface" />
+          <Bell size={20} weight="medium" />
+          <span aria-hidden="true" className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-sungold rounded-full border border-surface" />
         </button>
 
         <div className="h-8 w-px bg-outline/10 mx-1 hidden md:block" />

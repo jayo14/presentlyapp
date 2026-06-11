@@ -2,25 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '../Logo';
 import {
-  House,
-  Users,
-  Buildings,
-  BookOpen,
-  MapPin,
-  FileText,
   ShieldCheck,
-  Clock,
-  Bell,
-  Gear,
   SignOut,
   CaretLeft,
   CaretRight,
   Sun,
   Moon,
   Download,
-  ChartBar,
-  ChartLineUp,
-  Monitor
+  Gear,
 } from '@phosphor-icons/react';
 import { UserRole } from '../../types';
 import { useTheme } from '../ThemeProvider';
@@ -61,6 +50,7 @@ const NavItem: React.FC<{
         : "text-textMuted hover:text-text hover:bg-surface-highest/40 hover:border-outline/10 border border-transparent hover:translate-x-1"
     )}
     title={collapsed ? label : undefined}
+    aria-label={label}
   >
     <Icon
       size={20}
@@ -81,7 +71,7 @@ const NavItem: React.FC<{
 
 const NavSection: React.FC<{ label: string; collapsed: boolean }> = ({ label, collapsed }) => (
   collapsed ? (
-    <div className="h-px bg-outline/10 mx-4 my-4" />
+    <div className="h-px bg-outline/10 mx-4 my-4" aria-hidden="true" />
   ) : (
     <div className="px-4 pt-6 pb-2">
       <span className="text-[10px] font-bold text-textMuted uppercase tracking-[0.2em]">{label}</span>
@@ -118,6 +108,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         "hidden md:flex flex-col bg-surface border-r border-outline/10 h-screen sticky top-0 transition-all duration-300 ease-premium relative z-30",
         collapsed ? "w-[80px]" : "w-[280px]"
       )}
+      aria-label="Application Sidebar"
     >
       {/* Sidebar Header */}
       <div className={cn(
@@ -154,7 +145,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </div>
         ))}
 
-        <div className="h-px bg-outline/5 mx-2 my-6" />
+        <div className="h-px bg-outline/5 mx-2 my-6" aria-hidden="true" />
         <div className="space-y-1">
           {commonItems.map(item => (
             <NavItem
@@ -179,6 +170,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-medium text-textMuted hover:bg-surface-highest/40 hover:text-text transition-all duration-200",
             collapsed ? "justify-center" : "gap-3"
           )}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
           {isDark ? <Moon size={20} /> : <Sun size={20} />}
           {!collapsed && <span className="flex-1 text-left">{isDark ? 'Dark mode' : 'Light mode'}</span>}
@@ -192,6 +184,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-bold text-primary hover:bg-primary/5 transition-all duration-200",
               collapsed ? "justify-center" : "gap-3"
             )}
+            aria-label="Install App"
             title={collapsed ? 'Install App' : undefined}
           >
             <Download size={20} weight="bold" />
@@ -200,10 +193,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         )}
 
         {/* User Card */}
-        <div className={cn(
-          "flex items-center rounded-2xl bg-surface-low border border-outline/5 p-2 transition-all duration-300",
-          collapsed ? "justify-center" : "gap-3"
-        )}>
+        <div
+          className={cn(
+            "flex items-center rounded-2xl bg-surface-low border border-outline/5 p-2 transition-all duration-300",
+            collapsed ? "justify-center" : "gap-3"
+          )}
+          role="region"
+          aria-label="User profile summary"
+        >
           <div className="w-10 h-10 rounded-xl overflow-hidden bg-surface-highest border border-outline/10 flex-shrink-0 flex items-center justify-center font-bold text-xs text-textMuted">
             {userAvatar ? (
               <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
@@ -224,6 +221,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             "w-full flex items-center px-3 py-2.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-500/5 transition-all duration-200",
             collapsed ? "justify-center" : "gap-3"
           )}
+          aria-label="Sign out"
         >
           <SignOut size={20} weight="bold" />
           {!collapsed && <span className="flex-1 text-left uppercase tracking-widest text-[10px]">Sign out</span>}
@@ -234,6 +232,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-24 z-40 w-6 h-6 rounded-full bg-surface border border-outline/10 shadow-premium flex items-center justify-center text-textMuted hover:text-primary transition-colors"
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {collapsed ? <CaretRight size={12} weight="bold" /> : <CaretLeft size={12} weight="bold" />}
       </button>
