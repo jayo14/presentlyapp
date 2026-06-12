@@ -22,6 +22,7 @@ import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface AdminDashboardProps {
   userName: string;
@@ -114,7 +115,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
         <SEO title="System Logs | Admin | Presently" description="View and audit system activity logs on Presently." />
 
         {/* Logs Table Card */}
-        <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
+        <DashboardCard isPressable={false} className="p-0 overflow-hidden">
           {/* Filters */}
           <div className="p-3 border-b border-outline flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
@@ -159,7 +160,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                   <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider text-right">Time</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-zinc-100 dark:divide-white/5">
                 {logsLoading ? (
                   Array(5).fill(0).map((_, i) => (
                     <tr key={i}>
@@ -175,14 +176,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                     </td>
                   </tr>
                 ) : logs.map(log => (
-                  <tr key={log.id} className="hover:bg-surfaceHigh hover:text-text/50 transition-colors">
+                  <tr key={log.id} className="hover:bg-surfaceHigh transition-colors group">
                     <td className="px-4 py-3">
                       {log.level === 'info' && <Info size={16} weight="bold" className="text-blue-500" />}
                       {log.level === 'warning' && <Warning size={16} weight="bold" className="text-amber-500" />}
                       {log.level === 'error' && <XCircle size={16} weight="bold" className="text-red-500" />}
                       {log.level === 'success' && <CheckCircle size={16} weight="bold" className="text-emerald-500" />}
                     </td>
-                    <td className="px-4 py-3 text-text font-medium">{log.action}</td>
+                    <td className="px-4 py-3 text-text font-medium group-hover:text-primary transition-colors">{log.action}</td>
                     <td className="px-4 py-3 text-textMuted">{log.user_name || log.ip_address || 'System'}</td>
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center px-2 py-0.5 bg-surfaceHigh text-textMuted rounded text-xs font-medium">
@@ -224,7 +225,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
               </div>
             </div>
           )}
-        </div>
+        </DashboardCard>
       </DashboardPage>
     );
   }
@@ -247,7 +248,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       {/* Stats Grid */}
       <ResponsiveGrid>
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
+          <DashboardCard key={i} className="p-4" isPressable={false}>
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
                 <stat.icon size={18} weight="bold" className={stat.color} />
@@ -255,12 +256,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             </div>
             <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
             <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
-          </div>
+          </DashboardCard>
         ))}
       </ResponsiveGrid>
 
       {/* System Activity Chart */}
-      <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden mt-6">
+      <DashboardCard isPressable={false} className="overflow-hidden mt-6 p-0">
         <div className="px-5 py-4 border-b border-outline flex items-center justify-between">
           <div>
             <h3 className="font-headline text-sm font-semibold text-text">System Activity</h3>
@@ -292,12 +293,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                 <YAxis stroke="#a1a1aa" fontSize={11} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--tooltip-bg, #18181b)',
-                    border: '1px solid var(--tooltip-border, #27272a)',
+                    backgroundColor: 'var(--surface-container-highest)',
+                    border: '1px solid var(--outline)',
                     borderRadius: '8px',
                     fontSize: '12px',
                   }}
-                  itemStyle={{ color: '#fff' }}
+                  itemStyle={{ color: 'var(--on-surface)' }}
                 />
                 <Area type="monotone" dataKey="active" stroke="#f5c518" fillOpacity={1} fill="url(#colorActive)" strokeWidth={2} name="Active Users" />
                 <Area type="monotone" dataKey="sessions" stroke="#3b82f6" fillOpacity={1} fill="url(#colorSessions)" strokeWidth={2} name="Sessions" />
@@ -305,7 +306,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
+      </DashboardCard>
     </DashboardPage>
   );
 };

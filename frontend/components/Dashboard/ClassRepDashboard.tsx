@@ -21,6 +21,7 @@ import { analyzeTimetableImage } from '../../services/geminiService';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface ClassRepDashboardProps {
   userName: string;
@@ -158,7 +159,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => {
                     const dayEntries = timetable.filter(t => t.day === day).sort((a, b) => a.startTime.localeCompare(b.startTime));
                     return (
-                        <div key={day} className="bg-surface text-text border border-outline rounded-xl p-4">
+                        <DashboardCard key={day} className="p-4" isPressable={false}>
                             <h3 className="font-headline text-xs font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-2">
                                 <Calendar size={14} />
                                 {day}
@@ -186,7 +187,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                                             </div>
                                             <button
                                                 onClick={() => handleDeleteEntry(entry.id)}
-                                                className="ml-2 p-1.5 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                                className="ml-2 p-1.5 text-textMuted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                                             >
                                                 <Trash size={14} weight="bold" />
                                             </button>
@@ -196,7 +197,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                             ) : (
                                 <p className="text-xs text-textMuted italic">No classes scheduled.</p>
                             )}
-                        </div>
+                        </DashboardCard>
                     );
                 })}
             </div>
@@ -339,7 +340,7 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
             description="Manage attendance and reports for your class."
           >
               {/* Mark Attendance Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
+              <DashboardCard isPressable={false} className="p-5">
                   <h3 className="font-headline text-sm font-semibold text-text mb-3">Mark Attendance for Absent Students</h3>
                   <div className="flex gap-3 mb-4">
                       <div className="relative flex-1">
@@ -378,17 +379,17 @@ export const ClassRepDashboard: React.FC<ClassRepDashboardProps> = ({ userName, 
                           </div>
                       ))}
                   </div>
-              </div>
+              </DashboardCard>
 
               {/* Class Reports Card */}
-              <div className="bg-surface text-text border border-outline rounded-xl p-5">
+              <DashboardCard isPressable={false} className="p-5 mt-6">
                   <h3 className="font-headline text-sm font-semibold text-text mb-1">Class Reports</h3>
                   <p className="text-xs text-textMuted mb-4">Generate attendance sheets for lecturers.</p>
                   <button className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-textMuted bg-surfaceLow border border-outline rounded-lg hover:bg-surfaceLow transition-colors">
                       <span>Download Weekly Summary (PDF)</span>
                       <FileText size={16} className="text-textMuted" />
                   </button>
-              </div>
+              </DashboardCard>
           </DashboardPage>
       );
   }

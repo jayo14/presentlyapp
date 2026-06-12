@@ -38,6 +38,7 @@ import { LoadingScreen } from '../LoadingScreen';
 import { useLecturerDashboard } from '../../services/api/dashboard';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -181,9 +182,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 </div>
                 {dayClasses.length > 0 ? (
                     dayClasses.map((t) => (
-                    <div
+                    <DashboardCard
                         key={t.id}
-                        className="bg-surface text-text border border-outline p-3.5 rounded-xl hover:border-outline transition-colors"
+                        className="p-3.5"
                     >
                         <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">{t.course_code}</span>
                         <h4 className="font-headline text-sm font-medium text-text mt-1 line-clamp-2">{t.course_name}</h4>
@@ -199,7 +200,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             </div>
                         )}
                         </div>
-                    </div>
+                    </DashboardCard>
                     ))
                 ) : (
                     <div className="bg-surfaceLow/50 border border-dashed border-outline rounded-xl p-5 text-center">
@@ -250,37 +251,37 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
       {/* Stats Cards */}
       <ResponsiveGrid>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        <DashboardCard className="p-4" isPressable={false}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-              <BookOpen size={18} weight="bold" className="text-blue-600" />
+            <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+              <BookOpen size={18} weight="bold" className="text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
           <p className="text-xs text-textMuted mt-0.5">My Courses</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4" isPressable={false}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <Clock size={18} weight="bold" className="text-emerald-600" />
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+              <Clock size={18} weight="bold" className="text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
           <p className="text-xs text-textMuted mt-0.5">Active Sessions</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4" isPressable={false}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-              <Users size={18} weight="bold" className="text-violet-600" />
+            <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center">
+              <Users size={18} weight="bold" className="text-violet-600 dark:text-violet-400" />
             </div>
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
           <p className="text-xs text-textMuted mt-0.5">Total Students</p>
-        </div>
+        </DashboardCard>
       </ResponsiveGrid>
 
       {/* Sessions */}
-      <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden mt-6">
+      <DashboardCard isPressable={false} className="overflow-hidden mt-6 p-0">
         <div className="px-5 py-4 border-b border-outline flex justify-between items-center">
           <h3 className="font-headline text-sm font-semibold text-text">Recent Sessions</h3>
           <button
@@ -318,10 +319,10 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 };
 
                 return (
-                  <div
+                  <DashboardCard
                     key={session.id}
                     onClick={() => setSelectedSession(session)}
-                    className="bg-surfaceLow/50 border border-outline rounded-xl p-4 hover:border-outline cursor-pointer transition-all group"
+                    className="p-4 group border-outline/50 bg-surfaceLow/50"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -356,7 +357,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                           e.stopPropagation();
                           navigate(`/dashboard/reports?courseId=${session.course}&sessionId=${session.id}`);
                         }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-primary text-text rounded-lg hover:bg-primary hover:text-black transition-colors"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-primary text-black rounded-lg hover:bg-primary/90 transition-colors"
                       >
                         <FileText size={13} weight="bold" />
                         Report
@@ -367,18 +368,18 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                           setSessionToDelete(session.id.toString());
                           setIsDeleteModalOpen(true);
                         }}
-                        className="p-2 text-textMuted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-textMuted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                       >
                         <Trash size={14} weight="bold" />
                       </button>
                     </div>
-                  </div>
+                  </DashboardCard>
                 );
               })}
             </div>
           </div>
         )}
-      </div>
+      </DashboardCard>
 
       {/* Session Detail Dialog */}
       {selectedSession && (
@@ -401,7 +402,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
             className="bg-surface text-text border border-outline rounded-none md:rounded-xl w-full h-[100dvh] md:h-auto md:max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none overflow-y-auto"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="bg-red-50 p-2.5 rounded-lg text-red-500">
+              <div className="bg-red-50 dark:bg-red-500/10 p-2.5 rounded-lg text-red-500">
                 <Trash size={20} weight="bold" />
               </div>
               <div>
@@ -418,7 +419,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
               </button>
               <button
                 onClick={confirmDelete}
-                className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-text rounded-lg hover:bg-red-700 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 Delete
               </button>
