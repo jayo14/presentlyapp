@@ -2,36 +2,46 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Proxy /api calls to Render backend
+    // 1. Proxy /api calls to Render backend
     if (url.pathname.startsWith('/api')) {
-      const backendUrl = new URL(request.url);
-      backendUrl.hostname = 'presentlyapp-alpha.onrender.com';
-      backendUrl.protocol = 'https';
-      backendUrl.port = ''; // Ensure no port is carried over
+      const targetUrl = 'https://presentlyapp-alpha.onrender.com' + url.pathname + url.search;
 
-      const modifiedRequest = new Request(backendUrl, request);
-      return fetch(modifiedRequest);
+      // Clone the request to preserve headers and body for the proxy
+      const proxyRequest = new Request(targetUrl, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        redirect: 'manual'
+      });
+
+      return fetch(proxyRequest);
     }
 
-    // Attempt to serve from assets
+    // 2. Try to serve static assets from the ASSETS binding
     try {
-      let response = await env.ASSETS.fetch(request);
-
-      // If asset not found (404), serve index.html for SPA routing
-      if (response.status === 404) {
-        const indexRequest = new Request(new URL('/index.html', request.url), request);
-        return await env.ASSETS.fetch(indexRequest);
+      const response = await env.ASSETS.fetch(request);
+      // If we got a valid response (not a 404), return it
+      if (response && response.status !== 404) {
+        return response;
       }
-
-      return response;
     } catch (e) {
-      // Fallback for SPA routing if ASSETS.fetch fails
-      try {
-        const indexRequest = new Request(new URL('/index.html', request.url), request);
-        return await env.ASSETS.fetch(indexRequest);
-      } catch (e2) {
-        return new Response("Not Found", { status: 404 });
-      }
+      console.error('Asset fetch error:', e);
     }
+
+    // 3. SPA Fallback: Serve index.html for all other routes
+    try {
+      const indexUrl = new URL('/index.html', request.url);
+      const indexRequest = new Request(indexUrl, request);
+      const indexResponse = await env.ASSETS.fetch(indexRequest);
+
+      if (indexResponse && indexResponse.status !== 404) {
+        return indexResponse;
+      }
+    } catch (e) {
+      console.error('SPA fallback error:', e);
+    }
+
+    // 4. Final fallback
+    return new Response("Not Found", { status: 404 });
   }
 };

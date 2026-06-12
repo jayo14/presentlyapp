@@ -1,10 +1,10 @@
 name = "presentlyapp"
 main = "worker.mjs"
-compatibility_date = "2024-05-22"
+compatibility_date = "2024-11-01"
 compatibility_flags = ["nodejs_compat"]
 
 [assets]
-directory = "./frontend/dist"
+directory = "frontend/dist"
 binding = "ASSETS"
 
 [build]
