@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Calendar, Clock, CheckCircle, XCircle, AlertCircle, TrendingUp, 
-  BookOpen, MapPin, User, Filter, ChevronRight, Loader2, FileText,
-  Award, Target, RefreshCw
+  BookOpen, MapPin, User, Filter, ChevronRight, FileText
 } from 'lucide-react';
 import { SkeletonStudentDashboard } from '../Skeleton';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../Button';
+import { DashboardPage } from '../layout-primitives/DashboardPage';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
+import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { cn } from '@/lib/utils';
 
 interface Course {
   id: number;
@@ -140,7 +143,8 @@ export const StudentViewPage: React.FC = () => {
 
   useEffect(() => {
     // Simulate loading
-    setTimeout(() => setLoading(false), 1000);
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -153,7 +157,7 @@ export const StudentViewPage: React.FC = () => {
       case 'absent': return 'text-red-600 bg-red-500/10';
       case 'late': return 'text-yellow-600 bg-yellow-500/10';
       case 'excused': return 'text-blue-600 bg-blue-500/10';
-      default: return 'text-secondary bg-surface';
+      default: return 'text-textMuted bg-surface';
     }
   };
 
@@ -180,71 +184,63 @@ export const StudentViewPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto pb-24 md:pb-8 animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="mb-8 px-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="font-headline text-2xl md:text-3xl font-bold text-primary mb-2">
-              My Attendance
-            </h1>
-            <p className="text-textMuted">Track your attendance across all courses</p>
+    <DashboardPage
+      title="My Attendance"
+      description="Track your attendance across all courses"
+      containerClassName="max-w-4xl mx-auto"
+    >
+      {/* Overall Stats */}
+      <ResponsiveGrid cols={4} gap={24}>
+        <DashboardCard className="flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-textMuted">Overall</span>
+            <TrendingUp size={18} className="text-primary" />
           </div>
-        </div>
+          <div className="flex items-end gap-2 mb-2">
+            <span className="text-2xl font-black text-text tracking-tight">{overallAttendance}%</span>
+          </div>
+          <div className="h-1.5 bg-surfaceLow rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-1000"
+              style={{ width: `${overallAttendance}%` }}
+            />
+          </div>
+        </DashboardCard>
 
-        {/* Overall Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-textMuted text-sm">Overall</span>
-              <TrendingUp size={20} className="text-primary" />
-            </div>
-            <div className="flex items-end gap-2">
-              <span className="text-3xl font-black text-text tracking-tight">{overallAttendance}%</span>
-            </div>
-            <div className="mt-2 h-2 bg-surfaceLow rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary rounded-full transition-all"
-                style={{ width: `${overallAttendance}%` }}
-              />
-            </div>
+        <DashboardCard className="flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-textMuted">Courses</span>
+            <BookOpen size={18} className="text-primary" />
           </div>
+          <span className="text-2xl font-black text-text tracking-tight">{courses.length}</span>
+          <p className="text-[10px] font-bold text-textMuted uppercase mt-1">Active</p>
+        </DashboardCard>
 
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-textMuted text-sm">Courses</span>
-              <BookOpen size={20} className="text-primary" />
-            </div>
-            <span className="text-3xl font-bold text-primary">{courses.length}</span>
-            <p className="text-textMuted text-xs mt-1">Active enrollments</p>
+        <DashboardCard className="flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-textMuted">Present</span>
+            <CheckCircle size={18} className="text-green-500" />
           </div>
+          <span className="text-2xl font-black text-text tracking-tight">
+            {courses.reduce((sum, c) => sum + c.attendedSessions, 0)}
+          </span>
+          <p className="text-[10px] font-bold text-textMuted uppercase mt-1">Total</p>
+        </DashboardCard>
 
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-textMuted text-sm">Present</span>
-              <CheckCircle size={20} className="text-green-600" />
-            </div>
-            <span className="text-3xl font-bold text-green-600">
-              {courses.reduce((sum, c) => sum + c.attendedSessions, 0)}
-            </span>
-            <p className="text-textMuted text-xs mt-1">Total sessions</p>
+        <DashboardCard className="flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-textMuted">Absent</span>
+            <XCircle size={18} className="text-red-500" />
           </div>
-
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-textMuted text-sm">Absent</span>
-              <XCircle size={20} className="text-red-600" />
-            </div>
-            <span className="text-3xl font-bold text-red-600">
-              {courses.reduce((sum, c) => sum + (c.totalSessions - c.attendedSessions), 0)}
-            </span>
-            <p className="text-textMuted text-xs mt-1">Missed sessions</p>
-          </div>
-        </div>
-      </div>
+          <span className="text-2xl font-black text-text tracking-tight">
+            {courses.reduce((sum, c) => sum + (c.totalSessions - c.attendedSessions), 0)}
+          </span>
+          <p className="text-[10px] font-bold text-textMuted uppercase mt-1">Missed</p>
+        </DashboardCard>
+      </ResponsiveGrid>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 px-4 overflow-x-auto">
+      <div className="flex gap-2 mt-8 mb-6 overflow-x-auto pb-2 custom-scrollbar">
         {[
           { id: 'courses', label: 'Courses', icon: BookOpen },
           { id: 'upcoming', label: 'Upcoming', icon: Calendar },
@@ -253,10 +249,10 @@ export const StudentViewPage: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-[13px] whitespace-nowrap transition-all duration-200 border ${
               activeTab === tab.id
-                ? 'bg-primaryContainer text-on-primary-fixed shadow-md'
-                : 'bg-surface text-textMuted hover:bg-surfaceLow hover:text-text'
+                ? 'bg-primary/10 text-primary border-primary/20 shadow-sm'
+                : 'bg-surface text-textMuted border-outline/5 hover:bg-surface-highest/40 hover:text-text'
             }`}
           >
             <tab.icon size={16} />
@@ -265,192 +261,196 @@ export const StudentViewPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Course List */}
-      {activeTab === 'courses' && (
-        <div className="px-4">
-          {/* Filter */}
-          <div className="flex items-center gap-2 mb-4">
-            <Filter size={16} className="text-textMuted" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="px-3 py-1.5 rounded-lg bg-surface border border-outline text-sm text-primary"
-            >
-              <option value="all">All Courses</option>
-              <option value="excellent">Excellent (&gt;90%)</option>
-              <option value="good">Good (75-90%)</option>
-              <option value="warning">Warning (60-75%)</option>
-              <option value="danger">Danger (&lt;60%)</option>
-            </select>
-          </div>
-
-          <div className="space-y-3">
-            {filteredCourses.map(course => (
-              <div
-                key={course.id}
-                onClick={() => navigate(`/dashboard/courses/${course.id}`)}
-                className="bg-surface border border-outline rounded-2xl p-5 hover:shadow-lg transition-all cursor-pointer group"
+      {/* Tab Content */}
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+        {activeTab === 'courses' && (
+          <div className="space-y-6">
+            {/* Filter */}
+            <div className="flex items-center gap-3 px-1">
+              <Filter size={14} className="text-textMuted" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as any)}
+                className="bg-transparent text-[11px] font-black uppercase tracking-[0.2em] text-primary focus:outline-none cursor-pointer"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-primary font-bold text-sm">{course.code}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(course.status)}`}>
+                <option value="all">All Courses</option>
+                <option value="excellent">Excellent (>90%)</option>
+                <option value="good">Good (75-90%)</option>
+                <option value="warning">Warning (60-75%)</option>
+                <option value="danger">Danger (<60%)</option>
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredCourses.map(course => (
+                <DashboardCard
+                  key={course.id}
+                  onClick={() => navigate(`/dashboard/courses/${course.id}`)}
+                  className="group flex flex-col justify-between h-full"
+                >
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-primary font-black text-[10px] uppercase tracking-widest">{course.code}</span>
+                        </div>
+                        <h3 className="font-headline text-text font-black text-xl tracking-tighter leading-tight group-hover:text-primary transition-colors">
+                          {course.name}
+                        </h3>
+                      </div>
+                      <div className={cn(
+                        "px-3 py-1 rounded-full text-[10px] font-black tracking-widest border",
+                        getStatusColor(course.status)
+                      )}>
                         {course.attendancePercentage}%
-                      </span>
+                      </div>
                     </div>
-                    <h3 className="font-headline text-text font-black text-lg tracking-tight mb-1">
-                      {course.name}
-                    </h3>
-                    <p className="text-textMuted text-sm flex items-center gap-1">
+
+                    <p className="text-textMuted text-xs font-medium flex items-center gap-2 mb-6 uppercase tracking-wider">
                       <User size={14} />
                       {course.lecturer}
                     </p>
                   </div>
-                  <ChevronRight size={20} className="text-textMuted group-hover:text-primary transition-colors" />
-                </div>
 
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-textMuted">
-                    {course.attendedSessions} / {course.totalSessions} sessions
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-green-600 flex items-center gap-1">
-                      <CheckCircle size={14} />
-                      {course.attendedSessions}
-                    </span>
-                    <span className="text-red-600 flex items-center gap-1">
-                      <XCircle size={14} />
-                      {course.totalSessions - course.attendedSessions}
-                    </span>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-textMuted">
+                      <span>{course.attendedSessions} / {course.totalSessions} sessions</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-green-500 flex items-center gap-1">
+                          <CheckCircle size={14} />
+                          {course.attendedSessions}
+                        </span>
+                        <span className="text-red-500 flex items-center gap-1">
+                          <XCircle size={14} />
+                          {course.totalSessions - course.attendedSessions}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="h-2 bg-surfaceLow rounded-full overflow-hidden">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all duration-1000",
+                          course.status === 'excellent' ? 'bg-green-500' :
+                          course.status === 'good' ? 'bg-blue-500' :
+                          course.status === 'warning' ? 'bg-amber-500' :
+                          'bg-red-500'
+                        )}
+                        style={{ width: `${course.attendancePercentage}%` }}
+                      />
+                    </div>
+
+                    {course.attendancePercentage < 75 && (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/dashboard/courses/${course.id}/justify`);
+                        }}
+                        variant="secondary"
+                        size="sm"
+                        className="w-full h-11 rounded-xl text-[11px] font-black uppercase tracking-widest mt-2"
+                      >
+                        <FileText size={14} className="mr-2" />
+                        Justify Absence
+                      </Button>
+                    )}
                   </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mt-3 h-2 bg-surfaceLow rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${
-                      course.status === 'excellent' ? 'bg-green-600' :
-                      course.status === 'good' ? 'bg-blue-600' :
-                      course.status === 'warning' ? 'bg-yellow-600' :
-                      'bg-red-600'
-                    }`}
-                    style={{ width: `${course.attendancePercentage}%` }}
-                  />
-                </div>
-
-                {/* Submit justification if below threshold */}
-                {course.attendancePercentage < 75 && (
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/dashboard/courses/${course.id}/justify`);
-                    }}
-                    variant="secondary"
-                    size="sm"
-                    className="mt-3 w-full"
-                  >
-                    <FileText size={14} className="mr-2" />
-                    Submit Absence Justification
-                  </Button>
-                )}
-              </div>
-            ))}
+                </DashboardCard>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Upcoming Sessions */}
-      {activeTab === 'upcoming' && (
-        <div className="px-4 space-y-3">
-          {upcomingSessions.map(session => (
-            <div
-              key={session.id}
-              className="bg-surface border border-outline rounded-2xl p-5 hover:shadow-lg transition-all"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <span className="text-primary font-bold text-sm">{session.courseCode}</span>
-                  <h3 className="font-headline text-text font-black text-lg tracking-tight mt-1">
-                    {session.courseName}
-                  </h3>
-                </div>
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                  {session.date}
-                </span>
-              </div>
-
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-textMuted">
-                  <Clock size={14} />
-                  <span>{session.time}</span>
-                </div>
-                <div className="flex items-center gap-2 text-textMuted">
-                  <MapPin size={14} />
-                  <span>{session.venue}</span>
-                </div>
-                <div className="flex items-center gap-2 text-textMuted">
-                  <User size={14} />
-                  <span>{session.lecturer}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {upcomingSessions.length === 0 && (
-            <div className="text-center py-16 bg-surface rounded-2xl border border-outline">
-              <Calendar size={48} className="mx-auto text-textMuted mb-4" />
-              <h3 className="font-headline text-lg font-semibold text-primary mb-2">No upcoming sessions</h3>
-              <p className="text-textMuted">Check back later for scheduled classes</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Attendance History */}
-      {activeTab === 'history' && (
-        <div className="px-4 space-y-3">
-          {attendanceHistory.map(record => (
-            <div
-              key={record.id}
-              className="bg-surface border border-outline rounded-2xl p-5"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${getStatusColor(record.status)}`}>
-                    {getStatusIcon(record.status)}
-                  </div>
+        {activeTab === 'upcoming' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {upcomingSessions.map(session => (
+              <DashboardCard key={session.id}>
+                <div className="flex items-start justify-between mb-4">
                   <div>
-                    <span className="text-primary font-bold text-sm">{record.courseCode}</span>
-                    <div className="flex items-center gap-3 text-sm text-textMuted mt-1">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={12} />
-                        {new Date(record.date).toLocaleDateString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={12} />
-                        {record.time}
-                      </span>
+                    <span className="text-primary font-black text-[10px] uppercase tracking-widest">{session.courseCode}</span>
+                    <h3 className="font-headline text-text font-black text-xl tracking-tighter leading-tight mt-1">
+                      {session.courseName}
+                    </h3>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-widest bg-primary/10 text-primary border border-primary/20 uppercase">
+                    {session.date}
+                  </span>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-outline/5">
+                  <div className="flex items-center gap-3 text-xs font-medium text-textMuted uppercase tracking-wider">
+                    <Clock size={16} className="text-primary" />
+                    <span>{session.time}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-medium text-textMuted uppercase tracking-wider">
+                    <MapPin size={16} className="text-primary" />
+                    <span className="truncate">{session.venue}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-medium text-textMuted uppercase tracking-wider">
+                    <User size={16} className="text-primary" />
+                    <span>{session.lecturer}</span>
+                  </div>
+                </div>
+              </DashboardCard>
+            ))}
+
+            {upcomingSessions.length === 0 && (
+              <div className="col-span-full text-center py-24 bg-surface rounded-[2.5rem] border border-outline/10 border-dashed">
+                <Calendar size={48} className="mx-auto text-textMuted opacity-20 mb-6" />
+                <h3 className="font-headline text-lg font-black text-text tracking-tight uppercase mb-2">No upcoming sessions</h3>
+                <p className="text-xs font-medium text-textMuted uppercase tracking-widest">Check back later for scheduled classes</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'history' && (
+          <div className="space-y-4">
+            {attendanceHistory.map(record => (
+              <DashboardCard key={record.id} noPadding className="p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className={cn(
+                      "w-12 h-12 rounded-2xl flex items-center justify-center border",
+                      getStatusColor(record.status)
+                    )}>
+                      {getStatusIcon(record.status)}
+                    </div>
+                    <div>
+                      <span className="text-primary font-black text-[10px] uppercase tracking-widest">{record.courseCode}</span>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-bold text-textMuted uppercase tracking-wider mt-1">
+                        <span className="flex items-center gap-1.5">
+                          <Calendar size={12} className="text-primary" />
+                          {new Date(record.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Clock size={12} className="text-primary" />
+                          {record.time}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <span className={cn(
+                    "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border",
+                    getStatusColor(record.status)
+                  )}>
+                    {record.status}
+                  </span>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(record.status)}`}>
-                  {record.status}
-                </span>
-              </div>
 
-              {record.notes && (
-                <div className="mt-3 p-3 bg-surfaceLow rounded-lg">
-                  <p className="text-xs text-textMuted flex items-start gap-2">
-                    <FileText size={12} className="mt-0.5" />
-                    <span>{record.notes}</span>
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+                {record.notes && (
+                  <div className="mt-4 p-4 bg-surfaceLow rounded-2xl border border-outline/5">
+                    <p className="text-[11px] font-medium text-textMuted flex items-start gap-3">
+                      <FileText size={14} className="mt-0.5 text-primary shrink-0" />
+                      <span>{record.notes}</span>
+                    </p>
+                  </div>
+                )}
+              </DashboardCard>
+            ))}
+          </div>
+        )}
+      </div>
+    </DashboardPage>
   );
 };
