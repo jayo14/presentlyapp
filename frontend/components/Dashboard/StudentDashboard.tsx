@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   Fingerprint
 } from '@phosphor-icons/react';
-import { motion } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { SEO } from '../SEO';
@@ -117,7 +116,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
           Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
         </>
       }
-      containerClassName="max-w-4xl mx-auto"
+      className="max-w-4xl mx-auto"
     >
       <SEO title="Presently | Home" />
 

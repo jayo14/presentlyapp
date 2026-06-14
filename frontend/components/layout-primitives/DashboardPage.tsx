@@ -8,7 +8,7 @@ interface DashboardPageProps {
   children: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;
-  containerClassName?: string;
+  headerClassName?: string;
   titleClassName?: string;
 }
 
@@ -23,18 +23,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   children,
   actions,
   className,
-  containerClassName,
+  headerClassName,
   titleClassName,
 }) => {
   return (
     <div className={cn(
       "flex flex-col gap-6 md:gap-8 w-full animate-in fade-in duration-500 pb-24 md:pb-0",
-      containerClassName
+      className
     )}>
       {/* Header Section */}
       <div className={cn(
         "flex flex-col md:flex-row md:items-center justify-between gap-4",
-        className
+        headerClassName
       )}>
         <div className="max-w-2xl">
           {subtitle && (
