@@ -274,10 +274,10 @@ export const StudentViewPage: React.FC = () => {
                 className="bg-transparent text-[11px] font-black uppercase tracking-[0.2em] text-primary focus:outline-none cursor-pointer"
               >
                 <option value="all">All Courses</option>
-                <option value="excellent">Excellent (>90%)</option>
+                <option value="excellent">Excellent (&gt;90%)</option>
                 <option value="good">Good (75-90%)</option>
                 <option value="warning">Warning (60-75%)</option>
-                <option value="danger">Danger (<60%)</option>
+                <option value="danger">Danger (&lt;60%)</option>
               </select>
             </div>
 
