@@ -187,7 +187,7 @@ export const StudentViewPage: React.FC = () => {
     <DashboardPage
       title="My Attendance"
       description="Track your attendance across all courses"
-      containerClassName="max-w-4xl mx-auto"
+      className="max-w-4xl mx-auto"
     >
       {/* Overall Stats */}
       <ResponsiveGrid cols={4} gap={24}>
