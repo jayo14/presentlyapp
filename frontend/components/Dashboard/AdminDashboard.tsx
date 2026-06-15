@@ -22,6 +22,7 @@ import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface AdminDashboardProps {
   userName: string;
@@ -114,15 +115,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
         <SEO title="System Logs | Admin | Presently" description="View and audit system activity logs on Presently." />
 
         {/* Logs Table Card */}
-        <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
+        <DashboardCard noPadding className="border-outline/5 overflow-hidden">
           {/* Filters */}
-          <div className="p-3 border-b border-outline flex flex-col sm:flex-row gap-3">
+          <div className="p-3 border-b border-outline/5 flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={15} />
               <input
                 type="text"
                 placeholder="Search logs..."
-                className="w-full bg-surfaceLow border border-outline rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                className="w-full bg-surfaceLow border border-outline/5 rounded-lg pl-9 pr-4 py-2 text-sm text-text placeholder:text-textMuted focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 value={logSearch}
                 onChange={(e) => {
                   setLogSearch(e.target.value);
@@ -131,7 +132,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
               />
             </div>
             <select
-              className="bg-surfaceLow border border-outline text-textMuted text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none"
+              className="bg-surfaceLow border border-outline/5 text-textMuted text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none"
               value={logType}
               onChange={(e) => {
                 setLogType(e.target.value);
@@ -151,7 +152,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-outline">
+                <tr className="border-b border-outline/5">
                   <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider w-12">Type</th>
                   <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">Action</th>
                   <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider">User</th>
@@ -159,7 +160,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                   <th className="px-4 py-3 text-xs font-medium text-textMuted uppercase tracking-wider text-right">Time</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-zinc-100/5">
                 {logsLoading ? (
                   Array(5).fill(0).map((_, i) => (
                     <tr key={i}>
@@ -175,7 +176,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                     </td>
                   </tr>
                 ) : logs.map(log => (
-                  <tr key={log.id} className="hover:bg-surfaceHigh hover:text-text/50 transition-colors">
+                  <tr key={log.id} className="hover:bg-surfaceHigh transition-colors group">
                     <td className="px-4 py-3">
                       {log.level === 'info' && <Info size={16} weight="bold" className="text-blue-500" />}
                       {log.level === 'warning' && <Warning size={16} weight="bold" className="text-amber-500" />}
@@ -202,7 +203,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
 
           {/* Pagination */}
           {logCount > 0 && (
-            <div className="px-4 py-3 border-t border-outline flex items-center justify-between">
+            <div className="px-4 py-3 border-t border-outline/5 flex items-center justify-between">
               <p className="text-xs text-textMuted">
                 Showing <span className="font-medium text-textMuted">{logs.length}</span> of <span className="font-medium text-textMuted">{logCount}</span>
               </p>
@@ -210,21 +211,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                 <button
                   disabled={logPage === 1 || logsLoading}
                   onClick={() => loadLogs(logPage - 1)}
-                  className="px-3 py-1.5 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-sm font-medium text-textMuted bg-surfaceLow text-text border border-outline/5 rounded-lg hover:bg-surfaceHigh transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
                 <button
                   disabled={logs.length < 30 || (logPage * 30) >= logCount || logsLoading}
                   onClick={() => loadLogs(logPage + 1)}
-                  className="px-3 py-1.5 text-sm font-medium text-textMuted bg-surface text-text border border-outline rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-sm font-medium text-textMuted bg-surfaceLow text-text border border-outline/5 rounded-lg hover:bg-surfaceHigh transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
               </div>
             </div>
           )}
-        </div>
+        </DashboardCard>
       </DashboardPage>
     );
   }
@@ -247,7 +248,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       {/* Stats Grid */}
       <ResponsiveGrid>
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
+          <DashboardCard key={i} className="p-4" delay={i * 0.1}>
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
                 <stat.icon size={18} weight="bold" className={stat.color} />
@@ -255,20 +256,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             </div>
             <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
             <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
-          </div>
+          </DashboardCard>
         ))}
       </ResponsiveGrid>
 
       {/* System Activity Chart */}
-      <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden mt-6">
-        <div className="px-5 py-4 border-b border-outline flex items-center justify-between">
+      <DashboardCard noPadding className="mt-6 border-outline/5">
+        <div className="px-5 py-4 border-b border-outline/5 flex items-center justify-between">
           <div>
             <h3 className="font-headline text-sm font-semibold text-text">System Activity</h3>
             <p className="text-xs text-textMuted mt-0.5">Active users and sessions over time</p>
           </div>
           <button
             onClick={loadSystemData}
-            className="p-2 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh hover:text-text transition-colors"
+            className="p-2 text-textMuted hover:text-text rounded-lg hover:bg-surfaceHigh transition-colors"
           >
             <ArrowsClockwise size={14} weight="bold" />
           </button>
@@ -287,17 +288,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" strokeOpacity={0.5} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                 <XAxis dataKey="name" stroke="#a1a1aa" fontSize={11} tickLine={false} axisLine={false} dy={8} />
                 <YAxis stroke="#a1a1aa" fontSize={11} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--tooltip-bg, #18181b)',
-                    border: '1px solid var(--tooltip-border, #27272a)',
-                    borderRadius: '8px',
+                    backgroundColor: 'var(--surface, #fff)',
+                    border: '1px solid var(--outline, rgba(0,0,0,0.1))',
+                    borderRadius: '12px',
                     fontSize: '12px',
                   }}
-                  itemStyle={{ color: '#fff' }}
+                  itemStyle={{ color: 'var(--text)' }}
                 />
                 <Area type="monotone" dataKey="active" stroke="#f5c518" fillOpacity={1} fill="url(#colorActive)" strokeWidth={2} name="Active Users" />
                 <Area type="monotone" dataKey="sessions" stroke="#3b82f6" fillOpacity={1} fill="url(#colorSessions)" strokeWidth={2} name="Sessions" />
@@ -305,7 +306,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
+      </DashboardCard>
     </DashboardPage>
   );
 };

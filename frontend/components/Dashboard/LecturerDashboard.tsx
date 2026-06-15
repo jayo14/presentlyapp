@@ -38,6 +38,7 @@ import { LoadingScreen } from '../LoadingScreen';
 import { useLecturerDashboard } from '../../services/api/dashboard';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -181,9 +182,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 </div>
                 {dayClasses.length > 0 ? (
                     dayClasses.map((t) => (
-                    <div
+                    <DashboardCard
                         key={t.id}
-                        className="bg-surface text-text border border-outline p-3.5 rounded-xl hover:border-outline transition-colors"
+                        className="p-3.5 border-outline hover:border-outline/20 transition-colors"
                     >
                         <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">{t.course_code}</span>
                         <h4 className="font-headline text-sm font-medium text-text mt-1 line-clamp-2">{t.course_name}</h4>
@@ -199,7 +200,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             </div>
                         )}
                         </div>
-                    </div>
+                    </DashboardCard>
                     ))
                 ) : (
                     <div className="bg-surfaceLow/50 border border-dashed border-outline rounded-xl p-5 text-center">
@@ -250,38 +251,38 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
       {/* Stats Cards */}
       <ResponsiveGrid>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-              <BookOpen size={18} weight="bold" className="text-blue-600" />
+            <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+              <BookOpen size={18} weight="bold" className="text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
           <p className="text-xs text-textMuted mt-0.5">My Courses</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <Clock size={18} weight="bold" className="text-emerald-600" />
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+              <Clock size={18} weight="bold" className="text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
           <p className="text-xs text-textMuted mt-0.5">Active Sessions</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-              <Users size={18} weight="bold" className="text-violet-600" />
+            <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center">
+              <Users size={18} weight="bold" className="text-violet-600 dark:text-violet-400" />
             </div>
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
           <p className="text-xs text-textMuted mt-0.5">Total Students</p>
-        </div>
+        </DashboardCard>
       </ResponsiveGrid>
 
       {/* Sessions */}
-      <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden mt-6">
-        <div className="px-5 py-4 border-b border-outline flex justify-between items-center">
+      <DashboardCard noPadding className="mt-6">
+        <div className="px-5 py-4 border-b border-outline/5 flex justify-between items-center">
           <h3 className="font-headline text-sm font-semibold text-text">Recent Sessions</h3>
           <button
             onClick={() => navigate('/dashboard/sessions')}
@@ -318,14 +319,14 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 };
 
                 return (
-                  <div
+                  <DashboardCard
                     key={session.id}
                     onClick={() => setSelectedSession(session)}
-                    className="bg-surfaceLow/50 border border-outline rounded-xl p-4 hover:border-outline cursor-pointer transition-all group"
+                    className="p-4 border-outline/5 hover:border-outline/20 group"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-surface text-text border border-outline flex items-center justify-center text-xs font-bold text-textMuted group-hover:text-primary transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-surface text-text border border-outline/5 flex items-center justify-center text-xs font-bold text-textMuted group-hover:text-primary transition-colors">
                           {session.course_code?.substring(0, 2) || 'CS'}
                         </div>
                         <div>
@@ -338,7 +339,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-textMuted mt-3 pt-3 border-t border-outline">
+                    <div className="flex items-center gap-4 text-xs text-textMuted mt-3 pt-3 border-t border-outline/5">
                       <div className="flex items-center gap-1.5">
                         <Calendar size={12} weight="bold" />
                         <span>{new Date(session.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
@@ -372,13 +373,13 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                         <Trash size={14} weight="bold" />
                       </button>
                     </div>
-                  </div>
+                  </DashboardCard>
                 );
               })}
             </div>
           </div>
         )}
-      </div>
+      </DashboardCard>
 
       {/* Session Detail Dialog */}
       {selectedSession && (
@@ -398,7 +399,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           <div
             {...deleteModalProps}
             aria-labelledby="delete-title"
-            className="bg-surface text-text border border-outline rounded-none md:rounded-xl w-full h-[100dvh] md:h-auto md:max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none overflow-y-auto"
+            className="bg-surface text-text border border-outline/5 rounded-none md:rounded-xl w-full h-[100dvh] md:h-auto md:max-w-sm p-6 shadow-xl animate-in zoom-in-95 outline-none overflow-y-auto"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="bg-red-50 p-2.5 rounded-lg text-red-500">
