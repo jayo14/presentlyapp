@@ -16,10 +16,10 @@ Frontend E2E verification of authenticated routes can be achieved by mocking the
 **Action:**
 Use the `verify_dashboards.py` script pattern for future visual verification tasks.
 
-## 2025-05-23 - Iconography & Accessibility
+## 2025-05-23 - Iconography Standards
 
 **Learning:**
-`lucide-react` icons in this project do not support the `weight` prop (unlike Phosphor icons). Including it causes build failures. Additionally, interactive cards must have `role="button"` and keyboard listeners to be accessible.
+This project standardizes on `@phosphor-icons/react` for dashboard and UI iconography. Phosphor icons support the `weight` prop, allowing for refined visual hierarchy (e.g., `weight="bold"` for active states).
 
 **Action:**
-Always omit the `weight` prop when using Lucide icons. Ensure `DashboardCard` usage includes proper accessibility attributes if the `onClick` prop is used.
+Always use `@phosphor-icons/react` for new dashboard components and layout primitives. Ensure the `weight` prop is used intentionally to maintain the premium university-grade aesthetic.
