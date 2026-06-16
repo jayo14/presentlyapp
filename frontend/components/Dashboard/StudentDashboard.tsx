@@ -127,9 +127,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
       <DashboardPage
         subtitle={new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
-        title={`Hey ${userName.split(' ')[0]},`}
+        title={
+          <>
+            Hey {userName.split(' ')[0]}, <span className="text-primary dark:text-slate-600">you're on track.</span>
+          </>
+        }
         titleClassName="text-3xl font-black tracking-tighter leading-tight"
-        description={<span className="text-primary dark:text-slate-600">you're on track.</span>}
         className="max-w-4xl mx-auto pb-24"
       >
         <div className="lg:col-span-12 space-y-8">

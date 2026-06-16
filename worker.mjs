@@ -4,12 +4,7 @@ export default {
 
     // Proxy API requests to the Render backend
     if (url.pathname.startsWith('/api')) {
-      const backendBase = env.BACKEND_URL;
-
-      if (!backendBase) {
-        return new Response("Configuration Error: BACKEND_URL not defined", { status: 500 });
-      }
-
+      const backendBase = env.BACKEND_URL || 'https://presentlyapp-alpha.onrender.com';
       const backendUrl = new URL(url.pathname + url.search, backendBase);
 
       // Create request options without body for GET/HEAD
