@@ -22,6 +22,7 @@ import { systemApi, SystemStats, SystemActivity, SystemAlert, SystemLog } from '
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface AdminDashboardProps {
   userName: string;
@@ -114,7 +115,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
         <SEO title="System Logs | Admin | Presently" description="View and audit system activity logs on Presently." />
 
         {/* Logs Table Card */}
-        <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden">
+        <DashboardCard noPadding className="overflow-hidden">
           {/* Filters */}
           <div className="p-3 border-b border-outline flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
@@ -224,7 +225,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
               </div>
             </div>
           )}
-        </div>
+        </DashboardCard>
       </DashboardPage>
     );
   }
@@ -247,7 +248,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       {/* Stats Grid */}
       <ResponsiveGrid>
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-surface text-text border border-outline rounded-xl p-4 transition-shadow hover:shadow-sm">
+          <DashboardCard key={i} className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center`}>
                 <stat.icon size={18} weight="bold" className={stat.color} />
@@ -255,12 +256,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             </div>
             <p className="text-2xl font-semibold text-text tracking-tight">{stat.value}</p>
             <p className="text-xs text-textMuted mt-0.5">{stat.label}</p>
-          </div>
+          </DashboardCard>
         ))}
       </ResponsiveGrid>
 
       {/* System Activity Chart */}
-      <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden mt-6">
+      <DashboardCard noPadding className="overflow-hidden mt-6">
         <div className="px-5 py-4 border-b border-outline flex items-center justify-between">
           <div>
             <h3 className="font-headline text-sm font-semibold text-text">System Activity</h3>
@@ -305,7 +306,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
+      </DashboardCard>
     </DashboardPage>
   );
 };

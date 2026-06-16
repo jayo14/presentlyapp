@@ -38,6 +38,7 @@ import { LoadingScreen } from '../LoadingScreen';
 import { useLecturerDashboard } from '../../services/api/dashboard';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
+import { DashboardCard } from '../layout-primitives/DashboardCard';
 
 interface LecturerDashboardProps {
   userName: string;
@@ -181,9 +182,9 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 </div>
                 {dayClasses.length > 0 ? (
                     dayClasses.map((t) => (
-                    <div
+                    <DashboardCard
                         key={t.id}
-                        className="bg-surface text-text border border-outline p-3.5 rounded-xl hover:border-outline transition-colors"
+                        className="p-3.5 rounded-xl"
                     >
                         <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">{t.course_code}</span>
                         <h4 className="font-headline text-sm font-medium text-text mt-1 line-clamp-2">{t.course_name}</h4>
@@ -199,7 +200,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                             </div>
                         )}
                         </div>
-                    </div>
+                    </DashboardCard>
                     ))
                 ) : (
                     <div className="bg-surfaceLow/50 border border-dashed border-outline rounded-xl p-5 text-center">
@@ -250,7 +251,7 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
 
       {/* Stats Cards */}
       <ResponsiveGrid>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
               <BookOpen size={18} weight="bold" className="text-blue-600" />
@@ -258,8 +259,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_courses ?? courses.length}</p>
           <p className="text-xs text-textMuted mt-0.5">My Courses</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
               <Clock size={18} weight="bold" className="text-emerald-600" />
@@ -267,8 +268,8 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.active_sessions ?? sessions.filter(s => s.is_active).length}</p>
           <p className="text-xs text-textMuted mt-0.5">Active Sessions</p>
-        </div>
-        <div className="bg-surface text-text border border-outline rounded-xl p-4">
+        </DashboardCard>
+        <DashboardCard className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
               <Users size={18} weight="bold" className="text-violet-600" />
@@ -276,11 +277,11 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
           </div>
           <p className="text-2xl font-semibold text-text">{lecturerStats?.total_students || 0}</p>
           <p className="text-xs text-textMuted mt-0.5">Total Students</p>
-        </div>
+        </DashboardCard>
       </ResponsiveGrid>
 
       {/* Sessions */}
-      <div className="bg-surface text-text border border-outline rounded-xl overflow-hidden mt-6">
+      <DashboardCard noPadding className="overflow-hidden mt-6">
         <div className="px-5 py-4 border-b border-outline flex justify-between items-center">
           <h3 className="font-headline text-sm font-semibold text-text">Recent Sessions</h3>
           <button
@@ -318,10 +319,11 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                 };
 
                 return (
-                  <div
+                  <DashboardCard
                     key={session.id}
                     onClick={() => setSelectedSession(session)}
-                    className="bg-surfaceLow/50 border border-outline rounded-xl p-4 hover:border-outline cursor-pointer transition-all group"
+                    variant="outline"
+                    className="bg-surfaceLow/50 p-4 rounded-xl group"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -372,13 +374,13 @@ export const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ userName, 
                         <Trash size={14} weight="bold" />
                       </button>
                     </div>
-                  </div>
+                  </DashboardCard>
                 );
               })}
             </div>
           </div>
         )}
-      </div>
+      </DashboardCard>
 
       {/* Session Detail Dialog */}
       {selectedSession && (
