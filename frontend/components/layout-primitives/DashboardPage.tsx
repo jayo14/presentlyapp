@@ -3,25 +3,34 @@ import { cn } from '@/lib/utils';
 
 interface DashboardPageProps {
   title: React.ReactNode;
+  subtitle?: React.ReactNode;
   description?: React.ReactNode;
   children: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;
   titleClassName?: string;
+  containerClassName?: string;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   title,
+  subtitle,
   description,
   children,
   actions,
   className,
   titleClassName,
+  containerClassName,
 }) => {
   return (
     <div className={cn("flex flex-col gap-8 w-full animate-in fade-in duration-500", className)}>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-4", containerClassName)}>
         <div>
+          {subtitle && (
+            <div className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60 mb-1">
+              {subtitle}
+            </div>
+          )}
           <h1 className={cn("text-2xl font-bold tracking-tight text-text font-headline", titleClassName)}>
             {title}
           </h1>
