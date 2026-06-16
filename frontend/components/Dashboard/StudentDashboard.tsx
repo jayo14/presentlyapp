@@ -264,7 +264,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         key={activity.id}
-                        onClick={() => {}}
                         className="p-4 flex items-center gap-4 group"
                     >
                         <CourseIcon
