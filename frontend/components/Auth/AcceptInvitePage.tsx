@@ -72,7 +72,7 @@ export const AcceptInvitePage: React.FC = () => {
           <p className="text-textMuted mt-1 text-sm">Staff Invitation</p>
         </div>
 
-        <div className="bg-surface border border-outline rounded-2xl shadow-xl p-6 md:p-8">
+        <div className="skeuo-card p-6 md:p-8 shadow-2xl">
           {pageState === 'loading' && (
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="w-10 h-10 animate-spin text-primary" />
@@ -117,7 +117,7 @@ export const AcceptInvitePage: React.FC = () => {
                       minLength={8}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full h-12 pl-11 pr-11 bg-surfaceContainer border border-outline rounded-xl text-text placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                      className="w-full h-14 pl-11 pr-11 bg-surfaceLow border border-outline rounded-2xl text-text placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                     />
                     <button
                       type="button"
@@ -142,7 +142,7 @@ export const AcceptInvitePage: React.FC = () => {
                       minLength={8}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full h-12 pl-11 pr-11 bg-surfaceContainer border border-outline rounded-xl text-text placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                      className="w-full h-14 pl-11 pr-11 bg-surfaceLow border border-outline rounded-2xl text-text placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                     />
                     <button
                       type="button"
@@ -157,7 +157,7 @@ export const AcceptInvitePage: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="btn-presently-primary w-full h-12 text-base font-bold rounded-xl flex items-center justify-center gap-2"
+                  className="skeuo-button-gold w-full h-14 text-lg font-bold flex items-center justify-center gap-2 mt-2"
                 >
                   Activate Account
                 </button>

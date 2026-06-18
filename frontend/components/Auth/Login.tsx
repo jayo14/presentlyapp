@@ -153,7 +153,7 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Login Form Card */}
-        <div className="glass-panel border-outline/20 p-8 rounded-[2rem] shadow-2xl backdrop-blur-3xl">
+        <div className="skeuo-card p-8 rounded-[2.5rem] shadow-2xl">
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-5">
               {/* Email Input */}
@@ -226,7 +226,7 @@ export const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={loginMutation.isPending}
-                className="btn-presently-primary w-full flex items-center justify-center gap-2 w-full h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="skeuo-button-gold w-full flex items-center justify-center gap-2 h-14 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loginMutation.isPending ? (
                   <>

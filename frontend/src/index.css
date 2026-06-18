@@ -116,6 +116,43 @@
     box-shadow: 0 0 0 #D4A705;
   }
 
+  .skeuo-button {
+    @apply bg-surface text-text border border-black/5 rounded-full;
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.1),
+      0 12px 24px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  }
+
+  .dark .skeuo-button {
+    @apply bg-surface-container-low text-text border-white/5;
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.4),
+      0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .skeuo-button:hover {
+    @apply -translate-y-[2px];
+    box-shadow:
+      0 6px 0 rgba(0,0,0,0.1),
+      0 16px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .dark .skeuo-button:hover {
+    box-shadow:
+      0 6px 0 rgba(0,0,0,0.4),
+      0 16px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .skeuo-button:active {
+    @apply translate-y-[4px];
+    box-shadow: 0 0 0 rgba(0,0,0,0.1);
+  }
+
+  .dark .skeuo-button:active {
+    box-shadow: 0 0 0 rgba(0,0,0,0.4);
+  }
+
   .orb {
     @apply absolute rounded-full blur-[120px] pointer-events-none mix-blend-screen;
     animation: orb-float 20s infinite alternate ease-in-out;

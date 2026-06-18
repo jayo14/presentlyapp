@@ -15,6 +15,8 @@ interface VenueMapProps {
   selectedVenue?: Venue | null;
   drawingMode?: boolean;
   onBoundaryComplete?: (coordinates: number[][]) => void;
+  isFullScreen?: boolean;
+  onToggleFullScreen?: () => void;
 }
 
 const DEFAULT_CENTER: [number, number] = [3.8936, 7.3775]; // [lng, lat]
@@ -125,6 +127,8 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   selectedVenue,
   drawingMode = false,
   onBoundaryComplete,
+  isFullScreen = false,
+  onToggleFullScreen,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -142,6 +146,35 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
 
   const [heading, setHeading] = useState<number | null>(null);
   const [showCompass, setShowCompass] = useState(false);
+
+  // Helper to force map resize
+  const forceMapResize = useCallback(() => {
+    if (mapRef.current) {
+      mapRef.current.resize();
+    }
+  }, []);
+
+  // Effect to handle fullscreen changes and resize map
+  useEffect(() => {
+    if (mapReady) {
+      if (isFullScreen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+
+      // Small delay to allow container to resize
+      const timer = setTimeout(forceMapResize, 100);
+      const timer2 = setTimeout(forceMapResize, 500);
+      const timer3 = setTimeout(forceMapResize, 1000);
+      return () => {
+        document.body.style.overflow = '';
+        clearTimeout(timer);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    }
+  }, [isFullScreen, mapReady, forceMapResize]);
 
   // Real-time user location and orientation tracking
   useEffect(() => {
@@ -1037,7 +1070,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className="relative flex-1 w-full h-full min-h-[500px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col">
+    <div className={`relative flex-1 w-full h-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col ${isFullScreen ? 'fixed inset-0 z-[100000] h-screen w-screen' : 'min-h-[500px]'}`}>
       <div
         ref={mapContainerRef}
         className="absolute inset-0 w-full h-full z-0"
@@ -1178,6 +1211,23 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           >
             <RefreshCw size={20} />
           </button>
+          {onToggleFullScreen && (
+            <button
+              onClick={onToggleFullScreen}
+              className={`p-2 border-t border-outline transition-colors flex items-center justify-center text-secondary hover:bg-inputccent hover:text-muted-foregroundccent-foreground`}
+              title={isFullScreen ? "Exit Full Screen" : "Full Screen View"}
+            >
+              {isFullScreen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              )}
+            </button>
+          )}
         </div>
       </div>
 

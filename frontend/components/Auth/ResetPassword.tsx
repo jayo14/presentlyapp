@@ -53,7 +53,7 @@ const PasswordResetSuccess: React.FC<PasswordResetSuccessProps> = ({ onBackToLog
 
         <button
           onClick={onBackToLogin}
-          className="w-full h-12 bg-primaryContainer text-on-primary-fixed rounded-full font-bold hover:opacity-90 transition-all shadow-lg"
+          className="skeuo-button-gold w-full h-12 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Back to Login
         </button>
@@ -184,7 +184,7 @@ export const ResetPassword: React.FC = () => {
           <p className="text-textMuted">This password reset link is invalid or has expired.</p>
           <button
             onClick={() => navigate('/forgot-password')}
-            className="px-6 py-3 bg-primaryContainer text-on-primary-fixed rounded-full font-semibold hover:opacity-90 transition-all"
+            className="skeuo-button-gold px-6 py-3 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Request New Link
           </button>
@@ -217,7 +217,7 @@ export const ResetPassword: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-surface border border-outline p-6 rounded-2xl shadow-lg">
+        <div className="skeuo-card p-6 rounded-[2.5rem] shadow-2xl">
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-5">
               {/* New Password */}
@@ -316,7 +316,7 @@ export const ResetPassword: React.FC = () => {
               <button
                 type="submit"
                 disabled={!isPasswordValid || resetPasswordMutation.isPending}
-                className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="skeuo-button-gold w-full h-14 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {resetPasswordMutation.isPending ? (
                   <>

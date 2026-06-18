@@ -1215,7 +1215,7 @@ export const Onboarding: React.FC = () => {
         </div>
 
         <div
-          className="glass-panel border-outline/20 p-6 md:p-8 rounded-[2rem] shadow-2xl relative overflow-hidden backdrop-blur-3xl animate-reveal"
+          className="skeuo-card p-6 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-3xl animate-reveal"
           role="main"
         >
           {/* Header Title */}
@@ -1288,13 +1288,13 @@ export const Onboarding: React.FC = () => {
                 <button
                   onClick={handleBack}
                   aria-label="Go back to previous step"
-                  className="w-14 h-14 bg-surfaceLow border border-outline/20 text-textMuted rounded-2xl hover:bg-surfaceVariant transition-all flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="w-14 h-14 skeuo-button flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   <ChevronLeft size={24} aria-hidden="true" />
                 </button>
               )}
               <button
-                className="btn-presently-primary flex-1 h-14 flex items-center justify-center gap-2 group text-on-primary-fixed"
+                className="skeuo-button-gold flex-1 h-14 flex items-center justify-center gap-2 group text-on-primary-fixed"
                 onClick={handleNext}
                 disabled={(state.step === 1 && !state.selectedRole) || (state.pendingImage !== null) || completeOnboardingMutation.isPending}
                 aria-busy={completeOnboardingMutation.isPending}

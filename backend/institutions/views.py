@@ -1398,19 +1398,6 @@ class VenueViewSet(viewsets.ModelViewSet):
             'sessions': serializer.data
         })
 
-    @action(detail=False, methods=['get'])
-    def active_sessions(self, request):
-        """Get IDs of venues that have active sessions"""
-        active_venue_ids = AttendanceSession.objects.filter(
-            is_active=True,
-            venue__isnull=False
-        ).values_list('venue_id', flat=True).distinct()
-
-        return Response({
-            'success': True,
-            'active_venue_ids': list(active_venue_ids)
-        })
-
 
 class CourseViewSet(viewsets.ModelViewSet):
     """ViewSet for Course CRUD"""

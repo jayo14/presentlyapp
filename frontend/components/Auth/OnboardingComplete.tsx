@@ -112,7 +112,7 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
         </div>
 
         {/* Success Card */}
-        <div className="bg-surface text-text border border-outline rounded-3xl shadow-2xl p-8 md:p-12 text-center mb-8">
+        <div className="skeuo-card p-8 md:p-12 text-center mb-8">
           {/* Success Icon */}
           <div className="mb-6 flex justify-center">
             <div className="relative">
@@ -166,25 +166,21 @@ export const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({
 
           {/* Action Buttons */}
           <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Button
+            <button
               onClick={handleSkipToDashboard}
-              variant="primary"
-              size="lg"
-              className="flex-1 md:flex-none"
+              className="skeuo-button-gold flex-1 h-14 flex items-center justify-center gap-2 font-bold px-8"
             >
               Go to Dashboard
               <ArrowRight size={18} className="ml-2" />
-            </Button>
+            </button>
             
-            <Button
+            <button
               onClick={handleTakeTour}
-              variant="secondary"
-              size="lg"
-              className="flex-1 md:flex-none"
+              className="skeuo-button flex-1 h-14 flex items-center justify-center gap-2 font-bold px-8"
             >
               <BookOpen size={18} className="mr-2" />
               Take a Tour
-            </Button>
+            </button>
           </div>
 
           {/* Auto-redirect Countdown */}

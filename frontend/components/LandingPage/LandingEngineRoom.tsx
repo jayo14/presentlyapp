@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { IconCpu, IconShieldCheck, IconMapPin, IconShare, IconFingerprint, IconSettings, IconCircleCheck } from '@tabler/icons-react';
 
 const STAGES = [
@@ -28,9 +28,54 @@ const STAGES = [
 
 export const LandingEngineRoom: React.FC = () => {
   const [activeStage, setActiveStage] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Autoplay Logic
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      setActiveStage((prev) => (prev + 1) % STAGES.length);
+    }, 5000); // 5 seconds per stage
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  // Scroll Synchronization
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Map scroll progress to stage indices
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.onChange(v => {
+      // Only sync scroll if user is actively scrolling in the middle of the section
+      // and we want to transition between stages
+      if (v > 0.3 && v < 0.7) {
+        setIsAutoPlaying(false);
+        const stageIndex = Math.floor(((v - 0.3) / 0.4) * STAGES.length);
+        if (stageIndex >= 0 && stageIndex < STAGES.length) {
+          setActiveStage(stageIndex);
+        }
+      } else if (v >= 0.7 || v <= 0.3) {
+        // Resume autoplay if they scroll past or haven't reached the "active" zone
+        setIsAutoPlaying(true);
+      }
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+
+  const handleStageClick = (index: number) => {
+    setActiveStage(index);
+    setIsAutoPlaying(false);
+    // Optional: Resume autoplay after a delay
+    setTimeout(() => setIsAutoPlaying(true), 15000);
+  };
 
   return (
-    <section id="governance" className="py-40 bg-white relative overflow-hidden">
+    <section id="governance" ref={sectionRef} className="py-40 bg-white relative overflow-hidden">
       {/* Background Accent */}
       <div className="orb w-[1000px] h-[1000px] bg-sungold/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 
@@ -56,7 +101,7 @@ export const LandingEngineRoom: React.FC = () => {
             {STAGES.map((stage, i) => (
               <button
                 key={stage.id}
-                onClick={() => setActiveStage(i)}
+                onClick={() => handleStageClick(i)}
                 className={`w-full flex gap-8 p-8 rounded-[2rem] border transition-all duration-700 text-left group ${
                   activeStage === i
                     ? 'bg-neutral-50 border-black/5 shadow-xl scale-[1.02]'

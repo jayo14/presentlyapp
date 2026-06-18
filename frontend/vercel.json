@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "[ -d frontend ] && (cd frontend && pnpm install && pnpm build) || (pnpm install && pnpm build)",
-  "outputDirectory": "frontend/dist",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [

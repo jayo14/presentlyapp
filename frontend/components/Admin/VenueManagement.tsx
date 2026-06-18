@@ -26,6 +26,7 @@ export const VenueManagement: React.FC = () => {
   const [newVenueLocation, setNewVenueLocation] = useState<{lat: number; lng: number} | null>(null);
   const [newVenueBoundary, setNewVenueBoundary] = useState<number[][] | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isMapFullScreen, setIsMapFullScreen] = useState(false);
   const [activeVenueIds, setActiveVenueIds] = useState<Set<number>>(new Set());
 
   // Debounce search term
@@ -381,6 +382,8 @@ export const VenueManagement: React.FC = () => {
               selectedVenue={selectedVenue}
               drawingMode={isDrawing}
               onBoundaryComplete={handleBoundaryComplete}
+              isFullScreen={isMapFullScreen}
+              onToggleFullScreen={() => setIsMapFullScreen(!isMapFullScreen)}
             />
           </Suspense>
         </div>

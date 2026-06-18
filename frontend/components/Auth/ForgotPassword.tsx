@@ -214,7 +214,7 @@ export const ForgotPassword: React.FC = () => {
               </div>
               <button
                 onClick={handleReset}
-                className="w-full h-12 bg-primaryContainer text-on-primary-fixed rounded-full font-semibold hover:opacity-90 transition-all"
+                className="skeuo-button-gold w-full h-14 font-bold flex items-center justify-center"
               >
                 Try Again
               </button>
