@@ -10,9 +10,12 @@
     "binding": "ASSETS"
   },
   "build": {
-    "command": "cd frontend && npm install -g pnpm && pnpm install && pnpm run build"
+    "command": "cd frontend && npx pnpm install && npx pnpm run build"
   },
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "BACKEND_URL": "https://presentlyapp-alpha.onrender.com"
   }
 }

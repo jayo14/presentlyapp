@@ -2,24 +2,40 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Attempt to serve from assets
+    // Proxy API requests to the backend
+    if (url.pathname.startsWith('/api/')) {
+      const backendUrl = env.BACKEND_URL || 'https://presentlyapp-alpha.onrender.com';
+      const targetUrl = new URL(url.pathname + url.search, backendUrl);
+
+      const newRequest = new Request(targetUrl, request);
+
+      // Cloudflare Workers restriction: GET/HEAD requests cannot have a body
+      if (request.method === 'GET' || request.method === 'HEAD') {
+        return fetch(new Request(targetUrl, {
+          method: request.method,
+          headers: request.headers,
+          redirect: request.redirect
+        }));
+      }
+
+      return fetch(newRequest);
+    }
+
+    // Attempt to serve from static assets
     try {
       let response = await env.ASSETS.fetch(request);
 
-      // If asset not found (404) and not an API call, serve index.html for SPA routing
-      if (response.status === 404 && !url.pathname.startsWith('/api')) {
+      // SPA Fallback: If asset not found (404), serve index.html
+      if (response.status === 404) {
         const indexRequest = new Request(new URL('/index.html', request.url), request);
         return await env.ASSETS.fetch(indexRequest);
       }
 
       return response;
     } catch (e) {
-      // Fallback for SPA routing if ASSETS.fetch fails with 404
-      if (!url.pathname.startsWith('/api')) {
-        const indexRequest = new Request(new URL('/index.html', request.url), request);
-        return await env.ASSETS.fetch(indexRequest);
-      }
-      return new Response("Internal Server Error", { status: 500 });
+      // Fallback if ASSETS.fetch fails
+      const indexRequest = new Request(new URL('/index.html', request.url), request);
+      return await env.ASSETS.fetch(indexRequest);
     }
   }
 };

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install -g pnpm && pnpm install && pnpm run build",
+  "buildCommand": "cd frontend && npx pnpm install && npx pnpm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
   "cleanUrls": true,
