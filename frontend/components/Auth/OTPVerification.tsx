@@ -136,7 +136,7 @@ export const OTPVerification: React.FC = () => {
         <ArrowLeft size={20} />
       </button>
 
-      <div className="w-full max-w-md rounded-2xl border border-outline bg-surface shadow-xl p-6 md:p-8">
+      <div className="w-full max-w-md skeuo-card p-6 md:p-8 shadow-xl">
         {/* Header */}
         <div className="mb-10 text-center">
           <h1 className="font-headline text-4xl font-bold text-text mb-4">
@@ -160,7 +160,7 @@ export const OTPVerification: React.FC = () => {
               onKeyDown={(e) => handleKeyDown(index, e)}
               className={[
                 'w-11 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold',
-                'bg-surfaceContainer border text-text rounded-xl',
+                'bg-surfaceLow border text-text rounded-xl',
                 'transition-all focus:outline-none focus:ring-2 focus:ring-primary',
                 digit ? 'border-primary' : 'border-outline focus:border-primary',
               ].join(' ')}
@@ -173,7 +173,7 @@ export const OTPVerification: React.FC = () => {
           <button
             type="button"
             onClick={handlePasteFromClipboard}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-card text-text hover:bg-surfaceHigh transition-colors"
+            className="skeuo-button h-10 px-4 inline-flex items-center gap-2"
           >
             <ClipboardPaste size={16} />
             Paste code
@@ -214,7 +214,7 @@ export const OTPVerification: React.FC = () => {
         <button
           onClick={handleVerify}
           disabled={!isOtpComplete || verifyMutation.isPending}
-          className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="skeuo-button-gold w-full h-14 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {verifyMutation.isPending ? (
             <>
