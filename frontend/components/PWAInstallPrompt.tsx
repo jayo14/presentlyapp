@@ -53,7 +53,7 @@ export const PWAInstallPrompt: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 left-4 z-[70] max-w-xs animate-slide-up">
-      <div className="rounded-xl border border-outline bg-surface/95 backdrop-blur p-4 shadow-xl">
+      <div className="skeuo-card p-4 shadow-xl">
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
             <Download size={18} />
@@ -66,7 +66,7 @@ export const PWAInstallPrompt: React.FC = () => {
                 <button
                   type="button"
                   onClick={installApp}
-                  className="px-3 py-1.5 rounded-lg bg-primary text-black text-xs font-semibold hover:opacity-90"
+                  className="skeuo-button-gold px-3 py-1.5 rounded-lg text-xs font-semibold"
                 >
                   Install App
                 </button>

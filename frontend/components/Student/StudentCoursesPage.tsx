@@ -128,62 +128,63 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 const attendance = course.attendance_percentage || 0;
                 return (
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    key={course.id}
-                    className="bg-surface dark:bg-surfaceContainer/10 rounded-[2.5rem] p-7 border border-outline/10 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  key={course.id}
+                  className="skeuo-card p-7 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
                   >
-                    <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10"></div>
+                  <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10"></div>
 
-                    <div className="flex justify-between items-start mb-6">
-                      <CourseIcon
-                        title={course.course_name}
-                        code={course.course_code}
-                        className="w-14 h-14 group-hover:scale-110 transition-transform duration-500"
+                  <div className="flex justify-between items-start mb-6">
+                    <CourseIcon
+                      title={course.course_name}
+                      code={course.course_code}
+                      className="w-14 h-14 group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <button
+                      onClick={() => setCourseToDrop(course)}
+                      disabled={droppingId === course.id}
+                      className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-background transition-all active:scale-90"
+                    >
+                      {droppingId === course.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                    </button>
+                  </div>
+
+                  <div className="space-y-1 mb-8">
+                    <p className="text-[10px] font-black tracking-widest text-primary/70 uppercase">{course.course_code}</p>
+                    <h3 className="text-2xl font-headline font-black text-text tracking-tight leading-tight">{course.course_name}</h3>
+                    <p className="text-textMuted font-bold text-xs flex items-center gap-2">
+                      <User size={14} className="opacity-40" />
+                      {course.lecturer_name || 'Prof. Unassigned'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-end">
+                      <div className="flex items-center gap-2">
+                        <Activity size={16} className="text-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Progress</span>
+                      </div>
+                      <span className={`text-xl font-headline font-black ${attendance >= 75 ? 'text-emerald-500' : 'text-amber-500 font-black'}`}>
+                        {Math.round(attendance)}%
+                      </span>
+                    </div>
+                    <div className="h-2.5 w-full bg-surfaceHigh/40 rounded-full overflow-hidden p-0.5">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${attendance}%` }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                        className={`h-full rounded-full ${attendance >= 75 ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.3)]'}`}
                       />
-                      <button
-                        onClick={() => setCourseToDrop(course)}
-                        disabled={droppingId === course.id}
-                        className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-background transition-all active:scale-90"
-                      >
-                        {droppingId === course.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                      </button>
                     </div>
-
-                    <div className="space-y-1 mb-8">
-                      <p className="text-[10px] font-black tracking-widest text-primary/70 uppercase">{course.course_code}</p>
-                      <h3 className="text-2xl font-headline font-black text-text tracking-tight leading-tight">{course.course_name}</h3>
-                      <p className="text-textMuted font-bold text-xs flex items-center gap-2">
-                        <User size={14} className="opacity-40" />
-                        {course.lecturer_name || 'Prof. Unassigned'}
-                      </p>
+                    <div className="flex justify-between text-[10px] font-black text-textMuted/40 uppercase tracking-tighter">
+                      <span>{course.sessions_attended} Sessions</span>
+                      <span>{course.total_sessions} Total</span>
                     </div>
-
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-end">
-                        <div className="flex items-center gap-2">
-                          <Activity size={16} className="text-emerald-500" />
-                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Progress</span>
-                        </div>
-                        <span className={`text-xl font-headline font-black ${attendance >= 75 ? 'text-emerald-500' : 'text-amber-500 font-black'}`}>
-                          {Math.round(attendance)}%
-                        </span>
-                      </div>
-                      <div className="h-2.5 w-full bg-surfaceHigh/40 rounded-full overflow-hidden p-0.5">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${attendance}%` }}
-                          transition={{ duration: 1, delay: 0.5 }}
-                          className={`h-full rounded-full ${attendance >= 75 ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.3)]'}`}
-                        />
-                      </div>
-                      <div className="flex justify-between text-[10px] font-black text-textMuted/40 uppercase tracking-tighter">
-                        <span>{course.sessions_attended} Sessions</span>
-                        <span>{course.total_sessions} Total</span>
-                      </div>
-                    </div>
+                  </div>
                   </motion.div>
+
                 );
               })
             ) : (

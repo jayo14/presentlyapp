@@ -194,7 +194,7 @@ export const StudentViewPage: React.FC = () => {
 
         {/* Overall Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
+          <div className="skeuo-card p-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-textMuted text-sm">Overall</span>
               <TrendingUp size={20} className="text-primary" />
@@ -210,7 +210,7 @@ export const StudentViewPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
+          <div className="skeuo-card p-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-textMuted text-sm">Courses</span>
               <BookOpen size={20} className="text-primary" />
@@ -219,7 +219,7 @@ export const StudentViewPage: React.FC = () => {
             <p className="text-textMuted text-xs mt-1">Active enrollments</p>
           </div>
 
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
+          <div className="skeuo-card p-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-textMuted text-sm">Present</span>
               <CheckCircle size={20} className="text-green-600" />
@@ -230,7 +230,7 @@ export const StudentViewPage: React.FC = () => {
             <p className="text-textMuted text-xs mt-1">Total sessions</p>
           </div>
 
-          <div className="bg-surface border border-outline rounded-2xl p-5 shadow-md">
+          <div className="skeuo-card p-5">
             <div className="flex items-center justify-between mb-2">
               <span className="text-textMuted text-sm">Absent</span>
               <XCircle size={20} className="text-red-600" />

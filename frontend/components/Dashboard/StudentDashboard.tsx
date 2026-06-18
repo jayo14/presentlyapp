@@ -204,7 +204,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                 {/* COMPACT STATS GRID */}
                 <ResponsiveGrid cols={3}>
                     {/* ATTENDANCE CARD */}
-                    <div className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all">
+                    <div className="skeuo-card p-6 flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all">
                     <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                         <Pulse size={18} weight="bold" />
                     </div>
@@ -218,7 +218,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     </div>
 
                     {/* ACADEMIC LEVEL CARD */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] shadow-lg shadow-primary/10 group cursor-default">
+                    <div className="relative overflow-hidden bg-gradient-to-br from-[#755b00cc] to-primary p-6 rounded-[2.5rem] flex flex-col justify-between min-h-[120px] shadow-lg shadow-primary/10 group cursor-default">
                     <Star size={40} weight="bold" className="absolute -right-2 -top-2 opacity-10 rotate-12" />
                     <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
                         <Trophy size={18} weight="bold" />
@@ -238,7 +238,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     {/* COURSES CARD */}
                     <div
                     onClick={() => window.location.href = '/dashboard/courses'}
-                    className="bg-surface text-text border border-outline p-4 rounded-[2rem] flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all cursor-pointer group"
+                    className="skeuo-card p-6 flex flex-col justify-between min-h-[120px] hover:shadow-lg transition-all cursor-pointer group"
                     >
                     <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                         <BookOpen size={18} weight="bold" />
@@ -272,7 +272,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.1 }}
                             key={activity.id}
-                            className="bg-surface text-text border border-outline p-4 rounded-[1.75rem] flex items-center gap-4 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group"
+                            className="skeuo-card p-4 flex items-center gap-4 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group"
                         >
                             <CourseIcon
                             title={activity.course_name}
