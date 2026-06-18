@@ -152,16 +152,16 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Login Form Card */}
-        <div className="glass-panel border p-6 rounded-2xl shadow-lg">
+        <div className="skeuo-card p-8 shadow-2xl">
           <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-6">
               {/* Email Input */}
               <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <div className="relative">
+                <label className="block text-sm font-medium mb-2 px-1">Email</label>
+                <div className="relative group">
                   <Mail
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#a1a1aa] z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors z-10"
                   />
                   <input
                     type="email"
@@ -169,18 +169,18 @@ export const Login: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   />
                 </div>
               </div>
 
               {/* Password Input */}
               <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
-                <div className="relative">
+                <label className="block text-sm font-medium mb-2 px-1">Password</label>
+                <div className="relative group">
                   <Lock
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors z-10"
                   />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -188,12 +188,12 @@ export const Login: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-transparent border rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-12 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary transition-colors z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors z-10"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -202,20 +202,20 @@ export const Login: React.FC = () => {
               </div>
 
               {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
+              <div className="flex items-center justify-between text-sm px-1">
+                <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer accent-[#FFD700]"
+                    className="w-4 h-4 cursor-pointer accent-sungold rounded"
                   />
-                  <span className="text-textMuted">Remember me</span>
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">Remember me</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => navigate('/forgot-password')}
-                  className="text-primary font-medium hover:text-primary-fixed transition-colors"
+                  className="text-sungold font-medium hover:underline transition-colors"
                 >
                   Forgot password?
                 </button>
@@ -225,7 +225,7 @@ export const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={loginMutation.isPending}
-                className="btn-presently-primary w-full flex items-center justify-center gap-2 h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="skeuo-button-gold w-full flex items-center justify-center gap-2 h-14 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loginMutation.isPending ? (
                   <>

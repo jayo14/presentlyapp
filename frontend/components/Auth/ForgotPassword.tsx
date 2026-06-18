@@ -111,14 +111,14 @@ export const ForgotPassword: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-surface border border-outline p-6 rounded-2xl shadow-lg">
+        <div className="skeuo-card p-8 shadow-2xl">
           {pageState === 'form' && (
             <form onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-text/80 mb-2 tracking-wide">University Email</label>
-                  <div className="relative">
-                    <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10" />
+                  <label className="block text-sm font-bold text-foreground/80 mb-2 tracking-wide px-1">University Email</label>
+                  <div className="relative group">
+                    <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-sungold transition-colors z-10" />
                     <input
                       type="email"
                       placeholder="name@university.edu"
@@ -127,11 +127,11 @@ export const ForgotPassword: React.FC = () => {
                       onChange={handleEmailChange}
                       disabled={requestPasswordResetMutation.isPending}
                       className={[
-                        'w-full h-14 pl-12 pr-12 bg-surfaceLow border rounded-2xl text-text placeholder-textMuted',
-                        'focus:outline-none focus:ring-1 transition-colors',
+                        'w-full h-14 pl-12 pr-12 bg-background/50 border rounded-2xl text-foreground placeholder-muted-foreground',
+                        'focus:outline-none focus:ring-1 transition-all',
                         emailError
-                          ? 'border-destructive focus:border-destructive focus:ring-destructive'
-                          : 'border-outline focus:border-primary focus:ring-primary',
+                          ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                          : 'border-foreground/10 focus:border-sungold focus:ring-sungold',
                         'disabled:opacity-50',
                       ].join(' ')}
                     />
@@ -139,7 +139,7 @@ export const ForgotPassword: React.FC = () => {
                       <button
                         type="button"
                         onClick={clearEmail}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-text transition-colors z-10"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors z-10"
                         aria-label="Clear email"
                       >
                         <X size={20} />
@@ -147,7 +147,7 @@ export const ForgotPassword: React.FC = () => {
                     )}
                   </div>
                   {emailError && (
-                    <div className="flex items-center gap-1.5 mt-2 text-red-400 text-xs">
+                    <div className="flex items-center gap-1.5 mt-2 text-red-500 text-xs px-1">
                       <AlertCircle size={14} />
                       <span>{emailError}</span>
                     </div>
@@ -157,7 +157,7 @@ export const ForgotPassword: React.FC = () => {
                 <button
                   type="submit"
                   disabled={requestPasswordResetMutation.isPending || !email || !!emailError || cooldownRemaining > 0}
-                  className="w-full h-14 bg-primaryContainer text-on-primary-fixed rounded-2xl font-bold text-lg hover:opacity-90 hover:-translate-y-px active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="skeuo-button-gold w-full h-14 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {requestPasswordResetMutation.isPending ? (
                     <>
@@ -171,12 +171,12 @@ export const ForgotPassword: React.FC = () => {
                   )}
                 </button>
 
-                <p className="text-center text-sm text-textMuted mt-2">
+                <p className="text-center text-sm text-muted-foreground mt-2">
                   Having trouble?{' '}
                   <button
                     type="button"
                     onClick={() => window.open('mailto:support@getpresently.com.ng', '_blank')}
-                    className="text-primary font-semibold hover:underline"
+                    className="text-sungold font-semibold hover:underline"
                   >
                     Contact Support
                   </button>

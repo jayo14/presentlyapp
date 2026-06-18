@@ -93,17 +93,17 @@ const SocialMarquee = () => (
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#FDF9F0] selection:bg-sungold/30 selection:text-neutral-900 font-sans text-neutral-900 landing-page overflow-x-hidden">
+    <div className="min-h-screen bg-background selection:bg-sungold/30 selection:text-neutral-900 font-sans text-foreground landing-page overflow-x-hidden">
       <Navbar />
       <Hero />
       <SocialMarquee />
 
-      <section className="bg-white py-40 relative overflow-hidden">
+      <section className="bg-background py-40 relative overflow-hidden">
         {/* Background Accent */}
         <div className="orb w-[800px] h-[800px] bg-sungold/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 
         <div className="max-w-[1440px] mx-auto px-8 md:px-16 relative z-10">
-          <div className='grid grid-cols-1 md:grid-cols-4 gap-16 py-24 border-y border-black/5'>
+          <div className='grid grid-cols-1 md:grid-cols-4 gap-16 py-24 border-y border-foreground/5'>
             <StatCounterWrapper value="14+" label="Federal institutions" />
             <StatCounterWrapper value="99.9%" label="Security fidelity" />
             <StatCounterWrapper value="3.2s" label="Avg. latency" />
@@ -116,13 +116,13 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="max-w-5xl mx-auto text-center mt-40"
           >
-            <p className="text-[clamp(2rem,4vw,3.5rem)] text-neutral-900 font-medium tracking-tight leading-tight mb-12">
+            <p className="text-[clamp(2rem,4vw,3.5rem)] text-foreground font-medium tracking-tight leading-tight mb-12">
               "Presently transformed our NUC accreditation process from a <span className="italic  text-neutral-400">manual nightmare</span> into an automated gold standard."
             </p>
             <div className="flex items-center justify-center gap-6">
-               <div className="w-12 h-px bg-black/5" />
+               <div className="w-12 h-px bg-foreground/5" />
                <p className="text-neutral-500 font-medium tracking-tight text-sm">Prof. Ifeanyi · Deputy vice chancellor</p>
-               <div className="w-12 h-px bg-black/5" />
+               <div className="w-12 h-px bg-foreground/5" />
             </div>
           </motion.div>
         </div>
@@ -134,11 +134,11 @@ export default function LandingPage() {
       <LandingMobileApp />
       <LandingTestimonials />
 
-      <section className="py-40 bg-[#FDF9F0]">
+      <section className="py-40 bg-background">
         <div className="max-w-7xl mx-auto px-8 md:px-16">
           <div className="mb-32">
             <span className="text-sungold text-[11px] font-medium tracking-tight mb-8 block">Executive FAQ</span>
-            <h2 className="text-[clamp(3rem,6vw,5.5rem)] tracking-[-0.04em] text-neutral-900 leading-[0.9] font-medium">Institutional<br />questions.</h2>
+            <h2 className="text-[clamp(3rem,6vw,5.5rem)] tracking-[-0.04em] text-foreground leading-[0.9] font-medium">Institutional<br />questions.</h2>
           </div>
           <div className="max-w-4xl">
             <AccordionItem

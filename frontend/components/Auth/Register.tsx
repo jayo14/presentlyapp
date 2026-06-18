@@ -166,7 +166,7 @@ export const Register: React.FC = () => {
           <p className="text-textMuted text-lg leading-relaxed">Start tracking attendance with precision.</p>
         </div>
 
-        <div className="glass-panel border-outline/20 p-8 rounded-[2rem] shadow-2xl backdrop-blur-3xl">
+        <div className="skeuo-card p-8 shadow-2xl backdrop-blur-3xl">
           {registerMutation.error && (
             <div className="p-3 bg-red-500/10 border border-red-500 rounded-lg mb-4">
               <p className="text-sm text-red-500">
@@ -176,14 +176,14 @@ export const Register: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-6">
               {/* Full Name */}
               <div>
-                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Full Name</label>
-                <div className="relative">
+                <label className="block text-sm font-bold mb-2 text-foreground/80 tracking-wide px-1">Full Name</label>
+                <div className="relative group">
                   <UserIcon
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-sungold transition-colors z-10"
                   />
                   <input
                     type="text"
@@ -191,18 +191,18 @@ export const Register: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-surfaceContainer border border-outline text-text rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Email Address</label>
-                <div className="relative">
+                <label className="block text-sm font-bold mb-2 text-foreground/80 tracking-wide px-1">Email Address</label>
+                <div className="relative group">
                   <Mail
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-sungold transition-colors z-10"
                   />
                   <input
                     type="email"
@@ -210,18 +210,18 @@ export const Register: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-surfaceContainer border border-outline text-text rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-4 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
                   />
                 </div>
               </div>
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-bold mb-2 text-text/80 tracking-wide">Password</label>
-                <div className="relative">
+                <label className="block text-sm font-bold mb-2 text-foreground/80 tracking-wide px-1">Password</label>
+                <div className="relative group">
                   <Lock
                     size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted z-10"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-sungold transition-colors z-10"
                   />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -229,12 +229,12 @@ export const Register: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-surfaceContainer border border-outline text-text rounded-2xl placeholder:text-textMuted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                    className="w-full h-14 pl-12 pr-12 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary transition-colors z-10"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-sungold transition-colors z-10"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -245,12 +245,12 @@ export const Register: React.FC = () => {
                 {password && (
                   <div className="mt-3">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-textMuted">Password Strength</span>
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground px-1">Password Strength</span>
                       <span className={`text-[10px] font-bold ${getStrengthColor(passwordStrength).replace('bg-', 'text-')}`}>
                         {getStrengthLabel(passwordStrength)}
                       </span>
                     </div>
-                    <div className="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden flex gap-1">
+                    <div className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden flex gap-1">
                       {[25, 50, 75, 100].map((step) => (
                         <div
                           key={step}
@@ -259,24 +259,21 @@ export const Register: React.FC = () => {
                         />
                       ))}
                     </div>
-                    <p className="text-[11px] text-textMuted mt-2 leading-relaxed">
-                      Use 8+ characters with a mix of letters, numbers & symbols to avoid the "common password" error.
-                    </p>
                   </div>
                 )}
               </div>
 
-              <p className="text-xs text-textMuted">
+              <p className="text-xs text-muted-foreground px-1 leading-relaxed">
                 By clicking "Create Account", you agree to our{' '}
-                <a href="/terms" className="underline hover:text-text transition-colors">Terms</a>
+                <a href="/terms" className="underline hover:text-foreground transition-colors">Terms</a>
                 {' '}and{' '}
-                <a href="/privacy" className="underline hover:text-text transition-colors">Privacy Policy</a>.
+                <a href="/privacy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
               </p>
 
               <button
                 type="submit"
                 disabled={registerMutation.isPending}
-                className="btn-presently-primary w-full flex items-center justify-center gap-2 w-full h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="skeuo-button-gold w-full flex items-center justify-center gap-2 h-14 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {registerMutation.isPending ? (
                   <>

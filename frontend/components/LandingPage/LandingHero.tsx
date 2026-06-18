@@ -27,7 +27,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen bg-[#FDF9F0] pt-40 pb-20 overflow-hidden flex items-center selection:bg-sungold/30">
+    <section className="relative min-h-screen bg-background pt-40 pb-20 overflow-hidden flex items-center selection:bg-sungold/30">
       {/* Savage Background Orbs */}
       <div className="orb w-[800px] h-[800px] bg-sungold/10 -top-40 -right-40" />
       <div className="orb w-[600px] h-[600px] bg-blue-400/5 bottom-0 -left-20" />

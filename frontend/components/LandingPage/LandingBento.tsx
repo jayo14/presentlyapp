@@ -63,7 +63,7 @@ const BentoCard = ({ children, className = "", delay = 0 }) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-      className={`relative group overflow-hidden rounded-[2.5rem] border border-black/5 bg-white hover:border-sungold/40 transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] ${className}`}
+      className={`relative group overflow-hidden rounded-[2.5rem] border border-foreground/5 bg-surface hover:border-sungold/40 transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] ${className}`}
     >
       <div style={{ transform: "translateZ(50px)" }} className="h-full">
         {children}
@@ -74,7 +74,7 @@ const BentoCard = ({ children, className = "", delay = 0 }) => {
 
 export const LandingBento = () => {
   return (
-    <section id="infrastructure" className="py-40 bg-[#FDF9F0] relative overflow-hidden">
+    <section id="infrastructure" className="py-40 bg-background relative overflow-hidden">
       <div className="orb w-[500px] h-[500px] bg-blue-400/5 top-20 -right-20" />
 
       <div className="max-w-[1440px] mx-auto px-8 md:px-16 relative z-10">
@@ -89,7 +89,7 @@ export const LandingBento = () => {
                <div className="w-10 h-px bg-sungold" />
                <span className="text-sungold font-medium text-[11px] tracking-tight">Sovereign architecture</span>
             </motion.div>
-            <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-medium text-neutral-900 leading-[0.9] tracking-[-0.04em]">
+            <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-medium text-foreground leading-[0.9] tracking-[-0.04em]">
               The core of institutional<br />
               <span className="text-neutral-400 italic ">excellence.</span>
             </h2>
@@ -98,7 +98,7 @@ export const LandingBento = () => {
             <p className="text-xl text-neutral-500 leading-relaxed  mb-8">
               Presently is not an app; it is a fundamental layer of academic integrity for the modern university.
             </p>
-            <a href="#" className="inline-flex items-center gap-2 text-neutral-900 font-medium tracking-tight text-[11px] group">
+            <a href="#" className="inline-flex items-center gap-2 text-foreground font-medium tracking-tight text-[11px] group">
               Explore infrastructure <IconArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </a>
           </div>
@@ -106,7 +106,7 @@ export const LandingBento = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-full">
 
-          <BentoCard className="md:col-span-8 p-8 min-h-[500px] flex flex-col justify-between bg-white group">
+          <BentoCard className="md:col-span-8 p-8 min-h-[500px] flex flex-col justify-between bg-surface group">
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-8">
                 <div className="w-16 h-16 rounded-2xl bg-sungold/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
@@ -114,7 +114,7 @@ export const LandingBento = () => {
                 </div>
                 <MiniChart color="#F9C406" />
               </div>
-              <h3 className="text-4xl font-medium text-neutral-900 tracking-tight mb-6 leading-tight">NUC accreditation sovereignty.</h3>
+              <h3 className="text-4xl font-medium text-foreground tracking-tight mb-6 leading-tight">NUC accreditation sovereignty.</h3>
               <p className="text-lg text-neutral-500 max-w-xl leading-relaxed ">
                 Generating audit-ready attendance reports with cryptographic certainty. Presently ensures your institution meets the 75% attendance threshold mandated for examination eligibility with immutable, location-verified records.
               </p>
@@ -122,7 +122,7 @@ export const LandingBento = () => {
 
             <div className="mt-12 flex flex-wrap gap-4 relative z-10">
                {['ISO 27001 certified', 'CCMAS compliant', 'Real-time audit logs', 'Sovereign data storage'].map(tag => (
-                 <span key={tag} className="px-6 py-2.5 rounded-full bg-neutral-50 border border-black/5 text-[11px] font-medium tracking-tight text-neutral-600 hover:border-sungold/40 transition-colors">
+                 <span key={tag} className="px-6 py-2.5 rounded-full bg-foreground/5 border border-foreground/5 text-[11px] font-medium tracking-tight text-neutral-600 hover:border-sungold/40 transition-colors">
                    {tag}
                  </span>
                ))}
@@ -133,7 +133,7 @@ export const LandingBento = () => {
             </div>
           </BentoCard>
 
-          <BentoCard className="md:col-span-4 p-8 min-h-[500px] bg-[#231F0F] flex flex-col justify-between text-white group">
+          <BentoCard className="md:col-span-4 p-8 min-h-[500px] bg-neutral-900 flex flex-col justify-between text-white group">
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-8">
                 <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-xl group-hover:bg-sungold/20 transition-colors duration-700">
@@ -166,31 +166,31 @@ export const LandingBento = () => {
             </div>
           </BentoCard>
 
-          <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-white group">
+          <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-surface group">
             <div className="w-14 h-14 rounded-xl bg-sungold/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
               <IconUsers size={28} className="text-sungold" />
             </div>
-            <h4 className="text-2xl font-medium text-neutral-900 tracking-tight mb-4">Classroom authority.</h4>
+            <h4 className="text-2xl font-medium text-foreground tracking-tight mb-4">Classroom authority.</h4>
             <p className="text-base text-neutral-500 leading-relaxed ">
               Lecturers reclaim up to 20% of contact time previously lost to manual roll calls. Presently restores the focus to pedagogy.
             </p>
           </BentoCard>
 
-          <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-white group">
+          <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-surface group">
             <div className="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
               <IconChartBar size={28} className="text-blue-500" />
             </div>
-            <h4 className="text-2xl font-medium text-neutral-900 tracking-tight mb-4">Predictive engagement.</h4>
+            <h4 className="text-2xl font-medium text-foreground tracking-tight mb-4">Predictive engagement.</h4>
             <p className="text-base text-neutral-500 leading-relaxed ">
               Monitor student engagement live. Identify at-risk cohorts before they fall behind mandated minimums.
             </p>
           </BentoCard>
 
-          <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-white group">
+          <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-surface group">
             <div className="w-14 h-14 rounded-xl bg-green-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
               <IconFileText size={28} className="text-green-500" />
             </div>
-            <h4 className="text-2xl font-medium text-neutral-900 tracking-tight mb-4">Examination clearance.</h4>
+            <h4 className="text-2xl font-medium text-foreground tracking-tight mb-4">Examination clearance.</h4>
             <p className="text-base text-neutral-500 leading-relaxed ">
               Seamlessly bridge attendance with exam clearance. Instantly verify eligibility based on secure records.
             </p>

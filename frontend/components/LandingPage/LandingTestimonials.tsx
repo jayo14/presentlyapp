@@ -28,7 +28,7 @@ const TESTIMONIALS = [
 
 export const LandingTestimonials: React.FC = () => {
   return (
-    <section className="py-40 bg-[#FDF9F0] relative overflow-hidden">
+    <section className="py-40 bg-background relative overflow-hidden">
       {/* Background Accent */}
       <div className="orb w-[800px] h-[800px] bg-sungold/5 bottom-0 right-0" />
 

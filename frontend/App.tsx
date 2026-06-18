@@ -124,6 +124,9 @@ const warmUpBackend = () => {
   const backendBase = rawApi.endsWith('/api') ? rawApi : `${rawApi}/api`;
   fetch(`${backendBase}/warmup/`, {
     method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
     signal: AbortSignal.timeout(40000),
   }).catch(() => {});
 };
