@@ -10,7 +10,7 @@
     "binding": "ASSETS"
   },
   "build": {
-    "command": "[ -d frontend ] && (cd frontend && pnpm install && pnpm build) || (pnpm install && pnpm build)"
+    "command": "cd frontend && npm install -g pnpm && pnpm install && pnpm run build"
   },
   "observability": {
     "enabled": true
