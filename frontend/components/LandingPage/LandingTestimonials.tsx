@@ -29,8 +29,38 @@ const TESTIMONIALS = [
 export const LandingTestimonials: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const next = () => setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length);
-  const prev = () => setCurrentIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  // Responsive items count
+  const getVisibleCount = () => {
+    if (typeof window === 'undefined') return 3;
+    if (window.innerWidth < 768) return 1;
+    if (window.innerWidth < 1024) return 2;
+    return 3;
+  };
+
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  useEffect(() => {
+    const handleResize = () => setVisibleCount(getVisibleCount());
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const next = () => {
+    setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+  };
+  
+  const prev = () => {
+    setCurrentIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  };
+
+  const getVisibleTestimonials = () => {
+    const items = [];
+    for (let i = 0; i < visibleCount; i++) {
+      items.push(TESTIMONIALS[(currentIndex + i) % TESTIMONIALS.length]);
+    }
+    return items;
+  };
 
   return (
     <section className="py-40 bg-background relative overflow-hidden">
@@ -77,47 +107,51 @@ export const LandingTestimonials: React.FC = () => {
           </div>
         </div>
 
-        <div className="relative h-[450px] md:h-[400px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentIndex}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0"
-            >
-              <div
-                className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-black/5 flex flex-col md:flex-row items-center gap-12 group hover:border-sungold/40 transition-all duration-700 hover:shadow-2xl relative overflow-hidden h-full"
-              >
-                <div className="relative z-10 flex-1">
-                  <div className="w-14 h-14 rounded-2xl bg-sungold/10 flex items-center justify-center mb-8">
-                     <IconQuote size={28} className="text-sungold fill-sungold" />
-                  </div>
-                  <p className="text-2xl md:text-3xl font-medium text-neutral-900 leading-tight italic mb-8">
-                    "{TESTIMONIALS[currentIndex].quote}"
-                  </p>
-                </div>
+        <div className="relative overflow-hidden">
+          <div className="flex gap-8">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {getVisibleTestimonials().map((testimonial, idx) => (
+                <motion.div
+                  key={`${testimonial.name}-${currentIndex}-${idx}`}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex-1 min-w-0"
+                >
+                  <div
+                    className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-black/5 flex flex-col justify-between group hover:border-sungold/40 transition-all duration-700 hover:shadow-2xl relative overflow-hidden h-[480px]"
+                  >
+                    <div className="relative z-10">
+                      <div className="w-14 h-14 rounded-2xl bg-sungold/10 flex items-center justify-center mb-8">
+                         <IconQuote size={28} className="text-sungold fill-sungold" />
+                      </div>
+                      <p className="text-xl md:text-2xl font-medium text-neutral-900 leading-tight italic mb-8">
+                        "{testimonial.quote}"
+                      </p>
+                    </div>
 
-                <div className="flex items-center gap-5 relative z-10 md:border-l md:border-black/5 md:pl-12">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-[2rem] border-2 border-neutral-100 overflow-hidden shrink-0">
-                    <img
-                      src={TESTIMONIALS[currentIndex].img}
-                      alt={TESTIMONIALS[currentIndex].name}
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                    />
+                    <div className="flex items-center gap-4 relative z-10 pt-8 border-t border-black/5">
+                      <div className="w-14 h-14 rounded-2xl border-2 border-neutral-100 overflow-hidden shrink-0">
+                        <img
+                          src={testimonial.img}
+                          alt={testimonial.name}
+                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-medium text-base text-neutral-900 tracking-tight mb-0.5 truncate">{testimonial.name}</h4>
+                        <p className="text-[10px] font-bold text-sungold uppercase tracking-widest mb-1 truncate">{testimonial.role}</p>
+                        <p className="text-[10px] font-medium text-neutral-400 tracking-tight flex items-center gap-1.5 truncate">
+                           <IconCircleCheck size={14} className="text-green-500" /> {testimonial.institution}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-medium text-xl text-neutral-900 tracking-tight mb-1">{TESTIMONIALS[currentIndex].name}</h4>
-                    <p className="text-sm font-medium text-sungold tracking-tight mb-1">{TESTIMONIALS[currentIndex].role}</p>
-                    <p className="text-sm font-medium text-neutral-400 tracking-tight flex items-center gap-1.5">
-                       <IconCircleCheck size={16} className="text-green-500" /> {TESTIMONIALS[currentIndex].institution}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
         </div>
 
         <div className="mt-32 pt-16 border-t border-black/5 flex flex-wrap justify-center items-center gap-16 opacity-30 grayscale contrast-125">

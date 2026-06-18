@@ -209,9 +209,9 @@ export const Login: React.FC = () => {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer accent-primary"
+                    className="w-4 h-4 rounded-full cursor-pointer accent-primary border border-outline"
                   />
-                  <span className="text-textMuted font-medium">Remember me</span>
+                  <span className="text-textMuted font-medium text-xs">Remember me</span>
                 </label>
                 <button
                   type="button"

@@ -16,11 +16,16 @@ import { ResponsiveContainer } from '../layouts/ResponsiveContainer';
 export const DevicesPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const { data: devices, isLoading, isRefetching, refetch } = useQuery({
     queryKey: ['security', 'devices'],
     queryFn: securityApi.getDevices
   });
+
+  const paginatedDevices = devices?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil((devices?.length || 0) / itemsPerPage);
 
   const trustMutation = useMutation({
     mutationFn: (deviceId: number) => securityApi.trustDevice(deviceId),
@@ -97,7 +102,7 @@ export const DevicesPage: React.FC = () => {
         ) : (
           <AnimatePresence>
             <div className="space-y-4">
-              {devices?.map((device, index) => (
+              {paginatedDevices?.map((device, index) => (
                 <motion.div
                   key={device.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -167,6 +172,28 @@ export const DevicesPage: React.FC = () => {
                   )}
                 </motion.div>
               ))}
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-4">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-surface rounded-lg border border-outline disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                <span className="text-sm font-medium">Page {currentPage} of {totalPages}</span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 bg-surface rounded-lg border border-outline disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
             </div>
           </AnimatePresence>
         )}

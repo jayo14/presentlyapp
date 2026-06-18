@@ -115,7 +115,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   return (
     <aside
       className={cn(
-        "hidden md:flex flex-col bg-surface border-r border-outline/10 h-screen sticky top-0 transition-all duration-300 ease-premium relative z-30",
+        "hidden md:flex flex-col bg-surface border-r border-outline/10 h-screen fixed left-0 top-0 transition-all duration-300 ease-premium relative z-30",
         collapsed ? "w-[80px]" : "w-[280px]"
       )}
     >
