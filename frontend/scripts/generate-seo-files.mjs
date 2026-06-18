@@ -4,7 +4,7 @@ import path from 'node:path';
 import { SitemapStream, streamToPromise } from 'sitemap';
 
 const siteUrl = process.env.VITE_SITE_URL || 'https://getpresently.com.ng';
-const publicDir = path.resolve(process.cwd(), 'public');
+const publicDir = path.resolve(process.cwd(), 'dist');
 
 const universities = [
   'lasustech',
