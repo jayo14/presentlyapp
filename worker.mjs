@@ -7,18 +7,18 @@ export default {
       const backendUrl = env.BACKEND_URL || 'https://presentlyapp-alpha.onrender.com';
       const targetUrl = new URL(url.pathname + url.search, backendUrl);
 
-      const newRequest = new Request(targetUrl, request);
+      const proxyOptions = {
+        method: request.method,
+        headers: request.headers,
+        redirect: "follow"
+      };
 
       // Cloudflare Workers restriction: GET/HEAD requests cannot have a body
-      if (request.method === 'GET' || request.method === 'HEAD') {
-        return fetch(new Request(targetUrl, {
-          method: request.method,
-          headers: request.headers,
-          redirect: request.redirect
-        }));
+      if (request.method !== 'GET' && request.method !== 'HEAD') {
+        proxyOptions.body = request.body;
       }
 
-      return fetch(newRequest);
+      return fetch(new Request(targetUrl, proxyOptions));
     }
 
     // Attempt to serve from static assets

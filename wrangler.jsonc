@@ -10,7 +10,7 @@
     "binding": "ASSETS"
   },
   "build": {
-    "command": "cd frontend && npx pnpm install && npx pnpm run build"
+    "command": "cd frontend && npm install pnpm && CI=true npx pnpm install && npx pnpm run build"
   },
   "observability": {
     "enabled": true
