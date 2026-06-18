@@ -100,8 +100,8 @@ export const DevicesPage: React.FC = () => {
             <p className="text-textMuted animate-pulse">Scanning secure zones...</p>
           </div>
         ) : (
-          <AnimatePresence>
-            <div className="space-y-4">
+          <div className="space-y-4">
+            <AnimatePresence>
               {paginatedDevices?.map((device, index) => (
                 <motion.div
                   key={device.id}
@@ -172,7 +172,7 @@ export const DevicesPage: React.FC = () => {
                   )}
                 </motion.div>
               ))}
-            </div>
+            </AnimatePresence>
             
             {/* Pagination Controls */}
             {totalPages > 1 && (
@@ -194,8 +194,7 @@ export const DevicesPage: React.FC = () => {
                 </button>
               </div>
             )}
-            </div>
-          </AnimatePresence>
+          </div>
         )}
       </div>
     </div>
