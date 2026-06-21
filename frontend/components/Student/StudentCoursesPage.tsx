@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BookOpen, User, GraduationCap, Plus, Search, Trash2, ArrowLeft, MoreVertical, Activity, Loader2, BookMarked } from 'lucide-react';
+import { User, Plus, Search, Trash2, Activity, Loader2, BookMarked, ArrowRight } from 'lucide-react';
 import { studentApi, EnrolledCourse } from '../../services/api/student';
 import CourseRegistrationDialog from './CourseRegistrationDialog';
 import CourseIcon from '../Course/CourseIcon';
@@ -84,7 +84,40 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
     <>
       <SEO title="Academic Portfolio | Presently" description="Manage your registered courses and track academic progress." noIndex />
 
-      <div className="space-y-8 animate-in fade-in duration-700 max-w-4xl mx-auto pb-24">
+      <div className="relative isolate overflow-hidden space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto pb-24">
+        <div className="orb w-[560px] h-[560px] bg-sungold/10 -top-48 -right-32" />
+        <div className="orb w-[420px] h-[420px] bg-blue-400/5 top-1/3 -left-24" />
+        <div className="relative z-10 space-y-8">
+
+        <section className="skeuo-card mx-2 p-6 md:p-8 overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-sungold/10 via-transparent to-transparent pointer-events-none" />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 dark:bg-white/5 border border-black/5 text-[10px] font-black uppercase tracking-[0.25em] text-textMuted">
+                Academic Portfolio
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-3xl md:text-5xl font-headline font-black tracking-tight text-text">Courses</h1>
+                <p className="max-w-2xl text-sm md:text-base text-textMuted/80 font-medium">
+                  Track your enrolled courses, review attendance progress, and register for more from the same dashboard.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 md:gap-4 lg:min-w-[340px]">
+              <div className="skeuo-card p-4 md:p-5 rounded-[1.75rem]">
+                <p className="text-[9px] font-black uppercase tracking-widest text-textMuted">Active courses</p>
+                <p className="mt-2 text-2xl md:text-3xl font-black tracking-tighter text-text">{filteredCourses.length}</p>
+              </div>
+              <div className="skeuo-card p-4 md:p-5 rounded-[1.75rem]">
+                <p className="text-[9px] font-black uppercase tracking-widest text-textMuted">Total sessions</p>
+                <p className="mt-2 text-2xl md:text-3xl font-black tracking-tighter text-text">
+                  {courses.reduce((sum, course) => sum + (course.total_sessions || 0), 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* HEADER SECTION */}
         {/* <header className="px-2 flex flex-col gap-1">
@@ -108,15 +141,17 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
 
         {/* SEARCH BAR */}
         <section className="px-2">
-          <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary transition-colors" size={20} />
-            <input
-              type="text"
-              placeholder="Find a course..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-surfaceLow/50 dark:bg-surfaceContainer/20 border border-outline/10 h-16 pl-14 pr-6 rounded-[1.5rem] font-bold text-sm text-text placeholder:text-textMuted/50 focus:outline-none focus:border-primary/50 shadow-sm transition-all"
-            />
+          <div className="skeuo-card p-2 md:p-3">
+            <div className="relative group">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-primary transition-colors" size={20} />
+              <input
+                type="text"
+                placeholder="Find a course..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-transparent h-16 pl-14 pr-6 rounded-[1.5rem] font-bold text-sm text-text placeholder:text-textMuted/50 focus:outline-none transition-all"
+              />
+            </div>
           </div>
         </section>
 
@@ -132,9 +167,10 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
                   key={course.id}
-                  className="skeuo-card p-7 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
+                  className="skeuo-card p-7 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all relative overflow-hidden group"
                   >
-                  <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10"></div>
+                  <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem] pointer-events-none transition-all group-hover:bg-primary/10" />
+                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-sungold/40 to-transparent opacity-70" />
 
                   <div className="flex justify-between items-start mb-6">
                     <CourseIcon
@@ -145,7 +181,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                     <button
                       onClick={() => setCourseToDrop(course)}
                       disabled={droppingId === course.id}
-                      className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-background transition-all active:scale-90"
+                      className="skeuo-button w-10 h-10 rounded-full flex items-center justify-center text-red-500 hover:text-red-600 transition-all active:scale-90"
                     >
                       {droppingId === course.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                     </button>
@@ -188,17 +224,18 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
                 );
               })
             ) : (
-              <div className="py-24 flex flex-col items-center justify-center bg-surfaceLow/40 dark:bg-surfaceContainer/10 border-2 border-dashed border-outline/20 rounded-[3rem] text-center px-12">
-                <div className="w-20 h-20 bg-surfaceHigh dark:bg-surfaceContainer rounded-full flex items-center justify-center mb-6 text-textMuted/40">
+              <div className="skeuo-card py-24 flex flex-col items-center justify-center text-center px-12 mx-2">
+                <div className="w-20 h-20 bg-white/70 dark:bg-white/5 rounded-full flex items-center justify-center mb-6 text-textMuted/40 border border-black/5">
                   <BookMarked size={40} />
                 </div>
                 <h4 className="text-2xl font-headline font-black text-text">No Courses Registered</h4>
                 <p className="text-textMuted/80 text-sm font-medium mt-2 max-w-[240px]">Expand your academic portfolio by enrolling in new department courses.</p>
                 <button
                   onClick={() => setIsRegistrationOpen(true)}
-                  className="mt-8 px-10 py-4 bg-primary text-white dark:text-black font-headline font-black text-sm rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
+                  className="mt-8 skeuo-button-gold px-10 py-4 font-headline font-black text-sm inline-flex items-center gap-2"
                 >
                   Register Courses
+                  <ArrowRight size={16} />
                 </button>
               </div>
             )}
@@ -208,7 +245,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
         {/* FLOATING ACTION BUTTON */}
         <button
           onClick={() => setIsRegistrationOpen(true)}
-          className="fixed bottom-28 right-6 w-16 h-16 bg-primary text-white dark:text-black rounded-[1.5rem] shadow-[0_20px_40px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center active:scale-90 transition-all z-[60]"
+          className="fixed bottom-28 right-6 w-16 h-16 skeuo-button-gold rounded-[1.75rem] flex items-center justify-center active:scale-90 transition-all z-[60]"
         >
           <Plus size={32} strokeWidth={3} />
         </button>
@@ -230,6 +267,7 @@ export const StudentCoursesPage: React.FC<StudentCoursesPageProps> = ({ userName
           description={`Are you sure you want to remove ${courseToDrop?.course_code} from your portfolio? This will permanently delete your local attendance records for this course.`}
           confirmText="Drop Course"
         />
+        </div>
       </div>
     </>
   );
