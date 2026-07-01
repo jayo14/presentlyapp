@@ -38,6 +38,63 @@ export interface SystemLog {
   details?: string;
 }
 
+export interface AdminAttendanceStats {
+  registered_students: number;
+  lecturers: number;
+  institutions: number;
+  active_campuses: number;
+  today_attendance: number;
+  today_attendance_delta: number;
+  live_classes: number;
+  attendance_success_rate: number;
+  system_health: 'healthy' | 'degraded' | 'down';
+}
+
+export interface AdminLiveSession {
+  id: string;
+  institution: string;
+  course_code: string;
+  course_name: string;
+  started_at: string;
+  checked_in: number;
+  total_enrolled: number;
+  closes_in_minutes: number | null;
+  status: 'live' | 'closing_soon';
+}
+
+export interface AdminTodaysNumbers {
+  total_checked_in: number;
+  rejected_checkins: number;
+  gps_failures: number;
+  late_arrivals: number;
+  classes_completed: number;
+  average_attendance_pct: number;
+}
+
+export interface AdminPlatformHealth {
+  server_uptime_pct: number;
+  realtime_connections: number;
+  notification_queue: number;
+  emails_sent_today: number;
+  db_latency_ms: number;
+  storage_used_pct: number;
+}
+
+export interface AdminRecentActivity {
+  id: string;
+  type: 'success' | 'warning' | 'error' | 'info';
+  message: string;
+  timestamp: string;
+}
+
+export interface AdminDashboardData {
+  attendance_stats: AdminAttendanceStats;
+  live_sessions: AdminLiveSession[];
+  todays_numbers: AdminTodaysNumbers;
+  platform_health: AdminPlatformHealth;
+  recent_activity: AdminRecentActivity[];
+}
+
 export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
@@ -101,6 +158,12 @@ export interface EmailDeliveryFilters {
 }
 
 export const systemApi = {
+  // Get admin control-center dashboard data
+  getDashboard: async (): Promise<AdminDashboardData> => {
+    const response = await apiClient.get('/system/dashboard/');
+    return response.data;
+  },
+
   // Get system statistics
   getStats: async (): Promise<SystemStats> => {
     try {

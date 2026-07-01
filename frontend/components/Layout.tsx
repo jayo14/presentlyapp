@@ -344,7 +344,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MAIN CONTENT AREA  */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col min-h-screen min-w-0 md:p-6 lg:p-8">
+      <div className={cn(
+        "flex-1 flex flex-col min-h-screen min-w-0 md:p-6 lg:p-8 transition-all duration-300 ease-premium",
+        "md:ml-[280px]",
+        sidebarCollapsed && "md:ml-[80px]"
+      )}>
         <div className="flex-1 flex flex-col bg-surface md:rounded-[2.5rem] shadow-premium overflow-hidden border border-outline/5 relative">
           <SiteHeader
             title={getCurrentPageTitle()}

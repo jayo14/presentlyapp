@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Shield, Smartphone, Monitor, Tablet, Trash2,
   MapPin, Clock, Wifi, ChevronLeft, ShieldCheck,

@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  LayoutDashboard, 
-  FileText, 
-  Layers, 
-  Tag as TagIcon, 
-  Users, 
-  Settings,
+import {
+  Plus,
+  LayoutDashboard,
+  FileText,
+  Layers,
+  Tag as TagIcon,
+  Users,
   ArrowLeft,
-  ChevronRight,
   Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-import { 
-  adminGetAllPosts, 
+import {
+  adminGetAllPosts,
   adminGetPostBySlug,
-  getAllCategories, 
-  getAllTags, 
+  getAllCategories,
+  getAllTags,
   getAllSubscribers,
   createPost,
   updatePost,
@@ -31,7 +30,7 @@ import {
   unsubscribeUser
 } from '../../src/lib/blog';
 
-import type { Post, Category, Tag, NewsletterSubscriber, PaginatedResponse } from '../../src/types/blog';
+import type { Post, Category, Tag, NewsletterSubscriber } from '../../src/types/blog';
 
 import { BlogOverview } from './blog/BlogOverview';
 import { PostList } from './blog/PostList';
@@ -40,24 +39,56 @@ import { CategoryManager } from './blog/CategoryManager';
 import { TagManager } from './blog/TagManager';
 import { SubscriberManager } from './blog/SubscriberManager';
 
+// ─── Derive view from URL path ────────────────────────────────────────────────
+// /dashboard/blog          → overview
+// /dashboard/blog/posts    → posts
+// /dashboard/blog/new      → editor
+// /dashboard/blog/categories → categories
+// /dashboard/blog/tags     → tags
+// /dashboard/blog/subscribers → subscribers
+
 type ViewType = 'overview' | 'posts' | 'categories' | 'tags' | 'subscribers' | 'editor';
 
+function pathToView(pathname: string): ViewType {
+  if (pathname.endsWith('/new')) return 'editor';
+  if (pathname.endsWith('/posts')) return 'posts';
+  if (pathname.endsWith('/categories')) return 'categories';
+  if (pathname.endsWith('/tags')) return 'tags';
+  if (pathname.endsWith('/subscribers')) return 'subscribers';
+  return 'overview';
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export const BlogManagement: React.FC = () => {
-  const [view, setView] = useState<ViewType>('overview');
-  const [prevView, setPrevView] = useState<ViewType>('overview');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const view: ViewType = pathToView(location.pathname);
+
+  const goTo = (v: ViewType) => {
+    const base = '/dashboard/blog';
+    const map: Record<ViewType, string> = {
+      overview: base,
+      posts: `${base}/posts`,
+      categories: `${base}/categories`,
+      tags: `${base}/tags`,
+      subscribers: `${base}/subscribers`,
+      editor: `${base}/new`,
+    };
+    navigate(map[v]);
+  };
+
   const [loading, setLoading] = useState(true);
-  
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
-  
   const [totalPosts, setTotalPosts] = useState(0);
   const [totalSubscribers, setTotalSubscribers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
 
-  // Stats for overview
   const [stats, setStats] = useState({
     totalPosts: 0,
     publishedPosts: 0,
@@ -67,9 +98,7 @@ export const BlogManagement: React.FC = () => {
     subscribersCount: '0',
   });
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
+  useEffect(() => { loadInitialData(); }, []);
 
   const loadInitialData = async () => {
     setLoading(true);
@@ -80,22 +109,21 @@ export const BlogManagement: React.FC = () => {
         getAllTags(),
         getAllSubscribers(1)
       ]);
-
       setPosts(postsRes.results);
       setTotalPosts(postsRes.count);
       setCategories(categoriesData);
       setTags(tagsData);
       setSubscribers(subscribersRes.results);
       setTotalSubscribers(subscribersRes.count);
-
-      // Calculate stats
       setStats({
         totalPosts: postsRes.count,
-        publishedPosts: postsRes.results.filter(p => p.status === 'published').length, // This is partial since it's just page 1
+        publishedPosts: postsRes.results.filter(p => p.status === 'published').length,
         draftPosts: postsRes.results.filter(p => p.status === 'draft').length,
         categoriesCount: categoriesData.length,
         tagsCount: tagsData.length,
-        subscribersCount: subscribersRes.count > 1000 ? `${(subscribersRes.count / 1000).toFixed(1)}k` : subscribersRes.count.toString(),
+        subscribersCount: subscribersRes.count > 1000
+          ? `${(subscribersRes.count / 1000).toFixed(1)}k`
+          : subscribersRes.count.toString(),
       });
     } catch (err) {
       console.error('Failed to load blog data:', err);
@@ -112,11 +140,8 @@ export const BlogManagement: React.FC = () => {
       setPosts(res.results);
       setTotalPosts(res.count);
       setCurrentPage(page);
-    } catch (err) {
-      toast.error('Failed to fetch posts');
-    } finally {
-      setLoading(false);
-    }
+    } catch { toast.error('Failed to fetch posts'); }
+    finally { setLoading(false); }
   };
 
   const handleEditPost = async (post: Post) => {
@@ -124,14 +149,12 @@ export const BlogManagement: React.FC = () => {
     try {
       const fullPost = await adminGetPostBySlug(post.slug);
       setEditingPost(fullPost);
-      setView('editor');
-    } catch (err) {
-      toast.error('Failed to load full post details. Using preview data.');
+      goTo('editor');
+    } catch {
+      toast.error('Failed to load post details. Using preview data.');
       setEditingPost(post);
-      setView('editor');
-    } finally {
-      setLoading(false);
-    }
+      goTo('editor');
+    } finally { setLoading(false); }
   };
 
   const handleDuplicatePost = async (post: Post) => {
@@ -139,254 +162,208 @@ export const BlogManagement: React.FC = () => {
     try {
       const fullPost = await adminGetPostBySlug(post.slug);
       setEditingPost({ ...fullPost, id: undefined, slug: `${fullPost.slug}-copy` });
-      setView('editor');
-    } catch (err) {
-      toast.error('Failed to duplicate post');
-    } finally {
-      setLoading(false);
-    }
+      goTo('editor');
+    } catch { toast.error('Failed to duplicate post'); }
+    finally { setLoading(false); }
   };
 
-  const buildPostPayload = (data: Partial<Post>) => {
-    return {
-      title: data.title,
-      slug: data.slug,
-      excerpt: data.excerpt,
-      content: data.content,
-      cover_image: data.cover_image || '',
-      author_name: data.author_name,
-      author_avatar: data.author_avatar || '',
-      status: data.status,
-      is_featured: data.is_featured ?? false,
-      reading_time: data.reading_time ?? 5,
-      seo_title: data.seo_title || '',
-      seo_description: data.seo_description || '',
-      category_id: data.category?.id ?? null,
-      tag_ids: (data.tags || []).map((tag) => tag.id).filter((id): id is number => typeof id === 'number'),
-    };
-  };
+  const buildPostPayload = (data: Partial<Post>) => ({
+    title: data.title,
+    slug: data.slug,
+    excerpt: data.excerpt,
+    content: data.content,
+    cover_image: data.cover_image || '',
+    author_name: data.author_name,
+    author_avatar: data.author_avatar || '',
+    status: data.status,
+    is_featured: data.is_featured ?? false,
+    reading_time: data.reading_time ?? 5,
+    seo_title: data.seo_title || '',
+    seo_description: data.seo_description || '',
+    category_id: data.category?.id ?? null,
+    tag_ids: (data.tags || []).map(t => t.id).filter((id): id is number => typeof id === 'number'),
+  });
 
   const handleSavePost = async (data: Partial<Post>) => {
     setLoading(true);
     try {
       const payload = buildPostPayload(data);
-      if (editingPost) {
+      if (editingPost?.slug) {
         await updatePost(editingPost.slug, payload);
-        toast.success('Post updated successfully');
+        toast.success('Post updated');
       } else {
         await createPost(payload);
-        toast.success('Post created successfully');
+        toast.success('Post created');
       }
-      setView('posts');
+      setEditingPost(null);
+      goTo('posts');
       loadInitialData();
-    } catch (err) {
-      toast.error('Failed to save post');
-    } finally {
-      setLoading(false);
-    }
+    } catch { toast.error('Failed to save post'); }
+    finally { setLoading(false); }
   };
 
   const handleDeletePost = async (slug: string) => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
-    try {
-      await deletePost(slug);
-      toast.success('Post deleted');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to delete post');
-    }
+    if (!confirm('Delete this post?')) return;
+    try { await deletePost(slug); toast.success('Post deleted'); loadInitialData(); }
+    catch { toast.error('Failed to delete post'); }
   };
 
-  // Category Actions
   const handleCreateCategory = async (data: Partial<Category>) => {
-    try {
-      await createCategory(data);
-      toast.success('Category created');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to create category');
-    }
+    try { await createCategory(data); toast.success('Category created'); loadInitialData(); }
+    catch { toast.error('Failed to create category'); }
   };
-
   const handleUpdateCategory = async (slug: string, data: Partial<Category>) => {
-    try {
-      await updateCategory(slug, data);
-      toast.success('Category updated');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to update category');
-    }
+    try { await updateCategory(slug, data); toast.success('Category updated'); loadInitialData(); }
+    catch { toast.error('Failed to update category'); }
   };
-
   const handleDeleteCategory = async (slug: string) => {
     if (!confirm('Delete this category?')) return;
-    try {
-      await deleteCategory(slug);
-      toast.success('Category deleted');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to delete category');
-    }
+    try { await deleteCategory(slug); toast.success('Category deleted'); loadInitialData(); }
+    catch { toast.error('Failed to delete category'); }
   };
 
-  // Tag Actions
   const handleCreateTag = async (data: Partial<Tag>) => {
-    try {
-      await createTag(data);
-      toast.success('Tag created');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to create tag');
-    }
+    try { await createTag(data); toast.success('Tag created'); loadInitialData(); }
+    catch { toast.error('Failed to create tag'); }
   };
-
   const handleUpdateTag = async (slug: string, data: Partial<Tag>) => {
-    try {
-      await updateTag(slug, data);
-      toast.success('Tag updated');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to update tag');
-    }
+    try { await updateTag(slug, data); toast.success('Tag updated'); loadInitialData(); }
+    catch { toast.error('Failed to update tag'); }
   };
-
   const handleDeleteTag = async (slug: string) => {
     if (!confirm('Delete this tag?')) return;
-    try {
-      await deleteTag(slug);
-      toast.success('Tag deleted');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to delete tag');
-    }
+    try { await deleteTag(slug); toast.success('Tag deleted'); loadInitialData(); }
+    catch { toast.error('Failed to delete tag'); }
   };
 
   const handleUnsubscribe = async (id: number) => {
     if (!confirm('Unsubscribe this user?')) return;
-    try {
-      await unsubscribeUser(id);
-      toast.success('User unsubscribed');
-      loadInitialData();
-    } catch (err) {
-      toast.error('Failed to unsubscribe user');
-    }
+    try { await unsubscribeUser(id); toast.success('User unsubscribed'); loadInitialData(); }
+    catch { toast.error('Failed to unsubscribe user'); }
   };
 
   const navItems = [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'posts', label: 'Posts', icon: FileText },
-    { id: 'categories', label: 'Categories', icon: Layers },
-    { id: 'tags', label: 'Tags', icon: TagIcon },
-    { id: 'subscribers', label: 'Subscribers', icon: Users },
+    { id: 'overview',     label: 'Overview',     icon: LayoutDashboard },
+    { id: 'posts',        label: 'Posts',         icon: FileText },
+    { id: 'categories',   label: 'Categories',    icon: Layers },
+    { id: 'tags',         label: 'Tags',          icon: TagIcon },
+    { id: 'subscribers',  label: 'Subscribers',   icon: Users },
   ];
 
+  // ── Editor full-page view ──────────────────────────────────────────────
   if (view === 'editor') {
     return (
-      <PostEditor 
+      <PostEditor
         post={editingPost}
         categories={categories}
         tags={tags}
         onSave={(data) => handleSavePost({ ...data, status: 'draft' })}
         onPublish={(data) => handleSavePost({ ...data, status: 'published' })}
-        onCancel={() => setView('posts')}
+        onCancel={() => { setEditingPost(null); goTo('posts'); }}
       />
     );
   }
 
+  // ── Main layout ────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-8 min-h-screen bg-[#FBFBFC]">
-      {/* Admin Blog Navigation */}
-      <div className="flex items-center justify-between border-b border-outline/10 bg-white/40 backdrop-blur-xl px-12 py-6 sticky top-0 z-40">
-        <div className="flex items-center gap-12">
+    <div className="flex flex-col gap-8 min-h-screen bg-background text-text">
+
+      {/* ── Top navigation bar ── */}
+      <div className="flex items-center justify-between border-b border-outline/10 bg-surface/80 backdrop-blur-xl px-6 lg:px-12 py-4 sticky top-0 z-40">
+        <div className="flex items-center gap-6 lg:gap-12 flex-wrap">
+          {/* Brand */}
           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
-               <FileText size={20} />
-             </div>
-             <div>
-                <h1 className="text-xl font-headline font-black text-text tracking-tight">Editorial</h1>
-                <p className="text-[10px] uppercase font-bold text-textMuted tracking-widest opacity-60">Admin CMS v2.0</p>
-             </div>
+            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+              <FileText size={18} />
+            </div>
+            <div>
+              <h1 className="text-base font-headline font-black text-text tracking-tight">Editorial</h1>
+              <p className="text-[10px] uppercase font-bold text-textMuted tracking-widest opacity-60">Admin CMS</p>
+            </div>
           </div>
+
+          {/* Nav tabs */}
           <nav className="flex items-center gap-1 p-1.5 bg-surfaceHigh/40 rounded-2xl">
             {navItems.map(item => (
               <button
                 key={item.id}
-                onClick={() => { setPrevView(view); setView(item.id as ViewType); }}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-300 ${
-                  view === item.id 
-                    ? 'bg-white shadow-xl shadow-primary/5 text-primary' 
-                    : 'text-textMuted hover:text-text hover:bg-white/40'
+                onClick={() => goTo(item.id as ViewType)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 ${
+                  view === item.id
+                    ? 'bg-surface shadow-md text-primary'
+                    : 'text-textMuted hover:text-text hover:bg-surface/60'
                 }`}
               >
-                <item.icon size={16} />
-                {item.label}
+                <item.icon size={14} />
+                <span className="hidden sm:inline">{item.label}</span>
               </button>
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-4">
-           {view !== 'overview' && (
-             <button 
-               onClick={() => setView('overview')}
-               className="p-3 bg-white border border-outline/10 rounded-xl text-textMuted hover:text-primary transition-all hover:shadow-lg shadow-primary/5 group"
-             >
-               <ArrowLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
-             </button>
-           )}
-           <button 
-              onClick={() => { setEditingPost(null); setView('editor'); }}
-              className="px-8 py-3.5 bg-text text-background rounded-full font-black text-xs shadow-2xl hover:scale-102 transition-transform active:scale-95 flex items-center gap-2"
-           >
-             <Plus size={18} />
-             Create New
-           </button>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3">
+          {view !== 'overview' && (
+            <button
+              onClick={() => goTo('overview')}
+              className="p-2.5 bg-surface border border-outline/10 rounded-xl text-textMuted hover:text-primary transition-all group"
+            >
+              <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+            </button>
+          )}
+          <button
+            onClick={() => { setEditingPost(null); goTo('editor'); }}
+            className="px-5 py-2.5 bg-text text-background rounded-full font-black text-xs flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all"
+          >
+            <Plus size={16} />
+            Create New
+          </button>
         </div>
       </div>
 
-      {/* Main Viewport */}
-      <div className="px-12 pb-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      {/* ── Main viewport ── */}
+      <div className="px-6 lg:px-12 pb-24 animate-in fade-in duration-500">
         {loading ? (
           <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
-             <div className="relative">
-                <Loader2 size={48} className="text-primary animate-spin" />
-                <div className="absolute inset-0 m-auto w-2 h-2 bg-primary rounded-full"></div>
-             </div>
-             <p className="text-sm font-black text-textMuted uppercase tracking-widest animate-pulse">Loading Editorial Data...</p>
+            <Loader2 size={36} className="text-primary animate-spin" />
+            <p className="text-sm font-black text-textMuted uppercase tracking-widest animate-pulse">
+              Loading Editorial Data…
+            </p>
           </div>
         ) : (
           <>
             {view === 'overview' && (
-              <BlogOverview 
+              <BlogOverview
                 stats={stats}
                 recentPosts={posts.slice(0, 5)}
-                onViewAllPosts={() => setView('posts')}
-                onNewPost={() => { setEditingPost(null); setView('editor'); }}
+                onViewAllPosts={() => goTo('posts')}
+                onNewPost={() => { setEditingPost(null); goTo('editor'); }}
                 onEditPost={(post) => { void handleEditPost(post); }}
-                onManageCategories={() => setView('categories')}
-                onViewSubscribers={() => setView('subscribers')}
+                onManageCategories={() => goTo('categories')}
+                onViewSubscribers={() => goTo('subscribers')}
               />
             )}
-            
+
             {view === 'posts' && (
-              <PostList 
+              <PostList
                 posts={posts}
                 totalPosts={totalPosts}
                 currentPage={currentPage}
-                onNewPost={() => { setEditingPost(null); setView('editor'); }}
+                onNewPost={() => { setEditingPost(null); goTo('editor'); }}
                 onEditPost={(post) => { void handleEditPost(post); }}
                 onDeletePost={handleDeletePost}
                 onPreviewPost={(slug) => window.open(`/blog/${slug}`, '_blank')}
                 onDuplicatePost={(post) => { void handleDuplicatePost(post); }}
                 onSearch={(term) => handleFetchPosts(1, term)}
-                onFilterStatus={(status) => console.log('filter', status)}
-                onFilterCategory={(id) => console.log('filter cat', id)}
+                onFilterStatus={(status) => console.log('filter status', status)}
+                onFilterCategory={(id) => console.log('filter category', id)}
                 onSort={(sort) => console.log('sort', sort)}
                 onPageChange={(page) => handleFetchPosts(page)}
               />
             )}
 
             {view === 'categories' && (
-              <CategoryManager 
+              <CategoryManager
                 categories={categories}
                 onCreate={handleCreateCategory}
                 onUpdate={handleUpdateCategory}
@@ -395,7 +372,7 @@ export const BlogManagement: React.FC = () => {
             )}
 
             {view === 'tags' && (
-              <TagManager 
+              <TagManager
                 tags={tags}
                 onCreate={handleCreateTag}
                 onUpdate={handleUpdateTag}
@@ -404,13 +381,13 @@ export const BlogManagement: React.FC = () => {
             )}
 
             {view === 'subscribers' && (
-              <SubscriberManager 
+              <SubscriberManager
                 subscribers={subscribers}
                 totalSubscribers={totalSubscribers}
                 currentPage={currentPage}
                 onUnsubscribe={handleUnsubscribe}
-                onSearch={(term) => console.log('search sub', term)}
-                onPageChange={(page) => console.log('page sub', page)}
+                onSearch={(term) => handleFetchPosts(1, term)}
+                onPageChange={(page) => setCurrentPage(page)}
               />
             )}
           </>

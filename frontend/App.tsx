@@ -457,6 +457,11 @@ const AppContent: React.FC = () => {
               <Route path="venues" element={<AdminRoute requiredPermission="venues.view"><Suspense fallback={<LoadingFallback />}><VenueManagement /></Suspense></AdminRoute>} />
               <Route path="departments" element={<AdminRoute requiredPermission="system.settings.manage"><DepartmentManagement /></AdminRoute>} />
               <Route path="blog" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
+              <Route path="blog/posts" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
+              <Route path="blog/categories" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
+              <Route path="blog/tags" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
+              <Route path="blog/subscribers" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
+              <Route path="blog/new" element={<AdminRoute requiredPermission="blog.view"><BlogManagement /></AdminRoute>} />
               <Route path="logs" element={<AdminRoute requiredPermission="system.analytics.view"><AdminDashboard userName={user?.full_name || ''} view="logs" /></AdminRoute>} />
               <Route path="email-monitor" element={<AdminRoute requiredPermission="system.analytics.view"><EmailMonitor /></AdminRoute>} />
 

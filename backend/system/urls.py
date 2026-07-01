@@ -7,6 +7,7 @@ urlpatterns = [
     path('stats/', views.SystemStatsView.as_view(), name='stats'),
     path('activity/', views.SystemActivityView.as_view(), name='activity'),
     path('alerts/', views.SystemAlertsView.as_view(), name='alerts'),
+    path('dashboard/', views.AdminDashboardView.as_view(), name='admin-dashboard'),
     path('logs/', views.SystemLogsView.as_view(), name='logs'),
     path('logs/export/csv/', views.SystemLogsExportCsvView.as_view(), name='logs-export-csv'),
     path('email/overview/', views.EmailDeliveryOverviewView.as_view(), name='email-overview'),
