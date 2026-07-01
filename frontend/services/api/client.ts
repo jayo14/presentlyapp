@@ -38,6 +38,7 @@ const GRACEFUL_404_ENDPOINTS = [
   '/system/stats/',
   '/system/activity/',
   '/system/alerts/',
+  '/system/health/',
   '/system/config/',
   '/venues/active_sessions/'
 ];

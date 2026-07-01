@@ -50,6 +50,7 @@ import {
   Legend
 } from 'recharts';
 import { systemApi, SystemStats, SystemActivity, SystemLog, SystemAlert, PaginatedResponse, AdminDashboardData, AdminLiveSession, AdminAttendanceStats, AdminTodaysNumbers, AdminPlatformHealth, AdminRecentActivity } from '../../services/api/system';
+import { useSystemHealth } from '../../hooks/useSystemHealth';
 import { SEO } from '../SEO';
 import { DashboardPage } from '../layout-primitives/DashboardPage';
 import { ResponsiveGrid } from '../layout-primitives/ResponsiveGrid';
@@ -297,6 +298,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
   const [logType, setLogType] = useState('All Events');
   const [logsLoading, setLogsLoading] = useState(false);
   const [logSearch, setLogSearch] = useState('');
+  const { data: livePlatformHealth } = useSystemHealth(view === 'dashboard');
 
   useEffect(() => {
     if (view === 'dashboard') {
@@ -305,6 +307,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ userName, view =
       loadLogs(1);
     }
   }, [view]);
+
+  useEffect(() => {
+    if (livePlatformHealth) {
+      setPlatformHealth(livePlatformHealth);
+    }
+  }, [livePlatformHealth]);
 
   const loadDashboardData = async () => {
     try {

@@ -10,14 +10,44 @@ from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.utils import timezone
 from datetime import timedelta
-from .models import SystemLog, FeatureFlag, EmailDeliveryLog
+from .models import SystemLog, FeatureFlag, EmailDeliveryLog, SystemMetricsSnapshot
 from .feature_flags import get_feature_flag
-from .serializers import SystemLogSerializer, EmailDeliveryLogSerializer
+from .serializers import (
+    SystemLogSerializer,
+    EmailDeliveryLogSerializer,
+    SystemMetricsSnapshotSerializer,
+)
 from institutions.models import User, AttendanceSession, Venue, UserRole, Institution
 
 
 def _is_admin_user(user) -> bool:
     return bool(user and user.is_authenticated and (getattr(user, 'is_superuser', False) or user.role == UserRole.ADMIN))
+
+
+def _latest_system_metrics_snapshot():
+    return SystemMetricsSnapshot.objects.order_by('-collected_at').first()
+
+
+def _platform_health_from_snapshot(snapshot):
+    if snapshot is None:
+        return {
+            'server_uptime_pct': 0.0,
+            'realtime_connections': 0,
+            'notification_queue': 0,
+            'emails_sent_today': 0,
+            'db_latency_ms': 0.0,
+            'storage_used_pct': 0.0,
+        }
+
+    snapshot_data = SystemMetricsSnapshotSerializer(snapshot).data
+    return {
+        'server_uptime_pct': snapshot_data['server_uptime_pct'],
+        'realtime_connections': snapshot.active_django_sessions,
+        'notification_queue': snapshot.notification_queue,
+        'emails_sent_today': snapshot.emails_sent_today,
+        'db_latency_ms': snapshot.db_latency_ms,
+        'storage_used_pct': snapshot.storage_used_pct,
+    }
 
 class SystemStatsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -70,6 +100,20 @@ class SystemAlertsView(APIView):
                 'timestamp': alert.timestamp.isoformat()
             })
         return Response(data)
+
+
+class SystemHealthView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not _is_admin_user(request.user):
+            return Response({'error': 'Admin access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+        snapshot = _latest_system_metrics_snapshot()
+        return Response({
+            'platform_health': _platform_health_from_snapshot(snapshot),
+            'latest_snapshot': SystemMetricsSnapshotSerializer(snapshot).data if snapshot else None,
+        })
 
 
 def _apply_log_filters(queryset, params):
@@ -442,19 +486,29 @@ class AdminDashboardView(APIView):
         gps_failures_today = today_qs.filter(final_verdict='REJECTED').count()
 
         # ── Platform health ───────────────────────────────────────────────
-        try:
-            from notifications.models import Notification
-            notif_queue = Notification.objects.filter(is_read=False).count()
-        except Exception:
-            notif_queue = 0
+        snapshot = _latest_system_metrics_snapshot()
+        platform_health = _platform_health_from_snapshot(snapshot)
 
-        try:
-            from system.models import EmailDeliveryLog
-            emails_today = EmailDeliveryLog.objects.filter(
-                created_at__date=today, status='sent'
-            ).count()
-        except Exception:
-            emails_today = 0
+        if snapshot is None:
+            try:
+                from notifications.models import Notification
+                platform_health['notification_queue'] = Notification.objects.filter(is_read=False).count()
+            except Exception:
+                platform_health['notification_queue'] = 0
+
+            try:
+                from system.models import EmailDeliveryLog
+                platform_health['emails_sent_today'] = EmailDeliveryLog.objects.filter(
+                    created_at__date=today, status='sent'
+                ).count()
+            except Exception:
+                platform_health['emails_sent_today'] = 0
+
+            try:
+                from django.contrib.sessions.models import Session
+                platform_health['realtime_connections'] = Session.objects.filter(expire_date__gte=now).count()
+            except Exception:
+                platform_health['realtime_connections'] = 0
 
         # ── Recent activity ───────────────────────────────────────────────
         recent_logs = SystemLog.objects.select_related('user').order_by('-timestamp')[:12]
@@ -491,12 +545,12 @@ class AdminDashboardView(APIView):
                 'average_attendance_pct': avg_pct,
             },
             'platform_health': {
-                'server_uptime_pct': 99.9,
-                'realtime_connections': 0,
-                'notification_queue': notif_queue,
-                'emails_sent_today': emails_today,
-                'db_latency_ms': 0,
-                'storage_used_pct': 0,
+                'server_uptime_pct': platform_health['server_uptime_pct'],
+                'realtime_connections': platform_health['realtime_connections'],
+                'notification_queue': platform_health['notification_queue'],
+                'emails_sent_today': platform_health['emails_sent_today'],
+                'db_latency_ms': platform_health['db_latency_ms'],
+                'storage_used_pct': platform_health['storage_used_pct'],
             },
             'recent_activity': activity,
         })
