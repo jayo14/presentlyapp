@@ -66,6 +66,87 @@
   }
 }
 
+/* Map rendering fixes */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: var(--surface-container-lowest, var(--surface-container-low)) !important;
+  z-index: 1;
+}
+
+.dark .leaflet-container {
+  background-color: var(--inverse-surface, var(--surface-container-low)) !important;
+}
+
+.leaflet-control-container .leaflet-top,
+.leaflet-control-container .leaflet-bottom {
+  z-index: 1000 !important;
+}
+
+.maplibregl-canvas-container.maplibregl-interactive,
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass {
+  cursor: inherit;
+}
+
+.maplibregl-popup-content {
+  background-color: var(--surface) !important;
+  color: var(--on-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: var(--surface) !important;
+}
+
+.mapbox-gl-draw_ctrl-draw-btn {
+  background-color: var(--surface) !important;
+  color: var(--on-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+.mapbox-gl-draw_ctrl-draw-btn:hover {
+  background-color: var(--surface-container-highest) !important;
+}
+
+.mapbox-gl-draw_ctrl-draw-btn.active {
+  background-color: var(--primary-container) !important;
+  color: var(--on-primary-fixed) !important;
+  border-color: var(--primary) !important;
+}
+
+.mapboxgl-ctrl-group,
+.maplibregl-ctrl-group {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.mapboxgl-ctrl-group button,
+.maplibregl-ctrl-group button {
+  color: var(--on-surface) !important;
+  background-color: transparent !important;
+}
+
+.mapboxgl-ctrl-group button:hover,
+.maplibregl-ctrl-group button:hover {
+  background-color: var(--surface-container-highest) !important;
+}
+
+.maplibregl-canvas-container.maplibregl-interactive[style*="cursor: crosshair"] {
+  cursor: crosshair !important;
+}
+
+.maplibregl-map .maplibregl-canvas-container canvas {
+  outline: none;
+}
+
 @layer components {
   .glass {
     background: rgba(255, 255, 255, 0.05);

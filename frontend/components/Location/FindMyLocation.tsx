@@ -35,14 +35,12 @@ export const FindMyLocation: React.FC<FindMyLocationProps> = ({
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // Use CartoDB Positron for a premium "Google Maps" look
-    // This is the "light_all" style recommended for better visualization
-    const tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-    const attribution = '© OpenStreetMap © CARTO';
+    // Use direct OpenStreetMap tiles to avoid dependency on blocked style hosts.
+    const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const attribution = '© OpenStreetMap contributors';
 
     L.tileLayer(tileUrl, {
       attribution: attribution,
-      subdomains: 'abcd',
       maxZoom: 20
     }).addTo(map);
 

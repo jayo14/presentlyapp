@@ -25,8 +25,29 @@ const DEFAULT_ZOOM = 13;
 // Mapbox Token from environment
 const MAPBOX_TOKEN = (import.meta as any).env?.VITE_MAPBOX_TOKEN || '';
 
-// Premium open-source map style (Google-like)
-const ROAD_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+// Reliable open-source road style with no remote style JSON dependency.
+const ROAD_STYLE: maplibregl.StyleSpecification = {
+  version: 8,
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: [
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      ],
+      tileSize: 256,
+      attribution: '© OpenStreetMap contributors',
+    },
+  },
+  layers: [
+    {
+      id: 'osm-tiles',
+      type: 'raster',
+      source: 'osm',
+      minzoom: 0,
+      maxzoom: 19,
+    },
+  ],
+};
 
 const SATELLITE_STYLE: maplibregl.StyleSpecification = {
   version: 8,
@@ -143,6 +164,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   const [mapReady, setMapReady] = useState(false);
   const [showUserLocation, setShowUserLocation] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const currentStyleRef = useRef<'road' | 'satellite'>('road');
 
   const [heading, setHeading] = useState<number | null>(null);
   const [showCompass, setShowCompass] = useState(false);
@@ -1044,12 +1066,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
+    if (currentStyleRef.current === mapType) return;
 
     const newStyle = mapType === 'satellite' ? SATELLITE_STYLE : ROAD_STYLE;
 
     // When we set a new style, all sources and layers are removed
     // We need to wait for the style to load, then re-add everything
-    map.once('styledata', () => {
+    map.once('style.load', () => {
+      currentStyleRef.current = mapType;
       // Re-add sources and layers
       addSourcesAndLayers(map);
 
@@ -1057,14 +1081,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       const pSrc = map.getSource('venue-points') as maplibregl.GeoJSONSource | undefined;
       const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
 
-      if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
-      if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
+      if (pSrc) pSrc.setData(buildPointGeoJSON(venuesRef.current, activeSessRef.current as Set<number>, selectedVenueRef.current?.id));
+      if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venuesRef.current, activeSessRef.current as Set<number>, selectedVenueRef.current?.id));
 
       renderVenueMarkers(map);
     });
 
     map.setStyle(newStyle);
-  }, [mapType, mapReady, addSourcesAndLayers, venues, activeSessions, selectedVenue, renderVenueMarkers]);
+  }, [mapType, mapReady, addSourcesAndLayers, renderVenueMarkers]);
 
   const handleReset = () =>
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
