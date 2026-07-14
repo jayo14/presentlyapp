@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
@@ -10,8 +10,8 @@ from rest_framework import status
 from institutions.rbac import user_has_permission
 
 from .models import (
-    Plan, BillingOwner, BillingOwnerType, Subscription,
-    SubscriptionStatus, Payment, PaymentStatus, DepartmentSeat, AccountCredit,
+    Plan, Subscription, SubscriptionStatus,
+    Payment, PaymentStatus, DepartmentSeat, AccountCredit,
 )
 from .serializers import (
     PlanSerializer,
