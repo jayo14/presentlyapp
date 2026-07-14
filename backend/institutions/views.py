@@ -43,7 +43,7 @@ from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
     DepartmentSerializer, VenueSerializer, CourseSerializer, CourseEnrollmentSerializer, AttendanceSessionSerializer,
-    AttendanceSerializer, PasswordChangeSerializer, TimetableSerializer
+    AttendanceSerializer, PasswordChangeSerializer, TimetableSerializer, CourseMembershipSerializer
 )
 from .attendance_logic import perform_attendance_check_in, check_session_validity
 from .geolocation_utils import verify_location, calculate_distance
@@ -1690,6 +1690,14 @@ class CourseViewSet(viewsets.ModelViewSet):
             'courses': courses,
             'total': len(courses)
         })
+
+    @action(detail=True, methods=['get'])
+    def memberships(self, request, pk=None):
+        """Return all active memberships for a course."""
+        course = self.get_object()
+        memberships = course.memberships.filter(is_active=True).select_related('user', 'assigned_by')
+        serializer = CourseMembershipSerializer(memberships, many=True)
+        return Response({'success': True, 'memberships': serializer.data})
 
 
 class CourseEnrollmentViewSet(viewsets.ModelViewSet):

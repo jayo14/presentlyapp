@@ -241,6 +241,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     courses = models.TextField(blank=True, null=True)  # Comma-separated for now
     
     # Class Rep-specific fields
+    # DEPRECATED: Use CourseMembership (role=CLASS_REP) instead. Kept for backward compatibility.
     assigned_lecturer = models.CharField(max_length=200, blank=True, null=True)
     
     # Preferences

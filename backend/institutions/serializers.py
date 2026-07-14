@@ -10,7 +10,7 @@ from system.feature_flags import (
     get_feature_int,
 )
 from .models import (
-    User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
+    User, Institution, College, Department, Course, CourseMembership, CourseEnrollment, AttendanceSession, 
     Attendance, UserRole, Venue, Timetable, AuditLog,
     RBACPermission, StaffRole, RolePermission, StaffProfile, UserPermission, StaffInvitation
 )
@@ -692,3 +692,17 @@ class StaffPermissionUpdateSerializer(serializers.Serializer):
     role_id = serializers.IntegerField(required=False, allow_null=True)
     permissions = serializers.ListField(child=serializers.CharField(), required=False)
     status = serializers.ChoiceField(choices=StaffProfile.STATUS_CHOICES, required=False)
+
+
+class CourseMembershipSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.full_name', read_only=True)
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+    assigned_by_name = serializers.CharField(source='assigned_by.full_name', read_only=True, allow_null=True)
+
+    class Meta:
+        model = CourseMembership
+        fields = [
+            'id', 'course', 'user', 'user_name', 'user_email', 'role',
+            'is_active', 'assigned_by', 'assigned_by_name', 'created_at', 'updated_at',
+        ]
+        read_only_fields = ['created_at', 'updated_at']
