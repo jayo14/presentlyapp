@@ -6,8 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Search, Plus, MoreVertical } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
+import { Alert } from 'react-native';
 import { api } from '@/services/api';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useCurrentPlan } from '@/hooks/useApi';
 
 export default function LecturerCourseHubScreen() {
   const router = useRouter();
@@ -21,8 +23,26 @@ export default function LecturerCourseHubScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const { data: currentPlan } = useCurrentPlan();
+  const canCreate = currentPlan?.course_limit === null || !currentPlan?.is_active;
+
   const bgColor = isDark ? '#0A0A0A' : colors.background;
   const surfaceColor = isDark ? '#1A1A1A' : '#FFFFFF';
+
+  const handleCreatePress = () => {
+    if (canCreate) {
+      router.push('/(lecturer)/create-course');
+    } else {
+      Alert.alert(
+        'Course limit reached',
+        `You've reached the ${currentPlan?.course_limit ?? 1}-course limit. Upgrade to Pro to create more courses.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Upgrade', onPress: () => router.push('/pricing') },
+        ],
+      );
+    }
+  };
 
   useEffect(() => {
     loadCourses();
@@ -140,7 +160,7 @@ export default function LecturerCourseHubScreen() {
       {/* FAB */}
       <TouchableOpacity
         style={[styles.fab, { bottom: bottomDockOffset + 16 }]}
-        onPress={() => router.push('/(lecturer)/create-course')}
+        onPress={handleCreatePress}
       >
         <Plus size={32} color="#0A0A0A" strokeWidth={2.5} />
       </TouchableOpacity>

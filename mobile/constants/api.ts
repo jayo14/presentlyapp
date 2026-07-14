@@ -205,6 +205,11 @@ export const API_ENDPOINTS = {
     ADMIN_TAGS: '/blog/admin/tags/',
     ADMIN_SUBSCRIBERS: '/blog/admin/subscribers/',
   },
+  // Billing
+  BILLING: {
+    ME: '/billing/me/',
+    CHECKOUT: '/billing/checkout/',
+  },
   // RBAC & Staff
   RBAC: {
     PERMISSIONS: '/rbac/permissions/',

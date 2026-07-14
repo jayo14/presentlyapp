@@ -653,3 +653,25 @@ export const useRoles = () => {
     queryFn: () => api.rbac.getRoles(),
   });
 };
+
+// Billing hooks
+export const useCurrentPlan = () => {
+  return useQuery({
+    queryKey: ['billing', 'plan'],
+    queryFn: () => api.billing.getCurrentPlan(),
+    staleTime: 60_000,
+    refetchInterval: (query) =>
+      query.state.data?.status === 'PENDING' ? 3000 : false,
+  });
+};
+
+export const useCheckout = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (planCode: string) => api.billing.checkout(planCode),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing'] });
+    },
+  });
+};
