@@ -6,4 +6,5 @@ export * from './venues';
 export * from './courses';
 export * from './dashboard';
 export * from './staff';
+export * from './billing';
 export { default as apiClient, tokenManager } from './client';

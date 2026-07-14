@@ -83,6 +83,8 @@ const BlogManagement = simpleLazy(() => import('./components/Admin/BlogManagemen
 const StaffManagement = simpleLazy(() => import('./components/Admin/StaffManagement').then(module => ({ default: module.StaffManagement })));
 const EmailMonitor = simpleLazy(() => import('./components/Admin/EmailMonitor').then(module => ({ default: module.EmailMonitor })));
 const AcceptInvitePage = simpleLazy(() => import('./components/Auth/AcceptInvitePage').then(module => ({ default: module.AcceptInvitePage })));
+const PricingPage = simpleLazy(() => import('./components/Billing/PricingPage').then(module => ({ default: module.default })));
+const CheckoutCallback = simpleLazy(() => import('./components/Billing/CheckoutCallback').then(module => ({ default: module.default })));
 
 const PUBLIC_ROUTE_PREFIXES = [
   '/',
@@ -104,6 +106,8 @@ const PUBLIC_ROUTE_PREFIXES = [
   '/otp-verification',
   '/check-in',
   '/accept-invite',
+  '/pricing',
+  '/billing',
 ];
 
 const isPublicPath = (pathname: string): boolean =>
@@ -354,6 +358,8 @@ const AppContent: React.FC = () => {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/check-in/:sessionCode" element={<Suspense fallback={<PublicLoadingFallback />}><PublicCheckInPage /></Suspense>} />
           <Route path="/accept-invite" element={<Suspense fallback={<PublicLoadingFallback />}><AcceptInvitePage /></Suspense>} />
+          <Route path="/pricing" element={<Suspense fallback={<PublicLoadingFallback />}><PricingPage /></Suspense>} />
+          <Route path="/billing/callback" element={<Suspense fallback={<PublicLoadingFallback />}><CheckoutCallback /></Suspense>} />
           
           <Route
             path="/onboarding"
