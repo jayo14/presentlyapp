@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
-from django.db import transaction
+from django.db import models, transaction
 from django.db.utils import IntegrityError
 from django_ratelimit.decorators import ratelimit
 from django_ratelimit.core import is_ratelimited
@@ -1428,11 +1428,27 @@ class CourseViewSet(viewsets.ModelViewSet):
         if department_id:
             queryset = queryset.filter(department__id=department_id)
         if lecturer_id:
-            queryset = queryset.filter(lecturer_id=lecturer_id)
+            from .models import CourseMembership
+            member_course_ids = CourseMembership.objects.filter(
+                user_id=lecturer_id,
+                role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+                is_active=True,
+            ).values_list('course_id', flat=True)
+            queryset = queryset.filter(
+                models.Q(lecturer_id=lecturer_id) | models.Q(id__in=member_course_ids)
+            )
         
         # Lecturers can see their own courses (including inactive ones)
         if self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
-            queryset = queryset.filter(lecturer=self.request.user)
+            from .models import CourseMembership
+            member_course_ids = CourseMembership.objects.filter(
+                user=self.request.user,
+                role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+                is_active=True,
+            ).values_list('course_id', flat=True)
+            queryset = queryset.filter(
+                models.Q(lecturer=self.request.user) | models.Q(id__in=member_course_ids)
+            )
         elif self.request.user.is_authenticated and self.request.user.role == UserRole.STUDENT:
             # For students, filter by enrollment if requested OR if listing "my courses" (no other filters)
             # Only apply this if it's a list action
@@ -1455,7 +1471,14 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Auto-assign the lecturer if the user is a lecturer"""
         if self.request.user.role == UserRole.LECTURER:
-            serializer.save(lecturer=self.request.user)
+            course = serializer.save(lecturer=self.request.user)
+            from .models import CourseMembership
+            CourseMembership.objects.get_or_create(
+                course=course,
+                user=self.request.user,
+                role=CourseMembership.Role.LECTURER,
+                defaults={'is_active': True, 'assigned_by': self.request.user},
+            )
         else:
             serializer.save()
     
@@ -1466,7 +1489,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         
         # Check if user has permission to view enrollments
         if request.user.role not in [UserRole.LECTURER, UserRole.ADMIN]:
-            if course.lecturer != request.user:
+            if not course.is_user_lecturer(request.user):
                 return Response({
                     'error': 'Permission denied'
                 }, status=status.HTTP_403_FORBIDDEN)
@@ -1656,6 +1679,7 @@ class CourseViewSet(viewsets.ModelViewSet):
                 'department': list(course.department.values_list('id', flat=True)),
                 'department_name': ", ".join([d.name for d in course.department.all()]),
                 'lecturer_name': course.lecturer.full_name if course.lecturer else None,
+                'lecturers': [u.full_name for u in course.get_lecturers()],
                 'enrollment_count': enrollment_count,
                 'can_enroll': course.id not in enrolled_course_ids,
                 'is_active': course.is_active
@@ -1696,7 +1720,15 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         
         # Lecturers can only see enrollments for their courses
         elif self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
-            queryset = queryset.filter(course__lecturer=self.request.user)
+            from .models import CourseMembership
+            member_course_ids = CourseMembership.objects.filter(
+                user=self.request.user,
+                role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+                is_active=True,
+            ).values_list('course_id', flat=True)
+            queryset = queryset.filter(
+                models.Q(course__lecturer=self.request.user) | models.Q(course_id__in=member_course_ids)
+            )
         
         return queryset.select_related('student', 'course')
     
@@ -1889,7 +1921,15 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         
         # Lecturers can only see sessions for their courses
         if self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
-            queryset = queryset.filter(course__lecturer=self.request.user)
+            from .models import CourseMembership
+            member_course_ids = CourseMembership.objects.filter(
+                user=self.request.user,
+                role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+                is_active=True,
+            ).values_list('course_id', flat=True)
+            queryset = queryset.filter(
+                models.Q(course__lecturer=self.request.user) | models.Q(course_id__in=member_course_ids)
+            )
         
         return queryset
     
@@ -1899,7 +1939,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         session = self.get_object()
         
         # Check if user is the lecturer for this course or an admin
-        if request.user.role != UserRole.ADMIN and session.course.lecturer != request.user:
+        if request.user.role != UserRole.ADMIN and not session.course.is_user_lecturer(request.user):
             return Response({
                 'success': False,
                 'error': 'Permission denied'
@@ -1924,7 +1964,7 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
     def manual_mark(self, request, pk=None):
         """Create/update manual attendance by matric and optionally link to an existing student."""
         session = self.get_object()
-        if request.user.role != UserRole.ADMIN and session.course.lecturer != request.user:
+        if request.user.role != UserRole.ADMIN and not session.course.is_user_lecturer(request.user):
             return Response({'success': False, 'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
 
         raw_student_identifier = request.data.get('student_id') or request.data.get('student_identifier') or ''
@@ -2054,7 +2094,15 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         if user.is_authenticated and user.role == UserRole.STUDENT:
             queryset = queryset.filter(student=user)
         elif user.is_authenticated and user.role == UserRole.LECTURER:
-            queryset = queryset.filter(session__course__lecturer=user)
+            from .models import CourseMembership
+            member_course_ids = CourseMembership.objects.filter(
+                user=user,
+                role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+                is_active=True,
+            ).values_list('course_id', flat=True)
+            queryset = queryset.filter(
+                models.Q(session__course__lecturer=user) | models.Q(session__course_id__in=member_course_ids)
+            )
 
         return queryset
 
@@ -2122,7 +2170,15 @@ def lecturer_dashboard_summary(request):
         return Response({'success': False, 'error': 'Not a lecturer'}, status=403)
 
     # Managed courses
-    courses = Course.objects.filter(lecturer=user)
+    from .models import CourseMembership
+    member_course_ids = CourseMembership.objects.filter(
+        user=user,
+        role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+        is_active=True,
+    ).values_list('course_id', flat=True)
+    courses = Course.objects.filter(
+        models.Q(lecturer=user) | models.Q(id__in=member_course_ids)
+    )
     course_ids = courses.values_list('id', flat=True)
     
     # Active sessions
@@ -2466,7 +2522,15 @@ class TimetableViewSet(viewsets.ModelViewSet):
                 enrolled_courses = CourseEnrollment.objects.filter(student=user, is_active=True).values_list('course_id', flat=True)
                 return self.queryset.select_related('course', 'venue', 'created_by').prefetch_related('course__department').filter(course_id__in=enrolled_courses)
             elif user.role == UserRole.LECTURER:
-                return self.queryset.select_related('course', 'venue', 'created_by').prefetch_related('course__department').filter(course__lecturer=user)
+                from .models import CourseMembership
+                member_course_ids = CourseMembership.objects.filter(
+                    user=user,
+                    role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+                    is_active=True,
+                ).values_list('course_id', flat=True)
+                return self.queryset.select_related('course', 'venue', 'created_by').prefetch_related('course__department').filter(
+                    models.Q(course__lecturer=user) | models.Q(course_id__in=member_course_ids)
+                )
         return self.queryset.select_related('course', 'venue', 'created_by').prefetch_related('course__department')
 
     def perform_create(self, serializer):
