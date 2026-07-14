@@ -16,6 +16,7 @@ import { LandingBento } from "./LandingPage/LandingBento";
 import { LandingMobileApp } from "./LandingPage/LandingMobileApp";
 import { LandingEngineRoom } from "./LandingPage/LandingEngineRoom";
 import { RoleBasedSection } from "./LandingPage/RoleBasedSection";
+import { LandingPricing } from "./LandingPage/LandingPricing";
 import { LandingTestimonials } from "./LandingPage/LandingTestimonials";
 import { CTASection } from "./LandingPage/LandingCTA";
 import { Footer } from "./LandingPage/LandingFooter";
@@ -131,6 +132,7 @@ export default function LandingPage() {
       <LandingBento />
       <LandingEngineRoom />
       <RoleBasedSection />
+      <LandingPricing />
       <LandingMobileApp />
       <LandingTestimonials />
 
