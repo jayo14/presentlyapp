@@ -5,7 +5,6 @@ import {
   DollarSign, Package, UserCheck, Activity,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import apiClient from '../../services/api/client';
 import { billingApi } from '../../services/api/billing';
 import { SEO } from '../SEO';
 
@@ -41,6 +40,7 @@ export const BillingAdmin: React.FC = () => {
   const [editingPlan, setEditingPlan] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState<Tab | null>(null);
+  const [subFilter, setSubFilter] = useState('');
   const [planForm, setPlanForm] = useState({
     code: '', name: '', billing_owner_type: 'SELF',
     price_kobo: 0, interval: 'MONTHLY',
@@ -360,7 +360,19 @@ export const BillingAdmin: React.FC = () => {
       {/* ─── Subscriptions ────────────────────────────── */}
       {activeTab === 'subscriptions' && (
         <div>
-          <p className="text-sm text-neutral-500 mb-6">{subscriptions.length} subscription(s)</p>
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-sm text-neutral-500">{subscriptions.length} subscription(s)</p>
+            <div className="flex items-center gap-2">
+              <Search size={14} className="text-neutral-400" />
+              <input
+                type="text"
+                placeholder="Filter by plan code..."
+                value={subFilter}
+                onChange={e => setSubFilter(e.target.value)}
+                className="text-sm border border-black/10 rounded-lg px-3 py-1.5 w-48 focus:outline-none focus:ring-2 focus:ring-sungold/40"
+              />
+            </div>
+          </div>
           <div className="bg-white rounded-2xl border border-black/5 overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-neutral-50 border-b border-black/5">
@@ -374,7 +386,9 @@ export const BillingAdmin: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/5">
-                {subscriptions.map(sub => (
+                {subscriptions
+                  .filter(sub => !subFilter || sub.plan?.code?.toLowerCase().includes(subFilter.toLowerCase()))
+                  .map(sub => (
                   <tr key={sub.id} className="hover:bg-neutral-50/50">
                     <td className="p-4">
                       <span className="text-xs font-mono">{sub.billing_owner?.owner_type}:{sub.billing_owner?.owner_user?.email || sub.billing_owner?.owner_department?.name || sub.id}</span>
