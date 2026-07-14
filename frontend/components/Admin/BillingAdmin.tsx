@@ -39,6 +39,8 @@ export const BillingAdmin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<any>(null);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const [subFilter, setSubFilter] = useState('');
   const [planForm, setPlanForm] = useState({
     code: '', name: '', billing_owner_type: 'SELF',
     price_kobo: 0, interval: 'MONTHLY',
@@ -122,6 +124,7 @@ export const BillingAdmin: React.FC = () => {
     try {
       await billingApi.adminDeactivatePlan(planId);
       toast.success('Plan deactivated');
+      setConfirmDelete(null);
       await loadPlans();
     } catch { /* handled by interceptor */ }
   };
@@ -319,7 +322,7 @@ export const BillingAdmin: React.FC = () => {
                           <Check size={14} />
                         </button>
                         {plan.is_active && (
-                          <button onClick={() => handleDeactivatePlan(plan.id)} className="p-1.5 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                          <button onClick={() => setConfirmDelete(plan.id)} className="p-1.5 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors">
                             <X size={14} />
                           </button>
                         )}
@@ -498,13 +501,28 @@ export const BillingAdmin: React.FC = () => {
         </div>
       )}
 
+      {/* ─── Confirm Deactivate ──────────────────────── */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-sm mx-4 shadow-2xl text-center">
+            <AlertCircle size={40} className="text-red-500 mx-auto mb-4" />
+            <h2 className="text-lg font-medium mb-2">Deactivate plan?</h2>
+            <p className="text-sm text-neutral-500 mb-8">Existing subscriptions won't be affected, but no new subscriptions can use this plan.</p>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => setConfirmDelete(null)} className="px-6 py-2.5 rounded-xl text-sm font-medium text-neutral-500 hover:bg-neutral-100 transition-colors">Cancel</button>
+              <button onClick={() => handleDeactivatePlan(confirmDelete)} className="px-6 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors">Deactivate</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── Plan Modal ───────────────────────────────── */}
       {showPlanModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-8 w-full max-w-lg mx-4 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-medium">{editingPlan ? 'Edit Plan' : 'New Plan'}</h2>
-              <button onClick={() => setShowPlanModal(false)} className="p-2 text-neutral-400 hover:text-neutral-900 rounded-xl hover:bg-neutral-100">
+              <button onClick={() => { setShowPlanModal(false); setEditingPlan(null); }} className="p-2 text-neutral-400 hover:text-neutral-900 rounded-xl hover:bg-neutral-100">
                 <X size={20} />
               </button>
             </div>
