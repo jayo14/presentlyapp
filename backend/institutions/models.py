@@ -384,6 +384,59 @@ class Course(models.Model):
         """Check if a given level is applicable for this course"""
         return level in self.get_applicable_levels()
 
+    def get_lecturers(self):
+        """Return active lecturers (LECTURER or CO_LECTURER) via CourseMembership.
+        Falls back to course.lecturer if no memberships exist (rollout safety)."""
+        memberships = self.memberships.filter(
+            role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+            is_active=True,
+        ).select_related('user')
+        if memberships.exists():
+            return [m.user for m in memberships]
+        if self.lecturer:
+            return [self.lecturer]
+        return []
+
+    def is_user_lecturer(self, user):
+        """Check if user is an active lecturer/co-lecturer on this course."""
+        if not user or not user.is_authenticated:
+            return False
+        if self.memberships.filter(
+            user=user,
+            role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+            is_active=True,
+        ).exists():
+            return True
+        return self.lecturer_id == user.id
+
+
+class CourseMembership(models.Model):
+    """Roles scoped to a course (lecturer, co-lecturer, class rep)."""
+
+    class Role(models.TextChoices):
+        LECTURER = 'LECTURER', 'Lecturer'
+        CO_LECTURER = 'CO_LECTURER', 'Co-Lecturer'
+        CLASS_REP = 'CLASS_REP', 'Class Representative'
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='memberships')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_memberships')
+    role = models.CharField(max_length=20, choices=Role.choices)
+    is_active = models.BooleanField(default=True)
+    assigned_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_memberships')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'course_memberships'
+        unique_together = [['course', 'user', 'role']]
+        indexes = [
+            models.Index(fields=['course', 'role']),
+            models.Index(fields=['user', 'role']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.full_name} - {self.get_role_display()} @ {self.course.code}"
+
 
 class CourseEnrollment(models.Model):
     """Student enrollment in courses"""
