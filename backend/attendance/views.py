@@ -444,8 +444,7 @@ class LecturerSessionSubmissionsView(APIView):
         # Restrict to lecturer's own sessions (ADMIN can see all)
         if (
             getattr(request.user, 'role', None) == 'LECTURER'
-            and hasattr(session.course, 'lecturer')
-            and session.course.lecturer != request.user
+            and not session.course.is_user_lecturer(request.user)
         ):
             return Response(
                 {'error': 'You do not have permission to view this session.'},
@@ -490,8 +489,7 @@ class LecturerOverrideView(APIView):
         # Restrict to lecturer's own sessions (ADMIN can override all)
         if (
             getattr(request.user, 'role', None) == 'LECTURER'
-            and hasattr(submission.session.course, 'lecturer')
-            and submission.session.course.lecturer != request.user
+            and not submission.session.course.is_user_lecturer(request.user)
         ):
             return Response(
                 {'error': 'You do not have permission to override this submission.'},

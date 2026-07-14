@@ -347,7 +347,7 @@ class CourseAttendanceAnalyticsView(APIView):
             return Response({'error': 'Course not found'}, status=404)
 
         user = request.user
-        if user.role not in [UserRole.LECTURER, UserRole.ADMIN] and course.lecturer != user:
+        if user.role not in [UserRole.LECTURER, UserRole.ADMIN] and not course.is_user_lecturer(user):
             return Response({'error': 'Permission denied'}, status=403)
 
         # Optional date-range filters
