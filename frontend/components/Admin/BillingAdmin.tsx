@@ -41,6 +41,7 @@ export const BillingAdmin: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState<Tab | null>(null);
   const [subFilter, setSubFilter] = useState('');
+  const [planFormError, setPlanFormError] = useState('');
   const [planForm, setPlanForm] = useState({
     code: '', name: '', billing_owner_type: 'SELF',
     price_kobo: 0, interval: 'MONTHLY',
@@ -97,12 +98,21 @@ export const BillingAdmin: React.FC = () => {
 
   const handleSavePlan = async () => {
     try {
+      setPlanFormError('');
+      let parsedFeatures = {};
+      try {
+        parsedFeatures = JSON.parse(planForm.features || '{}');
+      } catch {
+        setPlanFormError('Invalid JSON in features field');
+        return;
+      }
+
       const payload = {
         ...planForm,
         price_kobo: Number(planForm.price_kobo),
         seat_limit: planForm.seat_limit ? Number(planForm.seat_limit) : null,
         course_limit: planForm.course_limit ? Number(planForm.course_limit) : null,
-        features: JSON.parse(planForm.features || '{}'),
+        features: parsedFeatures,
       };
 
       if (editingPlan) {
@@ -619,8 +629,14 @@ export const BillingAdmin: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-8">
-              <button onClick={() => setShowPlanModal(false)} className="px-6 py-2.5 rounded-xl text-sm font-medium text-neutral-500 hover:bg-neutral-100 transition-colors">Cancel</button>
+            {planFormError && (
+              <div className="flex items-center gap-2 text-red-600 text-sm mt-4">
+                <AlertCircle size={16} />
+                {planFormError}
+              </div>
+            )}
+            <div className="flex justify-end gap-3 mt-6">
+              <button onClick={() => { setShowPlanModal(false); setPlanFormError(''); }} className="px-6 py-2.5 rounded-xl text-sm font-medium text-neutral-500 hover:bg-neutral-100 transition-colors">Cancel</button>
               <button onClick={handleSavePlan} className="px-6 py-2.5 rounded-xl text-sm font-medium bg-neutral-900 text-white hover:bg-neutral-800 transition-colors">
                 {editingPlan ? 'Update' : 'Create'}
               </button>
