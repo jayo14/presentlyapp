@@ -14,8 +14,9 @@ from .models import (
     SubscriptionStatus, Payment, PaymentStatus, DepartmentSeat, AccountCredit,
 )
 from .serializers import (
-    PlanSerializer, SubscriptionSerializer, PaymentSerializer,
-    DepartmentSeatSerializer, AccountCreditSerializer,
+    PlanSerializer,
+    AdminSubscriptionSerializer, AdminPaymentSerializer,
+    AdminDepartmentSeatSerializer, AdminAccountCreditSerializer,
 )
 
 
@@ -87,7 +88,7 @@ def admin_subscriptions_view(request):
     if plan_filter:
         qs = qs.filter(plan__code=plan_filter)
 
-    return Response(SubscriptionSerializer(qs, many=True).data)
+    return Response(AdminSubscriptionSerializer(qs, many=True).data)
 
 
 @api_view(['PUT'])
@@ -111,7 +112,7 @@ def admin_subscription_override_view(request, sub_id):
         sub.current_period_start = timezone.now()
         sub.current_period_end = timezone.now() + timezone.timedelta(days=30)
     sub.save()
-    return Response(SubscriptionSerializer(sub).data)
+    return Response(AdminSubscriptionSerializer(sub).data)
 
 
 # ─── Payments ─────────────────────────────────────────────────────────────
@@ -130,7 +131,7 @@ def admin_payments_view(request):
     if status_filter:
         qs = qs.filter(status=status_filter.upper())
 
-    return Response(PaymentSerializer(qs, many=True).data)
+    return Response(AdminPaymentSerializer(qs, many=True).data)
 
 
 # ─── Department Seats ────────────────────────────────────────────────────
@@ -153,7 +154,7 @@ def admin_seats_view(request):
     elif active_filter == 'false':
         qs = qs.filter(is_active=False)
 
-    return Response(DepartmentSeatSerializer(qs, many=True).data)
+    return Response(AdminDepartmentSeatSerializer(qs, many=True).data)
 
 
 # ─── Account Credits ─────────────────────────────────────────────────────
@@ -165,7 +166,7 @@ def admin_credits_view(request):
         return Response({'error': 'Forbidden.'}, status=status.HTTP_403_FORBIDDEN)
 
     qs = AccountCredit.objects.select_related('user').order_by('-created_at')
-    return Response(AccountCreditSerializer(qs, many=True).data)
+    return Response(AdminAccountCreditSerializer(qs, many=True).data)
 
 
 # ─── Stats ───────────────────────────────────────────────────────────────

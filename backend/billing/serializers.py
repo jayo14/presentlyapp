@@ -1,5 +1,7 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Plan, Subscription, Payment, BillingOwner, DepartmentSeat, AccountCredit
+from institutions.models import Department
 
 
 class PlanSerializer(serializers.ModelSerializer):
@@ -9,6 +11,10 @@ class PlanSerializer(serializers.ModelSerializer):
 
 
 class BillingOwnerSerializer(serializers.ModelSerializer):
+    owner_user_email = serializers.EmailField(source='owner_user.email', read_only=True, default=None)
+    owner_department_name = serializers.CharField(source='owner_department.name', read_only=True, default=None)
+    owner_institution_name = serializers.CharField(source='owner_institution.short_name', read_only=True, default=None)
+
     class Meta:
         model = BillingOwner
         fields = '__all__'
@@ -29,12 +35,69 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 
 class DepartmentSeatSerializer(serializers.ModelSerializer):
+    user_email = serializers.EmailField(source='user.email', read_only=True, default=None)
+    plan_name = serializers.CharField(source='subscription.plan.name', read_only=True, default=None)
+
     class Meta:
         model = DepartmentSeat
         fields = '__all__'
 
 
 class AccountCreditSerializer(serializers.ModelSerializer):
+    user_email = serializers.EmailField(source='user.email', read_only=True, default=None)
+
+    class Meta:
+        model = AccountCredit
+        fields = '__all__'
+
+
+# ─── Admin serializers with full nested details ──────────────────────────
+
+class UserSummarySerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    email = serializers.EmailField()
+    full_name = serializers.CharField()
+
+
+class AdminBillingOwnerSerializer(serializers.ModelSerializer):
+    owner_user = UserSummarySerializer(read_only=True)
+    owner_department_name = serializers.CharField(source='owner_department.name', read_only=True, default=None)
+    owner_institution_name = serializers.CharField(source='owner_institution.short_name', read_only=True, default=None)
+
+    class Meta:
+        model = BillingOwner
+        fields = '__all__'
+
+
+class AdminSubscriptionSerializer(serializers.ModelSerializer):
+    plan = PlanSerializer(read_only=True)
+    billing_owner = AdminBillingOwnerSerializer(read_only=True)
+
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+
+
+class AdminPaymentSerializer(serializers.ModelSerializer):
+    billing_owner = AdminBillingOwnerSerializer(read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+
+class AdminDepartmentSeatSerializer(serializers.ModelSerializer):
+    user = UserSummarySerializer(read_only=True)
+    plan_name = serializers.CharField(source='subscription.plan.name', read_only=True, default=None)
+
+    class Meta:
+        model = DepartmentSeat
+        fields = '__all__'
+
+
+class AdminAccountCreditSerializer(serializers.ModelSerializer):
+    user = UserSummarySerializer(read_only=True)
+
     class Meta:
         model = AccountCredit
         fields = '__all__'
