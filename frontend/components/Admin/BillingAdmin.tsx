@@ -40,7 +40,7 @@ export const BillingAdmin: React.FC = () => {
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
-  const [subFilter, setSubFilter] = useState('');
+  const [refreshing, setRefreshing] = useState<Tab | null>(null);
   const [planForm, setPlanForm] = useState({
     code: '', name: '', billing_owner_type: 'SELF',
     price_kobo: 0, interval: 'MONTHLY',
@@ -137,6 +137,20 @@ export const BillingAdmin: React.FC = () => {
     } catch { /* handled by interceptor */ }
   };
 
+  const refreshTab = async (tab: Tab) => {
+    setRefreshing(tab);
+    try {
+      if (tab === 'overview') await loadStats();
+      if (tab === 'plans') await loadPlans();
+      if (tab === 'subscriptions') await loadSubscriptions();
+      if (tab === 'payments') await loadPayments();
+      if (tab === 'seats') await loadSeats();
+      if (tab === 'credits') await loadCredits();
+    } finally {
+      setRefreshing(null);
+    }
+  };
+
   const openEditPlan = (plan: any) => {
     setEditingPlan(plan);
     setPlanForm({
@@ -213,6 +227,13 @@ export const BillingAdmin: React.FC = () => {
             {tab.label}
           </button>
         ))}
+        <button
+          onClick={() => refreshTab(activeTab)}
+          className="ml-auto flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-all"
+        >
+          <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+          Refresh
+        </button>
       </div>
 
       {/* ─── Overview ─────────────────────────────────── */}
