@@ -20,7 +20,8 @@ import {
   QrCode,
   User,
   GraduationCap,
-  X
+  X,
+  CreditCard,
 } from '@phosphor-icons/react';
 import { UserRole } from '../types';
 import { useCurrentUser } from '../hooks/useAuth';
@@ -170,6 +171,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             items: [
               { id: 'logs', icon: Monitor, label: 'Audit Logs', permission: 'system.analytics.view' },
               { id: 'email-monitor', icon: Envelope, label: 'Email Monitor', permission: 'system.analytics.view' },
+              { id: 'billing', icon: CreditCard, label: 'Billing', permission: 'billing.admin' },
               { id: 'notifications', icon: Bell, label: 'Notifications', permission: null },
             ].filter((item) => canAccess(item.permission)),
           },
