@@ -87,5 +87,6 @@ urlpatterns = [
     path('blog/', include('blog.urls')),  # Blog posts, tags, categories, newsletter
     path('exam-clearance/', include('exam_clearance.urls')),  # Exam clearance management
     path('system/', include('system.urls')),  # System logs, stats, config
+    path('billing/', include('billing.urls')),  # Billing, plans, subscriptions
 ]
 

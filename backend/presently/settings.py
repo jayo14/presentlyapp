@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'exam_clearance',
     'accounts',
     'system',
+    'billing',
 ]
 
 MIDDLEWARE = [
@@ -427,6 +428,10 @@ EXAM_CLEARANCE_THRESHOLD = 75  # Minimum attendance percentage for exam clearanc
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')
 CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
+
+# Paystack Configuration
+PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY', '')
+PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY', '')
 
 # Django Location Field Configuration
 LOCATION_FIELD = {
