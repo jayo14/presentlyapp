@@ -113,9 +113,6 @@ def seed_permissions_and_roles() -> None:
     get_all_permission_codenames.cache_clear()
 
 
-from functools import lru_cache
-
-@lru_cache(maxsize=1)
 def get_all_permission_codenames() -> List[str]:
     return sorted(RBACPermission.objects.values_list("codename", flat=True))
 
