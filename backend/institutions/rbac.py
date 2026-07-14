@@ -46,6 +46,9 @@ PERMISSION_GROUPS: Dict[str, List[dict]] = {
         {"codename": "system.staff.manage", "name": "Manage Staff", "dangerous": True, "enabled": False},
         {"codename": "system.settings.manage", "name": "System Settings", "dangerous": True, "enabled": False},
     ],
+    "billing": [
+        {"codename": "billing.department.manage", "name": "Manage Department Billing", "dangerous": False, "enabled": True},
+    ],
 }
 
 SYSTEM_ROLE_PRESETS: Dict[str, List[str]] = {
@@ -58,6 +61,7 @@ SYSTEM_ROLE_PRESETS: Dict[str, List[str]] = {
         "sessions.view", "sessions.create", "sessions.edit",
         "attendance.view", "attendance.export",
         "system.analytics.view", "system.users.manage",
+        "billing.department.manage",
     ],
     "editor": [
         "blog.view", "blog.create", "blog.edit",
