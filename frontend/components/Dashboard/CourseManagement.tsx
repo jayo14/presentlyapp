@@ -6,6 +6,8 @@ import { Course, Department, College, Institution } from '../../types';
 import { coursesApi } from '../../services/api/courses';
 import { institutionsApi } from '../../services/api/institutions';
 import { toast } from 'sonner';
+import { useCurrentUser } from '../../hooks/useAuth';
+import { useCanCreateCourse } from '../../hooks/useBilling';
 
 interface CourseManagementProps {
   userInstitutionId?: number;
@@ -26,6 +28,10 @@ export const CourseManagement: React.FC<CourseManagementProps> = ({ userInstitut
   const [selectedCollege, setSelectedCollege] = useState<number | null>(null);
   const [deptSearchTerm, setDeptSearchTerm] = useState('');
   
+  const { data: user } = useCurrentUser();
+  const { allowed: canCreate, reason: limitReason } = useCanCreateCourse();
+  const isAdmin = user?.role === 'ADMIN';
+
   const [formData, setFormData] = useState<Partial<Course>>({
     code: '',
     title: '',
@@ -175,9 +181,20 @@ export const CourseManagement: React.FC<CourseManagementProps> = ({ userInstitut
             <h2 className="font-headline text-2xl font-bold text-text">Manage Courses</h2>
             <p className="text-textMuted">View and manage your assigned courses.</p>
           </div>
-          <Button onClick={handleCreate}>
-            <Plus size={18} className="mr-2"/> Add New Course
-          </Button>
+          {isAdmin || canCreate ? (
+            <Button onClick={handleCreate}>
+              <Plus size={18} className="mr-2"/> Add New Course
+            </Button>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-amber-500 max-w-[200px] text-right leading-tight">
+                {limitReason}
+              </span>
+              <Button onClick={() => window.location.href = '/pricing'} variant="premium">
+                Upgrade
+              </Button>
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -187,7 +204,13 @@ export const CourseManagement: React.FC<CourseManagementProps> = ({ userInstitut
             <BookOpen className="w-12 h-12 text-textMuted mx-auto mb-4" />
             <h3 className="font-headline text-lg font-medium text-text">No courses found</h3>
             <p className="text-textMuted mt-1 mb-6">Get started by creating your first course.</p>
-            <Button onClick={handleCreate} variant="secondary">Create Course</Button>
+            {isAdmin || canCreate ? (
+              <Button onClick={handleCreate} variant="secondary">Create Course</Button>
+            ) : (
+              <Button onClick={() => window.location.href = '/pricing'} variant="premium">
+                Upgrade to create more courses
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid gap-4">
