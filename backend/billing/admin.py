@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Plan, BillingOwner, Subscription, Payment
+from .models import Plan, BillingOwner, Subscription, Payment, AccountCredit, DepartmentSeat
 
 
 @admin.register(Plan)
@@ -23,3 +23,14 @@ class SubscriptionAdmin(admin.ModelAdmin):
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ['paystack_reference', 'amount_kobo', 'currency', 'status', 'paid_at']
     list_filter = ['status']
+
+
+@admin.register(AccountCredit)
+class AccountCreditAdmin(admin.ModelAdmin):
+    list_display = ['user', 'amount_kobo', 'reason', 'consumed', 'created_at']
+
+
+@admin.register(DepartmentSeat)
+class DepartmentSeatAdmin(admin.ModelAdmin):
+    list_display = ['user', 'subscription', 'is_active', 'assigned_at']
+    list_filter = ['is_active']

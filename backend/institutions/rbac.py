@@ -48,6 +48,7 @@ PERMISSION_GROUPS: Dict[str, List[dict]] = {
     ],
     "billing": [
         {"codename": "billing.department.manage", "name": "Manage Department Billing", "dangerous": False, "enabled": True},
+        {"codename": "billing.admin", "name": "Billing Admin (Full Access)", "dangerous": True, "enabled": False},
     ],
 }
 
