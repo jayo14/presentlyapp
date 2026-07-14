@@ -21,7 +21,7 @@ export const CTASection = () => (
          className="inline-flex items-center gap-3 mb-12 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mx-auto"
       >
          <IconShieldCheck size={20} className="text-sungold" />
-         <span className="text-white font-medium text-[11px] tracking-tight">Trusted infrastructure</span>
+          <span className="text-white font-medium text-[11px] tracking-tight">Trusted by institutions</span>
       </motion.div>
 
       <h2 className="text-[clamp(3rem,6vw,5.5rem)] text-white tracking-[-0.04em] mb-12 leading-[0.9] font-medium">
@@ -35,7 +35,7 @@ export const CTASection = () => (
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
         <a href="/register" className="w-full sm:w-auto skeuo-button-gold px-12 py-6 rounded-full font-medium text-xl hover:scale-105 transition-all flex items-center justify-center gap-3 shadow-2xl group">
-          Deploy infrastructure
+          Start free
           <IconArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
         </a>
 
@@ -54,8 +54,8 @@ export const CTASection = () => (
           />
         </motion.button>
 
-        <a href="/demo" className="w-full sm:w-auto px-8 py-6 rounded-full font-medium text-lg text-white/60 hover:text-white transition-colors flex items-center justify-center gap-2 group">
-          Executive demo
+        <a href="/contact" className="w-full sm:w-auto px-8 py-6 rounded-full font-medium text-lg text-white/60 hover:text-white transition-colors flex items-center justify-center gap-2 group">
+          Talk to sales
           <IconBuildings size={20} className="group-hover:scale-110 transition-transform" />
         </a>
       </div>

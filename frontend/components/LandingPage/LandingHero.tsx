@@ -44,15 +44,15 @@ export const Hero = () => {
             className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 bg-white border border-black/5 rounded-full shadow-sm w-fit"
           >
             <div className="w-1.5 h-1.5 rounded-full bg-sungold animate-pulse" />
-            <span className="text-[11px] font-medium tracking-tight text-neutral-600">NUC accreditation protocol v2.4</span>
+            <span className="text-[11px] font-medium tracking-tight text-neutral-600">NUC compliant attendance system</span>
           </motion.div>
 
           <motion.h1
             variants={itemVariants}
             className="text-[clamp(3rem,6vw,5.5rem)] text-neutral-900 leading-[0.9] tracking-[-0.04em] mb-8 font-medium"
           >
-            Sovereign academic<br />
-            <span className="italic  text-neutral-400">infrastructure.</span>
+            Smart attendance,<br />
+            <span className="italic  text-neutral-400">verified.</span>
           </motion.h1>
 
           <motion.p
@@ -66,13 +66,13 @@ export const Hero = () => {
             variants={itemVariants}
             className="flex flex-wrap items-center gap-6 mb-16"
           >
-            <button className="skeuo-button-gold px-10 py-5 font-medium text-lg flex items-center gap-3 group">
-              Deploy presently
+            <a href="/register" className="skeuo-button-gold px-10 py-5 font-medium text-lg flex items-center gap-3 group">
+              Get started free
               <IconArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="px-8 py-5 font-medium text-lg border border-black/10 rounded-[2rem] hover:bg-white/50 transition-colors">
-              Watch the protocol
-            </button>
+            </a>
+            <a href="#features" className="px-8 py-5 font-medium text-lg border border-black/10 rounded-[2rem] hover:bg-white/50 transition-colors">
+              See how it works
+            </a>
           </motion.div>
 
           <motion.div
@@ -215,10 +215,10 @@ export const Hero = () => {
                        <IconShieldCheck size={40} className="text-green-500" />
                     </div>
                     <h4 className="text-3xl font-medium mb-4">Integrity verified</h4>
-                    <p className="text-neutral-400 max-w-sm mb-12">Institutional protocol successfully cross-referenced with GPS, Biometrics, and Fingerprinting.</p>
-                    <button className="px-8 py-3 bg-neutral-900 text-white rounded-full text-sm font-medium hover:scale-105 transition-transform">
-                      Generate NUC Report
-                    </button>
+                    <p className="text-neutral-400 max-w-sm mb-12">Attendance cross-referenced with GPS, biometrics, and device fingerprinting for tamper-proof records.</p>
+                    <a href="/register" className="inline-block px-8 py-3 bg-neutral-900 text-white rounded-full text-sm font-medium hover:scale-105 transition-transform">
+                      Get started free
+                    </a>
                   </motion.div>
                 )}
               </AnimatePresence>

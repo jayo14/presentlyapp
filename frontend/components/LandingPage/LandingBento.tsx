@@ -98,8 +98,8 @@ export const LandingBento = () => {
             <p className="text-xl text-neutral-500 leading-relaxed  mb-8">
               Presently is not an app; it is a fundamental layer of academic integrity for the modern university.
             </p>
-            <a href="#" className="inline-flex items-center gap-2 text-foreground font-medium tracking-tight text-[11px] group">
-              Explore infrastructure <IconArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            <a href="#features" className="inline-flex items-center gap-2 text-foreground font-medium tracking-tight text-[11px] group">
+              Explore features <IconArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </a>
           </div>
         </div>
@@ -114,14 +114,14 @@ export const LandingBento = () => {
                 </div>
                 <MiniChart color="#F9C406" />
               </div>
-              <h3 className="text-4xl font-medium text-foreground tracking-tight mb-6 leading-tight">NUC accreditation sovereignty.</h3>
+              <h3 className="text-4xl font-medium text-foreground tracking-tight mb-6 leading-tight">NUC-ready compliance.</h3>
               <p className="text-lg text-neutral-500 max-w-xl leading-relaxed ">
                 Generating audit-ready attendance reports with cryptographic certainty. Presently ensures your institution meets the 75% attendance threshold mandated for examination eligibility with immutable, location-verified records.
               </p>
             </div>
 
             <div className="mt-12 flex flex-wrap gap-4 relative z-10">
-               {['ISO 27001 certified', 'CCMAS compliant', 'Real-time audit logs', 'Sovereign data storage'].map(tag => (
+               {['ISO 27001 certified', 'CCMAS compliant', 'Real-time audit logs', 'Tamper-proof records'].map(tag => (
                  <span key={tag} className="px-6 py-2.5 rounded-full bg-foreground/5 border border-foreground/5 text-[11px] font-medium tracking-tight text-neutral-600 hover:border-sungold/40 transition-colors">
                    {tag}
                  </span>

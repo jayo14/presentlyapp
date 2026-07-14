@@ -38,7 +38,7 @@ export const RoleBasedSection = () => {
             description="The definitive dashboard for vice chancellors and registrars to monitor NUC compliance and university-wide engagement trends in real-time."
             icon={IconBuilding}
             color="#231F0F"
-            features={["NUC audit readiness", "Faculty analytics", "Security oversight", "Data sovereignty"]}
+            features={["NUC audit readiness", "Faculty analytics", "Security oversight", "Data security"]}
             className="min-h-[500px] bg-neutral-50 border-black/5"
           >
              <div className="w-full flex justify-center p-8">
@@ -114,7 +114,7 @@ export const RoleBasedSection = () => {
 
             {/* Students */}
             <FeatureCard
-              title="Student sovereignty."
+              title="For students."
               description="A seamless check-in experience that respects student time and focus. Track your record and stay ahead of NUC eligibility requirements."
               icon={IconUser}
               color="#F9C406"

@@ -89,12 +89,12 @@ export const LandingEngineRoom: React.FC = () => {
              className="flex items-center gap-4 mb-8"
           >
              <div className="w-10 h-px bg-sungold" />
-             <span className="text-sungold font-medium text-[11px] tracking-tight">The verification protocol</span>
+             <span className="text-sungold font-medium text-[11px] tracking-tight">How it works</span>
           </motion.div>
 
           <h2 className="text-[clamp(2.5rem,4vw,4.5rem)] tracking-[-0.04em] text-neutral-900 leading-[0.9] font-medium mb-12">
-            Zero-trust<br />
-            <span className="text-neutral-400 italic ">architecture.</span>
+            Reliable by<br />
+            <span className="text-neutral-400 italic ">design.</span>
           </h2>
 
           <div className="space-y-6 mb-16">

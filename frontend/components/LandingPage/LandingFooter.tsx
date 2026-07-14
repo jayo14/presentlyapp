@@ -11,11 +11,11 @@ export const Footer = () => (
       </div>
 
       <div>
-        <h4 className="text-neutral-900 font-medium mb-10 tracking-tight text-[11px]">Infrastructure</h4>
+        <h4 className="text-neutral-900 font-medium mb-10 tracking-tight text-[11px]">Product</h4>
         <ul className="space-y-4 text-[13px]  tracking-tight">
-          <li><a href="#" className="hover:text-sungold transition-colors">Verification protocol</a></li>
-          <li><a href="#" className="hover:text-sungold transition-colors">Sovereign cloud</a></li>
-          <li><a href="#" className="hover:text-sungold transition-colors">Data integrity</a></li>
+          <li><a href="#features" className="hover:text-sungold transition-colors">Features</a></li>
+          <li><a href="#mobile-app" className="hover:text-sungold transition-colors">Mobile app</a></li>
+          <li><a href="#pricing" className="hover:text-sungold transition-colors">Pricing</a></li>
         </ul>
       </div>
 
@@ -42,7 +42,7 @@ export const Footer = () => (
       <div className="flex flex-wrap items-center justify-center gap-6 text-center md:text-left">
          <p>© 2025 Presently.</p>
          <div className="hidden md:block w-1 h-1 rounded-full bg-neutral-200" />
-         <p className="text-sungold/40">Sovereign academic infrastructure for Nigeria.</p>
+         <p className="text-sungold/40">Purpose-built for Nigerian universities.</p>
       </div>
       <ThemeToggle />
     </div>

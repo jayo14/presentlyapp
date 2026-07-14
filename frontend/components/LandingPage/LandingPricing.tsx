@@ -171,16 +171,16 @@ export const LandingPricing = () => {
         >
           <div className="rounded-3xl border-2 border-dashed border-sungold/30 bg-sungold/[0.03] p-10 md:p-14 text-center">
             <h3 className="text-3xl md:text-4xl font-medium tracking-tight text-neutral-900">
-              Institution-wide deployment
+              Institution-wide
             </h3>
             <p className="mt-4 text-lg text-neutral-500 max-w-2xl mx-auto leading-relaxed">
-              Custom pricing for universities and polytechnics rolling out Presently across multiple colleges and departments. Includes dedicated infrastructure, white-label branding, and priority compliance support.
+              Custom pricing for universities and polytechnics rolling out Presently across multiple colleges and departments. Includes white-label branding, dedicated support, and priority compliance.
             </p>
             <div className="mt-10 max-w-2xl mx-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-left">
                 {[
                   'Unlimited lecturer seats',
-                  'Dedicated infrastructure',
+                  'Dedicated support',
                   'White-label branding',
                   'NUC compliance reports',
                   'Priority support SLA',
