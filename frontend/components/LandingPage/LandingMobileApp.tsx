@@ -14,7 +14,7 @@ import {
 
 export const LandingMobileApp: React.FC = () => {
   return (
-    <section className="py-40 bg-white overflow-hidden relative">
+    <section id="mobile-app" className="py-40 bg-white overflow-hidden relative">
       <div className="orb w-[800px] h-[800px] bg-sungold/5 top-1/2 right-0" />
 
       <div className="max-w-[1440px] mx-auto px-8 md:px-16 grid lg:grid-cols-2 gap-24 items-center relative z-10">

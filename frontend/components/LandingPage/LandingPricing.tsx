@@ -58,7 +58,7 @@ export const LandingPricing = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-40 bg-white relative overflow-hidden">
+    <section id="pricing" className="py-40 bg-white relative overflow-hidden">
       <div className="orb w-[1000px] h-[1000px] bg-sungold/5 -top-60 -right-60" />
 
       <div className="max-w-[1440px] mx-auto px-8 md:px-16 relative z-10">

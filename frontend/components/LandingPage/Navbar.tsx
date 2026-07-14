@@ -16,10 +16,10 @@ export const Navbar: React.FC = () => {
     }, []);
 
     const navLinks = [
-        { label: 'Governance', href: '#governance' },
-        { label: 'Infrastructure', href: '#infrastructure' },
+        { label: 'Features', href: '#features' },
+        { label: 'Mobile App', href: '#mobile-app' },
         { label: 'Pricing', href: '#pricing' },
-        { label: 'Blog', href: '#blog' },
+        { label: 'Blog', href: '/blog' },
     ];
 
     return (
@@ -56,7 +56,7 @@ export const Navbar: React.FC = () => {
                         Log in
                     </a>
                     <a href="/register" className="bg-[#231F0F] text-white px-6 py-3 rounded-full hover:bg-sungold hover:text-neutral-900 transition-all active:scale-95 text-[12px] font-medium tracking-tight flex items-center gap-2 shadow-lg border border-white/5">
-                        Deploy infrastructure <IconArrowUpRight size={18} />
+                        Get started free <IconArrowUpRight size={18} />
                     </a>
                 </div>
 
@@ -93,7 +93,7 @@ export const Navbar: React.FC = () => {
                         <div className="flex flex-col gap-3">
                             <a href="/login" className="w-full text-center py-4 rounded-2xl border border-black/5 text-neutral-900 font-medium tracking-tight text-sm">Log in</a>
                             <a href="/register" className="bg-sungold text-neutral-900 px-6 py-4 rounded-2xl text-sm font-medium tracking-tight flex items-center justify-center gap-2">
-                                Deploy <IconArrowUpRight size={18} />
+                                Get started free <IconArrowUpRight size={18} />
                             </a>
                         </div>
                     </div>

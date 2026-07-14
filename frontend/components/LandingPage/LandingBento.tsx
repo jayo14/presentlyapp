@@ -74,7 +74,7 @@ const BentoCard = ({ children, className = "", delay = 0 }) => {
 
 export const LandingBento = () => {
   return (
-    <section id="infrastructure" className="py-40 bg-background relative overflow-hidden">
+    <section id="features" className="py-40 bg-background relative overflow-hidden">
       <div className="orb w-[500px] h-[500px] bg-blue-400/5 top-20 -right-20" />
 
       <div className="max-w-[1440px] mx-auto px-8 md:px-16 relative z-10">
