@@ -117,8 +117,52 @@ class Subscription(models.Model):
             models.Index(fields=['billing_owner', 'status']),
         ]
 
+    def available_seats(self):
+        if self.plan.seat_limit is None:
+            return None
+        used = self.seats.filter(is_active=True).count()
+        remaining = self.plan.seat_limit - used
+        return max(remaining, 0)
+
     def __str__(self):
         return f"{self.billing_owner} -> {self.plan.code} ({self.status})"
+
+
+class DepartmentSeat(models.Model):
+    subscription = models.ForeignKey(
+        Subscription, on_delete=models.CASCADE, related_name='seats'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='department_seats'
+    )
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'billing_department_seats'
+        unique_together = [['subscription', 'user']]
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} -> {self.subscription.plan.code}"
+
+
+class AccountCredit(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='account_credits'
+    )
+    amount_kobo = models.IntegerField()
+    reason = models.CharField(max_length=200)
+    consumed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'billing_account_credits'
+
+    def __str__(self):
+        return f"{self.user.email}: {self.amount_kobo}k ({'consumed' if self.consumed else 'available'})"
 
 
 class Payment(models.Model):
