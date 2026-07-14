@@ -176,9 +176,28 @@ export const LandingPricing = () => {
             <p className="mt-4 text-lg text-neutral-500 max-w-2xl mx-auto leading-relaxed">
               Custom pricing for universities and polytechnics rolling out Presently across multiple colleges and departments. Includes dedicated infrastructure, white-label branding, and priority compliance support.
             </p>
+            <div className="mt-10 max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-left">
+                {[
+                  'Unlimited lecturer seats',
+                  'Dedicated infrastructure',
+                  'White-label branding',
+                  'NUC compliance reports',
+                  'Priority support SLA',
+                  'Custom integrations',
+                  'On-site training',
+                  'Dedicated account manager',
+                ].map((f) => (
+                  <div key={f} className="flex items-center gap-3">
+                    <IconCircleCheck size={18} className="shrink-0 text-sungold" />
+                    <span className="text-sm text-neutral-600">{f}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
             <button
               onClick={() => navigate('/contact')}
-              className="mt-8 inline-flex items-center gap-2 bg-[#231F0F] text-white px-8 py-3.5 rounded-xl text-sm font-semibold tracking-tight hover:bg-[#231F0F]/90 transition-colors"
+              className="mt-10 inline-flex items-center gap-2 bg-[#231F0F] text-white px-8 py-3.5 rounded-xl text-sm font-semibold tracking-tight hover:bg-[#231F0F]/90 transition-colors"
             >
               Contact sales
               <IconArrowRight size={16} />
