@@ -161,6 +161,30 @@ export const LandingPricing = () => {
         >
           All plans include end-to-end encryption, GPS geofencing, and NUC-compliant reporting.
         </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="mt-20 max-w-4xl mx-auto"
+        >
+          <div className="rounded-3xl border-2 border-dashed border-sungold/30 bg-sungold/[0.03] p-10 md:p-14 text-center">
+            <h3 className="text-3xl md:text-4xl font-medium tracking-tight text-neutral-900">
+              Institution-wide deployment
+            </h3>
+            <p className="mt-4 text-lg text-neutral-500 max-w-2xl mx-auto leading-relaxed">
+              Custom pricing for universities and polytechnics rolling out Presently across multiple colleges and departments. Includes dedicated infrastructure, white-label branding, and priority compliance support.
+            </p>
+            <button
+              onClick={() => navigate('/contact')}
+              className="mt-8 inline-flex items-center gap-2 bg-[#231F0F] text-white px-8 py-3.5 rounded-xl text-sm font-semibold tracking-tight hover:bg-[#231F0F]/90 transition-colors"
+            >
+              Contact sales
+              <IconArrowRight size={16} />
+            </button>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
