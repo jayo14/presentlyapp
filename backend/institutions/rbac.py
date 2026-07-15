@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Dict, List
 
 from institutions.models import RBACPermission, RolePermission, StaffRole, UserPermission
@@ -113,6 +114,7 @@ def seed_permissions_and_roles() -> None:
     get_all_permission_codenames.cache_clear()
 
 
+@lru_cache(maxsize=None)
 def get_all_permission_codenames() -> List[str]:
     return sorted(RBACPermission.objects.values_list("codename", flat=True))
 
