@@ -46,18 +46,20 @@ def _hash_token(token: str) -> str:
 
 
 def _upsert_user_permissions(user: User, selected_codes: list[str], actor: User) -> None:
-    selected_set = set(selected_codes)
-    all_perms = list(RBACPermission.objects.all())
+    # Remove overrides for permissions no longer in the selected set.
+    UserPermission.objects.filter(user=user).exclude(
+        permission__codename__in=selected_codes
+    ).delete()
 
-    for perm in all_perms:
-        UserPermission.objects.update_or_create(
-            user=user,
-            permission=perm,
-            defaults={
-                'allowed': perm.codename in selected_set,
-                'created_by': actor,
-            },
-        )
+    # Create/update overrides only for the explicitly selected permissions.
+    for code in selected_codes:
+        perm = RBACPermission.objects.filter(codename=code).first()
+        if perm:
+            UserPermission.objects.update_or_create(
+                user=user,
+                permission=perm,
+                defaults={'allowed': True, 'created_by': actor},
+            )
 
 
 def _send_staff_invite_email(invitation: StaffInvitation, invite_link: str) -> None:
