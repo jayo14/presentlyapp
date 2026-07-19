@@ -105,38 +105,43 @@ function buildBoundaryGeoJSON(
   activeSessions: Set<number>,
   selectedVenueId?: number,
 ): GeoJSON.FeatureCollection {
+  const features = venues
+    .filter((v) => v.boundary_coordinates && v.boundary_coordinates.length >= 3)
+    .map((v) => {
+      const isSelected = v.id === selectedVenueId;
+      const isActive = activeSessions.has(v.id);
+      const baseColor = isSelected
+        ? '#f9c406'
+        : isActive
+          ? '#ef4444'
+          : v.venue_color || '#6366f1';
+      return {
+        type: 'Feature' as const,
+        id: v.id,
+        geometry: {
+          type: 'Polygon' as const,
+          coordinates: [
+            v.boundary_coordinates!.map(([lat, lng]) => [lng, lat] as [number, number]),
+          ],
+        },
+        properties: {
+          id: v.id,
+          name: v.name,
+          fillColor: baseColor,
+          fillOpacity: isSelected ? 0.4 : (v.venue_opacity ?? 0.4),
+          strokeColor: baseColor,
+          strokeWidth: isSelected ? 4 : (v.border_width ?? 2),
+        },
+      };
+    });
+
+  if (features.length > 0) {
+    console.log('[VenueMap] buildBoundaryGeoJSON features:', features.length, 'sample coords:', features[0].geometry.coordinates[0].slice(0, 3));
+  }
+
   return {
     type: 'FeatureCollection',
-    features: venues
-      .filter((v) => v.boundary_coordinates && v.boundary_coordinates.length >= 3)
-      .map((v) => {
-        const isSelected = v.id === selectedVenueId;
-        const isActive = activeSessions.has(v.id);
-        const baseColor = isSelected
-          ? '#f9c406'
-          : isActive
-            ? '#ef4444'
-            : v.venue_color || '#6366f1';
-        return {
-          type: 'Feature' as const,
-          id: v.id,
-          geometry: {
-            type: 'Polygon' as const,
-            // boundary_coordinates stored as [lat,lng] pairs – convert to [lng,lat] for MapLibre
-            coordinates: [
-              v.boundary_coordinates!.map(([lat, lng]) => [lng, lat] as [number, number]),
-            ],
-          },
-          properties: {
-            id: v.id,
-            name: v.name,
-            fillColor: baseColor,
-            fillOpacity: isSelected ? 0.35 : (v.venue_opacity ?? 0.15),
-            strokeColor: baseColor,
-            strokeWidth: isSelected ? 4 : (v.border_width ?? 2),
-          },
-        };
-      }),
+    features,
   };
 }
 
@@ -563,6 +568,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           'fill-antialias': true,
         },
       });
+      console.log('[VenueMap] added venue-polygon-fill layer');
     }
     if (!map.getLayer('venue-polygon-outline')) {
       map.addLayer({
@@ -575,6 +581,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
           'line-opacity': 1,
         },
       });
+      console.log('[VenueMap] added venue-polygon-outline layer');
     }
     if (!map.getLayer('venue-points-layer')) {
       map.addLayer({
@@ -675,8 +682,19 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     tooltipRef.current = tooltip;
 
     map.on('load', () => {
+      console.log('[VenueMap] map load event, venues count:', venuesRef.current.length);
       addSourcesAndLayers(map);
       renderVenueMarkers(map);
+
+      const pSrc = map.getSource('venue-points');
+      const bSrc = map.getSource('venue-polygons');
+      console.log('[VenueMap] after load: pSrc=', !!pSrc, 'bSrc=', !!bSrc);
+
+      if (bSrc) {
+        const boundaryData = buildBoundaryGeoJSON(venuesRef.current, activeSessRef.current as Set<number>, selectedVenueRef.current?.id);
+        console.log('[VenueMap] initial polygon data features:', boundaryData.features.length);
+        bSrc.setData(boundaryData);
+      }
 
       // Perform multiple resizes to catch any late layout shifts
       map.resize();
@@ -689,6 +707,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     });
 
     map.on('style.load', () => {
+      console.log('[VenueMap] map style load event');
       addSourcesAndLayers(map);
       const pSrc = map.getSource('venue-points') as maplibregl.GeoJSONSource | undefined;
       const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
@@ -816,8 +835,14 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     const pSrc = map.getSource('venue-points') as maplibregl.GeoJSONSource | undefined;
     const bSrc = map.getSource('venue-polygons') as maplibregl.GeoJSONSource | undefined;
 
+    console.log('[VenueMap] sync effect: mapReady=', mapReady, 'venues=', venues.length, 'pSrc=', !!pSrc, 'bSrc=', !!bSrc);
+
     if (pSrc) pSrc.setData(buildPointGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
-    if (bSrc) bSrc.setData(buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id));
+    if (bSrc) {
+      const boundaryData = buildBoundaryGeoJSON(venues, activeSessions as Set<number>, selectedVenue?.id);
+      console.log('[VenueMap] setting polygon data, features:', boundaryData.features.length);
+      bSrc.setData(boundaryData);
+    }
 
     // Only re-render markers for a subset if the list is large, or just always for safety
     // but now renderVenueMarkers only picks active/selected ones anyway.
