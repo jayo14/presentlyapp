@@ -71,7 +71,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
       {/* Stats Dashboard for Subscribers */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Growth Metric */}
-        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline/10 shadow-sm relative overflow-hidden group">
+        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline shadow-sm relative overflow-hidden group">
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Total Community</p>
@@ -93,7 +93,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
         </div>
 
         {/* Engagement Metric */}
-        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline/10 shadow-sm relative overflow-hidden group">
+        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline shadow-sm relative overflow-hidden group">
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Open Rate</p>
@@ -110,7 +110,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
         </div>
 
         {/* Active Subscribers */}
-        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline/10 shadow-sm relative overflow-hidden group">
+        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline shadow-sm relative overflow-hidden group">
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Status: Active</p>
@@ -127,7 +127,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
         </div>
 
         {/* Churn Rate (Unsubscribed) */}
-        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline/10 shadow-sm relative overflow-hidden group">
+        <div className="bg-surface p-8 rounded-[2.5rem] border border-outline shadow-sm relative overflow-hidden group">
           <div className="relative z-10 space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Status: Inactive</p>
@@ -148,9 +148,9 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
       </div>
 
       {/* Main Content: Table & Filter */}
-      <div className="bg-surface rounded-[3rem] shadow-sm border border-outline/5 overflow-hidden transition-all duration-700">
+      <div className="bg-surface rounded-[3rem] shadow-sm border border-outline overflow-hidden transition-all duration-700">
         {/* Table Header / Action Bar */}
-        <div className="p-10 flex flex-wrap items-center justify-between gap-8 border-b border-outline/5">
+        <div className="p-10 flex flex-wrap items-center justify-between gap-8 border-b border-outline">
            <div className="relative flex-1 min-w-[400px]">
              <Search size={24} className="absolute left-6 top-1/2 -translate-y-1/2 text-textMuted" />
              <input 
@@ -162,8 +162,8 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
              />
            </div>
            <div className="flex gap-4">
-              <button className="px-8 py-4 bg-surfaceHigh/60 rounded-full text-xs font-black text-text hover:bg-surfaceHigh transition-colors flex items-center gap-2 border border-outline/10"><Filter size={16} /> Filter</button>
-              <button className="px-8 py-4 bg-surfaceHigh/60 rounded-full text-xs font-black text-text hover:bg-surfaceHigh transition-colors flex items-center gap-2 border border-outline/10"><Calendar size={16} /> Date Range</button>
+              <button className="px-8 py-4 bg-surfaceHigh/60 rounded-full text-xs font-black text-text hover:bg-surfaceHigh transition-colors flex items-center gap-2 border border-outline"><Filter size={16} /> Filter</button>
+              <button className="px-8 py-4 bg-surfaceHigh/60 rounded-full text-xs font-black text-text hover:bg-surfaceHigh transition-colors flex items-center gap-2 border border-outline"><Calendar size={16} /> Date Range</button>
            </div>
         </div>
 
@@ -185,7 +185,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
                 <tr key={subscriber.id || i} className="group hover:bg-primary/5 transition-all duration-300 h-24">
                   <td className="pl-12">
                     <div className="flex items-center gap-4">
-                       <div className="w-12 h-12 bg-gradient-to-br from-surfaceHigh to-surface rounded-2xl flex items-center justify-center font-black text-text shadow-sm border border-outline/10 group-hover:scale-110 transition-transform duration-500">
+                       <div className="w-12 h-12 bg-gradient-to-br from-surfaceHigh to-surface rounded-2xl flex items-center justify-center font-black text-text shadow-sm border border-outline group-hover:scale-110 transition-transform duration-500">
                           {subscriber.email.slice(0, 1).toUpperCase()}
                        </div>
                        <div className="flex flex-col">
@@ -213,7 +213,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
                     </div>
                   </td>
                   <td className="px-8">
-                    <span className="px-4 py-2 bg-surfaceHigh text-[10px] font-black text-textMuted rounded-xl uppercase tracking-widest border border-outline/5 transition-all group-hover:border-primary/20">
+                    <span className="px-4 py-2 bg-surfaceHigh text-[10px] font-black text-textMuted rounded-xl uppercase tracking-widest border border-outline transition-all group-hover:border-primary/20">
                       {subscriber.source || 'Website'}
                     </span>
                   </td>
@@ -251,7 +251,7 @@ export const SubscriberManager: React.FC<SubscriberManagerProps> = ({
              <button 
                disabled={currentPage === 1}
                onClick={() => onPageChange(currentPage - 1)}
-               className="flex items-center gap-2 px-8 py-3 rounded-full bg-white border border-outline/10 text-xs font-black text-text disabled:opacity-30 disabled:cursor-not-allowed hover:bg-surfaceHigh transition-colors"
+               className="flex items-center gap-2 px-8 py-3 rounded-full bg-white border border-outline text-xs font-black text-text disabled:opacity-30 disabled:cursor-not-allowed hover:bg-surfaceHigh transition-colors"
              >
                <ChevronLeft size={16} /> Previous
              </button>

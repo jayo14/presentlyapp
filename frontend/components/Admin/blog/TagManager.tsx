@@ -86,13 +86,13 @@ export const TagManager: React.FC<TagManagerProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 flex-1">
         {/* Left Column: Tag Cloud (8 cols) */}
-        <div className="lg:col-span-8 bg-surface p-12 rounded-[3rem] border border-outline/10 shadow-sm relative overflow-hidden h-fit">
+        <div className="lg:col-span-8 bg-surface p-12 rounded-[3rem] border border-outline shadow-sm relative overflow-hidden h-fit">
           <div className="flex flex-wrap gap-4 relative z-10">
             {filteredTags.map((tag) => (
               <div 
                 key={tag.id} 
                 className={`group flex items-center gap-4 px-6 py-3 rounded-2xl border transition-all duration-300 transform hover:scale-105 cursor-pointer ${
-                  editingTag?.id === tag.id ? 'bg-primary border-primary text-background shadow-xl shadow-primary/20' : 'bg-surfaceHigh/20 border-outline/10 text-text hover:bg-surfaceHigh/50 hover:border-primary/20'
+                  editingTag?.id === tag.id ? 'bg-primary border-primary text-background shadow-xl shadow-primary/20' : 'bg-surfaceHigh/20 border-outline text-text hover:bg-surfaceHigh/50 hover:border-primary/20'
                 }`}
                 onClick={() => handleEdit(tag)}
               >
@@ -131,7 +131,7 @@ export const TagManager: React.FC<TagManagerProps> = ({
           {(isAdding || editingTag) ? (
             <div className="bg-text p-10 rounded-[3rem] text-background shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
                <div className="relative z-10 space-y-8">
-                 <div className="flex justify-between items-center mb-8 pb-6 border-b border-white/10">
+                  <div className="flex justify-between items-center mb-8 pb-6 border-b border-outline">
                    <h3 className="text-2xl font-headline font-black tracking-tight">{editingTag ? 'Modify Tag' : 'New Tag'}</h3>
                    <button onClick={() => { setIsAdding(false); setEditingTag(null); }} className="text-background/40 hover:text-background transition-colors"><X size={24} /></button>
                  </div>
@@ -142,7 +142,7 @@ export const TagManager: React.FC<TagManagerProps> = ({
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/10 transition-all font-medium" 
+                        className="w-full bg-white/5 border border-outline rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/10 transition-all font-medium" 
                         placeholder="e.g. Artificial Intelligence" 
                         required
                       />
@@ -155,7 +155,7 @@ export const TagManager: React.FC<TagManagerProps> = ({
                           name="slug"
                           value={formData.slug}
                           onChange={handleChange}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/10 transition-all font-medium" 
+                           className="w-full bg-white/5 border border-outline rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/10 transition-all font-medium" 
                           placeholder="ai-trends" 
                           required
                         />
@@ -173,7 +173,7 @@ export const TagManager: React.FC<TagManagerProps> = ({
                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] rounded-full pointer-events-none"></div>
             </div>
           ) : (
-            <div className="h-full bg-surfaceHigh/20 border-2 border-dashed border-outline/10 rounded-[3rem] p-12 flex flex-col items-center justify-center text-center space-y-6">
+            <div className="h-full bg-surfaceHigh/20 border-2 border-dashed border-outline rounded-[3rem] p-12 flex flex-col items-center justify-center text-center space-y-6">
                <div className="p-6 bg-surface rounded-full text-textMuted/40 shadow-sm">
                  <TagIcon size={40} />
                </div>

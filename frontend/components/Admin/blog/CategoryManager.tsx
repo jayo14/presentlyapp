@@ -82,10 +82,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
         {/* Left Column: Category Cards (8 cols) */}
         <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           {categories.map((category) => (
-            <div key={category.id} className="group bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+            <div key={category.id} className="group bg-surface p-8 rounded-[2rem] border border-outline shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 relative overflow-hidden flex flex-col justify-between min-h-[220px]">
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-6">
-                  <div className="p-3 bg-surfaceHigh/40 rounded-2xl text-primary transform group-hover:scale-110 transition-transform duration-500 shadow-sm border border-outline/5 inline-block">
+                  <div className="p-3 bg-surfaceHigh/40 rounded-2xl text-primary transform group-hover:scale-110 transition-transform duration-500 shadow-sm border border-outline inline-block">
                     <Layers size={24} />
                   </div>
                   <div className="flex gap-2">
@@ -98,7 +98,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
                 <p className="text-sm text-textMuted/80 line-clamp-2 leading-relaxed mb-6 italic">{category.description || 'No description provided for this category.'}</p>
               </div>
               
-              <div className="relative z-10 flex items-center justify-between pt-6 border-t border-outline/5 text-[10px] font-black uppercase tracking-widest text-textMuted pt-4">
+              <div className="relative z-10 flex items-center justify-between pt-6 border-t border-outline text-[10px] font-black uppercase tracking-widest text-textMuted pt-4">
                 <span className="flex items-center gap-1.5"><FileText size={14} className="text-primary/40" /> 12 Posts</span>
                 <span className="cursor-pointer hover:text-primary flex items-center gap-1 hover:translate-x-1 transition-transform">View posts <ChevronRight size={14} /></span>
               </div>
@@ -108,7 +108,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
             </div>
           ))}
           {categories.length === 0 && (
-            <div className="col-span-2 py-20 bg-surfaceHigh/10 border-2 border-dashed border-outline/10 rounded-[3rem] text-center">
+            <div className="col-span-2 py-20 bg-surfaceHigh/10 border-2 border-dashed border-outline rounded-[3rem] text-center">
               <Layers size={48} className="mx-auto text-textMuted/20 mb-4" />
               <p className="text-textMuted italic font-bold">No categories created yet.</p>
             </div>
@@ -119,7 +119,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
         <div className="lg:col-span-4 sticky top-24">
           {(isAdding || editingCategory) ? (
             <div className="bg-text p-8 rounded-[2rem] text-background shadow-2xl space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="flex justify-between items-center border-b border-white/10 pb-6">
+              <div className="flex justify-between items-center border-b border-outline pb-6">
                 <h3 className="text-2xl font-headline font-black tracking-tight">{editingCategory ? 'Edit Category' : 'New Category'}</h3>
                 <button onClick={() => { setIsAdding(false); setEditingCategory(null); }} className="text-background/40 hover:text-background transition-colors"><X size={24} /></button>
               </div>
@@ -131,7 +131,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium" 
+                    className="w-full bg-white/10 border border-outline rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium" 
                     placeholder="e.g. Technology" 
                     required
                   />
@@ -144,7 +144,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
                        name="slug"
                        value={formData.slug}
                        onChange={handleChange}
-                       className="w-full bg-white/10 border-white/10 rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium" 
+                        className="w-full bg-white/10 border border-outline rounded-2xl pl-10 pr-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium" 
                        placeholder="technology"
                        required
                      />
@@ -156,7 +156,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    className="w-full bg-white/10 border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium resize-none leading-relaxed h-32" 
+                    className="w-full bg-white/10 border border-outline rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-primary/20 text-background placeholder:text-background/20 transition-all font-medium resize-none leading-relaxed h-32" 
                     placeholder="What topics will this category cover?" 
                   />
                 </div>
@@ -169,7 +169,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
               </form>
             </div>
           ) : (
-            <div className="bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm text-center space-y-6 py-12">
+            <div className="bg-surface p-8 rounded-[2rem] border border-outline shadow-sm text-center space-y-6 py-12">
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
                 <Layers size={32} />
               </div>
