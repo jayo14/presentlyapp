@@ -269,7 +269,7 @@ export const BlogManagement: React.FC = () => {
     <div className="flex flex-col gap-8 min-h-screen bg-background text-text">
 
       {/* ── Top navigation bar ── */}
-      <div className="flex items-center justify-between border-b border-outline/10 bg-surface/80 backdrop-blur-xl px-6 lg:px-12 py-4 sticky top-0 z-40">
+      <div className="flex items-center justify-between border-b border-outline bg-surface/80 backdrop-blur-xl px-6 lg:px-12 py-4 sticky top-0 z-40">
         <div className="flex items-center gap-6 lg:gap-12 flex-wrap">
           {/* Brand */}
           <div className="flex items-center gap-3">
@@ -306,7 +306,7 @@ export const BlogManagement: React.FC = () => {
           {view !== 'overview' && (
             <button
               onClick={() => goTo('overview')}
-              className="p-2.5 bg-surface border border-outline/10 rounded-xl text-textMuted hover:text-primary transition-all group"
+               className="p-2.5 bg-surface border border-outline rounded-xl text-textMuted hover:text-primary transition-all group"
             >
               <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
             </button>
