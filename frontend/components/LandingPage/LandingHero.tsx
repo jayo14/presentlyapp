@@ -39,10 +39,10 @@ export const Hero = () => {
           animate="visible"
           className="flex flex-col justify-center"
         >
-            <motion.div
-              variants={itemVariants}
-              className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-full shadow-sm w-fit"
-            >
+             <motion.div
+               variants={itemVariants}
+               className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-full shadow-sm w-fit"
+             >
               <div className="w-1.5 h-1.5 rounded-full bg-sungold animate-pulse" />
               <span className="text-[11px] font-medium tracking-tight text-neutral-600 dark:text-neutral-300">NUC compliant attendance system</span>
             </motion.div>
@@ -70,7 +70,7 @@ export const Hero = () => {
               Get started free
               <IconArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </a>
-            <a href="#features" className="px-8 py-5 font-medium text-lg border border-black/10 dark:border-white/15 rounded-[2rem] hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+             <a href="#features" className="px-8 py-5 font-medium text-lg border border-black/10 dark:border-white/15 dark:bg-white/5 rounded-[2rem] hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
               See how it works
             </a>
           </motion.div>
@@ -99,13 +99,13 @@ export const Hero = () => {
         >
           <div className="skeuo-card w-full h-[640px] p-6 bg-white dark:bg-[#161616] overflow-hidden flex flex-col">
             {/* Mockup Header */}
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-black/5 dark:border-white/10">
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-black/5 dark:border-white/5">
               <div className="flex gap-2">
                 {['#FF5F56', '#FFBD2E', '#27C93F'].map(c => (
                   <div key={c} className="w-3 h-3 rounded-full" style={{ backgroundColor: c }} />
                 ))}
               </div>
-              <div className="flex bg-neutral-100 dark:bg-white/5 p-1 rounded-full border border-black/5 dark:border-white/10">
+              <div className="flex bg-neutral-100 dark:bg-white/5 p-1 rounded-full border border-black/5 dark:border-white/5">
                 {['attendance', 'analytics', 'verification'].map((tab) => (
                   <button
                     key={tab}
@@ -134,7 +134,7 @@ export const Hero = () => {
                     className="grid grid-cols-2 gap-6 h-full"
                   >
                     <div className="space-y-6">
-                       <div className="p-6 rounded-3xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/10">
+                       <div className="p-6 rounded-3xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/5">
                          <div className="flex items-center gap-3 mb-4">
                            <IconMapPin size={20} className="text-sungold" />
                            <span className="text-xs font-medium text-neutral-400 dark:text-neutral-500">Live checkpoint</span>
@@ -142,7 +142,7 @@ export const Hero = () => {
                          <h4 className="text-2xl font-medium mb-1">Lecture Hall 7</h4>
                          <p className="text-[11px] text-neutral-400 dark:text-neutral-500">Computer Science Dept</p>
                        </div>
-                       <div className="p-6 rounded-3xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/10">
+                       <div className="p-6 rounded-3xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/5">
                          <IconUsers size={20} className="text-blue-500 mb-4" />
                          <h4 className="text-2xl font-medium mb-1">428 / 500</h4>
                          <p className="text-[11px] text-neutral-400 dark:text-neutral-500">Students checked-in</p>
@@ -178,10 +178,10 @@ export const Hero = () => {
                   >
                      <div className="grid grid-cols-3 gap-4">
                         {[1,2,3].map(i => (
-                          <div key={i} className="h-32 rounded-2xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/10" />
+                          <div key={i} className="h-32 rounded-2xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/5" />
                         ))}
                      </div>
-                     <div className="flex-1 rounded-3xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/10 p-8">
+                     <div className="flex-1 rounded-3xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/5 p-8">
                        <div className="flex items-center justify-between mb-8">
                           <h4 className="font-medium text-lg">Weekly engagement</h4>
                            <IconBell size={20} className="text-neutral-400 dark:text-neutral-500" />

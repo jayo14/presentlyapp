@@ -120,7 +120,7 @@ export const LandingTestimonials: React.FC = () => {
                   className="flex-1 min-w-0"
                 >
                    <div
-                     className="bg-white dark:bg-surface p-8 md:p-10 rounded-[2.5rem] border border-black/5 dark:border-white/10 flex flex-col justify-between group hover:border-sungold/40 transition-all duration-700 hover:shadow-2xl relative overflow-hidden h-[480px]"
+                     className="bg-white dark:bg-surface p-8 md:p-10 rounded-[2.5rem] border border-black/5 dark:border-white/5 flex flex-col justify-between group hover:border-sungold/40 transition-all duration-700 hover:shadow-2xl relative overflow-hidden h-[480px]"
                    >
                     <div className="relative z-10">
                       <div className="w-14 h-14 rounded-2xl bg-sungold/10 flex items-center justify-center mb-8">
@@ -131,8 +131,8 @@ export const LandingTestimonials: React.FC = () => {
                       </p>
                     </div>
 
-                     <div className="flex items-center gap-4 relative z-10 pt-8 border-t border-black/5 dark:border-white/10">
-                       <div className="w-14 h-14 rounded-2xl border-2 border-neutral-100 dark:border-white/10 overflow-hidden shrink-0">
+                     <div className="flex items-center gap-4 relative z-10 pt-8 border-t border-black/5 dark:border-white/5">
+                       <div className="w-14 h-14 rounded-2xl border-2 border-neutral-100 dark:border-white/5 overflow-hidden shrink-0">
                         <img
                           src={testimonial.img}
                           alt={testimonial.name}
@@ -154,7 +154,7 @@ export const LandingTestimonials: React.FC = () => {
           </div>
         </div>
 
-         <div className="mt-32 pt-16 border-t border-black/5 dark:border-white/10 flex flex-wrap justify-center items-center gap-16 opacity-30 grayscale contrast-125">
+         <div className="mt-32 pt-16 border-t border-black/5 dark:border-white/5 flex flex-wrap justify-center items-center gap-16 opacity-30 grayscale contrast-125">
             {['Fut minna', 'Unilag', 'Abu zaria', 'Ui ibadan', 'Oau ife'].map(uni => (
               <span key={uni} className="font-medium text-xl tracking-tighter text-neutral-400 dark:text-neutral-500">{uni}</span>
             ))}

@@ -89,7 +89,7 @@ export const LandingEngineRoom: React.FC = () => {
              className="flex items-center gap-4 mb-8"
           >
              <div className="w-10 h-px bg-sungold" />
-             <span className="text-sungold font-medium text-[11px] tracking-tight">How it works</span>
+              <span className="text-sungold font-medium text-sm tracking-tight">How it works</span>
           </motion.div>
 
            <h2 className="text-[clamp(2.5rem,4vw,4.5rem)] tracking-[-0.04em] text-neutral-900 dark:text-neutral-50 leading-[0.9] font-medium mb-12">
@@ -104,7 +104,7 @@ export const LandingEngineRoom: React.FC = () => {
                 onClick={() => handleStageClick(i)}
                 className={`w-full flex gap-8 p-8 rounded-[2rem] border transition-all duration-700 text-left group ${
                   activeStage === i
-                    ? 'bg-neutral-50 dark:bg-surface-container-low border-black/5 dark:border-white/10 shadow-xl scale-[1.02]'
+                    ? 'bg-neutral-50 dark:bg-surface-container-low border-black/5 dark:border-white/5 shadow-xl scale-[1.02]'
                     : 'bg-transparent border-transparent opacity-40 hover:opacity-100'
                 }`}
               >
@@ -164,7 +164,7 @@ export const LandingEngineRoom: React.FC = () => {
                        />
                      ))}
 
-                      <div className="relative w-40 h-40 rounded-[2.5rem] bg-white dark:bg-surface border border-black/5 dark:border-white/10 flex items-center justify-center shadow-2xl">
+                      <div className="relative w-40 h-40 rounded-[2.5rem] bg-white dark:bg-surface border border-black/5 dark:border-white/5 flex items-center justify-center shadow-2xl">
                         <motion.div
                           animate={{ rotate: [0, 5, 0, -5, 0] }}
                           transition={{ duration: 4, repeat: Infinity }}
@@ -182,7 +182,7 @@ export const LandingEngineRoom: React.FC = () => {
                       <h3 className="text-3xl font-medium text-neutral-900 dark:text-neutral-50 tracking-tight">
                         {STAGES[activeStage].title}
                      </h3>
-                      <div className="mt-8 flex items-center justify-center gap-3 py-3 px-6 bg-white dark:bg-surface rounded-full border border-black/5 dark:border-white/10 shadow-sm">
+                      <div className="mt-8 flex items-center justify-center gap-3 py-3 px-6 bg-white dark:bg-surface rounded-full border border-black/5 dark:border-white/5 shadow-sm">
                          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                          <span className="text-xs font-medium tracking-tight text-neutral-500 dark:text-neutral-400">Verified verification</span>
                       </div>

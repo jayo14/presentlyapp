@@ -3,7 +3,7 @@ import { Logo } from "../Logo";
 import { ThemeToggle } from '../ThemeToggle';
 
 export const Footer = () => (
-  <footer className="bg-white dark:bg-surface pt-40 pb-20 px-8 text-neutral-500 border-t border-black/5 dark:border-white/10">
+  <footer className="bg-white dark:bg-surface pt-40 pb-20 px-8 text-neutral-500 border-t border-black/5 dark:border-white/5">
     <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-20 mb-32">
       <div className="col-span-1 md:col-span-1">
         <Logo className="mb-8 scale-125 origin-left" />
@@ -38,7 +38,7 @@ export const Footer = () => (
       </div>
     </div>
 
-    <div className="max-w-[1440px] mx-auto pt-12 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-[11px] tracking-tight font-medium text-neutral-300 dark:text-neutral-400">
+    <div className="max-w-[1440px] mx-auto pt-12 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[11px] tracking-tight font-medium text-neutral-300 dark:text-neutral-400">
       <div className="flex flex-wrap items-center justify-center gap-6 text-center md:text-left">
          <p>© 2025 Presently.</p>
          <div className="hidden md:block w-1 h-1 rounded-full bg-neutral-200" />

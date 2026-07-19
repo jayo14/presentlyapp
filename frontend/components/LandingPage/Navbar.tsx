@@ -28,7 +28,7 @@ export const Navbar: React.FC = () => {
                 className={cn(
                   "transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-auto flex items-center justify-between px-8 md:px-12",
                    isScrolled
-                    ? "mt-6 w-[95%] md:w-[85%] py-4 rounded-full bg-white/70 dark:bg-black/15 backdrop-blur-xl border border-black/5 dark:border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
+                     ? "mt-6 w-[95%] md:w-[85%] py-4 rounded-full bg-white/70 dark:bg-black/15 backdrop-blur-xl border border-black/5 dark:border-white/[0.05] shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
                     : "mt-0 w-full py-10 bg-transparent border-transparent"
                 )}
             >
@@ -64,7 +64,7 @@ export const Navbar: React.FC = () => {
                         <button
                           onClick={() => setMobileOpen((s) => !s)}
                           aria-label={mobileOpen ? "Close menu" : "Open menu"}
-                          className="p-2 rounded-full bg-neutral-100 dark:bg-white/10 border border-black/5 dark:border-white/10 text-neutral-700 dark:text-neutral-200"
+                           className="p-2 rounded-full bg-neutral-100 dark:bg-white/10 border border-black/5 dark:border-white/5 text-neutral-700 dark:text-neutral-200"
                         >
                         {mobileOpen ? <IconX size={20} /> : <IconMenu2 size={20} />}
                     </button>
@@ -77,7 +77,7 @@ export const Navbar: React.FC = () => {
               mobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
             )}>
                 <div className="w-[95%] mt-4 pointer-events-auto lg:hidden">
-                        <div className="bg-white/95 dark:bg-[#161616]/95 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[2rem] shadow-2xl p-8">
+                         <div className="bg-white/95 dark:bg-[#161616]/95 backdrop-blur-2xl border border-black/5 dark:border-white/[0.05] rounded-[2rem] shadow-2xl p-8">
                             <nav className="flex flex-col gap-4 mb-8">
                                 {navLinks.map((item) => (
                                     <a
@@ -91,7 +91,7 @@ export const Navbar: React.FC = () => {
                                 ))}
                             </nav>
                             <div className="flex flex-col gap-3">
-                                <a href="/login" className="w-full text-center py-4 rounded-2xl border border-black/5 dark:border-white/10 text-neutral-900 dark:text-neutral-100 font-medium tracking-tight text-sm">Log in</a>
+                                <a href="/login" className="w-full text-center py-4 rounded-2xl border border-black/5 dark:border-white/5 text-neutral-900 dark:text-neutral-100 font-medium tracking-tight text-sm">Log in</a>
                             <a href="/register" className="bg-sungold text-neutral-900 px-6 py-4 rounded-2xl text-sm font-medium tracking-tight flex items-center justify-center gap-2">
                                 Get started free <IconArrowUpRight size={18} />
                             </a>

@@ -6,7 +6,7 @@ export const Logo: React.FC<{ className?: string, showText?: boolean }> = ({
 }) => (
   <div className={`flex items-center gap-2.5 ${className}`}>
     <div className="relative group">
-      <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-black/5 overflow-hidden">
+      <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-white dark:bg-surface-container-low rounded-xl shadow-sm border border-black/5 dark:border-white/5 overflow-hidden">
         <picture>
           <source srcSet="/logo.webp" type="image/webp" />
           <img
@@ -20,7 +20,7 @@ export const Logo: React.FC<{ className?: string, showText?: boolean }> = ({
       </div>
     </div>
     {showText && (
-      <span className="text-neutral-900 font-medium text-xl tracking-tighter">
+      <span className="text-neutral-900 dark:text-neutral-50 font-medium text-xl tracking-tighter">
         Presently
       </span>
     )}

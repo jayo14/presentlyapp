@@ -50,7 +50,7 @@ export const LandingMobileApp: React.FC = () => {
               { title: 'Offline resilience', desc: 'Cryptographically signed records that sync even in zero-bandwidth environments.', icon: <IconShieldCheck size={28} /> },
             ].map(({ title, desc, icon }, i) => (
               <div key={i} className="flex gap-6 items-start group">
-                 <div className="w-14 h-14 rounded-2xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-500 shadow-sm">
+                 <div className="w-14 h-14 rounded-2xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/5 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-500 shadow-sm">
                    <div className="text-sungold">{icon}</div>
                  </div>
                  <div>
@@ -101,7 +101,7 @@ export const LandingMobileApp: React.FC = () => {
                   <div className="w-12 h-12 rounded-2xl bg-sungold/10 flex items-center justify-center">
                     <IconShieldCheck size={28} className="text-sungold" />
                   </div>
-                   <div className="w-10 h-10 rounded-full border border-black/5 dark:border-white/10 overflow-hidden">
+                   <div className="w-10 h-10 rounded-full border border-black/5 dark:border-white/5 overflow-hidden">
                      <img src="https://i.pravatar.cc/150?img=12" alt="Profile" />
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export const LandingMobileApp: React.FC = () => {
                  </h4>
                  <p className="text-neutral-400 dark:text-neutral-500 text-xs font-medium mb-10">University of Lagos · Hall 1</p>
 
-                 <div className="bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/10 rounded-[2rem] p-6 mb-8 relative overflow-hidden group shadow-sm">
+                 <div className="bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/5 rounded-[2rem] p-6 mb-8 relative overflow-hidden group shadow-sm">
                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
                       <IconMapPin size={60} />
                    </div>
@@ -128,7 +128,7 @@ export const LandingMobileApp: React.FC = () => {
                     { icon: <IconQrcode size={32} />, label: 'Id card' },
                     { icon: <IconBell size={32} />, label: 'Alerts' },
                   ].map(({ icon, label }, i) => (
-                     <div key={i} className="bg-neutral-50 dark:bg-surface-container-low aspect-square rounded-[2rem] border border-black/5 dark:border-white/10 flex flex-col items-center justify-center gap-3 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors cursor-pointer group">
+                     <div key={i} className="bg-neutral-50 dark:bg-surface-container-low aspect-square rounded-[2rem] border border-black/5 dark:border-white/5 flex flex-col items-center justify-center gap-3 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors cursor-pointer group">
                        <div className="text-sungold group-hover:scale-110 transition-transform">{icon}</div>
                        <span className="text-[10px] font-medium tracking-tight text-neutral-400 dark:text-neutral-500">{label}</span>
                      </div>

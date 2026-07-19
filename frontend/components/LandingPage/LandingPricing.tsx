@@ -143,7 +143,7 @@ export const LandingPricing = () => {
                  className={`flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-semibold tracking-tight transition-all duration-200 ${
                    plan.featured
                      ? 'bg-sungold text-[#231F0F] hover:bg-sungold/90'
-                     : 'bg-white dark:bg-surface text-neutral-900 dark:text-neutral-50 border border-black/10 dark:border-white/10 hover:border-sungold/50 hover:text-sungold shadow-sm'
+                     : 'bg-white dark:bg-surface text-neutral-900 dark:text-neutral-50 border border-black/10 dark:border-white/5 hover:border-sungold/50 hover:text-sungold shadow-sm'
                  }`}
               >
                 {plan.cta}
