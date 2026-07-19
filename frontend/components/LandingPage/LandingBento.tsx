@@ -89,15 +89,15 @@ export const LandingBento = () => {
                <div className="w-10 h-px bg-sungold" />
                <span className="text-sungold font-medium text-[11px] tracking-tight">Sovereign architecture</span>
             </motion.div>
-            <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-medium text-foreground leading-[0.9] tracking-[-0.04em]">
-              The core of institutional<br />
-              <span className="text-neutral-400 italic ">excellence.</span>
-            </h2>
+             <h2 className="text-[clamp(2.5rem,5vw,5rem)] font-medium text-foreground leading-[0.9] tracking-[-0.04em]">
+               The core of institutional<br />
+               <span className="text-neutral-400 dark:text-neutral-500 italic ">excellence.</span>
+             </h2>
           </div>
           <div className="max-w-md lg:mb-4">
-            <p className="text-xl text-neutral-500 leading-relaxed  mb-8">
-              Presently is not an app; it is a fundamental layer of academic integrity for the modern university.
-            </p>
+             <p className="text-xl text-neutral-500 dark:text-neutral-400 leading-relaxed  mb-8">
+               Presently is not an app; it is a fundamental layer of academic integrity for the modern university.
+             </p>
             <a href="#features" className="inline-flex items-center gap-2 text-foreground font-medium tracking-tight text-[11px] group">
               Explore features <IconArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </a>
@@ -122,7 +122,7 @@ export const LandingBento = () => {
 
             <div className="mt-12 flex flex-wrap gap-4 relative z-10">
                {['ISO 27001 certified', 'CCMAS compliant', 'Real-time audit logs', 'Tamper-proof records'].map(tag => (
-                 <span key={tag} className="px-6 py-2.5 rounded-full bg-foreground/5 border border-foreground/5 text-[11px] font-medium tracking-tight text-neutral-600 hover:border-sungold/40 transition-colors">
+                  <span key={tag} className="px-6 py-2.5 rounded-full bg-foreground/5 border border-foreground/5 text-[11px] font-medium tracking-tight text-neutral-600 dark:text-neutral-300 hover:border-sungold/40 transition-colors">
                    {tag}
                  </span>
                ))}
@@ -171,9 +171,9 @@ export const LandingBento = () => {
               <IconUsers size={28} className="text-sungold" />
             </div>
             <h4 className="text-2xl font-medium text-foreground tracking-tight mb-4">Classroom authority.</h4>
-            <p className="text-base text-neutral-500 leading-relaxed ">
-              Lecturers reclaim up to 20% of contact time previously lost to manual roll calls. Presently restores the focus to pedagogy.
-            </p>
+             <p className="text-base text-neutral-500 dark:text-neutral-400 leading-relaxed ">
+               Lecturers reclaim up to 20% of contact time previously lost to manual roll calls. Presently restores the focus to pedagogy.
+             </p>
           </BentoCard>
 
           <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-surface group">
@@ -181,9 +181,9 @@ export const LandingBento = () => {
               <IconChartBar size={28} className="text-blue-500" />
             </div>
             <h4 className="text-2xl font-medium text-foreground tracking-tight mb-4">Predictive engagement.</h4>
-            <p className="text-base text-neutral-500 leading-relaxed ">
-              Monitor student engagement live. Identify at-risk cohorts before they fall behind mandated minimums.
-            </p>
+             <p className="text-base text-neutral-500 dark:text-neutral-400 leading-relaxed ">
+               Monitor student engagement live. Identify at-risk cohorts before they fall behind mandated minimums.
+             </p>
           </BentoCard>
 
           <BentoCard className="md:col-span-4 p-6 min-h-[400px] bg-surface group">
@@ -191,9 +191,9 @@ export const LandingBento = () => {
               <IconFileText size={28} className="text-green-500" />
             </div>
             <h4 className="text-2xl font-medium text-foreground tracking-tight mb-4">Examination clearance.</h4>
-            <p className="text-base text-neutral-500 leading-relaxed ">
-              Seamlessly bridge attendance with exam clearance. Instantly verify eligibility based on secure records.
-            </p>
+             <p className="text-base text-neutral-500 dark:text-neutral-400 leading-relaxed ">
+               Seamlessly bridge attendance with exam clearance. Instantly verify eligibility based on secure records.
+             </p>
           </BentoCard>
 
         </div>

@@ -75,7 +75,7 @@ export const LandingEngineRoom: React.FC = () => {
   };
 
   return (
-    <section id="governance" ref={sectionRef} className="py-40 bg-white relative overflow-hidden">
+    <section id="governance" ref={sectionRef} className="py-40 bg-white dark:bg-surface relative overflow-hidden">
       {/* Background Accent */}
       <div className="orb w-[1000px] h-[1000px] bg-sungold/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 
@@ -92,10 +92,10 @@ export const LandingEngineRoom: React.FC = () => {
              <span className="text-sungold font-medium text-[11px] tracking-tight">How it works</span>
           </motion.div>
 
-          <h2 className="text-[clamp(2.5rem,4vw,4.5rem)] tracking-[-0.04em] text-neutral-900 leading-[0.9] font-medium mb-12">
-            Reliable by<br />
-            <span className="text-neutral-400 italic ">design.</span>
-          </h2>
+           <h2 className="text-[clamp(2.5rem,4vw,4.5rem)] tracking-[-0.04em] text-neutral-900 dark:text-neutral-50 leading-[0.9] font-medium mb-12">
+             Reliable by<br />
+             <span className="text-neutral-400 dark:text-neutral-500 italic ">design.</span>
+           </h2>
 
           <div className="space-y-6 mb-16">
             {STAGES.map((stage, i) => (
@@ -104,20 +104,20 @@ export const LandingEngineRoom: React.FC = () => {
                 onClick={() => handleStageClick(i)}
                 className={`w-full flex gap-8 p-8 rounded-[2rem] border transition-all duration-700 text-left group ${
                   activeStage === i
-                    ? 'bg-neutral-50 border-black/5 shadow-xl scale-[1.02]'
+                    ? 'bg-neutral-50 dark:bg-surface-container-low border-black/5 dark:border-white/10 shadow-xl scale-[1.02]'
                     : 'bg-transparent border-transparent opacity-40 hover:opacity-100'
                 }`}
               >
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-700 ${
-                  activeStage === i ? 'bg-sungold text-neutral-900 shadow-lg shadow-sungold/20' : 'bg-neutral-100 text-neutral-400'
+                  activeStage === i ? 'bg-sungold text-neutral-900 shadow-lg shadow-sungold/20' : 'bg-neutral-100 dark:bg-white/10 text-neutral-400 dark:text-neutral-500'
                 }`}>
                   <stage.icon size={28} />
                 </div>
                 <div>
-                  <h4 className={`text-xl font-medium mb-2 tracking-tight ${activeStage === i ? 'text-neutral-900' : 'text-neutral-500'}`}>
+                   <h4 className={`text-xl font-medium mb-2 tracking-tight ${activeStage === i ? 'text-neutral-900 dark:text-neutral-50' : 'text-neutral-500 dark:text-neutral-400'}`}>
                     {stage.title}
                   </h4>
-                  <p className="text-neutral-500 leading-relaxed  text-base max-w-sm">
+                   <p className="text-neutral-500 dark:text-neutral-400 leading-relaxed  text-base max-w-sm">
                     {stage.desc}
                   </p>
                 </div>
@@ -133,7 +133,7 @@ export const LandingEngineRoom: React.FC = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-neutral-50 rounded-[3rem] p-12 border border-black/5 shadow-2xl relative overflow-hidden aspect-square flex items-center justify-center"
+             className="bg-neutral-50 dark:bg-surface-container-low rounded-[3rem] p-12 border border-black/5 dark:border-white/5 shadow-2xl relative overflow-hidden aspect-square flex items-center justify-center"
           >
             <AnimatePresence mode="wait">
                <motion.div
@@ -164,7 +164,7 @@ export const LandingEngineRoom: React.FC = () => {
                        />
                      ))}
 
-                     <div className="relative w-40 h-40 rounded-[2.5rem] bg-white border border-black/5 flex items-center justify-center shadow-2xl">
+                      <div className="relative w-40 h-40 rounded-[2.5rem] bg-white dark:bg-surface border border-black/5 dark:border-white/10 flex items-center justify-center shadow-2xl">
                         <motion.div
                           animate={{ rotate: [0, 5, 0, -5, 0] }}
                           transition={{ duration: 4, repeat: Infinity }}
@@ -179,13 +179,13 @@ export const LandingEngineRoom: React.FC = () => {
 
                   <div className="mt-16 text-center">
                      <p className="text-[11px] font-medium tracking-tight text-sungold mb-3">Protocol active</p>
-                     <h3 className="text-3xl font-medium text-neutral-900 tracking-tight">
+                      <h3 className="text-3xl font-medium text-neutral-900 dark:text-neutral-50 tracking-tight">
                         {STAGES[activeStage].title}
                      </h3>
-                     <div className="mt-8 flex items-center justify-center gap-3 py-3 px-6 bg-white rounded-full border border-black/5 shadow-sm">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-xs font-medium tracking-tight text-neutral-500">Verified verification</span>
-                     </div>
+                      <div className="mt-8 flex items-center justify-center gap-3 py-3 px-6 bg-white dark:bg-surface rounded-full border border-black/5 dark:border-white/10 shadow-sm">
+                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                         <span className="text-xs font-medium tracking-tight text-neutral-500 dark:text-neutral-400">Verified verification</span>
+                      </div>
                   </div>
                </motion.div>
             </AnimatePresence>
@@ -196,11 +196,11 @@ export const LandingEngineRoom: React.FC = () => {
                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                className="absolute top-10 right-10 glass p-5 rounded-2xl shadow-xl z-20"
             >
-               <div className="flex items-center gap-2 mb-1">
-                  <IconCpu size={18} className="text-sungold" />
-                  <span className="font-medium text-[10px] tracking-tight text-neutral-400">Telemetry</span>
-               </div>
-               <p className="text-[12px] font-medium text-neutral-600">14ms response</p>
+                <div className="flex items-center gap-2 mb-1">
+                   <IconCpu size={18} className="text-sungold" />
+                   <span className="font-medium text-[10px] tracking-tight text-neutral-400 dark:text-neutral-500">Telemetry</span>
+                </div>
+                <p className="text-[12px] font-medium text-neutral-600 dark:text-neutral-300">14ms response</p>
             </motion.div>
 
             <motion.div
@@ -208,11 +208,11 @@ export const LandingEngineRoom: React.FC = () => {
                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                className="absolute bottom-10 left-10 glass p-5 rounded-2xl shadow-xl z-20"
             >
-               <div className="flex items-center gap-2 mb-1">
-                  <IconShieldCheck size={18} className="text-green-500" />
-                  <span className="font-medium text-[10px] tracking-tight text-neutral-400">Integrity</span>
-               </div>
-               <p className="text-[12px] font-medium text-neutral-600">AES-256 validated</p>
+                <div className="flex items-center gap-2 mb-1">
+                   <IconShieldCheck size={18} className="text-green-500" />
+                   <span className="font-medium text-[10px] tracking-tight text-neutral-400 dark:text-neutral-500">Integrity</span>
+                </div>
+                <p className="text-[12px] font-medium text-neutral-600 dark:text-neutral-300">AES-256 validated</p>
             </motion.div>
           </motion.div>
         </div>

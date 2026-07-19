@@ -30,7 +30,7 @@ const StatCounterWrapper = ({ value, label }: { value: string, label: string }) 
 
   return (
     <div className="text-center">
-      <p className="text-5xl md:text-6xl font-medium text-neutral-900 tracking-tighter mb-4">
+      <p className="text-5xl md:text-6xl font-medium text-neutral-900 dark:text-neutral-50 tracking-tighter mb-4">
         <AnimatedStat value={numericValue} suffix={suffix} decimals={decimals} />
       </p>
       <p className="text-[11px] font-medium tracking-tight text-neutral-400">{label}</p>
@@ -41,20 +41,20 @@ const StatCounterWrapper = ({ value, label }: { value: string, label: string }) 
 const AccordionItem = ({ question, answer, icon: Icon }: { question: string, answer: string, icon: any }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   return (
-    <div className="border-b border-black/5 last:border-0 py-10">
+    <div className="border-b border-black/5 dark:border-white/10 last:border-0 py-10">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left group gap-6"
       >
         <div className="flex items-center gap-6 flex-1">
           {Icon && (
-            <div className="w-14 h-14 rounded-2xl bg-neutral-50 border border-black/5 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-sm">
+             <div className="w-14 h-14 rounded-2xl bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-sm">
               <Icon size={24} className="text-sungold" />
             </div>
           )}
-          <span className="text-xl md:text-2xl font-medium text-neutral-900 group-hover:text-sungold transition-colors tracking-tight">{question}</span>
+           <span className="text-xl md:text-2xl font-medium text-neutral-900 dark:text-neutral-50 group-hover:text-sungold transition-colors tracking-tight">{question}</span>
         </div>
-        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sungold flex-shrink-0 bg-white border border-black/10 shadow-sm transition-transform duration-300" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sungold flex-shrink-0 bg-white dark:bg-surface border border-black/10 dark:border-white/15 shadow-sm transition-transform duration-300" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
           {isOpen ? <IconMinus size={20} /> : <IconPlus size={20} />}
         </div>
       </button>
@@ -63,14 +63,14 @@ const AccordionItem = ({ question, answer, icon: Icon }: { question: string, ans
         animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
         className="overflow-hidden"
       >
-        <p className="pt-8 text-neutral-500 leading-relaxed max-w-4xl text-lg ">{answer}</p>
+         <p className="pt-8 text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-4xl text-lg ">{answer}</p>
       </motion.div>
     </div>
   );
 };
 
 const SocialMarquee = () => (
-  <div className="bg-white border-y border-black/5 py-16 overflow-hidden flex whitespace-nowrap">
+  <div className="bg-white dark:bg-surface border-y border-black/5 dark:border-white/10 py-16 overflow-hidden flex whitespace-nowrap">
     <motion.div
       animate={{ x: "-50%" }}
       transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
@@ -78,13 +78,13 @@ const SocialMarquee = () => (
     >
       {[1, 2, 3].map(i => (
         <React.Fragment key={i}>
-          <span className="text-neutral-400 font-medium text-lg italic tracking-tight">"The NUC audit was a breeze with presently reports."</span>
+          <span className="text-neutral-400 dark:text-neutral-500 font-medium text-lg italic tracking-tight">"The NUC audit was a breeze with presently reports."</span>
           <div className="w-2 h-2 rounded-full bg-sungold/30" />
-          <span className="text-neutral-500 font-medium text-lg tracking-tight">ISO 27001 certified data storage</span>
+          <span className="text-neutral-500 dark:text-neutral-400 font-medium text-lg tracking-tight">ISO 27001 certified data storage</span>
           <div className="w-2 h-2 rounded-full bg-sungold/30" />
-          <span className="text-neutral-400 font-medium text-lg italic tracking-tight">"Proxy attendance dropped to zero in our faculty."</span>
+          <span className="text-neutral-400 dark:text-neutral-500 font-medium text-lg italic tracking-tight">"Proxy attendance dropped to zero in our faculty."</span>
           <div className="w-2 h-2 rounded-full bg-sungold/30" />
-          <span className="text-neutral-500 font-medium text-lg tracking-tight">Trusted by 14+ federal institutions</span>
+          <span className="text-neutral-500 dark:text-neutral-400 font-medium text-lg tracking-tight">Trusted by 14+ federal institutions</span>
           <div className="w-2 h-2 rounded-full bg-sungold/30" />
         </React.Fragment>
       ))}
@@ -118,12 +118,12 @@ export default function LandingPage() {
             className="max-w-5xl mx-auto text-center mt-40"
           >
             <p className="text-[clamp(2rem,4vw,3.5rem)] text-foreground font-medium tracking-tight leading-tight mb-12">
-              "Presently transformed our NUC accreditation process from a <span className="italic  text-neutral-400">manual nightmare</span> into an automated gold standard."
+              "Presently transformed our NUC accreditation process from a <span className="italic text-neutral-400 dark:text-neutral-500">manual nightmare</span> into an automated gold standard."
             </p>
             <div className="flex items-center justify-center gap-6">
-               <div className="w-12 h-px bg-foreground/5" />
-               <p className="text-neutral-500 font-medium tracking-tight text-sm">Prof. Ifeanyi · Deputy vice chancellor</p>
-               <div className="w-12 h-px bg-foreground/5" />
+                <div className="w-12 h-px bg-foreground/5" />
+                <p className="text-neutral-500 dark:text-neutral-400 font-medium tracking-tight text-sm">Prof. Ifeanyi · Deputy vice chancellor</p>
+                <div className="w-12 h-px bg-foreground/5" />
             </div>
           </motion.div>
         </div>

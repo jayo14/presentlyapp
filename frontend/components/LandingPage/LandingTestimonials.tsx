@@ -79,28 +79,28 @@ export const LandingTestimonials: React.FC = () => {
                <div className="w-10 h-px bg-sungold" />
                <span className="text-sungold font-medium text-[11px] tracking-tight">Voices of authority</span>
             </motion.div>
-            <h2 className="text-[clamp(2.5rem,5vw,5rem)] tracking-[-0.04em] text-neutral-900 leading-[0.9] font-medium">
-              Validated by<br />
-              <span className="text-neutral-400 italic ">academic leadership.</span>
-            </h2>
+             <h2 className="text-[clamp(2.5rem,5vw,5rem)] tracking-[-0.04em] text-neutral-900 dark:text-neutral-50 leading-[0.9] font-medium">
+               Validated by<br />
+               <span className="text-neutral-400 dark:text-neutral-500 italic ">academic leadership.</span>
+             </h2>
           </div>
           <div className="max-w-md">
-            <p className="text-xl text-neutral-500 leading-relaxed mb-6">
+             <p className="text-xl text-neutral-500 dark:text-neutral-400 leading-relaxed mb-6">
               Institutional integrity is the core of our mission. Read how Presently is reshaping Nigerian academia.
             </p>
             <div className="flex gap-4">
               <button
-                onClick={prev}
-                className="w-12 h-12 rounded-full border border-black/5 bg-white flex items-center justify-center text-neutral-900 hover:bg-sungold hover:text-white transition-all shadow-sm"
-                aria-label="Previous testimonial"
-              >
+                 onClick={prev}
+                 className="w-12 h-12 rounded-full border border-black/5 bg-white dark:bg-surface flex items-center justify-center text-neutral-900 dark:text-neutral-50 hover:bg-sungold hover:text-white transition-all shadow-sm"
+                 aria-label="Previous testimonial"
+               >
                 <IconChevronLeft size={24} />
               </button>
               <button
-                onClick={next}
-                className="w-12 h-12 rounded-full border border-black/5 bg-white flex items-center justify-center text-neutral-900 hover:bg-sungold hover:text-white transition-all shadow-sm"
-                aria-label="Next testimonial"
-              >
+                 onClick={next}
+                 className="w-12 h-12 rounded-full border border-black/5 bg-white dark:bg-surface flex items-center justify-center text-neutral-900 dark:text-neutral-50 hover:bg-sungold hover:text-white transition-all shadow-sm"
+                 aria-label="Next testimonial"
+               >
                 <IconChevronRight size={24} />
               </button>
             </div>
@@ -119,30 +119,30 @@ export const LandingTestimonials: React.FC = () => {
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   className="flex-1 min-w-0"
                 >
-                  <div
-                    className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-black/5 flex flex-col justify-between group hover:border-sungold/40 transition-all duration-700 hover:shadow-2xl relative overflow-hidden h-[480px]"
-                  >
+                   <div
+                     className="bg-white dark:bg-surface p-8 md:p-10 rounded-[2.5rem] border border-black/5 dark:border-white/10 flex flex-col justify-between group hover:border-sungold/40 transition-all duration-700 hover:shadow-2xl relative overflow-hidden h-[480px]"
+                   >
                     <div className="relative z-10">
                       <div className="w-14 h-14 rounded-2xl bg-sungold/10 flex items-center justify-center mb-8">
                          <IconQuote size={28} className="text-sungold fill-sungold" />
                       </div>
-                      <p className="text-xl md:text-2xl font-medium text-neutral-900 leading-tight italic mb-8">
+                       <p className="text-xl md:text-2xl font-medium text-neutral-900 dark:text-neutral-50 leading-tight italic mb-8">
                         "{testimonial.quote}"
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-4 relative z-10 pt-8 border-t border-black/5">
-                      <div className="w-14 h-14 rounded-2xl border-2 border-neutral-100 overflow-hidden shrink-0">
+                     <div className="flex items-center gap-4 relative z-10 pt-8 border-t border-black/5 dark:border-white/10">
+                       <div className="w-14 h-14 rounded-2xl border-2 border-neutral-100 dark:border-white/10 overflow-hidden shrink-0">
                         <img
                           src={testimonial.img}
                           alt={testimonial.name}
                           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                         />
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="font-medium text-base text-neutral-900 tracking-tight mb-0.5 truncate">{testimonial.name}</h4>
-                        <p className="text-[10px] font-bold text-sungold uppercase tracking-widest mb-1 truncate">{testimonial.role}</p>
-                        <p className="text-[10px] font-medium text-neutral-400 tracking-tight flex items-center gap-1.5 truncate">
+                       <div className="min-w-0">
+                         <h4 className="font-medium text-base text-neutral-900 dark:text-neutral-50 tracking-tight mb-0.5 truncate">{testimonial.name}</h4>
+                         <p className="text-[10px] font-bold text-sungold uppercase tracking-widest mb-1 truncate">{testimonial.role}</p>
+                         <p className="text-[10px] font-medium text-neutral-400 dark:text-neutral-500 tracking-tight flex items-center gap-1.5 truncate">
                            <IconCircleCheck size={14} className="text-green-500" /> {testimonial.institution}
                         </p>
                       </div>
@@ -154,10 +154,10 @@ export const LandingTestimonials: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-32 pt-16 border-t border-black/5 flex flex-wrap justify-center items-center gap-16 opacity-30 grayscale contrast-125">
-           {['Fut minna', 'Unilag', 'Abu zaria', 'Ui ibadan', 'Oau ife'].map(uni => (
-             <span key={uni} className="font-medium text-xl tracking-tighter text-neutral-400">{uni}</span>
-           ))}
+         <div className="mt-32 pt-16 border-t border-black/5 dark:border-white/10 flex flex-wrap justify-center items-center gap-16 opacity-30 grayscale contrast-125">
+            {['Fut minna', 'Unilag', 'Abu zaria', 'Ui ibadan', 'Oau ife'].map(uni => (
+              <span key={uni} className="font-medium text-xl tracking-tighter text-neutral-400 dark:text-neutral-500">{uni}</span>
+            ))}
         </div>
       </div>
     </section>
