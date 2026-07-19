@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Map as MapIcon, List, Grid, X as CloseIcon, RefreshCw } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Loader2, Map as MapIcon, List, Grid, X as CloseIcon, RefreshCw } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
@@ -28,6 +29,25 @@ export const VenueManagement: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isMapFullScreen, setIsMapFullScreen] = useState(false);
   const [activeVenueIds, setActiveVenueIds] = useState<Set<number>>(new Set());
+
+  // ESC handler and body overflow for fullscreen map dialog
+  useEffect(() => {
+    if (!isMapFullScreen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMapFullScreen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isMapFullScreen]);
 
   // Debounce search term
   useEffect(() => {
@@ -364,29 +384,74 @@ export const VenueManagement: React.FC = () => {
 
       {/* Map or Grid View */}
       {viewMode === 'map' ? (
-        <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-surface border border-outline rounded-lg overflow-hidden relative flex flex-col h-full">
-          <Suspense fallback={
-            <div className="absolute inset-0 bg-surface border border-outline rounded-lg overflow-hidden flex flex-col items-center justify-center gap-4">
-              <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse"></div>
-              <div className="relative z-10 flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin"></div>
-                <div className="text-textMuted font-medium animate-pulse">Initializing Map Engine...</div>
-              </div>
+        <>
+          {/* Normal map view */}
+          {!isMapFullScreen && (
+            <div className="flex-1 min-h-[500px] md:min-h-[600px] bg-surface border border-outline rounded-lg overflow-hidden relative flex flex-col h-full">
+              <Suspense fallback={
+                <div className="absolute inset-0 bg-surface border border-outline rounded-lg overflow-hidden flex flex-col items-center justify-center gap-4">
+                  <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse"></div>
+                  <div className="relative z-10 flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin"></div>
+                    <div className="text-textMuted font-medium animate-pulse">Initializing Map Engine...</div>
+                  </div>
+                </div>
+              }>
+                <VenueMap
+                  venues={filteredVenues}
+                  activeSessions={activeVenueIds}
+                  onVenueClick={handleVenueClick}
+                  onMapClick={handleMapClick}
+                  selectedVenue={selectedVenue}
+                  drawingMode={isDrawing}
+                  onBoundaryComplete={handleBoundaryComplete}
+                  isFullScreen={false}
+                  onToggleFullScreen={() => setIsMapFullScreen(true)}
+                />
+              </Suspense>
             </div>
-          }>
-            <VenueMap
-              venues={filteredVenues}
-              activeSessions={activeVenueIds}
-              onVenueClick={handleVenueClick}
-              onMapClick={handleMapClick}
-              selectedVenue={selectedVenue}
-              drawingMode={isDrawing}
-              onBoundaryComplete={handleBoundaryComplete}
-              isFullScreen={isMapFullScreen}
-              onToggleFullScreen={() => setIsMapFullScreen(!isMapFullScreen)}
-            />
-          </Suspense>
-        </div>
+          )}
+
+          {/* Fullscreen map dialog */}
+          <AnimatePresence>
+            {isMapFullScreen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100000] bg-black/80 backdrop-blur-sm flex items-center justify-center"
+                onClick={() => setIsMapFullScreen(false)}
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                  className="w-full h-full relative"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Suspense fallback={
+                    <div className="absolute inset-0 bg-surface flex items-center justify-center">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    </div>
+                  }>
+                    <VenueMap
+                      venues={filteredVenues}
+                      activeSessions={activeVenueIds}
+                      onVenueClick={handleVenueClick}
+                      onMapClick={handleMapClick}
+                      selectedVenue={selectedVenue}
+                      drawingMode={isDrawing}
+                      onBoundaryComplete={handleBoundaryComplete}
+                      isFullScreen={true}
+                      onToggleFullScreen={() => setIsMapFullScreen(false)}
+                    />
+                  </Suspense>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
         {displayVenues.map(venue => (

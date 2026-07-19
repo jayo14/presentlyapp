@@ -115,14 +115,23 @@ function buildBoundaryGeoJSON(
         : isActive
           ? '#ef4444'
           : v.venue_color || '#6366f1';
+      const raw = v.boundary_coordinates!
+        .map(([lat, lng]) => [Number(lng), Number(lat)] as [number, number]);
+
+      if (raw.length >= 3) {
+        const first = raw[0];
+        const last = raw[raw.length - 1];
+        if (first[0] !== last[0] || first[1] !== last[1]) {
+          raw.push([first[0], first[1]]);
+        }
+      }
+
       return {
         type: 'Feature' as const,
         id: v.id,
         geometry: {
           type: 'Polygon' as const,
-          coordinates: [
-            v.boundary_coordinates!.map(([lat, lng]) => [lng, lat] as [number, number]),
-          ],
+          coordinates: [raw],
         },
         properties: {
           id: v.id,
@@ -180,28 +189,6 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
       mapRef.current.resize();
     }
   }, []);
-
-  // Effect to handle fullscreen changes and resize map
-  useEffect(() => {
-    if (mapReady) {
-      if (isFullScreen) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
-
-      // Small delay to allow container to resize
-      const timer = setTimeout(forceMapResize, 100);
-      const timer2 = setTimeout(forceMapResize, 500);
-      const timer3 = setTimeout(forceMapResize, 1000);
-      return () => {
-        document.body.style.overflow = '';
-        clearTimeout(timer);
-        clearTimeout(timer2);
-        clearTimeout(timer3);
-      };
-    }
-  }, [isFullScreen, mapReady, forceMapResize]);
 
   // Real-time user location and orientation tracking
   useEffect(() => {
@@ -1119,7 +1106,7 @@ export const VenueMap: React.FC<VenueMapProps> = React.memo(({
     mapRef.current?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
   return (
-    <div className={`relative flex-1 w-full h-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col ${isFullScreen ? 'fixed inset-0 z-[100000] h-screen w-screen' : 'min-h-[500px]'}`}>
+    <div className="relative flex-1 w-full h-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden group flex flex-col min-h-[500px]">
       <div
         ref={mapContainerRef}
         className="absolute inset-0 w-full h-full z-0"
