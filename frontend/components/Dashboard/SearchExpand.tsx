@@ -215,7 +215,7 @@ export const SearchExpand: React.FC = () => {
 
       {/* Input */}
       <div className={cn(
-        "flex-1 flex items-center bg-surface-highest/20 rounded-xl border border-outline/5 overflow-visible transition-all duration-300",
+        "flex-1 flex items-center bg-surface-highest/20 rounded-xl border border-outline overflow-visible transition-all duration-300",
         isExpanded ? "opacity-100 pl-10 pr-2" : "opacity-0 w-0 pointer-events-none"
       )}>
         <input
@@ -282,7 +282,7 @@ export const SearchExpand: React.FC = () => {
               </div>
             );
           })}
-          <div className="px-3 py-2 border-t border-outline/5">
+          <div className="px-3 py-2 border-t border-outline">
             <p className="text-[10px] text-textMuted">
               ↑↓ navigate · Enter select · Esc close
             </p>

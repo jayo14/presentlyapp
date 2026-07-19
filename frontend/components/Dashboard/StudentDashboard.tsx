@@ -124,7 +124,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
       <SEO title="Presently | Home" />
 
       <div className="min-h-screen pb-24 text-slate-900 dark:text-white font-sans selection:bg-primary/20 overflow-x-hidden">
-        <main className="max-w-4xl mx-auto px-6 pt-4 space-y-8">
+        <main className="w-full px-6 pt-4 space-y-8">
             {/* GREETING - PRESERVING MOBILE-NATIVE STYLE */}
             <header className="max-w-md md:max-w-none">
                 <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60 mb-1">
@@ -146,7 +146,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setIsAttendanceModalOpen(true)}
-                    className="relative aspect-[16/9] md:aspect-[3/1] rounded-[2.5rem] overflow-hidden bg-slate-900 shadow-xl shadow-primary/5 group cursor-pointer border border-white/5"
+                    className="relative aspect-[16/9] md:aspect-[3/1] rounded-[2.5rem] overflow-hidden bg-slate-900 shadow-xl shadow-primary/5 group cursor-pointer border border-outline"
                     >
                     {isImageTransitioning ? (
                         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
@@ -175,7 +175,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ userName, vi
 
                     <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between z-10">
                         <div className="flex justify-between items-start">
-                        <div className="px-3 py-1.5 bg-white/10 backdrop-blur-xl border border-white/10 rounded-xl flex items-center gap-2">
+                        <div className="px-3 py-1.5 bg-white/10 backdrop-blur-xl border border-outline rounded-xl flex items-center gap-2">
                             <Fingerprint size={14} weight="bold" className="text-white animate-pulse" />
                             <span className="text-[8px] font-black text-white uppercase tracking-widest">Tap to Scan</span>
                         </div>

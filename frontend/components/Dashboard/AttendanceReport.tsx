@@ -717,7 +717,7 @@ export const AttendanceReport: React.FC = () => {
                           value={manualMatric}
                           onChange={(e) => setManualMatric(e.target.value.toUpperCase())}
                           placeholder="CSC/2019/001"
-                          className="w-full h-24 bg-surfaceLow border-2 border-outline/10 group-hover:border-primary/20 focus:border-primary/50 rounded-[2.5rem] pl-16 pr-8 text-3xl font-black tracking-widest font-mono outline-none transition-all shadow-inner"
+                           className="w-full h-24 bg-surfaceLow border-2 border-outline group-hover:border-primary/20 focus:border-primary/50 rounded-[2.5rem] pl-16 pr-8 text-3xl font-black tracking-widest font-mono outline-none transition-all shadow-inner"
                           required
                       />
                   </div>
