@@ -63,7 +63,7 @@ const BentoCard = ({ children, className = "", delay = 0 }) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-      className={`relative group overflow-hidden rounded-[2.5rem] border border-foreground/5 bg-surface hover:border-sungold/40 transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] ${className}`}
+      className={`relative group overflow-hidden rounded-[2.5rem] border border-outline bg-surface hover:border-sungold/40 transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] ${className}`}
     >
       <div style={{ transform: "translateZ(50px)" }} className="h-full">
         {children}
