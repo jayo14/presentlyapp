@@ -41,6 +41,7 @@ interface LayoutProps {
   onLogout: () => void;
   currentPage: string;
   setCurrentPage?: (page: string) => void;
+  fullWidth?: boolean;
 }
 
 // Global variable to persist install prompt event across component unmounts/remounts
@@ -76,7 +77,7 @@ const MobileNavItem: React.FC<{
   </button>
 );
 
-export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "User", onLogout, currentPage, setCurrentPage, fullWidth }) => {
   const { data: currentUser } = useCurrentUser();
   const { resolvedTheme, setTheme } = useTheme();
   const [installPrompt, setInstallPrompt] = useState<any>(deferredPromptEvent);
@@ -267,6 +268,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
     return found?.label || 'Dashboard';
   };
 
+  const isDashboardPage = (page: string) => {
+    return [
+      'dashboard', 'sessions', 'courses', 'analytics', 'timetable',
+      'reports', 'class-mgmt', 'security', 'logs', 'email-monitor',
+      'billing', 'notifications', 'users', 'staff', 'institutions',
+      'departments', 'venues', 'blog'
+    ].includes(page);
+  };
+
   return (
     <div className="min-h-screen bg-background text-text flex selection:bg-primary/30 selection:text-primary-foreground">
       {/* ═══════════════════════════════════════════════════════ */}
@@ -303,7 +313,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         "fixed inset-y-0 left-0 w-[300px] bg-surface text-foreground z-50 transform transition-transform duration-300 ease-premium md:hidden flex flex-col shadow-2xl",
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="h-20 flex justify-between items-center px-6 border-b border-outline/5">
+        <div className="h-20 flex justify-between items-center px-6 border-b border-outline">
           <Logo className="text-text" />
           <button
             onClick={() => setIsMobileMenuOpen(false)}
@@ -333,7 +343,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
           ))}
         </nav>
 
-        <div className="p-6 border-t border-outline/5 bg-surface-low">
+        <div className="p-6 border-t border-outline bg-surface-low">
           <button
             onClick={onLogout}
             className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl text-xs font-black uppercase tracking-widest text-red-500 bg-red-500/5 border border-red-500/10"
@@ -351,7 +361,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
         "md:ml-[280px]",
         sidebarCollapsed && "md:ml-[80px]"
       )}>
-        <div className="flex-1 flex flex-col bg-surface md:rounded-[2.5rem] shadow-premium overflow-hidden border border-outline/5 relative">
+        <div className="flex-1 flex flex-col bg-surface md:rounded-[2.5rem] shadow-premium overflow-hidden border border-outline relative">
           <SiteHeader
             title={getCurrentPageTitle()}
             onMenuClick={() => setIsMobileMenuOpen(true)}
@@ -361,8 +371,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole, userName = "
             isAdmin={userRole === UserRole.ADMIN}
           />
 
-          <main className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar pb-32 md:pb-8">
-            <div className="w-full max-w-[1400px] mx-auto p-6 md:p-8 lg:p-12">
+          <main className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar pb-32 md:pb-8 flex flex-col min-h-0">
+            <div className={cn("w-full mx-auto p-6 md:p-8 lg:p-12 flex-1 min-h-0", fullWidth || isDashboardPage(currentPage) ? "max-w-none" : "max-w-[1400px]")}>
               {children}
             </div>
           </main>
