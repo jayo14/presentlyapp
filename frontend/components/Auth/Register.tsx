@@ -185,14 +185,14 @@ export const Register: React.FC = () => {
                     size={20}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-sungold transition-colors z-10"
                   />
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
-                  />
+                   <input
+                     type="text"
+                     placeholder="John Doe"
+                     required
+                     value={name}
+                     onChange={(e) => setName(e.target.value)}
+                     className="w-full h-14 pl-12 pr-4 bg-background/50 border border-outline rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
+                   />
                 </div>
               </div>
 
@@ -204,14 +204,14 @@ export const Register: React.FC = () => {
                     size={20}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-sungold transition-colors z-10"
                   />
-                  <input
-                    type="email"
-                    placeholder="name@university.edu"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 pl-12 pr-4 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
-                  />
+                   <input
+                     type="email"
+                     placeholder="name@university.edu"
+                     required
+                     value={email}
+                     onChange={(e) => setEmail(e.target.value)}
+                     className="w-full h-14 pl-12 pr-4 bg-background/50 border border-outline rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
+                   />
                 </div>
               </div>
 
@@ -223,14 +223,14 @@ export const Register: React.FC = () => {
                     size={20}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-sungold transition-colors z-10"
                   />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 pl-12 pr-12 bg-background/50 border border-foreground/10 rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
-                  />
+                   <input
+                     type={showPassword ? 'text' : 'password'}
+                     placeholder="••••••••"
+                     required
+                     value={password}
+                     onChange={(e) => setPassword(e.target.value)}
+                     className="w-full h-14 pl-12 pr-12 bg-background/50 border border-outline rounded-2xl placeholder:text-muted-foreground focus:outline-none focus:border-sungold focus:ring-1 focus:ring-sungold transition-all"
+                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}

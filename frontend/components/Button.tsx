@@ -24,9 +24,9 @@ export const Button = ({
 
   const variants = {
     primary: "bg-primary text-black shadow-[0_8px_32px_rgba(255,215,0,0.25)] hover:shadow-[0_12px_48px_rgba(255,215,0,0.4)] rounded-2xl",
-    secondary: "bg-surfaceHigh text-text border border-outline/10 hover:border-primary/30 rounded-2xl",
-    outline: "bg-transparent border-2 border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/50 rounded-2xl",
-    ghost: "text-textMuted hover:text-text hover:bg-surfaceLow rounded-xl",
+    secondary: "bg-surface-high text-text border border-outline/10 hover:border-primary/30 rounded-2xl",
+    outline: "bg-transparent border-2 border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/50 dark:bg-surface/30 dark:hover:bg-surface/50 rounded-2xl",
+    ghost: "text-textMuted hover:text-text hover:bg-surface-low rounded-xl dark:hover:bg-surface-low/50",
     premium: "bg-black dark:bg-white text-white dark:text-black shadow-2xl rounded-[1.75rem] hover:scale-[1.02] active:scale-95"
   };
 
