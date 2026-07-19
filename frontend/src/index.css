@@ -33,6 +33,11 @@
     --on-primary-fixed: #231F0F;
     --success: #22C55E;
 
+    --surface-high: #F0F0F0;
+    --surface-low: #FAFAFA;
+    --on-surface-variant: #666666;
+    --card-border: rgba(0,0,0,0.06);
+
     /* Animation Tokens */
     --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -44,7 +49,12 @@
     --on-surface: #F5F5F5;
     --surface-container-low: #1C1C1C;
     --surface-container-highest: #2D2D2D;
-    --outline: rgba(255,255,255,0.1);
+    --outline: rgba(255,255,255,0.08);
+    --surface-high: #2D2D2D;
+    --surface-low: #111111;
+    --on-surface-variant: #A1A1AA;
+    --card-border: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.06);
   }
 
   body {
@@ -171,7 +181,7 @@
 
   .dark .skeuo-card {
     background-color: var(--surface-container-low);
-    @apply border-white/5;
+    border-color: var(--card-border);
     box-shadow:
       0 20px 50px -12px rgba(0,0,0,0.5),
       inset 0 1px 1px rgba(255,255,255,0.05);
@@ -206,7 +216,8 @@
   }
 
   .dark .skeuo-button {
-    @apply bg-surface-container-low text-text border-white/5;
+    @apply bg-surface-container-low text-text;
+    border-color: var(--card-border);
     box-shadow:
       0 4px 0 rgba(0,0,0,0.4),
       0 12px 24px rgba(0, 0, 0, 0.2);
@@ -246,6 +257,57 @@
 
   .text-sentence {
     text-transform: none;
+  }
+
+  /* Theme-adaptive custom scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--outline) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--outline);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--muted);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background-color: var(--muted-foreground);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.1);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255,255,255,0.2);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background-color: rgba(255,255,255,0.3);
   }
 }
 

@@ -22,6 +22,8 @@ export default {
         "surface-container-low": "var(--surface-container-low)",
         "surface-container-high": "var(--surface-container-high)",
         "surface-container-highest": "var(--surface-container-highest)",
+        "surface-high": "var(--surface-high)",
+        "surface-low": "var(--surface-low)",
         "presently-black": "#231F0F",
         "sungold": "#F9C406",
   
