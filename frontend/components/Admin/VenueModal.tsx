@@ -464,7 +464,7 @@ export const VenueModal: React.FC<VenueModalProps> = React.memo(({
                     onClick={() => handleChange('venue_color', c)}
                     className={`w-7 h-7 rounded-full border-border transition-transform ${
                       formData.venue_color === c
-                        ? 'border-white scale-110'
+                        ? 'border-outline scale-110'
                         : 'border-transparent hover:scale-105'
                     }`}
                     style={{ backgroundColor: c }}
