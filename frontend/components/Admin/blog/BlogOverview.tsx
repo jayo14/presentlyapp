@@ -54,7 +54,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
       {/* Stat Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Posts */}
-        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline/10 shadow-sm flex flex-col justify-between">
+        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline shadow-sm flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-surfaceHigh rounded-lg">
               <FileText size={24} className="text-textMuted" />
@@ -69,7 +69,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
         </div>
 
         {/* Categories */}
-        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline/10 shadow-sm flex flex-col justify-between">
+        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline shadow-sm flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-surfaceHigh rounded-lg">
               <FolderOpen size={24} className="text-textMuted" />
@@ -82,7 +82,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
         </div>
 
         {/* Active Tags */}
-        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline/10 shadow-sm flex flex-col justify-between">
+        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline shadow-sm flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-surfaceHigh rounded-lg">
               <TagIcon size={24} className="text-textMuted" />
@@ -95,7 +95,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
         </div>
 
         {/* Subscribers */}
-        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline/10 shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-surface p-6 rounded-[1.5rem] border border-outline shadow-sm flex flex-col justify-between relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-surfaceHigh rounded-lg">
               <Users size={24} className="text-textMuted" />
@@ -143,7 +143,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Recent Posts Table */}
-        <div className="lg:col-span-8 bg-surface rounded-[2rem] shadow-sm border border-outline/10 overflow-hidden">
+        <div className="lg:col-span-8 bg-surface rounded-[2rem] shadow-sm border border-outline overflow-hidden">
           <div className="p-8 flex justify-between items-end">
             <div>
               <h3 className="text-2xl font-headline font-black text-text">Recent Posts</h3>
@@ -170,7 +170,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
                 {recentPosts.map((post, i) => (
                   <tr key={post.id || i} className="group hover:bg-surfaceHigh/40 transition-colors cursor-pointer" onClick={() => onEditPost(post)}>
                     <td className="px-8 py-4 flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surfaceHigh border border-outline/10">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surfaceHigh border border-outline">
                         {post.cover_image ? (
                           <img src={post.cover_image} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -207,7 +207,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
 
         {/* Right Column: Content Health */}
         <div className="lg:col-span-4 space-y-8">
-          <div className="bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm">
+          <div className="bg-surface p-8 rounded-[2rem] border border-outline shadow-sm">
             <h3 className="text-2xl font-headline font-black text-text mb-8 tracking-tight">Content Health</h3>
             <ul className="space-y-8">
               {/* Metric 1 */}
@@ -258,7 +258,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
                 <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline self-center">Fix SEO →</button>
               </li>
               {/* Metric 4 */}
-              <li className="flex items-start justify-between border-t border-outline/5 pt-8">
+              <li className="flex items-start justify-between border-t border-outline pt-8">
                 <div className="flex gap-4">
                   <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
                     <TrendingUp size={20} />
@@ -277,7 +277,7 @@ export const BlogOverview: React.FC<BlogOverviewProps> = ({
             <div className="relative z-10">
               <h4 className="font-headline text-2xl font-black mb-2 tracking-tight">Editorial Tip</h4>
               <p className="text-sm opacity-90 leading-relaxed mb-6 font-medium">Posts with more than 3 internal links tend to rank 24% higher in local search results.</p>
-              <button className="text-[10px] font-bold uppercase tracking-widest py-3 px-6 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-colors">Learn more</button>
+              <button className="text-[10px] font-bold uppercase tracking-widest py-3 px-6 bg-white/10 hover:bg-white/20 border border-outline rounded-xl transition-colors">Learn more</button>
             </div>
             <TrendingUp size={120} className="absolute -bottom-8 -right-8 text-background/5 select-none" />
           </div>

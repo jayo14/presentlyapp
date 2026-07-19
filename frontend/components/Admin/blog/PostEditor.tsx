@@ -197,7 +197,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
   return (
     <div className="min-h-screen bg-background relative">
       {/* Dynamic Navigation/Header for Editor */}
-      <header className="fixed top-0 right-0 w-[calc(100%-240px)] h-16 flex justify-between items-center px-8 bg-surface/80 backdrop-blur-xl border-b border-outline/10 z-50">
+      <header className="fixed top-0 right-0 w-[calc(100%-240px)] h-16 flex justify-between items-center px-8 bg-surface/80 backdrop-blur-xl border-b border-outline z-50">
         <div className="flex items-center gap-4 text-textMuted font-bold text-[11px] uppercase tracking-widest">
           <button className="hover:text-primary transition-colors">Blog</button>
           <span className="opacity-20">/</span>
@@ -230,7 +230,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
       </header>
 
       <main className="pt-16 min-h-screen">
-        <div className="max-w-[1400px] mx-auto p-12 flex gap-12">
+        <div className="p-12 flex gap-12">
           {/* Left Column: Editor (70%) */}
           <section className="w-[70%] space-y-8">
             {/* Cover Image Upload Zone */}
@@ -336,9 +336,9 @@ export const PostEditor: React.FC<PostEditorProps> = ({
             </div>
 
             {/* Content Editor */}
-            <div className="bg-surface rounded-[2rem] overflow-hidden border border-outline/10 shadow-sm transition-all focus-within:shadow-xl focus-within:shadow-primary/5 focus-within:border-primary/20">
+            <div className="bg-surface rounded-[2rem] overflow-hidden border border-outline shadow-sm transition-all focus-within:shadow-xl focus-within:shadow-primary/5 focus-within:border-primary/20">
               {/* Toolbar */}
-              <div className="flex items-center gap-1 p-3 border-b border-outline/5 bg-surfaceHigh/20">
+              <div className="flex items-center gap-1 p-3 border-b border-outline bg-surfaceHigh/20">
                 <button onClick={() => insertText('**', '**')} className="p-2.5 hover:bg-white rounded-xl text-textMuted hover:text-primary transition-colors"><Bold size={18} /></button>
                 <button onClick={() => insertText('*', '*')} className="p-2.5 hover:bg-white rounded-xl text-textMuted hover:text-primary transition-colors"><Italic size={18} /></button>
                 <div className="w-px h-6 bg-outline/10 mx-2" />
@@ -363,7 +363,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
               />
             </div>
 
-            <div className="flex items-center gap-6 py-6 text-[10px] font-black text-textMuted uppercase tracking-widest border-t border-outline/5">
+            <div className="flex items-center gap-6 py-6 text-[10px] font-black text-textMuted uppercase tracking-widest border-t border-outline">
               <span className="flex items-center gap-2"><Clock size={14} className="text-primary" /> ~{formData.reading_time || 5} min read</span>
               <span className="w-1.5 h-1.5 bg-outline/10 rounded-full"></span>
               <span className="flex items-center gap-2"><Send size={14} className="text-primary" /> {formData.content?.split(/\s+/).filter(Boolean).length || 0} words</span>
@@ -373,11 +373,11 @@ export const PostEditor: React.FC<PostEditorProps> = ({
           {/* Right Column: Sidebar (30%) */}
           <aside className="w-[30%] space-y-6 sticky top-24 h-fit pb-12">
             {/* Status & Visibility */}
-            <div className="bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm space-y-6">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60 border-b border-outline/5 pb-4">Status & Visibility</h3>
+            <div className="bg-surface p-8 rounded-[2rem] border border-outline shadow-sm space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60 border-b border-outline pb-4">Status & Visibility</h3>
               <div className="space-y-4">
                 {(['draft', 'published'] as const).map((status) => (
-                  <label key={status} className="flex items-center gap-4 cursor-pointer group p-3 rounded-2xl hover:bg-surfaceHigh/40 transition-all border border-transparent hover:border-outline/5">
+                  <label key={status} className="flex items-center gap-4 cursor-pointer group p-3 rounded-2xl hover:bg-surfaceHigh/40 transition-all border border-transparent hover:border-outline">
                     <div className="relative flex items-center">
                       <input 
                         type="radio" 
@@ -397,8 +397,8 @@ export const PostEditor: React.FC<PostEditorProps> = ({
             </div>
 
             {/* Author Card */}
-            <div className="bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm space-y-6">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60 border-b border-outline/5 pb-4">Author Details</h3>
+            <div className="bg-surface p-8 rounded-[2rem] border border-outline shadow-sm space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60 border-b border-outline pb-4">Author Details</h3>
               <div className="space-y-6">
                 <div className="group">
                   <label className="block text-[10px] font-black text-textMuted/60 mb-2 group-focus-within:text-primary transition-colors transition-colors uppercase tracking-widest">Name</label>
@@ -464,8 +464,8 @@ export const PostEditor: React.FC<PostEditorProps> = ({
             </div>
 
             {/* Category Card */}
-            <div className="bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm space-y-6">
-              <div className="flex justify-between items-center border-b border-outline/5 pb-4">
+            <div className="bg-surface p-8 rounded-[2rem] border border-outline shadow-sm space-y-6">
+              <div className="flex justify-between items-center border-b border-outline pb-4">
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">Category</h3>
                 <button className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">Create New</button>
               </div>
@@ -482,8 +482,8 @@ export const PostEditor: React.FC<PostEditorProps> = ({
             </div>
 
             {/* Tags Card */}
-            <div className="bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm space-y-6">
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60 border-b border-outline/5 pb-4">Tags</h3>
+            <div className="bg-surface p-8 rounded-[2rem] border border-outline shadow-sm space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60 border-b border-outline pb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {formData.tags?.map((tag) => (
                   <span key={tag.id} className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary text-[10px] font-black shadow-sm rounded-full border border-primary/10">
@@ -493,7 +493,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
                 ))}
               </div>
               
-              <div className="pt-4 border-t border-outline/5">
+              <div className="pt-4 border-t border-outline">
                 <p className="text-[9px] font-black text-textMuted opacity-40 uppercase tracking-widest mb-3">Suggested Tags</p>
                 <div className="flex flex-wrap gap-1.5">
                   {allTags.filter(at => !formData.tags?.some(t => t.id === at.id)).slice(0, 8).map(tag => (
@@ -510,8 +510,8 @@ export const PostEditor: React.FC<PostEditorProps> = ({
             </div>
 
             {/* SEO Settings Card */}
-            <div className={`bg-surface p-8 rounded-[2rem] border border-outline/10 shadow-sm transition-all duration-500 overflow-hidden ${seoExpanded ? 'max-h-[800px]' : 'max-h-24'}`}>
-              <div className="flex items-center justify-between cursor-pointer border-b border-outline/5 pb-4 mb-6" onClick={() => setSeoExpanded(!seoExpanded)}>
+            <div className={`bg-surface p-8 rounded-[2rem] border border-outline shadow-sm transition-all duration-500 overflow-hidden ${seoExpanded ? 'max-h-[800px]' : 'max-h-24'}`}>
+              <div className="flex items-center justify-between cursor-pointer border-b border-outline pb-4 mb-6" onClick={() => setSeoExpanded(!seoExpanded)}>
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-textMuted/60">SEO Settings</h3>
                 {seoExpanded ? <ChevronUp size={16} className="text-textMuted" /> : <ChevronDown size={16} className="text-textMuted" />}
               </div>
@@ -547,9 +547,9 @@ export const PostEditor: React.FC<PostEditorProps> = ({
                 </div>
                 
                 {/* Search Preview */}
-                <div className="space-y-3 pt-6 border-t border-outline/5">
+                <div className="space-y-3 pt-6 border-t border-outline">
                   <p className="text-[9px] font-black text-textMuted opacity-40 uppercase tracking-widest">Google Preview</p>
-                  <div className="p-6 bg-white rounded-2xl border border-outline/10 shadow-md space-y-1.5 transform hover:scale-[1.02] transition-transform cursor-pointer">
+                  <div className="p-6 bg-white rounded-2xl border border-outline shadow-md space-y-1.5 transform hover:scale-[1.02] transition-transform cursor-pointer">
                     <div className="text-[#1a0dab] text-lg font-sans truncate font-medium">
                       {formData.seo_title || formData.title || 'Post Title - Presently'}
                     </div>
@@ -566,7 +566,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({
           </aside>
         </div>
         {uploadError && (
-          <div className="max-w-[1400px] mx-auto px-12 pb-6">
+          <div className="px-12 pb-6">
             <div className="rounded-xl border border-error/20 bg-error/5 px-4 py-3 text-sm font-semibold text-error">
               {uploadError}
             </div>

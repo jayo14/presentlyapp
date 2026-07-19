@@ -89,7 +89,7 @@ export const PostList: React.FC<PostListProps> = ({
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-surface p-6 rounded-[2rem] shadow-sm border border-outline/10">
+      <div className="bg-surface p-6 rounded-[2rem] shadow-sm border border-outline">
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 min-w-[300px]">
             <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-textMuted" />
@@ -120,7 +120,7 @@ export const PostList: React.FC<PostListProps> = ({
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-8 border-b border-outline/10">
+      <div className="flex items-center gap-8 border-b border-outline">
         <button className="pb-4 text-sm font-black border-b-2 border-primary text-text">All ({totalPosts})</button>
         <button className="pb-4 text-sm font-bold text-textMuted/60 hover:text-text transition-colors">Published</button>
         <button className="pb-4 text-sm font-bold text-textMuted/60 hover:text-text transition-colors">Drafts</button>
@@ -128,7 +128,7 @@ export const PostList: React.FC<PostListProps> = ({
       </div>
 
       {/* Posts Table */}
-      <div className="bg-surface rounded-[2rem] overflow-hidden shadow-sm border border-outline/5 transition-all">
+      <div className="bg-surface rounded-[2rem] overflow-hidden shadow-sm border border-outline transition-all">
         <table className="w-full text-left">
           <thead className="bg-surfaceHigh/30">
             <tr className="h-14">
@@ -164,7 +164,7 @@ export const PostList: React.FC<PostListProps> = ({
                   />
                 </td>
                 <td className="px-4">
-                  <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-outline/10 bg-surfaceHigh">
+                  <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-outline bg-surfaceHigh">
                     {post.cover_image ? (
                       <img src={post.cover_image} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -178,7 +178,7 @@ export const PostList: React.FC<PostListProps> = ({
                 </td>
                 <td className="px-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-surfaceHigh border border-outline/10 flex items-center justify-center text-[10px] font-black text-textMuted">
+                    <div className="w-7 h-7 rounded-full bg-surfaceHigh border border-outline flex items-center justify-center text-[10px] font-black text-textMuted">
                       {post.author_avatar ? (
                         <img src={post.author_avatar} alt="" className="w-full h-full rounded-full object-cover" />
                       ) : (
@@ -189,7 +189,7 @@ export const PostList: React.FC<PostListProps> = ({
                   </div>
                 </td>
                 <td className="px-4 text-center">
-                  <span className="px-2.5 py-1 bg-surfaceHigh text-[9px] font-black text-textMuted rounded-full uppercase tracking-tighter border border-outline/10">
+                  <span className="px-2.5 py-1 bg-surfaceHigh text-[9px] font-black text-textMuted rounded-full uppercase tracking-tighter border border-outline">
                     {post.category?.name || 'Uncategorized'}
                   </span>
                 </td>
@@ -206,7 +206,7 @@ export const PostList: React.FC<PostListProps> = ({
                   </span>
                   
                   {/* Row Actions (Visible on Hover) */}
-                  <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-surfaceHigh/90 backdrop-blur pb-1 pt-1 pl-4 rounded-xl opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 shadow-xl border border-outline/10 px-2">
+                  <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-surfaceHigh/90 backdrop-blur pb-1 pt-1 pl-4 rounded-xl opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 shadow-xl border border-outline px-2">
                     <button 
                       onClick={() => onEditPost(post)}
                       className="p-2 hover:bg-white rounded-lg text-textMuted hover:text-primary transition-colors"
@@ -261,8 +261,8 @@ export const PostList: React.FC<PostListProps> = ({
             </div>
             <div className="h-8 w-[1px] bg-white/20"></div>
             <div className="flex gap-3">
-              <button className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-xs font-black transition-colors border border-white/5">Publish</button>
-              <button className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-xs font-black transition-colors border border-white/5">Unpublish</button>
+               <button className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-xs font-black transition-colors border border-outline">Publish</button>
+               <button className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-xs font-black transition-colors border border-outline">Unpublish</button>
               <button className="bg-error hover:bg-error/80 px-4 py-2 rounded-xl text-xs font-black transition-colors shadow-lg shadow-error/20">Delete</button>
             </div>
           </div>
@@ -281,7 +281,7 @@ export const PostList: React.FC<PostListProps> = ({
           <button 
             disabled={currentPage === 1}
             onClick={() => onPageChange(currentPage - 1)}
-            className="w-11 h-11 flex items-center justify-center rounded-full border border-outline/10 text-textMuted hover:bg-surfaceHigh transition-colors disabled:opacity-30 disabled:cursor-not-allowed group"
+            className="w-11 h-11 flex items-center justify-center rounded-full border border-outline text-textMuted hover:bg-surfaceHigh transition-colors disabled:opacity-30 disabled:cursor-not-allowed group"
           >
             <ChevronLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -299,7 +299,7 @@ export const PostList: React.FC<PostListProps> = ({
           <button 
             disabled={currentPage >= Math.ceil(totalPosts / 10)}
             onClick={() => onPageChange(currentPage + 1)}
-            className="w-11 h-11 flex items-center justify-center rounded-full border border-outline/10 text-textMuted hover:bg-surfaceHigh transition-colors disabled:opacity-30 disabled:cursor-not-allowed group"
+            className="w-11 h-11 flex items-center justify-center rounded-full border border-outline text-textMuted hover:bg-surfaceHigh transition-colors disabled:opacity-30 disabled:cursor-not-allowed group"
           >
             <ChevronRight size={20} className="group-hover:translate-x-0.5 transition-transform" />
           </button>
