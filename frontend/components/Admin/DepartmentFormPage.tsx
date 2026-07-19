@@ -216,7 +216,7 @@ export const DepartmentFormPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-surfaceLow">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
         {/* Header */}
         <div className="flex flex-col gap-6">
           <button 
@@ -593,7 +593,7 @@ export const DepartmentFormPage: React.FC = () => {
              >
                {loading ? (
                  <>
-                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-outline rounded-full animate-spin" />
                    Saving...
                  </>
                ) : (
