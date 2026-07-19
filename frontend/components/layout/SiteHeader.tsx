@@ -27,7 +27,7 @@ export const SiteHeader: React.FC<SiteHeaderProps> = ({
   isAdmin
 }) => {
   return (
-    <header className="h-[80px] flex items-center justify-between px-6 md:px-8 border-b border-outline/5 bg-surface/80 backdrop-blur-md sticky top-0 z-20">
+    <header className="h-[80px] flex items-center justify-between px-6 md:px-8 border-b border-outline bg-surface/80 backdrop-blur-md sticky top-0 z-20">
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
@@ -52,14 +52,14 @@ export const SiteHeader: React.FC<SiteHeaderProps> = ({
           <span className="absolute top-2 right-2 w-2 h-2 bg-sungold rounded-full border-2 border-surface" />
         </button>
 
-        <div className="h-8 w-px bg-outline/10 mx-1 hidden md:block" />
+        <div className="h-8 w-px bg-outline mx-1 hidden md:block" />
 
         <button
           onClick={onProfileClick}
-          className="flex items-center gap-3 p-1 pr-3 rounded-2xl hover:bg-surface-highest/40 transition-all border border-transparent hover:border-outline/10 group"
+          className="flex items-center gap-3 p-1 pr-3 rounded-2xl hover:bg-surface-highest/40 transition-all border border-transparent hover:border-outline group"
           aria-label="User profile"
         >
-          <div className="w-9 h-9 rounded-xl overflow-hidden bg-surface-low border border-outline/5 flex items-center justify-center font-bold text-xs text-textMuted group-hover:scale-95 transition-transform">
+          <div className="w-9 h-9 rounded-xl overflow-hidden bg-surface-low border border-outline flex items-center justify-center font-bold text-xs text-textMuted group-hover:scale-95 transition-transform">
             {userAvatar ? (
               <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
             ) : (

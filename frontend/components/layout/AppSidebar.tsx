@@ -58,7 +58,7 @@ const NavItem: React.FC<{
       collapsed ? "justify-center" : "gap-3",
       isActive
         ? "bg-primary/10 text-primary"
-        : "text-textMuted hover:text-text hover:bg-surface-highest/40 hover:border-outline/10 border border-transparent hover:translate-x-1"
+        : "text-textMuted hover:text-text hover:bg-surface-highest/40 hover:border-outline border border-transparent hover:translate-x-1"
     )}
     title={collapsed ? label : undefined}
   >
@@ -115,13 +115,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   return (
     <aside
       className={cn(
-        "hidden md:flex flex-col bg-surface border-r border-outline/10 h-screen fixed left-0 top-0 transition-all duration-300 ease-premium z-30",
+        "hidden md:flex flex-col bg-surface border-r border-outline h-screen fixed left-0 top-0 transition-all duration-300 ease-premium z-30",
         collapsed ? "w-[80px]" : "w-[280px]"
       )}
     >
       {/* Sidebar Header */}
       <div className={cn(
-        "h-[80px] flex items-center border-b border-outline/5 px-6 flex-shrink-0",
+        "h-[80px] flex items-center border-b border-outline px-6 flex-shrink-0",
         collapsed && "justify-center px-0"
       )}>
         {collapsed ? (
@@ -154,7 +154,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </div>
         ))}
 
-        <div className="h-px bg-outline/5 mx-2 my-6" />
+        <div className="h-px bg-outline mx-2 my-6" />
         <div className="space-y-1">
           {commonItems.map(item => (
             <NavItem
@@ -171,7 +171,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </nav>
 
       {/* Sidebar Footer */}
-      <div className="p-4 mt-auto border-t border-outline/5 space-y-2">
+      <div className="p-4 mt-auto border-t border-outline space-y-2">
         {/* Theme Toggle */}
         <button
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
@@ -201,10 +201,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
         {/* User Card */}
         <div className={cn(
-          "flex items-center rounded-2xl bg-surface-low border border-outline/5 p-2 transition-all duration-300",
+          "flex items-center rounded-2xl bg-surface-low border border-outline p-2 transition-all duration-300",
           collapsed ? "justify-center" : "gap-3"
         )}>
-          <div className="w-10 h-10 rounded-xl overflow-hidden bg-surface-highest border border-outline/10 flex-shrink-0 flex items-center justify-center font-bold text-xs text-textMuted">
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-surface-highest border border-outline flex-shrink-0 flex items-center justify-center font-bold text-xs text-textMuted">
             {userAvatar ? (
               <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
             ) : userInitials}
@@ -233,7 +233,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       {/* Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-24 z-40 w-6 h-6 rounded-full bg-surface border border-outline/10 shadow-premium flex items-center justify-center text-textMuted hover:text-primary transition-colors"
+        className="absolute -right-3 top-24 z-40 w-6 h-6 rounded-full bg-surface border border-outline shadow-premium flex items-center justify-center text-textMuted hover:text-primary transition-colors"
       >
         {collapsed ? <CaretRight size={12} weight="bold" /> : <CaretLeft size={12} weight="bold" />}
       </button>
