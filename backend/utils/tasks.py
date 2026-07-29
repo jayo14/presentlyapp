@@ -31,6 +31,12 @@ class IdempotentTask:
     """
 
     def __init__(self, key_func, timeout: int = 300):
+        """
+        :param key_func: callable that receives (*args, **kwargs) and returns a string key.
+                         For bound tasks (bind=True), args[0] is `self`.
+        :param timeout: seconds to keep the lock in cache.  Must be longer than the
+                        task's worst-case runtime so that a slow retry does not re-enter.
+        """
         self.key_func = key_func
         self.timeout = timeout
 
