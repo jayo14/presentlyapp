@@ -102,6 +102,17 @@ There are **two parallel attendance check-in code paths** in this repository:
 - **File:** `mobile/constants/api.ts:62-68` defines `ATTENDANCES` CRUD endpoints (`/attendances/`), but `grep` found **zero** mobile callers.
 - **File:** `mobile/services/sessions.ts:24` defines `checkIn` for `/sessions/{id}/check_in/`, but **no student screen calls it**.
 
+### 4.5 Dead Code Identification
+The following mobile endpoints are defined but **never invoked** by production code:
+
+| Defined Endpoint | Defined In | Called By | Status |
+|---|---|---|---|
+| `POST /sessions/{id}/check_in/` | `mobile/services/sessions.ts:24` | None (student screens use `/check-in/{code}/` instead) | Dead code |
+| `GET/POST/PUT/DELETE /attendances/` | `mobile/constants/api.ts:62-68` | None | Dead code |
+| `GET/POST /attendances/` | `mobile/services/analytics.ts:68-73` | None (mark/getHistory never imported) | Dead code |
+
+These should be removed or wired up if the new pipeline is ever activated.
+
 ### 4.4 Verified Pipeline
 The mobile app **exclusively** calls the **legacy pipeline** (`/check-in/{code}/`).
 
