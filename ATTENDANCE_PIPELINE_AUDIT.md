@@ -245,6 +245,11 @@ The following new-pipeline endpoints exist but have **zero production callers**:
 
 These endpoints are fully implemented but unreachable by any client.
 
+### 6.13 Verdict Message Localization
+- **Legacy:** Returns `success: true/false` with `status` and plain-English `message` strings.
+- **New:** Returns `verdict` + `message` via `_verdict_message()` (`attendance/views.py:391-397`). The messages are hardcoded English strings with no i18n support.
+- **Impact:** Both pipelines lack proper localization. The legacy pipeline's response format is more compatible with the existing frontend error-handling logic.
+
 ---
 
 ## 7. Model Usage Tables
