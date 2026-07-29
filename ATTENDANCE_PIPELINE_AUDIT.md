@@ -426,6 +426,39 @@ To avoid losing capability when retiring the new pipeline:
 6. **Deprecate `/api/attendance/submit/` and its views/serializers** once the legacy pipeline covers all scenarios.
 7. **Keep `AttendanceRecord` as a read model** or merge it into `Attendance` to avoid breaking lecturer reports.
 
+### 10.5 Behavioral Flags Migration Detail
+The new pipeline's `behavioral_flags` JSONField stores:
+```json
+{
+  "appBackgrounded": true,
+  "backgroundDurationMs": 1200,
+  "locationExitCount": 1,
+  "windowRestartCount": 1,
+  "tapPatternSuspicious": false
+}
+```
+These signals are already collected by the mobile app in `useAttendanceSession.ts` but **never sent to the legacy pipeline**. To migrate them:
+- Add a `behavioral_flags` JSONField to `AttendanceAttemptLog`.
+- Update `perform_attendance_check_in` to read `behavioral_flags` from `request.data` and persist them alongside the existing `AttendanceAttemptLog` write.
+- Update the legacy scoring logic to penalize `appBackgrounded` and `tapPatternSuspicious` (the new pipeline deducts 5 points for each).
+
+### 10.6 Server-Side Scoring Migration Detail
+The new pipeline's `_server_recompute_score` function (`attendance/views.py:63-135`) evaluates:
+- Proximity (40 pts)
+- Sample count (20 pts)
+- Mock GPS (15 pts penalty)
+- Suspiciously still (10 pts penalty)
+- Behavioral flags (15 pts penalty)
+
+The legacy pipeline's scoring in `attendance_logic.py:243-365` evaluates:
+- GPS accuracy (20 pts)
+- Geofence (30 pts)
+- Device/integrity (10 pts)
+- Movement/stability (20 pts)
+- Network/environment (20 pts)
+
+The two scoring systems are **not directly compatible**. A unified pipeline should pick one system or create a superset. The legacy system is more granular but the new system's server-recomputation is a stronger anti-spoof measure.
+
 ---
 
 ## 11. Evidence Sources
