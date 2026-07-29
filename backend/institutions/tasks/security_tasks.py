@@ -2,6 +2,9 @@ import hashlib
 import logging
 
 from celery import shared_task
+from django.core.cache import cache
+
+from utils.tasks import IdempotentTask, task_idempotency_key
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +26,19 @@ def _calculate_travel_speed(lat1, lon1, time1, lat2, lon2, time2):
     return distance / time_diff
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=10)
+@shared_task(
+    bind=True,
+    max_retries=3,
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_jitter=True,
+)
+@IdempotentTask(
+    key_func=lambda self, user_id, ip_address, user_agent_raw, device_fingerprint_from_client: task_idempotency_key(
+        "process_login_security", user_id, ip_address, device_fingerprint_from_client or ""
+    ),
+    timeout=300,
+)
 def process_login_security_async(self, user_id, ip_address, user_agent_raw, device_fingerprint_from_client):
     """Process login security checks outside the request/response cycle."""
     from django.conf import settings
