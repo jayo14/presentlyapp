@@ -143,11 +143,26 @@ class LecturerOverrideSerializer(serializers.Serializer):
 class SubmissionStatusSerializer(serializers.ModelSerializer):
     """Lightweight polling response for GET /api/attendance/submission/<id>/status/."""
 
+    confidenceScore = serializers.IntegerField(source='server_confidence_score')
+    message = serializers.SerializerMethodField()
+
     class Meta:
         model = AttendanceSubmission
         fields = [
             'id',
             'verdict',
-            'server_confidence_score',
+            'confidenceScore',
+            'message',
             'fail_reasons',
         ]
+
+    def get_message(self, obj):
+        if obj.verdict == AttendanceSubmission.VERDICT_PENDING:
+            return 'Submission received. Scoring in progress.'
+        if obj.verdict == AttendanceSubmission.VERDICT_ACCEPTED:
+            return 'Attendance accepted.'
+        if obj.verdict == AttendanceSubmission.VERDICT_FLAGGED:
+            return 'Attendance flagged for manual review.'
+        if obj.verdict == AttendanceSubmission.VERDICT_REJECTED:
+            return 'Attendance rejected.'
+        return 'Unknown verdict.'
