@@ -2,18 +2,34 @@ import logging
 from celery import shared_task
 from django.db import transaction
 from django.db.models import Exists, OuterRef
+from django.core.cache import cache
+
 from institutions.models import Attendance
 from .models import AttendanceSubmission, AttendanceRecord
 from .scoring import _server_recompute_score, _determine_verdict
+from utils.tasks import IdempotentTask, task_idempotency_key
 
 logger = logging.getLogger(__name__)
 
 
+# Two-layer idempotency:
+#   1. Cache lock – prevents two workers from scoring the same submission
+#      concurrently if the task is enqueued twice.
+#   2. The AttendanceSubmission row itself is the source of truth; the task
+#      updates it inside transaction.atomic() with select_for_update(), so even
+#      if the cache lock is evicted, a second execution will re-score the same
+#      submission and write the same verdict without creating duplicates.
 @shared_task(
     bind=True,
     max_retries=3,
-    default_retry_delay=10,
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_jitter=True,
     acks_late=True,
+)
+@IdempotentTask(
+    key_func=lambda self, submission_id: task_idempotency_key("score_submission", submission_id),
+    timeout=300,
 )
 def score_submission_task(self, submission_id):
     """
