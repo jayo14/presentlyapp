@@ -417,6 +417,14 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+# Acknowledge tasks only after they have been executed.  Combined with
+# reject_on_worker_lost this guarantees that a task in flight when a worker
+# is killed (e.g. during a deploy) gets redelivered rather than silently
+# vanishing.  IMPORTANT: tasks MUST be idempotent (see utils/tasks.py) because
+# redelivered tasks may partially re-execute.
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+
 # Report Generation Settings
 REPORTS_DIR = BASE_DIR / 'reports'
 REPORTS_DIR.mkdir(exist_ok=True)
