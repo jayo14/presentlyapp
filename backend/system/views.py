@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Exists, OuterRef
 from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.utils import timezone
@@ -17,7 +17,7 @@ from .serializers import (
     EmailDeliveryLogSerializer,
     SystemMetricsSnapshotSerializer,
 )
-from institutions.models import User, AttendanceSession, Venue, UserRole, Institution
+from institutions.models import User, Attendance, AttendanceSession, Venue, UserRole, Institution
 
 
 def _is_admin_user(user) -> bool:
@@ -402,7 +402,7 @@ class AdminDashboardView(APIView):
         if not _is_admin_user(request.user):
             return Response({'error': 'Admin access required.'}, status=status.HTTP_403_FORBIDDEN)
 
-        from attendance.models import AttendanceRecord
+        from attendance.models import AttendanceAttemptLog
 
         now = timezone.now()
         today = now.date()
@@ -414,8 +414,8 @@ class AdminDashboardView(APIView):
         institutions = Institution.objects.filter(is_active=True).count()
         active_campuses = Venue.objects.filter(is_active=True).count()
 
-        today_qs = AttendanceRecord.objects.filter(created_at__date=today)
-        yesterday_qs = AttendanceRecord.objects.filter(created_at__date=yesterday)
+        today_qs = Attendance.objects.filter(checked_in_at__date=today)
+        yesterday_qs = Attendance.objects.filter(checked_in_at__date=yesterday)
         today_checkins = today_qs.count()
         yesterday_checkins = yesterday_qs.count()
 
@@ -430,8 +430,9 @@ class AdminDashboardView(APIView):
             end_time__gte=now,
         ).select_related('course', 'venue', 'venue__institution')
 
-        # GPS success rate: records with PRESENT verdict today vs total
-        gps_verified = today_qs.filter(final_verdict='PRESENT').count()
+        # PRESENT (on-time) and LATE (late but present) both confirm physical presence.
+        # FLAGGED means fraud signals were detected, so exclude it from GPS-verified count.
+        gps_verified = today_qs.filter(status__in=['PRESENT', 'LATE']).count()
         gps_rate = round((gps_verified / today_checkins * 100), 1) if today_checkins > 0 else 100.0
 
         # System health: degraded if >5 recent errors, down if >20
@@ -448,7 +449,7 @@ class AdminDashboardView(APIView):
         # ── Live sessions ────────────────────────────────────────────────
         live_sessions_data = []
         for s in live_sessions_qs[:8]:
-            checked_in = AttendanceRecord.objects.filter(session=s).count()
+            checked_in = Attendance.objects.filter(session=s).count()
             enrolled = s.course.enrollments.filter(is_active=True).count()
             mins_remaining = int((s.end_time - now).total_seconds() / 60)
             closes_in = mins_remaining if 0 < mins_remaining < 120 else None
@@ -461,8 +462,8 @@ class AdminDashboardView(APIView):
             live_sessions_data.append({
                 'id': str(s.id),
                 'institution': institution_name,
-                'course_code': s.course.course_code,
-                'course_name': s.course.name,
+                'course_code': s.course.code,
+                'course_name': s.course.title,
                 'started_at': s.start_time.isoformat(),
                 'checked_in': checked_in,
                 'total_enrolled': enrolled,
@@ -471,8 +472,23 @@ class AdminDashboardView(APIView):
             })
 
         # ── Today's numbers ──────────────────────────────────────────────
-        rejected_today = today_qs.filter(final_verdict='REJECTED').count()
-        late_today = today_qs.filter(final_verdict='LATE').count()
+        # Rejected attempts never create Attendance rows in the legacy pipeline;
+        # they are only logged in AttendanceAttemptLog. Count log entries that have
+        # a rejection reason and no corresponding Attendance record for the same
+        # student+session (hard rejections, not flagged check-ins).
+        rejected_today = AttendanceAttemptLog.objects.filter(
+            created_at__date=today,
+            rejected_reason__isnull=False,
+        ).annotate(
+            has_attendance=Exists(
+                Attendance.objects.filter(
+                    student=OuterRef('student'),
+                    session=OuterRef('session'),
+                    checked_in_at__date=today,
+                )
+            )
+        ).filter(has_attendance=False).count()
+        late_today = today_qs.filter(status='LATE').count()
         classes_completed = AttendanceSession.objects.filter(
             end_time__date=today, end_time__lte=now
         ).count()
@@ -483,7 +499,18 @@ class AdminDashboardView(APIView):
             for s in all_today_sessions
         )
         avg_pct = round((today_checkins / enrolled_today * 100)) if enrolled_today > 0 else 0
-        gps_failures_today = today_qs.filter(final_verdict='REJECTED').count()
+        gps_failures_today = AttendanceAttemptLog.objects.filter(
+            created_at__date=today,
+            rejected_reason__isnull=False,
+        ).annotate(
+            has_attendance=Exists(
+                Attendance.objects.filter(
+                    student=OuterRef('student'),
+                    session=OuterRef('session'),
+                    checked_in_at__date=today,
+                )
+            )
+        ).filter(has_attendance=False).count()
 
         # ── Platform health ───────────────────────────────────────────────
         snapshot = _latest_system_metrics_snapshot()
