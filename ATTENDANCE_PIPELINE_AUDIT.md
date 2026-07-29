@@ -266,6 +266,14 @@ These endpoints are fully implemented but unreachable by any client.
 
 ---
 
+## 14. Document Control
+
+| Version | Date | Author | Changes |
+|---|---|---|---|
+| 0.1 | 2026-07-29 | Kilo | Initial audit with caller mapping, model usage tables, field comparison, and recommendation |
+
+---
+
 ## 7. Model Usage Tables
 
 ### 7.1 `UserDevice` (`accounts/models.py:3`)
