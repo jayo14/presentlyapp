@@ -1927,19 +1927,42 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == 'true')
         
-        # Lecturers can only see sessions for their courses
-        if self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
-            from .models import CourseMembership
-            member_course_ids = CourseMembership.objects.filter(
-                user=self.request.user,
-                role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
-                is_active=True,
+        # Students can only see active sessions for their enrolled courses
+        if self.request.user.is_authenticated and self.request.user.role == UserRole.STUDENT:
+            enrolled_course_ids = CourseEnrollment.objects.filter(
+                student=self.request.user,
+                is_active=True
             ).values_list('course_id', flat=True)
             queryset = queryset.filter(
-                models.Q(course__lecturer=self.request.user) | models.Q(course_id__in=member_course_ids)
+                course_id__in=enrolled_course_ids,
+                is_active=True
             )
+        else:
+            # Lecturers can only see sessions for their courses
+            if self.request.user.is_authenticated and self.request.user.role == UserRole.LECTURER:
+                from .models import CourseMembership
+                member_course_ids = CourseMembership.objects.filter(
+                    user=self.request.user,
+                    role__in=[CourseMembership.Role.LECTURER, CourseMembership.Role.CO_LECTURER],
+                    is_active=True,
+                ).values_list('course_id', flat=True)
+                queryset = queryset.filter(
+                    models.Q(course__lecturer=self.request.user) | models.Q(course_id__in=member_course_ids)
+                )
         
         return queryset
+    
+    def get_object(self):
+        obj = super().get_object()
+        # Students may only retrieve active sessions for their enrolled courses
+        if self.request.user.is_authenticated and self.request.user.role == UserRole.STUDENT:
+            enrolled_course_ids = CourseEnrollment.objects.filter(
+                student=self.request.user,
+                is_active=True
+            ).values_list('course_id', flat=True)
+            if not (obj.course_id in enrolled_course_ids and obj.is_active):
+                raise PermissionDenied('You do not have permission to view this session.')
+        return obj
     
     @action(detail=True, methods=['post'])
     def end(self, request, pk=None):
