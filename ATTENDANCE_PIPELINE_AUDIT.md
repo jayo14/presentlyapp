@@ -180,6 +180,32 @@ These are the new-pipeline CRUD helpers. They are not wired into any component.
 - **New:** `AttendanceSubmission` and `AttendanceRecord` are **not** registered in Django admin. Lecturers view them via the lecturer API endpoints (`/api/attendance/lecturer/session/{id}/submissions/` and `/api/attendance/lecturer/override/{id}/`).
 - **Impact:** If the new pipeline were activated, admin staff would lose the ability to browse attendance records in the Django admin unless admin classes are added.
 
+### 6.5 Response Shape Differences
+- **Legacy success response:**
+  ```json
+  {
+    "success": true,
+    "status": "success",
+    "message": "Attendance marked successfully",
+    "score": 85,
+    "attendance": { "id": 1, "status": "PRESENT", "trust_score": 85, ... }
+  }
+  ```
+- **New success response:**
+  ```json
+  {
+    "verdict": "ACCEPTED",
+    "confidenceScore": 85,
+    "message": "Attendance accepted."
+  }
+  ```
+- **Impact:** The frontend `AttendanceCheckIn.tsx` and `PublicCheckInPage.tsx` expect `result?.success` or `result?.status === 'success'` and `result.attendance`. The new pipeline returns neither. Switching pipelines would require rewriting all check-in UI components.
+
+### 6.6 Rate Limiting Differences
+- **Legacy:** Rate-limited in `public_check_in_view` (`institutions/views.py:2493-2505`) at `PUBLIC_CHECK_IN_RATE` (default `20/m`) keyed by user. `AttendanceSessionViewSet.check_in` has no explicit rate limit in the viewset itself.
+- **New:** Rate-limited in `SubmitAttendanceView` (`attendance/views.py:228`) at `5/m` per user via `django_ratelimit`, with an additional application-level limit of 3 non-REJECTED submissions per session.
+- **Impact:** The new pipeline has stricter per-session limits. If migrated, the legacy pipeline should adopt the 3-submission cap.
+
 ---
 
 ## 7. Model Usage Tables
