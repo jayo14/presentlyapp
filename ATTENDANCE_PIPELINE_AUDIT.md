@@ -250,6 +250,15 @@ These endpoints are fully implemented but unreachable by any client.
 - **New:** Returns `verdict` + `message` via `_verdict_message()` (`attendance/views.py:391-397`). The messages are hardcoded English strings with no i18n support.
 - **Impact:** Both pipelines lack proper localization. The legacy pipeline's response format is more compatible with the existing frontend error-handling logic.
 
+### 6.14 Manual Attendance Sync (Legacy Only)
+- `sync_manual_attendance_for_user` (`institutions/views.py:93-129`) materializes `ManualAttendanceRecord` rows into `Attendance` when a user completes onboarding.
+- **The new pipeline has no equivalent.** If a lecturer marks attendance manually and the student later uses the new pipeline, the manual record would remain orphaned in `manual_attendance_records` without being reflected in `AttendanceSubmission` or `AttendanceRecord`.
+
+### 6.15 Test Coverage Gap
+- The new pipeline has **9 unit tests** in `backend/attendance/tests.py` covering validation, scoring, overrides, and rate limiting.
+- The legacy pipeline has **integration tests** in `backend/institutions/tests.py` and `backend/institutions/test_comprehensive.py` covering check-in, duplicates, location rejection, and public check-in.
+- **Neither pipeline has mobile E2E tests.** The mobile app's check-in flow is untested at the integration level.
+
 ---
 
 ## 7. Model Usage Tables
