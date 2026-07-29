@@ -66,7 +66,7 @@ export const OfflineIndicator: React.FC = () => {
     };
   }, []);
 
-  if (!showIndicator && !isSlowConnection) return null;
+  if (!showIndicator) return null;
 
   return (
     <div
@@ -79,18 +79,12 @@ export const OfflineIndicator: React.FC = () => {
         'flex items-center gap-2 text-sm font-medium',
         !connectionState.online
           ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 animate-pulse'
-          : isSlowConnection
-            ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200'
-            : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+          : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
       ].join(' ')}
     >
       {!connectionState.online ? <WifiOff size={16} /> : <Wifi size={16} />}
       <span>
-        {!connectionState.online
-          ? 'You are offline'
-          : isSlowConnection
-            ? 'Slow connection detected'
-            : 'Back online'}
+        {!connectionState.online ? 'You are offline' : 'Back online'}
       </span>
     </div>
   );
