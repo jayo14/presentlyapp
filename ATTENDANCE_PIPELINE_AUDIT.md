@@ -259,6 +259,11 @@ These endpoints are fully implemented but unreachable by any client.
 - The legacy pipeline has **integration tests** in `backend/institutions/tests.py` and `backend/institutions/test_comprehensive.py` covering check-in, duplicates, location rejection, and public check-in.
 - **Neither pipeline has mobile E2E tests.** The mobile app's check-in flow is untested at the integration level.
 
+### 6.16 Elevation Field (Legacy Only)
+- `Attendance.elevation` (`institutions/models.py:722-728`) stores the student's altitude in meters at check-in.
+- The new pipeline has **no elevation field**. `AttendanceSubmission.coordinates` only stores `{lat, lng, accuracyMeters}`.
+- **Impact:** If venue elevation is ever used for anti-spoofing (e.g., checking that a student is on the correct floor of a building), this data is lost in the new pipeline.
+
 ---
 
 ## 7. Model Usage Tables
