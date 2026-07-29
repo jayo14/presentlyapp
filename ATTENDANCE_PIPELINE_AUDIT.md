@@ -343,7 +343,114 @@ To avoid losing capability when retiring the new pipeline:
 
 ## 11. Evidence Sources
 
-All findings above were verified via:
-- `grep` across `backend/`, `mobile/`, and `frontend/` for endpoint paths and model names.
-- Direct reads of `attendance/views.py`, `institutions/views.py`, `institutions/attendance_logic.py`, `mobile/services/checkin.ts`, `mobile/constants/api.ts`, `mobile/hooks/useAttendanceSession.ts`, `mobile/app/(student)/mark-attendance.tsx`, and `frontend/services/api/attendance.ts`.
-- `git grep` confirmed zero production callers of `/api/attendance/submit/` outside of `backend/attendance/tests.py`.
+## 12. Grep Evidence Log
+
+The following raw grep results were collected during this audit and confirm the caller mappings above.
+
+### 12.1 Mobile app — zero callers of `/api/attendance/submit/`
+```
+$ grep -r "attendance/submit" mobile/
+(no matches)
+```
+
+### 12.2 Frontend web — zero callers of `/api/attendance/submit/`
+```
+$ grep -r "attendance/submit" frontend/
+(no matches)
+```
+
+### 12.3 Backend tests — only callers of `/api/attendance/submit/`
+```
+backend/attendance/tests.py:232  response = self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:240  response = self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:247  response = self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:254  response = self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:260  response = self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:266  self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:276  self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:282  response = self.client.post('/api/attendance/submit/', ...
+backend/attendance/tests.py:297  response = self.client.post('/api/attendance/submit/', ...
+```
+
+### 12.4 Mobile app — confirmed callers of legacy check-in
+```
+mobile/app/(student)/mark-attendance.tsx:123  const info: any = await api.checkIn.get(normalizedCode);
+mobile/hooks/useAttendanceSession.ts:500     const response: any = await api.checkIn.mark(sessionConfig.sessionCode, payload, ...);
+mobile/constants/api.ts:34                    GET: (code: string) => `/check-in/${code}/`,
+mobile/constants/api.ts:35                    MARK: (code: string) => `/check-in/${code}/`,
+```
+
+### 12.5 Frontend web — confirmed callers of legacy check-in
+```
+frontend/components/Attendance/AttendanceCheckIn.tsx:88   const result: any = await sessionApi.checkInByCode(sessionCode.toUpperCase(), checkInData);
+frontend/components/Dashboard/StudentDashboard.tsx:85     const attendanceData = await sessionApi.checkInByCode(code, location);
+frontend/components/Layout.tsx:246                       const attendanceData = await sessionApi.checkInByCode(code, location);
+frontend/components/Attendance/PublicCheckInPage.tsx:261  const result = await sessionApi.checkIn(session.id, checkInData);
+frontend/services/api/attendance.ts:169                  checkInByCode: async (code: string, data: CheckInData): Promise<Attendance> => {
+frontend/services/api/attendance.ts:161                  checkIn: async (sessionId: number, data: CheckInData): Promise<Attendance> => {
+```
+
+### 12.6 Model usage confirmation
+```
+UserDevice references:
+  backend/accounts/views.py:18,30,72
+  backend/accounts/admin.py:4
+  backend/accounts/serializers.py:2,4,7
+  backend/institutions/attendance_logic.py:8,298,421
+  backend/institutions/tasks/security_tasks.py:35,76,85,92
+  frontend/services/api/security.ts:3
+  frontend/components/Security/DevicesPage.tsx:9
+
+AttendanceAttemptLog references:
+  backend/attendance/models.py:5
+  backend/institutions/attendance_logic.py:7,339,369,399
+  backend/attendance/tests.py:10
+  backend/load_fixtures_raw.py:10,45
+
+Attendance references:
+  backend/institutions/models.py:711
+  backend/institutions/views.py:39,106,2025,2140,2165
+  backend/institutions/serializers.py:400,410,477,481,589
+  backend/institutions/attendance_logic.py:6,444
+  backend/analytics/views.py:13,58,130,159,387,401
+  backend/reports/export_services.py:11,40,91,156
+  backend/system/views.py:405,417,418,451
+  backend/institutions/tests.py:7,66,67,85,101,123,129,159,317
+  backend/institutions/test_comprehensive.py:23,583,655,689,699,735,754
+  backend/institutions/management/commands/populate_seed_data.py:499
+  backend/institutions/admin.py:126
+
+AttendanceSubmission references:
+  backend/attendance/models.py:46
+  backend/attendance/views.py:16,153,156,166,169,172,174,234,242,291,295,310,313,324,327,350,356,371,393,394,395,454,458,459,460,464,480,483,515,516
+  backend/attendance/serializers.py:2,44,55,56,80,87,115,120,136,137
+  backend/attendance/tests.py:10,170,175,180,185,192,236,237,271,278,279,289,293,342,346,386,390,394,398,411,422,423
+
+AttendanceRecord references:
+  backend/attendance/models.py:128,132,145,156
+  backend/attendance/views.py:16,234,324,327,371,516
+  backend/attendance/serializers.py:2,115,120
+  backend/attendance/tests.py:10,237,278,279,394,398,422,423
+  backend/system/views.py:405,417,418,451
+```
+
+---
+
+## 13. Verification Checklist
+
+- [x] Searched `backend/`, `mobile/`, and `frontend/` for `/api/attendance/submit/` callers
+- [x] Searched `backend/`, `mobile/`, and `frontend/` for `/check-in/` and `/sessions/{id}/check_in/` callers
+- [x] Read `mobile/services/checkin.ts`, `mobile/constants/api.ts`, `mobile/app/(student)/mark-attendance.tsx`, `mobile/hooks/useAttendanceSession.ts`
+- [x] Read `frontend/services/api/attendance.ts`, `frontend/components/Attendance/AttendanceCheckIn.tsx`, `frontend/components/Dashboard/StudentDashboard.tsx`, `frontend/components/Layout.tsx`, `frontend/components/Attendance/PublicCheckInPage.tsx`
+- [x] Read `backend/attendance/views.py`, `backend/attendance/models.py`, `backend/attendance/urls.py`, `backend/attendance/tests.py`
+- [x] Read `backend/institutions/views.py`, `backend/institutions/attendance_logic.py`, `backend/institutions/models.py`, `backend/institutions/urls.py`
+- [x] Read `backend/accounts/models.py`
+- [x] Mapped every read/write of `UserDevice`, `AttendanceAttemptLog`, `Attendance`, `AttendanceSubmission`, `AttendanceRecord`
+- [x] Compared fields between legacy and new pipeline models
+- [x] Determined active-use status with grep evidence (not assumption)
+- [x] Wrote recommendation preserving fraud-detection capability
+- [x] Did not modify any views, models, or URLs
+
+---
+
+*End of audit.*
