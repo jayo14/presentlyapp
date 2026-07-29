@@ -136,6 +136,18 @@ The mobile app **exclusively** calls the **legacy pipeline** (`/check-in/{code}/
 ### 5.3 Verified Pipeline
 The web frontend **exclusively** calls the **legacy pipeline**.
 
+### 5.4 Dead Web Code
+The following frontend API helpers are defined but **never invoked** by student check-in flows:
+
+| Defined Endpoint | Defined In | Called By | Status |
+|---|---|---|---|
+| `GET /attendances/` | `frontend/services/api/attendance.ts:194` | None | Dead code |
+| `POST /attendances/` | `frontend/services/api/attendance.ts:206` | None | Dead code |
+| `PATCH /attendances/{id}/` | `frontend/services/api/attendance.ts:213` | None | Dead code |
+| `DELETE /attendances/{id}/` | `frontend/services/api/attendance.ts:219` | None | Dead code |
+
+These are the new-pipeline CRUD helpers. They are not wired into any component.
+
 ---
 
 ## 6. Backend Caller Verification (Detailed)
