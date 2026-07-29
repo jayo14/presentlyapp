@@ -138,3 +138,16 @@ class LecturerOverrideSerializer(serializers.Serializer):
         ]
     )
     reason = serializers.CharField(max_length=1000, required=True)
+
+
+class SubmissionStatusSerializer(serializers.ModelSerializer):
+    """Lightweight polling response for GET /api/attendance/submission/<id>/status/."""
+
+    class Meta:
+        model = AttendanceSubmission
+        fields = [
+            'id',
+            'verdict',
+            'server_confidence_score',
+            'fail_reasons',
+        ]

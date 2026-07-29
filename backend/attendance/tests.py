@@ -2,13 +2,16 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 from rest_framework import status
+from django.conf import settings
 
 from institutions.models import (
     User, UserRole, Institution, College, Department,
     Course, CourseEnrollment, AttendanceSession, Venue,
 )
 from .models import AttendanceSubmission, AttendanceRecord
-from .views import _haversine_metres, _server_recompute_score, _determine_verdict
+from .views import _haversine_metres
+from .scoring import _server_recompute_score, _determine_verdict
+from .tasks import score_submission_task
 import datetime
 
 
@@ -230,11 +233,10 @@ class AttendanceSubmitViewTests(TestCase):
     def test_successful_submission(self):
         self.client.force_authenticate(user=self.student)
         response = self.client.post('/api/attendance/submit/', self._payload(), format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('verdict', response.data)
-        self.assertIn('confidenceScore', response.data)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(response.data['verdict'], AttendanceSubmission.VERDICT_PENDING)
         self.assertEqual(AttendanceSubmission.objects.count(), 1)
-        self.assertEqual(AttendanceRecord.objects.count(), 1)
+        self.assertEqual(AttendanceRecord.objects.count(), 0)
 
     def test_unauthenticated_rejected(self):
         response = self.client.post('/api/attendance/submit/', self._payload(), format='json')
@@ -267,8 +269,8 @@ class AttendanceSubmitViewTests(TestCase):
             self._payload(mock_gps_flag=True),
             format='json'
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['verdict'], AttendanceSubmission.VERDICT_REJECTED)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(response.data['verdict'], AttendanceSubmission.VERDICT_PENDING)
 
     def test_duplicate_submission_when_accepted_returns_409(self):
         self.client.force_authenticate(user=self.student)
@@ -439,4 +441,140 @@ class LecturerOverrideViewTests(TestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class AsyncScoringTests(TestCase):
+    """Tests for the async Celery scoring flow."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.inst = make_institution()
+        self.college = make_college(self.inst)
+        self.dept = make_department(self.college, self.inst)
+        self.lecturer = make_lecturer()
+        self.student = make_student()
+        self.course = make_course(self.lecturer, self.dept)
+        CourseEnrollment.objects.create(student=self.student, course=self.course, is_active=True)
+        self.session = make_session(self.course)
+
+    def _payload(self, **overrides):
+        base = {
+            'session_id': self.session.id,
+            'coordinates': {'lat': 6.8920, 'lng': 3.7182},
+            'sample_count': 5,
+            'mock_gps_flag': False,
+            'network_type': 'wifi',
+            'movement_variance': 0.5,
+            'suspiciously_still': False,
+            'collection_duration_ms': 25000,
+            'confidence_score': 95,
+            'score_breakdown': {},
+            'fail_reasons': [],
+            'behavioral_flags': {},
+            'device_fingerprint': 'test-device-001',
+        }
+        base.update(overrides)
+        return base
+
+    def test_submission_returns_202_and_pending(self):
+        self.client.force_authenticate(user=self.student)
+        response = self.client.post('/api/attendance/submit/', self._payload(), format='json')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(response.data['verdict'], AttendanceSubmission.VERDICT_PENDING)
+        self.assertEqual(AttendanceSubmission.objects.count(), 1)
+        self.assertEqual(AttendanceRecord.objects.count(), 0)
+
+    def test_task_transitions_pending_to_accepted(self):
+        self.client.force_authenticate(user=self.student)
+        response = self.client.post('/api/attendance/submit/', self._payload(), format='json')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        submission_id = response.data['id']
+
+        old_eager = getattr(settings, 'CELERY_TASK_ALWAYS_EAGER', False)
+        settings.CELERY_TASK_ALWAYS_EAGER = True
+        try:
+            score_submission_task.apply(args=[submission_id])
+        finally:
+            settings.CELERY_TASK_ALWAYS_EAGER = old_eager
+
+        submission = AttendanceSubmission.objects.get(pk=submission_id)
+        self.assertEqual(submission.verdict, AttendanceSubmission.VERDICT_ACCEPTED)
+        self.assertGreater(submission.server_confidence_score, 0)
+        self.assertEqual(AttendanceRecord.objects.count(), 1)
+
+    def test_task_transitions_pending_to_rejected_for_mock_gps(self):
+        self.client.force_authenticate(user=self.student)
+        response = self.client.post(
+            '/api/attendance/submit/',
+            self._payload(mock_gps_flag=True),
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        submission_id = response.data['id']
+
+        old_eager = getattr(settings, 'CELERY_TASK_ALWAYS_EAGER', False)
+        settings.CELERY_TASK_ALWAYS_EAGER = True
+        try:
+            score_submission_task.apply(args=[submission_id])
+        finally:
+            settings.CELERY_TASK_ALWAYS_EAGER = old_eager
+
+        submission = AttendanceSubmission.objects.get(pk=submission_id)
+        self.assertEqual(submission.verdict, AttendanceSubmission.VERDICT_REJECTED)
+
+    def test_polling_endpoint_returns_pending_then_resolved(self):
+        self.client.force_authenticate(user=self.student)
+        response = self.client.post('/api/attendance/submit/', self._payload(), format='json')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        submission_id = response.data['id']
+
+        poll_url = f'/api/attendance/submission/{submission_id}/status/'
+        poll_response = self.client.get(poll_url)
+        self.assertEqual(poll_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(poll_response.data['verdict'], AttendanceSubmission.VERDICT_PENDING)
+
+        old_eager = getattr(settings, 'CELERY_TASK_ALWAYS_EAGER', False)
+        settings.CELERY_TASK_ALWAYS_EAGER = True
+        try:
+            score_submission_task.apply(args=[submission_id])
+        finally:
+            settings.CELERY_TASK_ALWAYS_EAGER = old_eager
+
+        poll_response = self.client.get(poll_url)
+        self.assertEqual(poll_response.status_code, status.HTTP_200_OK)
+        self.assertIn(poll_response.data['verdict'], [
+            AttendanceSubmission.VERDICT_ACCEPTED,
+            AttendanceSubmission.VERDICT_FLAGGED,
+            AttendanceSubmission.VERDICT_REJECTED,
+        ])
+
+    def test_student_cannot_poll_other_students_submission(self):
+        other_student = make_student(email="other@test.com")
+        self.client.force_authenticate(user=self.student)
+        response = self.client.post('/api/attendance/submit/', self._payload(), format='json')
+        submission_id = response.data['id']
+
+        self.client.force_authenticate(user=other_student)
+        poll_response = self.client.get(f'/api/attendance/submission/{submission_id}/status/')
+        self.assertEqual(poll_response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_task_retry_exhaustion_sets_flagged(self):
+        from unittest.mock import patch
+        self.client.force_authenticate(user=self.student)
+        response = self.client.post('/api/attendance/submit/', self._payload(), format='json')
+        submission_id = response.data['id']
+
+        with patch('attendance.tasks._server_recompute_score', side_effect=RuntimeError('boom')):
+            old_eager = getattr(settings, 'CELERY_TASK_ALWAYS_EAGER', False)
+            settings.CELERY_TASK_ALWAYS_EAGER = True
+            try:
+                score_submission_task.apply(args=[submission_id])
+            finally:
+                settings.CELERY_TASK_ALWAYS_EAGER = old_eager
+
+        submission = AttendanceSubmission.objects.get(pk=submission_id)
+        self.assertEqual(submission.verdict, AttendanceSubmission.VERDICT_FLAGGED)
+        self.assertTrue(
+            any('Automated scoring failed' in r for r in submission.fail_reasons)
+        )
 

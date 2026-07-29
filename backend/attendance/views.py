@@ -20,7 +20,9 @@ from .serializers import (
     AttendanceRecordSerializer,
     LecturerOverrideSerializer,
     SessionConfigSerializer,
+    SubmissionStatusSerializer,
 )
+from .scoring import _server_recompute_score, _determine_verdict
 
 logger = logging.getLogger(__name__)
 
@@ -246,7 +248,7 @@ class SubmitAttendanceView(APIView):
         data = serializer.validated_data
         student = request.user
 
-        # Fetch session
+        # Fetch session (fast cached read)
         session_data = _get_session_cached(data['session_id'])
         if not session_data:
             return Response(
@@ -256,7 +258,7 @@ class SubmitAttendanceView(APIView):
 
         session = SimpleNamespace(**session_data)
 
-        # Validate session is active and not expired
+        # ── Synchronous admission checks (fast, immediate feedback) ──────
         now = timezone.now()
         if not getattr(session, 'is_active', True):
             return Response(
@@ -268,14 +270,12 @@ class SubmitAttendanceView(APIView):
                 {'error': 'Session has expired.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        # Also check end_time as fallback
         if session.end_time and now > session.end_time:
             return Response(
                 {'error': 'Session has ended.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Validate student enrollment
         is_enrolled = CourseEnrollment.objects.filter(
             student=student,
             course_id=session.course_id,
@@ -287,7 +287,6 @@ class SubmitAttendanceView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Rate limit: max 3 submissions per student per session
         existing_submissions = AttendanceSubmission.objects.filter(
             session_id=session.id, student=student
         )
@@ -306,7 +305,6 @@ class SubmitAttendanceView(APIView):
                 is_active=True,
             )
 
-            # Reject duplicate if a non-REJECTED record already exists.
             existing_submission = AttendanceSubmission.objects.select_for_update(nowait=False).filter(
                 session_id=locked_session.id,
                 student=student,
@@ -335,18 +333,8 @@ class SubmitAttendanceView(APIView):
                     status=status.HTTP_409_CONFLICT
                 )
 
-            # Server-side score re-computation.
-            server_score, server_fail_reasons = _server_recompute_score(locked_session, data)
-            verdict, all_fail_reasons = _determine_verdict(
-                server_score,
-                data['confidence_score'],
-                locked_session,
-                server_fail_reasons,
-                data
-            )
-
+            # ── Create PENDING submission (no scoring yet) ────────────────
             ip_address = _get_client_ip(request)
-
             submission = AttendanceSubmission.objects.create(
                 session_id=locked_session.id,
                 student=student,
@@ -358,38 +346,34 @@ class SubmitAttendanceView(APIView):
                 suspiciously_still=data.get('suspiciously_still', False),
                 collection_duration_ms=data.get('collection_duration_ms', 0),
                 confidence_score=data['confidence_score'],
-                server_confidence_score=server_score,
-                verdict=verdict,
-                score_breakdown=data.get('score_breakdown', {}),
-                fail_reasons=all_fail_reasons,
+                server_confidence_score=0,
+                verdict=AttendanceSubmission.VERDICT_PENDING,
+                score_breakdown={},
+                fail_reasons=[],
                 behavioral_flags=data.get('behavioral_flags', {}),
                 ip_address=ip_address,
                 device_fingerprint=data.get('device_fingerprint', ''),
             )
 
-            # Create or update AttendanceRecord
-            AttendanceRecord.objects.update_or_create(
-                session_id=locked_session.id,
-                student=student,
-                defaults={
-                    'submission': submission,
-                    'final_verdict': verdict,
-                    'confidence_score': server_score,
-                },
+            # Enqueue async scoring only after DB commit
+            transaction.on_commit(
+                lambda: score_submission_task.delay(submission.id)
             )
 
         return Response(
             {
-                'verdict': verdict,
-                'confidenceScore': server_score,
-                'message': _verdict_message(verdict),
+                'id': submission.id,
+                'verdict': AttendanceSubmission.VERDICT_PENDING,
+                'confidenceScore': 0,
+                'message': 'Submission received. Scoring in progress.',
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_202_ACCEPTED
         )
 
 
 def _verdict_message(verdict):
     messages = {
+        AttendanceSubmission.VERDICT_PENDING: 'Submission received. Scoring in progress.',
         AttendanceSubmission.VERDICT_ACCEPTED: 'Attendance accepted.',
         AttendanceSubmission.VERDICT_FLAGGED: 'Attendance flagged for manual review.',
         AttendanceSubmission.VERDICT_REJECTED: 'Attendance rejected.',
@@ -526,4 +510,41 @@ class LecturerOverrideView(APIView):
                 'message': 'Submission overridden to {}.'.format(new_verdict),
             }
         )
+
+
+class SubmissionStatusView(APIView):
+    """GET /api/attendance/submission/<id>/status/"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, submission_id):
+        try:
+            submission = AttendanceSubmission.objects.select_related(
+                'session__course', 'student'
+            ).get(pk=submission_id)
+        except AttendanceSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Submission not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Students may only poll their own submissions.
+        # Lecturers may poll any submission for their sessions.
+        user = request.user
+        if user == submission.student:
+            pass
+        elif getattr(user, 'role', None) in ('LECTURER', 'ADMIN'):
+            if not submission.session.course.is_user_lecturer(user):
+                return Response(
+                    {'error': 'You do not have permission to view this submission.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        else:
+            return Response(
+                {'error': 'You do not have permission to view this submission.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = SubmissionStatusSerializer(submission)
+        return Response(serializer.data)
 

@@ -4,6 +4,7 @@ from .views import (
     SessionConfigView,
     LecturerSessionSubmissionsView,
     LecturerOverrideView,
+    SubmissionStatusView,
 )
 
 app_name = 'attendance'
@@ -12,6 +13,7 @@ urlpatterns = [
     # Student endpoints
     path('submit/', SubmitAttendanceView.as_view(), name='submit'),
     path('session/<int:session_id>/', SessionConfigView.as_view(), name='session-config'),
+    path('submission/<int:submission_id>/status/', SubmissionStatusView.as_view(), name='submission-status'),
 
     # Lecturer endpoints
     path(
