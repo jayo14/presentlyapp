@@ -234,6 +234,17 @@ These are the new-pipeline CRUD helpers. They are not wired into any component.
 ### 6.11 System Stats Caller Note
 - `backend/system/views.py:405-451` reads `AttendanceRecord` (new pipeline) for admin dashboard statistics, even though the new pipeline is not used by clients. This means the admin stats page shows **empty or test-only data** for `AttendanceRecord`-based queries, while the legacy `Attendance` queries in the same file return real data.
 
+### 6.12 Dead New-Pipeline Endpoints
+The following new-pipeline endpoints exist but have **zero production callers**:
+
+| Endpoint | View | Evidence of Zero Callers |
+|---|---|---|
+| `GET /api/attendance/session/{sessionId}/` | `SessionConfigView` (`attendance/views.py:400`) | Mobile builds `SessionConfig` from `GET /check-in/{code}/` response; frontend never calls this URL |
+| `GET /api/attendance/lecturer/session/{sessionId}/submissions/` | `LecturerSessionSubmissionsView` (`attendance/views.py:425`) | No frontend or mobile component imports this path |
+| `PATCH /api/attendance/lecturer/override/{submissionId}/` | `LecturerOverrideView` (`attendance/views.py:468`) | No frontend or mobile component imports this path |
+
+These endpoints are fully implemented but unreachable by any client.
+
 ---
 
 ## 7. Model Usage Tables
