@@ -170,6 +170,16 @@ These are the new-pipeline CRUD helpers. They are not wired into any component.
 | `backend/system/views.py:405-451` | `AttendanceRecord.objects.filter(...)` reads for admin stats |
 | `backend/institutions/tasks/security_tasks.py` | `UserDevice.objects.filter/create` for login security |
 
+### 6.3 Serializer Differences
+- **Legacy:** `AttendanceSerializer` (`institutions/serializers.py:570`) outputs `PRESENT`/`LATE`/`EXCUSED`/`FLAGGED` status, `distance_from_venue`, `location_verified`, `elevation`.
+- **New:** `AttendanceSubmissionDetailSerializer` (`attendance/serializers.py:80`) outputs `verdict` (`ACCEPTED`/`FLAGGED`/`REJECTED`), `confidence_score`, `server_confidence_score`, `behavioral_flags`. `AttendanceRecordSerializer` (`attendance/serializers.py:115`) is a thin wrapper around `final_verdict` and `confidence_score`.
+- **Impact:** Any frontend component expecting `attendance.status === 'PRESENT'` will break if switched to the new pipeline's `verdict === 'ACCEPTED'` without a mapping layer.
+
+### 6.4 Admin Registration Differences
+- **Legacy:** `Attendance` is registered in `backend/institutions/admin.py:126` with `AttendanceAdmin`. `ManualAttendanceRecord` is also admin-registered.
+- **New:** `AttendanceSubmission` and `AttendanceRecord` are **not** registered in Django admin. Lecturers view them via the lecturer API endpoints (`/api/attendance/lecturer/session/{id}/submissions/` and `/api/attendance/lecturer/override/{id}/`).
+- **Impact:** If the new pipeline were activated, admin staff would lose the ability to browse attendance records in the Django admin unless admin classes are added.
+
 ---
 
 ## 7. Model Usage Tables
