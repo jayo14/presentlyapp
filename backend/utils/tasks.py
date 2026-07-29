@@ -49,7 +49,13 @@ class IdempotentTask:
                 logger.error("Failed to build idempotency key for %s: %s", func.__name__, exc)
                 return func(*args, **kwargs)
 
-            if not cache.add(key, "1", timeout=self.timeout):
+            try:
+                acquired = cache.add(key, "1", timeout=self.timeout)
+            except Exception as exc:
+                logger.warning("Cache unavailable for idempotency check (%s); executing task: %s", exc, key)
+                return func(*args, **kwargs)
+
+            if not acquired:
                 logger.warning(
                     "Skipping duplicate task execution (already in flight or recently completed): %s",
                     key,
