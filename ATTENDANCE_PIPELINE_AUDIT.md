@@ -206,6 +206,16 @@ These are the new-pipeline CRUD helpers. They are not wired into any component.
 - **New:** Rate-limited in `SubmitAttendanceView` (`attendance/views.py:228`) at `5/m` per user via `django_ratelimit`, with an additional application-level limit of 3 non-REJECTED submissions per session.
 - **Impact:** The new pipeline has stricter per-session limits. If migrated, the legacy pipeline should adopt the 3-submission cap.
 
+### 6.7 Email Notification Differences
+- **Legacy:** Sends a confirmation email via `send_attendance_confirmed_email` (`institutions/attendance_logic.py:459-476`) on every successful check-in. Includes streak data, course info, and history URL.
+- **New:** Does **not** send any email. The `SubmitAttendanceView` returns only a JSON verdict.
+- **Impact:** Students currently receive email confirmations. Any migration must preserve or replace this notification.
+
+### 6.8 Offline Queue Differences
+- **Legacy:** Has **no** offline queue support. If the network is down, the mobile app receives a network error and the check-in is lost.
+- **New:** The mobile app's `useAttendanceSession.ts:492-498` queues failed submissions to `storage.queueAttendance()` for later retry. However, there is **no backend endpoint** to flush this queue, so the queue is currently dead-end.
+- **Impact:** Offline support is partially implemented on mobile but has no server-side consumer.
+
 ---
 
 ## 7. Model Usage Tables
