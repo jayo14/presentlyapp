@@ -1,9 +1,36 @@
+import logging
+
 from celery import shared_task
+from django.core.cache import cache
 from django.utils import timezone
 from django.db import transaction
 
+from utils.tasks import IdempotentTask, task_idempotency_key
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=30)
+logger = logging.getLogger(__name__)
+
+
+# Two-layer idempotency:
+#   1. Cache lock (fast path) – rejects near-simultaneous duplicate webhook deliveries
+#      before they hit the DB.  The lock is intentionally *not* deleted on success;
+#      letting it expire naturally keeps the race window closed.
+#   2. DB get_or_create (authoritative) – guarantees exactly-once semantics even if
+#      the cache is evicted or unavailable, because the Payment row is the source of
+#      truth.  Both layers must exist; the cache guard alone is not enough because
+#      cache is volatile, and the DB guard alone is slower under a retry storm.
+@shared_task(
+    bind=True,
+    max_retries=3,
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_jitter=True,
+)
+@IdempotentTask(
+    key_func=lambda self, event_data: task_idempotency_key(
+        "handle_charge_success", event_data.get("data", {}).get("reference", "")
+    ),
+    timeout=300,
+)
 def handle_charge_success_task(self, event_data):
     from .models import Payment, PaymentStatus, Subscription, SubscriptionStatus, Plan, BillingOwner
 
@@ -58,7 +85,19 @@ def handle_charge_success_task(self, event_data):
                 pass
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=30)
+@shared_task(
+    bind=True,
+    max_retries=3,
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_jitter=True,
+)
+@IdempotentTask(
+    key_func=lambda self, event_data: task_idempotency_key(
+        "handle_subscription_disable", event_data.get("data", {}).get("subscription_code", "")
+    ),
+    timeout=300,
+)
 def handle_subscription_disable_task(self, event_data):
     from .models import Subscription, SubscriptionStatus
 
@@ -73,7 +112,19 @@ def handle_subscription_disable_task(self, event_data):
     ).update(status=SubscriptionStatus.CANCELED)
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=30)
+@shared_task(
+    bind=True,
+    max_retries=3,
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_jitter=True,
+)
+@IdempotentTask(
+    key_func=lambda self, event_data: task_idempotency_key(
+        "handle_invoice_failed", event_data.get("data", {}).get("subscription_code", "")
+    ),
+    timeout=300,
+)
 def handle_invoice_failed_task(self, event_data):
     from .models import Subscription, SubscriptionStatus
 
