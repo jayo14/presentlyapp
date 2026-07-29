@@ -216,6 +216,24 @@ These are the new-pipeline CRUD helpers. They are not wired into any component.
 - **New:** The mobile app's `useAttendanceSession.ts:492-498` queues failed submissions to `storage.queueAttendance()` for later retry. However, there is **no backend endpoint** to flush this queue, so the queue is currently dead-end.
 - **Impact:** Offline support is partially implemented on mobile but has no server-side consumer.
 
+### 6.9 `confidence_score` Naming Collision
+- **Legacy:** Uses `trust_score` (0-100) on `Attendance`.
+- **New:** Uses `confidence_score` (client-reported, 0-100) and `server_confidence_score` (server-recomputed, 0-100) on `AttendanceSubmission`, plus `confidence_score` (0-100) on `AttendanceRecord`.
+- **Impact:** The term `confidence_score` appears in the new pipeline with two different meanings (client vs. server). The legacy `trust_score` is a single authoritative value. Any unified schema should standardize on one name.
+
+### 6.10 Database Table Inventory
+| Table Name | Model | Pipeline | Rows in Production? |
+|---|---|---|---|
+| `attendances` | `Attendance` | Legacy | Yes — primary production table |
+| `attendance_attempt_logs` | `AttendanceAttemptLog` | Legacy | Yes — fraud audit trail |
+| `user_devices` | `UserDevice` | Legacy | Yes — device trust history |
+| `attendance_submissions` | `AttendanceSubmission` | New | **No** — only test data |
+| `attendance_records` | `AttendanceRecord` | New | **No** — only test data |
+| `manual_attendance_records` | `ManualAttendanceRecord` | Legacy | Yes — lecturer manual entries |
+
+### 6.11 System Stats Caller Note
+- `backend/system/views.py:405-451` reads `AttendanceRecord` (new pipeline) for admin dashboard statistics, even though the new pipeline is not used by clients. This means the admin stats page shows **empty or test-only data** for `AttendanceRecord`-based queries, while the legacy `Attendance` queries in the same file return real data.
+
 ---
 
 ## 7. Model Usage Tables
