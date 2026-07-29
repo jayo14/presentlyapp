@@ -1,8 +1,11 @@
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
+from django.utils import timezone
+from datetime import timedelta
 
-from institutions.models import User, UserRole
+from institutions.models import User, UserRole, Course, AttendanceSession, Attendance
+from attendance.models import AttendanceAttemptLog
 from .models import FeatureFlag, SystemMetricsSnapshot
 from .views import AdminDashboardView, SystemHealthView
 from institutions.serializers import VenueSerializer
@@ -89,6 +92,95 @@ class SystemHealthEndpointTests(TestCase):
         self.assertEqual(response.data['platform_health']['db_latency_ms'], latest.db_latency_ms)
         self.assertEqual(response.data['platform_health']['storage_used_pct'], latest.storage_used_pct)
         self.assertEqual(response.data['latest_snapshot']['id'], latest.id)
+
+
+class AdminDashboardAttendanceStatsTests(TestCase):
+    """
+    Regression test for the bug where admin dashboard stats queried
+    AttendanceRecord (dead new-pipeline model) instead of Attendance (legacy).
+    """
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.admin = User.objects.create_user(
+            email='admin@test.com',
+            password='password',
+            full_name='Test Admin',
+            role=UserRole.ADMIN,
+        )
+        self.student = User.objects.create_user(
+            email='student@test.com',
+            password='password',
+            full_name='Test Student',
+            role=UserRole.STUDENT,
+        )
+        self.course = Course.objects.create(
+            code='CS101',
+            name='Intro to CS',
+            credit_units=3,
+        )
+        now = timezone.now()
+        self.session = AttendanceSession.objects.create(
+            course=self.course,
+            session_code='TEST1234',
+            start_time=now - timedelta(hours=2),
+            end_time=now + timedelta(hours=2),
+            is_active=True,
+        )
+
+    def test_dashboard_attendance_stats_use_legacy_attendance(self):
+        today = timezone.now().date()
+
+        # Create 3 PRESENT, 2 LATE, 1 FLAGGED attendance records for today
+        for _ in range(3):
+            Attendance.objects.create(
+                session=self.session,
+                student=self.student,
+                status='PRESENT',
+            )
+        for _ in range(2):
+            Attendance.objects.create(
+                session=self.session,
+                student=self.student,
+                status='LATE',
+            )
+        Attendance.objects.create(
+            session=self.session,
+            student=self.student,
+            status='FLAGGED',
+        )
+
+        # Create 2 hard-rejected attempt logs for today (no Attendance created)
+        for _ in range(2):
+            AttendanceAttemptLog.objects.create(
+                student=self.student,
+                session=self.session,
+                rejected_reason='Outside geofence',
+            )
+
+        request = self.factory.get('/api/system/dashboard/')
+        force_authenticate(request, user=self.admin)
+
+        response = AdminDashboardView.as_view()(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Total today's check-ins should include all 6 Attendance records
+        self.assertEqual(response.data['attendance_stats']['today_attendance'], 6)
+
+        # GPS success rate = (PRESENT + LATE) / total * 100
+        expected_gps_rate = round((5 / 6) * 100, 1)
+        self.assertEqual(response.data['attendance_stats']['attendance_success_rate'], expected_gps_rate)
+
+        # Today's numbers
+        self.assertEqual(response.data['todays_numbers']['total_checked_in'], 6)
+        self.assertEqual(response.data['todays_numbers']['rejected_checkins'], 2)
+        self.assertEqual(response.data['todays_numbers']['late_arrivals'], 2)
+        self.assertEqual(response.data['todays_numbers']['gps_failures'], 2)
+
+        # Live session checked_in count should match Attendance records
+        live_session = response.data['live_sessions'][0]
+        self.assertEqual(live_session['checked_in'], 6)
 
     def test_dashboard_platform_health_uses_latest_snapshot(self):
         latest = SystemMetricsSnapshot.objects.create(
