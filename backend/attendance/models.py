@@ -46,10 +46,12 @@ class AttendanceAttemptLog(models.Model):
 class AttendanceSubmission(models.Model):
     """Raw GPS-verified attendance submission from the mobile app"""
 
+    VERDICT_PENDING = 'PENDING'
     VERDICT_ACCEPTED = 'ACCEPTED'
     VERDICT_FLAGGED = 'FLAGGED'
     VERDICT_REJECTED = 'REJECTED'
     VERDICT_CHOICES = [
+        (VERDICT_PENDING, 'Pending'),
         (VERDICT_ACCEPTED, 'Accepted'),
         (VERDICT_FLAGGED, 'Flagged'),
         (VERDICT_REJECTED, 'Rejected'),
