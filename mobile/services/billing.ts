@@ -24,11 +24,13 @@ export interface CheckoutResponse {
 }
 
 export const billingService = {
-  getCurrentPlan: () =>
-    apiClient.get(API_ENDPOINTS.BILLING.ME).then((r) => r.data as CurrentPlan),
+  getCurrentPlan: async (): Promise<CurrentPlan> => {
+    const r = await apiClient.get<CurrentPlan>(API_ENDPOINTS.BILLING.ME);
+    return r;
+  },
 
-  checkout: (planCode: string) =>
-    apiClient
-      .post(API_ENDPOINTS.BILLING.CHECKOUT, { plan_code: planCode })
-      .then((r) => r.data as CheckoutResponse),
+  checkout: async (planCode: string): Promise<CheckoutResponse> => {
+    const r = await apiClient.post<CheckoutResponse>(API_ENDPOINTS.BILLING.CHECKOUT, { plan_code: planCode });
+    return r;
+  },
 };
