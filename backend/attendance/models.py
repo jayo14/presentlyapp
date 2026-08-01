@@ -86,6 +86,14 @@ class AttendanceSubmission(models.Model):
     movement_variance = models.FloatField(default=0.0)
     suspiciously_still = models.BooleanField(default=False)
     collection_duration_ms = models.IntegerField(default=0)
+    sample_spread = models.FloatField(
+        null=True, blank=True,
+        help_text="Standard deviation (meters) of accepted GPS samples from weighted center"
+    )
+    rejected_outlier_count = models.IntegerField(
+        null=True, blank=True,
+        help_text="Number of outlier samples rejected before averaging"
+    )
 
     # Scoring
     confidence_score = models.IntegerField(default=0, help_text="Client-submitted score (0-100)")

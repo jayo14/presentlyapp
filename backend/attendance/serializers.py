@@ -67,6 +67,8 @@ class AttendanceSubmissionCreateSerializer(serializers.Serializer):
     device_fingerprint = serializers.CharField(
         max_length=512, allow_blank=True, required=False, default=''
     )
+    sample_spread = serializers.FloatField(required=False, allow_null=True)
+    rejected_outlier_count = serializers.IntegerField(required=False, allow_null=True)
 
     def validate_coordinates(self, value):
         for key in ('lat', 'lng'):
@@ -93,6 +95,8 @@ class AttendanceSubmissionDetailSerializer(serializers.ModelSerializer):
             'submitted_at',
             'coordinates',
             'sample_count',
+            'sample_spread',
+            'rejected_outlier_count',
             'mock_gps_flag',
             'network_type',
             'movement_variance',

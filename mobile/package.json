@@ -7,8 +7,9 @@
     "start-tunnel": "bunx rork start -p 5a3gf5xivcb048tt901wd --tunnel",
     "start-web": "bunx rork start -p 5a3gf5xivcb048tt901wd --web",
     "start-web-tunnel": "bunx rork start -p 5a3gf5xivcb048tt901wd --web --tunnel",
-    "start-web-dev": "DEBUG=expo* bunx rork start -p 5a3gf5xivcb048tt901wd --web",
-    "lint": "expo lint"
+    "start-web-dev": "DEBUG=expo* bunx rork start -p 5a3gf5xivcb048tt901wd --web --dev",
+    "lint": "expo lint",
+    "test": "jest"
   },
   "dependencies": {
     "@expo-google-fonts/lexend": "^0.4.1",
@@ -70,6 +71,9 @@
     "@types/react": "~19.1.10",
     "eslint": "^9.31.0",
     "eslint-config-expo": "~10.0.0",
+    "jest": "^29.7.0",
+    "jest-expo": "^54.0.17",
+    "ts-jest": "^29.4.12",
     "typescript": "~5.9.2"
   },
   "private": true

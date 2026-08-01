@@ -397,21 +397,56 @@ export function useAttendanceSession(
       }
     }
 
-    // Weighted average and drift
+    // Weighted average with outlier rejection and drift
+    let accepted = gpsSamples;
+    let rejectedOutlierCount = 0;
+
+    if (accepted.length >= 3) {
+      const lats = accepted.map(s => s.lat).sort((a, b) => a - b);
+      const lngs = accepted.map(s => s.lng).sort((a, b) => a - b);
+      const medianLat = lats[Math.floor(lats.length / 2)];
+      const medianLng = lngs[Math.floor(lngs.length / 2)];
+
+      const before = accepted.length;
+      accepted = accepted.filter(s => {
+        const dist = haversineDistanceMeters(s.lat, s.lng, medianLat, medianLng);
+        if (dist > 30) return false;
+        return true;
+      });
+      rejectedOutlierCount = before - accepted.length;
+
+      if (accepted.length === 0) {
+        accepted = gpsSamples;
+        rejectedOutlierCount = 0;
+      }
+    }
+
+    // Accuracy-weighted average: weight = 1 / accuracy^2
     let totalWeight = 0, weightedLat = 0, weightedLng = 0;
-    for (const s of gpsSamples) {
-      const w = 1 / Math.max(s.accuracy, MIN_ACCURACY_FOR_WEIGHT);
+    for (const s of accepted) {
+      const w = 1 / Math.max(s.accuracy, MIN_ACCURACY_FOR_WEIGHT) ** 2;
       totalWeight += w;
       weightedLat += s.lat * w;
       weightedLng += s.lng * w;
     }
     const avgLat = weightedLat / totalWeight;
     const avgLng = weightedLng / totalWeight;
-    const avgAccuracy = gpsSamples.reduce((sum, s) => sum + s.accuracy, 0) / gpsSamples.length;
+    const avgAccuracy = accepted.reduce((sum, s) => sum + s.accuracy, 0) / accepted.length;
 
-    // Calculate drift_avg (average distance from center mean)
-    const drift_avg = gpsSamples.reduce((sum, s) => 
-        sum + haversineDistanceMeters(s.lat, s.lng, avgLat, avgLng), 0) / gpsSamples.length;
+    // Calculate drift_avg (average distance from weighted center)
+    let driftSum = 0;
+    for (const s of accepted) {
+      driftSum += haversineDistanceMeters(s.lat, s.lng, avgLat, avgLng);
+    }
+    const drift_avg = driftSum / accepted.length;
+
+    // Compute sample spread = std dev (in meters) from weighted center
+    let spreadSumSq = 0;
+    for (const s of accepted) {
+      const d = haversineDistanceMeters(s.lat, s.lng, avgLat, avgLng);
+      spreadSumSq += d * d;
+    }
+    const sampleSpread = Math.sqrt(spreadSumSq / accepted.length);
 
     const anyExplicitMock = gpsSamples.some((s) => s.isMock);
     const suspiciousRepeat = [...suspiciousAccuracyCounts.values()].some((c) => c >= MOCK_ACCURACY_REPEAT_THRESHOLD);
@@ -468,6 +503,8 @@ export function useAttendanceSession(
       locationExitCount,
       windowRestartCount,
       tapPatternSuspicious,
+      sampleSpread,
+      rejectedOutlierCount,
       timestamp: new Date().toISOString()
     };
 

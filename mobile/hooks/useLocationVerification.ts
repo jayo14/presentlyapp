@@ -23,6 +23,10 @@ export interface LocationPayload {
   gyroDelta: { x: number; y: number; z: number };
   collectionDurationMs: number;
   timestamp: string;
+  /** Standard deviation (in meters) of accepted GPS samples from the weighted center. */
+  sampleSpread?: number;
+  /** Number of outlier samples rejected before averaging. */
+  rejectedOutlierCount?: number;
 }
 
 export type VerificationStatus =
@@ -321,13 +325,61 @@ export function useLocationVerification(): UseLocationVerificationResult {
       return;
     }
 
-    // Weighted average: weight = 1 / accuracy (better accuracy → higher weight)
+    // ------------------------------------------------------------------
+    // Haversine helper (local, no extra dependency)
+    // ------------------------------------------------------------------
+    const EARTH_RADIUS_METERS = 6_371_000;
+    const haversineDistanceMeters = (
+      lat1: number,
+      lng1: number,
+      lat2: number,
+      lng2: number,
+    ): number => {
+      const toRad = (deg: number) => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+      return 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(a));
+    };
+
+    // Weighted average with outlier rejection
+    // Weights are 1 / accuracy^2 because GPS error is approximately Gaussian
+    // and the reported `accuracy` value represents roughly one standard deviation.
+    let accepted = gpsSamples;
+    let rejectedOutlierCount = 0;
+
+    if (accepted.length >= 3) {
+      const lats = accepted.map(s => s.lat).sort((a, b) => a - b);
+      const lngs = accepted.map(s => s.lng).sort((a, b) => a - b);
+      const medianLat = lats[Math.floor(lats.length / 2)];
+      const medianLng = lngs[Math.floor(lngs.length / 2)];
+
+      const before = accepted.length;
+      accepted = accepted.filter(s => {
+        const dist = haversineDistanceMeters(s.lat, s.lng, medianLat, medianLng);
+        if (dist > 30) {
+          onProgress?.(`Rejecting outlier (${Math.round(dist)}m from median)`);
+          return false;
+        }
+        return true;
+      });
+      rejectedOutlierCount = before - accepted.length;
+
+      if (accepted.length === 0) {
+        accepted = gpsSamples;
+        rejectedOutlierCount = 0;
+      }
+    }
+
+    // Accuracy-weighted average: weight = 1 / accuracy^2
     let totalWeight = 0;
     let weightedLat = 0;
     let weightedLng = 0;
 
-    for (const s of gpsSamples) {
-      const w = 1 / Math.max(s.accuracy, MIN_ACCURACY_FOR_WEIGHT);
+    for (const s of accepted) {
+      const w = 1 / Math.max(s.accuracy, MIN_ACCURACY_FOR_WEIGHT) ** 2;
       totalWeight += w;
       weightedLat += s.lat * w;
       weightedLng += s.lng * w;
@@ -335,8 +387,15 @@ export function useLocationVerification(): UseLocationVerificationResult {
 
     const avgLat = weightedLat / totalWeight;
     const avgLng = weightedLng / totalWeight;
-    const avgAccuracy =
-      gpsSamples.reduce((sum, s) => sum + s.accuracy, 0) / gpsSamples.length;
+    const avgAccuracy = accepted.reduce((sum, s) => sum + s.accuracy, 0) / accepted.length;
+
+    // Compute sample spread = std dev (in meters) from weighted center
+    let spreadSumSq = 0;
+    for (const s of accepted) {
+      const d = haversineDistanceMeters(s.lat, s.lng, avgLat, avgLng);
+      spreadSumSq += d * d;
+    }
+    const sampleSpread = Math.sqrt(spreadSumSq / accepted.length);
 
     // Mock GPS detection:
     // (a) any sample was explicitly marked as mocked
@@ -374,6 +433,8 @@ export function useLocationVerification(): UseLocationVerificationResult {
       gyroDelta: { x: gyroDeltaX, y: gyroDeltaY, z: gyroDeltaZ },
       collectionDurationMs,
       timestamp: new Date().toISOString(),
+      sampleSpread,
+      rejectedOutlierCount,
     };
 
     if (!cancelledRef.current) {

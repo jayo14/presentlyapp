@@ -11,6 +11,10 @@ export interface LocationSample {
   accuracy: number;
   timestamp: number;
   isMock?: boolean;
+  /** Standard deviation (in meters) of accepted samples from the weighted center. */
+  sampleSpread?: number;
+  /** Number of outlier samples rejected before averaging. */
+  rejectedOutlierCount?: number;
 }
 
 export interface AntiCheatSignals {
@@ -31,6 +35,7 @@ export const getHighPrecisionLocation = async (
     requiredSamples?: number;
     timeoutMs?: number;
     accuracyThreshold?: number;
+    outlierThresholdMeters?: number;
     onProgress?: (message: string) => void;
   } = {}
 ): Promise<LocationSample> => {
@@ -38,6 +43,7 @@ export const getHighPrecisionLocation = async (
     requiredSamples = 5,
     timeoutMs = 25000,
     accuracyThreshold = 50,
+    outlierThresholdMeters = 30,
     onProgress
   } = options;
 
@@ -72,17 +78,94 @@ export const getHighPrecisionLocation = async (
       resolve(result);
     };
 
+    // ------------------------------------------------------------------
+    // Haversine helper (local, no extra dependency)
+    // ------------------------------------------------------------------
+    const EARTH_RADIUS_METERS = 6_371_000;
+
+    const haversineDistanceMeters = (
+      lat1: number,
+      lng1: number,
+      lat2: number,
+      lng2: number,
+    ): number => {
+      const toRad = (deg: number) => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+      return 2 * EARTH_RADIUS_METERS * Math.asin(Math.sqrt(a));
+    };
+
+    // ------------------------------------------------------------------
+    // Weighted average with outlier rejection
+    // ------------------------------------------------------------------
+    // Weights are 1 / accuracy^2 because GPS error is approximately Gaussian
+    // and the reported `accuracy` value represents roughly one standard deviation.
+    // Squared-inverse weighting therefore gives higher weight to more precise
+    // readings and naturally down-weights noisy samples.
     const calculateAverage = (dataPoints: LocationSample[]): LocationSample => {
       if (dataPoints.length === 0) throw new Error('No GPS samples acquired');
-      const sumLat = dataPoints.reduce((s, p) => s + p.latitude, 0);
-      const sumLon = dataPoints.reduce((s, p) => s + p.longitude, 0);
-      const avgAcc = dataPoints.reduce((s, p) => s + p.accuracy, 0) / dataPoints.length;
-      
+
+      // Phase 1: outlier rejection (requires >= 3 samples to compute a median)
+      let accepted = dataPoints;
+      let rejectedOutlierCount = 0;
+
+      if (accepted.length >= 3) {
+        const lats = accepted.map(s => s.latitude).sort((a, b) => a - b);
+        const lngs = accepted.map(s => s.longitude).sort((a, b) => a - b);
+        const medianLat = lats[Math.floor(lats.length / 2)];
+        const medianLng = lngs[Math.floor(lngs.length / 2)];
+
+        const before = accepted.length;
+        accepted = accepted.filter(s => {
+          const dist = haversineDistanceMeters(s.latitude, s.longitude, medianLat, medianLng);
+          if (dist > outlierThresholdMeters) {
+            onProgress?.(`Rejecting outlier (${Math.round(dist)}m from median)`);
+            return false;
+          }
+          return true;
+        });
+        rejectedOutlierCount = before - accepted.length;
+
+        if (accepted.length === 0) {
+          accepted = dataPoints;
+          rejectedOutlierCount = 0;
+        }
+      }
+
+      // Phase 2: accuracy-weighted average (weight = 1 / accuracy^2)
+      let totalWeight = 0;
+      let weightedLat = 0;
+      let weightedLng = 0;
+
+      for (const s of accepted) {
+        const w = 1 / Math.max(s.accuracy, 0.001) ** 2;
+        totalWeight += w;
+        weightedLat += s.latitude * w;
+        weightedLng += s.longitude * w;
+      }
+
+      const avgLat = weightedLat / totalWeight;
+      const avgLng = weightedLng / totalWeight;
+      const avgAcc = accepted.reduce((sum, s) => sum + s.accuracy, 0) / accepted.length;
+
+      // Phase 3: compute sample spread = std dev (in meters) from weighted center
+      let spreadSumSq = 0;
+      for (const s of accepted) {
+        const d = haversineDistanceMeters(s.latitude, s.longitude, avgLat, avgLng);
+        spreadSumSq += d * d;
+      }
+      const sampleSpread = Math.sqrt(spreadSumSq / accepted.length);
+
       return {
-        latitude: sumLat / dataPoints.length,
-        longitude: sumLon / dataPoints.length,
+        latitude: avgLat,
+        longitude: avgLng,
         accuracy: avgAcc,
-        timestamp: dataPoints[dataPoints.length - 1].timestamp
+        timestamp: accepted[accepted.length - 1].timestamp,
+        sampleSpread,
+        rejectedOutlierCount,
       };
     };
 

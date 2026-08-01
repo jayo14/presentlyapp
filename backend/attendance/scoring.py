@@ -6,6 +6,11 @@ def _server_recompute_score(session, payload: dict) -> tuple:
     """
     Re-compute a confidence score from the server's perspective.
     Returns (server_score: int, fail_reasons: list[str]).
+
+    TODO: penalize high sample_spread here.  A submission with 5 tight samples
+    (sampleSpread < 5m) is more trustworthy than 5 samples scattered over 40m
+    that happen to average near the target.  Once the mobile client sends
+    sample_spread, deduct points when it exceeds a threshold (e.g. > 20m).
     """
     score = 100
     fail_reasons = []

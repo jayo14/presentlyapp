@@ -353,6 +353,8 @@ class SubmitAttendanceView(APIView):
                 behavioral_flags=data.get('behavioral_flags', {}),
                 ip_address=ip_address,
                 device_fingerprint=data.get('device_fingerprint', ''),
+                sample_spread=data.get('sample_spread'),
+                rejected_outlier_count=data.get('rejected_outlier_count'),
             )
 
             # Enqueue async scoring only after DB commit
