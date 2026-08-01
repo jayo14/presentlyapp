@@ -105,7 +105,7 @@ class ApiClient {
           }
 
           try {
-            const response = await axios.post(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.AUTH.REFRESH_TOKEN}`, { refresh });
+            const response = await this.client.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN, { refresh });
             const accessToken = this.extractAccessToken(response.data);
             const newRefreshToken = this.extractRefreshToken(response.data);
 
