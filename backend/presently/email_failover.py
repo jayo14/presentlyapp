@@ -179,6 +179,11 @@ class FailoverEmailBackend(BaseEmailBackend):
     def _providers(self) -> list[tuple[str, Callable[[list[Any]], int]]]:
         providers: list[tuple[str, Callable[[list[Any]], int]]] = []
 
+        gmail_user = getattr(settings, "GMAIL_SMTP_USER", None)
+        gmail_pass = getattr(settings, "GMAIL_APP_PASSWORD", None)
+        if gmail_user and gmail_pass:
+            providers.append(("Gmail", lambda messages: self._send_messages_via_smtp(messages, "smtp.gmail.com", 587, gmail_user, gmail_pass)))
+
         resend_key = getattr(settings, "RESEND_API_KEY", None)
         if resend_key:
             providers.append(("Resend", lambda messages: self._send_messages_via_resend(messages, resend_key)))
@@ -201,11 +206,6 @@ class FailoverEmailBackend(BaseEmailBackend):
         ahasend_pass = getattr(settings, "AHASEND_SMTP_PASSWORD", None)
         if ahasend_user and ahasend_pass:
             providers.append(("AhaSend", lambda messages: self._send_messages_via_smtp(messages, "send.ahasend.com", 587, ahasend_user, ahasend_pass)))
-
-        gmail_user = getattr(settings, "GMAIL_SMTP_USER", None)
-        gmail_pass = getattr(settings, "GMAIL_APP_PASSWORD", None)
-        if gmail_user and gmail_pass:
-            providers.append(("Gmail", lambda messages: self._send_messages_via_smtp(messages, "smtp.gmail.com", 587, gmail_user, gmail_pass)))
 
         return providers
 
@@ -409,6 +409,14 @@ def send_templated_email_with_failover(
 
     providers: list[tuple[str, Callable[[], dict[str, Any]]]] = []
 
+    gmail_user = getattr(settings, "GMAIL_SMTP_USER", None)
+    gmail_pass = getattr(settings, "GMAIL_APP_PASSWORD", None)
+    if gmail_user and gmail_pass:
+        providers.append(("Gmail", lambda: _send_template_via_smtp(
+            host="smtp.gmail.com", port=587, username=gmail_user, password=gmail_pass,
+            to=recipients, template_key=template_key, variables=variables, subject=email_subject, from_email=from_address,
+        )))
+
     resend_key = getattr(settings, "RESEND_API_KEY", None)
     template_id = getattr(settings, "RESEND_TEMPLATES", {}).get(template_key)
     if resend_key and template_id:
@@ -449,15 +457,7 @@ def send_templated_email_with_failover(
         providers.append(("AhaSend", lambda: _send_template_via_smtp(
             host="send.ahasend.com", port=587, username=ahasend_user, password=ahasend_pass,
             to=recipients, template_key=template_key, variables=variables, subject=email_subject, from_email=from_address,
-        )))
-
-    gmail_user = getattr(settings, "GMAIL_SMTP_USER", None)
-    gmail_pass = getattr(settings, "GMAIL_APP_PASSWORD", None)
-    if gmail_user and gmail_pass:
-        providers.append(("Gmail", lambda: _send_template_via_smtp(
-            host="smtp.gmail.com", port=587, username=gmail_user, password=gmail_pass,
-            to=recipients, template_key=template_key, variables=variables, subject=email_subject, from_email=from_address,
-        )))
+        )        ))
 
     if not providers:
         error_text = "No email providers configured"
