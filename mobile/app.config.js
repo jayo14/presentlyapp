@@ -2,11 +2,11 @@ export default ({ config }) => {
   return {
     ...config,
     name: "Presently",
-    slug: "presently-attendance-app",
+    slug: "presently-app-new",
     version: "1.0.0",
     orientation: "portrait",
     icon: "../frontend/public/logo.png",
-    scheme: "presently-app",
+    scheme: "presently-app-new",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     splash: {
@@ -16,7 +16,7 @@ export default ({ config }) => {
     },
     ios: {
       supportsTablet: false,
-      bundleIdentifier: "com.getpresently.app",
+      bundleIdentifier: "com.presently.app",
       infoPlist: {
         NSLocationWhenInUseUsageDescription: "Presently needs your location to verify your attendance in class.",
         NSCameraUsageDescription: "Presently needs camera access to scan session QR codes.",
@@ -28,7 +28,7 @@ export default ({ config }) => {
         foregroundImage: "../frontend/public/logo.png",
         backgroundColor: "#ffffff",
       },
-      package: "com.getpresently.app",
+      package: "com.presently.app",
       permissions: [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -61,7 +61,7 @@ export default ({ config }) => {
         origin: "https://rork.com/",
       },
       eas: {
-        projectId: "62a94bff-8f92-4650-88aa-012973eb62fb",
+        projectId: "779f0fff-8c3c-4cbb-a292-9fd2987147ba",
       },
       API_URL: process.env.API_URL,
     },
