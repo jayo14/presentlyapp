@@ -532,6 +532,38 @@ class AdminDashboardView(APIView):
                 platform_health['emails_sent_today'] = 0
 
             try:
+                from system.models import EmailDeliveryLog
+                from django.db.models import Sum
+                from presently.email_failover import _provider_daily_budget, _provider_sent_today
+
+                providers = ['Gmail', 'Resend', 'SendPulse', 'Mailjet', 'Mailtrap', 'AhaSend']
+                email_quota = []
+                for provider in providers:
+                    budget = _provider_daily_budget(provider)
+                    sent = _provider_sent_today(provider)
+                    if budget is not None and budget > 0:
+                        pct = round((sent / budget) * 100, 1)
+                        near_limit = pct >= 80
+                        email_quota.append({
+                            'provider': provider,
+                            'sent_today': sent,
+                            'daily_budget': budget,
+                            'pct_used': pct,
+                            'near_limit': near_limit,
+                        })
+                    elif budget is not None:
+                        email_quota.append({
+                            'provider': provider,
+                            'sent_today': sent,
+                            'daily_budget': 0,
+                            'pct_used': 0,
+                            'near_limit': False,
+                        })
+                platform_health['email_quota'] = email_quota
+            except Exception:
+                platform_health['email_quota'] = []
+
+            try:
                 from django.contrib.sessions.models import Session
                 platform_health['realtime_connections'] = Session.objects.filter(expire_date__gte=now).count()
             except Exception:
@@ -576,6 +608,7 @@ class AdminDashboardView(APIView):
                 'realtime_connections': platform_health['realtime_connections'],
                 'notification_queue': platform_health['notification_queue'],
                 'emails_sent_today': platform_health['emails_sent_today'],
+                'email_quota': platform_health.get('email_quota', []),
                 'db_latency_ms': platform_health['db_latency_ms'],
                 'storage_used_pct': platform_health['storage_used_pct'],
             },

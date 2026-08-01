@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import FeatureFlag, SystemLog, SystemMetricsSnapshot
+from .models import FeatureFlag, SystemLog, SystemMetricsSnapshot, EmailDeliveryLog
 
 
 @admin.register(FeatureFlag)
@@ -42,3 +42,15 @@ class SystemMetricsSnapshotAdmin(admin.ModelAdmin):
 		'collected_at',
 	)
 	ordering = ('-collected_at',)
+
+
+@admin.register(EmailDeliveryLog)
+class EmailDeliveryLogAdmin(admin.ModelAdmin):
+	list_display = ('provider', 'status', 'template_key', 'subject', 'recipient_count', 'created_at')
+	list_filter = ('provider', 'status', 'template_key')
+	search_fields = ('subject', 'template_key', 'provider', 'error_message')
+	readonly_fields = ('provider', 'status', 'template_key', 'subject', 'recipients', 'recipient_count', 'error_message', 'provider_response', 'duration_ms', 'created_at')
+	ordering = ('-created_at',)
+
+	def has_add_permission(self, request):
+		return False
