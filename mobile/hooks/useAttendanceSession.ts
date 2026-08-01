@@ -470,7 +470,7 @@ export function useAttendanceSession(
     let visitorId: string | undefined;
     let deviceId: string | undefined;
     if (Platform.OS === 'android') {
-      visitorId = Application.androidId || undefined;
+      visitorId = Application.getAndroidId() || undefined;
       deviceId = Device.osInternalBuildId || undefined;
     } else if (Platform.OS === 'ios') {
       visitorId = await Application.getIosIdForVendorAsync() || undefined;

@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 10,
-    fontFamily: Fonts.lexend.semibold,
+    fontFamily: Fonts.lexend.semiBold,
     color: '#64748B',
     letterSpacing: 2,
     marginBottom: 4,

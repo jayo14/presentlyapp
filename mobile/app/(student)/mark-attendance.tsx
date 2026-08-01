@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   iconBox: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center' },
   benefitRow: { flexDirection: 'row', alignItems: 'center', gap: 12, width: '100%', marginTop: 16, paddingHorizontal: 16 },
   benefitText: { fontSize: 14, fontFamily: Fonts.lexend.medium, opacity: 0.9 },
-  verifyingCard: { backgroundColor: '#1A1A1A', width: '100%', borderRadius: 24, padding: 32, alignItems: 'center', borderWeight: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  verifyingCard: { backgroundColor: '#1A1A1A', width: '100%', borderRadius: 24, padding: 32, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   verifyingTitle: { color: '#FFF', fontSize: 20, fontFamily: Fonts.lexend.bold, marginTop: 20, marginBottom: 24 },
   progressBarBg: { width: '100%', height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'hidden', marginBottom: 12 },
   progressBarFill: { height: '100%', borderRadius: 4 },

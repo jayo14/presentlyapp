@@ -79,8 +79,7 @@ class ApiClient {
         const originalRequest = error.config as RetryConfig;
         if (!originalRequest) return Promise.reject(error);
 
-        const status = error.response?.status;
-        const errorData = error.response?.data as any;
+        const status = error.response?.status;        const errorData = error.response?.data as any;
 
         // 1. Handle Token Refresh (401)
         if (status === 401 && !originalRequest.url?.includes(API_ENDPOINTS.AUTH.REFRESH_TOKEN)) {
@@ -131,7 +130,7 @@ class ApiClient {
         }
 
         // 2. Exponential Backoff Retry for transient errors (500, 502, 503, 504, or Network Error)
-        const isTransientError = !status || (status >= 500 && status <= 504);
+        const isTransientError = status === undefined || (status >= 500 && status <= 504);
         const shouldRetry = isTransientError && !originalRequest._noRetry && (originalRequest._retryCount || 0) < this.maxRetries;
         
         if (shouldRetry) {
@@ -154,7 +153,7 @@ class ApiClient {
         } else if (status === 429) {
             const retryAfter = error.response?.headers['retry-after'] || '60';
             console.warn(`[API] 429: Too many requests. Retry after ${retryAfter}s`);
-        } else if (status >= 500) {
+        } else if (status != null && status >= 500) {
             console.error('[API] 500+: Server Error');
         } else if (!status) {
             console.error('[API] Network Error / Timeout');

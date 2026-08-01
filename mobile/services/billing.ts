@@ -25,10 +25,10 @@ export interface CheckoutResponse {
 
 export const billingService = {
   getCurrentPlan: () =>
-    apiClient.get<CurrentPlan>(API_ENDPOINTS.BILLING.ME).then((r) => r.data),
+    apiClient.get(API_ENDPOINTS.BILLING.ME).then((r) => r.data as CurrentPlan),
 
   checkout: (planCode: string) =>
     apiClient
-      .post<CheckoutResponse>(API_ENDPOINTS.BILLING.CHECKOUT, { plan_code: planCode })
-      .then((r) => r.data),
+      .post(API_ENDPOINTS.BILLING.CHECKOUT, { plan_code: planCode })
+      .then((r) => r.data as CheckoutResponse),
 };

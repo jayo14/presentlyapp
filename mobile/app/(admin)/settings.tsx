@@ -20,7 +20,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminSettingsScreen() {
   const { colors, isDark } = useTheme();
-  const { logout } = useAuth();
+  const { signOut } = useAuth();
 
   const [config, setConfig] = useState({
     maintenanceMode: false,
@@ -139,7 +139,7 @@ export default function AdminSettingsScreen() {
         <View style={styles.dangerZone}>
           <Button
             title="Log Out Admin Session"
-            onPress={logout}
+            onPress={signOut}
             variant="outline"
             style={{ borderColor: '#EF4444', borderWidth: 1 }}
             textStyle={{ color: '#EF4444' }}

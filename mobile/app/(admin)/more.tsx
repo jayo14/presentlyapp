@@ -4,13 +4,11 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import {
-  Settings, Bell, Shield, Database,
-  Smartphone, Globe, Moon, Lock,
-  ChevronRight, LogOut, Trash2, Info,
-  CheckCircle2, AlertTriangle, Cloud,
-  Building, Activity, Download, Gauge,
+  Smartphone, Moon,
+  ChevronRight, LogOut,
+  Building, Activity, Gauge,
   ShieldCheck, LayoutGrid, HelpCircle,
-  FileText
+  FileText, BookOpen
 } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import Fonts from '@/constants/fonts';

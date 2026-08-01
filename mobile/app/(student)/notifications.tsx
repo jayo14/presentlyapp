@@ -24,7 +24,7 @@ export default function StudentNotificationsScreen() {
 
   const loadNotifications = useCallback(async () => {
     try {
-        const data = await api.notifications.list();
+        const data = (await api.notifications.list()) as any;
         setNotifications(data.results || data);
     } catch (e) {
         console.error('Failed to load notifications', e);

@@ -360,7 +360,7 @@ export function useLocationVerification(): UseLocationVerificationResult {
       accepted = accepted.filter(s => {
         const dist = haversineDistanceMeters(s.lat, s.lng, medianLat, medianLng);
         if (dist > 30) {
-          onProgress?.(`Rejecting outlier (${Math.round(dist)}m from median)`);
+          console.log(`Rejecting outlier (${Math.round(dist)}m from median)`);
           return false;
         }
         return true;

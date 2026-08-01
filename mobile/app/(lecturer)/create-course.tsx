@@ -78,7 +78,7 @@ export default function CreateCourseScreen() {
 
   const loadColleges = async () => {
     try {
-        const data = await api.colleges.list();
+        const data = await api.colleges.list() as any;
         setColleges(data.results || data);
     } catch (e) {
         console.error('Failed to load colleges', e);
@@ -87,7 +87,7 @@ export default function CreateCourseScreen() {
 
   const loadDepartments = async (collegeId: string) => {
     try {
-        const data = await api.departments.list({ college: collegeId });
+        const data = await api.departments.list({ college: collegeId }) as any;
         setDepartments(data.results || data);
     } catch (e) {
         console.error('Failed to load departments', e);

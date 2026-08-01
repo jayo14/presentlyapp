@@ -262,7 +262,7 @@ export const getAntiCheatSignals = async (): Promise<AntiCheatSignals> => {
     signals.ipAddress = ip;
 
     if (Platform.OS === 'android') {
-      signals.visitorId = Application.androidId || undefined;
+      signals.visitorId = Application.getAndroidId() || undefined;
       signals.deviceId = Device.osInternalBuildId || undefined;
     } else if (Platform.OS === 'ios') {
       signals.visitorId = await Application.getIosIdForVendorAsync() || undefined;

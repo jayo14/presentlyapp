@@ -25,7 +25,7 @@ export default function DepartmentCoursesScreen() {
 
   const loadDepartmentCourses = async () => {
     try {
-        const data = await api.departments.getCourses(id as string);
+        const data = await api.departments.getCourses(id as string) as any;
         setCourses(data.courses || []);
         setDepartmentName(data.department || 'Department');
     } catch (e) {
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   },
   codeText: {
     fontSize: 10,
-    fontFamily: Fonts.lexend.black,
+    fontFamily: Fonts.lexend.bold,
     letterSpacing: 1,
   },
   creditsText: {
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 11,
-    fontFamily: Fonts.lexend.semibold,
+    fontFamily: Fonts.lexend.semiBold,
     color: '#94A3B8',
   },
   cardRight: {

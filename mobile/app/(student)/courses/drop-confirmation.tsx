@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   },
   dropBtnText: {
     fontSize: 16,
-    fontFamily: Fonts.lexend.semibold,
+    fontFamily: Fonts.lexend.semiBold,
     color: '#F43F5E',
   }
 });

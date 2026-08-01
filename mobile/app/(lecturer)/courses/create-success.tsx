@@ -150,14 +150,14 @@ const styles = StyleSheet.create({
   },
   courseCode: {
     fontSize: 72,
-    fontFamily: Fonts.lexend.black,
+    fontFamily: Fonts.lexend.bold,
     color: '#FFCA0D',
     fontStyle: 'italic',
     letterSpacing: -4,
   },
   courseTitle: {
     fontSize: 20,
-    fontFamily: Fonts.lexend.semibold,
+    fontFamily: Fonts.lexend.semiBold,
     color: 'rgba(255, 255, 255, 0.9)',
     marginTop: 8,
     textAlign: 'center',
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   },
   secondaryActionText: {
     fontSize: 15,
-    fontFamily: Fonts.lexend.semibold,
+    fontFamily: Fonts.lexend.semiBold,
     color: '#FFFFFF',
   }
 });

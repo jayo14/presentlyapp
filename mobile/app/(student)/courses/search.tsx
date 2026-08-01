@@ -217,11 +217,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 12,
   },
-  emptyState: {
-    marginTop: 80,
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
   emptyDesc: {
     fontSize: 14,
     fontFamily: Fonts.lexend.regular,

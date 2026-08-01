@@ -17,7 +17,7 @@ export default function ManageVenuesScreen() {
   const [activeVenueIds, setActiveVenueIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVenue, setSelectedVenue] = useState<any>(null);
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<typeof MapView>(null);
 
   // Create/Edit Modal
   const [modalVisible, setModalVisible] = useState(false);

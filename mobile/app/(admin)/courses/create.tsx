@@ -45,7 +45,7 @@ export default function CreateCourseScreen() {
       const [facData, deptData] = await Promise.all([
         api.colleges.list(),
         api.departments.list()
-      ]);
+      ]) as [any, any];
       setFaculties(Array.isArray(facData) ? facData : (facData.results || []));
       setDepartments(Array.isArray(deptData) ? deptData : (deptData.results || []));
     } catch (e) {

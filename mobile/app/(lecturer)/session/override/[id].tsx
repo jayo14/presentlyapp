@@ -39,7 +39,7 @@ export default function ManualOverrideScreen() {
       const allStudents = await api.courses.getEnrolledStudents(sessionData.course);
       const studentList = Array.isArray(allStudents) ? allStudents : (allStudents.students || []);
 
-      const attendances = await api.attendance.list({ session: id });
+      const attendances = await api.attendance.list({ session: id }) as any;
       const presentStudentIds = new Set((attendances.results || attendances || []).map((a: any) => a.student));
 
       const absent = studentList.filter((s: any) => !presentStudentIds.has(s.id));

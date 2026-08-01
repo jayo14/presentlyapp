@@ -187,7 +187,7 @@ export default function VerifyEmailScreen() {
         </Text>
 
         <TouchableOpacity 
-          style={[styles.pasteButton, { backgroundColor: colors.surfaceHigh }]} 
+          style={[styles.pasteButton, { backgroundColor: colors.cardBg }]} 
           onPress={handlePaste}
           activeOpacity={0.7}
         >

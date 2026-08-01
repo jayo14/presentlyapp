@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimens
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { ArrowLeft, Search, Bell, Star, Terminal, Engineering, Palette, CircleDollarSign, ChevronRight, PlusCircle, Brain, Bitcoin, Leaf } from 'lucide-react-native';
+import { ArrowLeft, Search, Bell, Star, Terminal, GraduationCap, Palette, CircleDollarSign, ChevronRight, PlusCircle, Brain, Bitcoin, Leaf } from 'lucide-react-native';
 import Fonts from '@/constants/fonts';
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
@@ -53,7 +53,7 @@ export default function RegistrationHubScreen() {
 
   const loadDepartments = async () => {
     try {
-        const data = await api.departments.list();
+        const data = await api.departments.list() as any;
         setDepartments(data.results || data);
     } catch (e) {
         console.error('Failed to load departments', e);
