@@ -1,4 +1,6 @@
 import logging
+import os
+import re
 import smtplib
 from dataclasses import dataclass
 from email.mime.multipart import MIMEMultipart
@@ -13,6 +15,26 @@ from django.db.models import Sum
 from django.utils import timezone
 
 logger = logging.getLogger("presently.email")
+
+_TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "email_templates")
+
+
+def _load_template(template_key: str) -> str | None:
+    """Load a local HTML email template by key name."""
+    path = os.path.join(_TEMPLATE_DIR, f"{template_key}.html")
+    if os.path.isfile(path):
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+    return None
+
+
+def _render_template(html: str, variables: dict[str, Any]) -> str:
+    """Replace {{variable}} placeholders in HTML with values from variables dict."""
+    def _replace(match: re.Match) -> str:
+        key = match.group(1).strip()
+        value = variables.get(key)
+        return str(value) if value is not None else match.group(0)
+    return re.sub(r"\{\{\s*(\w+)\s*\}\}", _replace, html)
 
 DEFAULT_EMAIL_PROVIDER_DAILY_BUDGETS = {
     "resend": 100,
@@ -155,18 +177,25 @@ def _smtp_message_for_template(
     msg["From"] = from_email
     msg["To"] = ", ".join(to_emails)
 
-    lines = [f"This is an automated Presently notification ({template_key}).", ""]
-    for key, value in (variables or {}).items():
-        lines.append(f"{key}: {value}")
+    local_html = _load_template(template_key)
+    if local_html:
+        html_body = _render_template(local_html, variables)
+    else:
+        logger.warning("Local HTML template not found for '%s', falling back to basic HTML", template_key)
+        html_items = "".join(
+            f"<li><strong>{k}</strong>: {v}</li>" for k, v in (variables or {}).items()
+        )
+        html_body = (
+            "<html><body>"
+            f"<p>This is an automated Presently notification ({template_key}).</p>"
+            f"<ul>{html_items}</ul>"
+            "</body></html>"
+        )
 
-    text_body = "\n".join(lines)
-    html_items = "".join(f"<li><strong>{k}</strong>: {v}</li>" for k, v in (variables or {}).items())
-    html_body = (
-        "<html><body>"
-        f"<p>This is an automated Presently notification ({template_key}).</p>"
-        f"<ul>{html_items}</ul>"
-        "</body></html>"
-    )
+    text_parts = [f"Presently Notification: {template_key.replace('_', ' ').title()}", ""]
+    for key, value in (variables or {}).items():
+        text_parts.append(f"{key}: {value}")
+    text_body = "\n".join(text_parts)
 
     msg.attach(MIMEText(text_body, "plain", "utf-8"))
     msg.attach(MIMEText(html_body, "html", "utf-8"))
