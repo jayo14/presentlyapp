@@ -8,13 +8,21 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "API_URL": "https://presentlyapp-alpha.onrender.com/api"
+        "API_URL": "https://presentlyapp-alpha.onrender.com/api",
+        "EXPO_PUBLIC_API_BASE_URL": "https://presentlyapp-alpha.onrender.com",
+        "EXPO_PUBLIC_API_TIMEOUT": "30000",
+        "EXPO_PUBLIC_USE_MOCK_DATA": "false",
+        "EXPO_PUBLIC_ENABLE_LOGGING": "true"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "API_URL": "https://presentlyapp-alpha.onrender.com/api"
+        "API_URL": "https://presentlyapp-alpha.onrender.com/api",
+        "EXPO_PUBLIC_API_BASE_URL": "https://presentlyapp-alpha.onrender.com",
+        "EXPO_PUBLIC_API_TIMEOUT": "30000",
+        "EXPO_PUBLIC_USE_MOCK_DATA": "false",
+        "EXPO_PUBLIC_ENABLE_LOGGING": "true"
       },
       "android": {
         "buildType": "apk"
@@ -23,7 +31,11 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "API_URL": "https://presentlyapp-alpha.onrender.com/api"
+        "API_URL": "https://presentlyapp-alpha.onrender.com/api",
+        "EXPO_PUBLIC_API_BASE_URL": "https://presentlyapp-alpha.onrender.com",
+        "EXPO_PUBLIC_API_TIMEOUT": "30000",
+        "EXPO_PUBLIC_USE_MOCK_DATA": "false",
+        "EXPO_PUBLIC_ENABLE_LOGGING": "true"
       }
     }
   },
