@@ -1,0 +1,10 @@
+backend/
+frontend/
+.git/
+*.md
+.env
+.env.*
+*.log
+__tests__/
+*.test.ts
+*.test.tsx

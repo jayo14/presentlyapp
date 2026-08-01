@@ -9,7 +9,8 @@
       "distribution": "internal",
       "env": {
         "API_URL": "https://presentlyapp-alpha.onrender.com/api"
-      }
+      },
+      "install": "npm install --legacy-peer-deps"
     },
     "preview": {
       "distribution": "internal",
@@ -18,13 +19,15 @@
       },
       "android": {
         "buildType": "apk"
-      }
+      },
+      "install": "npm install --legacy-peer-deps"
     },
     "production": {
       "autoIncrement": true,
       "env": {
         "API_URL": "https://presentlyapp-alpha.onrender.com/api"
-      }
+      },
+      "install": "npm install --legacy-peer-deps"
     }
   },
   "submit": {
