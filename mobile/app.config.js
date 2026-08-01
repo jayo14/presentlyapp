@@ -5,12 +5,12 @@ export default ({ config }) => {
     slug: "presently-app-new",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "../frontend/public/logo.png",
+    icon: "./assets/logo.png",
     scheme: "presently-app-new",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     splash: {
-      image: "../frontend/public/logo.png",
+      image: "./assets/logo.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
     },
@@ -25,7 +25,7 @@ export default ({ config }) => {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "../frontend/public/logo.png",
+        foregroundImage: "./assets/logo.png",
         backgroundColor: "#ffffff",
       },
       package: "com.presently.app",
@@ -37,7 +37,7 @@ export default ({ config }) => {
       ]
     },
     web: {
-      favicon: "../frontend/public/logo.png",
+      favicon: "./assets/logo.png",
     },
     plugins: [
       "expo-router",
