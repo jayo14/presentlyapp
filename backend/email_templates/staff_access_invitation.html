@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>You're Invited to Presently</title>
+
+    <style>
+      body, table, td, p, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse; }
+    </style>
+  </head>
+
+  <body style="margin:0;padding:0;background-color:#0A0A0C;font-family:'Plus Jakarta Sans','Outfit',Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 16px;background:#0A0A0C;">
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            style="max-width:600px;width:100%;background:#1b1b1d;border-radius:20px;border:1px solid rgba(255,202,13,0.14);overflow:hidden;"
+          >
+            <!-- GOLD TOP LINE -->
+            <tr>
+              <td>
+                <table width="100%">
+                  <tr>
+                    <td width="33%" style="height:2px;background:#1b1b1d;"></td>
+                    <td width="34%" style="height:2px;background:#FFCA0D;"></td>
+                    <td width="33%" style="height:2px;background:#1b1b1d;"></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- HEADER -->
+            <tr>
+              <td style="background:#131315;padding:22px 40px;border-bottom:1px solid rgba(255,202,13,0.12);">
+                <table width="100%">
+                  <tr>
+                    <td>
+                      <img src="https://www.getpresently.com.ng/logo.png" width="22" />
+                      <span style="font-size:16px;font-weight:800;color:#B8962E;margin-left:6px;">Presently</span>
+                    </td>
+                    <td align="right">
+                      <span
+                        style="font-size:10px;font-weight:700;color:#FFCA0D;border:1px solid rgba(255,202,13,0.2);padding:6px 12px;border-radius:100px;"
+                      >
+                        ✦ Staff Invite
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- HERO -->
+            <tr>
+              <td style="background:#18160F;padding:50px 40px;">
+                <p style="font-size:28px;font-weight:900;color:#F5F0E8;margin:0;">
+                  You've been invited,<br />
+                  <span style="color:#FFCA0D;">{{first_name}}</span>
+                </p>
+
+                <p style="margin-top:12px;color:#9A8F7A;font-size:15px;line-height:1.7;">
+                  You’ve been granted access to the Presently staff dashboard. Activate your account to start managing
+                  attendance, venues, and system operations.
+                </p>
+              </td>
+            </tr>
+
+            <!-- DIVIDER -->
+            <tr>
+              <td>
+                <table width="100%">
+                  <tr>
+                    <td width="20%" style="height:1px;background:#1b1b1d;"></td>
+                    <td width="60%" style="height:1px;background:rgba(255,202,13,0.2);"></td>
+                    <td width="20%" style="height:1px;background:#1b1b1d;"></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- DETAILS -->
+            <tr>
+              <td style="padding:40px;background:#1b1b1d;">
+                <!-- ROLE -->
+                <p style="font-size:11px;color:#FFCA0D;letter-spacing:1.5px;">ROLE</p>
+                <p style="color:#F5F0E8;font-weight:700;margin-top:4px;">{{role_name}}</p>
+
+                <!-- PERMISSIONS -->
+                <!-- <p style="font-size:11px;color:#FFCA0D;letter-spacing:1.5px;margin-top:20px;">PERMISSIONS</p>
+                <p style="color:#9A8F7A;font-size:13px;line-height:1.6;">{{permissions}}</p> -->
+
+                <!-- EXPIRY -->
+                <p style="font-size:11px;color:#FFCA0D;letter-spacing:1.5px;margin-top:20px;">EXPIRY</p>
+                <p style="color:#FF6B6B;font-size:13px;">{{expires_in_hours}}</p>
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            <tr>
+              <td align="center" style="padding:30px;background:#1b1b1d;">
+                <table>
+                  <tr>
+                    <td style="background:#FFCA0D;border-radius:12px;">
+                      <a
+                        href="{{invite_url}}"
+                        style="display:inline-block;padding:16px 36px;font-weight:800;color:#241a00;text-decoration:none;"
+                      >
+                        Accept Invitation →
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p style="font-size:11px;color:#5C5448;margin-top:14px;">If the button doesn't work, use this link:</p>
+
+                <p style="font-size:10px;color:#FFCA0D;word-break:break-all;">{{invitation_url}}</p>
+              </td>
+            </tr>
+
+            <!-- SECURITY -->
+            <tr>
+              <td style="padding:24px 40px;background:#1b1b1d;border-top:1px solid rgba(255,255,255,0.06);">
+                <p style="font-size:12px;color:#9A8F7A;line-height:1.7;">
+                  If you did not expect this invitation, you can safely ignore this email. Your account will not be
+                  created without your action.
+                </p>
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td
+                style="background:#131315;padding:30px 40px;text-align:center;border-top:1px solid rgba(255,202,13,0.12);"
+              >
+                <img src="https://www.getpresently.com.ng/logo.png" width="20" />
+                <p style="font-size:13px;color:#B8962E;font-weight:700;margin-top:6px;">Presently</p>
+
+                <p style="font-size:11px;color:#5C5448;margin-top:10px;">
+                  <a href="{{support_url}}" style="color:#5C5448;text-decoration:none;">Support</a> •
+                  <a href="{{privacy_url}}" style="color:#5C5448;text-decoration:none;">Privacy</a>
+                </p>
+
+                <p style="font-size:10px;color:#3D3A34;margin-top:10px;">© {{year}} Presently. All rights reserved.</p>
+              </td>
+            </tr>
+
+            <!-- GOLD BOTTOM LINE -->
+            <tr>
+              <td>
+                <table width="100%">
+                  <tr>
+                    <td width="33%" style="height:2px;background:#1b1b1d;"></td>
+                    <td width="34%" style="height:2px;background:#FFCA0D;"></td>
+                    <td width="33%" style="height:2px;background:#1b1b1d;"></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

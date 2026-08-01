@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <title>Session Live | Presently</title>
+  <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+  <style type="text/css">
+    body, table, td, p, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+    table, td { mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse; }
+    img { -ms-interpolation-mode:bicubic; border:0; outline:none; text-decoration:none; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Outfit:wght@400;500;600&display=swap');
+  </style>
+</head>
+
+<!--
+  PRESENTLY — ATTENDANCE SESSION LIVE
+  Resend variables:
+    {{first_name}}         — Recipient first name
+    {{course_code}}        — e.g. "CS101"
+    {{course_name}}        — e.g. "Intro to Computer Science"
+    {{lecturer_name}}      — e.g. "Dr. Elena Sterling"
+    {{room_location}}      — e.g. "Hall C · Level 4"
+    {{session_time}}       — e.g. "9:00AM – 10:30AM"
+    {{minutes_remaining}}  — e.g. "10"
+    {{closes_at}}          — e.g. "09:15 AM"
+    {{mark_url}}           — Mark attendance URL
+    {{support_url}}
+    {{privacy_url}}
+    {{institution_url}}
+    {{year}}
+-->
+
+<body style="margin:0;padding:0;background-color:#0A0A0C;font-family:'Plus Jakarta Sans','Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0A0A0C;padding:40px 16px;">
+  <tr><td align="center">
+
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#1b1b1d;border-radius:20px;overflow:hidden;border:1px solid rgba(255,202,13,0.14);">
+
+      <!-- TOP GOLD LINE -->
+      <tr><td style="padding:0;line-height:0;font-size:0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td width="33%" style="height:2px;background-color:#1b1b1d;line-height:2px;font-size:2px;">&nbsp;</td>
+          <td width="34%" style="height:2px;background-color:#FFCA0D;line-height:2px;font-size:2px;">&nbsp;</td>
+          <td width="33%" style="height:2px;background-color:#1b1b1d;line-height:2px;font-size:2px;">&nbsp;</td>
+        </tr></table>
+      </td></tr>
+
+      <!-- HEADER -->
+      <tr><td style="background-color:#131315;padding:22px 40px;border-bottom:1px solid rgba(255,202,13,0.12);">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="vertical-align:middle;">
+            <div style="display: flex; align-items: center; justify-content: start; gap: 2px">
+                <img src="https://www.getpresently.com.ng/logo.png" width="24" alt="logo" style='align-self: start' />
+                <p
+                  style="margin:0 0 18px 0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:16px;font-weight:800;color:#B8962E;letter-spacing:-0.3px;"
+                >
+                  Presently
+                </p>
+              </div>
+          </td>
+          <td align="right" style="vertical-align:middle;">
+            <span style="font-family:'Outfit',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#4ADE80;background-color:rgba(74,222,128,0.10);border:1px solid rgba(74,222,128,0.22);padding:5px 12px;border-radius:100px;white-space:nowrap;">&#9679; Live Session</span>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <!-- HERO -->
+      <tr><td style="background-color:#131315;padding:48px 40px 0 40px;">
+        <p style="margin:0 0 12px 0;font-family:'Outfit',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#FFCA0D;">&#9679; &nbsp;Action Required</p>
+        <p style="margin:0 0 14px 0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:40px;font-weight:900;line-height:1.06;letter-spacing:-1.5px;color:#F5F0E8;">
+          Session Live:<br /><span style="color:#FFCA0D;">{{course_code}}</span>
+        </p>
+        <p style="margin:0 0 40px 0;font-family:'Outfit',Arial,sans-serif;font-size:15px;font-weight:400;line-height:1.7;color:#9A8F7A;max-width:420px;">
+          {{lecturer_name}} has opened the attendance portal for the morning lecture. Mark your presence before the window closes.
+        </p>
+      </td></tr>
+
+      <!-- HERO BOTTOM RULE -->
+      <tr><td style="padding:0;line-height:0;font-size:0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td width="20%" style="height:1px;background-color:#131315;line-height:1px;font-size:1px;">&nbsp;</td>
+          <td width="60%" style="height:1px;background-color:rgba(255,202,13,0.22);line-height:1px;font-size:1px;">&nbsp;</td>
+          <td width="20%" style="height:1px;background-color:#131315;line-height:1px;font-size:1px;">&nbsp;</td>
+        </tr></table>
+      </td></tr>
+
+      <!-- SPLIT: COURSE INFO + COUNTDOWN -->
+      <tr><td style="padding:0;font-size:0;line-height:0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr valign="top">
+
+          <!-- Course info (left) -->
+          <td width="380" style="background-color:#242426;padding:32px;">
+            <p style="margin:0 0 20px 0;font-family:'Outfit',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5C5448;">Course Intelligence</p>
+            <p style="margin:0 0 4px 0;font-family:'Outfit',Arial,sans-serif;font-size:11px;font-weight:600;color:#5C5448;letter-spacing:0.5px;">Course Name</p>
+            <p style="margin:0 0 18px 0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:15px;font-weight:700;color:#F5F0E8;">{{course_name}}</p>
+            <p style="margin:0 0 4px 0;font-family:'Outfit',Arial,sans-serif;font-size:11px;font-weight:600;color:#5C5448;letter-spacing:0.5px;">Lecturer</p>
+            <p style="margin:0 0 18px 0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:15px;font-weight:700;color:#F5F0E8;">{{lecturer_name}}</p>
+            <p style="margin:0 0 4px 0;font-family:'Outfit',Arial,sans-serif;font-size:11px;font-weight:600;color:#5C5448;letter-spacing:0.5px;">Room</p>
+            <p style="margin:0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:15px;font-weight:700;color:#F5F0E8;">{{room_location}}</p>
+          </td>
+
+          <!-- Countdown (right) — gold block -->
+          <td style="background-color:#FFCA0D;padding:32px 24px;vertical-align:top;">
+            <p style="margin:0 0 8px 0;font-family:'Outfit',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(36,26,0,0.65);">Closes In</p>
+            <p style="margin:0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:64px;font-weight:900;letter-spacing:-3px;color:#241a00;line-height:1;">{{minutes_remaining}}</p>
+            <p style="margin:2px 0 0 0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(36,26,0,0.75);">Minutes</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px;">
+              <tr><td style="height:1px;background-color:rgba(0,0,0,0.15);line-height:1px;font-size:1px;">&nbsp;</td></tr>
+            </table>
+            <p style="margin:16px 0 0 0;font-family:'Outfit',Arial,sans-serif;font-size:11px;font-weight:700;color:rgba(36,26,0,0.7);line-height:1.55;">Portal closes at<br />{{closes_at}} sharp</p>
+          </td>
+
+        </tr></table>
+      </td></tr>
+
+      <!-- CTA -->
+      <tr><td style="background-color:#1b1b1d;padding:32px 40px 12px 40px;text-align:center;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr>
+          <td style="background-color:#FFCA0D;border-radius:12px;text-align:center;">
+            <a href="{{mark_url}}" target="_blank" style="display:inline-block;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:15px;font-weight:800;color:#241a00;text-decoration:none;padding:16px 36px;letter-spacing:-0.2px;border-radius:12px;white-space:nowrap;">Mark Attendance Now &nbsp;&rarr;</a>
+          </td>
+        </tr></table>
+        <p style="margin:14px 0 0 0;font-family:'Outfit',Arial,sans-serif;font-size:12px;font-weight:400;line-height:1.65;color:#5C5448;max-width:360px;margin-left:auto;margin-right:auto;">
+          You will be redirected to the Presently portal for GPS-location verification before your attendance is recorded.
+        </p>
+      </td></tr>
+
+      <!-- SPACER -->
+      <tr><td style="background-color:#1b1b1d;height:32px;line-height:32px;font-size:32px;">&nbsp;</td></tr>
+
+      <!-- FOOTER -->
+      <tr><td style="background-color:#131315;border-top:1px solid rgba(255,202,13,0.12);padding:32px 40px 36px 40px;text-align:center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 2px">
+                <img src="https://www.getpresently.com.ng/logo.png" width="24" alt="logo" style='align-self: start' />
+                <p
+                  style="margin:0 0 18px 0;font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:16px;font-weight:800;color:#B8962E;letter-spacing:-0.3px;"
+                >
+                  Presently
+                </p>
+              </div>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom:18px;"><tr>
+          <td style="padding:0 14px;border-right:1px solid #2C2A24;"><a href="{{support_url}}" style="font-family:'Outfit',Arial,sans-serif;font-size:12px;font-weight:500;color:#5C5448;text-decoration:none;letter-spacing:0.5px;">Support</a></td>
+          <td style="padding:0 14px;border-right:1px solid #2C2A24;"><a href="{{privacy_url}}" style="font-family:'Outfit',Arial,sans-serif;font-size:12px;font-weight:500;color:#5C5448;text-decoration:none;letter-spacing:0.5px;">Privacy Policy</a></td>
+          <td style="padding:0 14px;"><a href="{{institution_url}}" style="font-family:'Outfit',Arial,sans-serif;font-size:12px;font-weight:500;color:#5C5448;text-decoration:none;letter-spacing:0.5px;">Institution Details</a></td>
+        </tr></table>
+        <p style="margin:0;font-family:'Outfit',Arial,sans-serif;font-size:11px;font-weight:400;color:#3D3A34;line-height:1.7;">&copy; {{year}} Presently. All rights reserved.<br />This is an automated transactional email.</p>
+      </td></tr>
+
+      <!-- BOTTOM GOLD LINE -->
+      <tr><td style="padding:0;line-height:0;font-size:0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td width="33%" style="height:2px;background-color:#1b1b1d;line-height:2px;font-size:2px;">&nbsp;</td>
+          <td width="34%" style="height:2px;background-color:#FFCA0D;line-height:2px;font-size:2px;">&nbsp;</td>
+          <td width="33%" style="height:2px;background-color:#1b1b1d;line-height:2px;font-size:2px;">&nbsp;</td>
+        </tr></table>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
