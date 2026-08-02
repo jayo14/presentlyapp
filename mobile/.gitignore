@@ -11,3 +11,6 @@ expo-env.d.ts
 .env.production.local
 .env.development.local
 .env.test.local.expo/
+
+# Package manager - use bun (bun.lock is the source of truth)
+package-lock.json
