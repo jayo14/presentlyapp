@@ -27,7 +27,7 @@ export default function AttendanceRecordsScreen() {
     if (typeof id !== 'string') return;
     
     const sessions = await storage.getSessions();
-    const foundSession = sessions.find(s => (s.uuid || s.id) === id);
+    const foundSession = sessions.find(s => s.id === id);
     setSession(foundSession || null);
 
     // Simulated data matching Screen 2

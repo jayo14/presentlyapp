@@ -30,7 +30,7 @@ export default function UserManagement() {
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
 
-  const users = ((usersData as any)?.results || usersData || []) as any[];
+  const users = (usersData as any[]) || [];
 
   const filteredUsers = useMemo(() => {
     return users.filter(user => {

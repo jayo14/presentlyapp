@@ -208,12 +208,6 @@ class FailoverEmailBackend(BaseEmailBackend):
     def _providers(self) -> list[tuple[str, Callable[[list[Any]], int]]]:
         providers: list[tuple[str, Callable[[list[Any]], int]]] = []
 
-        gmail_api_refresh = getattr(settings, "GMAIL_API_REFRESH_TOKEN", None)
-        gmail_client_id = getattr(settings, "GOOGLE_CLIENT_ID", None)
-        gmail_client_secret = getattr(settings, "GOOGLE_CLIENT_SECRET", None)
-        if gmail_api_refresh and gmail_client_id and gmail_client_secret:
-            providers.append(("Gmail API", lambda messages: self._send_messages_via_gmail_api(messages)))
-
         gmail_user = getattr(settings, "GMAIL_SMTP_USER", None)
         gmail_pass = getattr(settings, "GMAIL_APP_PASSWORD", None)
         if gmail_user and gmail_pass:
@@ -424,17 +418,6 @@ class FailoverEmailBackend(BaseEmailBackend):
 
         return sent_count
 
-    def _send_messages_via_gmail_api(self, email_messages: list[Any]) -> int:
-        if not email_messages:
-            return 0
-        try:
-            from presently.email_backend import GmailApiEmailBackend
-            backend = GmailApiEmailBackend()
-            return backend.send_messages(email_messages)
-        except Exception as exc:
-            logger.error("Gmail API send failed: %s", exc, exc_info=True)
-            raise
-
 
 def send_templated_email_with_failover(
     *,
@@ -454,21 +437,6 @@ def send_templated_email_with_failover(
     email_subject = subject or f"Presently: {template_key.replace('_', ' ').title()}"
 
     providers: list[tuple[str, Callable[[], dict[str, Any]]]] = []
-
-    gmail_api_refresh = getattr(settings, "GMAIL_API_REFRESH_TOKEN", None)
-    gmail_client_id = getattr(settings, "GOOGLE_CLIENT_ID", None)
-    gmail_client_secret = getattr(settings, "GOOGLE_CLIENT_SECRET", None)
-    if gmail_api_refresh and gmail_client_id and gmail_client_secret:
-        providers.append(("Gmail API", lambda: _send_template_via_gmail_api(
-            refresh_token=gmail_api_refresh,
-            client_id=gmail_client_id,
-            client_secret=gmail_client_secret,
-            to=recipients,
-            template_key=template_key,
-            variables=variables,
-            subject=email_subject,
-            from_email=from_address,
-        )))
 
     gmail_user = getattr(settings, "GMAIL_SMTP_USER", None)
     gmail_pass = getattr(settings, "GMAIL_APP_PASSWORD", None)
@@ -692,47 +660,6 @@ def _send_template_via_mailtrap(
         raise
 
     return response if isinstance(response, dict) else {"result": str(response)}
-
-
-def _send_template_via_gmail_api(
-    *,
-    refresh_token: str,
-    client_id: str,
-    client_secret: str,
-    to: list[str],
-    template_key: str,
-    variables: dict[str, Any],
-    subject: str,
-    from_email: str,
-) -> dict[str, Any]:
-    try:
-        from google.oauth2.credentials import Credentials
-        from googleapiclient.discovery import build
-        import base64
-
-        message = _smtp_message_for_template(
-            from_email=from_email,
-            to_emails=to,
-            subject=subject,
-            template_key=template_key,
-            variables=variables,
-        )
-
-        credentials = Credentials(
-            None,
-            refresh_token=refresh_token,
-            token_uri="https://oauth2.googleapis.com/token",
-            client_id=client_id,
-            client_secret=client_secret,
-        )
-        service = build("gmail", "v1", credentials=credentials)
-        raw_msg = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        service.users().messages().send(userId="me", body={"raw": raw_msg}).execute()
-        return {"provider": "Gmail API", "sent_count": len(to)}
-    except Exception as exc:
-        if _is_quota_error(exc):
-            raise QuotaExhaustedError(str(exc)) from exc
-        raise
 
 
 def _send_template_via_smtp(

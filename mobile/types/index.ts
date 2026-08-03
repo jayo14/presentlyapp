@@ -59,7 +59,6 @@ export interface LecturerCourse {
 
 export interface Session {
   id: string;
-  uuid?: string;
   courseId: string;
   courseCode: string;
   courseName: string;

@@ -197,7 +197,7 @@ export default function LecturerDashboard() {
       setIsCreatingSession(false);
       resetCreationFlow();
       refetchUpcoming();
-      router.push(`/(lecturer)/session/${response.uuid || response.id}`);
+      router.push(`/(lecturer)/session/${response.id}`);
     } catch (error) {
       Alert.alert('Error', 'Failed to create session');
       console.error(error);
@@ -657,7 +657,7 @@ export default function LecturerDashboard() {
                             </View>
                             <TouchableOpacity
                                 style={[styles.startSessionBtn, { backgroundColor: colors.primary }]}
-                                onPress={() => router.push(`/(lecturer)/session/${nextSession.uuid || nextSession.id}`)}
+                                onPress={() => router.push(`/(lecturer)/session/${nextSession.id}`)}
                             >
                                 <Text style={styles.startSessionText}>Start Session</Text>
                             </TouchableOpacity>

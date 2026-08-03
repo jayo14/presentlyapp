@@ -112,7 +112,7 @@ export default function LecturerSessionsScreen() {
       setIsCreating(false);
       setCreationStep(1);
       loadData();
-      router.push(`/(lecturer)/session/${response.uuid || response.id}`);
+      router.push(`/(lecturer)/session/${response.id}`);
     } catch (error) {
       Alert.alert('Error', 'Failed to create session');
       console.error(error);
@@ -525,7 +525,7 @@ export default function LecturerSessionsScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[styles.card, { backgroundColor: isDark ? '#2d281a' : '#FFFFFF', borderColor: colors.border }]}
-            onPress={() => router.push(`/(lecturer)/session/${item.uuid || item.id}`)}
+            onPress={() => router.push(`/(lecturer)/session/${item.id}`)}
           >
             <View style={styles.cardHeader}>
                 <View style={styles.cardIcon}>
