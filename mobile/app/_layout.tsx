@@ -68,6 +68,21 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (pathname === "/auth/verify-email") {
+      if (!user.onboardingCompleted) {
+        router.replace("/onboarding/role-selection");
+      } else {
+        const roleRoot =
+          user.role === "admin"
+            ? "/(admin)"
+            : user.role === "lecturer"
+              ? "/(lecturer)"
+              : "/(student)";
+        router.replace(roleRoot as any);
+      }
+      return;
+    }
+
     if (!user.onboardingCompleted) {
       if (inPreOnboarding) {
         router.replace("/onboarding/role-selection");

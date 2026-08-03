@@ -43,7 +43,7 @@ const mapApiUser = (data: any, fallbackEmail: string): User => {
     fullName: (userData?.full_name ?? userData?.fullName ?? userData?.name ?? fullNameFromParts) || 'User',
     email: userData?.email ?? fallbackEmail,
     role: normalizeRole(userData?.role ?? userData?.user_type),
-    emailVerified: userData?.is_verified ?? userData?.emailVerified ?? false,
+    emailVerified: userData?.is_verified ?? userData?.emailVerified ?? userData?.email_verified ?? false,
     onboardingCompleted: userData?.onboarding_completed ?? userData?.onboardingCompleted ?? false,
     matricNumber: userData?.matric_number ?? userData?.matricNumber ?? '',
     department: userData?.department ?? '',
