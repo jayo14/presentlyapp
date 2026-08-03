@@ -27,9 +27,7 @@ def check_session_validity(session):
     Checks if a session is valid based on student participation.
     Rule: A session is marked invalid if less than 10% of enrolled students attended.
     """
-    total_enrolled = session.course.enrolled_students_count  # Assuming helper property/count exists or used via query
-    from .models import CourseEnrollment
-    total_enrolled = CourseEnrollment.objects.filter(course=session.course, is_active=True).count()
+    total_enrolled = session.course.get_enrolled_students_count()
     
     total_marked = session.attendances.count()
     

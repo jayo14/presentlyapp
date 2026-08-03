@@ -572,6 +572,7 @@ class AttendanceSession(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sessions')
     venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=True, related_name='sessions')
     session_code = models.CharField(max_length=50, unique=True)  # QR code identifier
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     is_active = models.BooleanField(default=True)

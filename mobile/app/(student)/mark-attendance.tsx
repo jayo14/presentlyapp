@@ -135,7 +135,7 @@ export default function MarkAttendanceScreen() {
       } catch { /* let server handle it */ }
 
       const config: SessionConfig = {
-        sessionId: info.id || info.session_id,
+        sessionId: info.uuid || info.id || info.session_id,
         sessionCode: normalizedCode,
         lecturerCoordinates: {
           lat: info.lecturer_latitude || info.latitude,

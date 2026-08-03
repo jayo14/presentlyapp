@@ -1851,6 +1851,22 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         if self.action in ['end', 'manual_mark']:
             return [RequireRBACPermission('attendance.modify', allow_lecturer=True)]
         return [IsAuthenticated()]
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        pk = self.kwargs.get(lookup_url_kwarg)
+        if pk is not None:
+            try:
+                uuid.UUID(pk)
+                obj = queryset.filter(uuid=pk).first()
+                if obj:
+                    self.check_object_permissions(self.request, obj)
+                    return obj
+            except (ValueError, AttributeError):
+                pass
+        return super().get_object()
+
     def perform_create(self, serializer):
         """Create session and notify enrolled students"""
         session = serializer.save()

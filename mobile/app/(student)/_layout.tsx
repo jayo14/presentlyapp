@@ -16,9 +16,8 @@ export default function StudentLayout() {
     return <Redirect href={destination} />;
   }
 
-  // Calculate bottom position accounting for Android navigation bar
-  const bottomPosition = Platform.OS === 'ios' ? 24 : Math.max(16, insets.bottom);
-  const dockRadius = 36;
+  const bottomPosition = Platform.OS === 'ios' ? 20 : Math.max(12, insets.bottom);
+  const dockRadius = 28;
 
   return (
     <Tabs
@@ -26,53 +25,48 @@ export default function StudentLayout() {
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: isDark ? '#ccbf8e' : '#94A3B8',
-        tabBarActiveBackgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.82)',
+        tabBarInactiveTintColor: isDark ? '#9e9474' : '#94A3B8',
         tabBarStyle: {
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(24, 21, 14, 0.66)' : 'rgba(255, 255, 255, 0.66)'),
+          backgroundColor: 'transparent',
           borderTopWidth: 0,
-          height: Platform.OS === 'ios' ? 98 : 84,
-          paddingBottom: Platform.OS === 'ios' ? 32 : 14,
+          height: Platform.OS === 'ios' ? 88 : 76,
+          paddingBottom: Platform.OS === 'ios' ? 26 : 12,
           paddingTop: 8,
           position: 'absolute',
           bottom: bottomPosition,
-          left: 14,
-          right: 14,
-          paddingHorizontal: 6,
+          left: 12,
+          right: 12,
+          paddingHorizontal: 8,
           borderRadius: dockRadius,
-          elevation: 14,
+          elevation: 6,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.22,
-          shadowRadius: 20,
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.12,
+          shadowRadius: 14,
           borderWidth: 1,
-          borderColor: isDark ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.78)',
+          borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
           overflow: 'hidden',
         },
         tabBarBackground: () => (
           <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: dockRadius, overflow: 'hidden' }}>
-            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFillObject} />
-            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: isDark ? 'rgba(34, 30, 20, 0.32)' : 'rgba(255,255,255,0.35)' }]} />
-            <View style={[styles.glassHighlight, { backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.72)' }]} />
-            <View style={[styles.glassDepth, { backgroundColor: isDark ? 'rgba(8, 8, 8, 0.22)' : 'rgba(148, 163, 184, 0.12)' }]} />
+            <BlurView intensity={85} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFillObject} />
+            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: isDark ? 'rgba(35, 30, 15, 0.78)' : 'rgba(255,255,255,0.82)' }]} />
           </View>
         ),
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontFamily: 'Lexend_700Bold',
-          marginTop: 1,
-          marginBottom: 1,
-          letterSpacing: 0.2,
+          fontSize: 9,
+          fontFamily: 'Lexend_500Medium',
+          marginTop: 2,
+          marginBottom: 2,
+          letterSpacing: 0.3,
         },
         tabBarIconStyle: {
           marginTop: 2,
         },
         tabBarItemStyle: {
-          borderRadius: 20,
-          marginHorizontal: 4,
-          marginTop: 3,
-          marginBottom: 2,
-          paddingVertical: 2,
+          borderRadius: 16,
+          marginHorizontal: 2,
+          paddingVertical: 4,
         },
       }}
     >
@@ -80,14 +74,14 @@ export default function StudentLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <Home size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen
         name="courses"
         options={{
           title: 'Courses',
-          tabBarIcon: ({ color, size }) => <BookOpen size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen
@@ -100,10 +94,11 @@ export default function StudentLayout() {
               styles.fabContainer,
               {
                 backgroundColor: colors.primary,
-                borderColor: isDark ? colors.background : '#FFFFFF'
+                borderColor: isDark ? '#231e0f' : '#FFFFFF',
+                shadowColor: colors.primary,
               }
             ]}>
-              <QrCode size={28} color="#231e0f" strokeWidth={2.5} />
+              <QrCode size={24} color="#231e0f" strokeWidth={2.5} />
             </View>
           ),
         }}
@@ -112,14 +107,14 @@ export default function StudentLayout() {
         name="analytics"
         options={{
           title: 'Analytics',
-          tabBarIcon: ({ color, size }) => <BarChart3 size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <BarChart3 size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => <User size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen name="dashboard" options={{ href: null }} />
@@ -144,31 +139,17 @@ export default function StudentLayout() {
 
 const styles = StyleSheet.create({
   fabContainer: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    borderWidth: 3.5,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 2.5,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -40,
+    marginTop: -28,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.24,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  glassHighlight: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '48%',
-  },
-  glassDepth: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '46%',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    elevation: 10,
   },
 });

@@ -11,7 +11,6 @@ export default function LecturerLayout() {
   const { user, isLoading } = useAuth();
   const insets = useSafeAreaInsets();
 
-  // Show loading state while checking auth
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#231e0f' : '#FFFFFF' }}>
@@ -20,20 +19,17 @@ export default function LecturerLayout() {
     );
   }
 
-  // Redirect to sign-in if not authenticated
   if (!user) {
     return <Redirect href="/auth/sign-in" />;
   }
 
-  // Redirect if not a lecturer
   if (user.role !== 'lecturer') {
     const destination = user.role === 'admin' ? '/(admin)' : '/(student)';
     return <Redirect href={destination} />;
   }
 
-  // Calculate bottom position accounting for Android navigation bar
-  const bottomPosition = Platform.OS === 'ios' ? 24 : Math.max(16, insets.bottom);
-  const dockRadius = 36;
+  const bottomPosition = Platform.OS === 'ios' ? 20 : Math.max(12, insets.bottom);
+  const dockRadius = 28;
 
   return (
     <Tabs
@@ -41,53 +37,48 @@ export default function LecturerLayout() {
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: isDark ? '#ccbf8e' : '#94A3B8',
-        tabBarActiveBackgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.82)',
+        tabBarInactiveTintColor: isDark ? '#9e9474' : '#94A3B8',
         tabBarStyle: {
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : (isDark ? 'rgba(24, 21, 14, 0.66)' : 'rgba(255, 255, 255, 0.66)'),
+          backgroundColor: 'transparent',
           borderTopWidth: 0,
-          height: Platform.OS === 'ios' ? 98 : 84,
-          paddingBottom: Platform.OS === 'ios' ? 32 : 14,
+          height: Platform.OS === 'ios' ? 88 : 76,
+          paddingBottom: Platform.OS === 'ios' ? 26 : 12,
           paddingTop: 8,
           position: 'absolute',
           bottom: bottomPosition,
-          left: 14,
-          right: 14,
-          paddingHorizontal: 6,
+          left: 12,
+          right: 12,
+          paddingHorizontal: 8,
           borderRadius: dockRadius,
-          elevation: 14,
+          elevation: 6,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.22,
-          shadowRadius: 20,
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.12,
+          shadowRadius: 14,
           borderWidth: 1,
-          borderColor: isDark ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.78)',
+          borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
           overflow: 'hidden',
         },
         tabBarBackground: () => (
           <View style={{ ...StyleSheet.absoluteFillObject, borderRadius: dockRadius, overflow: 'hidden' }}>
-            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFillObject} />
-            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: isDark ? 'rgba(34, 30, 20, 0.32)' : 'rgba(255,255,255,0.35)' }]} />
-            <View style={[styles.glassHighlight, { backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.72)' }]} />
-            <View style={[styles.glassDepth, { backgroundColor: isDark ? 'rgba(8, 8, 8, 0.22)' : 'rgba(148, 163, 184, 0.12)' }]} />
+            <BlurView intensity={85} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFillObject} />
+            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: isDark ? 'rgba(35, 30, 15, 0.78)' : 'rgba(255,255,255,0.82)' }]} />
           </View>
         ),
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontFamily: 'Lexend_700Bold',
-          marginTop: 1,
-          marginBottom: 1,
-          letterSpacing: 0.2,
+          fontSize: 9,
+          fontFamily: 'Lexend_500Medium',
+          marginTop: 2,
+          marginBottom: 2,
+          letterSpacing: 0.3,
         },
         tabBarIconStyle: {
           marginTop: 2,
         },
         tabBarItemStyle: {
-          borderRadius: 20,
-          marginHorizontal: 4,
-          marginTop: 3,
-          marginBottom: 2,
-          paddingVertical: 2,
+          borderRadius: 16,
+          marginHorizontal: 2,
+          paddingVertical: 4,
         },
       }}
     >
@@ -95,35 +86,35 @@ export default function LecturerLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Home size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen
         name="sessions"
         options={{
           title: 'Sessions',
-          tabBarIcon: ({ color }) => <Calendar size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen
         name="courses"
         options={{
           title: 'Courses',
-          tabBarIcon: ({ color }) => <BookOpen size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen
         name="analytics"
         options={{
           title: 'Records',
-          tabBarIcon: ({ color }) => <BarChart3 size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <BarChart3 size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <User size={22} color={color} strokeWidth={2} />,
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} strokeWidth={2.2} />,
         }}
       />
       <Tabs.Screen name="dashboard" options={{ href: null }} />
@@ -140,20 +131,3 @@ export default function LecturerLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  glassHighlight: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '48%',
-  },
-  glassDepth: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '46%',
-  },
-});
