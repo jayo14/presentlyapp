@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,110 +36,105 @@ export default function RoleSelectionScreen() {
       <View style={[styles.glowTop, { backgroundColor: colors.primary + '1A' }]} />
       <View style={[styles.glowBottom, { backgroundColor: colors.primary + '0D' }]} />
 
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <View style={styles.progressHeader}>
-            <Text style={[styles.stepText, { color: colors.primary }]}>Step 1 of 4</Text>
-            <Text style={[styles.percentageText, { color: colors.textSecondary }]}>25%</Text>
-          </View>
-          <View style={styles.progressBarContainer}>
-            <View style={[styles.progressBar, { backgroundColor: colors.primary, width: '25%' }]} />
-            <View style={[styles.progressBarBackground, { backgroundColor: colors.primary + '33' }]} />
-          </View>
-        </View>
-
-        <View style={styles.titleSection}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            How will you use <Text style={{ color: colors.primary }}>Presently?</Text>
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Choose the role that best describes you to personalize your experience.
-          </Text>
-        </View>
-
-        <View style={styles.rolesContainer}>
-          <TouchableOpacity
-            style={[
-              styles.roleCard,
-              {
-                backgroundColor: selectedRole === 'student' ? colors.primary + '1A' : (isDark ? 'rgba(255,255,255,0.05)' : colors.cardBg),
-                borderColor: selectedRole === 'student' ? colors.primary : 'transparent',
-                borderWidth: 2,
-              },
-              selectedRole === 'student' && styles.roleCardActive
-            ]}
-            onPress={() => setSelectedRole('student')}
-            activeOpacity={0.9}
-            accessible={true}
-            accessibilityLabel="Student Role"
-            accessibilityRole="radio"
-            accessibilityState={{ selected: selectedRole === 'student' }}
-          >
-            <View style={styles.cardHeader}>
-              <View style={[styles.iconContainer, { backgroundColor: colors.primary }]}>
-                <GraduationCap size={32} color={isDark ? '#231f0f' : '#FFFFFF'} strokeWidth={2.5} />
-              </View>
-              {selectedRole === 'student' && (
-                <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
-                  <Check size={14} color={isDark ? '#231f0f' : '#FFFFFF'} strokeWidth={4} />
-                </View>
-              )}
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <View style={styles.progressHeader}>
+              <Text style={[styles.stepText, { color: colors.primary }]}>Step 1 of 4</Text>
+              <Text style={[styles.percentageText, { color: colors.textSecondary }]}>25%</Text>
             </View>
-            <Text style={[styles.roleTitle, { color: colors.text }]}>Student</Text>
-            <Text style={[styles.roleDescription, { color: colors.textSecondary }]}>
-              Track your attendance, view course materials, and stay updated with campus events.
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.roleCard,
-              {
-                backgroundColor: selectedRole === 'lecturer' ? colors.primary + '1A' : (isDark ? 'rgba(255,255,255,0.05)' : colors.cardBg),
-                borderColor: selectedRole === 'lecturer' ? colors.primary : 'transparent',
-                borderWidth: 2,
-              },
-              selectedRole === 'lecturer' && styles.roleCardActive
-            ]}
-            onPress={() => setSelectedRole('lecturer')}
-            activeOpacity={0.9}
-            accessible={true}
-            accessibilityLabel="Lecturer Role"
-            accessibilityRole="radio"
-            accessibilityState={{ selected: selectedRole === 'lecturer' }}
-          >
-            <View style={styles.cardHeader}>
-              <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]}>
-                <Users size={32} color={colors.primary} strokeWidth={2.5} />
-              </View>
-              {selectedRole === 'lecturer' && (
-                <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
-                  <Check size={14} color={isDark ? '#231f0f' : '#FFFFFF'} strokeWidth={4} />
-                </View>
-              )}
+            <View style={styles.progressBarContainer}>
+              <View style={[styles.progressBar, { backgroundColor: colors.primary, width: '25%' }]} />
+              <View style={[styles.progressBarBackground, { backgroundColor: colors.primary + '33' }]} />
             </View>
-            <Text style={[styles.roleTitle, { color: colors.text }]}>Lecturer</Text>
-            <Text style={[styles.roleDescription, { color: colors.textSecondary }]}>
-              Manage your classes, monitor student engagement, and generate attendance reports easily.
-            </Text>
-          </TouchableOpacity>
-        </View>
+          </View>
 
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={[styles.continueButton, { backgroundColor: colors.primary }]}
-            onPress={handleContinue}
-            activeOpacity={0.8}
-            disabled={loading}
-          >
-            <Text style={[styles.continueButtonText, { color: '#231f10' }]}>Continue</Text>
-            <ArrowRight size={20} color="#231f10" strokeWidth={3} />
-          </TouchableOpacity>
-          <Text style={[styles.footerHint, { color: colors.textSecondary }]}>
-            YOU CAN CHANGE THIS LATER IN SETTINGS
-          </Text>
+          <View style={styles.titleSection}>
+            <Text style={[styles.title, { color: colors.text }]}>
+              How will you use <Text style={{ color: colors.primary }}>Presently?</Text>
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              Choose the role that best describes you to personalize your experience.
+            </Text>
+          </View>
+
+          <View style={styles.rolesContainer}>
+            <TouchableOpacity
+              style={[
+                styles.roleCard,
+                {
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.cardBg,
+                  borderColor: selectedRole === 'student' ? colors.primary : isDark ? 'rgba(255,255,255,0.08)' : colors.border,
+                },
+              ]}
+              onPress={() => setSelectedRole('student')}
+              activeOpacity={1}
+              accessible={true}
+              accessibilityLabel="Student Role"
+              accessibilityRole="radio"
+              accessibilityState={{ selected: selectedRole === 'student' }}
+            >
+              <View style={styles.cardHeader}>
+                <View style={[styles.iconContainer, { backgroundColor: colors.primary }]}>
+                  <GraduationCap size={32} color={isDark ? '#231f0f' : '#FFFFFF'} strokeWidth={2.5} />
+                </View>
+                {selectedRole === 'student' && (
+                  <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
+                    <Check size={14} color={isDark ? '#231f0f' : '#FFFFFF'} strokeWidth={4} />
+                  </View>
+                )}
+              </View>
+              <Text style={[styles.roleTitle, { color: colors.text }]}>Student</Text>
+              <Text style={[styles.roleDescription, { color: colors.textSecondary }]}>
+                Track your attendance, view course materials, and stay updated with campus events.
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.roleCard,
+                {
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.cardBg,
+                  borderColor: selectedRole === 'lecturer' ? colors.primary : isDark ? 'rgba(255,255,255,0.08)' : colors.border,
+                },
+              ]}
+              onPress={() => setSelectedRole('lecturer')}
+              activeOpacity={1}
+              accessible={true}
+              accessibilityLabel="Lecturer Role"
+              accessibilityRole="radio"
+              accessibilityState={{ selected: selectedRole === 'lecturer' }}
+            >
+              <View style={styles.cardHeader}>
+                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#F1F5F9' }]}>
+                  <Users size={32} color={colors.primary} strokeWidth={2.5} />
+                </View>
+                {selectedRole === 'lecturer' && (
+                  <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
+                    <Check size={14} color={isDark ? '#231f0f' : '#FFFFFF'} strokeWidth={4} />
+                  </View>
+                )}
+              </View>
+              <Text style={[styles.roleTitle, { color: colors.text }]}>Lecturer</Text>
+              <Text style={[styles.roleDescription, { color: colors.textSecondary }]}>
+                Manage your classes, monitor student engagement, and generate attendance reports easily.
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={[styles.continueButton, { backgroundColor: colors.primary }]}
+              onPress={handleContinue}
+              activeOpacity={0.8}
+              disabled={loading}
+            >
+              <Text style={[styles.continueButtonText, { color: '#231f10' }]}>Continue</Text>
+              <ArrowRight size={20} color="#231f10" strokeWidth={3} />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -165,8 +160,12 @@ const styles = StyleSheet.create({
     borderRadius: 160,
   },
   content: {
-    flex: 1,
     paddingHorizontal: 28,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 28,
+    paddingBottom: 24,
   },
   header: {
     paddingTop: 16,
@@ -225,22 +224,17 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   rolesContainer: {
-    flex: 1,
     gap: 20,
   },
   roleCard: {
     padding: 24,
     borderRadius: 24,
+    borderWidth: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 2,
-  },
-  roleCardActive: {
-    shadowColor: '#f9c815',
-    shadowOpacity: 0.12,
-    shadowRadius: 25,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -277,7 +271,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   footer: {
-    marginTop: 64,
+    marginTop: 32,
     paddingBottom: 32,
     alignItems: 'center',
   },
@@ -298,12 +292,5 @@ const styles = StyleSheet.create({
   continueButtonText: {
     fontSize: 18,
     fontFamily: Fonts.lexend.bold,
-  },
-  footerHint: {
-    marginTop: 32,
-    fontSize: 10,
-    fontFamily: Fonts.lexend.bold,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
   },
 });
