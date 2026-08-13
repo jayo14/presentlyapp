@@ -6,7 +6,7 @@ services:
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: ./entrypoint.sh gunicorn presently.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --worker-class gthread --timeout 30 --graceful-timeout 20 --max-requests 1000 --max-requests-jitter 200 --worker-tmp-dir /dev/shm --keep-alive 5
-    healthCheckPath: /admin/login/
+    healthCheckPath: /django-admin/login/
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
@@ -27,6 +27,8 @@ services:
         value: "*"
       - key: CORS_ALLOW_ALL_ORIGINS
         value: "False"
+      - key: ADMIN_URL
+        value: "django-admin/"
 
   - type: worker
     name: presently-backend-worker

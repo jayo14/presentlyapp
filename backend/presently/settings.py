@@ -16,8 +16,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$zkoz6=hl_t6%s8(yh7f@ve4lobpx!qe5l3-##y%jh(fpdq07^')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Default to True for development, False for production
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# Default to False for production, True only if explicitly set for development
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# Admin URL security - use a non-default, unguessable path
+ADMIN_URL = os.environ.get('ADMIN_URL', 'django-admin/')
+
+# CSRF Settings
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = True
+
+# Session cookie security
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# HSTS Settings
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 def _csv_env(*names, default='*'):
@@ -455,6 +476,15 @@ VENUE_MAX_BOUNDARY_POINTS_DEFAULT = int(os.environ.get('VENUE_MAX_BOUNDARY_POINT
 VENUE_MAX_PAYLOAD_CHARS_DEFAULT = int(os.environ.get('VENUE_MAX_PAYLOAD_CHARS_DEFAULT', '50000'))
 
 # Django Unfold Admin Configuration
+
+def _admin_link(path=''):
+    base = ADMIN_URL.rstrip('/')
+    path = path.lstrip('/')
+    if path:
+        return f"{base}/{path}/"
+    return f"{base}/"
+
+
 UNFOLD = {
     "SITE_TITLE": "Presently Admin",
     "SITE_HEADER": "Presently Administration",
@@ -506,7 +536,7 @@ UNFOLD = {
                     {
                         "title": "Dashboard",
                         "icon": "dashboard",
-                        "link": lambda request: "/admin/",
+                        "link": lambda request: _admin_link(),
                     },
                 ],
             },
@@ -517,22 +547,22 @@ UNFOLD = {
                     {
                         "title": "Institutions",
                         "icon": "school",
-                        "link": lambda request: "/admin/institutions/institution/",
+                        "link": lambda request: _admin_link("institutions/institution/"),
                     },
                     {
                         "title": "Colleges",
                         "icon": "domain",
-                        "link": lambda request: "/admin/institutions/college/",
+                        "link": lambda request: _admin_link("institutions/college/"),
                     },
                     {
                         "title": "Departments",
                         "icon": "apartment",
-                        "link": lambda request: "/admin/institutions/department/",
+                        "link": lambda request: _admin_link("institutions/department/"),
                     },
                     {
                         "title": "Venues",
                         "icon": "place",
-                        "link": lambda request: "/admin/institutions/venue/",
+                        "link": lambda request: _admin_link("institutions/venue/"),
                     },
                 ],
             },
@@ -543,12 +573,12 @@ UNFOLD = {
                     {
                         "title": "Courses",
                         "icon": "menu_book",
-                        "link": lambda request: "/admin/institutions/course/",
+                        "link": lambda request: _admin_link("institutions/course/"),
                     },
                     {
                         "title": "Users",
                         "icon": "people",
-                        "link": lambda request: "/admin/institutions/user/",
+                        "link": lambda request: _admin_link("institutions/user/"),
                     },
                 ],
             },
@@ -559,12 +589,12 @@ UNFOLD = {
                     {
                         "title": "Sessions",
                         "icon": "event",
-                        "link": lambda request: "/admin/institutions/attendancesession/",
+                        "link": lambda request: _admin_link("institutions/attendancesession/"),
                     },
                     {
                         "title": "Attendance Records",
                         "icon": "how_to_reg",
-                        "link": lambda request: "/admin/institutions/attendance/",
+                        "link": lambda request: _admin_link("institutions/attendance/"),
                     },
                 ],
             },
@@ -575,12 +605,12 @@ UNFOLD = {
                     {
                         "title": "User Devices",
                         "icon": "devices",
-                        "link": lambda request: "/admin/accounts/userdevice/",
+                        "link": lambda request: _admin_link("accounts/userdevice/"),
                     },
                     {
                         "title": "Feature Flags",
                         "icon": "toggle_on",
-                        "link": lambda request: "/admin/system/featureflag/",
+                        "link": lambda request: _admin_link("system/featureflag/"),
                     },
                 ],
             },
