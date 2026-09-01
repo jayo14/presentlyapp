@@ -1,10 +1,11 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Loader2, Map as MapIcon, List, Grid, X as CloseIcon, RefreshCw } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Search, Building, AlertCircle, Loader, Loader2, Map as MapIcon, List, Grid, X as CloseIcon, RefreshCw, Download, Upload } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Venue, Institution } from '../../types';
 import { venueApi } from '../../services/api/venues';
+import { spatialApi } from '../../services/api/spatial';
 import { institutionsApi } from '../../services/api/institutions';
 import { SEO } from '../SEO';
 
@@ -235,6 +236,38 @@ export const VenueManagement: React.FC = () => {
     }
   };
 
+  const handleExportGeoJSON = async () => {
+    try {
+      const collection = await spatialApi.exportGeoJSON({ institution: selectedInstitution || undefined });
+      const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `spatial-features-${Date.now()}.geojson`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to export GeoJSON:', err);
+      setError('Failed to export GeoJSON data');
+    }
+  };
+
+  const handleImportGeoJSON = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      const res = await spatialApi.importGeoJSON(json);
+      alert(res.message || 'GeoJSON features imported successfully.');
+      await loadVenues(selectedInstitution || undefined);
+    } catch (err: any) {
+      console.error('Failed to import GeoJSON:', err);
+      setError(err.response?.data?.error || 'Failed to import GeoJSON file');
+    }
+    e.target.value = '';
+  };
+
   if (loading && venues.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -252,15 +285,37 @@ export const VenueManagement: React.FC = () => {
           <MapPin className="w-8 h-8 text-primary" />
           <div>
             <h2 className="font-headline text-2xl font-bold text-text flex items-center gap-2">
-              Venue Management
+              Venue & Spatial Feature Management
               <span className="text-xs font-normal bg-surfaceHigh px-2 py-1 rounded-full text-textMuted">
                 {filteredVenues.length}
               </span>
             </h2>
-            <p className="text-sm text-textMuted">Manage venue locations with geolocation data</p>
+            <p className="text-sm text-textMuted">Manage spatial features, GeoJSON boundaries, and venue locations</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleExportGeoJSON}
+            className="gap-1.5"
+            title="Export GeoJSON FeatureCollection"
+          >
+            <Download className="w-4 h-4" />
+            Export GeoJSON
+          </Button>
+          <label className="cursor-pointer">
+            <input
+              type="file"
+              accept=".geojson,.json"
+              onChange={handleImportGeoJSON}
+              className="hidden"
+            />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surfaceHigh hover:bg-surface border border-outline rounded-lg text-sm font-medium text-text transition-colors">
+              <Upload className="w-4 h-4" />
+              Import GeoJSON
+            </span>
+          </label>
           <div className="flex items-center gap-1 bg-surfaceHigh rounded-lg p-1">
             <button
               onClick={() => setViewMode('map')}
