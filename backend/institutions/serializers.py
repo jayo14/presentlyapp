@@ -12,7 +12,10 @@ from system.feature_flags import (
 from .models import (
     User, Institution, College, Department, Course, CourseMembership, CourseEnrollment, AttendanceSession, 
     Attendance, UserRole, Venue, Timetable, AuditLog,
-    RBACPermission, StaffRole, RolePermission, StaffProfile, UserPermission, StaffInvitation
+    RBACPermission, StaffRole, RolePermission, StaffProfile, UserPermission, StaffInvitation,
+    SpatialFeature, BuildingProperties, RoomProperties, RoadProperties, EntranceProperties,
+    SpatialCategory, SpatialGeometryType, SpatialVerificationMethod, SpatialVerificationStatus,
+    AccessRestriction, EntranceType
 )
 
 
@@ -264,6 +267,235 @@ class VenueSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError("Longitude must be between -180 and 180")
         
         return value
+
+
+class BuildingPropertiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BuildingProperties
+        fields = ['building_code', 'floors_above_ground', 'floors_below_ground', 'gross_area_sqm', 'year_built', 'hvac_type']
+
+
+class RoomPropertiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoomProperties
+        fields = [
+            'building_code', 'floor_number', 'room_number', 'wing', 'capacity',
+            'room_type', 'has_projector', 'has_computers', 'has_whiteboard',
+            'has_microphone', 'has_air_conditioning', 'is_wheelchair_accessible'
+        ]
+
+
+class RoadPropertiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoadProperties
+        fields = ['surface_type', 'lanes', 'speed_limit_kmh', 'one_way', 'is_passable']
+
+
+class EntrancePropertiesSerializer(serializers.ModelSerializer):
+    building_name = serializers.CharField(source='building.name', read_only=True)
+
+    class Meta:
+        model = EntranceProperties
+        fields = ['building', 'building_name', 'entrance_type', 'is_wheelchair_accessible', 'floor_level', 'opening_hours']
+
+
+class SpatialFeatureSerializer(serializers.ModelSerializer):
+    """
+    Canonical Serializer for Spatial Features with clean 10-section API structure.
+    """
+    identity = serializers.SerializerMethodField()
+    geometry = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    relationships = serializers.SerializerMethodField()
+    properties = serializers.SerializerMethodField()
+    navigation = serializers.SerializerMethodField()
+    display = serializers.SerializerMethodField()
+    geofence = serializers.SerializerMethodField()
+    provenance = serializers.SerializerMethodField()
+    lifecycle = serializers.SerializerMethodField()
+
+    building_properties = BuildingPropertiesSerializer(required=False, allow_null=True)
+    room_properties = RoomPropertiesSerializer(required=False, allow_null=True)
+    road_properties = RoadPropertiesSerializer(required=False, allow_null=True)
+    entrance_properties = EntrancePropertiesSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = SpatialFeature
+        fields = [
+            'id', 'uuid', 'name', 'code', 'slug', 'category', 'subcategory', 'description',
+            'geometry_type', 'geojson_geometry', 'derived_centroid', 'derived_bbox',
+            'derived_area_sqm', 'derived_length_m', 'elevation_m', 'latitude', 'longitude',
+            'address', 'city', 'state_province', 'country', 'parent', 'institution', 'college',
+            'departments', 'verification_method', 'verification_radius_m', 'custom_geofence_geometry',
+            'elevation_tolerance_m', 'label_position', 'venue_color', 'venue_opacity', 'border_width',
+            'stroke_dasharray', 'icon_name', 'min_zoom', 'max_zoom', 'is_visible_on_map',
+            'source', 'source_provider', 'mapping_method', 'confidence_score', 'verification_status',
+            'mapped_by', 'mapped_at', 'verified_by', 'verified_at', 'notes', 'is_active',
+            'is_operational', 'access_restriction', 'created_at', 'updated_at',
+            'identity', 'geometry', 'location', 'relationships', 'properties', 'navigation',
+            'display', 'geofence', 'provenance', 'lifecycle',
+            'building_properties', 'room_properties', 'road_properties', 'entrance_properties'
+        ]
+        read_only_fields = [
+            'id', 'uuid', 'derived_centroid', 'derived_bbox', 'derived_area_sqm',
+            'derived_length_m', 'latitude', 'longitude', 'mapped_at', 'created_at', 'updated_at'
+        ]
+
+    def get_identity(self, obj):
+        return {
+            'id': obj.id,
+            'uuid': str(obj.uuid),
+            'code': obj.code,
+            'slug': obj.slug,
+            'name': obj.name,
+            'category': obj.category,
+            'subcategory': obj.subcategory,
+            'description': obj.description,
+        }
+
+    def get_geometry(self, obj):
+        return {
+            'type': obj.geometry_type,
+            'coordinates': obj.geojson_geometry.get('coordinates', []) if obj.geojson_geometry else [],
+            'derived_centroid': obj.derived_centroid,
+            'derived_bbox': obj.derived_bbox,
+            'derived_area_sqm': obj.derived_area_sqm,
+            'derived_length_m': obj.derived_length_m,
+            'elevation_m': float(obj.elevation_m) if obj.elevation_m is not None else None,
+        }
+
+    def get_location(self, obj):
+        return {
+            'latitude': float(obj.latitude) if obj.latitude is not None else None,
+            'longitude': float(obj.longitude) if obj.longitude is not None else None,
+            'address': obj.address,
+            'city': obj.city,
+            'state_province': obj.state_province,
+            'country': obj.country,
+        }
+
+    def get_relationships(self, obj):
+        return {
+            'parent_id': obj.parent_id,
+            'institution_id': obj.institution_id,
+            'college_id': obj.college_id,
+            'department_ids': list(obj.departments.values_list('id', flat=True)),
+        }
+
+    def get_properties(self, obj):
+        if hasattr(obj, 'building_properties'):
+            return BuildingPropertiesSerializer(obj.building_properties).data
+        elif hasattr(obj, 'room_properties'):
+            return RoomPropertiesSerializer(obj.room_properties).data
+        elif hasattr(obj, 'road_properties'):
+            return RoadPropertiesSerializer(obj.road_properties).data
+        elif hasattr(obj, 'entrance_properties'):
+            return EntrancePropertiesSerializer(obj.entrance_properties).data
+        return {}
+
+    def get_navigation(self, obj):
+        entrances_data = []
+        if hasattr(obj, 'building_entrances'):
+            for ent in obj.building_entrances.all():
+                entrances_data.append({
+                    'id': ent.spatial_feature_id,
+                    'name': ent.spatial_feature.name,
+                    'entrance_type': ent.entrance_type,
+                    'coordinates': ent.spatial_feature.derived_centroid,
+                    'is_wheelchair_accessible': ent.is_wheelchair_accessible,
+                    'floor_level': ent.floor_level,
+                })
+        road_data = {}
+        if hasattr(obj, 'road_properties'):
+            road_data = {
+                'one_way': obj.road_properties.one_way,
+                'speed_limit_kmh': obj.road_properties.speed_limit_kmh,
+                'is_passable': obj.road_properties.is_passable,
+            }
+        return {
+            'entrances': entrances_data,
+            **road_data
+        }
+
+    def get_display(self, obj):
+        return {
+            'label_position': obj.label_position,
+            'venue_color': obj.venue_color,
+            'venue_opacity': obj.venue_opacity,
+            'border_width': obj.border_width,
+            'stroke_dasharray': obj.stroke_dasharray,
+            'icon_name': obj.icon_name,
+            'min_zoom': obj.min_zoom,
+            'max_zoom': obj.max_zoom,
+            'is_visible_on_map': obj.is_visible_on_map,
+        }
+
+    def get_geofence(self, obj):
+        return {
+            'verification_method': obj.verification_method,
+            'verification_radius_m': obj.verification_radius_m,
+            'custom_geofence_geometry': obj.custom_geofence_geometry,
+            'elevation_tolerance_m': obj.elevation_tolerance_m,
+        }
+
+    def get_provenance(self, obj):
+        return {
+            'source': obj.source,
+            'source_provider': obj.source_provider,
+            'mapping_method': obj.mapping_method,
+            'confidence_score': obj.confidence_score,
+            'verification_status': obj.verification_status,
+            'mapped_by': obj.mapped_by.email if obj.mapped_by else None,
+            'mapped_at': obj.mapped_at,
+            'verified_by': obj.verified_by.email if obj.verified_by else None,
+            'verified_at': obj.verified_at,
+            'notes': obj.notes,
+        }
+
+    def get_lifecycle(self, obj):
+        return {
+            'is_active': obj.is_active,
+            'is_operational': obj.is_operational,
+            'access_restriction': obj.access_restriction,
+            'created_at': obj.created_at,
+            'updated_at': obj.updated_at,
+        }
+
+    def validate_geojson_geometry(self, value):
+        from .spatial_utils import validate_geojson_geometry
+        if value:
+            is_valid, err = validate_geojson_geometry(value)
+            if not is_valid:
+                raise serializers.ValidationError(err)
+        return value
+
+
+class GeoJSONFeatureSerializer(serializers.Serializer):
+    """
+    Serializes SpatialFeature into standard GeoJSON Feature (RFC 7946).
+    """
+    def to_representation(self, instance):
+        props = SpatialFeatureSerializer(instance).data
+        properties_dict = {
+            'name': instance.name,
+            'code': instance.code,
+            'category': instance.category,
+            'subcategory': instance.subcategory,
+            'description': instance.description,
+            'venue_color': instance.venue_color,
+            'venue_opacity': instance.venue_opacity,
+            'border_width': instance.border_width,
+            'verification_radius_m': instance.verification_radius_m,
+            'is_active': instance.is_active,
+            'canonical_details': props
+        }
+        return {
+            'type': 'Feature',
+            'id': instance.id,
+            'geometry': instance.geojson_geometry,
+            'properties': properties_dict
+        }
+
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
