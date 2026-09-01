@@ -593,6 +593,45 @@ class Venue(models.Model):
         location = f"{self.building or self.building_name} - {self.room_number}" if (self.building or self.building_name) and self.room_number else self.name
         return location
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        try:
+            from .spatial_utils import convert_lat_lng_ring_to_geojson_ring
+            geojson_geom = None
+            if self.boundary and isinstance(self.boundary, list) and len(self.boundary) >= 3:
+                ring = convert_lat_lng_ring_to_geojson_ring(self.boundary)
+                if len(ring) >= 3:
+                    geojson_geom = {'type': 'Polygon', 'coordinates': [ring]}
+            
+            if not geojson_geom and self.latitude is not None and self.longitude is not None:
+                geojson_geom = {'type': 'Point', 'coordinates': [float(self.longitude), float(self.latitude)]}
+
+            if geojson_geom:
+                sf = self.spatial_feature
+                if not sf:
+                    sf = SpatialFeature(name=self.name, category='ROOM', source='VENUE_SYNC')
+
+                sf.name = self.name
+                sf.code = self.code
+                sf.description = self.description
+                sf.institution = self.institution
+                sf.college = self.college
+                sf.geojson_geometry = geojson_geom
+                sf.elevation_m = self.elevation
+                sf.verification_radius_m = self.verification_radius or self.gps_radius or 50
+                sf.venue_color = self.venue_color or '#6366f1'
+                sf.venue_opacity = self.venue_opacity if self.venue_opacity is not None else 0.15
+                sf.border_width = self.border_width or 2
+                sf.is_active = self.is_active
+                sf.save()
+
+                if not self.spatial_feature_id:
+                    self.spatial_feature = sf
+                    super().save(update_fields=['spatial_feature'])
+        except Exception:
+            pass
+
+
 
 class AttendanceSession(models.Model):
     """Attendance sessions (lectures/classes)"""
