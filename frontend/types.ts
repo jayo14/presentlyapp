@@ -1,3 +1,5 @@
+export * from './types/spatial';
+
 export enum UserRole {
   STUDENT = 'STUDENT',
   LECTURER = 'LECTURER',
