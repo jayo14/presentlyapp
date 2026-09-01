@@ -3,6 +3,7 @@ export * from './auth';
 export * from './institutions';
 export * from './attendance';
 export * from './venues';
+export * from './spatial';
 export * from './courses';
 export * from './dashboard';
 export * from './staff';
