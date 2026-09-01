@@ -2517,7 +2517,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.is_restricted = True
             user.restriction_reason = reason
             user.restriction_note = note
-            user.restricted_at = django_timezone.now()
+            user.restricted_at = timezone.now()
             user.save()
             logger.info(f"User {user.email} restricted by {request.user.email}. Reason: {reason}")
             msg = f"User {user.full_name or user.email} has been restricted."
