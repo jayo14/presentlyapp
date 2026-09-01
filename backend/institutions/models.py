@@ -569,6 +569,14 @@ class Venue(models.Model):
     )
 
     # Metadata
+    spatial_feature = models.ForeignKey(
+        'SpatialFeature',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='linked_venues',
+        help_text="Canonical spatial feature link"
+    )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -1105,3 +1113,278 @@ class StaffInvitation(models.Model):
 
     def __str__(self):
         return f"{self.email} ({self.status})"
+
+
+class SpatialCategory(models.TextChoices):
+    CAMPUS = 'CAMPUS', 'Campus Boundary'
+    COLLEGE_ZONE = 'COLLEGE_ZONE', 'College / Faculty Zone'
+    BUILDING = 'BUILDING', 'Building Structure'
+    ROOM = 'ROOM', 'Room / Venue / Hall'
+    ROAD = 'ROAD', 'Road / Driveway'
+    PEDESTRIAN_PATH = 'PEDESTRIAN_PATH', 'Pedestrian Walkway / Path'
+    ENTRANCE = 'ENTRANCE', 'Entrance / Gate'
+    LANDMARK_POI = 'LANDMARK_POI', 'Landmark / Point of Interest'
+    PARKING = 'PARKING', 'Parking Area'
+    FACILITY = 'FACILITY', 'Utility / Facility'
+
+
+class SpatialGeometryType(models.TextChoices):
+    POINT = 'Point', 'Point'
+    POLYGON = 'Polygon', 'Polygon'
+    MULTI_POLYGON = 'MultiPolygon', 'MultiPolygon'
+    LINE_STRING = 'LineString', 'LineString'
+
+
+class SpatialVerificationMethod(models.TextChoices):
+    PHYSICAL_GEOMETRY = 'PHYSICAL_GEOMETRY', 'Use Physical Geometry Boundary'
+    RADIUS = 'RADIUS', 'Use Center Point Radius'
+    CUSTOM_POLYGON = 'CUSTOM_POLYGON', 'Use Custom Geofence Polygon'
+
+
+class SpatialVerificationStatus(models.TextChoices):
+    UNVERIFIED = 'UNVERIFIED', 'Unverified Draft'
+    VERIFIED = 'VERIFIED', 'Verified & Ground-Truthed'
+    FLAGGED = 'FLAGGED', 'Flagged for Review'
+
+
+class AccessRestriction(models.TextChoices):
+    PUBLIC = 'PUBLIC', 'Public Access'
+    STUDENTS_ONLY = 'STUDENTS_ONLY', 'Students Only'
+    STAFF_ONLY = 'STAFF_ONLY', 'Staff Only'
+    RESTRICTED = 'RESTRICTED', 'Restricted Access'
+
+
+class EntranceType(models.TextChoices):
+    MAIN = 'MAIN', 'Main Entrance'
+    SIDE = 'SIDE', 'Side Entrance'
+    ACCESSIBLE = 'ACCESSIBLE', 'Wheelchair Accessible Entrance'
+    EMERGENCY = 'EMERGENCY', 'Emergency Exit Only'
+    SERVICE = 'SERVICE', 'Service / Loading Dock'
+
+
+class SpatialFeature(models.Model):
+    """Canonical production-grade spatial model for all campus features."""
+    
+    # 1. Identity
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    slug = models.SlugField(max_length=255, blank=True, null=True)
+    category = models.CharField(max_length=30, choices=SpatialCategory.choices, db_index=True)
+    subcategory = models.CharField(max_length=50, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    # 2. Geometry (Canonical GeoJSON storage & Shapely derivations)
+    geometry_type = models.CharField(max_length=20, choices=SpatialGeometryType.choices, default=SpatialGeometryType.POLYGON)
+    geojson_geometry = models.JSONField(
+        help_text="Canonical GeoJSON geometry object (WGS84: [lng, lat])"
+    )
+    derived_centroid = models.JSONField(
+        blank=True, null=True,
+        help_text="Auto-computed centroid coordinate [lng, lat]"
+    )
+    derived_bbox = models.JSONField(
+        blank=True, null=True,
+        help_text="Auto-computed bounding box [min_lng, min_lat, max_lng, max_lat]"
+    )
+    derived_area_sqm = models.FloatField(blank=True, null=True)
+    derived_length_m = models.FloatField(blank=True, null=True)
+    elevation_m = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+
+    # 3. Location (Denormalized center lat/long for fast querying & backward compatibility)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True, db_index=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True, db_index=True)
+    address = models.TextField(blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state_province = models.CharField(max_length=100, blank=True, null=True)
+    country = models.CharField(max_length=100, default='Nigeria')
+
+    # 4. Hierarchical Spatial Relationships
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True, related_name='children'
+    )
+    institution = models.ForeignKey(
+        Institution, on_delete=models.CASCADE, null=True, blank=True, related_name='spatial_features'
+    )
+    college = models.ForeignKey(
+        College, on_delete=models.SET_NULL, null=True, blank=True, related_name='spatial_features'
+    )
+    departments = models.ManyToManyField(Department, blank=True, related_name='spatial_features')
+
+    # 8. Geofencing & Verification
+    verification_method = models.CharField(
+        max_length=30, choices=SpatialVerificationMethod.choices, default=SpatialVerificationMethod.PHYSICAL_GEOMETRY
+    )
+    verification_radius_m = models.IntegerField(default=50)
+    custom_geofence_geometry = models.JSONField(blank=True, null=True)
+    elevation_tolerance_m = models.FloatField(default=10.0)
+
+    # 9. Map Display & Visual Styling
+    label_position = models.JSONField(
+        blank=True, null=True,
+        help_text="Independent label anchor coordinate [lng, lat]"
+    )
+    venue_color = models.CharField(max_length=20, default='#6366f1')
+    venue_opacity = models.FloatField(default=0.15)
+    border_width = models.IntegerField(default=2)
+    stroke_dasharray = models.CharField(max_length=20, blank=True, null=True)
+    icon_name = models.CharField(max_length=50, blank=True, null=True)
+    min_zoom = models.FloatField(default=10.0)
+    max_zoom = models.FloatField(default=22.0)
+    is_visible_on_map = models.BooleanField(default=True)
+
+    # 10. Data Provenance & Audit Metadata
+    source = models.CharField(max_length=50, default='MANUAL_DRAW')
+    source_provider = models.CharField(max_length=100, blank=True, null=True)
+    mapping_method = models.CharField(max_length=50, blank=True, null=True)
+    confidence_score = models.FloatField(default=1.0)
+    verification_status = models.CharField(
+        max_length=20, choices=SpatialVerificationStatus.choices, default=SpatialVerificationStatus.UNVERIFIED
+    )
+    mapped_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='mapped_features'
+    )
+    mapped_at = models.DateTimeField(auto_now_add=True)
+    verified_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_features'
+    )
+    verified_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True, null=True)
+
+    # 11. Status & Lifecycle
+    is_active = models.BooleanField(default=True, db_index=True)
+    is_operational = models.BooleanField(default=True)
+    access_restriction = models.CharField(max_length=20, choices=AccessRestriction.choices, default=AccessRestriction.PUBLIC)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'spatial_features'
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['category', 'is_active']),
+            models.Index(fields=['institution', 'category']),
+            models.Index(fields=['parent', 'category']),
+            models.Index(fields=['latitude', 'longitude']),
+            models.Index(fields=['code']),
+        ]
+
+    def __str__(self):
+        return f"{self.name} [{self.category}]"
+
+    def clean(self):
+        super().clean()
+        from .spatial_utils import validate_geojson_geometry
+        if self.geojson_geometry:
+            is_valid, err = validate_geojson_geometry(self.geojson_geometry)
+            if not is_valid:
+                from django.core.exceptions import ValidationError
+                raise ValidationError({'geojson_geometry': err})
+
+    def save(self, *args, **kwargs):
+        from .spatial_utils import validate_geojson_geometry, compute_derived_spatial_properties
+        if self.geojson_geometry:
+            is_valid, err = validate_geojson_geometry(self.geojson_geometry)
+            if not is_valid:
+                raise ValueError(f"Invalid GeoJSON geometry: {err}")
+
+            self.geometry_type = self.geojson_geometry.get('type', self.geometry_type)
+            derived = compute_derived_spatial_properties(self.geojson_geometry)
+
+            self.derived_centroid = derived['derived_centroid']
+            self.derived_bbox = derived['derived_bbox']
+            self.derived_area_sqm = derived['derived_area_sqm']
+            self.derived_length_m = derived['derived_length_m']
+
+            self.longitude = float(derived['derived_centroid'][0])
+            self.latitude = float(derived['derived_centroid'][1])
+
+            if not self.label_position:
+                self.label_position = self.derived_centroid
+
+        super().save(*args, **kwargs)
+
+
+class BuildingProperties(models.Model):
+    """Specialized structural properties for BUILDING spatial features."""
+    spatial_feature = models.OneToOneField(
+        SpatialFeature, on_delete=models.CASCADE, related_name='building_properties'
+    )
+    building_code = models.CharField(max_length=50, blank=True, null=True)
+    floors_above_ground = models.IntegerField(default=1)
+    floors_below_ground = models.IntegerField(default=0)
+    gross_area_sqm = models.FloatField(blank=True, null=True)
+    year_built = models.IntegerField(blank=True, null=True)
+    hvac_type = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        db_table = 'building_properties'
+
+    def __str__(self):
+        return f"BuildingProperties for {self.spatial_feature.name}"
+
+
+class RoomProperties(models.Model):
+    """Specialized properties for ROOM spatial features."""
+    spatial_feature = models.OneToOneField(
+        SpatialFeature, on_delete=models.CASCADE, related_name='room_properties'
+    )
+    building_code = models.CharField(max_length=50, blank=True, null=True)
+    floor_number = models.CharField(max_length=20, blank=True, null=True)
+    room_number = models.CharField(max_length=50, blank=True, null=True)
+    wing = models.CharField(max_length=50, blank=True, null=True)
+    capacity = models.IntegerField(default=0)
+    room_type = models.CharField(max_length=50, default='CLASSROOM')
+    has_projector = models.BooleanField(default=False)
+    has_computers = models.BooleanField(default=False)
+    has_whiteboard = models.BooleanField(default=False)
+    has_microphone = models.BooleanField(default=False)
+    has_air_conditioning = models.BooleanField(default=False)
+    is_wheelchair_accessible = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'room_properties'
+
+    def __str__(self):
+        return f"RoomProperties for {self.spatial_feature.name}"
+
+
+class RoadProperties(models.Model):
+    """Specialized navigation properties for ROAD and PEDESTRIAN_PATH features."""
+    spatial_feature = models.OneToOneField(
+        SpatialFeature, on_delete=models.CASCADE, related_name='road_properties'
+    )
+    surface_type = models.CharField(max_length=50, default='PAVED')
+    lanes = models.IntegerField(default=2)
+    speed_limit_kmh = models.FloatField(blank=True, null=True)
+    one_way = models.BooleanField(default=False)
+    is_passable = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'road_properties'
+
+    def __str__(self):
+        return f"RoadProperties for {self.spatial_feature.name}"
+
+
+class EntranceProperties(models.Model):
+    """Specialized entrance metadata and link to parent Building."""
+    spatial_feature = models.OneToOneField(
+        SpatialFeature, on_delete=models.CASCADE, related_name='entrance_properties'
+    )
+    building = models.ForeignKey(
+        SpatialFeature, on_delete=models.CASCADE, null=True, blank=True, related_name='building_entrances'
+    )
+    entrance_type = models.CharField(
+        max_length=30, choices=EntranceType.choices, default=EntranceType.MAIN
+    )
+    is_wheelchair_accessible = models.BooleanField(default=False)
+    floor_level = models.CharField(max_length=20, default='0')
+    opening_hours = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        db_table = 'entrance_properties'
+
+    def __str__(self):
+        return f"EntranceProperties for {self.spatial_feature.name}"
+
