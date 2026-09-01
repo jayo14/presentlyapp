@@ -37,17 +37,20 @@ from utils.email import (
 from .attendance_logic import perform_attendance_check_in
 from .models import (
     User, Institution, College, Department, Course, CourseEnrollment, AttendanceSession, 
-    Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable, ManualAttendanceRecord
+    Attendance, Venue, UserRole, EmailVerificationOTP, AuditLog, Timetable, ManualAttendanceRecord,
+    SpatialFeature, BuildingProperties, RoomProperties, RoadProperties, EntranceProperties
 )
 from .rbac import user_has_permission
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     OnboardingSerializer, InstitutionSerializer, CollegeSerializer,
     DepartmentSerializer, VenueSerializer, CourseSerializer, CourseEnrollmentSerializer, AttendanceSessionSerializer,
-    AttendanceSerializer, PasswordChangeSerializer, TimetableSerializer, CourseMembershipSerializer
+    AttendanceSerializer, PasswordChangeSerializer, TimetableSerializer, CourseMembershipSerializer,
+    SpatialFeatureSerializer, GeoJSONFeatureSerializer
 )
 from .attendance_logic import perform_attendance_check_in, check_session_validity
 from .geolocation_utils import verify_location, calculate_distance
+from .spatial_utils import validate_geojson_geometry
 from .cache_keys import institutions_list_cache_key, colleges_list_cache_key, departments_list_cache_key
 
 # Configure logging
@@ -1398,6 +1401,133 @@ class VenueViewSet(viewsets.ModelViewSet):
             'success': True,
             'sessions': serializer.data
         })
+
+
+class SpatialFeatureViewSet(viewsets.ModelViewSet):
+    """
+    Canonical production-grade ViewSet for SpatialFeature management.
+    Supports filtering by category, institution, parent, status, search.
+    Provides custom endpoints for GeoJSON FeatureCollection export and import.
+    """
+    queryset = SpatialFeature.objects.all()
+    serializer_class = SpatialFeatureSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'export_geojson']:
+            return [IsAuthenticated()]
+        if self.action == 'create':
+            return [RequireRBACPermission('venues.create')]
+        if self.action in ['update', 'partial_update', 'import_geojson']:
+            return [RequireRBACPermission('venues.edit')]
+        if self.action == 'destroy':
+            return [RequireRBACPermission('venues.delete')]
+        return [IsAdminUser()]
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return self.queryset.model.objects.none()
+
+        queryset = SpatialFeature.objects.select_related('institution', 'college', 'parent').prefetch_related(
+            'departments', 'building_entrances'
+        ).order_by('name')
+
+        institution_id = self.request.query_params.get('institution')
+        if institution_id:
+            queryset = queryset.filter(institution_id=institution_id)
+
+        category = self.request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(category=category)
+
+        parent_id = self.request.query_params.get('parent')
+        if parent_id:
+            queryset = queryset.filter(parent_id=parent_id)
+
+        is_active = self.request.query_params.get('is_active')
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) | Q(code__icontains=search) | Q(description__icontains=search)
+            )
+
+        return queryset
+
+    @action(detail=False, methods=['get'], url_path='export-geojson')
+    def export_geojson(self, request):
+        """Export filtered spatial features as a standard GeoJSON FeatureCollection."""
+        features = self.get_queryset()
+        geojson_features = [GeoJSONFeatureSerializer(f).data for f in features]
+        return Response({
+            'type': 'FeatureCollection',
+            'features': geojson_features
+        }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='import-geojson')
+    def import_geojson(self, request):
+        """
+        Import standard GeoJSON FeatureCollection or Feature object into SpatialFeatures.
+        Validates geometries before persisting.
+        """
+        data = request.data
+        if not isinstance(data, dict):
+            return Response({'error': 'Payload must be a JSON object.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        features_to_import = []
+        if data.get('type') == 'FeatureCollection':
+            features_to_import = data.get('features', [])
+        elif data.get('type') == 'Feature':
+            features_to_import = [data]
+        else:
+            return Response({'error': 'Invalid GeoJSON type. Expected Feature or FeatureCollection.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        created_features = []
+        errors = []
+
+        for idx, feat in enumerate(features_to_import):
+            if not isinstance(feat, dict) or feat.get('type') != 'Feature':
+                errors.append({'index': idx, 'error': 'Item must be a GeoJSON Feature.'})
+                continue
+
+            geom = feat.get('geometry')
+            props = feat.get('properties', {})
+
+            is_valid, err = validate_geojson_geometry(geom)
+            if not is_valid:
+                errors.append({'index': idx, 'name': props.get('name', 'Unnamed'), 'error': f"Geometry validation failed: {err}"})
+                continue
+
+            name = props.get('name') or props.get('code') or f"Imported Feature {idx + 1}"
+            category = props.get('category') or 'BUILDING'
+
+            try:
+                sf = SpatialFeature.objects.create(
+                    name=name,
+                    code=props.get('code'),
+                    category=category,
+                    subcategory=props.get('subcategory'),
+                    description=props.get('description'),
+                    geojson_geometry=geom,
+                    geometry_type=geom.get('type', 'Polygon'),
+                    institution_id=props.get('institution_id'),
+                    venue_color=props.get('venue_color', '#6366f1'),
+                    venue_opacity=props.get('venue_opacity', 0.15),
+                    border_width=props.get('border_width', 2),
+                    source='GOOGLE_MAPS_IMPORT' if 'Google' in request.headers.get('User-Agent', '') else 'GEOJSON_IMPORT',
+                    mapped_by=request.user if request.user.is_authenticated else None
+                )
+                created_features.append(SpatialFeatureSerializer(sf).data)
+            except Exception as exc:
+                errors.append({'index': idx, 'name': name, 'error': str(exc)})
+
+        return Response({
+            'message': f"Imported {len(created_features)} features successfully.",
+            'imported': created_features,
+            'errors': errors
+        }, status=status.HTTP_207_MULTI_STATUS if errors else status.HTTP_201_CREATED)
 
 
 class CourseViewSet(viewsets.ModelViewSet):

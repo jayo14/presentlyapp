@@ -9,7 +9,7 @@ from .views import (
     request_password_reset_view, reset_password_view, verify_reset_token_view, public_check_in_view,
     InstitutionViewSet, CollegeViewSet, DepartmentViewSet,
     CourseViewSet, CourseEnrollmentViewSet, AttendanceSessionViewSet, AttendanceViewSet, UserViewSet,
-    VenueViewSet, TimetableViewSet, student_dashboard_summary, lecturer_dashboard_summary, dashboard_venues_head
+    VenueViewSet, SpatialFeatureViewSet, TimetableViewSet, student_dashboard_summary, lecturer_dashboard_summary, dashboard_venues_head
 )
 from .staff_views import (
     staff_accept_invite_view,
@@ -29,6 +29,7 @@ router.register(r'institutions', InstitutionViewSet, basename='institution')
 router.register(r'colleges', CollegeViewSet, basename='college')
 router.register(r'departments', DepartmentViewSet, basename='department')
 router.register(r'venues', VenueViewSet, basename='venue')
+router.register(r'spatial-features', SpatialFeatureViewSet, basename='spatial-feature')
 router.register(r'courses', CourseViewSet, basename='course')
 router.register(r'course-enrollments', CourseEnrollmentViewSet, basename='course-enrollment')
 router.register(r'sessions', AttendanceSessionViewSet, basename='session')
