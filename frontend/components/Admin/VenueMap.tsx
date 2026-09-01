@@ -115,8 +115,13 @@ function buildBoundaryGeoJSON(
         : isActive
           ? '#ef4444'
           : v.venue_color || '#6366f1';
-      const raw = v.boundary_coordinates!
-        .map(([lat, lng]) => [Number(lng), Number(lat)] as [number, number]);
+      const firstPair = v.boundary_coordinates![0];
+      const isLatLng = firstPair && Math.abs(firstPair[0]) <= 90 && Math.abs(firstPair[1]) <= 180;
+      const raw = v.boundary_coordinates!.map((pair) => {
+        return isLatLng
+          ? [Number(pair[1]), Number(pair[0])] as [number, number]
+          : [Number(pair[0]), Number(pair[1])] as [number, number];
+      });
 
       if (raw.length >= 3) {
         const first = raw[0];
