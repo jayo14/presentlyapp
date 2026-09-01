@@ -3,16 +3,18 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from unfold.admin import ModelAdmin
 
 from .models import (
-    User, Institution, College, Department, Venue, Course, AttendanceSession, 
-    Attendance, EmailVerificationOTP, Timetable
+    User, Institution, College, Department, Venue, Course, CourseMembership, CourseEnrollment,
+    AttendanceSession, Attendance, EmailVerificationOTP, Timetable, AuditLog,
+    RBACPermission, StaffRole, StaffProfile, UserPermission, StaffInvitation
 )
+
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ModelAdmin):
     """Admin configuration for custom User model"""
-    list_display = ['email', 'full_name', 'role', 'matric_number', 'staff_id', 'department', 'institution', 'college', 'onboarding_complete', 'is_active', 'last_login', 'date_joined']
-    list_filter = ['role', 'onboarding_complete', 'is_active', 'is_staff']
+    list_display = ['email', 'full_name', 'role', 'is_restricted', 'restriction_reason', 'matric_number', 'staff_id', 'department', 'institution', 'college', 'onboarding_complete', 'is_active', 'last_login', 'date_joined']
+    list_filter = ['is_restricted', 'restriction_reason', 'role', 'onboarding_complete', 'is_active', 'is_staff']
     list_select_related = ['department', 'institution', 'college']
     search_fields = ['email', 'full_name', 'matric_number', 'staff_id']
     ordering = ['-date_joined']
@@ -21,6 +23,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('full_name', 'avatar_url', 'phone_number', 'signature_image')}),
         ('Role & Institution', {'fields': ('role', 'institution', 'college', 'onboarding_complete')}),
+        ('Account Restriction', {'fields': ('is_restricted', 'restriction_reason', 'restriction_note', 'restricted_at')}),
         ('Student Fields', {'fields': ('matric_number', 'department', 'level')}),
         ('Lecturer Fields', {'fields': ('staff_id', 'courses')}),
         ('Class Rep Fields', {'fields': ('assigned_lecturer',)}),
@@ -28,6 +31,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important Dates', {'fields': ('date_joined', 'last_login')}),
     )
+
     
     add_fieldsets = (
         (None, {
@@ -154,3 +158,85 @@ class TimetableAdmin(ModelAdmin):
     search_fields = ['course__code', 'course__title', 'venue__name']
     ordering = ['day_of_week', 'start_time']
     readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(CourseMembership)
+class CourseMembershipAdmin(ModelAdmin):
+    """Admin configuration for CourseMembership model"""
+    list_display = ['user', 'course', 'role', 'is_active', 'created_at']
+    list_filter = ['role', 'is_active']
+    search_fields = ['user__email', 'user__full_name', 'course__code', 'course__title']
+    ordering = ['-created_at']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(CourseEnrollment)
+class CourseEnrollmentAdmin(ModelAdmin):
+    """Admin configuration for CourseEnrollment model"""
+    list_display = ['student', 'course', 'status', 'is_active', 'enrolled_at']
+    list_filter = ['status', 'is_active', 'enrolled_at']
+    search_fields = ['student__email', 'student__full_name', 'course__code', 'course__title']
+    ordering = ['-enrolled_at']
+    readonly_fields = ['enrolled_at', 'updated_at']
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(ModelAdmin):
+    """Admin configuration for AuditLog model"""
+    list_display = ['user', 'action', 'resource_type', 'resource_id', 'ip_address', 'timestamp']
+    list_filter = ['action', 'resource_type', 'timestamp']
+    search_fields = ['user__email', 'action', 'resource_type', 'resource_id']
+    ordering = ['-timestamp']
+    readonly_fields = ['timestamp']
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(RBACPermission)
+class RBACPermissionAdmin(ModelAdmin):
+    """Admin configuration for RBACPermission model"""
+    list_display = ['codename', 'name', 'group', 'is_dangerous', 'enabled_by_default']
+    list_filter = ['group', 'is_dangerous', 'enabled_by_default']
+    search_fields = ['codename', 'name', 'group', 'description']
+    ordering = ['group', 'codename']
+
+
+@admin.register(StaffRole)
+class StaffRoleAdmin(ModelAdmin):
+    """Admin configuration for StaffRole model"""
+    list_display = ['name', 'slug', 'is_system', 'is_active', 'created_at']
+    list_filter = ['is_system', 'is_active']
+    search_fields = ['name', 'slug', 'description']
+    ordering = ['name']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(StaffProfile)
+class StaffProfileAdmin(ModelAdmin):
+    """Admin configuration for StaffProfile model"""
+    list_display = ['user', 'role', 'status', 'invited_by', 'created_at']
+    list_filter = ['status', 'role']
+    search_fields = ['user__email', 'user__full_name', 'role__name']
+    ordering = ['-created_at']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(UserPermission)
+class UserPermissionAdmin(ModelAdmin):
+    """Admin configuration for UserPermission model"""
+    list_display = ['user', 'permission', 'allowed', 'created_by', 'created_at']
+    list_filter = ['allowed', 'permission__group']
+    search_fields = ['user__email', 'permission__codename']
+    ordering = ['-created_at']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(StaffInvitation)
+class StaffInvitationAdmin(ModelAdmin):
+    """Admin configuration for StaffInvitation model"""
+    list_display = ['email', 'full_name', 'role', 'status']
+    list_filter = ['status', 'role']
+    search_fields = ['email', 'full_name']
+    readonly_fields = ['token_hash']
+

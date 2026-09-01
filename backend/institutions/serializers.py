@@ -282,9 +282,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'phone_number', 'matric_number', 'department', 'department_name', 'level',
             'staff_id', 'courses', 'assigned_lecturer', 'signature_image',
             'notifications_enabled', 'location_enabled', 'dark_mode', 'timezone', 'permissions',
+            'is_restricted', 'restriction_reason', 'restriction_note', 'restricted_at',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'email', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'email', 'created_at', 'updated_at', 'is_restricted', 'restriction_reason', 'restriction_note', 'restricted_at']
+
 
     def get_permissions(self, obj):
         from .rbac import get_user_effective_permissions

@@ -170,7 +170,14 @@ export interface User {
   institution_id?: number;
   college?: number;
   college_id?: number;
+
+  // Account Restriction
+  is_restricted?: boolean;
+  restriction_reason?: string;
+  restriction_note?: string;
+  restricted_at?: string;
 }
+
 
 export interface Session {
   id: string;

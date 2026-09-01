@@ -17,6 +17,8 @@ import { AnalyticsTracker } from './components/Analytics/AnalyticsTracker';
 import { Login } from './components/Auth/Login';
 import { Register } from './components/Auth/Register';
 import { Layout } from './components/Layout';
+import { RestrictedAccountModal } from './components/Auth/RestrictedAccountModal';
+
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { UniversitiesPage } from './components/universities/UniversitiesPage';
@@ -165,6 +167,18 @@ const DashboardLayout: React.FC = () => {
     if (!isLoading && !user) return <Navigate to="/login" replace />;
     const activeUser = user as NonNullable<typeof user>;
 
+    if (activeUser.is_restricted) {
+        return (
+            <RestrictedAccountModal
+                reason={activeUser.restriction_reason}
+                note={activeUser.restriction_note}
+                restrictedAt={activeUser.restricted_at}
+                userEmail={activeUser.email}
+                userName={activeUser.full_name}
+            />
+        );
+    }
+
     return (
         <Layout
         userRole={activeUser.role}
@@ -177,6 +191,7 @@ const DashboardLayout: React.FC = () => {
         </Layout>
     );
 };
+
 
 const DashboardHome: React.FC = () => {
     const { data: user } = useCurrentUser();

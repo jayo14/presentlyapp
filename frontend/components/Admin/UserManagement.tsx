@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Users, Plus, Edit2, Trash2, Search, Filter, Mail, Shield, AlertCircle, Loader, Download, UserX, UserCheck, Key, Eye, MoreVertical, X } from 'lucide-react';
+import { Users, Plus, Edit2, Trash2, Search, Filter, Mail, Shield, AlertCircle, Loader, Download, UserX, UserCheck, Key, Eye, MoreVertical, X, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { User, UserRole } from '../../types';
@@ -7,6 +7,15 @@ import apiClient from '../../services/api/client';
 import { toast } from 'sonner';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility';
 import { SEO } from '../SEO';
+
+const RESTRICTION_REASONS = [
+  { value: 'SUSPICIOUS_ACTIVITY', label: 'Suspicious activity or anomalous behavior detected' },
+  { value: 'SECURITY_FLAG', label: 'Security verification flag / Identity discrepancy' },
+  { value: 'POTENTIAL_FRAUD', label: 'Potential fraudulent activity or policy violation' },
+  { value: 'ACADEMIC_MISCONDUCT', label: 'Academic integrity investigation or policy breach' },
+  { value: 'ADMINISTRATIVE_HOLD', label: 'Administrative hold / Pending review by institution' },
+  { value: 'OTHER', label: 'Other administrative reason' },
+];
 
 export const UserManagement: React.FC = () => {
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -19,6 +28,14 @@ export const UserManagement: React.FC = () => {
   const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [onboardingFilter, setOnboardingFilter] = useState<string>('all');
+
+  // Restriction modal state
+  const [showRestrictModal, setShowRestrictModal] = useState(false);
+  const [restrictTargetUser, setRestrictTargetUser] = useState<User | null>(null);
+  const [restrictionReason, setRestrictionReason] = useState<string>('SUSPICIOUS_ACTIVITY');
+  const [restrictionNote, setRestrictionNote] = useState<string>('');
+  const [isSubmittingRestriction, setIsSubmittingRestriction] = useState(false);
+
   
   const [currentPage, setCurrentPage] = useState(1);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
@@ -141,6 +158,43 @@ export const UserManagement: React.FC = () => {
       console.error(err);
     }
   };
+
+  const handleOpenRestrictionModal = (user: User) => {
+    setRestrictTargetUser(user);
+    setRestrictionReason(user.restriction_reason || 'SUSPICIOUS_ACTIVITY');
+    setRestrictionNote(user.restriction_note || '');
+    setShowRestrictModal(true);
+  };
+
+  const handleConfirmToggleRestriction = async () => {
+    if (!restrictTargetUser) return;
+    try {
+      setIsSubmittingRestriction(true);
+      const isRestricting = !restrictTargetUser.is_restricted;
+      const res = await apiClient.post(`/users/${restrictTargetUser.id}/toggle-restriction/`, {
+        restrict: isRestricting,
+        reason: isRestricting ? restrictionReason : undefined,
+        note: isRestricting ? restrictionNote : undefined,
+      });
+
+      if (res.data.success) {
+        toast.success(isRestricting ? 'User Access Restricted' : 'Restriction Lifted', {
+          description: res.data.message
+        });
+        setShowRestrictModal(false);
+        setRestrictTargetUser(null);
+        await loadAllUsers();
+      }
+    } catch (err: any) {
+      toast.error('Restriction Update Failed', {
+        description: err.response?.data?.error || 'Failed to update restriction state'
+      });
+      console.error(err);
+    } finally {
+      setIsSubmittingRestriction(false);
+    }
+  };
+
 
   const handleResetPassword = async (userId: string, email: string) => {
     if (!confirm(`Send password reset email to ${email}?`)) {
@@ -384,13 +438,20 @@ export const UserManagement: React.FC = () => {
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      user.onboarding_complete
-                        ? 'bg-green-500/10 text-green-500'
-                        : 'bg-yellow-500/10 text-yellow-500'
-                    }`}>
-                      {user.onboarding_complete ? 'Active' : 'Pending'}
-                    </span>
+                    <div className="flex flex-col gap-1 items-start">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        user.onboarding_complete
+                          ? 'bg-green-500/10 text-green-500'
+                          : 'bg-yellow-500/10 text-yellow-500'
+                      }`}>
+                        {user.onboarding_complete ? 'Active' : 'Pending'}
+                      </span>
+                      {user.is_restricted && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-500 border border-red-500/30 flex items-center gap-1">
+                          <ShieldAlert className="w-3 h-3" /> Restricted
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
@@ -421,7 +482,7 @@ export const UserManagement: React.FC = () => {
                               className="fixed inset-0 z-10" 
                               onClick={() => setShowActionsMenu(null)}
                             ></div>
-                            <div className="absolute right-0 mt-2 w-48 rounded-xl bg-surface border border-outline shadow-2xl z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                            <div className="absolute right-0 mt-2 w-52 rounded-xl bg-surface border border-outline shadow-2xl z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right">
                               <button
                                 onClick={() => {
                                   handleSendEmail(user.email);
@@ -442,6 +503,22 @@ export const UserManagement: React.FC = () => {
                                 <Key className="w-4 h-4" />
                                 <span>Reset Password</span>
                               </button>
+
+                              <button
+                                onClick={() => {
+                                  handleOpenRestrictionModal(user);
+                                  setShowActionsMenu(null);
+                                }}
+                                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                                  user.is_restricted
+                                    ? 'text-emerald-500 hover:bg-emerald-500/10'
+                                    : 'text-red-500 hover:bg-red-500/10'
+                                }`}
+                              >
+                                <ShieldAlert className="w-4 h-4" />
+                                <span>{user.is_restricted ? 'Lift Restriction' : 'Restrict Access'}</span>
+                              </button>
+
                               <button
                                 onClick={() => {
                                   handleSuspendUser(user.id, user.is_active !== false);
@@ -453,6 +530,7 @@ export const UserManagement: React.FC = () => {
                                     : 'text-green-500 hover:bg-green-500/10'
                                 }`}
                               >
+
                                 {user.is_active !== false ? (
                                   <>
                                     <UserX className="w-4 h-4" />
@@ -617,8 +695,104 @@ export const UserManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Admin Restriction Dialog / Modal */}
+      {showRestrictModal && restrictTargetUser && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-surface border border-outline rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-outline flex justify-between items-center bg-surfaceLow">
+              <div className="flex items-center gap-3">
+                <ShieldAlert className={`w-6 h-6 ${restrictTargetUser.is_restricted ? 'text-emerald-500' : 'text-red-500'}`} />
+                <h3 className="font-headline text-lg font-bold text-text">
+                  {restrictTargetUser.is_restricted ? 'Lift User Restriction' : 'Restrict Account Access'}
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowRestrictModal(false);
+                  setRestrictTargetUser(null);
+                }}
+                className="text-textMuted hover:text-text"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="p-3 bg-surfaceHigh rounded-lg border border-outline text-xs space-y-1">
+                <p className="text-text font-medium">{restrictTargetUser.full_name || restrictTargetUser.name || 'User'}</p>
+                <p className="text-textMuted">{restrictTargetUser.email}</p>
+              </div>
+
+              {!restrictTargetUser.is_restricted ? (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-textMuted uppercase mb-2">
+                      Restriction Reason
+                    </label>
+                    <select
+                      value={restrictionReason}
+                      onChange={(e) => setRestrictionReason(e.target.value)}
+                      className="w-full px-3 py-2 bg-surfaceHigh border border-outline rounded-lg text-sm text-text focus:outline-none focus:border-primary"
+                    >
+                      {RESTRICTION_REASONS.map((reason) => (
+                        <option key={reason.value} value={reason.value}>
+                          {reason.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-textMuted uppercase mb-2">
+                      Internal / Custom Admin Note (Optional)
+                    </label>
+                    <textarea
+                      value={restrictionNote}
+                      onChange={(e) => setRestrictionNote(e.target.value)}
+                      placeholder="Add details for the user or internal administrative notes..."
+                      className="w-full px-3 py-2 bg-surfaceHigh border border-outline rounded-lg text-sm text-text focus:outline-none focus:border-primary h-24 resize-none"
+                    />
+                  </div>
+
+                  <p className="text-xs text-red-400 leading-relaxed">
+                    Restricting this account will immediately block dashboard access for this user and display a tailored restriction dialog with contact instructions.
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-textMuted leading-relaxed">
+                  Are you sure you want to lift the restriction for <span className="font-semibold text-text">{restrictTargetUser.email}</span>? They will regain full dashboard access.
+                </p>
+              )}
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-outline">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowRestrictModal(false);
+                    setRestrictTargetUser(null);
+                  }}
+                  disabled={isSubmittingRestriction}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleConfirmToggleRestriction}
+                  isLoading={isSubmittingRestriction}
+                  className={restrictTargetUser.is_restricted ? 'bg-emerald-600 hover:bg-emerald-700 text-white gap-2' : 'bg-red-600 hover:bg-red-700 text-white gap-2'}
+                >
+
+                  {restrictTargetUser.is_restricted ? 'Lift Restriction' : 'Apply Restriction'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
 
 export default UserManagement;

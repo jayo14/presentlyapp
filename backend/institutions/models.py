@@ -253,6 +253,26 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Security & Verification
     signature_image = models.ImageField(upload_to='signatures/', null=True, blank=True, help_text="Student's digital signature")
     
+    # Account Restriction
+    is_restricted = models.BooleanField(default=False, help_text="Designates whether this user account is access restricted.")
+    restriction_reason = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=[
+            ('SUSPICIOUS_ACTIVITY', 'Suspicious activity or anomalous behavior detected'),
+            ('SECURITY_FLAG', 'Security verification flag / Identity discrepancy'),
+            ('POTENTIAL_FRAUD', 'Potential fraudulent activity or policy violation'),
+            ('ACADEMIC_MISCONDUCT', 'Academic integrity investigation or policy breach'),
+            ('ADMINISTRATIVE_HOLD', 'Administrative hold / Pending review by institution'),
+            ('OTHER', 'Other administrative reason'),
+        ],
+        help_text="Selected reason for user account restriction"
+    )
+    restriction_note = models.TextField(blank=True, null=True, help_text="Internal or custom note detailing the restriction reason")
+    restricted_at = models.DateTimeField(null=True, blank=True, help_text="Timestamp when user was restricted")
+
+    
     # Django required fields
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

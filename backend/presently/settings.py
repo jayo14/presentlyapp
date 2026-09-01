@@ -477,12 +477,17 @@ VENUE_MAX_PAYLOAD_CHARS_DEFAULT = int(os.environ.get('VENUE_MAX_PAYLOAD_CHARS_DE
 
 # Django Unfold Admin Configuration
 
+from django.urls import reverse_lazy
+
 def _admin_link(path=''):
-    base = ADMIN_URL.rstrip('/')
-    path = path.lstrip('/')
-    if path:
-        return f"{base}/{path}/"
-    return f"{base}/"
+    if not path:
+        return reverse_lazy("admin:index")
+    # path is like 'institutions/venue/' -> app_label 'institutions', model_name 'venue'
+    parts = path.strip('/').split('/')
+    if len(parts) == 2:
+        return reverse_lazy(f"admin:{parts[0]}_{parts[1]}_changelist")
+    return f"/{ADMIN_URL.strip('/')}/{path.lstrip('/')}"
+
 
 
 UNFOLD = {

@@ -2495,6 +2495,49 @@ class UserViewSet(viewsets.ModelViewSet):
             }
         }, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['post'], url_path='toggle-restriction')
+    def toggle_restriction(self, request, pk=None):
+        """Toggle user restriction state with a restriction reason and note (Admin only)"""
+        user = self.get_object()
+        
+        if user.id == request.user.id:
+            return Response({
+                'success': False,
+                'error': 'You cannot restrict your own account.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        restrict = request.data.get('restrict')
+        if restrict is None:
+            # If not specified explicitly, toggle current state
+            restrict = not user.is_restricted
+            
+        if restrict:
+            reason = request.data.get('reason', 'SUSPICIOUS_ACTIVITY')
+            note = request.data.get('note', '')
+            user.is_restricted = True
+            user.restriction_reason = reason
+            user.restriction_note = note
+            user.restricted_at = django_timezone.now()
+            user.save()
+            logger.info(f"User {user.email} restricted by {request.user.email}. Reason: {reason}")
+            msg = f"User {user.full_name or user.email} has been restricted."
+        else:
+            user.is_restricted = False
+            user.restriction_reason = None
+            user.restriction_note = None
+            user.restricted_at = None
+            user.save()
+            logger.info(f"User {user.email} restriction lifted by {request.user.email}.")
+            msg = f"Restriction for {user.full_name or user.email} has been lifted."
+
+        serializer = self.get_serializer(user)
+        return Response({
+            'success': True,
+            'message': msg,
+            'user': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
 
 
 @api_view(['GET', 'POST'])
