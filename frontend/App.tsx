@@ -9,6 +9,7 @@ import { useCurrentUser, useLogout } from './hooks/useAuth';
 import { Toaster } from 'sonner';
 import { offlineSyncManager } from './src/utils/offlineSync';
 import { OfflineIndicator } from './src/components/OfflineIndicator';
+import { ServerWarmupBanner } from './components/ServerWarmupBanner';
 import { Loader2 } from 'lucide-react';
 import { ThemeProvider } from './components/ThemeProvider';
 import { AnalyticsTracker } from './components/Analytics/AnalyticsTracker';
@@ -566,6 +567,7 @@ const App: React.FC = () => {
         <BrowserRouter>
           <AnalyticsTracker />
           <OfflineIndicator />
+          <ServerWarmupBanner />
           <Toaster position="top-right" richColors closeButton />
           <PWAInstallPrompt />
           <ServiceWorkerUpdateNotifier />

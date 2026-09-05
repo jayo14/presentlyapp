@@ -1,0 +1,38 @@
+name: Render Backend Keep-Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    name: Ping Render Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend Health Endpoint
+        run: |
+          RAW_URL="${{ secrets.RENDER_BACKEND_URL }}"
+          if [ -z "$RAW_URL" ]; then
+            URLS=("https://presentlyapp-alpha.onrender.com" "https://presentlyapp-2.onrender.com")
+          else
+            IFS=',' read -ra URLS <<< "$RAW_URL"
+          fi
+
+          for TARGET_URL in "${URLS[@]}"; do
+            CLEAN_URL=$(echo "$TARGET_URL" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/\/*$//')
+            if [[ "$CLEAN_URL" != */health ]]; then
+              HEALTH_URL="${CLEAN_URL}/health"
+            else
+              HEALTH_URL="${CLEAN_URL}"
+            fi
+
+            echo "Pinging ${HEALTH_URL} with a 30-second timeout..."
+            HTTP_STATUS=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 30 "$HEALTH_URL" || echo "000")
+            
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "✅ Backend at ${HEALTH_URL} returned 200 OK."
+            else
+              echo "⚠️ Health check for ${HEALTH_URL} returned HTTP status: ${HTTP_STATUS}"
+            fi
+          done

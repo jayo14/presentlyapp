@@ -12,7 +12,8 @@ from rest_framework.response import Response
 from presently.firebase_config import initialize_firebase
 
 def health_check(request):
-    return JsonResponse({"status": "healthy"}, status=200)
+    return JsonResponse({"status": "ok"}, status=200)
+
 
 
 @api_view(['GET'])
