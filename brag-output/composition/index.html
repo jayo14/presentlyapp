@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Presently — Launch Demo</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --sungold: #F9C406;
+        --sungold-glow: rgba(249, 196, 6, 0.25);
+        --presently-black: #231F0F;
+        --soft-cream: #FDF9F0;
+        --dark-bg: #0C0C0C;
+        --dark-surface: #161616;
+        --dark-card: #1E1E1E;
+        --dark-border: rgba(255, 255, 255, 0.08);
+        --success: #22C55E;
+        --success-glow: rgba(34, 197, 94, 0.2);
+        --text-muted: #94A3B8;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--dark-bg);
+        color: #F5F5F5;
+        font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .font-display {
+        font-family: 'Outfit', sans-serif;
+      }
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Glow & decorative effects */
+      .gold-glow {
+        box-shadow: 0 0 50px var(--sungold-glow);
+      }
+      .orb {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(120px);
+        pointer-events: none;
+      }
+
+      /* Card styling */
+      .glass-panel {
+        background: rgba(22, 22, 22, 0.85);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--dark-border);
+        border-radius: 28px;
+      }
+      .glass-panel-light {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 28px;
+        color: var(--presently-black);
+      }
+
+      /* Badge pills */
+      .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .badge-gold {
+        background: rgba(249, 196, 6, 0.12);
+        border: 1px solid rgba(249, 196, 6, 0.35);
+        color: #F9C406;
+      }
+      .badge-green {
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        color: #22C55E;
+      }
+      .badge-red {
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        color: #EF4444;
+      }
+
+      /* Animated Radar */
+      .radar-ring {
+        position: absolute;
+        border-radius: 9999px;
+        border: 1px solid rgba(249, 196, 6, 0.25);
+      }
+
+      /* Corner aesthetics */
+      .corner-tl { position: absolute; top: 12px; left: 12px; width: 28px; height: 28px; border-top: 4px solid var(--sungold); border-left: 4px solid var(--sungold); border-top-left-radius: 8px; }
+      .corner-tr { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-top: 4px solid var(--sungold); border-right: 4px solid var(--sungold); border-top-right-radius: 8px; }
+      .corner-bl { position: absolute; bottom: 12px; left: 12px; width: 28px; height: 28px; border-bottom: 4px solid var(--sungold); border-left: 4px solid var(--sungold); border-bottom-left-radius: 8px; }
+      .corner-br { position: absolute; bottom: 12px; right: 12px; width: 28px; height: 28px; border-bottom: 4px solid var(--sungold); border-right: 4px solid var(--sungold); border-bottom-right-radius: 8px; }
+
+      /* Table rows */
+      .audit-row {
+        display: grid;
+        grid-template-columns: 180px 1.4fr 140px 130px 140px;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="60"
+      data-width="1920"
+      data-height="1080"
+      style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0C0C0C;"
+    >
+      <!-- Audio Elements with explicit single tracks and matched durations -->
+      <audio id="bgm" data-start="0" data-duration="60" data-track-index="1" data-volume="0.65" src="assets/music/track.mp3"></audio>
+      <audio id="sfx-stamp" data-start="2.8" data-duration="0.18" data-track-index="2" data-volume="0.85" src="assets/sfx/whoosh.ogg"></audio>
+      <audio id="sfx-click1" data-start="8.5" data-duration="0.05" data-track-index="3" data-volume="0.8" src="assets/sfx/click.ogg"></audio>
+      <audio id="sfx-slide1" data-start="9.2" data-duration="0.60" data-track-index="4" data-volume="0.75" src="assets/sfx/slide.ogg"></audio>
+      <audio id="sfx-type" data-start="20.0" data-duration="0.05" data-track-index="5" data-volume="0.8" src="assets/sfx/click.ogg"></audio>
+      <audio id="sfx-ping1" data-start="23.2" data-duration="0.12" data-track-index="6" data-volume="0.7" src="assets/sfx/pop.ogg"></audio>
+      <audio id="sfx-bell" data-start="29.0" data-duration="1.48" data-track-index="7" data-volume="0.9" src="assets/sfx/bell.ogg"></audio>
+      <audio id="sfx-count" data-start="35.5" data-duration="0.12" data-track-index="8" data-volume="0.75" src="assets/sfx/pop.ogg"></audio>
+      <audio id="sfx-row1" data-start="38.5" data-duration="0.60" data-track-index="9" data-volume="0.65" src="assets/sfx/slide.ogg"></audio>
+      <audio id="sfx-row2" data-start="40.2" data-duration="0.60" data-track-index="10" data-volume="0.65" src="assets/sfx/slide.ogg"></audio>
+      <audio id="sfx-stat" data-start="48.2" data-duration="0.12" data-track-index="11" data-volume="0.75" src="assets/sfx/pop.ogg"></audio>
+      <audio id="sfx-final" data-start="54.8" data-duration="1.48" data-track-index="12" data-volume="0.9" src="assets/sfx/bell.ogg"></audio>
+
+      <!-- Background Ambient Orbs (tagged to allow intentional off-canvas glow) -->
+      <div id="ambient-orb-1" class="orb" data-layout-allow-overflow="true" style="width: 700px; height: 700px; background: rgba(249, 196, 6, 0.08); top: -200px; right: -100px;"></div>
+      <div id="ambient-orb-2" class="orb" data-layout-allow-overflow="true" style="width: 500px; height: 500px; background: rgba(34, 197, 94, 0.05); bottom: -100px; left: -100px;"></div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 1: The Problem — Paper vs Trust (0.0s – 7.5s) -->
+      <!-- ======================================================== -->
+      <div id="scene-1" class="clip" data-start="0" data-duration="7.5" data-track-index="0" style="display: flex; align-items: center; justify-content: center; padding: 80px;">
+        <div style="width: 100%; max-width: 1680px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+          
+          <!-- Left: The Paper Problem -->
+          <div id="s1-paper-card" style="background: #F5EFE6; border-radius: 28px; padding: 48px; color: #2D2518; box-shadow: 0 25px 60px rgba(0,0,0,0.5); position: relative; overflow: hidden; transform-origin: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 2px dashed rgba(0,0,0,0.15); padding-bottom: 16px;">
+              <div>
+                <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #78644A;">Traditional Register</span>
+                <h3 class="font-display" style="font-size: 26px; font-weight: 700; margin-top: 4px;">CSC 301 · Attendance Sheet</h3>
+              </div>
+              <div style="background: #E8DCCB; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;">Date: 16/09/2026</div>
+            </div>
+
+            <!-- Fake paper sheet rows with proxy signatures -->
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px;">
+              <div style="display: grid; grid-template-columns: 140px 1.2fr 1fr; padding: 10px 14px; background: rgba(0,0,0,0.03); border-radius: 8px; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                <span class="font-mono" style="font-weight: 600;">2021/CSC/004</span>
+                <span>Abubakar S.</span>
+                <span style="font-family: cursive; color: #1E3A8A;">A.S.</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 140px 1.2fr 1fr; padding: 10px 14px; background: rgba(0,0,0,0.03); border-radius: 8px; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                <span class="font-mono" style="font-weight: 600;">2021/CSC/012</span>
+                <span>Emeka J. (Absent)</span>
+                <span style="font-family: cursive; color: #B91C1C; font-style: italic;">*Signed for by friend*</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 140px 1.2fr 1fr; padding: 10px 14px; background: rgba(0,0,0,0.03); border-radius: 8px; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                <span class="font-mono" style="font-weight: 600;">2021/CSC/019</span>
+                <span>Fatima Z.</span>
+                <span style="font-family: cursive; color: #1E3A8A;">F.Z.</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 140px 1.2fr 1fr; padding: 10px 14px; background: rgba(0,0,0,0.03); border-radius: 8px; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                <span class="font-mono" style="font-weight: 600;">2021/CSC/027</span>
+                <span>Tunde B. (Off-Campus)</span>
+                <span style="font-family: cursive; color: #B91C1C; font-style: italic;">*Proxy Signature*</span>
+              </div>
+            </div>
+
+            <!-- Problem Stamp (tagged to allow intentional overlay graphic) -->
+            <div id="s1-stamp" data-layout-allow-overlap="true" data-layout-allow-occlusion="true" style="position: absolute; top: 38%; left: 15%; transform: rotate(-12deg) scale(1); border: 4px solid #DC2626; color: #DC2626; padding: 14px 28px; border-radius: 16px; font-weight: 900; font-size: 28px; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(254, 226, 226, 0.92); box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);">
+              ⚠ EASILY MANIPULATED
+            </div>
+
+            <p style="margin-top: 24px; font-size: 13px; color: #78644A; font-weight: 600; text-align: center;">
+              Paper sheets cannot verify physical location, student identity, or actual presence.
+            </p>
+          </div>
+
+          <!-- Right: The Narrative Hook -->
+          <div id="s1-right-text" style="display: flex; flex-direction: column; justify-content: center; gap: 24px;">
+            <div class="badge-pill badge-gold" style="width: fit-content;">
+              <span style="width: 8px; height: 8px; border-radius: 9999px; background: var(--sungold);"></span>
+              Nigerian Higher Education Standard
+            </div>
+            <h1 class="font-display" style="font-size: 64px; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;">
+              University attendance<br />
+              should be more than<br />
+              <span style="color: #64748B;">a name on a sheet.</span>
+            </h1>
+            <p style="font-size: 22px; color: var(--text-muted); line-height: 1.6; max-width: 650px;">
+              Proxies slip through. Records get manipulated. Disputed clearance derails exams.<br />
+              <strong style="color: #FFFFFF;">Presently replaces guesswork with verified truth.</strong>
+            </p>
+            <div style="display: flex; align-items: center; gap: 16px; margin-top: 12px;">
+              <div style="width: 48px; height: 4px; background: var(--sungold); border-radius: 2px;"></div>
+              <span class="font-display" style="font-size: 20px; font-weight: 700; color: var(--sungold); letter-spacing: 0.05em;">Smart attendance. Verified.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 2: Step 1 — Lecturer Starts Session (7.5s – 18.0s) -->
+      <!-- ======================================================== -->
+      <div id="scene-2" class="clip" data-start="7.5" data-duration="10.5" data-track-index="0" style="display: flex; align-items: center; justify-content: center; padding: 60px;">
+        <div style="width: 100%; max-width: 1720px; height: 920px; display: grid; grid-template-columns: 1fr 1.15fr; gap: 50px; align-items: center;">
+          
+          <!-- Left: Lecturer Dashboard Controls -->
+          <div id="s2-lecturer-panel" class="glass-panel" style="padding: 44px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; padding: 6px;">
+                    <img src="assets/logo.png" alt="Presently" style="width: 100%; height: 100%; object-fit: contain;" />
+                  </div>
+                  <div>
+                    <h3 class="font-display" style="font-size: 22px; font-weight: 800;">Lecturer Console</h3>
+                    <p style="font-size: 13px; color: var(--text-muted);">Dr. Adebayo O. · Computer Science</p>
+                  </div>
+                </div>
+                <span class="badge-pill badge-gold">Step 1: Session Start</span>
+              </div>
+
+              <!-- Course Detail Card -->
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--dark-border); border-radius: 20px; padding: 24px; margin-bottom: 24px;">
+                <span class="badge-pill badge-gold" style="font-size: 11px; padding: 4px 10px; margin-bottom: 8px;">Active Course</span>
+                <h2 class="font-display" style="font-size: 32px; font-weight: 800; margin-top: 6px;">CSC 301</h2>
+                <p style="font-size: 16px; color: var(--text-muted); margin-top: 4px;">Distributed Systems & Cloud Computing</p>
+              </div>
+
+              <!-- Venue & Geofence Configuration -->
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--dark-border); border-radius: 16px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(249,196,6,0.15); display: flex; align-items: center; justify-content: center; color: var(--sungold);">📍</div>
+                    <div>
+                      <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Designated Venue</div>
+                      <div style="font-size: 16px; font-weight: 700;">Faculty of Science · Hall 7</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Capacity: 500 seats</span>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--dark-border); border-radius: 16px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; color: var(--success);">📡</div>
+                    <div>
+                      <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">GPS Geofence Perimeter</div>
+                      <div style="font-size: 16px; font-weight: 700;">Radius: 250m Strict Hall Boundary</div>
+                    </div>
+                  </div>
+                  <span class="badge-pill badge-green">Enforced</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Start Session Button & Cursor simulation -->
+            <div style="position: relative; margin-top: 32px;">
+              <button id="s2-start-btn" style="width: 100%; height: 68px; border-radius: 20px; background: var(--sungold); color: var(--presently-black); border: none; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; box-shadow: 0 15px 35px rgba(249, 196, 6, 0.3);">
+                <span>Launch Attendance Session</span>
+                <span style="font-size: 20px;">➔</span>
+              </button>
+              <!-- Animated Simulated Cursor -->
+              <div id="s2-cursor" style="position: absolute; top: 20px; right: 80px; width: 32px; height: 32px; pointer-events: none; z-index: 50;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="#0C0C0C" stroke-width="1.5">
+                  <path d="M4 3L11 20L14 13L21 10L4 3Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Projector / Big Screen QR View (SessionDetailDialog) -->
+          <div id="s2-projector-view" class="glass-panel" style="padding: 48px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 2px solid rgba(249, 196, 6, 0.3); background: #121212; position: relative;">
+            
+            <!-- Header status banner -->
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="width: 12px; height: 12px; border-radius: 9999px; background: #EF4444;"></span>
+                <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.1em; color: #EF4444; text-transform: uppercase;">SESSION LIVE</span>
+              </div>
+              <div class="badge-pill badge-gold">
+                <span>📍</span> Hall 7 · Projector Display
+              </div>
+            </div>
+
+            <!-- Big Crisp QR Code Section with Gold Corner Brackets -->
+            <div style="position: relative; margin: 16px 0;">
+              <div style="width: 360px; height: 360px; background: #FFFFFF; border-radius: 36px; padding: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 60px rgba(249,196,6,0.25);">
+                <!-- High Quality SVG QR Code Simulation -->
+                <svg width="300" height="300" viewBox="0 0 100 100" fill="#231F0F">
+                  <!-- Corner Finders -->
+                  <rect x="5" y="5" width="28" height="28" rx="4" stroke="#231F0F" stroke-width="4" fill="none" />
+                  <rect x="11" y="11" width="16" height="16" rx="2" fill="#231F0F" />
+                  <rect x="67" y="5" width="28" height="28" rx="4" stroke="#231F0F" stroke-width="4" fill="none" />
+                  <rect x="73" y="11" width="16" height="16" rx="2" fill="#231F0F" />
+                  <rect x="5" y="67" width="28" height="28" rx="4" stroke="#231F0F" stroke-width="4" fill="none" />
+                  <rect x="11" y="73" width="16" height="16" rx="2" fill="#231F0F" />
+                  <!-- Authentic QR data grid pattern -->
+                  <rect x="38" y="10" width="6" height="6" />
+                  <rect x="48" y="10" width="6" height="6" />
+                  <rect x="58" y="14" width="6" height="6" />
+                  <rect x="38" y="24" width="6" height="6" />
+                  <rect x="48" y="24" width="6" height="6" />
+                  <rect x="10" y="38" width="6" height="6" />
+                  <rect x="20" y="38" width="6" height="6" />
+                  <rect x="38" y="38" width="8" height="8" fill="#F9C406" />
+                  <rect x="52" y="38" width="6" height="6" />
+                  <rect x="68" y="38" width="6" height="6" />
+                  <rect x="80" y="38" width="6" height="6" />
+                  <rect x="38" y="52" width="6" height="6" />
+                  <rect x="48" y="52" width="6" height="6" />
+                  <rect x="62" y="52" width="6" height="6" />
+                  <rect x="74" y="52" width="6" height="6" />
+                  <rect x="84" y="52" width="6" height="6" />
+                  <rect x="38" y="68" width="6" height="6" />
+                  <rect x="52" y="68" width="6" height="6" />
+                  <rect x="68" y="68" width="6" height="6" />
+                  <rect x="80" y="68" width="6" height="6" />
+                  <rect x="44" y="80" width="6" height="6" />
+                  <rect x="58" y="80" width="6" height="6" />
+                  <rect x="70" y="80" width="6" height="6" />
+                  <rect x="84" y="80" width="6" height="6" />
+                </svg>
+              </div>
+              <div class="corner-tl"></div>
+              <div class="corner-tr"></div>
+              <div class="corner-bl"></div>
+              <div class="corner-br"></div>
+            </div>
+
+            <!-- Session Code Box & Counter -->
+            <div style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--dark-border); border-radius: 20px; padding: 18px; text-align: center;">
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase;">Session Passcode</span>
+                <h3 class="font-mono" style="font-size: 40px; font-weight: 900; color: var(--sungold); letter-spacing: 0.15em; margin-top: 4px;">8X49-K2</h3>
+              </div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--dark-border); border-radius: 20px; padding: 18px; text-align: center;">
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase;">Live Attendees</span>
+                <h3 class="font-display" style="font-size: 40px; font-weight: 900; color: #FFFFFF; margin-top: 4px;">0 <span style="font-size: 16px; color: var(--text-muted); font-weight: 600;">joined</span></h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 3: Step 2 & 3 — Student Check-In & Verification (18.0s – 34.0s) -->
+      <!-- ======================================================== -->
+      <div id="scene-3" class="clip" data-start="18.0" data-duration="16.0" data-track-index="0" style="display: flex; align-items: center; justify-content: center; padding: 60px;">
+        <div style="width: 100%; max-width: 1600px; display: grid; grid-template-columns: 520px 1fr; gap: 80px; align-items: center;">
+          
+          <!-- Smartphone Screen Mockup (AttendanceCheckIn.tsx) -->
+          <div id="s3-phone-frame" style="width: 500px; height: 860px; background: #000000; border: 8px solid #282828; border-radius: 54px; padding: 24px; box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 50px rgba(249,196,6,0.15); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+            
+            <!-- Phone Notch & Status -->
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; color: #888; padding: 0 10px;">
+              <span>10:04</span>
+              <div style="width: 120px; height: 24px; background: #1C1C1C; border-radius: 14px;"></div>
+              <span>5G 98%</span>
+            </div>
+
+            <!-- Phone Content Area -->
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;">
+              <span class="badge-pill badge-gold" style="margin-bottom: 20px;">Presently Student App</span>
+              <h2 class="font-display" style="font-size: 28px; font-weight: 800; margin-bottom: 6px;">CSC 301 Check-In</h2>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 28px;">Lecture Hall 7 · Distributed Systems</p>
+
+              <!-- Phone Session Input -->
+              <div style="width: 100%; background: #161616; border: 2px solid rgba(249,196,6,0.4); border-radius: 24px; padding: 22px; margin-bottom: 24px;">
+                <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px;">Session Passcode</div>
+                <div id="s3-phone-code" class="font-mono" style="font-size: 34px; font-weight: 900; color: var(--sungold); letter-spacing: 0.15em;">
+                  8X49-K2
+                </div>
+              </div>
+
+              <!-- Phone Telemetry Icon Box -->
+              <div id="s3-phone-telemetry-box" style="position: relative; width: 140px; height: 140px; margin: 12px 0;">
+                <div id="s3-phone-icon-bg" style="width: 140px; height: 140px; border-radius: 9999px; background: rgba(249,196,6,0.1); border: 2px solid rgba(249,196,6,0.3); display: flex; align-items: center; justify-content: center;">
+                  <!-- Fingerprint SVG Icon -->
+                  <svg id="s3-fingerprint-svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#F9C406" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+                    <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+                    <path d="M2 12a10 10 0 0 1 18-6" />
+                    <path d="M2 16a10 10 0 0 1 14.88-8.2" />
+                    <path d="M6 18c0-3.5 2-6 6-6a6 6 0 0 1 5.48 3.5" />
+                    <path d="M8 21a8 8 0 0 1-2-5c0-4 3.5-7 8-7a8 8 0 0 1 7.2 4.5" />
+                  </svg>
+                  <!-- Success Checkmark SVG (hidden initially) -->
+                  <svg id="s3-check-svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Dynamic status text on phone -->
+              <h3 id="s3-phone-status-title" class="font-display" style="font-size: 20px; font-weight: 800; margin-top: 14px;">Geospatial Calibration</h3>
+              <p id="s3-phone-status-desc" style="font-size: 13px; color: var(--text-muted); margin-top: 6px; max-width: 320px;">
+                Checking proximity to Lecture Hall 7...
+              </p>
+            </div>
+
+            <!-- Student ID Tag at bottom of phone -->
+            <div style="background: #161616; border-radius: 20px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="text-align: left;">
+                <div style="font-size: 13px; font-weight: 700;">Oluwaseun Adeyemi</div>
+                <div class="font-mono" style="font-size: 11px; color: var(--text-muted);">2021/CSC/042</div>
+              </div>
+              <span id="s3-phone-tag" class="badge-pill badge-gold" style="font-size: 10px; padding: 4px 10px;">Verifying</span>
+            </div>
+          </div>
+
+          <!-- Right: Deep Telemetry Verification Pipeline Breakdown -->
+          <div style="display: flex; flex-direction: column; gap: 28px;">
+            <div>
+              <div class="badge-pill badge-gold" style="margin-bottom: 16px;">Step 2 & 3: Anti-Proxy Verification</div>
+              <h1 class="font-display" style="font-size: 52px; font-weight: 800; line-height: 1.1;">
+                Zero proxies.<br />
+                Multi-factor verified.
+              </h1>
+              <p style="font-size: 20px; color: var(--text-muted); margin-top: 14px; max-width: 700px;">
+                Every check-in is authenticated simultaneously across geographical coordinates and physical device hardware.
+              </p>
+            </div>
+
+            <!-- Telemetry Step 1 Card: GPS Geofence -->
+            <div id="s3-step1-card" class="glass-panel" style="padding: 28px; border-left: 6px solid var(--sungold);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(249,196,6,0.15); display: flex; align-items: center; justify-content: center; font-size: 22px;">📡</div>
+                  <div>
+                    <h4 class="font-display" style="font-size: 20px; font-weight: 800;">1. Geospatial Telemetry (GPS)</h4>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-top: 2px;">Campus coordinates: 6.5244° N, 3.3792° E</p>
+                  </div>
+                </div>
+                <div id="s3-step1-badge" class="badge-pill badge-green">
+                  ✓ 4.2m From Hall (Inside Perimeter)
+                </div>
+              </div>
+            </div>
+
+            <!-- Telemetry Step 2 Card: Biometric & Device Hardware -->
+            <div id="s3-step2-card" class="glass-panel" style="padding: 28px; border-left: 6px solid var(--sungold);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; font-size: 22px;">🔐</div>
+                  <div>
+                    <h4 class="font-display" style="font-size: 20px; font-weight: 800;">2. Device & Biometric Integrity</h4>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-top: 2px;">Hardware signature & biometric token matched</p>
+                  </div>
+                </div>
+                <div id="s3-step2-badge" class="badge-pill badge-green">
+                  ✓ Identity Authenticated
+                </div>
+              </div>
+            </div>
+
+            <!-- Final Result Box -->
+            <div id="s3-result-card" style="background: rgba(34, 197, 94, 0.12); border: 2px solid rgba(34, 197, 94, 0.4); border-radius: 24px; padding: 24px 32px; display: flex; align-items: center; gap: 20px;">
+              <div style="width: 52px; height: 52px; border-radius: 9999px; background: var(--success); color: #000; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900;">✓</div>
+              <div>
+                <h4 class="font-display" style="font-size: 22px; font-weight: 800; color: #FFFFFF;">ATTENDANCE SECURED & RECORDED</h4>
+                <p style="font-size: 14px; color: #86EFAC; margin-top: 2px;">Cryptographic reference: TX-CSC301-8X49-VERIFIED</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 4: Step 4 — Live Accountability & Lecturer Visibility (34.0s – 47.0s) -->
+      <!-- ======================================================== -->
+      <div id="scene-4" class="clip" data-start="34.0" data-duration="13.0" data-track-index="0" style="display: flex; align-items: center; justify-content: center; padding: 60px;">
+        <div style="width: 100%; max-width: 1720px; display: flex; flex-direction: column; gap: 36px;">
+          
+          <!-- Header Banner -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+              <span class="badge-pill badge-gold" style="margin-bottom: 12px;">Step 4: Real-Time Audit Log</span>
+              <h2 class="font-display" style="font-size: 48px; font-weight: 800;">
+                Live Verified Attendance Record
+              </h2>
+              <p style="font-size: 18px; color: var(--text-muted); margin-top: 6px;">
+                Lecturers and administrators see tamper-proof logs updated second-by-second.
+              </p>
+            </div>
+
+            <!-- High Impact Live Counter Box -->
+            <div class="glass-panel" style="padding: 20px 40px; display: flex; align-items: center; gap: 32px; border: 2px solid rgba(249,196,6,0.3);">
+              <div>
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase;">Verified Present</span>
+                <div style="display: flex; align-items: baseline; gap: 8px;">
+                  <span id="s4-counter-num" class="font-display" style="font-size: 54px; font-weight: 900; color: var(--sungold);">0</span>
+                  <span style="font-size: 24px; color: var(--text-muted); font-weight: 700;">/ 500</span>
+                </div>
+              </div>
+              <div style="height: 50px; width: 1px; background: var(--dark-border);"></div>
+              <div>
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase;">Turnout Rate</span>
+                <div id="s4-rate-num" class="font-display" style="font-size: 54px; font-weight: 900; color: #22C55E;">85.6%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attendance Report Table (AttendanceReport.tsx recreation) -->
+          <div class="glass-panel" style="border-radius: 28px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.5);">
+            <!-- Table Header -->
+            <div style="display: grid; grid-template-columns: 180px 1.4fr 140px 130px 140px; padding: 20px 24px; background: #1C1C1C; border-bottom: 2px solid var(--dark-border); font-size: 12px; font-weight: 800; letter-spacing: 0.15em; color: var(--text-muted); text-transform: uppercase;">
+              <div>Matric Number</div>
+              <div>Full Name</div>
+              <div>Status</div>
+              <div>Time</div>
+              <div>GPS Proximity</div>
+            </div>
+
+            <!-- Table Rows -->
+            <div style="display: flex; flex-direction: column;">
+              <div id="s4-row-1" class="audit-row" style="background: rgba(255,255,255,0.02);">
+                <span class="font-mono" style="font-weight: 700; color: var(--sungold);">2021/CSC/042</span>
+                <span style="font-weight: 700; font-size: 16px;">Oluwaseun Adeyemi</span>
+                <div><span class="badge-pill badge-green" style="font-size: 11px;">PRESENT</span></div>
+                <div style="color: var(--text-muted); font-size: 14px;">10:04 AM</div>
+                <div class="font-mono" style="color: #22C55E; font-size: 13px; font-weight: 600;">4.2m away</div>
+              </div>
+
+              <div id="s4-row-2" class="audit-row">
+                <span class="font-mono" style="font-weight: 700; color: var(--sungold);">2021/CSC/089</span>
+                <span style="font-weight: 700; font-size: 16px;">Chioma Okonkwo</span>
+                <div><span class="badge-pill badge-green" style="font-size: 11px;">PRESENT</span></div>
+                <div style="color: var(--text-muted); font-size: 14px;">10:05 AM</div>
+                <div class="font-mono" style="color: #22C55E; font-size: 13px; font-weight: 600;">8.1m away</div>
+              </div>
+
+              <div id="s4-row-3" class="audit-row" style="background: rgba(255,255,255,0.02);">
+                <span class="font-mono" style="font-weight: 700; color: var(--sungold);">2021/CSC/115</span>
+                <span style="font-weight: 700; font-size: 16px;">Ibrahim Musa</span>
+                <div><span class="badge-pill badge-green" style="font-size: 11px;">PRESENT</span></div>
+                <div style="color: var(--text-muted); font-size: 14px;">10:05 AM</div>
+                <div class="font-mono" style="color: #22C55E; font-size: 13px; font-weight: 600;">6.4m away</div>
+              </div>
+
+              <div id="s4-row-4" class="audit-row">
+                <span class="font-mono" style="font-weight: 700; color: var(--sungold);">2021/CSC/204</span>
+                <span style="font-weight: 700; font-size: 16px;">Blessing Eze</span>
+                <div><span class="badge-pill badge-green" style="font-size: 11px;">PRESENT</span></div>
+                <div style="color: var(--text-muted); font-size: 14px;">10:06 AM</div>
+                <div class="font-mono" style="color: #22C55E; font-size: 13px; font-weight: 600;">12.0m away</div>
+              </div>
+            </div>
+
+            <!-- Table Footer Status -->
+            <div style="padding: 16px 24px; background: #121212; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--dark-border);">
+              <span style="font-size: 13px; color: var(--text-muted);">Displaying 4 of 428 verified attendees · Session CSC301</span>
+              <div style="display: flex; gap: 12px;">
+                <span class="badge-pill badge-gold" style="font-size: 10px;">Export PDF</span>
+                <span class="badge-pill badge-gold" style="font-size: 10px;">Export CSV (NUC Compliant)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 5: Step 5 — Institutional Proof & Exam Clearance (47.0s – 54.0s) -->
+      <!-- ======================================================== -->
+      <div id="scene-5" class="clip" data-start="47.0" data-duration="7.0" data-track-index="0" style="display: flex; align-items: center; justify-content: center; padding: 60px;">
+        <div style="width: 100%; max-width: 1680px; display: flex; flex-direction: column; gap: 40px;">
+          
+          <div style="text-align: center; max-width: 900px; margin: 0 auto;">
+            <span class="badge-pill badge-gold" style="margin-bottom: 16px;">Step 5: Institutional Visibility</span>
+            <h2 class="font-display" style="font-size: 52px; font-weight: 800;">
+              Trustworthy Data Institutions Can Rely On
+            </h2>
+            <p style="font-size: 20px; color: var(--text-muted); margin-top: 10px;">
+              From semester audit reports to automated exam clearance, accountability is built in.
+            </p>
+          </div>
+
+          <!-- 4 Bento Metric Cards -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;">
+            
+            <div id="s5-card-1" class="glass-panel" style="padding: 36px 28px; text-align: center; border-top: 4px solid var(--sungold);">
+              <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Institutional Average</span>
+              <h3 class="font-display" style="font-size: 56px; font-weight: 900; color: var(--sungold); margin: 12px 0;">88.4%</h3>
+              <p style="font-size: 13px; color: #22C55E; font-weight: 700;">▲ 14.2% Attendance Growth</p>
+            </div>
+
+            <div id="s5-card-2" class="glass-panel" style="padding: 36px 28px; text-align: center; border-top: 4px solid #22C55E;">
+              <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Exam Clearance</span>
+              <h3 class="font-display" style="font-size: 56px; font-weight: 900; color: #22C55E; margin: 12px 0;">94.2%</h3>
+              <p style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Met ≥ 75% NUC Threshold</p>
+            </div>
+
+            <div id="s5-card-3" class="glass-panel" style="padding: 36px 28px; text-align: center; border-top: 4px solid #3B82F6;">
+              <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Proxy Detection</span>
+              <h3 class="font-display" style="font-size: 56px; font-weight: 900; color: #3B82F6; margin: 12px 0;">0%</h3>
+              <p style="font-size: 13px; color: var(--text-muted); font-weight: 600;">All Check-ins Geoverified</p>
+            </div>
+
+            <div id="s5-card-4" class="glass-panel" style="padding: 36px 28px; text-align: center; border-top: 4px solid #A855F7;">
+              <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Automated Reports</span>
+              <h3 class="font-display" style="font-size: 56px; font-weight: 900; color: #A855F7; margin: 12px 0;">100%</h3>
+              <p style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Instant Senate & HOD Export</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 6: Outro — Positioning & Brand Promise (54.0s – 60.0s) -->
+      <!-- ======================================================== -->
+      <div id="scene-6" class="clip" data-start="54.0" data-duration="6.0" data-track-index="0" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px;">
+        
+        <!-- Brand Logo & Identity -->
+        <div id="s6-logo-wrap" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+          <div style="width: 120px; height: 120px; border-radius: 36px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 80px rgba(249, 196, 6, 0.35); padding: 18px;">
+            <img src="assets/logo.png" alt="Presently Logo" style="width: 100%; height: 100%; object-fit: contain;" />
+          </div>
+
+          <h1 class="font-display" style="font-size: 80px; font-weight: 900; letter-spacing: -0.04em; margin-top: 10px;">
+            Presently
+          </h1>
+
+          <div style="height: 4px; width: 80px; background: var(--sungold); border-radius: 2px;"></div>
+
+          <h2 class="font-display" style="font-size: 36px; font-weight: 700; color: #F5F5F5; max-width: 900px; line-height: 1.3;">
+            Trust Infrastructure for Higher Education in Nigeria.
+          </h2>
+
+          <p class="font-display" style="font-size: 26px; font-weight: 600; color: var(--sungold); letter-spacing: 0.05em; margin-top: 4px;">
+            Smart attendance. Verified.
+          </p>
+
+          <div style="display: flex; gap: 16px; margin-top: 24px;">
+            <span class="badge-pill badge-gold">📍 GPS Geofencing</span>
+            <span class="badge-pill badge-gold">🔐 Biometric Integrity</span>
+            <span class="badge-pill badge-gold">📊 Automated Clearance</span>
+          </div>
+
+          <div style="margin-top: 32px; font-size: 18px; color: var(--text-muted); font-weight: 600;">
+            getpresently.com.ng
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- GSAP Master Animation Timeline -->
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ========================================================
+      // SCENE 1 Animations (0.0s – 7.5s)
+      // ========================================================
+      tl.fromTo("#s1-paper-card", { opacity: 0, x: -60, scale: 0.95 }, { opacity: 1, x: 0, scale: 1, duration: 1.0, ease: "power3.out" }, 0.2);
+      tl.fromTo("#s1-right-text", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 1.0, ease: "power3.out" }, 0.5);
+      // Problem Stamp slam
+      tl.fromTo("#s1-stamp", { opacity: 0, scale: 2.5, rotation: -25 }, { opacity: 1, scale: 1, rotation: -12, duration: 0.5, ease: "back.out(2)" }, 2.8);
+      // Scene 1 Exit
+      tl.to("#scene-1", { opacity: 0, scale: 0.96, duration: 0.5, ease: "power2.in" }, 7.0);
+
+      // ========================================================
+      // SCENE 2 Animations (7.5s – 18.0s)
+      // ========================================================
+      tl.fromTo("#scene-2", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 7.5);
+      tl.fromTo("#s2-lecturer-panel", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 7.7);
+      tl.fromTo("#s2-projector-view", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 8.0);
+      // Cursor move and click button
+      tl.fromTo("#s2-cursor", { x: 80, y: 120, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: 1.0, ease: "power2.out" }, 7.8);
+      tl.to("#s2-cursor", { scale: 0.8, duration: 0.15, yoyo: true, repeat: 1 }, 8.8);
+      tl.to("#s2-start-btn", { scale: 0.97, duration: 0.15, yoyo: true, repeat: 1 }, 8.8);
+      // Projector glow expands
+      tl.to("#s2-projector-view", { scale: 1.02, duration: 0.6, ease: "back.out(1.5)" }, 9.2);
+      // Scene 2 Exit
+      tl.to("#scene-2", { opacity: 0, duration: 0.5, ease: "power2.in" }, 17.5);
+
+      // ========================================================
+      // SCENE 3 Animations (18.0s – 34.0s)
+      // ========================================================
+      tl.fromTo("#scene-3", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 18.0);
+      tl.fromTo("#s3-phone-frame", { opacity: 0, y: 50, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 1.0, ease: "power3.out" }, 18.2);
+      
+      // Step 1: Telemetry Geofence check
+      tl.fromTo("#s3-step1-card", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 19.5);
+      tl.fromTo("#s3-step1-badge", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, 23.0);
+      
+      // Phone changes to biometric check
+      tl.to("#s3-phone-status-title", { textContent: "Biometric Gateway Active", duration: 0.1 }, 24.5);
+      tl.to("#s3-phone-status-desc", { textContent: "Scanning device hardware & fingerprint...", duration: 0.1 }, 24.5);
+      tl.to("#s3-phone-icon-bg", { borderColor: "#F9C406", backgroundColor: "rgba(249,196,6,0.25)", duration: 0.5, repeat: 3, yoyo: true }, 24.8);
+
+      // Step 2: Telemetry Biometric verified
+      tl.fromTo("#s3-step2-card", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" }, 25.5);
+      tl.fromTo("#s3-step2-badge", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, 27.5);
+
+      // Grand Verification Success on Phone
+      tl.call(() => {
+        const fp = document.getElementById('s3-fingerprint-svg');
+        const ch = document.getElementById('s3-check-svg');
+        const st = document.getElementById('s3-phone-status-title');
+        const sd = document.getElementById('s3-phone-status-desc');
+        const tag = document.getElementById('s3-phone-tag');
+        if (fp) fp.style.display = 'none';
+        if (ch) ch.style.display = 'block';
+        if (st) st.textContent = 'Identity Verified';
+        if (sd) sd.textContent = 'Attendance Secured for CSC 301';
+        if (tag) {
+          tag.textContent = 'VERIFIED';
+          tag.className = 'badge-pill badge-green';
+        }
+      }, null, 29.0);
+
+      tl.fromTo("#s3-result-card", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.5)" }, 29.2);
+      // Scene 3 Exit
+      tl.to("#scene-3", { opacity: 0, duration: 0.5, ease: "power2.in" }, 33.5);
+
+      // ========================================================
+      // SCENE 4 Animations (34.0s – 47.0s)
+      // ========================================================
+      tl.fromTo("#scene-4", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 34.0);
+      // Live Counter rolls up 0 -> 428
+      const counterObj = { val: 0 };
+      tl.to(counterObj, {
+        val: 428,
+        duration: 2.5,
+        ease: "power2.out",
+        onUpdate: () => {
+          const el = document.getElementById('s4-counter-num');
+          if (el) el.textContent = Math.floor(counterObj.val).toString();
+        }
+      }, 35.0);
+
+      // Rows slide in one by one on beat
+      tl.fromTo("#s4-row-1", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5 }, 38.0);
+      tl.fromTo("#s4-row-2", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5 }, 39.5);
+      tl.fromTo("#s4-row-3", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5 }, 41.0);
+      tl.fromTo("#s4-row-4", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5 }, 42.5);
+      // Scene 4 Exit
+      tl.to("#scene-4", { opacity: 0, duration: 0.5, ease: "power2.in" }, 46.5);
+
+      // ========================================================
+      // SCENE 5 Animations (47.0s – 54.0s)
+      // ========================================================
+      tl.fromTo("#scene-5", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 47.0);
+      tl.fromTo("#s5-card-1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 47.5);
+      tl.fromTo("#s5-card-2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 48.3);
+      tl.fromTo("#s5-card-3", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 49.1);
+      tl.fromTo("#s5-card-4", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 49.9);
+      // Scene 5 Exit
+      tl.to("#scene-5", { opacity: 0, duration: 0.5, ease: "power2.in" }, 53.5);
+
+      // ========================================================
+      // SCENE 6 Animations (54.0s – 60.0s)
+      // ========================================================
+      tl.fromTo("#scene-6", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 54.0);
+      tl.fromTo("#s6-logo-wrap", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 1.0, ease: "power3.out" }, 54.5);
+      // Ambient glow swell
+      tl.to("#ambient-orb-1", { scale: 1.4, opacity: 0.25, duration: 3.0, ease: "sine.inOut" }, 54.0);
+
+      // Register timeline for Hyperframes runner
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+Introducing Presently: Trust Motion.
+
+Nigerian higher education runs on trust, but paper registers and proxy sign-ins compromise academic integrity.
+
+Presently is the trust infrastructure built for Nigerian universities:
+✓ GPS campus geofencing
+✓ Hardware-bound biometric validation
+✓ Real-time lecturer session audit
+✓ Automated NUC 75% exam clearance
+
+Smart attendance. Verified.
+
+Watch the film: getpresently.com.ng
