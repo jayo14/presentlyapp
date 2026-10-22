@@ -1,12 +1,11 @@
+import os
+
 import psycopg2
 
 try:
     print("Connecting...")
     conn = psycopg2.connect(
-        host="ep-dry-truth-ansqgzu2.c-6.us-east-1.aws.neon.tech",
-        user="neondb_owner",
-        password="***REMOVED-NEON-PASSWORD***",
-        database="neondb",
+        os.environ["DATABASE_URL"],
         sslmode="require",
         connect_timeout=10
     )

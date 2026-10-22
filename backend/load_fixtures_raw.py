@@ -3,7 +3,7 @@ import json
 import psycopg2
 from urllib.parse import urlparse
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres.owvqbnnybociimzqkeeh:***REMOVED-SUPABASE-PASSWORD***@aws-1-eu-north-1.pooler.supabase.com:6543/postgres")
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 model_to_table = {
     'admin.logentry': 'django_admin_log',

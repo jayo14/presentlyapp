@@ -2,7 +2,7 @@ import os
 import psycopg2
 
 def reset_sequences():
-    database_url = os.environ.get('DATABASE_URL', 'postgresql://postgres.owvqbnnybociimzqkeeh:***REMOVED-SUPABASE-PASSWORD***@aws-1-eu-north-1.pooler.supabase.com:6543/postgres')
+    database_url = os.environ['DATABASE_URL']
     conn = psycopg2.connect(database_url)
     cur = conn.cursor()
     

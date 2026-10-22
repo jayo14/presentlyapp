@@ -4,7 +4,7 @@ import json
 import os
 from datetime import datetime
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres.owvqbnnybociimzqkeeh:***REMOVED-SUPABASE-PASSWORD***@aws-1-eu-north-1.pooler.supabase.com:6543/postgres")
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 tables_to_migrate = [
     "venues", "users_groups", "users_user_permissions", "auth_permission", "user_devices",
