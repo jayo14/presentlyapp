@@ -71,7 +71,7 @@ presently-2/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/CodeGallantX/presently-2.git
+git clone https://github.com/jayo14/presentlyapp.git
 cd presently-2
 ```
 
