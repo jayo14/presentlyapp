@@ -3,50 +3,44 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { SitemapStream, streamToPromise } from 'sitemap';
 
-const siteUrl = process.env.VITE_SITE_URL || 'https://getpresently.com.ng';
+const siteUrl = process.env.VITE_SITE_URL || 'https://www.getpresently.com.ng';
 const publicDir = path.resolve(process.cwd(), 'dist');
 
-const universities = [
-  'lasustech',
-  'unilag',
-  'lasu',
-  'futa',
-  'oau',
-  'ui',
-  'uniport',
-  'uniben',
-];
+// Real, verified blog posts on disk in content/blog
+const contentBlogDir = path.resolve(process.cwd(), 'content/blog');
+let blogPosts = ['proxy-attendance-nigeria', 'how-presently-works'];
 
-const blogPosts = [
-  'why-gps-attendance-matters-in-nigerian-universities',
-  'how-to-roll-out-digital-attendance-in-one-semester',
-];
+if (fs.existsSync(contentBlogDir)) {
+  const files = fs.readdirSync(contentBlogDir);
+  const detectedSlugs = files
+    .filter((f) => f.endsWith('.mdx') || f.endsWith('.md'))
+    .map((f) => f.replace(/\.mdx?$/, ''));
+  if (detectedSlugs.length > 0) {
+    blogPosts = detectedSlugs;
+  }
+}
 
 const staticRoutes = [
   { url: '/', changefreq: 'weekly', priority: 1.0 },
   { url: '/features', changefreq: 'weekly', priority: 0.8 },
   { url: '/how-it-works', changefreq: 'weekly', priority: 0.8 },
-  { url: '/universities', changefreq: 'weekly', priority: 0.8 },
-  { url: '/documentation', changefreq: 'weekly', priority: 0.8 },
-  { url: '/volunteers', changefreq: 'weekly', priority: 0.8 },
+  { url: '/pricing', changefreq: 'weekly', priority: 0.9 },
+  { url: '/documentation', changefreq: 'weekly', priority: 0.7 },
   { url: '/blog', changefreq: 'weekly', priority: 0.8 },
+  { url: '/volunteers', changefreq: 'monthly', priority: 0.5 },
   { url: '/privacy', changefreq: 'monthly', priority: 0.4 },
   { url: '/terms', changefreq: 'monthly', priority: 0.4 },
 ];
 
-const universityRoutes = universities.map((slug) => ({
-  url: `/universities/${slug}`,
-  changefreq: 'weekly',
-  priority: 0.8,
-}));
-
 const blogRoutes = blogPosts.map((slug) => ({
   url: `/blog/${slug}`,
   changefreq: 'weekly',
-  priority: 0.6,
+  priority: 0.7,
 }));
 
-const allRoutes = [...staticRoutes, ...universityRoutes, ...blogRoutes];
+// Note: Programmatic doorway pages (/universities/:slug) are intentionally excluded from the sitemap
+// to comply with Google Search Essentials and avoid misrepresenting institutional partnerships.
+const allRoutes = [...staticRoutes, ...blogRoutes];
 
 async function generateSitemap() {
   const sitemap = new SitemapStream({ hostname: siteUrl });
@@ -76,4 +70,4 @@ function generateRobots() {
 
 await generateSitemap();
 generateRobots();
-console.log('[SEO] Generated sitemap.xml and robots.txt');
+console.log('[SEO] Generated clean, verified sitemap.xml and robots.txt');
