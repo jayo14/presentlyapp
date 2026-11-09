@@ -51,24 +51,30 @@ export const SEO: React.FC<SEOProps> = ({
     '@type': 'Organization',
     name: 'Presently',
     url: SITE_URL,
-    logo: `${SITE_URL}/icon-512.png`,
+    logo: `${SITE_URL}/logo.png`,
     sameAs: [
       'https://x.com/PresentlyNG',
     ],
     description,
   };
 
-  // SEO: WebSite schema supports sitelinks/search context.
+  // SEO: WebApplication schema establishes educational software entity.
+  const softwareAppJSONLD = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Presently Attendance Management Platform',
+    applicationCategory: 'EducationalApplication',
+    operatingSystem: 'All modern web browsers',
+    url: SITE_URL,
+    description,
+  };
+
+  // SEO: WebSite schema supports sitelinks context.
   const websiteSchemaJSONLD = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Presently',
     url: SITE_URL,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE_URL}/search?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
   };
 
   return (
@@ -107,6 +113,9 @@ export const SEO: React.FC<SEOProps> = ({
       {/* Schema.org JSON-LD */}
       <script type="application/ld+json">
         {JSON.stringify(schemaOrgJSONLD)}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(softwareAppJSONLD)}
       </script>
       <script type="application/ld+json">
         {JSON.stringify(websiteSchemaJSONLD)}

@@ -34,11 +34,12 @@ export const UniversityLandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-text">
-      {/* SEO: University-specific metadata + canonical URL. */}
+      {/* SEO: University-specific metadata (noindexed to prevent programmatic doorway penalties) */}
       <SEO
         title={`Attendance System for ${school.name}`}
-        description={`Presently helps ${school.shortName} run GPS-verified attendance, real-time notifications, and compliance reporting.`}
+        description={`Presently explores location-aware attendance and compliance reporting tailored for ${school.shortName}.`}
         canonicalPath={`/universities/${school.slug}`}
+        noIndex
       />
       {/* SEO: University-specific structured data. */}
       <JsonLd schema={schema} />

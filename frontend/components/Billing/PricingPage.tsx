@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../Button';
 import { useCurrentPlan, useCheckout } from '../../hooks/useBilling';
+import { SEO } from '../SEO';
 
 const FREE_FEATURES = [
   'Up to 1 course',
@@ -45,6 +46,11 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Pricing Plans for Lecturers & Institutions"
+        description="Predictable pricing for Nigerian academics: Free Starter tier for individual lecturers, ₦3,000/mo Lecturer Pro, and custom institutional campus plans."
+        canonicalPath="/pricing"
+      />
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
         <button
           onClick={() => navigate(-1)}
