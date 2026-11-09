@@ -1,209 +1,206 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { IconCircleCheck, IconArrowRight } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { IconCheck, IconArrowRight, IconBuildingBank, IconSparkles } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
-const PLANS = [
-  {
-    name: 'Starter',
-    price: 'Free',
-    period: null,
-    description: 'For individual lecturers getting started.',
-    features: [
-      '1 course',
-      'Unlimited students & sessions',
-      'Basic attendance tracking',
-      'Presently branding',
-    ],
-    cta: 'Get started',
-    href: '/register',
-    featured: false,
-  },
-  {
-    name: 'Lecturer Pro',
-    price: '₦3,000',
-    period: '/month',
-    description: 'For professional lecturers who need more.',
-    features: [
-      'Unlimited courses',
-      'Advanced analytics & insights',
-      'CSV/PDF export',
-      'AI-powered insights',
-      'No Presently branding',
-      'Priority support',
-    ],
-    cta: 'Upgrade to Pro',
-    href: '/pricing',
-    featured: true,
-  },
-  {
-    name: 'Department',
-    price: '₦200k',
-    period: '/year',
-    description: 'For departments adopting Presently institution-wide.',
-    features: [
-      'Up to 10 lecturer seats',
-      'All Pro features',
-      'Department analytics',
-      'Bulk seat management',
-      'Dedicated onboarding',
-    ],
-    cta: 'Contact sales',
-    href: '/contact',
-    featured: false,
-  },
-];
+export const LandingPricing: React.FC = () => {
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
 
-export const LandingPricing = () => {
-  const navigate = useNavigate();
+  const plans = [
+    {
+      name: 'Starter',
+      price: 'Free',
+      period: 'forever',
+      description: 'Ideal for an individual lecturer introducing digital attendance to their classroom.',
+      badge: null,
+      highlight: false,
+      features: [
+        '1 active course',
+        'Unlimited sessions and check-ins',
+        'Location-aware GPS verification',
+        'Dynamic 4-digit session PINs',
+        'Standard CSV attendance register export',
+        '1-tap lecturer manual check-in override',
+      ],
+      ctaText: 'Start Free as Lecturer',
+      ctaHref: '/register',
+    },
+    {
+      name: 'Lecturer Pro',
+      price: billingCycle === 'yearly' ? '₦30,000' : '₦3,000',
+      period: billingCycle === 'yearly' ? '/year' : '/month',
+      description: 'For active lecturers handling multiple courses and levels across semesters.',
+      badge: 'Most Popular for Academics',
+      highlight: true,
+      features: [
+        'Unlimited courses and levels',
+        'Unlimited sessions and students',
+        'Full location-aware GPS verification',
+        'Student attendance percentage analytics',
+        'Automated 75% exam threshold alerts',
+        'Advanced CSV and PDF report exports',
+        'Priority lecturer email support',
+      ],
+      ctaText: 'Get Started with Pro',
+      ctaHref: '/register',
+    },
+    {
+      name: 'Department',
+      price: '₦200,000',
+      period: '/year',
+      description: 'For academic departments standardizing attendance records across all teaching staff.',
+      badge: 'Faculty Standard',
+      highlight: false,
+      features: [
+        'Up to 10 lecturer accounts',
+        'Departmental administrator dashboard',
+        'Cross-course attendance monitoring',
+        'Automated 75% exam clearance lists',
+        'Centralized departmental CSV/Excel exports',
+        'Faculty onboarding and setup guidance',
+        'Dedicated technical support channel',
+      ],
+      ctaText: 'Inquire for Department',
+      ctaHref: '#institutions',
+    },
+  ];
 
   return (
-    <section id="pricing" className="py-40 bg-white dark:bg-surface relative overflow-hidden">
-      <div className="orb w-[1000px] h-[1000px] bg-sungold/5 -top-60 -right-60" />
-
-      <div className="max-w-[1440px] mx-auto px-8 md:px-16 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col items-center text-center mb-24"
-        >
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-10 h-px bg-sungold" />
-            <span className="text-sungold font-medium text-[11px] tracking-tight">Pricing</span>
-            <div className="w-10 h-px bg-sungold" />
-          </div>
-           <h2 className="text-[clamp(2.5rem,5vw,5rem)] tracking-[-0.04em] text-neutral-900 dark:text-neutral-50 leading-[0.9] font-medium max-w-3xl">
-             Simple, transparent<br />
-             <span className="text-neutral-400 dark:text-neutral-500 italic">pricing.</span>
-           </h2>
-           <p className="mt-6 text-xl text-neutral-500 dark:text-neutral-400 max-w-lg">
-            Start free. Upgrade when you outgrow it. No hidden fees, no surprises.
+    <section id="pricing" className="py-24 bg-white dark:bg-[#15130F] border-b border-neutral-200 dark:border-neutral-800">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+        
+        {/* Section Header */}
+        <div className="max-w-3xl mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-sungold block mb-3">
+            Transparent Pricing
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900 dark:text-white leading-[1.15] mb-6">
+            Predictable plans. Built for Nigerian academics.
+          </h2>
+          <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
+            Start completely free for individual courses. Upgrade when managing multiple academic levels or rolling out across a full department.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {PLANS.map((plan, i) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-               className={`relative flex flex-col rounded-3xl p-8 transition-all duration-300 ${
-                 plan.featured
-                   ? 'bg-[#231F0F] text-white shadow-2xl shadow-sungold/10 scale-[1.02] md:scale-110 border-2 border-sungold/30'
-                   : 'bg-neutral-50 dark:bg-surface-container-low border border-black/5 dark:border-white/5 text-neutral-900 dark:text-neutral-50 hover:border-sungold/30 hover:shadow-lg'
-               }`}
-            >
-              {plan.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-sungold px-4 py-1.5 text-[11px] font-semibold text-[#231F0F] tracking-tight">
-                    Most popular
-                  </span>
-                </div>
+        {/* Billing Cycle Switcher */}
+        <div className="flex items-center gap-3 mb-12">
+          <div className="p-1 bg-neutral-100 dark:bg-[#1E1B15] border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center">
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              className={cn(
+                "px-4 py-2 rounded-lg text-xs font-semibold transition-all",
+                billingCycle === 'monthly'
+                  ? "bg-white dark:bg-[#15130F] text-neutral-900 dark:text-white shadow-sm"
+                  : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
               )}
+            >
+              Monthly Billing
+            </button>
+            <button
+              onClick={() => setBillingCycle('yearly')}
+              className={cn(
+                "px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5",
+                billingCycle === 'yearly'
+                  ? "bg-white dark:bg-[#15130F] text-neutral-900 dark:text-white shadow-sm"
+                  : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+              )}
+            >
+              Annual Billing
+              <span className="px-1.5 py-0.5 rounded bg-sungold/20 text-charcoal-900 dark:text-sungold text-[10px] font-bold">
+                Save 17%
+              </span>
+            </button>
+          </div>
+        </div>
 
-               <h3 className={`text-2xl font-medium tracking-tight ${plan.featured ? 'text-white' : 'text-neutral-900 dark:text-neutral-50'}`}>
-                {plan.name}
-              </h3>
-               <p className={`mt-2 text-sm ${plan.featured ? 'text-white/60' : 'text-neutral-500 dark:text-neutral-400'}`}>
-                {plan.description}
-              </p>
-
-              <div className="mt-8 mb-8">
-                 <span className={`text-5xl font-medium tracking-tight ${plan.featured ? 'text-white' : 'text-neutral-900 dark:text-neutral-50'}`}>
-                  {plan.price}
-                </span>
-                {plan.period && (
-                   <span className={`text-lg ${plan.featured ? 'text-white/50' : 'text-neutral-400 dark:text-neutral-500'}`}>
-                    {plan.period}
+        {/* Pricing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          {plans.map((plan, idx) => (
+            <div
+              key={idx}
+              className={cn(
+                "rounded-2xl p-8 flex flex-col justify-between transition-all",
+                plan.highlight
+                  ? "bg-[#231F0F] text-white border-2 border-sungold shadow-xl relative"
+                  : "bg-neutral-50 dark:bg-[#1A1813] border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+              )}
+            >
+              <div>
+                {plan.badge && (
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-wider bg-sungold text-[#231F0F] px-2.5 py-0.5 rounded-full mb-4">
+                    {plan.badge}
                   </span>
                 )}
+
+                <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                <p className={cn("text-xs mb-6", plan.highlight ? "text-neutral-300" : "text-neutral-500")}>
+                  {plan.description}
+                </p>
+
+                <div className="flex items-baseline gap-1 mb-8">
+                  <span className="text-4xl font-extrabold tracking-tight font-mono">{plan.price}</span>
+                  <span className={cn("text-xs font-medium", plan.highlight ? "text-neutral-400" : "text-neutral-500")}>
+                    {plan.period}
+                  </span>
+                </div>
+
+                <div className="border-t border-neutral-200/40 dark:border-neutral-800 pt-6 mb-8">
+                  <span className={cn("text-xs font-semibold block mb-3 uppercase tracking-wider", plan.highlight ? "text-sungold" : "text-neutral-400")}>
+                    Included capabilities:
+                  </span>
+                  <ul className="space-y-3">
+                    {plan.features.map((feat, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-2.5 text-xs">
+                        <IconCheck size={16} className={cn("shrink-0 mt-0.5", plan.highlight ? "text-sungold" : "text-emerald-600")} />
+                        <span className={plan.highlight ? "text-neutral-200" : "text-neutral-700 dark:text-neutral-300"}>
+                          {feat}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
-              <ul className="space-y-3 mb-10 flex-1">
-                {plan.features.map((f) => (
-                   <li key={f} className="flex items-start gap-3">
-                     <IconCircleCheck
-                       size={18}
-                       className={`mt-0.5 shrink-0 ${
-                         plan.featured ? 'text-sungold' : 'text-sungold'
-                       }`}
-                     />
-                     <span className={`text-sm ${plan.featured ? 'text-white/80' : 'text-neutral-600 dark:text-neutral-300'}`}>
-                      {f}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={() => navigate(plan.href)}
-                 className={`flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-semibold tracking-tight transition-all duration-200 ${
-                   plan.featured
-                     ? 'bg-sungold text-[#231F0F] hover:bg-sungold/90'
-                     : 'bg-white dark:bg-surface text-neutral-900 dark:text-neutral-50 border border-black/10 dark:border-white/5 hover:border-sungold/50 hover:text-sungold shadow-sm'
-                 }`}
-              >
-                {plan.cta}
-                <IconArrowRight size={16} />
-              </button>
-            </motion.div>
+              <div>
+                <a
+                  href={plan.ctaHref}
+                  className={cn(
+                    "w-full py-3 rounded-xl text-xs font-semibold tracking-tight flex items-center justify-center gap-2 transition-all",
+                    plan.highlight
+                      ? "bg-sungold text-[#231F0F] hover:bg-sungold/90"
+                      : "bg-[#231F0F] text-white dark:bg-white dark:text-[#231F0F] hover:bg-[#231F0F]/80 dark:hover:bg-neutral-200"
+                  )}
+                >
+                  {plan.ctaText} <IconArrowRight size={15} />
+                </a>
+              </div>
+            </div>
           ))}
         </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center text-sm text-neutral-400 dark:text-neutral-500 mt-12"
-        >
-          All plans include end-to-end encryption, GPS geofencing, and NUC-compliant reporting.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
-          className="mt-20 max-w-4xl mx-auto"
-        >
-          <div className="rounded-3xl border-2 border-dashed border-sungold/30 bg-sungold/[0.03] p-10 md:p-14 text-center">
-             <h3 className="text-3xl md:text-4xl font-medium tracking-tight text-neutral-900 dark:text-neutral-50">
-              Institution-wide
-            </h3>
-             <p className="mt-4 text-lg text-neutral-500 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-              Custom pricing for universities and polytechnics rolling out Presently across multiple colleges and departments. Includes white-label branding, dedicated support, and priority compliance.
-            </p>
-            <div className="mt-10 max-w-2xl mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-left">
-                {[
-                  'Unlimited lecturer seats',
-                  'Dedicated support',
-                  'White-label branding',
-                  'NUC compliance reports',
-                  'Priority support SLA',
-                  'Custom integrations',
-                  'On-site training',
-                  'Dedicated account manager',
-                ].map((f) => (
-                  <div key={f} className="flex items-center gap-3">
-                    <IconCircleCheck size={18} className="shrink-0 text-sungold" />
-                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{f}</span>
-                  </div>
-                ))}
-              </div>
+        {/* Institution-Wide Tier Box */}
+        <div className="bg-neutral-50 dark:bg-[#1A1813] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 md:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sungold mb-2">
+              <IconBuildingBank size={18} />
+              <span>Institutional Rollout</span>
             </div>
-            <button
-              onClick={() => navigate('/contact')}
-              className="mt-10 inline-flex items-center gap-2 bg-[#231F0F] text-white px-8 py-3.5 rounded-xl text-sm font-semibold tracking-tight hover:bg-[#231F0F]/90 transition-colors"
-            >
-              Contact sales
-              <IconArrowRight size={16} />
-            </button>
+            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
+              Custom deployment for faculties & full universities.
+            </h3>
+            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              Tailored for polytechnics, colleges of education, and universities deploying across multiple colleges. Includes institutional single-sign-on (SSO), campus venue GPS mapping, dedicated on-site lecturer onboarding workshops, and service level agreements (SLAs).
+            </p>
           </div>
-        </motion.div>
+          <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+            <a
+              href="#institutions"
+              className="bg-[#231F0F] text-white hover:bg-sungold hover:text-[#231F0F] px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold tracking-tight flex items-center justify-center gap-2 transition-all"
+            >
+              Contact Institutional Sales <IconArrowRight size={16} />
+            </a>
+          </div>
+        </div>
+
       </div>
     </section>
   );
