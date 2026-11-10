@@ -65,11 +65,6 @@ export const NotFound: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         Home
                     </Button>
                 </div>
-                                <div className="text-sm mt-3">
-                                    <Link to="/universities" className="text-primary hover:underline">
-                                        Browse University Pages
-                                    </Link>
-                                </div>
             </div>
             
             <div className="mt-12 pt-8 border-t border-outline w-full flex justify-between items-center text-xs text-textMuted font-mono">

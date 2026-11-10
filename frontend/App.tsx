@@ -22,8 +22,6 @@ import { RestrictedAccountModal } from './components/Auth/RestrictedAccountModal
 
 import { ServiceWorkerUpdateNotifier } from './components/ServiceWorkerUpdateNotifier';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
-import { UniversitiesPage } from './components/universities/UniversitiesPage';
-import { UniversityLandingPage } from './components/universities/UniversityLandingPage';
 import { BlogListPage } from './components/blog/BlogListPage';
 import { BlogPostPage } from './components/blog/BlogPostPage';
 
@@ -96,7 +94,6 @@ const PUBLIC_ROUTE_PREFIXES = [
   '/volunteers',
   '/features',
   '/how-it-works',
-  '/universities',
   '/blog',
   '/login',
   '/register',
@@ -358,8 +355,6 @@ const AppContent: React.FC = () => {
           <Route path="/volunteers" element={<VolunteersPage />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/universities" element={<UniversitiesPage />} />
-          <Route path="/universities/:slug" element={<UniversityLandingPage />} />
           <Route path="/blog" element={<BlogListPage />} />
           <Route path="/blog/page/:page" element={<BlogListPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
